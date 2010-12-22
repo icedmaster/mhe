@@ -16,6 +16,7 @@
 					<Add option="-g" />
 					<Add directory="../../include/utils" />
 					<Add directory="../../include" />
+					<Add directory="../../include/test" />
 				</Compiler>
 			</Target>
 		</Build>
@@ -23,6 +24,7 @@
 			<Add option="-Wall" />
 		</Compiler>
 		<Unit filename="../../include/utils/argparser.hpp" />
+		<Unit filename="../../src/main.cpp" />
 		<Unit filename="../../src/utils/argparser.cpp" />
 		<Unit filename="../../tests/argparser_test.cpp" />
 		<Extensions>

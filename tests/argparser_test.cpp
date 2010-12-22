@@ -1,7 +1,8 @@
 #include <iostream>
+#include "argparser_test.hpp"
 #include "utils/argparser.hpp"
 
-int main(int argc, char **argv)
+int argparser_test(int argc, char **argv)
 {
     mhe::arg_parser ap(argc, argv);
     ap.add_arg("-s", mhe::arg_parser::str_type);
