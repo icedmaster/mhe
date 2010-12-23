@@ -18,15 +18,22 @@
 					<Add directory="../../include" />
 					<Add directory="../../include/test" />
 				</Compiler>
+				<Linker>
+					<Add library="/usr/lib/libboost_date_time-mt.a" />
+				</Linker>
 			</Target>
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
 		<Unit filename="../../include/utils/argparser.hpp" />
+		<Unit filename="../../src/camera.cpp" />
 		<Unit filename="../../src/main.cpp" />
 		<Unit filename="../../src/utils/argparser.cpp" />
+		<Unit filename="../../src/utils/logutils.cpp" />
 		<Unit filename="../../tests/argparser_test.cpp" />
+		<Unit filename="../../tests/log_test.cpp" />
+		<Unit filename="../../tests/misc_test.cpp" />
 		<Extensions>
 			<code_completion>
 				<search_path add="../../include" />
