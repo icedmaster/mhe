@@ -33,11 +33,13 @@
 		</Compiler>
 		<Unit filename="../../include/camera.hpp" />
 		<Unit filename="../../include/icamera.hpp" />
+		<Unit filename="../../include/irenderable.hpp" />
 		<Unit filename="../../include/mhe_gl.hpp" />
 		<Unit filename="../../include/utils/argparser.hpp" />
 		<Unit filename="../../include/utils/utils.hpp" />
 		<Unit filename="../../include/vector3d.hpp" />
 		<Unit filename="../../src/camera.cpp" />
+		<Unit filename="../../src/cube.cpp" />
 		<Unit filename="../../src/glwindow.cpp" />
 		<Unit filename="../../src/main.cpp" />
 		<Unit filename="../../src/utils/argparser.cpp" />

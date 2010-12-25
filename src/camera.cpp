@@ -26,10 +26,16 @@ void Camera::rotate_impl(const v3d& v, float ang)
     else if (v == z_axis)
         z_ang += ang;
     else return;    // not implemented yet
+}
 
-    /*
-    utils::truncate<float>(x_ang, 0, 360);
-    utils::truncate<float>(y_ang, 0, 360);
-    utils::truncate<float>(z_ang, 0, 360);
-    */
+
+void Camera::move_impl(const v3d& v, float dist)
+{
+    if (v == x_axis)
+        pos.set_x(pos.x() + dist);
+    else if (v == y_axis)
+        pos.set_y(pos.y() + dist);
+    else if (v == z_axis)
+        pos.set_z(pos.z() + dist);
+    else return;    // not implemented yet
 }

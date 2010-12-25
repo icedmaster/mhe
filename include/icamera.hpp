@@ -14,6 +14,7 @@ namespace mhe
             virtual const v3d& get_direction() const = 0;
 
             virtual void rotate_impl(const v3d& v, float ang) = 0;
+            virtual void move_impl(const v3d& v, float dist) = 0;
             virtual void update_impl() = 0;
         public:
             // accessors
@@ -40,6 +41,11 @@ namespace mhe
             void rotate(const v3d& v, float ang)
             {
                 rotate_impl(v, ang);
+            }
+
+            void move(const v3d& v, float dist)
+            {
+                move_impl(v, dist);
             }
 
             void update()

@@ -3,12 +3,15 @@
 #include "argparser.hpp"
 #include "logutils.hpp"
 #include "glwindow.hpp"
+#include "irenderable.hpp"
+#include "cube.hpp"
 #include <GL/gl.h>
 
 namespace
 {
     void render();
     mhe::iCamera* m_camera = 0;  // main camera
+    mhe::Cube cube;
 };
 
 int misc_test(int argc, char **argv)
@@ -69,6 +72,23 @@ int misc_test(int argc, char **argv)
                 m_camera->rotate(mhe::y_axis, 0.5);
             else if (event.key.keysym.sym == SDLK_LEFT)
                 m_camera->rotate(mhe::y_axis, -0.5);
+            else if (event.key.keysym.sym == SDLK_q)
+                m_camera->move(mhe::x_axis, 0.05);
+            else if (event.key.keysym.sym == SDLK_a)
+                m_camera->move(mhe::x_axis, -0.05);
+            else if (event.key.keysym.sym == SDLK_w)
+                m_camera->move(mhe::y_axis, 0.05);
+            else if (event.key.keysym.sym == SDLK_s)
+                m_camera->move(mhe::y_axis, -0.05);
+            else if (event.key.keysym.sym == SDLK_e)
+                m_camera->move(mhe::z_axis, 0.05);
+            else if (event.key.keysym.sym == SDLK_d)
+                m_camera->move(mhe::z_axis, -0.05);
+
+            else if (event.key.keysym.sym == SDLK_p)    // write current camera parameters
+                     l.printf("x: %f y: %f z: %f", m_camera->getPosition().x(),
+                                              m_camera->getPosition().y(),
+                                              m_camera->getPosition().z());
         }
         else if (event.type == SDL_KEYDOWN)
         {
@@ -112,6 +132,9 @@ namespace
         glVertex3f(0,0,0);
         glVertex3f(0, 0, 10);
         glEnd();
+
+        glColor3f(1, 1, 1);
+        cube.draw();
 
         glFlush();
         SDL_GL_SwapBuffers();

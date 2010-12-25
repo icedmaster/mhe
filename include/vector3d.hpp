@@ -55,6 +55,21 @@ namespace mhe
                 return v_[2];
             }
 
+            inline void set_x(float x)
+            {
+                v_[0] = x;
+            }
+
+            inline void set_y(float y)
+            {
+                v_[1] = y;
+            }
+
+            inline void set_z(float z)
+            {
+                v_[2] = z;
+            }
+
             float length() const
             {
                 return sqrt((v_[0] * v_[0]) + (v_[1] * v_[1]) + (v_[2] * v_[2]));

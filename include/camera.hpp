@@ -33,6 +33,7 @@ namespace mhe
             }
 
             void rotate_impl(const v3d& v, float ang);
+            void move_impl(const v3d& v, float dist);
             void update_impl();
         public:
             Camera() :
