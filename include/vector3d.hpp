@@ -15,41 +15,41 @@ namespace mhe
                 // create NULL vector
                 v_[0] = v_[1] = v_[2] = 0.0;
             }
-            
+
             v3d(float x, float y, float z)
             {
                 v_[0] = x; v_[1] = y; v_[2] = z;
             }
-            
+
             v3d(const v3d &v)
             {
                 v_[0] = v.v_[0];
                 v_[1] = v.v_[1];
                 v_[2] = v.v_[2];
             }
-            
+
             ~v3d() {} // do nothing
-            
+
             inline void set(float v)
             {
                 v_[0] = v_[1] = v_[2] = v;
             }
-            
+
             inline void set(float x, float y, float z)
             {
                 v_[0] = x; v_[1] = y; v_[2] = z;
             }
-            
+
             inline float x() const
             {
                 return v_[0];
             }
-            
+
             inline float y() const
             {
                 return v_[1];
             }
-            
+
             inline float z() const
             {
                 return v_[2];
@@ -64,17 +64,17 @@ namespace mhe
             {
                 *this *= (1 / length());
             }
-            
+
             const float* get() const
             {
                 return v_;
             }
-            
-            inline bool operator== (const v3d& v)
+
+            inline bool operator== (const v3d& v) const
             {
                 return ((v_[0] == v.v_[0]) && (v_[1] == v.v_[1]) && (v_[2] == v.v_[2])) ? true : false;
             }
-            
+
             inline bool operator!= (const v3d& v)
             {
                 return ((v_[0] != v.v_[0]) || (v_[1] != v.v_[1]) || (v_[2] != v.v_[2])) ? true : false;
@@ -125,12 +125,12 @@ namespace mhe
                 v_[0] += v.v_[0]; v_[1] += v.v_[1]; v_[2] += v.v_[2];
                 return *this;
             }
-            
+
             v3d& operator^ (const v3d& v)
             {
                 return cross(v);
             }
-            
+
             v3d& cross(const v3d& v)
             {
                 v_[0] = v_[1] * v.v_[2] - v_[2] * v.v_[1];
@@ -169,7 +169,7 @@ namespace mhe
                 v_[0] = nx; v_[1] = ny; v_[2] = nz;
             }
     };
-    
+
     inline v3d cross(const v3d& v1, const v3d& v2)
     {
         v3d v(v1.y() * v2.z() - v1.z() * v2.y(),
@@ -177,6 +177,10 @@ namespace mhe
               v1.x() * v2.y() - v1.y() * v2.x());
         return v;
     }
+
+    const v3d x_axis = v3d(1.0, 0.0, 0.0);
+    const v3d y_axis = v3d(0.0, 1.0, 0.0);
+    const v3d z_axis = v3d(0.0, 0.0, 1.0);
 };
 
 #endif

@@ -7,15 +7,45 @@ namespace mhe
 {
     class iCamera
     {
-        public:
-            //virtual ~iCamera() = 0;
-            // accessors
-            virtual void setPosition(const v3d& v) = 0;
-            virtual const v3d& getPosition() const = 0;
-            virtual void setDirection(const v3d& d) = 0;
-            virtual const v3d& getDirection() const = 0;
+        private:
+            virtual void set_position(const v3d& v) = 0;
+            virtual const v3d& get_position() const = 0;
+            virtual void set_direction(const v3d& d) = 0;
+            virtual const v3d& get_direction() const = 0;
 
-            virtual void update() = 0;
+            virtual void rotate_impl(const v3d& v, float ang) = 0;
+            virtual void update_impl() = 0;
+        public:
+            // accessors
+            void setPosition(const v3d& v)
+            {
+                set_position(v);
+            }
+
+            const v3d& getPosition() const
+            {
+                return get_position();
+            }
+
+            void setDirection(const v3d& d)
+            {
+                set_direction(d);
+            }
+
+            const v3d& getDirection() const
+            {
+                return get_direction();
+            }
+
+            void rotate(const v3d& v, float ang)
+            {
+                rotate_impl(v, ang);
+            }
+
+            void update()
+            {
+                update_impl();
+            }
     };
 };
 

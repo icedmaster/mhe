@@ -10,40 +10,48 @@ namespace mhe
         private:
             v3d pos;
             v3d dir;
+            float x_ang, y_ang, z_ang;
+
+            void set_position(const v3d& v)
+            {
+                pos = v;
+            }
+
+            const v3d& get_position() const
+            {
+                return pos;
+            }
+
+            void set_direction(const v3d& d)
+            {
+                dir = d;
+            }
+
+            const v3d& get_direction() const
+            {
+                return dir;
+            }
+
+            void rotate_impl(const v3d& v, float ang);
+            void update_impl();
         public:
-            Camera()
+            Camera() :
+                x_ang(0),
+                y_ang(0),
+                z_ang(0)
             {
             }
 
             Camera(const v3d& position, const v3d& direction) :
                 pos(position),
-                dir(direction)
+                dir(direction),
+                x_ang(0),
+                y_ang(0),
+                z_ang(0)
             {
             }
 
             ~Camera() {}
-
-            void setPosition(const v3d& p)
-            {
-                pos = p;
-            }
-
-            const v3d& getPosition() const
-            {
-                return pos;
-            }
-
-            void setDirection(const v3d& d)
-            {
-                dir = d;
-            }
-
-            const v3d& getDirection() const
-            {
-                return dir;
-            }
-
-            void update();
     };
 };
 

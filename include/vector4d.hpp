@@ -39,6 +39,11 @@ namespace mhe
             {
                 v_[0] = x; v_[1] = y; v_[2] = z; v_[3] = w;
             }
+
+			inline void set(const v3d& v, float w)
+			{
+				v_[0] = v.x(); v_[1] = v.y(); v_[2] = v.z(); v_[3] = w;
+			}
             
             inline float x() const
             {
@@ -80,10 +85,35 @@ namespace mhe
                 return v_[3];
             }
 
+			inline void set_x(float x)
+			{
+				v_[0] = x;
+			}
+
+			inline void set_y(float y)
+			{
+				v_[1] = y;
+			}
+
+			inline void set_z(float z)
+			{
+				v_[2] = z;
+			}
+
+			inline void set_w(float w)
+			{
+				v_[3] = w;
+			}
+
             const float* get() const
             {
                 return v_;
             }
+
+			const v3d& get() const
+			{
+				return v3d(v_[0], v_[1], v_[2]);
+			}
             
             inline bool operator== (const v4d& v)
             {
@@ -100,6 +130,12 @@ namespace mhe
                 v_[0] = v.v_[0]; v_[1] = v.v_[1]; v_[2] = v.v_[2]; v_[3] = v.v_[3];
                 return *this;
             }
+
+			inline v4d& operator= (const v3d& v)
+			{
+                v_[0] = v.x(); v_[1] = v.y(); v_[2] = v.z();
+                return *this;
+			}							
 
             v4d& operator/= (const float n)
             {

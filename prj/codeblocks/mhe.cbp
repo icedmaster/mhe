@@ -19,15 +19,26 @@
 					<Add directory="../../include/test" />
 				</Compiler>
 				<Linker>
+					<Add option="-L/usr/local/lib -Wl,-rpath,/usr/local/lib -lSDL -lpthread -lm -ldl -lpthread" />
 					<Add library="/usr/lib/libboost_date_time-mt.a" />
+					<Add library="/usr/local/lib/libSDLmain.a" />
+					<Add library="/usr/local/lib/libSDL.a" />
+					<Add library="/usr/lib/libpthread.a" />
+					<Add library="/usr/lib/fglrx/libGL.so" />
 				</Linker>
 			</Target>
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="../../include/camera.hpp" />
+		<Unit filename="../../include/icamera.hpp" />
+		<Unit filename="../../include/mhe_gl.hpp" />
 		<Unit filename="../../include/utils/argparser.hpp" />
+		<Unit filename="../../include/utils/utils.hpp" />
+		<Unit filename="../../include/vector3d.hpp" />
 		<Unit filename="../../src/camera.cpp" />
+		<Unit filename="../../src/glwindow.cpp" />
 		<Unit filename="../../src/main.cpp" />
 		<Unit filename="../../src/utils/argparser.cpp" />
 		<Unit filename="../../src/utils/logutils.cpp" />
