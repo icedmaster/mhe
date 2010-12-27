@@ -1,4 +1,4 @@
-[2010-Dec-24 00:27:28] Log started
+[2010-Dec-27 22:55:14] Log started
 
-[2010-Dec-24 00:27:28] first test string
-[2010-Dec-24 00:27:28] test string #2
+[2010-Dec-27 22:55:14] first test string
+[2010-Dec-27 22:55:14] test string #2

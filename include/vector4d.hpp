@@ -11,15 +11,15 @@ namespace mhe
             float v_[4];
         public:
             v4d()
-            {    
-                v_[0] = 0.0;  v_[1] = 0.0; v_[2] = 0.0; v_[3] = 0.0;            
+            {
+                v_[0] = 0.0;  v_[1] = 0.0; v_[2] = 0.0; v_[3] = 0.0;
             }
-            
-            v4d(float x, float y, float z, float w)                
-            {                
-                v_[0] = x;  v_[1] = y; v_[2] = z; v_[3] = w;                
+
+            v4d(float x, float y, float z, float w)
+            {
+                v_[0] = x;  v_[1] = y; v_[2] = z; v_[3] = w;
             }
-            
+
             v4d(const v4d &v)
             {
                 v_[0] = v.v_[0];
@@ -27,14 +27,14 @@ namespace mhe
                 v_[2] = v.v_[2];
                 v_[3] = v.v_[3];
             }
-            
+
             ~v4d() {} // do nothing
-            
+
             inline void set(float v)
             {
                 v_[0] = v_[1] = v_[2] = v_[3] = v;
             }
-            
+
             inline void set(float x, float y, float z, float w)
             {
                 v_[0] = x; v_[1] = y; v_[2] = z; v_[3] = w;
@@ -44,42 +44,42 @@ namespace mhe
 			{
 				v_[0] = v.x(); v_[1] = v.y(); v_[2] = v.z(); v_[3] = w;
 			}
-            
+
             inline float x() const
             {
                 return v_[0];
             }
-            
+
             inline float y() const
             {
                 return v_[1];
             }
-            
+
             inline float z() const
             {
                 return v_[2];
             }
-            
+
             inline float w() const
             {
                 return v_[3];
             }
-            
+
             inline float r() const
             {
                 return v_[0];
             }
-            
+
             inline float g() const
             {
                 return v_[1];
             }
-            
+
             inline float b() const
             {
                 return v_[2];
             }
-            
+
             inline float a() const
             {
                 return v_[3];
@@ -110,16 +110,16 @@ namespace mhe
                 return v_;
             }
 
-			const v3d& get() const
-			{
-				return v3d(v_[0], v_[1], v_[2]);
-			}
-            
+            inline void as_v3d(v3d& v) const
+            {
+                v.set(v_[0], v_[1], v_[2]);
+            }
+
             inline bool operator== (const v4d& v)
             {
                 return ((v_[0] == v.v_[0]) && (v_[1] == v.v_[1]) && (v_[2] == v.v_[2]) && (v_[3] == v.v_[3])) ? true : false;
             }
-            
+
             inline bool operator!= (const v4d& v)
             {
                 return ((v_[0] != v.v_[0]) || (v_[1] != v.v_[1]) || (v_[2] != v.v_[2]) || (v_[3] != v.v_[3])) ? true : false;
@@ -135,7 +135,7 @@ namespace mhe
 			{
                 v_[0] = v.x(); v_[1] = v.y(); v_[2] = v.z();
                 return *this;
-			}							
+			}
 
             v4d& operator/= (const float n)
             {
@@ -177,8 +177,8 @@ namespace mhe
             {
                 v_[0] += v.v_[0]; v_[1] += v.v_[1]; v_[2] += v.v_[2]; v_[3] += v.v_[3];
                 return *this;
-            }                            
-    };     
+            }
+    };
 
     typedef v4d colorf;
 
@@ -186,7 +186,7 @@ namespace mhe
     const colorf cfBlack = colorf(0, 0, 0, 0);
     const colorf cfRed   = colorf(1.0, 0, 0, 0);
     const colorf cfGreen = colorf(0, 1.0, 0, 0);
-    const colorf cfBlue  = colorf(0, 0, 1.0, 0);    
+    const colorf cfBlue  = colorf(0, 0, 1.0, 0);
 };
 
 #endif

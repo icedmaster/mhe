@@ -58,6 +58,7 @@ namespace mhe
                 v3d v1 = (v[1] - v[0]);
                 v3d v2 = (v[2] - v[0]);
                 n = cross(v1, v2);
+                n.normalize();
             }
 
             void draw_impl()
@@ -99,9 +100,10 @@ namespace mhe
 
             void calc_normal()
             {
-                v3d v1 = (v[1] - v[0]);
-                v3d v2 = (v[2] - v[0]);
+                v3d v1 = (v[0] - v[1]);
+                v3d v2 = (v[1] - v[2]);
                 n = cross(v1, v2);
+                n.normalize();
             }
 
             void draw_impl()

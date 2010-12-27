@@ -5,6 +5,7 @@
 #include "glwindow.hpp"
 #include "irenderable.hpp"
 #include "cube.hpp"
+#include "light.hpp"
 #include <GL/gl.h>
 
 namespace
@@ -12,6 +13,7 @@ namespace
     void render();
     mhe::iCamera* m_camera = 0;  // main camera
     mhe::Cube cube;
+    mhe::iLight* light = 0;
 };
 
 int misc_test(int argc, char **argv)
@@ -20,6 +22,7 @@ int misc_test(int argc, char **argv)
     boost::shared_ptr<mhe::stdlog> sl(new mhe::stdlog);
     boost::shared_ptr<mhe::filelog> fl(new mhe::filelog);
     l.add(sl);
+    fl->open("log.txt");
     l.add(fl);
 
     mhe::arg_parser ap(argc, argv);
@@ -44,8 +47,12 @@ int misc_test(int argc, char **argv)
 
     mhe::GLWindow window(w, h, bpp);
 
+    //cube.invertNormals();
     // initialize OpenGL
     glEnable(GL_DEPTH);
+    glEnable(GL_LIGHTING);
+    glDepthFunc(GL_LEQUAL);
+    glEnable(GL_NORMALIZE);
 
     // temporary code
     glMatrixMode(GL_PROJECTION);
@@ -57,6 +64,14 @@ int misc_test(int argc, char **argv)
     glViewport(0, 0, w, h);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+
+    // create Light
+    light = new mhe::Light(1);
+    light->setPosition(mhe::v3d(0.0, 0.5, 2.0));
+    light->setDiffuse(mhe::colorf(0.0, 1.0, 0.0, 0.0));
+    light->enable();
+    light->update();
+    glLightf(GL_LIGHT0, GL_SPOT_EXPONENT, 10);
 
     m_camera = new mhe::Camera(mhe::v3d(0.5, 0.5, 2), mhe::v3d(0, 0, 0));
 
@@ -103,6 +118,7 @@ int misc_test(int argc, char **argv)
     l.write("Misc test completed");
     SDL_Quit();
     delete m_camera;
+    delete light;
     return 0;
 }
 
@@ -114,6 +130,7 @@ namespace
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         m_camera->update();
+        //light->update();
 
         glColor3f(1.0, 0.0, 0.0);
         glBegin(GL_LINES);

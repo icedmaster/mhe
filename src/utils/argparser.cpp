@@ -114,7 +114,7 @@ bool arg_parser::process()
 	{
 		std::string s = argv_[i];
 		// try to get argument from string "arg=val"
-		cmn::uint pos = s.find_first_of("=");
+		size_t pos = s.find_first_of("=");
 		if (pos != std::string::npos)
 		{
 			if ( pos == (s.length() - 1) )	// incorrect string like "--abc="

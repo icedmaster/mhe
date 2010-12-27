@@ -6,7 +6,7 @@
 
 namespace mhe
 {
-    
+
     class Cube : public iRenderable
     {
         private:
@@ -14,7 +14,7 @@ namespace mhe
             v3d rh_;
             poly4d faces[6];
 
-            void createPolygons(); 
+            void createPolygons();
 
 	    void draw_impl();
 
@@ -27,13 +27,19 @@ namespace mhe
             {
                 createPolygons();
             }
-            
+
             Cube(const v3d& ll, const v3d& rh) : ll_(ll), rh_(rh)
             {
                 createPolygons();
             }
+
+            void invertNormals()
+            {
+                for (int i = 0; i < 6; ++i)
+                    faces[i].invertNormal();
+            }
     };
-    
+
 };
 
 #endif
