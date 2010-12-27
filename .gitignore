@@ -5,4 +5,6 @@
 /prj/codeblocks/mhe.layout.bak
 *.bak
 *~*
+*log*
+*.txt
 

@@ -1,6 +1,0 @@
-[2010-Dec-28 00:10:23] Log started
-
-[2010-Dec-28 00:10:23] Using default command line parameters
-
-[2010-Dec-28 00:10:23] Width: 800 Height:600
-[2010-Dec-28 00:10:38] Misc test completed
