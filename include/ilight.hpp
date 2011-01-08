@@ -7,7 +7,8 @@ namespace mhe
 {
 	enum LightType
 	{
-		LightDirected
+		LightDirected,
+		LightDiffused
 	};
 
 	class iLight
@@ -110,6 +111,7 @@ namespace mhe
 				return get_light_type();
 			}
 	};
+
 };
 
 #endif

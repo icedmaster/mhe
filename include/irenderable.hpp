@@ -100,15 +100,15 @@ namespace mhe
 
             void calc_normal()
             {
-                v3d v1 = (v[0] - v[1]);
-                v3d v2 = (v[1] - v[2]);
+                v3d v1 = (v[2] - v[1]);
+                v3d v2 = (v[1] - v[0]);
                 n = cross(v1, v2);
                 n.normalize();
             }
 
             void draw_impl()
             {
-                glBegin(GL_POLYGON);
+                glBegin(GL_QUADS);
                 glNormal3fv(n.get());
                 glVertex3fv(v[0].get());
                 glVertex3fv(v[1].get());
@@ -129,6 +129,11 @@ namespace mhe
             poly4d(const v3d& v0, const v3d& v1, const v3d& v2, const v3d& v3)
             {
                 set(v0, v1, v2, v3);
+            }
+
+            const v3d& getNormal() const
+            {
+                return n;
             }
 
             void invertNormal()

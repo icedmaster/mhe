@@ -3,6 +3,7 @@
 
 //#define ARGPARSER_TEST
 //#define LOG_TEST
-#define MISC_TEST
+//#define MISC_TEST
+#define TEXTURE_TEST
 
 #endif

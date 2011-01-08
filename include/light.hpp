@@ -104,6 +104,11 @@ namespace mhe
 			Light(const Light& l);
 
 	};
+
+	inline void setGlobalAmbient(const colorf& a)
+	{
+	    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, a.get());
+	}
 };
 
 #endif

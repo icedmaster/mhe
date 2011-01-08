@@ -26,9 +26,9 @@ void Cube::createPolygons()
                   v3d(ll_.x(), ll_.y(), ll_.z()) );
     // top
     faces[4].set( v3d(ll_.x(), rh_.y(), ll_.z()),
-                  v3d(rh_.x(), rh_.y(), ll_.z()),
+                  v3d(ll_.x(), rh_.y(), rh_.z()),
                   v3d(rh_.x(), rh_.y(), rh_.z()),
-                  v3d(ll_.x(), rh_.y(), rh_.z()) );
+                  v3d(rh_.x(), rh_.y(), ll_.z()) );
     // bottom
     faces[5].set( v3d(ll_.x(), ll_.y(), ll_.z()),
                   v3d(rh_.x(), ll_.y(), ll_.z()),

@@ -12,6 +12,10 @@
     #include "misc_test.hpp"
 #endif
 
+#ifdef TEXTURE_TEST
+    #include "texture_test.hpp"
+#endif
+
 int main(int argc, char **argv)
 {
     #ifdef ARGPARSER_TEST
@@ -24,6 +28,10 @@ int main(int argc, char **argv)
 
     #ifdef MISC_TEST
     return misc_test(argc, argv);
+    #endif
+
+    #ifdef TEXTURE_TEST
+    return texture_test(argc, argv);
     #endif
 
     return 0;

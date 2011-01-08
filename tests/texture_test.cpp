@@ -5,28 +5,26 @@
 #include "glwindow.hpp"
 #include "irenderable.hpp"
 #include "cube.hpp"
-#include "light.hpp"
-#include "material.hpp"
 #include "mhe_gl.hpp"
+#include "texture.hpp"
+#include "bmp_image.hpp"
 #include <boost/scoped_ptr.hpp>
 
 namespace
 {
     void render();
     mhe::iCamera* m_camera = 0;  // main camera
-    mhe::Cube cube(mhe::v3d(-2, 0, 1), mhe::v3d(2, 2, -1));
-    mhe::iLight* light = 0;
-    mhe::iLight* light1 = 0;
-    mhe::iLight* light2 = 0;
+    mhe::Cube cube;
+    mhe::iTexture *t = 0;
 };
 
-int misc_test(int argc, char **argv)
+int texture_test(int argc, char **argv)
 {
     mhe::mixlog l;
     boost::shared_ptr<mhe::stdlog> sl(new mhe::stdlog);
     boost::shared_ptr<mhe::filelog> fl(new mhe::filelog);
     l.add(sl);
-    fl->open("log.txt");
+    fl->open("text_log.txt");
     l.add(fl);
 
     mhe::arg_parser ap(argc, argv);
@@ -73,7 +71,8 @@ int misc_test(int argc, char **argv)
     // initialize OpenGL
     glEnable(GL_DEPTH);
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_LIGHTING);
+    glEnable(GL_TEXTURE_2D);
+    //glEnable(GL_LIGHTING);
     glDepthFunc(GL_LEQUAL);
     //glEnable(GL_AUTO_NORMAL);
     //glEnable(GL_NORMALIZE);
@@ -90,32 +89,18 @@ int misc_test(int argc, char **argv)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    mhe::setGlobalAmbient(mhe::colorf(0.3, 0.3, 0.3, 1));
-
-    // create Light
-    light = new mhe::Light(1, mhe::LightDirected);
-    light->setPosition(mhe::v3d(0.0, 3.0, 0.0));
-    light->setDirection(mhe::v3d(0.0, -1.0, 0.0));
-    light->setDiffuse(mhe::colorf(0.0, 1.0, 0.0, 1.0));
-    light->enable();
-    light->update();
-
-    light1 = new mhe::Light();
-    light1->setPosition(mhe::v3d(0.0, 0.0, 4));
-    light1->setDirection(mhe::v3d(0, 0, 0));
-    light1->setDiffuse(mhe::colorf(1.0, 0.0, 1.0, 1.0));
-    light1->enable();
-    light1->update();
-
-    light2 = new mhe::Light(2, mhe::LightDiffused);
-    light2->setPosition(mhe::v3d(4.0, 0.0, 0));
-    light2->setDirection(mhe::v3d(-1, 0, 0));
-    light2->setDiffuse(mhe::colorf(0.0, 0.0, 1.0, 1.0));
-    light2->enable();
-    light2->update();
-
     m_camera = new mhe::Camera(mhe::v3d(0.5, 0.5, 2), mhe::v3d(0, 0, 0));
     m_camera->update();
+
+    t = new mhe::Texture();
+    boost::shared_ptr<mhe::Image> im(new mhe::bmp_image);
+    if (!im->load("halo.bmp"))
+    {
+        l.write("Can't open texture image");
+        return 1;
+    }
+    t->setImage(im);
+    l.printf("Texture index: %u", t->id());
 
     SDL_Event event;
     for  (;;)
@@ -160,7 +145,7 @@ int misc_test(int argc, char **argv)
     l.write("Misc test completed");
     SDL_Quit();
     delete m_camera;
-    delete light;
+    //delete light;
     return 0;
 }
 
@@ -191,18 +176,18 @@ namespace
         glVertex3f(0, 0, 10);
         glEnd();
 
-        boost::scoped_ptr<mhe::iMaterial> m(new mhe::Material);
-        m->setDiffuse(mhe::FRONT_AND_BACK_FACE, mhe::colorf(1.0, 1.0, 1.0, 1));
-        m->update();
-        cube.draw();
-        mhe::poly4d p = cube.top();
+        //cube.draw();
+        mhe::poly4d p = cube.front();
 
-        //glColor3f(1, 0, 0);
+        glColor3f(1, 1, 1);
         //p.draw();
-
-        light->update();
-        light1->update();
-        light2->update();
+        glBindTexture(GL_TEXTURE_2D, t->id());
+        glBegin(GL_QUADS);
+        glTexCoord2f(0.0, 0.0); glVertex3f(0.0, 0.0, 0.0);
+        glTexCoord2f(0.0, 1.0); glVertex3f(0.0, 1.0, 0.0);
+        glTexCoord2f(1.0, 1.0); glVertex3f(1.0, 1.0, 0.0);
+        glTexCoord2f(1.0, 0.0); glVertex3f(1.0, 0.0, 0.0);
+        glEnd();
 
         //m_camera->update();
 

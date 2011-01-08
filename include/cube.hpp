@@ -38,6 +38,36 @@ namespace mhe
                 for (int i = 0; i < 6; ++i)
                     faces[i].invertNormal();
             }
+
+            const poly4d& front() const
+            {
+                return faces[0];
+            }
+
+            const poly4d& back() const
+            {
+                return faces[2];
+            }
+
+            const poly4d& top() const
+            {
+                return faces[4];
+            }
+
+            const poly4d& bottom() const
+            {
+                return faces[5];
+            }
+
+            const poly4d& left() const
+            {
+                return faces[3];
+            }
+
+            const poly4d& right() const
+            {
+                return faces[1];
+            }
     };
 
 };
