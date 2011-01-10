@@ -2,6 +2,7 @@
 #define _ITEXTURE_HPP_
 
 #include "image.hpp"
+#include "geom.hpp"
 #include <map>
 #include <boost/shared_ptr.hpp>
 
@@ -24,14 +25,16 @@ namespace mhe
 		private:
 			virtual void set_image(const boost::shared_ptr<Image>&, StoreType, FilterType) = 0;	// load image data to videobuffer
 			virtual void clear_impl() = 0;
-			virtual void set_u_impl(float) = 0;
-			virtual void set_v_impl(float) = 0;
-			virtual float get_u() const = 0;
-			virtual float get_v() const = 0;
 			virtual void set_filter(FilterType) = 0;
 			virtual cmn::uint get_id() const = 0;
 			virtual void set_name(const std::string&) = 0;
 			virtual const std::string& get_name() const = 0;
+			virtual void prepare_impl() {}  // not need overload
+			virtual void clean_impl() {}
+
+			virtual void set_coord(cmn::uint, const v2d&) = 0;
+			virtual const v2d& get_coord(cmn::uint) const = 0;
+			virtual void draw_impl(cmn::uint pos) = 0;
 		public:
 			void setImage(const boost::shared_ptr<Image>& im, StoreType st = NotStore, FilterType ft = Nearest)
 			{
@@ -41,26 +44,6 @@ namespace mhe
 			void clear()
 			{
 				clear_impl();
-			}
-
-			void set_u(float u)
-			{
-				set_u_impl(u);
-			}
-
-			void set_v(float v)
-			{
-				set_v_impl(v);
-			}
-
-			float u() const
-			{
-				return get_u();
-			}
-
-			float v() const
-			{
-				return get_v();
 			}
 
 			void setFilter(FilterType ft)
@@ -81,6 +64,39 @@ namespace mhe
 			const std::string& getName() const
 			{
 				return get_name();
+			}
+
+			// prepare texture before render it
+			void prepare()
+			{
+			    prepare_impl();
+			}
+
+			// cleaning after texture using
+			void clean()
+			{
+			    clean_impl();
+			}
+
+			void draw_at(cmn::uint pos)
+			{
+			    if (pos > 3)
+                    throw mhe::exception("Incorrect vertex");
+                draw_impl(pos);
+			}
+
+			void setCoord(cmn::uint pos, const v2d& c)
+			{
+			    if (pos > 3)
+                    throw mhe::exception("Incorrect vectex");
+			    set_coord(pos, c);
+			}
+
+			const v2d& getCoord(cmn::uint pos) const
+			{
+			    if (pos > 3)
+                    throw mhe::exception("Incorrect vertex");
+                return get_coord(pos);
 			}
 	};
 

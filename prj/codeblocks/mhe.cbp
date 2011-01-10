@@ -35,6 +35,7 @@
 		</Compiler>
 		<Unit filename="../../include/bmp_image.hpp" />
 		<Unit filename="../../include/camera.hpp" />
+		<Unit filename="../../include/extension.hpp" />
 		<Unit filename="../../include/geom.hpp" />
 		<Unit filename="../../include/icamera.hpp" />
 		<Unit filename="../../include/ilight.hpp" />
@@ -45,6 +46,7 @@
 		<Unit filename="../../include/light.hpp" />
 		<Unit filename="../../include/material.hpp" />
 		<Unit filename="../../include/mhe_gl.hpp" />
+		<Unit filename="../../include/multitexture.hpp" />
 		<Unit filename="../../include/test/texture_test.hpp" />
 		<Unit filename="../../include/texture.hpp" />
 		<Unit filename="../../include/utils/argparser.hpp" />
@@ -53,6 +55,7 @@
 		<Unit filename="../../src/bmp_image.cpp" />
 		<Unit filename="../../src/camera.cpp" />
 		<Unit filename="../../src/cube.cpp" />
+		<Unit filename="../../src/extension.cpp" />
 		<Unit filename="../../src/glwindow.cpp" />
 		<Unit filename="../../src/image.cpp" />
 		<Unit filename="../../src/light.cpp" />

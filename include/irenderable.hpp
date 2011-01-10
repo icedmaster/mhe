@@ -147,6 +147,49 @@ namespace mhe
                 calc_normal();
             }
     };
+
+    class Axis : public iRenderable
+    {
+        private:
+            cmn::uint len_;
+        private:
+            void draw_impl()
+            {
+                glColor3f(1.0, 0.0, 0.0);
+                glBegin(GL_LINES);
+                glVertex3f(0,0,0);
+                glVertex3f(len_, 0, 0);
+                glEnd();
+
+                glColor3f(0, 1, 0);
+                glBegin(GL_LINES);
+                glVertex3f(0,0,0);
+                glVertex3f(0, len_, 0);
+                glEnd();
+
+                glColor3f(0, 0, 1);
+                glBegin(GL_LINES);
+                glVertex3f(0,0,0);
+                glVertex3f(0, 0, len_);
+                glEnd();
+            }
+
+            cmn::uint num_vertexes() const
+            {
+                return 0;
+            }
+
+            int get_id() const
+            {
+                return 0;
+            }
+
+        public:
+            Axis(cmn::uint length = 10) :
+                len_(length)
+            {
+            }
+    };
 };
 
 #endif

@@ -13,10 +13,10 @@ namespace mhe
 			cmn::uint id_;
 			std::string name_;
 			FilterType ft_;
-			v2d c;	// texture coordinates
 			boost::shared_ptr<Image> im_;
 			StoreType st_;
 			bool binded_;
+			v2d c[4];
 
 			void rebuild_texture();
 		private:
@@ -38,26 +38,6 @@ namespace mhe
 						im_.reset();
 				}
 				binded_ = false;
-			}
-
-			void set_u_impl(float u)
-			{
-				c.set_x(u);
-			}
-
-			void set_v_impl(float v)
-			{
-				c.set_y(v);
-			}
-
-			float get_u() const
-			{
-				return c.x();
-			}
-
-			float get_v() const
-			{
-				return c.y();
 			}
 
 			void set_filter(FilterType ft)
@@ -83,6 +63,32 @@ namespace mhe
 				return name_;
 			}
 
+			void prepare_impl()
+			{
+			    glEnable(GL_TEXTURE_2D);
+			    glBindTexture(GL_TEXTURE_2D, id_);
+			}
+
+			void clean_impl()
+			{
+			    glDisable(GL_TEXTURE_2D);
+			}
+
+			void draw_impl(cmn::uint pos)
+			{
+			    glTexCoord2f(c[pos].x(), c[pos].y());
+			}
+
+			void set_coord(cmn::uint pos, const v2d& coord)
+			{
+			    c[pos] = coord;
+			}
+
+			const v2d& get_coord(cmn::uint pos) const
+			{
+			    return c[pos];
+			}
+
 		public:
 			Texture() :
 				id_(0),
@@ -94,7 +100,6 @@ namespace mhe
 				id_(t.id_),
 				name_(t.name_),
 				ft_(t.ft_),
-				c(t.c),
 				im_(t.im_),
 				st_(t.st_),
 				binded_(t.binded_)
@@ -105,6 +110,19 @@ namespace mhe
 				// delete texture from videobuffer
 				if (binded_)
 					glDeleteTextures(1, &id_);
+			}
+
+			Texture& operator= (const Texture& t)
+			{
+                id_ = t.id_;
+				name_ = t.name_;
+				ft_ = t.ft_;
+				im_ = t.im_;
+				st_ = t.st_;
+				binded_ = t.binded_;
+				for (int i = 0; i < 4; ++i)
+                    c[i] = t.c[i];
+				return *this;
 			}
 	};
 

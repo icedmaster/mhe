@@ -6,7 +6,7 @@
 #include "irenderable.hpp"
 #include "cube.hpp"
 #include "mhe_gl.hpp"
-#include "texture.hpp"
+#include "multitexture.hpp"
 #include "bmp_image.hpp"
 #include <boost/scoped_ptr.hpp>
 
@@ -47,22 +47,6 @@ int texture_test(int argc, char **argv)
     }
     l.printf("Width: %d Height:%d", w, h);
 
-    // write cube parameters
-    mhe::poly4d f = cube.front();
-    mhe::poly4d b = cube.back();
-    mhe::v3d n = f.getNormal();
-    l.printf("front: %f %f %f", n.x(), n.y(), n.z());
-    n = b.getNormal();
-    l.printf("back: %f %f %f", n.x(), n.y(), n.z());
-    n = cube.bottom().getNormal();
-    l.printf("bottom: %f %f %f", n.x(), n.y(), n.z());
-    n = cube.top().getNormal();
-    l.printf("top: %f %f %f", n.x(), n.y(), n.z());
-    n = cube.right().getNormal();
-    l.printf("right: %f %f %f", n.x(), n.y(), n.z());
-    n = cube.left().getNormal();
-    l.printf("left: %f %f %f", n.x(), n.y(), n.z());
-
     mhe::GLWindow window(w, h, bpp);
 
     glClearColor(0, 0, 0, 1);
@@ -71,7 +55,6 @@ int texture_test(int argc, char **argv)
     // initialize OpenGL
     glEnable(GL_DEPTH);
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_TEXTURE_2D);
     //glEnable(GL_LIGHTING);
     glDepthFunc(GL_LEQUAL);
     //glEnable(GL_AUTO_NORMAL);
@@ -92,15 +75,26 @@ int texture_test(int argc, char **argv)
     m_camera = new mhe::Camera(mhe::v3d(0.5, 0.5, 2), mhe::v3d(0, 0, 0));
     m_camera->update();
 
-    t = new mhe::Texture();
+    t = new mhe::MultiTexture();
     boost::shared_ptr<mhe::Image> im(new mhe::bmp_image);
     if (!im->load("halo.bmp"))
     {
-        l.write("Can't open texture image");
+        l.write("Can't open texture image halo.bmp");
         return 1;
     }
     t->setImage(im);
-    l.printf("Texture index: %u", t->id());
+
+    boost::shared_ptr<mhe::Image> im1(new mhe::bmp_image);
+    if (!im1->load("nya.bmp"))
+    {
+        l.write("Can't open texture image nya.bmp");
+        return 1;
+    }
+    t->setImage(im1);
+    t->setCoord(0, mhe::v2d(0.0, 0.0));
+    t->setCoord(1, mhe::v2d(0.0, 1.0));
+    t->setCoord(2, mhe::v2d(1.0, 1.0));
+    t->setCoord(3, mhe::v2d(1.0, 0.0));
 
     SDL_Event event;
     for  (;;)
@@ -146,6 +140,7 @@ int texture_test(int argc, char **argv)
     SDL_Quit();
     delete m_camera;
     //delete light;
+    delete t;
     return 0;
 }
 
@@ -158,36 +153,20 @@ namespace
 
         m_camera->update();
 
-        glColor3f(1.0, 0.0, 0.0);
-        glBegin(GL_LINES);
-        glVertex3f(0,0,0);
-        glVertex3f(10, 0, 0);
-        glEnd();
-
-        glColor3f(0, 1, 0);
-        glBegin(GL_LINES);
-        glVertex3f(0,0,0);
-        glVertex3f(0, 10, 0);
-        glEnd();
-
-        glColor3f(0, 0, 1);
-        glBegin(GL_LINES);
-        glVertex3f(0,0,0);
-        glVertex3f(0, 0, 10);
-        glEnd();
-
-        //cube.draw();
-        mhe::poly4d p = cube.front();
+        mhe::Axis axis;
+        axis.draw();
 
         glColor3f(1, 1, 1);
         //p.draw();
-        glBindTexture(GL_TEXTURE_2D, t->id());
+
+        t->prepare();
         glBegin(GL_QUADS);
-        glTexCoord2f(0.0, 0.0); glVertex3f(0.0, 0.0, 0.0);
-        glTexCoord2f(0.0, 1.0); glVertex3f(0.0, 1.0, 0.0);
-        glTexCoord2f(1.0, 1.0); glVertex3f(1.0, 1.0, 0.0);
-        glTexCoord2f(1.0, 0.0); glVertex3f(1.0, 0.0, 0.0);
+        t->draw_at(0); glVertex3f(0.0, 0.0, 0.0);
+        t->draw_at(1); glVertex3f(0.0, 1.0, 0.0);
+        t->draw_at(2); glVertex3f(1.0, 1.0, 0.0);
+        t->draw_at(3); glVertex3f(1.0, 0.0, 0.0);
         glEnd();
+        t->clean();
 
         //m_camera->update();
 
