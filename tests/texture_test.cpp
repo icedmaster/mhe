@@ -8,14 +8,69 @@
 #include "mhe_gl.hpp"
 #include "multitexture.hpp"
 #include "bmp_image.hpp"
+#include "timer.hpp"
+#include "sdl_input.hpp"
 #include <boost/scoped_ptr.hpp>
 
 namespace
 {
     void render();
+    bool running = true;
     mhe::iCamera* m_camera = 0;  // main camera
     mhe::Cube cube;
     mhe::iTexture *t = 0;
+    cmn::uint secs = 0, total_frames = 0;
+
+    class SimpleKeyboardHandler : public mhe::KeyboardEventHandler
+    {
+        public:
+            bool handle(const mhe::KeyboardEvent& ke)
+            {
+                if (ke.type() == mhe::KEY_UP) return true; // ignore this kind of messages
+
+                if (ke.type() == mhe::KEY_DOWN)
+                {
+                    // move right
+                    if (ke.sym() == SDLK_q)
+                        m_camera->move(mhe::x_axis, 0.05);
+                    else if (ke.sym() == SDLK_a)
+                        m_camera->move(mhe::x_axis, -0.05);
+                }
+                return true;
+            }
+    };
+
+    class SimpleQuit : public mhe::EventListener
+    {
+        public:
+            SimpleQuit(mhe::EventType et, int type) :
+                mhe::EventListener(et, type)
+            {
+            }
+            bool handle(const mhe::Event&)
+            {
+                running = false;
+                return true;
+            }
+    };
+
+    class ClickListener : public mhe::EventListener
+    {
+        public:
+            ClickListener(mhe::EventType et, int type) :
+                mhe::EventListener(et, type)
+            {
+            }
+
+            bool handle(const mhe::Event& e)
+            {
+                // we listen only left button click
+                mhe::Mouse m = e.getMouse();
+                if (m.button == mhe::BUTTON_RIGHT) return true;
+                std::cout << "left button clicked at \n" << m.pos.x << " " << m.pos.y << "\n";
+                return true;
+            }
+    };
 };
 
 int texture_test(int argc, char **argv)
@@ -96,9 +151,21 @@ int texture_test(int argc, char **argv)
     t->setCoord(2, mhe::v2d(1.0, 1.0));
     t->setCoord(3, mhe::v2d(1.0, 0.0));
 
-    SDL_Event event;
-    for  (;;)
+    // init timer for stats
+    SDL_InitSubSystem(SDL_INIT_TIMER);  // must be removed
+    boost::shared_ptr<mhe::iTimer> tmr(new mhe::Timer);
+    tmr->set(1000);
+
+    boost::scoped_ptr<mhe::iInputSystem> is(new mhe::SDLInputSystem);
+    is->setKeyboardEventHandler(new SimpleKeyboardHandler);
+    is->addListener(new SimpleQuit(mhe::SystemEventType, mhe::QUIT));
+    is->addListener(new SimpleQuit(mhe::KeyboardEventType, SDLK_ESCAPE));
+    is->addListener(new ClickListener(mhe::MouseEventType, mhe::MOUSE_BUTTON_PRESSED));
+
+    //SDL_Event event;
+    while  (running)
     {
+        /*
         SDL_PollEvent(&event);
         if (event.type == SDL_QUIT) break;
         if (event.type == SDL_KEYDOWN)
@@ -133,14 +200,21 @@ int texture_test(int argc, char **argv)
                                               m_camera->getPosition().y(),
                                               m_camera->getPosition().z());
         }
+        */
+        is->check();
+        is->handle();
         render();
+
+        if (tmr->elapsed())
+        {
+            ++secs;
+            tmr->start();
+        }
     }
 
     l.write("Misc test completed");
-    SDL_Quit();
-    delete m_camera;
-    //delete light;
-    delete t;
+    l.printf("frames: %u seconds: %u FPS: %f", total_frames, secs, (float)total_frames/(float)secs);
+
     return 0;
 }
 
@@ -172,5 +246,7 @@ namespace
 
         glFlush();
         SDL_GL_SwapBuffers();
+
+        ++total_frames;
     }
 }

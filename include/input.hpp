@@ -1,0 +1,255 @@
+#ifndef _INPUT_HPP_
+#define _INPUT_HPP_
+
+#include "types.hpp"
+#include <boost/shared_ptr.hpp>
+
+namespace mhe
+{
+	enum EventType
+	{
+		NullEventType,
+		KeyboardEventType,
+		MouseEventType,
+		SystemEventType
+	};
+
+    // Keyboard events
+	enum
+	{
+		KEY_DOWN,
+		KEY_UP
+	};
+
+	// System events
+	enum
+	{
+        QUIT
+	};
+
+	// Mouse events
+	enum
+	{
+	    MOUSE_MOVE,
+	    MOUSE_BUTTON_PRESSED,
+	    MOUSE_BUTTON_RELEASED
+	};
+
+	struct Point
+	{
+	    cmn::uint x;
+	    cmn::uint y;
+	};
+
+	struct Mouse
+	{
+	    Point pos;
+	    cmn::uint button;
+	};
+
+	class Event
+	{
+	    private:
+            Mouse mouse;
+		private:
+			virtual EventType get_type() const
+			{
+				return NullEventType;
+			}
+
+			virtual cmn::uint get_id() const
+			{
+				return 0;
+			}
+        protected:
+            void set_mouse(Mouse m)
+            {
+                mouse = m;
+            }
+		public:
+            Event()
+            {
+            }
+
+			EventType eventType() const
+			{
+				return get_type();
+			}
+
+			cmn::uint id() const
+			{
+				return get_id();
+			}
+
+			const Mouse& getMouse() const
+			{
+			    return mouse;
+			}
+	};
+
+	class KeyboardEvent : public Event
+	{
+		private:
+			EventType get_type() const
+			{
+				return KeyboardEventType;
+			}
+
+			cmn::uint get_id() const
+			{
+				return (KeyboardEventType << 24) | sym_;
+			}
+		private:
+			int type_;
+			cmn::uint sym_;
+		public:
+			KeyboardEvent(int type, cmn::uint sym) :
+				type_(type),
+				sym_(sym)
+			{
+			}
+
+			int type() const
+			{
+				return type_;
+			}
+
+			cmn::uint sym() const
+			{
+				return sym_;
+			}
+	};
+
+	class SystemEvent : public Event
+	{
+		private:
+			EventType get_type() const
+			{
+				return SystemEventType;
+			}
+
+			cmn::uint get_id() const
+			{
+				return (SystemEventType << 24) | event_;
+			}
+        private:
+            int event_;
+        public:
+            SystemEvent(int event) :
+                event_(event)
+            {
+            }
+	};
+
+	enum
+	{
+	    BUTTON_LEFT  = 1,
+	    BUTTON_RIGHT = (1 << 1)
+	};
+
+	class MouseEvent : public Event
+	{
+        private:
+			EventType get_type() const
+			{
+				return MouseEventType;
+			}
+
+			cmn::uint get_id() const
+			{
+				return (MouseEventType << 24) | event_;
+			}
+        private:
+            int event_;
+        public:
+            MouseEvent(int event, const Point& pos, cmn::uint but = 0) :
+                event_(event)
+            {
+                Mouse m;
+                m.button = but;
+                m.pos = pos;
+                set_mouse(m);
+            }
+
+            int type() const
+            {
+                return event_;
+            }
+
+            const Point& position() const
+            {
+                return getMouse().pos;
+            }
+
+            cmn::uint buttons() const
+            {
+                return getMouse().button;
+            }
+	};
+
+	class EventListener
+	{
+		private:
+			cmn::uint event_id;
+
+			void create_event_id(EventType et, int event)
+			{
+				event_id = ((et << 24) & 0xff000000) | event;
+			}
+		public:
+			EventListener(EventType et, int event)
+			{
+				create_event_id(et, event);
+			}
+
+			cmn::uint id() const
+			{
+				return event_id;
+			}
+
+			virtual bool handle(const Event&) {return true;}
+	};
+
+	class KeyboardEventHandler
+	{
+		public:
+			virtual bool handle(const KeyboardEvent&) {return true;}
+	};
+
+	class MouseEventHandler
+	{
+	    public:
+            virtual bool handle(const MouseEvent&) {return true;}
+	};
+
+	class iInputSystem
+	{
+		private:
+			virtual void check_impl() = 0;
+			virtual void handle_impl() = 0;
+			virtual void add_listener(EventListener* el) = 0;
+			virtual void set_keyboard_event_handler(KeyboardEventHandler *ke) = 0;
+		public:
+			void check()
+			{
+				check_impl();
+			}
+
+			void handle()
+			{
+			    handle_impl();
+			}
+
+			void addListener(EventListener* el)
+			{
+				add_listener(el);
+			}
+
+			void setKeyboardEventHandler(KeyboardEventHandler* ke)
+			{
+			    set_keyboard_event_handler(ke);
+			}
+	};
+};
+
+#endif
