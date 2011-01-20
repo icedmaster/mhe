@@ -47,10 +47,16 @@ namespace mhe
 	    cmn::uint button;
 	};
 
+	struct Keyboard
+	{
+	    cmn::uint key;
+	};
+
 	class Event
 	{
 	    private:
             Mouse mouse;
+            Keyboard keyboard;
 		private:
 			virtual EventType get_type() const
 			{
@@ -62,9 +68,14 @@ namespace mhe
 				return 0;
 			}
         protected:
-            void set_mouse(Mouse m)
+            void set_mouse(const Mouse& m)
             {
                 mouse = m;
+            }
+
+            void set_keyboard(const Keyboard& k)
+            {
+                keyboard = k;
             }
 		public:
             Event()
@@ -83,7 +94,16 @@ namespace mhe
 
 			const Mouse& getMouse() const
 			{
+			    if (get_type() != MouseEventType)
+                    throw mhe::exception("Not mouse type emitted!");
 			    return mouse;
+			}
+
+			const Keyboard& getKeyboard() const
+			{
+			    if (get_type() != KeyboardEventType)
+                    throw mhe::exception("Not keyboard event emitted!");
+                return keyboard;
 			}
 	};
 
@@ -97,16 +117,17 @@ namespace mhe
 
 			cmn::uint get_id() const
 			{
-				return (KeyboardEventType << 24) | sym_;
+				return (KeyboardEventType << 24) | getKeyboard().key;
 			}
 		private:
 			int type_;
-			cmn::uint sym_;
 		public:
 			KeyboardEvent(int type, cmn::uint sym) :
-				type_(type),
-				sym_(sym)
+				type_(type)
 			{
+			    Keyboard kb;
+			    kb.key = sym;
+			    set_keyboard(kb);
 			}
 
 			int type() const
@@ -116,7 +137,7 @@ namespace mhe
 
 			cmn::uint sym() const
 			{
-				return sym_;
+				return getKeyboard().key;
 			}
 	};
 

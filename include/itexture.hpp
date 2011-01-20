@@ -35,6 +35,7 @@ namespace mhe
 			virtual void set_coord(cmn::uint, const v2d&) = 0;
 			virtual const v2d& get_coord(cmn::uint) const = 0;
 			virtual void draw_impl(cmn::uint pos) = 0;
+			virtual void set_coord(const std::vector<float>&) = 0;
 		public:
 			void setImage(const boost::shared_ptr<Image>& im, StoreType st = NotStore, FilterType ft = Nearest)
 			{
@@ -97,6 +98,11 @@ namespace mhe
 			    if (pos > 3)
                     throw mhe::exception("Incorrect vertex");
                 return get_coord(pos);
+			}
+
+			void setCoord(const std::vector<float>& c)
+			{
+			    set_coord(c);
 			}
 	};
 

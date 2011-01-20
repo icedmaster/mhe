@@ -17,6 +17,7 @@ namespace mhe
 			StoreType st_;
 			bool binded_;
 			v2d c[4];
+			std::vector<float> coord;
 
 			void rebuild_texture();
 		private:
@@ -67,10 +68,13 @@ namespace mhe
 			{
 			    glEnable(GL_TEXTURE_2D);
 			    glBindTexture(GL_TEXTURE_2D, id_);
+			    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+			    glTexCoordPointer(2, GL_FLOAT, 0, &coord[0]);
 			}
 
 			void clean_impl()
 			{
+			    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 			    glDisable(GL_TEXTURE_2D);
 			}
 
@@ -87,6 +91,12 @@ namespace mhe
 			const v2d& get_coord(cmn::uint pos) const
 			{
 			    return c[pos];
+			}
+
+			void set_coord(const std::vector<float>& c)
+			{
+			    coord = c;
+
 			}
 
 		public:

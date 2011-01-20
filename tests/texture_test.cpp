@@ -130,7 +130,7 @@ int texture_test(int argc, char **argv)
     m_camera = new mhe::Camera(mhe::v3d(0.5, 0.5, 2), mhe::v3d(0, 0, 0));
     m_camera->update();
 
-    t = new mhe::MultiTexture();
+    t = new mhe::Texture();
     boost::shared_ptr<mhe::Image> im(new mhe::bmp_image);
     if (!im->load("halo.bmp"))
     {
@@ -150,6 +150,11 @@ int texture_test(int argc, char **argv)
     t->setCoord(1, mhe::v2d(0.0, 1.0));
     t->setCoord(2, mhe::v2d(1.0, 1.0));
     t->setCoord(3, mhe::v2d(1.0, 0.0));
+
+    float tc_[8] = {0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0};
+    std::vector<float> tc;
+    tc.assign(tc_, tc_ + 8);
+    t->setCoord(tc);
 
     // init timer for stats
     SDL_InitSubSystem(SDL_INIT_TIMER);  // must be removed
@@ -234,13 +239,20 @@ namespace
         //p.draw();
 
         t->prepare();
-        glBegin(GL_QUADS);
-        t->draw_at(0); glVertex3f(0.0, 0.0, 0.0);
-        t->draw_at(1); glVertex3f(0.0, 1.0, 0.0);
-        t->draw_at(2); glVertex3f(1.0, 1.0, 0.0);
-        t->draw_at(3); glVertex3f(1.0, 0.0, 0.0);
-        glEnd();
+
+        float coord[] = {0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0};
+        cmn::uint ind[] = {0, 1, 2, 2, 3, 0};
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glVertexPointer(3, GL_FLOAT, 0, coord);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, ind);
+        /*glBegin(GL_QUADS);
+        glVertex3f(0.0, 0.0, 0.0);
+        glVertex3f(0.0, 1.0, 0.0);
+        glVertex3f(1.0, 1.0, 0.0);
+        glVertex3f(1.0, 0.0, 0.0);
+        glEnd();*/
         t->clean();
+        glDisableClientState(GL_VERTEX_ARRAY);
 
         //m_camera->update();
 
