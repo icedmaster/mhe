@@ -14,10 +14,13 @@
 				<Option compiler="gcc" />
 				<Option parameters="-s str" />
 				<Compiler>
+					<Add option="-std=c++0x" />
 					<Add option="-g" />
 					<Add directory="../../include/utils" />
 					<Add directory="../../include" />
 					<Add directory="../../include/test" />
+					<Add directory="/usr/include/freetype2" />
+					<Add directory="../../libs" />
 				</Compiler>
 				<Linker>
 					<Add option="-L/usr/local/lib -Wl,-rpath,/usr/local/lib -lSDL -lpthread -lm -ldl -lpthread" />
@@ -27,6 +30,7 @@
 					<Add library="/usr/lib/libpthread.a" />
 					<Add library="/usr/lib/fglrx/libGL.so" />
 					<Add library="/usr/lib/libGLU.so" />
+					<Add library="/usr/local/lib/libfreetype.so" />
 				</Linker>
 			</Target>
 		</Build>
@@ -35,13 +39,18 @@
 		</Compiler>
 		<Unit filename="../../include/bmp_image.hpp" />
 		<Unit filename="../../include/camera.hpp" />
+		<Unit filename="../../include/config.hpp" />
 		<Unit filename="../../include/extension.hpp" />
 		<Unit filename="../../include/geom.hpp" />
+		<Unit filename="../../include/gui/font.hpp" />
+		<Unit filename="../../include/gui/ifont.hpp" />
+		<Unit filename="../../include/gui/oglft_font.hpp" />
 		<Unit filename="../../include/icamera.hpp" />
 		<Unit filename="../../include/ilight.hpp" />
 		<Unit filename="../../include/image.hpp" />
 		<Unit filename="../../include/imaterial.hpp" />
 		<Unit filename="../../include/imesh.hpp" />
+		<Unit filename="../../include/impl/system_factory.hpp" />
 		<Unit filename="../../include/input.hpp" />
 		<Unit filename="../../include/irenderable.hpp" />
 		<Unit filename="../../include/itexture.hpp" />
@@ -52,18 +61,23 @@
 		<Unit filename="../../include/mhe_gl.hpp" />
 		<Unit filename="../../include/multitexture.hpp" />
 		<Unit filename="../../include/sdl_input.hpp" />
+		<Unit filename="../../include/test/text_test.hpp" />
 		<Unit filename="../../include/test/texture_test.hpp" />
 		<Unit filename="../../include/texture.hpp" />
 		<Unit filename="../../include/timer.hpp" />
 		<Unit filename="../../include/utils/argparser.hpp" />
 		<Unit filename="../../include/utils/utils.hpp" />
 		<Unit filename="../../include/vector3d.hpp" />
+		<Unit filename="../../libs/oglft/OGLFT.cpp" />
+		<Unit filename="../../libs/oglft/OGLFT.h" />
 		<Unit filename="../../src/bmp_image.cpp" />
 		<Unit filename="../../src/camera.cpp" />
 		<Unit filename="../../src/cube.cpp" />
 		<Unit filename="../../src/extension.cpp" />
 		<Unit filename="../../src/glwindow.cpp" />
+		<Unit filename="../../src/gui/oglft_font.cpp" />
 		<Unit filename="../../src/image.cpp" />
+		<Unit filename="../../src/impl/system_factory.cpp" />
 		<Unit filename="../../src/light.cpp" />
 		<Unit filename="../../src/light.hpp" />
 		<Unit filename="../../src/main.cpp" />
@@ -76,6 +90,7 @@
 		<Unit filename="../../tests/argparser_test.cpp" />
 		<Unit filename="../../tests/log_test.cpp" />
 		<Unit filename="../../tests/misc_test.cpp" />
+		<Unit filename="../../tests/text_test.cpp" />
 		<Unit filename="../../tests/texture_test.cpp" />
 		<Extensions>
 			<code_completion>

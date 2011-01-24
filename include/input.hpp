@@ -2,16 +2,20 @@
 #define _INPUT_HPP_
 
 #include "types.hpp"
+#include "impl/system_factory.hpp"
 #include <boost/shared_ptr.hpp>
 
 namespace mhe
 {
+    class SystemFactory;
+
 	enum EventType
 	{
 		NullEventType,
 		KeyboardEventType,
 		MouseEventType,
-		SystemEventType
+		SystemEventType,
+		TimerEventType
 	};
 
     // Keyboard events
@@ -33,6 +37,12 @@ namespace mhe
 	    MOUSE_MOVE,
 	    MOUSE_BUTTON_PRESSED,
 	    MOUSE_BUTTON_RELEASED
+	};
+
+	// timer events
+	enum
+	{
+	    ELAPSED
 	};
 
 	struct Point
@@ -269,6 +279,37 @@ namespace mhe
 			void setKeyboardEventHandler(KeyboardEventHandler* ke)
 			{
 			    set_keyboard_event_handler(ke);
+			}
+	};
+
+	class InputSystem
+	{
+	    private:
+            boost::shared_ptr<iInputSystem> impl_;
+	    public:
+            InputSystem() :
+                impl_(SystemFactory::instance().createInputSystem())
+            {
+            }
+
+            void check()
+            {
+                impl_->check();
+            }
+
+            void handle()
+            {
+                impl_->handle();
+            }
+
+            void addListener(EventListener* el)
+			{
+				impl_->addListener(el);
+			}
+
+			void setKeyboardEventHandler(KeyboardEventHandler* ke)
+			{
+			    impl_->setKeyboardEventHandler(ke);
 			}
 	};
 };

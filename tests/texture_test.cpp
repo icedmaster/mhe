@@ -161,11 +161,11 @@ int texture_test(int argc, char **argv)
     boost::shared_ptr<mhe::iTimer> tmr(new mhe::Timer);
     tmr->set(1000);
 
-    boost::scoped_ptr<mhe::iInputSystem> is(new mhe::SDLInputSystem);
-    is->setKeyboardEventHandler(new SimpleKeyboardHandler);
-    is->addListener(new SimpleQuit(mhe::SystemEventType, mhe::QUIT));
-    is->addListener(new SimpleQuit(mhe::KeyboardEventType, SDLK_ESCAPE));
-    is->addListener(new ClickListener(mhe::MouseEventType, mhe::MOUSE_BUTTON_PRESSED));
+    mhe::InputSystem is;
+    is.setKeyboardEventHandler(new SimpleKeyboardHandler);
+    is.addListener(new SimpleQuit(mhe::SystemEventType, mhe::QUIT));
+    is.addListener(new SimpleQuit(mhe::KeyboardEventType, SDLK_ESCAPE));
+    is.addListener(new ClickListener(mhe::MouseEventType, mhe::MOUSE_BUTTON_PRESSED));
 
     //SDL_Event event;
     while  (running)
@@ -206,8 +206,8 @@ int texture_test(int argc, char **argv)
                                               m_camera->getPosition().z());
         }
         */
-        is->check();
-        is->handle();
+        is.check();
+        is.handle();
         render();
 
         if (tmr->elapsed())

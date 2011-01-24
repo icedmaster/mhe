@@ -9,7 +9,7 @@ namespace cmn
 	typedef unsigned short ushort;
 	typedef unsigned int uint;
 	typedef unsigned long ulong;
-	
+
 	typedef signed char int8_t;
 	typedef unsigned char uint8_t;
 	typedef signed short int16_t;
@@ -32,5 +32,6 @@ namespace mhe
     };
 }
 
+#define nullptr         0
+
 #endif
-	
