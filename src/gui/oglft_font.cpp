@@ -3,6 +3,12 @@
 namespace mhe {
 namespace gui {
 
+
+oglftFont::oglftFont()
+{
+    glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+}
+
 void oglftFont::set_fg_color(const colorf& c)
 {
 	fnt->setForegroundColor(c.r(), c.g(), c.b());

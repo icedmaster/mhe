@@ -42,6 +42,7 @@ namespace mhe
 				void print_impl(cmn::uint, cmn::uint, const std::wstring&);
 
 			public:
+                oglftFont();
 				bool load(const std::string& fontname, cmn::uint size);
 		};
 

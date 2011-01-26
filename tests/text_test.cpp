@@ -63,16 +63,17 @@ int text_test(int argc, char **argv)
 
     mhe::GLWindow window(w, h, bpp);
 
-    glClearColor(0, 0, 0, 1);
+    glClearColor(1, 1, 1, 1);
 
     glEnable(GL_DEPTH);
     glEnable(GL_DEPTH_TEST);
     //glEnable(GL_LIGHTING);
-    glDepthFunc(GL_LEQUAL);
+    //glDepthFunc(GL_LEQUAL);
 
     // temporary code
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
+
     float aspect = (float)w/(float)h;
     float tan_angle = tan(30.0 * 3.14159265358f / 180.0);
     glFrustum(-tan_angle * 0.1 * aspect, tan_angle * 0.1 * aspect,
@@ -89,7 +90,8 @@ int text_test(int argc, char **argv)
     is.addListener(new SimpleQuit(mhe::KeyboardEventType, SDLK_ESCAPE));
 
     // create font
-    fnt.reset(mhe::gui::FontManager::instance().load("/home/master/projects/assets/FreeSans.ttf", 10));
+    fnt.reset(mhe::gui::FontManager::instance().load("/home/master/projects/assets/FreeMono.ttf", 20));
+    fnt->setForegroundColor(mhe::cfRed);
 
     while (running)
     {
@@ -107,17 +109,29 @@ namespace
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        // set ortogonal projection for text rendering
+        glMatrixMode(GL_PROJECTION);
+        glPushMatrix();     // save previous projection
+        glLoadIdentity();
+        glOrtho( 0, 800, 0, 600, -1, 1 );
+        glMatrixMode(GL_MODELVIEW);
+        // disable depth test for 2d rendering
+        glDisable(GL_DEPTH);
+        glDisable(GL_DEPTH_TEST);
+        glLoadIdentity();
+        fnt->print(500, 500, "mhe123абв");
+        // restore parameters
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_DEPTH);
+        // restore projection
+        glMatrixMode(GL_PROJECTION);
+        glPopMatrix();
+
+        // draw other part of scene
         m_camera->update();
 
         mhe::Axis axis;
         axis.draw();
-
-        glMatrixMode(GL_PROJECTION);
-        glPushMatrix();
-        glDisable(GL_DEPTH);
-        fnt->print(20, 20, "MHE");
-        glEnable(GL_DEPTH);
-        glPopMatrix();
 
         glFlush();
         SDL_GL_SwapBuffers();
