@@ -28,6 +28,7 @@ namespace mhe
     namespace gui
     {
         class iFontManager;
+        class LabelImpl;
 
         class GUIFactory
         {
@@ -44,6 +45,7 @@ namespace mhe
                 }
 
                 iFontManager* createFontManager();
+                LabelImpl* createLabel();
         };
     };
 };

@@ -43,8 +43,14 @@
 		<Unit filename="../../include/extension.hpp" />
 		<Unit filename="../../include/geom.hpp" />
 		<Unit filename="../../include/gui/font.hpp" />
+		<Unit filename="../../include/gui/gcn_font.hpp" />
 		<Unit filename="../../include/gui/ifont.hpp" />
+		<Unit filename="../../include/gui/label.hpp" />
+		<Unit filename="../../include/gui/main_widget.hpp" />
+		<Unit filename="../../include/gui/mhe_label.hpp" />
 		<Unit filename="../../include/gui/oglft_font.hpp" />
+		<Unit filename="../../include/gui/widget.hpp" />
+		<Unit filename="../../include/gui/widget_impl.hpp" />
 		<Unit filename="../../include/icamera.hpp" />
 		<Unit filename="../../include/ilight.hpp" />
 		<Unit filename="../../include/image.hpp" />
@@ -60,6 +66,7 @@
 		<Unit filename="../../include/mesh.hpp" />
 		<Unit filename="../../include/mhe_gl.hpp" />
 		<Unit filename="../../include/multitexture.hpp" />
+		<Unit filename="../../include/rect.hpp" />
 		<Unit filename="../../include/sdl_input.hpp" />
 		<Unit filename="../../include/test/text_test.hpp" />
 		<Unit filename="../../include/test/texture_test.hpp" />
@@ -75,6 +82,8 @@
 		<Unit filename="../../src/cube.cpp" />
 		<Unit filename="../../src/extension.cpp" />
 		<Unit filename="../../src/glwindow.cpp" />
+		<Unit filename="../../src/gui/label.cpp" />
+		<Unit filename="../../src/gui/mhe_label.cpp" />
 		<Unit filename="../../src/gui/oglft_font.cpp" />
 		<Unit filename="../../src/image.cpp" />
 		<Unit filename="../../src/impl/system_factory.cpp" />

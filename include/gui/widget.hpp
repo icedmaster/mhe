@@ -3,75 +3,88 @@
 
 #include "input.hpp"
 #include "font.hpp"
+#include "rect.hpp"
 
 namespace mhe
 {
 	namespace gui
 	{
 		class Widget;
-		
+
 		enum WidgetType
 		{
-			MainWidget,
-			Label,
-			Button
+			MainWidgetType,
+			LabelType,
+			ButtonType
 		};
-		
+
 		// abstract Widget class
-		class iWidget
+		class Widget
 		{
 			private:
-				virtual void handle_keyboard_event(const KeyboardEvent&) = 0;
-				virtual void handle_mouse_event(const MouseEvent&) = 0;
-				virtual const boost::shared_ptr<Widget>& get_parent() const = 0; 
+				virtual bool handle_keyboard_event(const KeyboardEvent&) = 0;
+				virtual bool handle_mouse_event(const MouseEvent&) = 0;
+				virtual const boost::shared_ptr<Widget>& get_parent() const = 0;
 				virtual void add_widget(const boost::shared_ptr<Widget>&) = 0;
 				virtual void set_name(const std::string&) = 0;
-				virtual const std::string& get_name() const = 0; 
+				virtual const std::string& get_name() const = 0;
 				virtual WidgetType get_type() const = 0;
+				virtual void set_geom(const rect&) = 0;
+				virtual void set_font(const boost::shared_ptr<iFont>&) = 0;
 				virtual void draw_impl() = 0;
 			public:
 				// events
-				void handleKeyboardEvent(const KeyboardEvent& e)
+				bool handleKeyboardEvent(const KeyboardEvent& e)
 				{
-					handle_keyboard_event(e);
+					return handle_keyboard_event(e);
 				}
-				
-				void handleMouseEvent(const MouseEvent& e)
+
+				bool handleMouseEvent(const MouseEvent& e)
 				{
-					handle_mouse_event(e);
+					return handle_mouse_event(e);
 				}
-				
+
 				const boost::shared_ptr<Widget>& parent() const
 				{
 					return get_parent();
 				}
-				
-				void add(const boost::shared_ptr& w)
+
+				void add(const boost::shared_ptr<Widget>& w)
 				{
 					add_widget(w);
 				}
-				
+
 				void setName(const std::string& s)
 				{
 					set_name(s);
 				}
-				
+
 				const std::string& name() const
 				{
 					return get_name();
-				}	
+				}
 
 				WidgetType type() const
 				{
 					return get_type();
 				}
-				
+
+				void setGeometry(const rect& r)
+				{
+				    set_geom(r);
+				}
+
+				void setFont(const boost::shared_ptr<iFont>& fnt)
+				{
+				    set_font(fnt);
+				}
+
 				void draw()
 				{
 					draw_impl();
 				}
 		};
-		
+
 	};	// gui
 };	// mhe
 
