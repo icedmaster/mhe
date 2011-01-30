@@ -87,6 +87,11 @@ namespace mhe
                 {
                     impl_->setCaption(caption);
                 }
+
+                void setBackground(const colorf& color)
+                {
+                    impl_->setBackground(color);
+                }
         };
     };
 };

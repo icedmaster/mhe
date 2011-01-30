@@ -17,6 +17,7 @@ namespace mhe
                 virtual const rect& get_geom() const = 0;
                 virtual void set_font(const boost::shared_ptr<iFont>&) = 0;
                 virtual void set_caption(const std::string&) = 0;
+                virtual void set_background(const colorf&) = 0;
             public:
                 void draw()
                 {
@@ -41,6 +42,11 @@ namespace mhe
                 void setCaption(const std::string& caption)
                 {
                     set_caption(caption);
+                }
+
+                void setBackground(const colorf& color)
+                {
+                    set_background(color);
                 }
         };
     };

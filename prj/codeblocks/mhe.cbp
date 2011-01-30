@@ -44,6 +44,7 @@
 		<Unit filename="../../include/geom.hpp" />
 		<Unit filename="../../include/gui/font.hpp" />
 		<Unit filename="../../include/gui/gcn_font.hpp" />
+		<Unit filename="../../include/gui/gui.hpp" />
 		<Unit filename="../../include/gui/ifont.hpp" />
 		<Unit filename="../../include/gui/label.hpp" />
 		<Unit filename="../../include/gui/main_widget.hpp" />
@@ -68,6 +69,7 @@
 		<Unit filename="../../include/multitexture.hpp" />
 		<Unit filename="../../include/rect.hpp" />
 		<Unit filename="../../include/sdl_input.hpp" />
+		<Unit filename="../../include/test/gui_test.hpp" />
 		<Unit filename="../../include/test/text_test.hpp" />
 		<Unit filename="../../include/test/texture_test.hpp" />
 		<Unit filename="../../include/texture.hpp" />
@@ -83,6 +85,7 @@
 		<Unit filename="../../src/extension.cpp" />
 		<Unit filename="../../src/glwindow.cpp" />
 		<Unit filename="../../src/gui/label.cpp" />
+		<Unit filename="../../src/gui/main_widget.cpp" />
 		<Unit filename="../../src/gui/mhe_label.cpp" />
 		<Unit filename="../../src/gui/oglft_font.cpp" />
 		<Unit filename="../../src/image.cpp" />
@@ -97,6 +100,7 @@
 		<Unit filename="../../src/utils/argparser.cpp" />
 		<Unit filename="../../src/utils/logutils.cpp" />
 		<Unit filename="../../tests/argparser_test.cpp" />
+		<Unit filename="../../tests/gui_test.cpp" />
 		<Unit filename="../../tests/log_test.cpp" />
 		<Unit filename="../../tests/misc_test.cpp" />
 		<Unit filename="../../tests/text_test.cpp" />

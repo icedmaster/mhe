@@ -20,6 +20,10 @@
     #include "text_test.hpp"
 #endif
 
+#ifdef GUI_TEST
+    #include "gui_test.hpp"
+#endif
+
 int main(int argc, char **argv)
 {
     #ifdef ARGPARSER_TEST
@@ -40,6 +44,10 @@ int main(int argc, char **argv)
 
     #ifdef TEXT_TEST
     return text_test(argc, argv);
+    #endif
+
+    #ifdef GUI_TEST
+    return gui_test(argc, argv);
     #endif
 
     return 0;

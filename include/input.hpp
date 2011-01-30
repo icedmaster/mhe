@@ -228,6 +228,11 @@ namespace mhe
 				event_id = ((et << 24) & 0xff000000) | event;
 			}
 		public:
+            EventListener() :
+                event_id(0)
+            {
+            }
+
 			EventListener(EventType et, int event)
 			{
 				create_event_id(et, event);
@@ -260,6 +265,7 @@ namespace mhe
 			virtual void handle_impl() = 0;
 			virtual void add_listener(EventListener* el) = 0;
 			virtual void set_keyboard_event_handler(KeyboardEventHandler *ke) = 0;
+			virtual void set_mouse_event_handler(MouseEventHandler*) = 0;
 		public:
 			void check()
 			{
@@ -279,6 +285,11 @@ namespace mhe
 			void setKeyboardEventHandler(KeyboardEventHandler* ke)
 			{
 			    set_keyboard_event_handler(ke);
+			}
+
+			void setMouseEventHandler(MouseEventHandler* me)
+			{
+			    set_mouse_event_handler(me);
 			}
 	};
 
@@ -310,6 +321,11 @@ namespace mhe
 			void setKeyboardEventHandler(KeyboardEventHandler* ke)
 			{
 			    impl_->setKeyboardEventHandler(ke);
+			}
+
+			void setMouseEventHandler(MouseEventHandler* me)
+			{
+			    impl_->setMouseEventHandler(me);
 			}
 	};
 };

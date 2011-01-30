@@ -67,6 +67,11 @@ namespace mhe
             {
                 return p1;
             }
+
+            const v2d& rh() const
+            {
+                return p2;
+            }
     };
 };
 

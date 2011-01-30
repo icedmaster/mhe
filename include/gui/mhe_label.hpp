@@ -14,6 +14,7 @@ namespace mhe
                 rect g;
                 boost::shared_ptr<iFont> fnt;
                 std::string caption_;
+                colorf color_;
             private:
                 void draw_impl();
                 void set_geom(const rect& r)
@@ -34,6 +35,11 @@ namespace mhe
                 void set_caption(const std::string& caption)
                 {
                     caption_ = caption;
+                }
+
+                void set_background(const colorf& color)
+                {
+                    color_ = color;
                 }
         };
     };

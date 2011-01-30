@@ -13,7 +13,9 @@ namespace mhe
 			private:
 				boost::shared_ptr<Widget> parent_;
 				std::string name_;
-				std::map< std::string, boost::shared_ptr<Widget> > childs_;
+
+				typedef std::map< std::string, boost::shared_ptr<Widget> > wmap;
+				wmap childs_;
 			private:
 				bool handle_keyboard_event(const KeyboardEvent&);
 				bool handle_mouse_event(const MouseEvent&);
@@ -37,14 +39,16 @@ namespace mhe
 
 				WidgetType get_type() const
 				{
-					return MainWidget;
+					return MainWidgetType;
 				}
+
+				void set_geom(const rect&) {}
 
 				void set_font(const boost::shared_ptr<iFont>&)
 				{
 				}
 
-				void draw_impl() {}
+				void draw_impl();
 		};
 	};
 };
