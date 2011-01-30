@@ -18,6 +18,7 @@ namespace mhe
                 virtual void set_font(const boost::shared_ptr<iFont>&) = 0;
                 virtual void set_caption(const std::string&) = 0;
                 virtual void set_background(const colorf&) = 0;
+                virtual void set_image(const std::string& fn) = 0;
             public:
                 void draw()
                 {
@@ -47,6 +48,11 @@ namespace mhe
                 void setBackground(const colorf& color)
                 {
                     set_background(color);
+                }
+
+                void setImage(const std::string& fn)
+                {
+                    set_image(fn);
                 }
         };
     };

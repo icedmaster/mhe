@@ -148,6 +148,7 @@ int gui_test(int argc, char **argv)
     lbl->setOnMouseMove(new LabelListener);
     lbl->setOnMouseLeft(new LabelLeftListener);
     lbl->setOnMouseClick(new LabelClickListener);
+    lbl->setImage("/home/master/projects/assets/label.bmp");
     mw->add(lbl);
 
     while (running)
@@ -167,11 +168,18 @@ namespace
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        // draw other part of scene
+        m_camera->update();
+
+        mhe::Axis axis;
+        axis.draw();
+
         // set ortogonal projection for text rendering
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();     // save previous projection
         glLoadIdentity();
-        glOrtho( 0, 800, 0, 600, -1, 1 );
+        glOrtho( 0, mhe::globals::instance().window_width(),
+                 0, mhe::globals::instance().window_height(), -1, 1 );
         glMatrixMode(GL_MODELVIEW);
         // disable depth test for 2d rendering
         glDisable(GL_DEPTH);
@@ -184,12 +192,6 @@ namespace
         // restore projection
         glMatrixMode(GL_PROJECTION);
         glPopMatrix();
-
-        // draw other part of scene
-        m_camera->update();
-
-        mhe::Axis axis;
-        axis.draw();
 
         glFlush();
         SDL_GL_SwapBuffers();

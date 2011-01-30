@@ -31,6 +31,7 @@ namespace mhe
 				virtual WidgetType get_type() const = 0;
 				virtual void set_geom(const rect&) = 0;
 				virtual void set_font(const boost::shared_ptr<iFont>&) = 0;
+				virtual void set_image(const std::string&) {}
 				virtual void draw_impl() = 0;
 				virtual void set_on_mouse_move(EventListener*) {}
 				virtual void set_on_mouse_left(EventListener*) {}
@@ -80,6 +81,11 @@ namespace mhe
 				void setFont(const boost::shared_ptr<iFont>& fnt)
 				{
 				    set_font(fnt);
+				}
+
+				void setImage(const std::string& filename)
+				{
+				    set_image(filename);
 				}
 
 				void draw()

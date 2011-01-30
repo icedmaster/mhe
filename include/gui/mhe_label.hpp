@@ -2,7 +2,9 @@
 #define _MHE_LABEL_HPP_
 
 #include "gui/widget_impl.hpp"
+#include "texture.hpp"
 #include <boost/shared_ptr.hpp>
+#include <boost/scoped_ptr.hpp>
 
 namespace mhe
 {
@@ -13,6 +15,7 @@ namespace mhe
             private:
                 rect g;
                 boost::shared_ptr<iFont> fnt;
+                boost::scoped_ptr<iTexture> texture_;
                 std::string caption_;
                 colorf color_;
             private:
@@ -41,6 +44,8 @@ namespace mhe
                 {
                     color_ = color;
                 }
+
+                void set_image(const std::string& filename);
         };
     };
 };

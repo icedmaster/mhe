@@ -64,6 +64,11 @@ namespace mhe
 				    impl_->setFont(f);
 				}
 
+				void set_image(const std::string& fn)
+				{
+				    impl_->setImage(fn);
+				}
+
 				void draw_impl()
 				{
 				    impl_->draw();
