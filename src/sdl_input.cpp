@@ -1,4 +1,5 @@
 #include "sdl_input.hpp"
+#include "globals.hpp"
 
 namespace mhe {
 
@@ -122,7 +123,7 @@ void SDLInputSystem::add_mouse_move_event(const SDL_MouseMotionEvent& event)
 {
     Point p;
     p.x = event.x;
-    p.y = event.y;
+    p.y = globals::instance().window_height() - event.y;
     MouseEvent me(MOUSE_MOVE, p, event.state);
     mouse_events.push_back(me);
     check_listeners(me);
@@ -141,7 +142,7 @@ void SDLInputSystem::add_mouse_button_event(const SDL_MouseButtonEvent& event)
     }
     Point p;
     p.x = event.x;
-    p.y = event.y;
+    p.y = globals::instance().window_height()- event.y;
     MouseEvent me(type, p, but);
     mouse_events.push_back(me);
     check_listeners(me);

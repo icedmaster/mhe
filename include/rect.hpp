@@ -60,6 +60,8 @@ namespace mhe
             {
                 p1 = r.p1;
                 p2 = r.p2;
+                w_ = r.w_;
+                h_ = r.h_;
                 return *this;
             }
 

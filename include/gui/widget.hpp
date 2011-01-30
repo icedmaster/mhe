@@ -32,6 +32,9 @@ namespace mhe
 				virtual void set_geom(const rect&) = 0;
 				virtual void set_font(const boost::shared_ptr<iFont>&) = 0;
 				virtual void draw_impl() = 0;
+				virtual void set_on_mouse_move(EventListener*) {}
+				virtual void set_on_mouse_left(EventListener*) {}
+				virtual void set_on_mouse_click(EventListener*) {}
 			public:
 				// events
 				bool handleKeyboardEvent(const KeyboardEvent& e)
@@ -82,6 +85,21 @@ namespace mhe
 				void draw()
 				{
 					draw_impl();
+				}
+
+				void setOnMouseMove(EventListener* el)
+				{
+				    set_on_mouse_move(el);
+				}
+
+				void setOnMouseLeft(EventListener* el)
+				{
+				    set_on_mouse_left(el);
+				}
+
+				void setOnMouseClick(EventListener* el)
+				{
+				    set_on_mouse_click(el);
 				}
 		};
 

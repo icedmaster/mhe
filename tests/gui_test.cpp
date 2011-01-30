@@ -10,6 +10,7 @@
 #include "irenderable.hpp"
 #include "gui/font.hpp"
 #include "gui/gui.hpp"
+#include "globals.hpp"
 #include <boost/scoped_ptr.hpp>
 
 namespace
@@ -39,9 +40,9 @@ class SimpleQuit : public mhe::EventListener
 class GUIEventHandler : public mhe::MouseEventHandler
 {
     public:
-        bool handle(const mhe::MouseEvent& ke)
+        bool handle(const mhe::MouseEvent& me)
         {
-            mw->handleMouseEvent(ke);
+            mw->handleMouseEvent(me);
             return true;
         }
 };
@@ -52,6 +53,26 @@ class LabelListener : public mhe::EventListener
         bool handle(const mhe::Event&)
         {
             fnt->setForegroundColor(mhe::cfBlack);
+            return true;
+        }
+};
+
+class LabelLeftListener : public mhe::EventListener
+{
+    public:
+        bool handle(const mhe::Event&)
+        {
+            fnt->setForegroundColor(mhe::cfRed);
+            return true;
+        }
+};
+
+class LabelClickListener : public mhe::EventListener
+{
+    public:
+        bool handle(const mhe::Event& e)
+        {
+            lbl->setCaption("Nya ^_^");
             return true;
         }
 };
@@ -122,9 +143,11 @@ int gui_test(int argc, char **argv)
     lbl.reset(new mhe::gui::Label);
     lbl->setFont(fnt);
     lbl->setBackground(mhe::cfGreen);
-    lbl->setGeometry(mhe::rect(200, 200, 100, 50));
+    lbl->setGeometry(mhe::rect(200, 500, 100, 50));
     lbl->setCaption("nya");
     lbl->setOnMouseMove(new LabelListener);
+    lbl->setOnMouseLeft(new LabelLeftListener);
+    lbl->setOnMouseClick(new LabelClickListener);
     mw->add(lbl);
 
     while (running)

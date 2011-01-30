@@ -1,6 +1,7 @@
 // This module will be deleted
 
 #include "glwindow.hpp"
+#include "globals.hpp"
 
 using namespace mhe;
 
@@ -93,5 +94,7 @@ bool GLWindow::create_window()
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
     SDL_WM_SetCaption(name_.c_str(), NULL);
+
+    globals::instance().set_window(width_, height_);
     return true;
 }

@@ -42,6 +42,7 @@
 		<Unit filename="../../include/config.hpp" />
 		<Unit filename="../../include/extension.hpp" />
 		<Unit filename="../../include/geom.hpp" />
+		<Unit filename="../../include/globals.hpp" />
 		<Unit filename="../../include/gui/font.hpp" />
 		<Unit filename="../../include/gui/gcn_font.hpp" />
 		<Unit filename="../../include/gui/gui.hpp" />

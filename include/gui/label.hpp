@@ -19,6 +19,8 @@ namespace mhe
 
                 boost::shared_ptr<EventListener> on_mouse_move_;
                 boost::shared_ptr<EventListener> on_mouse_click_;
+                boost::shared_ptr<EventListener> on_mouse_left_;
+                bool mouse_on_;
             private:
                 bool handle_keyboard_event(const KeyboardEvent&)
                 {
@@ -67,20 +69,26 @@ namespace mhe
 				    impl_->draw();
 				}
 
-            public:
-                Label() :
-                    impl_(GUIFactory::instance().createLabel())
-                {
-                }
-
-                void setOnMouseClick(EventListener* el)
+				void set_on_mouse_click(EventListener* el)
                 {
                     on_mouse_click_.reset(el);
                 }
 
-                void setOnMouseMove(EventListener* el)
+                void set_on_mouse_move(EventListener* el)
                 {
                     on_mouse_move_.reset(el);
+                }
+
+                void set_on_mouse_left(EventListener* el)
+                {
+                    on_mouse_left_.reset(el);
+                }
+
+            public:
+                Label() :
+                    impl_(GUIFactory::instance().createLabel()),
+                    mouse_on_(false)
+                {
                 }
 
                 void setCaption(const std::string& caption)
