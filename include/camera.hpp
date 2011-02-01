@@ -11,6 +11,7 @@ namespace mhe
             v3d pos;
             v3d dir;
             float x_ang, y_ang, z_ang;
+            std::string name_;
 
             void set_position(const v3d& v)
             {
@@ -30,6 +31,15 @@ namespace mhe
             const v3d& get_direction() const
             {
                 return dir;
+            }
+
+            const std::string& get_name() const
+            {
+                return name_;
+            }
+
+            void set_projection(cmn::uint w, cmn::uint h)
+            {
             }
 
             void rotate_impl(const v3d& v, float ang);

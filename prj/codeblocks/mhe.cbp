@@ -42,6 +42,7 @@
 		<Unit filename="../../include/config.hpp" />
 		<Unit filename="../../include/extension.hpp" />
 		<Unit filename="../../include/geom.hpp" />
+		<Unit filename="../../include/gl_state_attr.hpp" />
 		<Unit filename="../../include/globals.hpp" />
 		<Unit filename="../../include/gui/font.hpp" />
 		<Unit filename="../../include/gui/gcn_font.hpp" />
@@ -60,6 +61,7 @@
 		<Unit filename="../../include/imesh.hpp" />
 		<Unit filename="../../include/impl/system_factory.hpp" />
 		<Unit filename="../../include/input.hpp" />
+		<Unit filename="../../include/irender.hpp" />
 		<Unit filename="../../include/irenderable.hpp" />
 		<Unit filename="../../include/itexture.hpp" />
 		<Unit filename="../../include/itimer.hpp" />
@@ -69,6 +71,9 @@
 		<Unit filename="../../include/mhe_gl.hpp" />
 		<Unit filename="../../include/multitexture.hpp" />
 		<Unit filename="../../include/rect.hpp" />
+		<Unit filename="../../include/render2d.hpp" />
+		<Unit filename="../../include/render3d.hpp" />
+		<Unit filename="../../include/scene.hpp" />
 		<Unit filename="../../include/sdl_input.hpp" />
 		<Unit filename="../../include/test/gui_test.hpp" />
 		<Unit filename="../../include/test/text_test.hpp" />
@@ -80,6 +85,7 @@
 		<Unit filename="../../include/utils/image_loader.hpp" />
 		<Unit filename="../../include/utils/utils.hpp" />
 		<Unit filename="../../include/vector3d.hpp" />
+		<Unit filename="../../include/window_system.hpp" />
 		<Unit filename="../../libs/oglft/OGLFT.cpp" />
 		<Unit filename="../../libs/oglft/OGLFT.h" />
 		<Unit filename="../../src/bmp_image.cpp" />
@@ -98,6 +104,8 @@
 		<Unit filename="../../src/main.cpp" />
 		<Unit filename="../../src/material.cpp" />
 		<Unit filename="../../src/mesh.cpp" />
+		<Unit filename="../../src/render2d.cpp" />
+		<Unit filename="../../src/render3d.cpp" />
 		<Unit filename="../../src/sdl_input.cpp" />
 		<Unit filename="../../src/texture.cpp" />
 		<Unit filename="../../src/utils/argparser.cpp" />
