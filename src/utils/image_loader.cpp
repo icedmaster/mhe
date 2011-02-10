@@ -14,6 +14,12 @@ namespace mhe
             if (im->load(filename))
                 return im;
         }
+        else if (ext == "png")
+        {
+            im = new png_image;
+            if (im->load(filename))
+                return im;
+        }
         if (im != nullptr)
             delete im;
         return nullptr;

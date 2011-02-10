@@ -4,6 +4,7 @@
 #include "utils/file_utils.hpp"
 #include "image.hpp"
 #include "bmp_image.hpp"
+#include "png_image.hpp"
 
 namespace mhe
 {

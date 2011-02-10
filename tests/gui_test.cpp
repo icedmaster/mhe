@@ -148,7 +148,8 @@ int gui_test(int argc, char **argv)
     lbl->setOnMouseMove(new LabelListener);
     lbl->setOnMouseLeft(new LabelLeftListener);
     lbl->setOnMouseClick(new LabelClickListener);
-    lbl->setImage("/home/master/projects/assets/label.bmp");
+    //lbl->setImage("/home/master/projects/assets/label.bmp");
+    lbl->setImage("/home/master/projects/assets/label2.png");
     mw->add(lbl);
 
     while (running)

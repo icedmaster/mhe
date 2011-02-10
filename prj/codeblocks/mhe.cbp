@@ -31,6 +31,7 @@
 					<Add library="/usr/lib/fglrx/libGL.so" />
 					<Add library="/usr/lib/libGLU.so" />
 					<Add library="/usr/local/lib/libfreetype.so" />
+					<Add library="/usr/lib/libpng.so" />
 				</Linker>
 			</Target>
 		</Build>
@@ -70,6 +71,7 @@
 		<Unit filename="../../include/mesh.hpp" />
 		<Unit filename="../../include/mhe_gl.hpp" />
 		<Unit filename="../../include/multitexture.hpp" />
+		<Unit filename="../../include/png_image.hpp" />
 		<Unit filename="../../include/rect.hpp" />
 		<Unit filename="../../include/render2d.hpp" />
 		<Unit filename="../../include/render3d.hpp" />
@@ -104,6 +106,7 @@
 		<Unit filename="../../src/main.cpp" />
 		<Unit filename="../../src/material.cpp" />
 		<Unit filename="../../src/mesh.cpp" />
+		<Unit filename="../../src/png_image.cpp" />
 		<Unit filename="../../src/render2d.cpp" />
 		<Unit filename="../../src/render3d.cpp" />
 		<Unit filename="../../src/sdl_input.cpp" />
