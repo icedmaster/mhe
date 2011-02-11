@@ -112,7 +112,7 @@ namespace mhe
 
 			// init addresses
 			for (cmn::uint i = 0; i < fi.height; ++i)
-				r[i] = (png_bytep)&data[png_get_rowbytes(png, info) * i];
+				r[i] = (png_bytep)&data[png_get_rowbytes(png, info) * (fi.height - i - 1)];
 
 			// read image
 			png_read_image(png, &r[0]);
