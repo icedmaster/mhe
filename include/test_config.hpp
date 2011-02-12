@@ -6,6 +6,7 @@
 //#define MISC_TEST
 //#define TEXTURE_TEST
 //#define TEXT_TEST
-#define GUI_TEST
+//#define GUI_TEST
+#define SCENE_TEST
 
 #endif

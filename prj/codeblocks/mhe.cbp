@@ -78,6 +78,7 @@
 		<Unit filename="../../include/scene.hpp" />
 		<Unit filename="../../include/sdl_input.hpp" />
 		<Unit filename="../../include/test/gui_test.hpp" />
+		<Unit filename="../../include/test/scene_test.hpp" />
 		<Unit filename="../../include/test/text_test.hpp" />
 		<Unit filename="../../include/test/texture_test.hpp" />
 		<Unit filename="../../include/texture.hpp" />
@@ -121,6 +122,7 @@
 		<Unit filename="../../tests/gui_test.cpp" />
 		<Unit filename="../../tests/log_test.cpp" />
 		<Unit filename="../../tests/misc_test.cpp" />
+		<Unit filename="../../tests/scene_test.cpp" />
 		<Unit filename="../../tests/text_test.cpp" />
 		<Unit filename="../../tests/texture_test.cpp" />
 		<Extensions>

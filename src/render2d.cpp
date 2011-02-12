@@ -6,7 +6,7 @@ namespace mhe
 	void Render2D::init_impl()
 	{
 		glMatrixMode(GL_PROJECTION);
-		glOrtho(0, ws_->width(), 0, ws_->height(), -1, 1);
+		glOrtho(ws_->width(), 0, ws_->height(), 0, -1, 1);
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 	}
@@ -60,7 +60,10 @@ namespace mhe
 	void Render2D::draw_impl()
 	{
 		// draw scene first...
-		//scene_->draw();
+		for (size_t i = 0; i < scenes_.size(); ++i)
+		{
+			scenes_[i]->draw();
+		}
 		// then our subrenders works
 		for (size_t i = 0; i < subrenders_.size(); ++i)
 		{
@@ -78,5 +81,10 @@ namespace mhe
 		draw_impl();
 		// update buffers
 		ws_->swapBuffers();
+	}
+
+	void Render2D::add_scene(Scene* scene)
+	{
+		scenes_.push_back(boost::shared_ptr<Scene>(scene));
 	}
 };

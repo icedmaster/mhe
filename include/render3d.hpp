@@ -2,8 +2,7 @@
 #define _RENDER3D_HPP_
 
 #include "irender.hpp"
-
-#include "irender.hpp"
+#include "scene.hpp"
 #include "mhe_gl.hpp"
 #include "window_system.hpp"
 #include <boost/shared_ptr.hpp>
@@ -15,9 +14,9 @@ namespace mhe
 	{
 		private:
 			boost::shared_ptr<WindowSystem> ws_;
-			std::vector< boost::shared_ptr<iCamera> > cameras_;
 			std::vector< boost::shared_ptr<iRender> > subrenders_;
-			boost::shared_ptr<iCamera> active_camera_;
+
+			std::vector< boost::shared_ptr<Scene> > scenes_;
 
 			void save_attributes();
 			void restore_attributes();
@@ -26,8 +25,7 @@ namespace mhe
 			void restore_impl();
 			void init_impl();
 
-			void add_scene(Scene* scene)
-			{}
+			void add_scene(Scene* scene);
 
 			void remove_scene()
 			{}
@@ -37,17 +35,9 @@ namespace mhe
 				subrenders_.push_back(sr);
 			}
 
-			void add_camera(const boost::shared_ptr<iCamera>& cam)
-			{
-				cameras_.push_back(cam);
-				active_camera_ = cam;
-			}
-
-			void set_active_camera(const std::string& name);
-
 			void clear_impl()
 			{
-				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+				glClear(GL_COLOR_BUFFER_BIT);
 			}
 
 			void draw_impl();

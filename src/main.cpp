@@ -24,6 +24,10 @@
     #include "gui_test.hpp"
 #endif
 
+#ifdef SCENE_TEST
+    #include "scene_test.hpp"
+#endif
+
 int main(int argc, char **argv)
 {
     #ifdef ARGPARSER_TEST
@@ -48,6 +52,10 @@ int main(int argc, char **argv)
 
     #ifdef GUI_TEST
     return gui_test(argc, argv);
+    #endif
+
+    #ifdef SCENE_TEST
+    return scene_test(argc, argv);
     #endif
 
     return 0;

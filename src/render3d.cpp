@@ -3,34 +3,23 @@
 
 namespace mhe
 {
-	void Render3D::set_active_camera(const std::string& name)
-	{
-		for (size_t i = 0; i < cameras_.size(); ++i)
-		{
-			if (cameras_[i]->name() == name)
-			{
-				active_camera_ = cameras_[i];
-				active_camera_->setProjection(ws_->width(), ws_->height());
-			}
-		}
-	}
-
 	void Render3D::init_impl()
 	{
 		GLStateAttr::instance().set(GL_DEPTH);
 		GLStateAttr::instance().set(GL_DEPTH_TEST);
-		active_camera_->setProjection(ws_->width(), ws_->height());
 	}
 
 	void Render3D::save_impl()
 	{
 		save_attributes();
+		glMatrixMode(GL_PROJECTION);
 		glPushMatrix();
 		init_impl();
 	}
 
 	void Render3D::restore_impl()
 	{
+		glMatrixMode(GL_PROJECTION);
 		glPopMatrix();
 		restore_attributes();
 	}
@@ -67,9 +56,12 @@ namespace mhe
 
 	void Render3D::draw_impl()
 	{
-		active_camera_->update();
 		// draw scene first...
-		//scene_->draw();
+		for (size_t i = 0; i < scenes_.size(); ++i)
+		{
+			glClear(GL_DEPTH_BUFFER_BIT);
+			scenes_[i]->draw();
+		}
 		// then our subrenders works
 		for (size_t i = 0; i < subrenders_.size(); ++i)
 		{
@@ -87,5 +79,10 @@ namespace mhe
 		draw_impl();
 		// update buffers
 		ws_->swapBuffers();
+	}
+
+	void Render3D::add_scene(Scene* scene)
+	{
+		scenes_.push_back(boost::shared_ptr<Scene>(scene));
 	}
 };

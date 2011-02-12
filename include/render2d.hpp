@@ -2,8 +2,9 @@
 #define _RENDER2D_HPP_
 
 #include "irender.hpp"
-#include "window_system.hpp"
+#include "scene.hpp"
 #include "mhe_gl.hpp"
+#include "window_system.hpp"
 #include <boost/shared_ptr.hpp>
 #include <vector>
 
@@ -15,6 +16,8 @@ namespace mhe
 			boost::shared_ptr<WindowSystem> ws_;
 			std::vector< boost::shared_ptr<iRender> > subrenders_;
 
+			std::vector< boost::shared_ptr<Scene> > scenes_;
+
 			void save_attributes();
 			void restore_attributes();
 		private:
@@ -22,8 +25,7 @@ namespace mhe
 			void restore_impl();
 			void init_impl();
 
-			void add_scene(Scene* scene)
-			{}
+			void add_scene(Scene* scene);
 
 			void remove_scene()
 			{}
