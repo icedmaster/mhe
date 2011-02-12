@@ -28,7 +28,8 @@ namespace mhe
 	// System events
 	enum
 	{
-        QUIT
+        QUIT,
+        TIMER
 	};
 
 	// Mouse events

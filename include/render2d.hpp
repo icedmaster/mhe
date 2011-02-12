@@ -22,7 +22,7 @@ namespace mhe
 			void restore_impl();
 			void init_impl();
 
-			void add_scene(iScene* scene)
+			void add_scene(Scene* scene)
 			{}
 
 			void remove_scene()

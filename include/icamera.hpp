@@ -20,6 +20,7 @@ namespace mhe
             virtual void update_impl() = 0;
 
             virtual const std::string& get_name() const = 0;
+            virtual cmn::uint get_id() const {return 0;}
             virtual void set_projection(cmn::uint, cmn::uint) = 0;
         public:
             // accessors
@@ -56,6 +57,11 @@ namespace mhe
             const std::string& name() const
             {
                 return get_name();
+            }
+
+            cmn::uint id() const
+            {
+                return get_id();
             }
 
             void setProjection(cmn::uint w, cmn::uint h)

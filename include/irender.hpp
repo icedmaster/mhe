@@ -13,7 +13,7 @@ namespace mhe
 			virtual void save_impl() = 0;
 			virtual void restore_impl() = 0;
 			virtual void init_impl() = 0;
-			virtual void add_scene(iScene* scene) = 0;
+			virtual void add_scene(Scene* scene) = 0;
 			virtual void remove_scene() = 0;
 			virtual void add_subrender(const boost::shared_ptr<iRender>&) = 0;
 			virtual void add_camera(const boost::shared_ptr<iCamera>&) {}
@@ -32,7 +32,7 @@ namespace mhe
 				init_impl();
 			}
 
-			void add(iScene* scene)
+			void add(Scene* scene)
 			{
 				add_scene(scene);
 			}

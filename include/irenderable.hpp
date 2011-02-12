@@ -11,6 +11,7 @@ namespace mhe
     {
         private:
             virtual void draw_impl() = 0;
+            virtual void update_impl(cmn::uint) {}
 
             virtual cmn::uint num_vertexes() const = 0;
 
@@ -37,6 +38,11 @@ namespace mhe
             int id() const
             {
                 return get_id();
+            }
+
+            void update(cmn::uint tick)
+            {
+                update_impl(tick);
             }
 
             /*const std::string& name() const

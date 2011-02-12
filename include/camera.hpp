@@ -12,6 +12,8 @@ namespace mhe
             v3d dir;
             float x_ang, y_ang, z_ang;
             std::string name_;
+            float z_near, z_far;
+            float fov;
 
             void set_position(const v3d& v)
             {
@@ -49,7 +51,10 @@ namespace mhe
             Camera() :
                 x_ang(0),
                 y_ang(0),
-                z_ang(0)
+                z_ang(0),
+                z_near(0.1),
+                z_far(100),
+                fov(30)
             {
             }
 
@@ -58,7 +63,10 @@ namespace mhe
                 dir(direction),
                 x_ang(0),
                 y_ang(0),
-                z_ang(0)
+                z_ang(0),
+                z_near(0.1),
+                z_far(100),
+                fov(30)
             {
             }
 
