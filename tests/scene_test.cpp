@@ -33,25 +33,32 @@ int scene_test(int argc, char **argv)
     const cmn::uint h = 600;
     const cmn::uint bpp = 32;
     mhe::GLWindow window(w, h, bpp);
-    boost::shared_ptr<mhe::Viewport> view(new mhe::Viewport(0, 0, w, h));
+    boost::shared_ptr<mhe::Viewport> view(new mhe::Viewport(0, 0, w / 2, h));
+    boost::shared_ptr<mhe::Viewport> view_2(new mhe::Viewport(w / 2, 0, w, h));
     mhe::globals::instance().set_window(w, h);
 
     glClearColor(1, 1, 1, 1);
 
     // create scene
-    mhe::Scene scene;
-    scene.setViewport(boost::shared_ptr<mhe::Viewport>(view));
+    mhe::Scene* scene = new mhe::Scene;
+    scene->setViewport(boost::shared_ptr<mhe::Viewport>(view));
     boost::shared_ptr<mhe::iRenderable> axis(new mhe::Axis);
-    scene.add(axis);
+    scene->add(axis);
+
+    mhe::Scene* scene_2 = new mhe::Scene;
+    scene_2->setViewport(boost::shared_ptr<mhe::Viewport>(view_2));
+    scene_2->add(axis);
 
     // setup render
     boost::shared_ptr<mhe::WindowSystem> ws(new mhe::WindowSystem);
     boost::shared_ptr<mhe::iRender> render(new mhe::Render3D(ws));
-    render->add(&scene);
+    render->add(scene);
+    render->add(scene_2);
 
     boost::shared_ptr<mhe::iCamera> m_camera(new mhe::Camera(mhe::v3d(0.5, 0.5, 2), mhe::v3d(0, 0, 0)));
     m_camera->update();
-    scene.addCamera(m_camera, true);
+    scene->addCamera(m_camera, true);
+    scene_2->addCamera(m_camera, true);
 
     mhe::InputSystem is;
     is.addListener(new SimpleQuit(mhe::SystemEventType, mhe::QUIT));
