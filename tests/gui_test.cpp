@@ -21,60 +21,60 @@ namespace
     boost::shared_ptr<mhe::gui::iFont> fnt;
     boost::shared_ptr<mhe::gui::MainWidget> mw;
     boost::shared_ptr<mhe::gui::Label> lbl;
-};
 
-class SimpleQuit : public mhe::EventListener
-{
-    public:
-        SimpleQuit(mhe::EventType et, int type) :
-            mhe::EventListener(et, type)
-        {
-        }
-        bool handle(const mhe::Event&)
-        {
-            running = false;
-            return true;
-        }
-};
+    class SimpleQuit : public mhe::EventListener
+    {
+        public:
+            SimpleQuit(mhe::EventType et, int type) :
+                mhe::EventListener(et, type)
+            {
+            }
+            bool handle(const mhe::Event&)
+            {
+                running = false;
+                return true;
+            }
+    };
 
-class GUIEventHandler : public mhe::MouseEventHandler
-{
-    public:
-        bool handle(const mhe::MouseEvent& me)
-        {
-            mw->handleMouseEvent(me);
-            return true;
-        }
-};
+    class GUIEventHandler : public mhe::MouseEventHandler
+    {
+        public:
+            bool handle(const mhe::MouseEvent& me)
+            {
+                mw->handleMouseEvent(me);
+                return true;
+            }
+    };
 
-class LabelListener : public mhe::EventListener
-{
-    public:
-        bool handle(const mhe::Event&)
-        {
-            fnt->setForegroundColor(mhe::cfBlack);
-            return true;
-        }
-};
+    class LabelListener : public mhe::EventListener
+    {
+        public:
+            bool handle(const mhe::Event&)
+            {
+                fnt->setForegroundColor(mhe::cfBlack);
+                return true;
+            }
+    };
 
-class LabelLeftListener : public mhe::EventListener
-{
-    public:
-        bool handle(const mhe::Event&)
-        {
-            fnt->setForegroundColor(mhe::cfRed);
-            return true;
-        }
-};
+    class LabelLeftListener : public mhe::EventListener
+    {
+        public:
+            bool handle(const mhe::Event&)
+            {
+                fnt->setForegroundColor(mhe::cfRed);
+                return true;
+            }
+    };
 
-class LabelClickListener : public mhe::EventListener
-{
-    public:
-        bool handle(const mhe::Event& e)
-        {
-            lbl->setCaption("Nya ^_^");
-            return true;
-        }
+    class LabelClickListener : public mhe::EventListener
+    {
+        public:
+            bool handle(const mhe::Event& e)
+            {
+                lbl->setCaption("Nya ^_^");
+                return true;
+            }
+    };
 };
 
 int gui_test(int argc, char **argv)

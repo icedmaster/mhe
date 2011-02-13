@@ -40,9 +40,7 @@ namespace mhe
                 return name_;
             }
 
-            void set_projection(cmn::uint w, cmn::uint h)
-            {
-            }
+            void set_projection(cmn::uint w, cmn::uint h);
 
             void rotate_impl(const v3d& v, float ang);
             void move_impl(const v3d& v, float dist);

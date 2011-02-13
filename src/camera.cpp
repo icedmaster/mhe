@@ -4,6 +4,19 @@
 
 using namespace mhe;
 
+void Camera::set_projection(cmn::uint w, cmn::uint h)
+{
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+
+    float aspect = (float)w/(float)h;
+    float tan_angle = tan(fov * 3.14159265358f / 180.0);
+    glFrustum(-tan_angle * 0.1 * aspect, tan_angle * 0.1 * aspect,
+              -tan_angle * 0.1, tan_angle * 0.1, 0.1, 100.0);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+}
+
 void Camera::update_impl()
 {
     glMatrixMode(GL_MODELVIEW);
