@@ -13,7 +13,7 @@ namespace mhe
             virtual void draw_impl() = 0;
             virtual void update_impl(cmn::uint) {}
 
-            virtual cmn::uint num_vertexes() const = 0;
+            virtual cmn::uint num_vertexes() const {return 0;}
 
             virtual int get_id() const
             {

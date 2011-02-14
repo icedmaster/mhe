@@ -2,6 +2,8 @@
 #include "render2d.hpp"
 #include "render3d.hpp"
 #include "glwindow.hpp"
+#include "gui/gui.hpp"
+#include "math/mhe_math.hpp"
 
 namespace
 {
@@ -39,6 +41,14 @@ int scene_test(int argc, char **argv)
 
     glClearColor(1, 1, 1, 1);
 
+    // create gui
+    boost::shared_ptr<mhe::gui::iFont> font(mhe::gui::FontManager::instance().load("/home/master/projects/assets/FreeSans.ttf", 20));
+    boost::shared_ptr<mhe::gui::Label> lbl(new mhe::gui::Label);
+    lbl->setFont(font);
+    lbl->setBackground(mhe::cfGreen);
+    lbl->setGeometry(mhe::rect(200, 500, 100, 50));
+    lbl->setCaption("nya");
+
     // create scene
     mhe::Scene* scene = new mhe::Scene;
     scene->setViewport(boost::shared_ptr<mhe::Viewport>(view));
@@ -49,16 +59,25 @@ int scene_test(int argc, char **argv)
     scene_2->setViewport(boost::shared_ptr<mhe::Viewport>(view_2));
     scene_2->add(axis);
 
+    mhe::Scene* gui_scene = new mhe::Scene;
+    gui_scene->setViewport(scene->getViewport());
+    gui_scene->add(lbl);
+
     // setup render
     boost::shared_ptr<mhe::WindowSystem> ws(new mhe::WindowSystem);
     boost::shared_ptr<mhe::iRender> render(new mhe::Render3D(ws));
     render->add(scene);
     render->add(scene_2);
+    boost::shared_ptr<mhe::iRender> gui_render(new mhe::Render2D(ws));
+    gui_render->add(gui_scene);
+    render->addSubrender(gui_render);
 
     boost::shared_ptr<mhe::iCamera> m_camera(new mhe::Camera(mhe::v3d(0.5, 0.5, 2), mhe::v3d(0, 0, 0)));
     m_camera->update();
+    boost::shared_ptr<mhe::iCamera> m_camera2(new mhe::Camera(mhe::v3d(0.5, 0.5, 2), mhe::v3d(0, 0, 0)));
+    m_camera2->update();
     scene->addCamera(m_camera, true);
-    scene_2->addCamera(m_camera, true);
+    scene_2->addCamera(m_camera2, true);
 
     mhe::InputSystem is;
     is.addListener(new SimpleQuit(mhe::SystemEventType, mhe::QUIT));

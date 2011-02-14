@@ -6,7 +6,7 @@ namespace mhe
 	void Render2D::init_impl()
 	{
 		glMatrixMode(GL_PROJECTION);
-		glOrtho(ws_->width(), 0, ws_->height(), 0, -1, 1);
+		glOrtho(0, ws_->width(), 0, ws_->height(), -1, 1);
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 	}
@@ -14,12 +14,18 @@ namespace mhe
 	void Render2D::save_impl()
 	{
 		save_attributes();
+		glMatrixMode(GL_PROJECTION);
 		glPushMatrix();
-		init_impl();
+		//glLoadIdentity();
+		//glOrtho(0, ws_->width(), 0, ws_->height(), -1, 1);
+		//glMatrixMode(GL_MODELVIEW);
+		//glLoadIdentity();
+		//init_impl();
 	}
 
 	void Render2D::restore_impl()
 	{
+	    glMatrixMode(GL_PROJECTION);
 		glPopMatrix();
 		restore_attributes();
 	}
@@ -62,6 +68,13 @@ namespace mhe
 		// draw scene first...
 		for (size_t i = 0; i < scenes_.size(); ++i)
 		{
+		    glMatrixMode(GL_PROJECTION);
+		    glLoadIdentity();
+		    glOrtho(0, scenes_[i]->getViewport()->w(),
+                    0, scenes_[i]->getViewport()->h(),
+                    -1, 1);
+            glMatrixMode(GL_MODELVIEW);
+            glLoadIdentity();
 			scenes_[i]->draw();
 		}
 		// then our subrenders works

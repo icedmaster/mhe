@@ -146,6 +146,16 @@ namespace mhe
                 return cross(v);
             }
 
+            v3d operator- () const
+            {
+                return v3d(-v_[0], -v_[1], -v_[2]);
+            }
+
+            float operator[] (int i) const
+            {
+                return v_[i];
+            }
+
             v3d& cross(const v3d& v)
             {
                 v_[0] = v_[1] * v.v_[2] - v_[2] * v.v_[1];

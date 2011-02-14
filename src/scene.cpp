@@ -25,8 +25,12 @@ namespace mhe
 	void Scene::draw()
 	{
 		view_->setup();
-		active_camera_->setProjection(view_->w(), view_->h());
-		active_camera_->update();
+		if (active_camera_)
+		{
+            active_camera_->setProjection(view_->w(), view_->h());
+            active_camera_->update();
+		}
+
 		for (nodemap::const_iterator it = obj_.begin();
 									 it != obj_.end();
 									 ++it)

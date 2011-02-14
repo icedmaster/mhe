@@ -4,6 +4,7 @@
 #include "input.hpp"
 #include "font.hpp"
 #include "rect.hpp"
+#include "irenderable.hpp"
 
 namespace mhe
 {
@@ -19,7 +20,7 @@ namespace mhe
 		};
 
 		// abstract Widget class
-		class Widget
+		class Widget : public iRenderable
 		{
 			private:
 				virtual bool handle_keyboard_event(const KeyboardEvent&) = 0;
@@ -32,7 +33,7 @@ namespace mhe
 				virtual void set_geom(const rect&) = 0;
 				virtual void set_font(const boost::shared_ptr<iFont>&) = 0;
 				virtual void set_image(const std::string&) {}
-				virtual void draw_impl() = 0;
+				virtual void draw_impl() {};
 				virtual void set_on_mouse_move(EventListener*) {}
 				virtual void set_on_mouse_left(EventListener*) {}
 				virtual void set_on_mouse_click(EventListener*) {}
@@ -86,11 +87,6 @@ namespace mhe
 				void setImage(const std::string& filename)
 				{
 				    set_image(filename);
-				}
-
-				void draw()
-				{
-					draw_impl();
 				}
 
 				void setOnMouseMove(EventListener* el)

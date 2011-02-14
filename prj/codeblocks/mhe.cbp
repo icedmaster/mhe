@@ -68,6 +68,9 @@
 		<Unit filename="../../include/itimer.hpp" />
 		<Unit filename="../../include/light.hpp" />
 		<Unit filename="../../include/material.hpp" />
+		<Unit filename="../../include/math/matrix.hpp" />
+		<Unit filename="../../include/math/mhe_math.hpp" />
+		<Unit filename="../../include/math/quat.hpp" />
 		<Unit filename="../../include/mesh.hpp" />
 		<Unit filename="../../include/mhe_gl.hpp" />
 		<Unit filename="../../include/multitexture.hpp" />
