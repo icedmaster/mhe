@@ -43,7 +43,7 @@ namespace mhe
 									 it != obj_.end();
 									 ++it)
 		{
-			//it->second->update(e.getTimer().ticks);
+			it->second->update(e.getTimer().tick);
 		}
 		return true;
 	}

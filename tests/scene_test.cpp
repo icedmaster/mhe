@@ -4,6 +4,10 @@
 #include "glwindow.hpp"
 #include "gui/gui.hpp"
 #include "math/mhe_math.hpp"
+#include "sprite.hpp"
+#include "utils/image_loader.hpp"
+#include "texture.hpp"
+#include "geom.hpp"
 #include <iostream>
 
 namespace
@@ -65,8 +69,13 @@ int scene_test(int argc, char **argv)
     lbl->setGeometry(mhe::rect(200, 500, 100, 50));
     lbl->setCaption("nya");
 
+    mhe::InputSystem is;
+    is.addListener(new SimpleQuit(mhe::SystemEventType, mhe::QUIT));
+    is.addListener(new SimpleQuit(mhe::KeyboardEventType, SDLK_ESCAPE));
+    is.addListener(new SimpleTimer(mhe::TimerEventType, 1000));
+
     // create scene
-    mhe::Scene* scene = new mhe::Scene;
+    mhe::Scene* scene = new mhe::Scene(is);
     scene->setViewport(boost::shared_ptr<mhe::Viewport>(view));
     boost::shared_ptr<mhe::iRenderable> axis(new mhe::Axis);
     scene->add(axis);
@@ -78,6 +87,22 @@ int scene_test(int argc, char **argv)
     mhe::Scene* gui_scene = new mhe::Scene;
     gui_scene->setViewport(scene->getViewport());
     gui_scene->add(lbl);
+
+    // try to create sprite
+    // 1) load images
+    boost::shared_ptr<mhe::Image> im(mhe::load_image("/home/master/projects/assets/sprite1.png"));
+    // 2) create texture
+    boost::shared_ptr<mhe::iTexture> tex(new mhe::Texture);
+    tex->setImage(im);
+    // 3) create new animation
+    mhe::Animation a(1000, tex);
+    // 4) create sprite
+    boost::shared_ptr<mhe::Sprite> s(new mhe::Sprite);
+    s->setPosition(mhe::v2d(100, 100));
+    // 5) add animation to sprite
+    s->addAnimation(a);
+    // 6) add sprite to scene
+    gui_scene->add(s);
 
     // setup render
     boost::shared_ptr<mhe::WindowSystem> ws(new mhe::WindowSystem);
@@ -94,11 +119,6 @@ int scene_test(int argc, char **argv)
     m_camera2->update();
     scene->addCamera(m_camera, true);
     scene_2->addCamera(m_camera2, true);
-
-    mhe::InputSystem is;
-    is.addListener(new SimpleQuit(mhe::SystemEventType, mhe::QUIT));
-    is.addListener(new SimpleQuit(mhe::KeyboardEventType, SDLK_ESCAPE));
-    is.addListener(new SimpleTimer(mhe::TimerEventType, 1000));
 
     while (running)
     {

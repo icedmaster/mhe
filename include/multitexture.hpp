@@ -80,6 +80,16 @@ namespace mhe
 			    return c[pos];
 			}
 
+			cmn::uint get_width() const
+			{
+			    return tex[0]->width();
+			}
+
+			cmn::uint get_height() const
+			{
+			    return tex[0]->height();
+			}
+
         public:
             MultiTexture()
             {

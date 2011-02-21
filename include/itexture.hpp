@@ -36,6 +36,9 @@ namespace mhe
 			virtual const v2d& get_coord(cmn::uint) const = 0;
 			virtual void draw_impl(cmn::uint pos) = 0;
 			virtual void set_coord(const std::vector<float>&) = 0;
+
+			virtual cmn::uint get_width() const = 0;
+			virtual cmn::uint get_height() const = 0;
 		public:
 			void setImage(const boost::shared_ptr<Image>& im, StoreType st = NotStore, FilterType ft = Nearest)
 			{
@@ -103,6 +106,16 @@ namespace mhe
 			void setCoord(const std::vector<float>& c)
 			{
 			    set_coord(c);
+			}
+
+			cmn::uint width() const
+			{
+			    return get_width();
+			}
+
+			cmn::uint height() const
+			{
+			    return get_height();
 			}
 	};
 

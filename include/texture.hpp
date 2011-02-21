@@ -18,6 +18,7 @@ namespace mhe
 			bool binded_;
 			v2d c[4];
 			std::vector<float> coord;
+			cmn::uint w_, h_;
 
 			void rebuild_texture();
 		private:
@@ -99,11 +100,22 @@ namespace mhe
 
 			}
 
+			cmn::uint get_width() const
+			{
+			    return w_;
+			}
+
+			cmn::uint get_height() const
+			{
+			    return h_;
+			}
+
 		public:
 			Texture() :
 				id_(0),
 				st_(NotStore),
-				binded_(false)
+				binded_(false),
+				w_(0), h_(0)
 			{}
 
 			Texture(const Texture& t) :
@@ -112,7 +124,8 @@ namespace mhe
 				ft_(t.ft_),
 				im_(t.im_),
 				st_(t.st_),
-				binded_(t.binded_)
+				binded_(t.binded_),
+				w_(0), h_(0)
 			{}
 
 			~Texture()

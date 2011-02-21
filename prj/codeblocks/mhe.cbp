@@ -80,6 +80,7 @@
 		<Unit filename="../../include/render3d.hpp" />
 		<Unit filename="../../include/scene.hpp" />
 		<Unit filename="../../include/sdl_input.hpp" />
+		<Unit filename="../../include/sprite.hpp" />
 		<Unit filename="../../include/test/gui_test.hpp" />
 		<Unit filename="../../include/test/scene_test.hpp" />
 		<Unit filename="../../include/test/text_test.hpp" />
@@ -115,6 +116,7 @@
 		<Unit filename="../../src/render3d.cpp" />
 		<Unit filename="../../src/scene.cpp" />
 		<Unit filename="../../src/sdl_input.cpp" />
+		<Unit filename="../../src/sprite.cpp" />
 		<Unit filename="../../src/texture.cpp" />
 		<Unit filename="../../src/utils/argparser.cpp" />
 		<Unit filename="../../src/utils/file_utils.cpp" />

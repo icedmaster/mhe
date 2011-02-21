@@ -17,6 +17,8 @@ void Texture::rebuild_texture()
 	glTexImage2D(GL_TEXTURE_2D, 0, im_->bpp() >> 3, im_->width(), im_->height(),
 				 0, format, GL_UNSIGNED_BYTE, &(im_->get()[0]));
 
+    w_ = im_->width();
+    h_ = im_->height();
 	if (st_ == NotStore)
 		im_.reset();
     binded_ = true;

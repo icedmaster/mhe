@@ -130,8 +130,8 @@ namespace mhe
 
 			const eTimer& getTimer() const
 			{
-			    if (get_type() != TimerEventType)
-                    throw mhe::exception("Not timer event emitted!");
+			    //if (get_type() != TimerEventType)
+                //    throw mhe::exception("Not timer event emitted!");
                 return timer;
 			}
 	};
