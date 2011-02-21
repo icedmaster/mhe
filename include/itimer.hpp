@@ -11,6 +11,7 @@ namespace mhe
             virtual void stop_impl() = 0;
             virtual bool is_elapsed() const = 0;
         public:
+            virtual ~iTimer() {}
             void set(cmn::uint interval, bool start = true)
             {
                 set_impl(interval);

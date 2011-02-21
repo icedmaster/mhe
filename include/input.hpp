@@ -52,22 +52,28 @@ namespace mhe
 	    cmn::uint y;
 	};
 
-	struct Mouse
+	struct eMouse
 	{
 	    Point pos;
 	    cmn::uint button;
 	};
 
-	struct Keyboard
+	struct eKeyboard
 	{
 	    cmn::uint key;
+	};
+
+	struct eTimer
+	{
+	    cmn::uint tick;
 	};
 
 	class Event
 	{
 	    private:
-            Mouse mouse;
-            Keyboard keyboard;
+            eMouse mouse;
+            eKeyboard keyboard;
+            eTimer timer;
 		private:
 			virtual EventType get_type() const
 			{
@@ -79,14 +85,19 @@ namespace mhe
 				return 0;
 			}
         protected:
-            void set_mouse(const Mouse& m)
+            void set_mouse(const eMouse& m)
             {
                 mouse = m;
             }
 
-            void set_keyboard(const Keyboard& k)
+            void set_keyboard(const eKeyboard& k)
             {
                 keyboard = k;
+            }
+
+            void set_timer(const eTimer& t)
+            {
+                timer = t;
             }
 		public:
             Event()
@@ -103,18 +114,25 @@ namespace mhe
 				return get_id();
 			}
 
-			const Mouse& getMouse() const
+			const eMouse& getMouse() const
 			{
 			    if (get_type() != MouseEventType)
                     throw mhe::exception("Not mouse type emitted!");
 			    return mouse;
 			}
 
-			const Keyboard& getKeyboard() const
+			const eKeyboard& getKeyboard() const
 			{
 			    if (get_type() != KeyboardEventType)
                     throw mhe::exception("Not keyboard event emitted!");
                 return keyboard;
+			}
+
+			const eTimer& getTimer() const
+			{
+			    if (get_type() != TimerEventType)
+                    throw mhe::exception("Not timer event emitted!");
+                return timer;
 			}
 	};
 
@@ -136,7 +154,7 @@ namespace mhe
 			KeyboardEvent(int type, cmn::uint sym) :
 				type_(type)
 			{
-			    Keyboard kb;
+			    eKeyboard kb;
 			    kb.key = sym;
 			    set_keyboard(kb);
 			}
@@ -167,9 +185,12 @@ namespace mhe
         private:
             int event_;
         public:
-            SystemEvent(int event) :
+            SystemEvent(int event, cmn::uint tick = 0) :
                 event_(event)
             {
+                eTimer t;
+                t.tick = tick;
+                set_timer(t);
             }
 	};
 
@@ -197,7 +218,7 @@ namespace mhe
             MouseEvent(int event, const Point& pos, cmn::uint but = 0) :
                 event_(event)
             {
-                Mouse m;
+                eMouse m;
                 m.button = but;
                 m.pos = pos;
                 set_mouse(m);
@@ -216,6 +237,27 @@ namespace mhe
             cmn::uint buttons() const
             {
                 return getMouse().button;
+            }
+	};
+
+	class TimerEvent : public Event
+	{
+	    private:
+			EventType get_type() const
+			{
+				return TimerEventType;
+			}
+
+			cmn::uint get_id() const
+			{
+				return (TimerEventType << 24);
+			}
+	    public:
+            TimerEvent(cmn::uint tick)
+            {
+                eTimer t;
+                t.tick = tick;
+                set_timer(t);
             }
 	};
 

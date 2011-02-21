@@ -2,6 +2,7 @@
 #define _SDL_INPUT_HPP_
 
 #include "input.hpp"
+#include "timer.hpp"
 #include <SDL/SDL.h>
 #include <boost/shared_ptr.hpp>
 #include <vector>
@@ -25,12 +26,22 @@ namespace mhe
 
 			typedef std::map< cmn::uint, boost::shared_ptr<EventListener> > listmap;
 			listmap m_listeners;
+			// different container for timer listeners, because we use another
+            // logic for this type of events
+			struct tl_s     // timer listener struct
+			{
+                boost::shared_ptr<iTimer> t;
+                boost::shared_ptr<EventListener> el;
+			};
+			std::vector<tl_s> timer_listeners;
+
 			void check_listeners(const Event& ev);
 			void add_keydown_event(const SDL_keysym&);
 			void add_keyup_event(const SDL_keysym&);
 			void add_mouse_move_event(const SDL_MouseMotionEvent&);
 			void add_mouse_button_event(const SDL_MouseButtonEvent&);
 			void add_quit_event();
+			void add_timer_event();
 		public:
 			SDLInputSystem();
 	};

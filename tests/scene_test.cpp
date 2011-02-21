@@ -4,6 +4,7 @@
 #include "glwindow.hpp"
 #include "gui/gui.hpp"
 #include "math/mhe_math.hpp"
+#include <iostream>
 
 namespace
 {
@@ -26,6 +27,21 @@ namespace
             running = false;
             return true;
         }
+    };
+
+    class SimpleTimer : public mhe::EventListener
+    {
+        public:
+            SimpleTimer(mhe::EventType et, int type) :
+                mhe::EventListener(et, type)
+            {
+            }
+
+            bool handle(const mhe::Event&)
+            {
+                std::cout << "second elapsed\n";
+                return true;
+            }
     };
 };
 
@@ -82,6 +98,7 @@ int scene_test(int argc, char **argv)
     mhe::InputSystem is;
     is.addListener(new SimpleQuit(mhe::SystemEventType, mhe::QUIT));
     is.addListener(new SimpleQuit(mhe::KeyboardEventType, SDLK_ESCAPE));
+    is.addListener(new SimpleTimer(mhe::TimerEventType, 1000));
 
     while (running)
     {

@@ -40,6 +40,22 @@ void SDLInputSystem::check_impl()
 			default: break;
 		}
 	}
+
+	// check timer events
+	for (size_t i = 0; i < timer_listeners.size(); ++i)
+	{
+	    if (timer_listeners[i].t->elapsed())
+	    {
+	        // create new event
+            TimerEvent te(SDL_GetTicks());
+            timer_listeners[i].el->handle(te);
+            // restart timer
+            timer_listeners[i].t->start();
+	    }
+	}
+
+	// last, create system event TIMER
+	add_timer_event();
 }
 
 
@@ -85,7 +101,16 @@ void SDLInputSystem::handle_impl()
 
 void SDLInputSystem::add_listener(EventListener* el)
 {
-	m_listeners.insert(listmap::value_type(el->id(), boost::shared_ptr<EventListener>(el)));
+    if ( (el->id() >> 24) == TimerEventType )
+    {
+        tl_s ts;
+        ts.t.reset(new Timer);
+        ts.t->set(el->id() & 0xffffff);
+        ts.el.reset(el);
+        timer_listeners.push_back(ts);
+    }
+    else
+        m_listeners.insert(listmap::value_type(el->id(), boost::shared_ptr<EventListener>(el)));
 }
 
 
@@ -108,6 +133,12 @@ void SDLInputSystem::add_keydown_event(const SDL_keysym& sym)
 void SDLInputSystem::add_quit_event()
 {
     SystemEvent se(QUIT);
+    check_listeners(se);
+}
+
+void SDLInputSystem::add_timer_event()
+{
+    SystemEvent se(TIMER, SDL_GetTicks());
     check_listeners(se);
 }
 

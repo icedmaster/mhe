@@ -65,7 +65,7 @@ namespace
             bool handle(const mhe::Event& e)
             {
                 // we listen only left button click
-                mhe::Mouse m = e.getMouse();
+                mhe::eMouse m = e.getMouse();
                 if (m.button == mhe::BUTTON_RIGHT) return true;
                 std::cout << "left button clicked at \n" << m.pos.x << " " << m.pos.y << "\n";
                 return true;
