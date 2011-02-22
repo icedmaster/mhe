@@ -20,11 +20,11 @@ namespace mhe
 	void Sprite::draw_impl()
 	{
 		if (an_.empty()) return;
-
 		float w = an_[cur_frame_].texture()->width();
 		float h = an_[cur_frame_].texture()->height();
 
 		// draw sprite
+		glColor3fv(cfWhite.get());
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, an_[cur_frame_].texture()->id());
 		glBegin(GL_QUADS);

@@ -6,6 +6,7 @@
 namespace mhe
 {
     class iInputSystem;
+    class iTexture;
 
     class SystemFactory
     {
@@ -22,6 +23,7 @@ namespace mhe
             }
 
             iInputSystem* createInputSystem();
+            iTexture* createTexture();
 
     };
 

@@ -6,6 +6,7 @@
 namespace mhe
 {
     std::string get_file_extensiton(const std::string& filename);
+    std::string get_file_name(const std::string& path);
 };
 
 #endif

@@ -12,6 +12,8 @@
     #include "gui/mhe_label.hpp"
 #endif
 
+#include "texture.hpp"
+
 namespace mhe {
 
 iInputSystem* SystemFactory::createInputSystem()
@@ -21,6 +23,11 @@ iInputSystem* SystemFactory::createInputSystem()
     #endif
 
     return nullptr;
+}
+
+iTexture* SystemFactory::createTexture()
+{
+    return new Texture;
 }
 
 namespace gui {

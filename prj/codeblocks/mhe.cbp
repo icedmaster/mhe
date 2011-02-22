@@ -86,6 +86,7 @@
 		<Unit filename="../../include/test/text_test.hpp" />
 		<Unit filename="../../include/test/texture_test.hpp" />
 		<Unit filename="../../include/texture.hpp" />
+		<Unit filename="../../include/texture_manager.hpp" />
 		<Unit filename="../../include/timer.hpp" />
 		<Unit filename="../../include/utils/argparser.hpp" />
 		<Unit filename="../../include/utils/file_utils.hpp" />
@@ -118,6 +119,7 @@
 		<Unit filename="../../src/sdl_input.cpp" />
 		<Unit filename="../../src/sprite.cpp" />
 		<Unit filename="../../src/texture.cpp" />
+		<Unit filename="../../src/texture_manager.cpp" />
 		<Unit filename="../../src/utils/argparser.cpp" />
 		<Unit filename="../../src/utils/file_utils.cpp" />
 		<Unit filename="../../src/utils/image_loader.cpp" />

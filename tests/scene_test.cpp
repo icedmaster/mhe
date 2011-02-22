@@ -8,6 +8,7 @@
 #include "utils/image_loader.hpp"
 #include "texture.hpp"
 #include "geom.hpp"
+#include "texture_manager.hpp"
 #include <iostream>
 
 namespace
@@ -90,10 +91,11 @@ int scene_test(int argc, char **argv)
 
     // try to create sprite
     // 1) load images
-    boost::shared_ptr<mhe::Image> im(mhe::load_image("/home/master/projects/assets/sprite1.png"));
+    //boost::shared_ptr<mhe::Image> im(mhe::load_image("/home/master/projects/assets/sprite1.png"));
     // 2) create texture
-    boost::shared_ptr<mhe::iTexture> tex(new mhe::Texture);
-    tex->setImage(im);
+    mhe::TextureManager tm;
+    boost::shared_ptr<mhe::iTexture> tex(tm.load("/home/master/projects/assets/sprite1.png"));
+    //tex->setImage(im);
     // 3) create new animation
     mhe::Animation a(1000, tex);
     // 4) create sprite
