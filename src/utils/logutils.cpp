@@ -1,24 +1,23 @@
-#include "logutils.hpp"
+#include "utils/logutils.hpp"
 
-using namespace mhe;
+namespace mhe {
+namespace utils {
 
-boost::shared_ptr<mhe::log> mhe::utils::createStandartLog()
-{
-	boost::shared_ptr<mixlog> l(new mixlog);
-	boost::shared_ptr<stdlog> l1(new stdlog);
-	boost::shared_ptr<filelog> l2(new filelog);
-	boost::shared_ptr<netlog> l3(new netlog);
+    bool createStandartLog()
+    {
+        boost::shared_ptr<stdlog> l1(new stdlog);
+        boost::shared_ptr<filelog> l2(new filelog);
+        boost::shared_ptr<netlog> l3(new netlog);
 
-	if ( !l2->open("log.log") || !l3->open() )
-		return l;
-	l->add(l1);
-	l->add(l2);
-	l->add(l3);
+        global_log::instance().add(l1);
 
-	return l;
+        if (l2->open("log.log"))
+            global_log::instance().add(l2);
+        if (l3->open())
+            global_log::instance().add(l3);
+
+        return true;
+    }
+
 }
-
-
-void mhe::utils::log_write(const std::string& s)
-{
 }

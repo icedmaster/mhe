@@ -18,14 +18,16 @@ namespace mhe
         return ext;
     }
 
-    std::string get_file_name(const std::string& path)
-    {
-        size_t s_pos = path.find_last_of('/');
-        if (s_pos == std::string::npos)
-            return path;
-        std::string fn = path.substr(s_pos + 1, path.length() - s_pos - 1);
-        for (size_t i = 0; i < fn.length(); ++i)
-            fn[i] = std::tolower(fn[i]);
-        return fn;
-    }
+	std::string get_file_name(const std::string& filepath)
+	{
+		size_t slash_pos = filepath.find_last_of('/');
+		// get filename with extension
+		const std::string& fne = filepath.substr(slash_pos + 1, filepath.length() - slash_pos - 1);
+		// remove extension
+		size_t point_pos = fne.find_last_of('.');
+		std::string fn = fne;
+		if (point_pos)
+			fn.erase(point_pos, fn.length() - point_pos);
+		return fn;
+	}
 };

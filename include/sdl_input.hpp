@@ -1,51 +1,46 @@
 #ifndef _SDL_INPUT_HPP_
 #define _SDL_INPUT_HPP_
 
-#include "input.hpp"
-#include "timer.hpp"
-#include <SDL/SDL.h>
-#include <boost/shared_ptr.hpp>
-#include <vector>
+#include "event.hpp"
 #include <map>
+#include <vector>
+#include <SDL/SDL.h>
 
 namespace mhe
 {
 	class SDLInputSystem : public iInputSystem
 	{
 		private:
-			void check_impl();
-			void handle_impl();
-			void add_listener(EventListener* el);
-			void set_keyboard_event_handler(KeyboardEventHandler *keh);
-			void set_mouse_event_handler(MouseEventHandler* meh);
-		private:
-			boost::shared_ptr<KeyboardEventHandler> keyboard_handler;
-			boost::shared_ptr<MouseEventHandler> mouse_handler;
-			std::vector<KeyboardEvent> keyboard_events;
-			std::vector<MouseEvent> mouse_events;
+			typedef std::multimap< cmn::uint, boost::shared_ptr<EventListener> > mlisteners;
+			typedef std::pair< mlisteners::iterator, mlisteners::iterator > mlitpair;
 
-			typedef std::map< cmn::uint, boost::shared_ptr<EventListener> > listmap;
-			listmap m_listeners;
-			// different container for timer listeners, because we use another
-            // logic for this type of events
-			struct tl_s     // timer listener struct
-			{
-                boost::shared_ptr<iTimer> t;
-                boost::shared_ptr<EventListener> el;
-			};
-			std::vector<tl_s> timer_listeners;
+			mlisteners listmap;
+			mlisteners arg_listmap;
+			mlisteners gl_listmap;
+			//std::vector< boost::shared_ptr<Event> > events;
+			WindowSystem* ws_;
 
-			void check_listeners(const Event& ev);
+			void check_listeners(Event& e);
+
 			void add_keydown_event(const SDL_keysym&);
 			void add_keyup_event(const SDL_keysym&);
 			void add_mouse_move_event(const SDL_MouseMotionEvent&);
 			void add_mouse_button_event(const SDL_MouseButtonEvent&);
+			void add_mouse_event(int type, int x, int y, int button);
 			void add_quit_event();
-			void add_timer_event();
+
+			void add_event_timestamp(Event* e);
 		public:
 			SDLInputSystem();
-	};
 
-};
+			void check();
+			void handle();
+			void addListener(EventListener* el);
+			void setWindowSystem(WindowSystem* ws)
+			{
+				ws_ = ws;
+			}
+	};
+}
 
 #endif

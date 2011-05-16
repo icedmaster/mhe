@@ -1,111 +1,253 @@
 #ifndef _WIDGET_HPP_
 #define _WIDGET_HPP_
 
-#include "input.hpp"
-#include "font.hpp"
-#include "rect.hpp"
-#include "irenderable.hpp"
+#include "mhe_math.hpp"
+#include "idriver.hpp"
+#include "event.hpp"
+#include "ifont.hpp"
+#include "itexture.hpp"
+#include <boost/shared_ptr.hpp>
 
 namespace mhe
 {
 	namespace gui
 	{
-		class Widget;
+	    class Widget;
+		typedef boost::shared_ptr<Widget> widgetptr;
 
-		enum WidgetType
+		class GUIEventHandler
 		{
-			MainWidgetType,
-			LabelType,
-			ButtonType
+			public:
+				virtual void handle(const Widget*) {}
+		};
+		typedef boost::shared_ptr<GUIEventHandler> guieventptr;
+
+		enum
+		{
+			OnMouseMove = 0,
+			OnMouseLeft = 1,
+			OnMouseLeftClick = 2,
+			OnMouseRightClick = 3,
+			OnMouseButtonRelease = 4
 		};
 
-		// abstract Widget class
-		class Widget : public iRenderable
+		// Must be implemented next functions:
+		// set_geometry(rect&)
+		// get_geometry()
+		// draw_impl()
+		// set_visible(bool)
+		// get_visible()
+		// set_enabled(bool)
+
+		class Widget
 		{
 			private:
-				virtual bool handle_keyboard_event(const KeyboardEvent&) = 0;
-				virtual bool handle_mouse_event(const MouseEvent&) = 0;
-				virtual const boost::shared_ptr<Widget>& get_parent() const = 0;
-				virtual void add_widget(const boost::shared_ptr<Widget>&) = 0;
-				virtual void set_name(const std::string&) = 0;
-				virtual const std::string& get_name() const = 0;
-				virtual WidgetType get_type() const = 0;
-				virtual void set_geom(const rect&) = 0;
-				virtual void set_font(const boost::shared_ptr<iFont>&) = 0;
-				virtual void set_image(const std::string&) {}
-				virtual void draw_impl() {};
-				virtual void set_on_mouse_move(EventListener*) {}
-				virtual void set_on_mouse_left(EventListener*) {}
-				virtual void set_on_mouse_click(EventListener*) {}
-			public:
+				bool visible_;
+                colorf clr;
+			private:
+				void process_event(int e)
+				{
+					guieventptr ge = get_gui_handler(e);
+					if (ge)
+                    	ge->handle(this);
+				}
+			private:
+				virtual void set_geometry(const rect<float>&) = 0;
+				virtual const rect<float>& get_geometry() const = 0;
+
+				virtual void draw_impl(const boost::shared_ptr<iDriver>&) = 0;
+
+                virtual void set_parent(const Widget*) {}
+				virtual widgetptr get_parent() const {return widgetptr();}
+				virtual void add_child(const widgetptr&) {}
+				virtual std::vector<widgetptr> get_childs() const
+				{
+					return std::vector<widgetptr>(0);
+				}
+
 				// events
-				bool handleKeyboardEvent(const KeyboardEvent& e)
+				virtual void set_mouse_on(bool)  {}
+				virtual bool is_mouse_on() const {return false;}
+
+				virtual void set_handler(int, const guieventptr&) {}
+				virtual guieventptr get_gui_handler(int) const {return guieventptr();}
+
+				virtual void set_enabled(bool) = 0;
+
+				virtual void set_font(const boost::shared_ptr<iFont>&) {}
+				virtual boost::shared_ptr<iFont> get_font() const {return boost::shared_ptr<iFont>();}
+				virtual void set_caption(const std::wstring&) {}
+				virtual std::wstring get_caption() const {return std::wstring();}
+
+				virtual void set_color(const colorf& c)
 				{
-					return handle_keyboard_event(e);
+				    clr = c;
 				}
 
-				bool handleMouseEvent(const MouseEvent& e)
+				virtual colorf get_color() const
 				{
-					return handle_mouse_event(e);
+					return clr;
+				}
+			protected:
+				// can be called from inherited classes
+				virtual void process_mouse_left_click(const MouseEvent&)
+				{
+					process_event(OnMouseLeftClick);
 				}
 
-				const boost::shared_ptr<Widget>& parent() const
+				virtual void process_mouse_right_click(const MouseEvent&)
 				{
-					return get_parent();
+					process_event(OnMouseRightClick);
 				}
 
-				void add(const boost::shared_ptr<Widget>& w)
+				virtual void process_mouse_move(const MouseEvent&)
 				{
-					add_widget(w);
+					process_event(OnMouseMove);
 				}
 
-				void setName(const std::string& s)
+				virtual void process_mouse_left(const MouseEvent&)
 				{
-					set_name(s);
+					process_event(OnMouseLeft);
 				}
 
-				const std::string& name() const
+				virtual void process_mouse_button_release(const MouseEvent&)
 				{
-					return get_name();
+					process_event(OnMouseButtonRelease);
 				}
 
-				WidgetType type() const
+				virtual void draw_rect(const boost::shared_ptr<iDriver>& driver,
+                                       const boost::shared_ptr<iTexture>& texture);
+
+                virtual void set_visible(bool visible)
 				{
-					return get_type();
+					visible_ = visible;
 				}
 
-				void setGeometry(const rect& r)
+				virtual bool get_visible() const
 				{
-				    set_geom(r);
+					return visible_;
 				}
 
-				void setFont(const boost::shared_ptr<iFont>& fnt)
+			public:
+				Widget();
+				virtual ~Widget() {}
+
+				void setGeometry(const rect<float>& r)
 				{
-				    set_font(fnt);
+					set_geometry(r);
 				}
 
-				void setImage(const std::string& filename)
+				const rect<float>& geometry() const
 				{
-				    set_image(filename);
+					return get_geometry();
 				}
 
-				void setOnMouseMove(EventListener* el)
+				void add(const widgetptr& widget)
 				{
-				    set_on_mouse_move(el);
+					widget->setParent(this);
+					add_child(widget);
 				}
 
-				void setOnMouseLeft(EventListener* el)
+				void setParent(const Widget* parent)
 				{
-				    set_on_mouse_left(el);
+				    set_parent(parent);
 				}
 
-				void setOnMouseClick(EventListener* el)
+				void draw(const boost::shared_ptr<iDriver>& driver)
 				{
-				    set_on_mouse_click(el);
+					draw_impl(driver);
+				}
+
+				bool handleMouseClick(const MouseEvent& me)
+				{
+					if (geometry().in(me.position()))
+					{
+						const std::vector<widgetptr>& ch = get_childs();
+						for (size_t i = 0; i < ch.size(); ++i)
+						{
+							if (ch[i]->handleMouseClick(me))
+								return true;
+						}
+						set_mouse_on(true);
+						if ( (me.state() == MOUSE_BUTTON_RELEASED) || !me.button() )
+							process_mouse_button_release(me);
+						else if (me.button() == BUTTON_LEFT)
+							process_mouse_left_click(me);
+						else if (me.button() == BUTTON_RIGHT)
+							process_mouse_right_click(me);
+						return true;
+					}
+					else if (is_mouse_on())
+					{
+						set_mouse_on(false);
+						process_mouse_left(me);
+					}
+					return false;
+				}
+
+				bool handleMouseMove(const MouseEvent& me)
+				{
+					if (geometry().in(me.position()))
+					{
+						const std::vector<widgetptr>& ch = get_childs();
+						for (size_t i = 0; i < ch.size(); ++i)
+						{
+							if (ch[i]->handleMouseMove(me))
+								return true;
+						}
+						process_mouse_move(me);
+						set_mouse_on(true);
+						return true;
+					}
+					else if (is_mouse_on())
+					{
+						set_mouse_on(false);
+						process_mouse_left(me);
+					}
+					return false;
+				}
+
+				void setHandler(int event, GUIEventHandler* handler)
+				{
+					set_handler(event, guieventptr(handler));
+				}
+
+				void setHandler(int event, const guieventptr& handler)
+				{
+					set_handler(event, handler);
+				}
+
+				void setVisible(bool visible)
+				{
+					set_visible(visible);
+				}
+
+				bool isVisible() const
+				{
+					return get_visible();
+				}
+
+				void setEnabled(bool enable)
+				{
+					set_enabled(enable);
+				}
+
+				void setFont(const boost::shared_ptr<iFont>& font)
+				{
+					set_font(font);
+				}
+
+				void setCaption(const std::wstring& caption)
+				{
+					set_caption(caption);
+				}
+
+				void setColor(const colorf& c)
+				{
+				    set_color(c);
 				}
 		};
-
-	};	// gui
-};	// mhe
+	}
+}
 
 #endif

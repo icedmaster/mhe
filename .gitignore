@@ -1,10 +1,17 @@
 /prj/codeblocks/bin/Debug/mhe
+/assets/
+/bin/
+/obj/
 /prj/codeblocks/mhe.depend
 /prj/codeblocks/mhe.cbp.bak
 /prj/codeblocks/mhe.layout
 /prj/codeblocks/mhe.layout.bak
 *.bak
 *~*
-*log*
+*.log
 *.txt
+*.o
+*.png
+*.bmp
+
 

@@ -3,24 +3,40 @@
 namespace mhe {
 namespace gui {
 
-    bool Label::handle_mouse_event(const MouseEvent& me)
-    {
-        // check mouse position
-        if (impl_->geom().in(me.position().x, me.position().y))
-        {
-            mouse_on_ = true;
-            // if button pressed call click handler
-            if ( (me.type() != MOUSE_MOVE) && on_mouse_click_ )
-                on_mouse_click_->handle(me);
-            else if (on_mouse_move_)
-                on_mouse_move_->handle(me);
-            return true;
-        }
-        else if (mouse_on_ && on_mouse_left_)
-            on_mouse_left_->handle(me);
-        mouse_on_ = false;
-        return false;
-    }
+	int Label::supported_handlers[Label::supported_handlers_number] = {OnMouseMove, OnMouseLeft,
+																	   OnMouseLeftClick, OnMouseRightClick};
 
-};
-};
+	Label::Label() :
+		mouse_on_(false),
+		enabled_(true)
+	{
+	}
+
+	void Label::draw_impl(const boost::shared_ptr<iDriver>& driver)
+	{
+		Widget::draw_rect(driver, texture_);
+	}
+
+	void Label::set_handler(int event, const guieventptr& handler)
+	{
+		int* it = std::find(supported_handlers,
+							supported_handlers + supported_handlers_number,
+							event);
+		if ( it == (supported_handlers + supported_handlers_number) ) return;
+		// delete previous handler
+		handlers.erase(event);
+		// set new handler
+		handlers[event] = handler;
+	}
+
+	guieventptr Label::get_gui_handler(int event) const
+	{
+		if (!get_visible() || !enabled_) return guieventptr();
+		std::map<int, guieventptr>::const_iterator it = handlers.find(event);
+		if (it == handlers.end())
+			return guieventptr();
+		return it->second;
+	}
+
+}
+}

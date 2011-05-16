@@ -1,4 +1,0 @@
-[2010-Dec-27 22:55:14] Log started
-
-[2010-Dec-27 22:55:14] first test string
-[2010-Dec-27 22:55:14] test string #2

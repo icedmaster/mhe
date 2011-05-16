@@ -11,10 +11,7 @@ namespace mhe
 	namespace utils
 	{
 		// Create std|file|net log
-		boost::shared_ptr<log> createStandartLog();
-
-		// write to singleton log functions
-		void log_write(const std::string& s);
+		bool createStandartLog();
 
 		// Singleton class for easy logging in project
 		class global_log : public mixlog

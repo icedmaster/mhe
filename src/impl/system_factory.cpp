@@ -2,7 +2,9 @@
 
 #ifdef __INCLUDE_SDL__
     #include "sdl_input.hpp"
+	#include "sdl_window_system.hpp"
 #endif
+/*
 
 #ifdef __INCLUDE_OGLFT__
     #include "gui/oglft_font.hpp"
@@ -11,10 +13,24 @@
 #ifdef __INCLUDE_MHE_GUI__
     #include "gui/mhe_label.hpp"
 #endif
-
+*/
 #include "texture.hpp"
 
 namespace mhe {
+
+iTexture* SystemFactory::createTexture()
+{
+	return new Texture();
+}
+
+iWindowSystem* SystemFactory::createWindowSystem()
+{
+    #ifdef __INCLUDE_SDL__
+    return new SDLWindowSystem;
+    #endif
+
+    return nullptr;
+}	
 
 iInputSystem* SystemFactory::createInputSystem()
 {
@@ -24,11 +40,7 @@ iInputSystem* SystemFactory::createInputSystem()
 
     return nullptr;
 }
-
-iTexture* SystemFactory::createTexture()
-{
-    return new Texture;
-}
+/*
 
 namespace gui {
 iFontManager* GUIFactory::createFontManager()
@@ -49,6 +61,6 @@ LabelImpl* GUIFactory::createLabel()
     return nullptr;
 }
 
-};  // gui
+};  // gui*/
 
 };  // mhe

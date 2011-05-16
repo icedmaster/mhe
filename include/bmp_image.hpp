@@ -59,6 +59,9 @@ namespace mhe
 
 			// Functions, that need to implement
 			bool load_impl(const std::string& fn);
+			bool load_impl(std::istream& stream);
+			bool save_impl(const std::string& fn);
+			bool save_impl(std::ostream& stream);
 
 			void set_impl(const std::vector<char>& d, cmn::uint w, cmn::uint h)
 			{

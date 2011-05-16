@@ -1,102 +1,140 @@
 #ifndef _SPRITE_HPP_
 #define _SPRITE_HPP_
 
-#include <vector>
-#include <boost/shared_ptr.hpp>
-#include "geom.hpp"
+#include "inode.hpp"
 #include "itexture.hpp"
-#include "globals.hpp"
-#include "irenderable.hpp"
+#include "mhe_math.hpp"
+#include "transform.hpp"
+#include <vector>
+#include <map>
 
 namespace mhe
 {
-	class Animation
-	{
-		private:
-			cmn::uint delay_;
-			boost::shared_ptr<iTexture> tex_;
-		public:
-			Animation(cmn::uint delay,
-					  const boost::shared_ptr<iTexture>& t) :
-				delay_(delay),
-				tex_(t)
+    class Animation : public Transform
+    {
+        private:
+            cmn::uint atime;    // time of playing current animation
+            boost::shared_ptr<iTexture> atexture;
+        public:
+            Animation() :
+                atime(0)
+            {
+            }
+
+            Animation(cmn::uint animation_time,
+                      const boost::shared_ptr<iTexture>& animation_texture) :
+                atime(animation_time),
+                atexture(animation_texture)
+            {
+            }
+
+            cmn::uint duration() const
+            {
+                return atime;
+            }
+
+            const boost::shared_ptr<iTexture>& texture() const
+            {
+                return atexture;
+            }
+    };
+
+    class AnimationList
+    {
+        public:
+            enum AnimationChangeType
+            {
+                FirstAnimation,
+                NextAnimation,
+                LastAnimation,
+                NoChange
+            };
+        private:
+            std::vector<Animation> animations_;
+            bool autorepeat_;
+            cmn::uint next_tick_;
+            size_t cur_animation_;
+            cmn::uint index_;
+        public:
+            AnimationList(bool repeat = false);
+
+            void reset();
+            void add(const Animation& a);
+            void remove(cmn::uint begin, cmn::uint number);
+            void start(cmn::uint tick);
+            void stop();
+            bool next();
+
+            AnimationChangeType update(cmn::uint tick);
+
+            bool get(Animation& a) const;
+            bool get(cmn::uint tick, Animation& a);
+
+            bool is_running() const
+            {
+                return next_tick_;
+            }
+
+            // index getter/setter
+            void setIndex(cmn::uint index)
+            {
+                index_ = index;
+            }
+
+            cmn::uint getIndex() const
+            {
+                return index_;
+            }
+    };
+
+    class Sprite : public iNode
+    {
+        private:
+            typedef std::map <cmn::uint, AnimationList> almap;
+            almap al_;
+            matrixf m_;
+            bool is_alive_;
+            float x_size_, y_size_;
+            bool reset_position_;
+            v3d pos_;   // need while we use reset position
+            AnimationList* current_al_;
+			Animation cur_animation;
+        private:
+            // implementations
+            void draw_impl(const boost::shared_ptr<iDriver>& driver);
+            void update_impl(cmn::uint tick);
+            void set_position(const v3d& pos);
+            matrixf get_matrix() const;
+        public:
+            Sprite() : is_alive_(true), x_size_(0.0), y_size_(0.0), reset_position_(true),
+				current_al_(0)
 			{}
+            Sprite(const AnimationList& al) : is_alive_(true), x_size_(0.0), y_size_(0.0),
+                reset_position_(false), current_al_(0)
+            {
+                al_[al.getIndex()] = al;
+            }
 
-			void set_delay(cmn::uint delay)
+            Sprite(const AnimationList& al, const v3d& position);
+
+            void addAnimationList(const AnimationList& al);
+			void setSize(float size)
 			{
-				delay_ = delay;
+				x_size_ = y_size_ = size;
 			}
 
-			cmn::uint delay() const
+			void setSize(float xsize, float ysize)
 			{
-				return delay_;
+				x_size_ = xsize;
+				y_size_ = ysize;
 			}
 
-			const boost::shared_ptr<iTexture>& texture() const
-			{
-				return tex_;
-			}
-	};
+			float width() const;
+			float height() const;
 
-	typedef std::vector< Animation > anvector;
-
-	class Sprite : public iRenderable
-	{
-		static const int repeat_forever = -1;
-		private:
-			anvector an_;
-			size_t cur_frame_;
-			cmn::uint id_;
-
-			bool is_running_;
-			int repeat_count_;
-			cmn::uint next_tick_;
-			v2d pos_;
-
-			void set_next_animation();
-		private:
-			cmn::uint num_vertexes() const
-			{
-				return 4;
-			}
-
-			int get_id() const
-			{
-				return id_;
-			}
-
-			void set_position(const v3d& v)
-			{
-				pos_.set(v.x(), v.y());
-			}
-
-			void draw_impl();
-		public:
-			Sprite() :
-				cur_frame_(0),
-				//id_(globals::instance().get_id()),
-				is_running_(false)
-			{}
-
-			Sprite(cmn::uint id) :
-				cur_frame_(0),
-				id_(id),
-				is_running_(false)
-			{}
-
-			void setAnimationList(const anvector& av);
-			void addAnimation(const Animation& a);
-
-			void start(cmn::uint tick);
-			void stop();
-
-			void update(cmn::uint tick);
-
-			void setPosition(const v2d& p)
-			{
-			    set_position(v3d(p.x(), p.y(), 0));
-			}
-	};
-};
+            // execute animation from list with index <index>
+            void execute(cmn::uint index, cmn::uint tick, bool reset_position = false);
+    };
+}
 
 #endif

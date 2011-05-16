@@ -4,7 +4,8 @@
 #include <vector>
 #include <cstring>	// for memcpy()
 #include <cmath>
-#include "vector3d.hpp"
+#include "math/math_utils.hpp"
+#include "math/vector3d.hpp"
 
 namespace mhe
 {
@@ -237,23 +238,92 @@ namespace mhe
 
 			void set_rotate_x(float angle)
 			{
+                angle = deg_to_rad(angle);
 				float s = sin(angle);
 				float c = cos(angle);
+				set(1, 0, 0,  0,
+                    0, c, -s, 0,
+                    0, s, c,  0,
+                    0, 0, 0,  1);
 			}
 
 			void set_rotate_y(float angle)
 			{
+			    angle = deg_to_rad(angle);
 				float s = sin(angle);
 				float c = cos(angle);
+				set(c,  0, s,  0,
+                    0,  1, 0,  0,
+                    -s, 0, c,  0,
+                    0,  0, 0,  1);
 			}
 
 			void set_rotate_z(float angle)
 			{
+			    angle = deg_to_rad(angle);
 				float s = sin(angle);
 				float c = cos(angle);
+				set(c, -s, 0,  0,
+                    s, c,  0,  0,
+                    0, 0,  1,  0,
+                    0, 0,  0,  1);
+			}
+
+			void set_scale(const v3d& s)
+			{
+			    set_scale(s.x(), s.y(), s.z());
+			}
+
+			void set_scale(T x, T y, T z)
+			{
+			    set(x, 0, 0, 0,
+                    0, y, 0, 0,
+                    0, 0, z, 0,
+                    0, 0, 0, 1);
+			}
+			
+			// function has been token from OSG
+			void set_frustum(T left, T right, T bottom, T top, T z_near, T z_far)
+			{
+				T A = (right + left) / (right - left);
+				T B = (top + bottom) / (top - bottom);
+				T C = -(z_far + z_near) / (z_far - z_near);
+				T D = -2.0 * z_far * z_near / (z_far - z_near);
+				set(2.0 * z_near / (right - left), 0.0, 							0.0, 0.0,
+					0.0, 						   2.0 * z_near / (top - bottom),   0.0, 0.0,
+					A, 							   B, 								C, 	 -1.0,
+					0.0, 						   0.0, 							D, 	 0.0);
+			}
+			
+			void set_ortho(T left, T right, T bottom, T top, T z_near, T z_far)
+			{
+				T tx = -(right + left) / (right - left);
+				T ty = -(top + bottom) / (top - bottom);
+				T tz = -(z_far + z_near) / (z_far - z_near);
+				set(2 / (right - left), 0, 					0, 					   0,
+					0, 					2 / (top - bottom), 0, 					   0,
+					0, 					0, 					-2 / (z_far - z_near), 0,
+					tx, 				ty, 				tz, 				   1);
+			}
+			
+			void set_perspective(T fov, T aspect_ratio, T z_near, T z_far)
+			{
+				float fov_tan = tan(deg_to_rad(fov * 0.5));
+				T right = fov_tan * aspect_ratio * z_near;
+				T left = -right;
+				T top = fov_tan * z_near;
+				T bottom = -top;
+				set_frustum(left, right, bottom, top, z_near, z_far);
+			}
+
+			// create identity matrix
+			static matrix identity()
+			{
+			    return matrix();
 			}
 	};
 
+	// helper functions
 	template <class T>
 	matrix<T> mult(const matrix<T>& m1, const matrix<T>& m2)
 	{

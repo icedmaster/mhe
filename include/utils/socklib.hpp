@@ -152,7 +152,7 @@ namespace sock
 				return true;
 			}
 
-			virtual bool connect_impl(int timeout)
+			virtual bool connect_impl(int/* timeout*/)
 			{
 				return false;
 			}
@@ -285,7 +285,7 @@ namespace sock
 				return sendto(get_socket(), buf, size, flags, (sockaddr*)&outaddr, sizeof(outaddr));
 			}
 
-			int read_impl(char *buf, int size, int flags, int timeout)
+			int read_impl(char *buf, int size, int flags, int/* timeout*/)
 			{
 				sockaddr_in inaddr;
 				memset((char*)&inaddr, 0, c_addr_len);
@@ -293,7 +293,7 @@ namespace sock
 				return recvfrom(get_socket(), buf, size, flags, (sockaddr*)&inaddr, &len);
 			}
 
-			int recv_p(cmn::uint16_t& port, cmn::uint32_t& addr, char *buf, int size, int flags, int timeout)
+			int recv_p(cmn::uint16_t& port, cmn::uint32_t& addr, char *buf, int size, int flags, int/* timeout*/)
 			{
 				sockaddr_in inaddr;
 				memset((char*)&inaddr, 0, c_addr_len);
@@ -348,7 +348,7 @@ namespace sock
             	return false;
 			}
 
-			bool connect_as_server(int timeout)
+			bool connect_as_server(int/* timeout*/)
 			{
 				int err = ::listen(get_socket(), 1);
 				if (err == socket_error) return false;
@@ -361,7 +361,7 @@ namespace sock
             	return true;
 			}
 
-			bool connect_as_client(int timeout)
+			bool connect_as_client(int/* timeout*/)
         	{
 				sockaddr_in addr;
 				memset((char*)&addr, 0, c_addr_len);
@@ -387,7 +387,7 @@ namespace sock
 				return slen;
 			}
 
-			int read_impl(char* buf, int size, int flags, int timeout)
+			int read_impl(char* buf, int size, int flags, int/* timeout*/)
 			{
 				int slen = 0;
 				while (slen != size)

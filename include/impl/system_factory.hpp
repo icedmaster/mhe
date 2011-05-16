@@ -5,8 +5,9 @@
 
 namespace mhe
 {
+	class iWindowSystem;
     class iInputSystem;
-    class iTexture;
+	class iTexture;
 
     class SystemFactory
     {
@@ -22,14 +23,15 @@ namespace mhe
                 return sf;
             }
 
+			iWindowSystem* createWindowSystem();
             iInputSystem* createInputSystem();
-            iTexture* createTexture();
+			iTexture* createTexture(); 
 
     };
 
     namespace gui
     {
-        class iFontManager;
+        /*class iFontManager;
         class LabelImpl;
 
         class GUIFactory
@@ -48,7 +50,7 @@ namespace mhe
 
                 iFontManager* createFontManager();
                 LabelImpl* createLabel();
-        };
+        };*/
     };
 };
 

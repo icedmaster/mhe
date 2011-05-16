@@ -2,61 +2,32 @@
 
 namespace mhe
 {
-	void Scene::add(const boost::shared_ptr<iRenderable>& obj)
+	void Scene::add(const boost::shared_ptr<iNode>& node)
 	{
-		obj_.insert( nodemap::value_type(obj->id(), obj) );
+		nodes_.insert(node);
 	}
 
-	const boost::shared_ptr<iRenderable>& Scene::getRootNode() const
+	void Scene::addCamera(const boost::shared_ptr<iCamera>& camera)
 	{
-		//nodemap::const_iterator it = nodemap.find("root");
-		nodemap::const_iterator it = obj_.find(0);
-		if (it != obj_.end()) return it->second;
-		return obj_.begin()->second;
+		cameras_.push_back(camera);
+		if (!m_camera)
+			m_camera = camera;
 	}
 
-	/*const boost::shared_ptr<iRenderable>& Scene::get(const std::string& name) const
+	void Scene::draw(const boost::shared_ptr<iDriver>& driver)
 	{
-		nodemap::const_iterator it = nodemap.find(name);
-		if (it != nodemap.end()) return it->second;
-		throw mhe::exception("Node with name " + name + " not found");
-	}*/
+		if (callback_)
+			callback_->beforeDraw(this, driver);
 
-	void Scene::draw()
-	{
-		view_->setup();
-		if (active_camera_)
+		if (m_camera)
+			m_camera->update(driver);
+		// simplify draw all nodes
+		for (nodeset::iterator it = nodes_.begin(); it != nodes_.end(); ++it)
 		{
-            active_camera_->setProjection(view_->w(), view_->h());
-            active_camera_->update();
+			it->draw(driver);
 		}
 
-		for (nodemap::const_iterator it = obj_.begin();
-									 it != obj_.end();
-									 ++it)
-			it->second->draw();
+		if (callback_)
+			callback_->afterDraw(this, driver);
 	}
-
-	bool Scene::handle(const Event& e)
-	{
-		for (nodemap::const_iterator it = obj_.begin();
-									 it != obj_.end();
-									 ++it)
-		{
-			it->second->update(e.getTimer().tick);
-		}
-		return true;
-	}
-
-	void Scene::setActiveCamera(cmn::uint id)
-	{
-		for (size_t i = 0; i < cameras_.size(); ++i)
-		{
-			if (cameras_[i]->id() == id)
-			{
-				active_camera_ = cameras_[i];
-				active_camera_->setProjection(view_->w(), view_->h());
-			}
-		}
-	}
-};
+}	// namespace

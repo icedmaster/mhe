@@ -1,112 +1,76 @@
 #ifndef _LABEL_HPP_
 #define _LABEL_HPP_
 
-#include "gui/widget.hpp"
-#include "gui/widget_impl.hpp"
-#include "impl/system_factory.hpp"
-#include <boost/scoped_ptr.hpp>
+#include "widget.hpp"
+#include "itexture.hpp"
+#include <map>
 
 namespace mhe
 {
-    namespace gui
-    {
-        class Label : public Widget
-        {
-            private:
-                boost::shared_ptr<Widget> parent_;
-                boost::scoped_ptr<LabelImpl> impl_;
-                std::string name_;
+	namespace gui
+	{
+		class Label : public Widget
+		{
+			private:
+				rect<float> g;		// geometry
+				bool mouse_on_;
+				boost::shared_ptr<iTexture> texture_;
+				std::map <int, guieventptr> handlers;
+				bool enabled_;
+				boost::shared_ptr<iFont> font_;
+				std::wstring caption_;
 
-                boost::shared_ptr<EventListener> on_mouse_move_;
-                boost::shared_ptr<EventListener> on_mouse_click_;
-                boost::shared_ptr<EventListener> on_mouse_left_;
-                bool mouse_on_;
-            private:
-                bool handle_keyboard_event(const KeyboardEvent&)
-                {
-                    return false;
-                }
-
-				bool handle_mouse_event(const MouseEvent& me);
-
-				const boost::shared_ptr<Widget>& get_parent() const
+				static const int supported_handlers_number = 4;
+				static int supported_handlers[supported_handlers_number];
+			private:
+				void set_mouse_on(bool on)
 				{
-				    return parent_;
+					mouse_on_ = on;
 				}
 
-				void add_widget(const boost::shared_ptr<Widget>&)
+				bool is_mouse_on() const
 				{
-				    return;
+					return mouse_on_;
 				}
 
-				void set_name(const std::string& name)
+				void set_geometry(const rect<float>& r)
 				{
-				    name_ = name;
+					g = r;
 				}
 
-				const std::string& get_name() const
+				const rect<float>& get_geometry() const
 				{
-				    return name_;
+					return g;
 				}
 
-				WidgetType get_type() const
+				void draw_impl(const boost::shared_ptr<iDriver>& driver);
+
+				void set_handler(int event, const guieventptr& handler);
+				guieventptr get_gui_handler(int event) const;
+
+				void set_enabled(bool enable)
 				{
-				    return LabelType;
+					enabled_ = enable;
 				}
 
-				void set_geom(const rect& r)
+				void set_font(const boost::shared_ptr<iFont>& font)
 				{
-				    impl_->setGeometry(r);
+					font_ = font;
 				}
 
-				void set_font(const boost::shared_ptr<iFont>& f)
+				void set_caption(const std::wstring& caption)
 				{
-				    impl_->setFont(f);
+					caption_ = caption;
 				}
+			public:
+                Label();
 
-				void set_image(const std::string& fn)
+				void setTexture(const boost::shared_ptr<iTexture>& t)
 				{
-				    impl_->setImage(fn);
+					texture_ = t;
 				}
-
-				void draw_impl()
-				{
-				    impl_->draw();
-				}
-
-				void set_on_mouse_click(EventListener* el)
-                {
-                    on_mouse_click_.reset(el);
-                }
-
-                void set_on_mouse_move(EventListener* el)
-                {
-                    on_mouse_move_.reset(el);
-                }
-
-                void set_on_mouse_left(EventListener* el)
-                {
-                    on_mouse_left_.reset(el);
-                }
-
-            public:
-                Label() :
-                    impl_(GUIFactory::instance().createLabel()),
-                    mouse_on_(false)
-                {
-                }
-
-                void setCaption(const std::string& caption)
-                {
-                    impl_->setCaption(caption);
-                }
-
-                void setBackground(const colorf& color)
-                {
-                    impl_->setBackground(color);
-                }
-        };
-    };
-};
+		};
+	}
+}
 
 #endif

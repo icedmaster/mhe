@@ -21,12 +21,24 @@ namespace
 		stream->read((char*)data,length);
 	}
 
-	void mhe_png_error(png_structp png_ptr, png_const_charp error_msg)
+	void mhe_png_write(png_structp png_ptr, png_bytep data, png_size_t length)
+	{
+        std::ostream *stream = static_cast<std::ostream*>(png_get_io_ptr(png_ptr));
+        stream->write((char*)data, length);
+	}
+
+	void mhe_png_flush(png_structp png_ptr)
+    {
+        std::ostream *stream = static_cast<std::ostream*>(png_get_io_ptr(png_ptr));
+        stream->flush();
+    }
+
+	void mhe_png_error(png_structp /*png_ptr*/, png_const_charp error_msg)
 	{
 		throw mhe::exception(error_msg);
 	}
 
-	void mhe_png_warning(png_structp png_ptr, png_const_charp warning_msg)
+	void mhe_png_warning(png_structp /*png_ptr*/, png_const_charp /*warning_msg*/)
 	{
 		// do nothing
 	}
@@ -141,6 +153,53 @@ namespace mhe
 			f.close();
 			return false;
 		}
+	}
+
+	bool png_image::save_impl(const std::string& fn)
+	{
+	    const int compression_level = 5;
+	    std::ofstream f(fn.c_str(), std::ios::binary);
+		if (!f.is_open())
+			return false;
+
+	    png_structp png = png_create_write_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
+	    if (!png) return false;
+
+	    png_infop info = png_create_info_struct(png);
+	    if (!info) return false;
+
+	    png_set_write_fn(png, &f, mhe_png_write, mhe_png_flush);
+	    png_set_compression_level(png, compression_level);
+
+	    int color = 2;  // without alpha channel
+	    if (fi.bpp == 32)
+            color = 6;
+
+        // bytes per pixel
+        const cmn::uint bts = fi.bpp >> 3;
+
+        // calculate bits per pixel (now use only 8)
+        cmn::uint bpp = 8;
+
+        // write header info
+        png_set_IHDR(png, info, fi.width, fi.height,
+                     bpp, color, PNG_INTERLACE_NONE,
+                     PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
+
+        // init data for writing
+        std::vector<png_bytep> r;
+        r.resize(fi.height);
+        for (cmn::uint i = 0; i < fi.height; ++i)
+            r[i] = (png_bytep)&data[fi.width * (fi.height - i - 1) * bts];
+
+        // write data to file
+        png_write_info(png, info);
+        png_write_image(png, &r[0]);
+        png_write_end(png, 0);
+
+	    png_destroy_write_struct(&png, &info);
+	    f.close();
+		return true;
 	}
 };
 

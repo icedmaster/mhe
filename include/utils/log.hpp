@@ -30,7 +30,8 @@ namespace mhe
 	{
 		private:
 			bool is_open_;
-			
+			dbg_level dlevel_;
+
 			std::string get_date_time()
 			{
 				using namespace boost::gregorian;
@@ -53,17 +54,17 @@ namespace mhe
             	write_impl(s);
 			}
 
-			void write_p(char *buf, int size, bool use_date_time)
+			void write_p(char *buf, int/* size*/, bool use_date_time)
 			{
 				write2log(std::string(buf), use_date_time);
 			}
-			
+
 			void write_p(const std::string& s, bool use_date_time)
 			{
             	write2log(s, use_date_time);
 			}
-			
-			void write_p(const std::wstring& ws, bool use_date_time)
+
+			void write_p(const std::wstring&/* ws*/, bool/* use_date_time*/)
 			{
 				//write_date_time();
 				//write_impl(ws);
@@ -81,11 +82,11 @@ namespace mhe
 
 		protected:
 			virtual void write_impl(const std::string& s) = 0;
-			
-			virtual void write_impl(const std::wstring& ws)
+
+			virtual void write_impl(const std::wstring&/* ws*/)
 			{
 			}
-			
+
 			virtual void close_impl() = 0;
 
 			void set_open()
@@ -99,19 +100,20 @@ namespace mhe
             }
 		public:
 			log() :
-				is_open_(false)
+				is_open_(false),
+				dlevel_(level_all)
 			{}
-			
+
 			virtual ~log()
-			{				
+			{
 			}
-			
+
 			void write(const std::string& s, bool use_date_time = true)
 			{
 				if (!is_open_) return;
 				write_p(s, use_date_time);
 			}
-			
+
 			void write(const std::wstring& ws, bool use_date_time = true)
 			{
 				if (!is_open_) return;
@@ -129,6 +131,30 @@ namespace mhe
 				write_p(buf, len, true);
 			}
 
+			void pdebug(const char* fmt, ...)
+			{
+			    if ( !is_open_ || (dlevel_ > level_dbg) )
+                    return;
+                char buf[1024];
+				va_list vaList;
+				va_start(vaList, fmt);
+				int len = vsnprintf(buf, sizeof(buf), fmt, vaList);
+				va_end(vaList);
+				write_p(buf, len, true);
+			}
+
+			void pinfo(const char* fmt, ...)
+			{
+			    if ( !is_open_ || (dlevel_ > level_info) )
+                    return;
+                char buf[1024];
+				va_list vaList;
+				va_start(vaList, fmt);
+				int len = vsnprintf(buf, sizeof(buf), fmt, vaList);
+				va_end(vaList);
+				write_p(buf, len, true);
+			}
+
 			void dbg_write(dbg_level module_lvl, dbg_level msg_lvl,
 						   const std::string& s)
 			{
@@ -136,7 +162,7 @@ namespace mhe
 					return;
             	write(s);
             }
-			
+
 			bool is_open() const
 			{
 				return is_open_;
@@ -147,35 +173,35 @@ namespace mhe
             	close_p();
             }
 	};
-	
-	
+
+
 	class stdlog : public log
 	{
 		private:
 			void close_impl()
 			{}
-			
+
 			void write_impl(const std::string& s)
 			{
 				std::cout << s;
 			}
-			
-			void write_impl(const std::wstring& ws)
+
+			void write_impl(const std::wstring&/* ws*/)
 			{}
-			
+
 		public:
 			stdlog() :
 				log()
 			{
 				set_open();
 			}
-			
+
 			~stdlog()
 			{
 				close();
 			}
 	};
-	
+
 
 	class filelog : public log
 	{
@@ -192,7 +218,7 @@ namespace mhe
 				of << s;
 			}
 
-			void write_impl(const std::wstring& ws)
+			void write_impl(const std::wstring&/* ws*/)
         	{
             }
 		public:
@@ -215,27 +241,27 @@ namespace mhe
             	return true;
             }
     };
-	
-	
+
+
 	class mixlog : public log
 	{
 		private:
 			std::vector< boost::shared_ptr<log> > logs;
-			
+
 			mixlog(const mixlog&) {}
-			
+
 			void write_impl(const std::string& s)
 			{
 				for (cmn::uint i = 0; i < logs.size(); ++i)
 					logs[i]->write(s, false);
 			}
-			
-			void write_impl(const std::wstring& ws)
+
+			void write_impl(const std::wstring&/* ws*/)
 			{
 				//for (cmn::uint i = 0; i < logs.size(); ++i)
 				//	logs[i]->write
 			}
-			
+
 			void close_impl()
 			{
 				for (cmn::uint i = 0; i < logs.size(); ++i)
@@ -247,7 +273,7 @@ namespace mhe
 			{
 				set_open();		// always open
 			}
-			
+
 			~mixlog()
 			{
 				close();
@@ -259,7 +285,7 @@ namespace mhe
 				logs.push_back(l);
 			}
 	};
-					
+
 };
 
 #endif

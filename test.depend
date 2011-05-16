@@ -1,0 +1,520 @@
+# depslib dependency file v1.0
+1305265196 source:w:\projects\gcc\opengl\test\main.cpp
+	<iostream>
+	<SDL/SDL.h>
+	<GL/gl.h>
+	<GL/glu.h>
+	<boost/shared_ptr.hpp>
+	<cstdlib>
+	<ctime>
+	"gl_extension.hpp"
+	"inode.hpp"
+	"opengl_driver.hpp"
+	"particle_system.hpp"
+	"test_particle_effect.hpp"
+	"circle_particle_effect.hpp"
+	"texture.hpp"
+	"sprite.hpp"
+	"mhe_loader.hpp"
+	"utils/logutils.hpp"
+	"texture_manager.hpp"
+	"event.hpp"
+	"window_system.hpp"
+	"camera.hpp"
+	"mhe_gui.hpp"
+	"png_image.hpp"
+
+1303812570 source:w:\projects\gcc\opengl\test\gl_extension.cpp
+	"gl_extension.hpp"
+	<iostream>
+
+1303812443 w:\projects\gcc\opengl\test\gl_extension.hpp
+	<GL/gl.h>
+	"glext.h"
+	<map>
+	<string>
+	<SDL/SDL.h>
+
+1298637879 w:\projects\gcc\opengl\test\glext.h
+	<windows.h>
+	<stddef.h>
+	<inttypes.h>
+	<inttypes.h>
+	<inttypes.h>
+	<stdint.h>
+	<stdint.h>
+	<inttypes.h>
+
+1303118628 w:\projects\gcc\opengl\test\include\inode.hpp
+	"math/matrix.hpp"
+	"idriver.hpp"
+	"types.hpp"
+	<boost/shared_ptr.hpp>
+
+1302761252 w:\projects\gcc\opengl\test\include\math\matrix.hpp
+	<vector>
+	<cstring>
+	<cmath>
+	"math/math_utils.hpp"
+	"math/vector3d.hpp"
+
+1298873906 w:\projects\gcc\opengl\test\\include\math\vector3d.hpp
+	<cmath>
+
+1303218411 w:\projects\gcc\opengl\test\include\idriver.hpp
+	<vector>
+	<boost/shared_ptr.hpp>
+	"types.hpp"
+	"mhe_math.hpp"
+	"window_system.hpp"
+
+1299742105 w:\projects\gcc\opengl\test\include\types.hpp
+	<string>
+
+1302269707 w:\projects\gcc\opengl\test\include\math\vector4d.hpp
+	<cmath>
+	"math/vector3d.hpp"
+
+1302269450 w:\projects\gcc\opengl\test\include\math\vector3d.hpp
+	<cmath>
+
+1304598378 source:w:\projects\gcc\opengl\test\src\opengl_driver.cpp
+	"opengl_driver.hpp"
+
+1304598348 w:\projects\gcc\opengl\test\include\opengl_driver.hpp
+	"idriver.hpp"
+	"gl_state_attr.hpp"
+	"mhe_gl.hpp"
+
+1298880484 w:\projects\gcc\opengl\test\include\gl_state_attr.hpp
+	"mhe_gl.hpp"
+	"types.hpp"
+	<set>
+
+1298877886 w:\projects\gcc\opengl\test\include\mhe_gl.hpp
+	<SDL/SDL.h>
+	<GL/gl.h>
+	<GL/glu.h>
+	"gl_extension.hpp"
+
+1303812443 w:\projects\gcc\opengl\test\\gl_extension.hpp
+	<GL/gl.h>
+	"glext.h"
+	<map>
+	<string>
+	<SDL/SDL.h>
+
+1298637879 w:\projects\gcc\opengl\test\\glext.h
+	<windows.h>
+	<stddef.h>
+	<inttypes.h>
+	<inttypes.h>
+	<inttypes.h>
+	<stdint.h>
+	<stdint.h>
+	<inttypes.h>
+
+1299166497 source:w:\projects\gcc\opengl\test\src\particle.cpp
+	"particle.hpp"
+
+1299166610 w:\projects\gcc\opengl\test\include\particle.hpp
+	"inode.hpp"
+	"mhe_math.hpp"
+	"idriver.hpp"
+	<boost/array.hpp>
+
+1302607809 w:\projects\gcc\opengl\test\include\mhe_math.hpp
+	"math/vector2d.hpp"
+	"math/vector3d.hpp"
+	"math/vector4d.hpp"
+	"math/matrix.hpp"
+	"math/quat.hpp"
+	"math/rect.hpp"
+	"math/math_utils.hpp"
+
+1303476582 w:\projects\gcc\opengl\test\include\math\math_utils.hpp
+	"types.hpp"
+
+1297684471 w:\projects\gcc\opengl\test\include\math\quat.hpp
+	"vector3d.hpp"
+
+1299772810 source:w:\projects\gcc\opengl\test\src\particle_system.cpp
+	"particle_system.hpp"
+
+1299772295 w:\projects\gcc\opengl\test\include\particle_system.hpp
+	"particle.hpp"
+	"particle_effect.hpp"
+	"mhe_math.hpp"
+	"sysutils.hpp"
+	"itexture.hpp"
+	<boost/shared_ptr.hpp>
+
+1299229557 w:\projects\gcc\opengl\test\include\particle_effect.hpp
+	"particle.hpp"
+	"sysutils.hpp"
+	<vector>
+
+1299230244 source:w:\projects\gcc\opengl\test\src\test_particle_effect.cpp
+	"test_particle_effect.hpp"
+
+1299138938 w:\projects\gcc\opengl\test\include\test_particle_effect.hpp
+	"particle_effect.hpp"
+
+1299230414 w:\projects\gcc\opengl\test\include\sysutils.hpp
+	<ctime>
+	<cstdlib>
+	"types.hpp"
+
+1299762428 source:w:\projects\gcc\opengl\test\src\circle_particle_effect.cpp
+	"circle_particle_effect.hpp"
+
+1299762222 w:\projects\gcc\opengl\test\include\circle_particle_effect.hpp
+	"particle_effect.hpp"
+
+1302262635 source:w:\projects\gcc\opengl\test\src\bmp_image.cpp
+	"bmp_image.hpp"
+	<fstream>
+	<iostream>
+
+1302244029 w:\projects\gcc\opengl\test\include\bmp_image.hpp
+	"image.hpp"
+	<cstring>
+
+1302244009 w:\projects\gcc\opengl\test\include\image.hpp
+	"types.hpp"
+	"mhe_math.hpp"
+	<vector>
+	<string>
+
+1302241944 source:w:\projects\gcc\opengl\test\src\file_utils.cpp
+	"file_utils.hpp"
+	<algorithm>
+	<cctype>
+
+1302240533 w:\projects\gcc\opengl\test\include\file_utils.hpp
+	<string>
+
+1302245654 source:w:\projects\gcc\opengl\test\src\image_loader.cpp
+	"image_loader.hpp"
+
+1302245689 w:\projects\gcc\opengl\test\include\image_loader.hpp
+	"file_utils.hpp"
+	"image.hpp"
+	"bmp_image.hpp"
+	"png_image.hpp"
+	"siwa_image.hpp"
+
+1302243929 w:\projects\gcc\opengl\test\include\png_image.hpp
+	"image.hpp"
+	<cstring>
+
+1302239910 source:w:\projects\gcc\opengl\test\src\png_image.cpp
+	"png_image.hpp"
+	<fstream>
+	<png.h>
+	<zlib.h>
+	<iostream>
+
+1303985112 w:\projects\gcc\opengl\test\include\math\vector2d.hpp
+
+1303988358 source:w:\projects\gcc\opengl\test\src\texture.cpp
+	"texture.hpp"
+
+1304056069 w:\projects\gcc\opengl\test\include\texture.hpp
+	"itexture.hpp"
+	"mhe_gl.hpp"
+
+1304660654 w:\projects\gcc\opengl\test\include\itexture.hpp
+	"image.hpp"
+	<boost/shared_ptr.hpp>
+
+1302160421 source:w:\projects\gcc\opengl\test\src\image.cpp
+	"image.hpp"
+
+1303987242 source:w:\projects\gcc\opengl\test\src\sprite.cpp
+	"sprite.hpp"
+
+1303987037 w:\projects\gcc\opengl\test\include\sprite.hpp
+	"inode.hpp"
+	"itexture.hpp"
+	"mhe_math.hpp"
+	"transform.hpp"
+	<vector>
+	<map>
+
+1288514542 source:w:\projects\gcc\opengl\test\lib\pugixml\pugixml.cpp
+	"pugixml.hpp"
+	<stdlib.h>
+	<stdio.h>
+	<string.h>
+	<assert.h>
+	<setjmp.h>
+	<wchar.h>
+	<math.h>
+	<float.h>
+	<istream>
+	<ostream>
+	<string>
+	<new>
+	<stdint.h>
+
+1288514554 w:\projects\gcc\opengl\test\lib\pugixml\pugixml.hpp
+	"pugiconfig.hpp"
+	<exception>
+	<stddef.h>
+
+1291881329 w:\projects\gcc\opengl\test\lib\pugixml\pugiconfig.hpp
+
+1305265071 source:w:\projects\gcc\opengl\test\src\mhe_loader.cpp
+	"mhe_loader.hpp"
+
+1305265056 w:\projects\gcc\opengl\test\include\mhe_loader.hpp
+	"lib/pugixml/pugixml.hpp"
+	"mhe_math.hpp"
+	"sprite.hpp"
+	"texture_manager.hpp"
+	"font_manager.hpp"
+	"utils/strutils.hpp"
+	"utils/logutils.hpp"
+	"mhe_gui.hpp"
+
+1288514554 w:\projects\gcc\opengl\test\\lib\pugixml\pugixml.hpp
+	"pugiconfig.hpp"
+	<exception>
+	<stddef.h>
+
+1291881329 w:\projects\gcc\opengl\test\\lib\pugixml\pugiconfig.hpp
+
+1300884082 source:w:\projects\gcc\opengl\test\src\utils\logutils.cpp
+	"utils/logutils.hpp"
+
+1300883797 w:\projects\gcc\opengl\test\include\utils\logutils.hpp
+	"netlog.hpp"
+
+1302242702 w:\projects\gcc\opengl\test\include\utils\netlog.hpp
+	"socklib.hpp"
+	"log.hpp"
+	<boost/shared_ptr.hpp>
+
+1302242645 w:\projects\gcc\opengl\test\include\utils\socklib.hpp
+	"socklib_config.hpp"
+	<string>
+	<cstring>
+
+1298325210 w:\projects\gcc\opengl\test\include\utils\socklib_config.hpp
+	"types.hpp"
+	<Winsock2.h>
+	<arpa/inet.h>
+
+1302264686 w:\projects\gcc\opengl\test\include\utils\log.hpp
+	"types.hpp"
+	<string>
+	<cstdarg>
+	<fstream>
+	<vector>
+	<stdio.h>
+	<boost/date_time/gregorian/gregorian.hpp>
+	<boost/date_time/posix_time/posix_time.hpp>
+	<boost/shared_ptr.hpp>
+
+1305202650 source:w:\projects\gcc\opengl\test\src\texture_manager.cpp
+	"texture_manager.hpp"
+	"bmp_image.hpp"
+	"png_image.hpp"
+	"siwa_image.hpp"
+
+1305202614 w:\projects\gcc\opengl\test\include\texture_manager.hpp
+	"itexture.hpp"
+	"file_utils.hpp"
+	"impl/system_factory.hpp"
+	"utils/logutils.hpp"
+	<map>
+
+1302675392 w:\projects\gcc\opengl\test\include\impl\system_factory.hpp
+	"config.hpp"
+
+1298325210 w:\projects\gcc\opengl\test\include\config.hpp
+
+1302675444 source:w:\projects\gcc\opengl\test\src\impl\system_factory.cpp
+	"impl/system_factory.hpp"
+	"sdl_input.hpp"
+	"sdl_window_system.hpp"
+	"gui/oglft_font.hpp"
+	"gui/mhe_label.hpp"
+	"texture.hpp"
+
+1302260675 source:w:\projects\gcc\opengl\test\src\siwa_image.cpp
+	"siwa_image.hpp"
+	<fstream>
+
+1302245609 w:\projects\gcc\opengl\test\include\siwa_image.hpp
+	"bmp_image.hpp"
+
+1303307276 w:\projects\gcc\opengl\test\include\sdl_input.hpp
+	"event.hpp"
+	<map>
+	<vector>
+	<SDL/SDL.h>
+
+1303367341 w:\projects\gcc\opengl\test\include\event.hpp
+	"types.hpp"
+	"mhe_math.hpp"
+	"window_system.hpp"
+	"impl/system_factory.hpp"
+	<boost/shared_ptr.hpp>
+
+1303364495 source:w:\projects\gcc\opengl\test\src\sdl_input.cpp
+	"sdl_input.hpp"
+
+1305007691 w:\projects\gcc\opengl\test\include\utils\strutils.hpp
+	<boost/lexical_cast.hpp>
+
+1303277907 w:\projects\gcc\opengl\test\include\math\rect.hpp
+	"vector2d.hpp"
+	<cmath>
+
+1303983296 w:\projects\gcc\opengl\test\include\window_system.hpp
+	"config.hpp"
+	"mhe_math.hpp"
+	"impl/system_factory.hpp"
+	<boost/shared_ptr.hpp>
+
+1303983314 w:\projects\gcc\opengl\test\include\sdl_window_system.hpp
+	"window_system.hpp"
+	<SDL/SDL.h>
+
+1303983390 source:w:\projects\gcc\opengl\test\src\sdl_window_system.cpp
+	"sdl_window_system.hpp"
+
+1303112737 source:w:\projects\gcc\opengl\test\src\camera.cpp
+	"camera.hpp"
+
+1303111191 w:\projects\gcc\opengl\test\include\camera.hpp
+	"icamera.hpp"
+
+1303112729 w:\projects\gcc\opengl\test\include\icamera.hpp
+	"mhe_math.hpp"
+	"idriver.hpp"
+	"transform.hpp"
+
+1303276511 w:\projects\gcc\opengl\test\include\transform.hpp
+	"mhe_math.hpp"
+
+1305265177 source:w:\projects\gcc\opengl\test\src\gui\gui_container.cpp
+	"gui/gui_container.hpp"
+
+1305265149 w:\projects\gcc\opengl\test\include\gui\gui_container.hpp
+	"inode.hpp"
+	"event.hpp"
+	"widget.hpp"
+	<vector>
+
+1305263960 w:\projects\gcc\opengl\test\include\gui\widget.hpp
+	"mhe_math.hpp"
+	"idriver.hpp"
+	"event.hpp"
+	"ifont.hpp"
+	"itexture.hpp"
+	<boost/shared_ptr.hpp>
+
+1305263993 source:w:\projects\gcc\opengl\test\src\gui\label.cpp
+	"gui/label.hpp"
+
+1305264058 w:\projects\gcc\opengl\test\include\gui\label.hpp
+	"widget.hpp"
+	"itexture.hpp"
+	<map>
+
+1304661118 w:\projects\gcc\opengl\test\include\mhe_gui.hpp
+	"gui/gui_container.hpp"
+	"gui/label.hpp"
+	"gui/button.hpp"
+	"gui/cursor.hpp"
+	"gui/bmfont.hpp"
+
+1304599910 w:\projects\gcc\opengl\test\include\gui\button.hpp
+	"widget.hpp"
+	"itexture.hpp"
+	<map>
+
+1304659243 source:w:\projects\gcc\opengl\test\src\gui\button.cpp
+	"gui/button.hpp"
+
+1303882766 w:\projects\gcc\opengl\test\include\gl_extension.hpp
+	<GL/gl.h>
+	"glext.h"
+	<map>
+	<string>
+	<SDL/SDL.h>
+
+1298637879 w:\projects\gcc\opengl\test\include\glext.h
+	<windows.h>
+	<stddef.h>
+	<inttypes.h>
+	<inttypes.h>
+	<inttypes.h>
+	<stdint.h>
+	<stdint.h>
+	<inttypes.h>
+
+1303896737 source:w:\projects\gcc\opengl\test\src\gl_extension.cpp
+	"gl_extension.hpp"
+	<iostream>
+	<set>
+
+1303989906 source:w:\projects\gcc\opengl\test\src\gui\cursor.cpp
+	"gui/cursor.hpp"
+
+1303985180 w:\projects\gcc\opengl\test\include\gui\cursor.hpp
+	"sprite.hpp"
+	"event.hpp"
+
+1304674089 source:w:\projects\gcc\opengl\test\src\texture_atlas.cpp
+	"texture_atlas.hpp"
+
+1304508896 w:\projects\gcc\opengl\test\include\texture_atlas.hpp
+	"itexture.hpp"
+	<boost/shared_ptr.hpp>
+	<boost/array.hpp>
+	<vector>
+
+1305201944 w:\projects\gcc\opengl\test\include\gui\ifont.hpp
+	<string>
+	"idriver.hpp"
+	"mhe_math.hpp"
+
+1305264010 source:w:\projects\gcc\opengl\test\src\gui\widget.cpp
+	"gui/widget.hpp"
+
+1305263491 source:w:\projects\gcc\opengl\test\src\gui\bmfont.cpp
+	"gui/bmfont.hpp"
+	"utils/options_parser.hpp"
+	"utils/global_log.hpp"
+	"texture_manager.hpp"
+	<fstream>
+
+1305201978 w:\projects\gcc\opengl\test\include\gui\bmfont.hpp
+	"ifont.hpp"
+	"texture_atlas.hpp"
+	<map>
+
+1304575657 w:\projects\gcc\opengl\test\include\utils\options_parser.hpp
+	"strutils.hpp"
+	<map>
+	<algorithm>
+	<boost/lexical_cast.hpp>
+	<cctype>
+
+1298325210 w:\projects\gcc\opengl\test\include\utils\global_log.hpp
+	"log.hpp"
+
+1304576277 source:w:\projects\gcc\opengl\test\src\utils\options_parser.cpp
+	"utils/options_parser.hpp"
+
+1305204237 w:\projects\gcc\opengl\test\include\font_manager.hpp
+	"gui/bmfont.hpp"
+	"texture_manager.hpp"
+
+1305264271 source:w:\projects\gcc\opengl\test\src\font_manager.cpp
+	"font_manager.hpp"
+

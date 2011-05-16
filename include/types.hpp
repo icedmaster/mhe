@@ -32,6 +32,6 @@ namespace mhe
     };
 }
 
-#define nullptr         0
+#define nullptr 0
 
 #endif

@@ -2,9 +2,9 @@
 #define _TEXTURE_MANAGER_HPP_
 
 #include "itexture.hpp"
-#include "impl/system_factory.hpp"
 #include "utils/file_utils.hpp"
-#include "utils/image_loader.hpp"
+#include "impl/system_factory.hpp"
+#include "utils/logutils.hpp"
 #include <map>
 
 namespace mhe
@@ -13,14 +13,21 @@ namespace mhe
     {
         private:
             typedef std::map< std::string, boost::shared_ptr<iTexture> > texmap;
-
             texmap tm_;
-            boost::shared_ptr<iTexture> fake_;
-        public:
-            TextureManager();
+			
+			Image* load_image(const std::string& filename) const;
 
-            const boost::shared_ptr<iTexture>& load(const std::string& filename);
+            bool have_texture(const std::string& name) const;
+            boost::shared_ptr<iTexture> load_impl(const std::string& name,
+                                                  const std::string& sname);
+        public:
+            void load(const std::string& name);
+            void unload(const std::string& name);
+
+            // This functions is not 'const', because if texture with name <name>
+            // not found, we try to load it
+            boost::shared_ptr<iTexture> get(const std::string& name);
     };
-};
+}
 
 #endif

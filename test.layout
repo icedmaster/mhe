@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="Debug" />
+	<File name="include\bmp_image.hpp" open="0" top="0" tabpos="19">
+		<Cursor position="903" topLine="42" />
+	</File>
+	<File name="include\circle_particle_effect.hpp" open="0" top="0" tabpos="9">
+		<Cursor position="562" topLine="0" />
+	</File>
+	<File name="include\event.hpp" open="0" top="0" tabpos="13">
+		<Cursor position="5419" topLine="272" />
+	</File>
+	<File name="include\gl_extension.hpp" open="0" top="0" tabpos="0">
+		<Cursor position="722" topLine="0" />
+	</File>
+	<File name="include\gui\bmfont.hpp" open="0" top="0" tabpos="0">
+		<Cursor position="203" topLine="0" />
+	</File>
+	<File name="include\gui\cursor.hpp" open="0" top="0" tabpos="0">
+		<Cursor position="236" topLine="0" />
+	</File>
+	<File name="include\gui\gui_container.hpp" open="0" top="0" tabpos="0">
+		<Cursor position="856" topLine="6" />
+	</File>
+	<File name="include\gui\ifont.hpp" open="0" top="0" tabpos="0">
+		<Cursor position="557" topLine="0" />
+	</File>
+	<File name="include\gui\label.hpp" open="0" top="0" tabpos="19">
+		<Cursor position="1282" topLine="45" />
+	</File>
+	<File name="include\gui\widget.hpp" open="0" top="0" tabpos="22">
+		<Cursor position="835" topLine="30" />
+	</File>
+	<File name="include\icamera.hpp" open="0" top="0" tabpos="0">
+		<Cursor position="205" topLine="0" />
+	</File>
+	<File name="include\idriver.hpp" open="0" top="0" tabpos="15">
+		<Cursor position="5481" topLine="194" />
+	</File>
+	<File name="include\image.hpp" open="0" top="0" tabpos="18">
+		<Cursor position="818" topLine="11" />
+	</File>
+	<File name="include\inode.hpp" open="1" top="0" tabpos="2">
+		<Cursor position="1105" topLine="14" />
+	</File>
+	<File name="include\itexture.hpp" open="0" top="0" tabpos="5">
+		<Cursor position="216" topLine="0" />
+	</File>
+	<File name="include\math\math_utils.hpp" open="0" top="0" tabpos="0">
+		<Cursor position="217" topLine="0" />
+	</File>
+	<File name="include\math\matrix.hpp" open="0" top="0" tabpos="18">
+		<Cursor position="7102" topLine="286" />
+	</File>
+	<File name="include\math\quat.hpp" open="0" top="0" tabpos="0">
+		<Cursor position="2469" topLine="149" />
+	</File>
+	<File name="include\math\rect.hpp" open="0" top="0" tabpos="0">
+		<Cursor position="369" topLine="31" />
+	</File>
+	<File name="include\math\vector3d.hpp" open="0" top="0" tabpos="0">
+		<Cursor position="1592" topLine="62" />
+	</File>
+	<File name="include\math\vector4d.hpp" open="0" top="0" tabpos="4">
+		<Cursor position="3569" topLine="151" />
+	</File>
+	<File name="include\mhe_gl.hpp" open="0" top="0" tabpos="0">
+		<Cursor position="136" topLine="0" />
+	</File>
+	<File name="include\mhe_loader.hpp" open="1" top="0" tabpos="4">
+		<Cursor position="1688" topLine="24" />
+	</File>
+	<File name="include\mhe_math.hpp" open="0" top="0" tabpos="0">
+		<Cursor position="78" topLine="0" />
+	</File>
+	<File name="include\opengl_driver.hpp" open="0" top="0" tabpos="16">
+		<Cursor position="659" topLine="15" />
+	</File>
+	<File name="include\particle.hpp" open="0" top="0" tabpos="4">
+		<Cursor position="484" topLine="10" />
+	</File>
+	<File name="include\particle_effect.hpp" open="0" top="0" tabpos="2">
+		<Cursor position="151" topLine="6" />
+	</File>
+	<File name="include\particle_system.hpp" open="0" top="0" tabpos="6">
+		<Cursor position="792" topLine="7" />
+	</File>
+	<File name="include\png_image.hpp" open="0" top="0" tabpos="22">
+		<Cursor position="666" topLine="24" />
+	</File>
+	<File name="include\sdl_input.hpp" open="0" top="0" tabpos="14">
+		<Cursor position="879" topLine="0" />
+	</File>
+	<File name="include\sdl_window_system.hpp" open="0" top="0" tabpos="0">
+		<Cursor position="262" topLine="0" />
+	</File>
+	<File name="include\siwa_image.hpp" open="0" top="0" tabpos="0">
+		<Cursor position="631" topLine="21" />
+	</File>
+	<File name="include\sprite.hpp" open="0" top="0" tabpos="21">
+		<Cursor position="3585" topLine="109" />
+	</File>
+	<File name="include\sysutils.hpp" open="0" top="0" tabpos="0">
+		<Cursor position="235" topLine="0" />
+	</File>
+	<File name="include\test_particle_effect.hpp" open="0" top="0" tabpos="0">
+		<Cursor position="161" topLine="0" />
+	</File>
+	<File name="include\texture.hpp" open="0" top="0" tabpos="25">
+		<Cursor position="1008" topLine="24" />
+	</File>
+	<File name="include\texture_atlas.hpp" open="0" top="0" tabpos="0">
+		<Cursor position="524" topLine="0" />
+	</File>
+	<File name="include\texture_manager.hpp" open="0" top="0" tabpos="14">
+		<Cursor position="270" topLine="0" />
+	</File>
+	<File name="include\transform.hpp" open="0" top="0" tabpos="0">
+		<Cursor position="361" topLine="9" />
+	</File>
+	<File name="include\types.hpp" open="0" top="0" tabpos="0">
+		<Cursor position="364" topLine="6" />
+	</File>
+	<File name="include\utils\log.hpp" open="0" top="0" tabpos="15">
+		<Cursor position="1670" topLine="51" />
+	</File>
+	<File name="include\utils\logutils.hpp" open="0" top="0" tabpos="0">
+		<Cursor position="422" topLine="3" />
+	</File>
+	<File name="include\utils\netlog.hpp" open="0" top="0" tabpos="0">
+		<Cursor position="476" topLine="11" />
+	</File>
+	<File name="include\utils\socklib.hpp" open="0" top="0" tabpos="0">
+		<Cursor position="8408" topLine="374" />
+	</File>
+	<File name="include\utils\strutils.hpp" open="0" top="0" tabpos="0">
+		<Cursor position="618" topLine="6" />
+	</File>
+	<File name="include\window_system.hpp" open="0" top="0" tabpos="0">
+		<Cursor position="665" topLine="15" />
+	</File>
+	<File name="lib\pugixml\pugixml.cpp" open="0" top="0" tabpos="20">
+		<Cursor position="96091" topLine="3695" />
+	</File>
+	<File name="main.cpp" open="1" top="1" tabpos="1">
+		<Cursor position="696" topLine="12" />
+	</File>
+	<File name="mesh.hpp" open="0" top="0" tabpos="0">
+		<Cursor position="179" topLine="0" />
+	</File>
+	<File name="src\bmp_image.cpp" open="0" top="0" tabpos="22">
+		<Cursor position="2132" topLine="64" />
+	</File>
+	<File name="src\camera.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="285" topLine="2" />
+	</File>
+	<File name="src\circle_particle_effect.cpp" open="0" top="0" tabpos="10">
+		<Cursor position="1902" topLine="24" />
+	</File>
+	<File name="src\file_utils.cpp" open="0" top="0" tabpos="12">
+		<Cursor position="1062" topLine="1" />
+	</File>
+	<File name="src\font_manager.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="242" topLine="25" />
+	</File>
+	<File name="src\gl_extension.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="1555" topLine="31" />
+	</File>
+	<File name="src\gui\bmfont.cpp" open="0" top="0" tabpos="4">
+		<Cursor position="4435" topLine="130" />
+	</File>
+	<File name="src\gui\button.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="971" topLine="23" />
+	</File>
+	<File name="src\gui\cursor.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="601" topLine="18" />
+	</File>
+	<File name="src\gui\gui_container.cpp" open="0" top="0" tabpos="18">
+		<Cursor position="182" topLine="0" />
+	</File>
+	<File name="src\gui\label.cpp" open="0" top="0" tabpos="20">
+		<Cursor position="258" topLine="0" />
+	</File>
+	<File name="src\gui\widget.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="118" topLine="0" />
+	</File>
+	<File name="src\image.cpp" open="0" top="0" tabpos="11">
+		<Cursor position="722" topLine="20" />
+	</File>
+	<File name="src\impl\system_factory.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="460" topLine="13" />
+	</File>
+	<File name="src\mhe_loader.cpp" open="1" top="0" tabpos="3">
+		<Cursor position="6507" topLine="196" />
+	</File>
+	<File name="src\opengl_driver.cpp" open="0" top="0" tabpos="17">
+		<Cursor position="712" topLine="21" />
+	</File>
+	<File name="src\particle.cpp" open="0" top="0" tabpos="8">
+		<Cursor position="1912" topLine="0" />
+	</File>
+	<File name="src\particle_system.cpp" open="0" top="0" tabpos="3">
+		<Cursor position="4662" topLine="129" />
+	</File>
+	<File name="src\png_image.cpp" open="0" top="0" tabpos="21">
+		<Cursor position="4924" topLine="174" />
+	</File>
+	<File name="src\sdl_input.cpp" open="0" top="0" tabpos="21">
+		<Cursor position="3498" topLine="106" />
+	</File>
+	<File name="src\sdl_window_system.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="713" topLine="0" />
+	</File>
+	<File name="src\siwa_image.cpp" open="0" top="0" tabpos="21">
+		<Cursor position="360" topLine="6" />
+	</File>
+	<File name="src\sprite.cpp" open="0" top="0" tabpos="19">
+		<Cursor position="3870" topLine="125" />
+	</File>
+	<File name="src\test_particle_effect.cpp" open="0" top="0" tabpos="5">
+		<Cursor position="460" topLine="0" />
+	</File>
+	<File name="src\texture.cpp" open="0" top="0" tabpos="18">
+		<Cursor position="470" topLine="43" />
+	</File>
+	<File name="src\texture_atlas.cpp" open="0" top="0" tabpos="5">
+		<Cursor position="1058" topLine="16" />
+	</File>
+	<File name="src\texture_manager.cpp" open="0" top="0" tabpos="15">
+		<Cursor position="1125" topLine="0" />
+	</File>
+	<File name="src\utils\logutils.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="455" topLine="0" />
+	</File>
+</CodeBlocks_layout_file>
