@@ -7,16 +7,22 @@
 	<File name="include/scene.hpp" open="0" top="0" tabpos="2">
 		<Cursor position="343" topLine="6" />
 	</File>
-	<File name="main.cpp" open="1" top="1" tabpos="0">
+	<File name="main.cpp" open="1" top="0" tabpos="0">
 		<Cursor position="8906" topLine="286" />
 	</File>
 	<File name="src/gl_extension.cpp" open="0" top="0" tabpos="3">
 		<Cursor position="1604" topLine="23" />
 	</File>
-	<File name="src/gui/bmfont.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="3873" topLine="128" />
+	<File name="src/gui/bmfont.cpp" open="1" top="1" tabpos="1">
+		<Cursor position="740" topLine="8" />
 	</File>
 	<File name="src/png_image.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="2688" topLine="100" />
+	</File>
+	<File name="src/texture_manager.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="1966" topLine="40" />
+	</File>
+	<File name="src/utils/options_parser.cpp" open="1" top="0" tabpos="0">
+		<Cursor position="0" topLine="0" />
 	</File>
 </CodeBlocks_layout_file>

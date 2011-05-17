@@ -16,7 +16,7 @@ namespace utils {
 
 	void OptionsParser::parse(const std::string& options, char delimiter)
 	{
-		std::string opt = options;
+		std::string opt = replace(options, '\r');
 		// разделяем на пары
 		size_t pos = 0;
 		do
