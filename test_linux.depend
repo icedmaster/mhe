@@ -378,7 +378,7 @@
 	"itexture.hpp"
 	<boost/shared_ptr.hpp>
 
-1302239912 source:/home/master/projects/opengl/mhe/src/png_image.cpp
+1305654107 source:/home/master/projects/opengl/mhe/src/png_image.cpp
 	"png_image.hpp"
 	<fstream>
 	<png.h>

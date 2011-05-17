@@ -22,6 +22,8 @@
 					<Add option="-L/usr/local/lib -Wl,-rpath,/usr/local/lib -lSDL -lpthread -lm -ldl -lpthread" />
 					<Add library="/usr/lib/fglrx/libGL.so" />
 					<Add library="/usr/lib/libboost_date_time.a" />
+					<Add library="lib/libpng15.a" />
+					<Add library="lib/libz.a" />
 				</Linker>
 			</Target>
 		</Build>

@@ -298,7 +298,7 @@ namespace
         test_sprite->draw(driver);
 		main_gui->draw(driver);
 		cursor->draw(driver);
-		font.print(driver, L"aabb РУССкий текст", mhe::v2d(30, 30));
+		//font.print(driver, L"aabb РУССкий текст", mhe::v2d(30, 30));
         driver->enable_lighting();
 
         //glFlush();
