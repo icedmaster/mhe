@@ -1,42 +1,22 @@
 #include "game_scene.hpp"
 
-namespace game
-{
-	GameScene::GameScene()
-	{}
-	
-	GameScene::GameScene(const GameScene&)
-	{}
-	
-	bool GameScene::init(cmn::uint w, cmn::uint h, cmn::uint bpp)
+namespace mhe  {
+namespace game {
+
+	GameScene::GameScene(boost::shared_ptr<Engine> engine,
+						 const std::string& arg = std::string()) :
+		engine_(engine),
+		init_arg_(arg)
 	{
-		if (ws_) return true;	// already initialized
-		return init_impl(w, h, bpp);
 	}
 	
-	bool GameScene::init_impl(cmn::uint w, cmn::uint h, cmn::uint bpp)
+	bool GameScene::init_impl()
 	{
-		ws_.reset(new mhe::WindowSystem());
-		is_.reset(new mhe::InputSystem());
-		driver_.reset(new mhe::OpenGLDriver());
-		driver->setWindowSystem(ws_.get());
-		tm_.reset(new mhe::TextureManager());
-		
-		mhe::load_default_extensions();
-		
-		if (!ws_.init(w, h, bpp))
-			return false;
+		scene_.reset(new Scene());
+		scene->setCallback(this);
+		engine_->setScene(scene_);
 		return true;
 	}
 	
-	GameScene* GameScene::clone() const
-	{
-		GameScene* gs = new GameScene();
-		gs->ws_ = ws_;
-		gs_->is_ = is_;
-		gs_->driver_ = driver_;
-		gs_->tm_ = tm_;
-		
-		return gs;
-	}
+}
 }

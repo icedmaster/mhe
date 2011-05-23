@@ -2,6 +2,7 @@
 /assets/
 /bin/
 /obj/
+/old/
 /prj/codeblocks/mhe.depend
 /prj/codeblocks/mhe.cbp.bak
 /prj/codeblocks/mhe.layout
@@ -13,5 +14,6 @@
 *.o
 *.png
 *.bmp
+*.zip
 
 
