@@ -19,7 +19,7 @@ namespace mhe
 		return !(num & (num - 1));
 	}
 
-	inline uint32_t nearest_pot(uint32_t x)
+	inline cmn::uint32_t nearest_pot(cmn::uint32_t x)
 	{
 		x = x - 1;
 		x = x | (x >> 1);	
