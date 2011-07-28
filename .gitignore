@@ -1,9 +1,9 @@
 /prj/codeblocks/bin/Debug/mhe
-/assets/
-/bin/
-/obj/
-/old/
-/build/
+/assets/*
+/bin/*
+/obj/*
+/old/*
+/build/*
 /prj/codeblocks/mhe.depend
 /prj/codeblocks/mhe.cbp.bak
 /prj/codeblocks/mhe.layout
@@ -18,6 +18,8 @@
 *.zip
 
 !/build/CMakeLists.txt
+
+
 
 
 
