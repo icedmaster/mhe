@@ -1,4 +1,4 @@
-#include "openal_sound.hpp"
+#include "sound/openal_sound.hpp"
 
 namespace mhe
 {
@@ -10,7 +10,7 @@ namespace mhe
 	OpenALSound::~OpenALSound()
 	{
 		if (src_id_ != 0xffffffff)
-			alDeleteSources(1, &src_id_)
+			alDeleteSources(1, &src_id_);
 		if (id_ != 0xffffffff)
 			alDeleteBuffers(1, &id_);
 	}
@@ -20,7 +20,7 @@ namespace mhe
 		// prepare buffers
 		ALenum format = (data->format() == Mono) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16;
 		alGenBuffers(1, &id_);
-		alBufferData(id_, format, &(data->get[0]), data->get().size(), data->freq);
+		alBufferData(id_, format, &(data->get()[0]), data->get().size(), data->freq());
 		
 		// prepare source
 		alGenSources(1, &src_id_);

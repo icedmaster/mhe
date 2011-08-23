@@ -2,12 +2,13 @@
 #define _OGG_SOUND_HPP_
 
 #include "isound_data.hpp"
-#include "ogg.h"
+#include <ogg/ogg.h>
+#include <vorbis/vorbisfile.h>
 #include <vector>
 
 namespace mhe
 {	
-	class ogg_sound
+	class ogg_sound : public iSoundData
 	{						
 		private:
 			std::vector<cmn::int16_t> data_;

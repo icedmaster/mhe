@@ -3,8 +3,8 @@
 
 #include "iaudio_driver.hpp"
 #include "utils/logutils.hpp"
-#include <al.h>
-#include <alc.h>
+#include <AL/al.h>
+#include <AL/alc.h>
 
 namespace mhe
 {
@@ -14,6 +14,8 @@ namespace mhe
 			ALCdevice* device_;
 			ALCcontext* context_;
 		public:
+			OpenALAudioDriver();
+			~OpenALAudioDriver();
 			bool init();
 	};
 }

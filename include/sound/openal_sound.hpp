@@ -2,6 +2,7 @@
 #define _OPENAL_SOUND_HPP_
 
 #include "isound.hpp"
+#include <AL/al.h>
 
 namespace mhe
 {
