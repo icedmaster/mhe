@@ -40,4 +40,11 @@ namespace mhe
 	{
 		alSourceStop(src_id_);
 	}
+
+	bool OpenALSound::is_playing() const
+	{
+		int value;
+		alGetSourcei(src_id_, AL_SOURCE_STATE, &value);
+		return (value == AL_PLAYING);
+	}
 }

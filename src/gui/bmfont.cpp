@@ -1,6 +1,6 @@
 #include "gui/bmfont.hpp"
 #include "utils/options_parser.hpp"
-#include "utils/global_log.hpp"
+#include "utils/logutils.hpp"
 #include "texture_manager.hpp"
 #include <fstream>
 

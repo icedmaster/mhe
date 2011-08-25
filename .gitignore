@@ -3,6 +3,7 @@
 /bin/*
 /obj/*
 /old/*
+/new/*
 /build/*
 /prj/codeblocks/mhe.depend
 /prj/codeblocks/mhe.cbp.bak
@@ -16,6 +17,7 @@
 *.png
 *.bmp
 *.zip
+*.ede
 
 !/build/CMakeLists.txt
 

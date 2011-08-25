@@ -9,7 +9,6 @@ namespace mhe
 	{
 		private:
 			global_log() {}
-			global_log(const global_log&) {}
 			~global_log() {}			
 		public:
 			const global_log& instance() const

@@ -8,6 +8,7 @@ namespace mhe
 	class iWindowSystem;
     class iInputSystem;
 	class iTexture;
+	class iSound;
 
     class SystemFactory
     {
@@ -26,6 +27,7 @@ namespace mhe
 			iWindowSystem* createWindowSystem();
             iInputSystem* createInputSystem();
 			iTexture* createTexture(); 
+			iSound* createSound();
 
     };
 

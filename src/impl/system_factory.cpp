@@ -15,12 +15,18 @@
 #endif
 */
 #include "texture.hpp"
+#include "sound/openal_sound.hpp"
 
 namespace mhe {
 
 iTexture* SystemFactory::createTexture()
 {
 	return new Texture();
+}
+
+iSound* SystemFactory::createSound()
+{
+	return new OpenALSound();
 }
 
 iWindowSystem* SystemFactory::createWindowSystem()

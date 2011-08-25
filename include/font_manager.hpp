@@ -1,6 +1,16 @@
 #ifndef _FONT_MANAGER_HPP_
 #define _FONT_MANAGER_HPP_
 
+#include "resource_loader.hpp"
+#include "resource_manager.hpp"
+
+namespace mhe
+{
+typedef ResourceManager<FontLoader> FontManager;
+}
+
+#if 0
+
 #include "gui/bmfont.hpp"
 #include "texture_manager.hpp"
 
@@ -23,5 +33,7 @@ namespace mhe
 			boost::shared_ptr<gui::iFont> get(const std::string& name);
 	};
 }
+
+#endif	// 0
 
 #endif

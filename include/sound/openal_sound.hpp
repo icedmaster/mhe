@@ -19,6 +19,8 @@ namespace mhe
 			
 			void play();
 			void stop();
+
+			bool is_playing() const;
 	};
 }
 

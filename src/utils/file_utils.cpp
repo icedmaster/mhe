@@ -4,7 +4,7 @@
 
 namespace mhe
 {
-    std::string get_file_extensiton(const std::string& filename)
+    std::string get_file_extension(const std::string& filename)
     {
         size_t point_pos = filename.find_last_of('.');
         if (point_pos == std::string::npos)

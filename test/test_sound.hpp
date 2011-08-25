@@ -3,19 +3,34 @@
 
 #include "test_common.hpp"
 #include "mhe_sound.hpp"
-
-#ifndef __WIN32__
-#include <unistd.h>
-#endif
+#include "resource_manager.hpp"
+#include "resource_loader.hpp"
 
 TEST(TestSound, test)
 {
 	// open sound system
 	mhe::OpenALAudioDriver driver;
 	ASSERT_EQ(true, driver.init());
+
+	mhe::ResourceManager<mhe::SoundLoader> loader;
+	boost::shared_ptr<mhe::iSound> sound = loader.get("assets/test1.ogg");
+	boost::shared_ptr<mhe::iSound> sound2 = loader.get("assets/test.ogg");
+	ASSERT_NE(sound, boost::shared_ptr<mhe::iSound>());
+	ASSERT_NE(sound2, boost::shared_ptr<mhe::iSound>());
+	sound2->play();
+	sound->play();
+	EXPECT_EQ(true, sound->is_playing());
+	EXPECT_EQ(true, sound2->is_playing());
+	mhe::test::sleep(7000);
+	EXPECT_FALSE(sound->is_playing() == true);
+	mhe::test::sleep(3000);
+	sound->stop();
+	sound2->stop();
+
+/*
 	// load sound data
 	boost::shared_ptr<mhe::ogg_sound> data(new mhe::ogg_sound());
-	ASSERT_EQ(true, data->load("assets/test1.ogg"));
+	ASSERT_EQ(true, data->load("assets/test2.ogg"));
 	
 	// init sound
 	mhe::OpenALSound sound;
@@ -23,12 +38,9 @@ TEST(TestSound, test)
 	sound.play();
 	
 //	mhe::test::sleep(5000);
-	#ifdef __WIN32__
 	Sleep(5000);
-	#else
-	sleep(5);
-	#endif
 	sound.stop();
+*/
 }
 
 #endif

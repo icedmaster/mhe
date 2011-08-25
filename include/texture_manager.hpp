@@ -1,6 +1,16 @@
 #ifndef _TEXTURE_MANAGER_HPP_
 #define _TEXTURE_MANAGER_HPP_
 
+#include "resource_loader.hpp"
+#include "resource_manager.hpp"
+
+namespace mhe
+{
+typedef ResourceManager<TextureLoader> TextureManager;
+}
+
+#if 0
+
 #include "itexture.hpp"
 #include "utils/file_utils.hpp"
 #include "impl/system_factory.hpp"
@@ -29,5 +39,7 @@ namespace mhe
             boost::shared_ptr<iTexture> get(const std::string& name);
     };
 }
+
+#endif	// 0
 
 #endif
