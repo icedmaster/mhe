@@ -182,6 +182,7 @@ namespace mhe
 	enum
 	{
 		QUIT = 1,
+		TICK,
 		TIMER
 	};
 

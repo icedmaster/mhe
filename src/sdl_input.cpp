@@ -39,6 +39,7 @@ namespace mhe
 				default: break;
 			}
 		}
+		add_tick_event();
 	}
 
 	void SDLInputSystem::handle()
@@ -105,6 +106,12 @@ namespace mhe
 	{
 		SystemEvent se(QUIT);
 		//events.push_back(boost::shared_ptr<Event>(se));
+		check_listeners(se);
+	}
+
+	void SDLInputSystem::add_tick_event()
+	{
+		SystemEvent se(TICK);
 		check_listeners(se);
 	}
 

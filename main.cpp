@@ -22,6 +22,7 @@
 #include "png_image.hpp"
 #include "mhe_sound.hpp"
 #include "sound_manager.hpp"
+#include "utils/fps_counter.hpp"
 
 typedef unsigned int uint;
 
@@ -218,9 +219,7 @@ int main(int, char**)
 	boost::shared_ptr<mhe::iSound> sound = sound_manager.get("assets/test.ogg");
 	sound->play();
 
-	cmn::uint fps_count = 0;
-	cmn::uint seconds = 0;
-	cmn::uint fps_ticks = SDL_GetTicks();
+	mhe::utils::FPSCounter fps_counter(is);
 	cmn::uint fps = 0;
 	fps_text = L"fps:0";
 
@@ -258,22 +257,12 @@ int main(int, char**)
             explode_sprite->execute(ind, tick, false);
             if (ind == 1) ind = 0;
             else ind = 1;
-        }
-		++fps;
-		++fps_count;
 
-		if (tick >= (fps_ticks + 1000))
-		{
-			fps_ticks = tick;
-			++seconds;
-			fps_text = L"FPS:" + boost::lexical_cast<std::wstring>(fps);
-			fps = 0;			
-		}
-		
+			fps_text = L"FPS:" +
+				boost::lexical_cast<std::wstring>(static_cast<int>(fps_counter.average_fps()));
+        }		
 		//driver->set_projection_matrix(fp);
     }
-
-	mhe::utils::global_log::instance().printf("fps: %u %u %f", fps_count, seconds, (float)fps_count / (float)seconds);
 
     return 0;
 }
