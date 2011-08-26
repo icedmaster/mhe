@@ -5,9 +5,11 @@
 
 namespace mhe
 {
+	class iDriver;
 	class iWindowSystem;
     class iInputSystem;
 	class iTexture;
+	class iAudioDriver;
 	class iSound;
 
     class SystemFactory
@@ -24,10 +26,12 @@ namespace mhe
                 return sf;
             }
 
-			iWindowSystem* createWindowSystem();
-            iInputSystem* createInputSystem();
-			iTexture* createTexture(); 
-			iSound* createSound();
+			iDriver* createDriver() const;
+			iWindowSystem* createWindowSystem() const;
+			iInputSystem* createInputSystem() const;
+			iTexture* createTexture() const;
+			iAudioDriver* createAudioDriver() const;
+			iSound* createSound() const;	
 
     };
 

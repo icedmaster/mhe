@@ -20,6 +20,7 @@ set (SRC_PATH
   ${SOURCE_ROOT}/impl
   ${SOURCE_ROOT}/utils
   ${SOURCE_ROOT}/sound
+  ${SOURCE_ROOT}/game
   ${LIB_DIR}/pugixml
 )
 

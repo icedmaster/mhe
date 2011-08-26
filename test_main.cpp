@@ -1,4 +1,4 @@
-#include "test/test_sound.hpp"
+#include "test/test_engine.hpp"
 
 int main(int argc, char** argv)
 {
