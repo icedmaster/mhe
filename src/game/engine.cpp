@@ -43,6 +43,9 @@ namespace game {
 		while (running_)
 		{
 			is_.check();
+			driver_->clear_depth();
+			driver_->clear_color();
+			ws_.swapBuffers();
 		}
 	}
 	
