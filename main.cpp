@@ -50,6 +50,8 @@ namespace
 
 	mhe::gui::BMFont font;
 
+	std::wstring fps_text;
+
     class QuitListener : public mhe::EventListener
     {
         public:
@@ -135,7 +137,7 @@ int main(int, char**)
     driver->enable_depth((mhe::DepthFunc)0);
     driver->enable_lighting();
     //driver->enable_blending(mhe::ALPHA_ONE_MINUS_ALPHA);
-    glEnable(GL_LIGHT0);
+    glEnable(GL_LIGHT0);	
 
     float diff[] = {0.0, 0.8, 0.0};
     glLightfv(GL_LIGHT0, GL_DIFFUSE, diff);
@@ -216,6 +218,12 @@ int main(int, char**)
 	boost::shared_ptr<mhe::iSound> sound = sound_manager.get("assets/test.ogg");
 	sound->play();
 
+	cmn::uint fps_count = 0;
+	cmn::uint seconds = 0;
+	cmn::uint fps_ticks = SDL_GetTicks();
+	cmn::uint fps = 0;
+	fps_text = L"fps:0";
+
     bool asc = true;
     int ind = 1;
     while (running)
@@ -232,7 +240,7 @@ int main(int, char**)
         sprite1.update(tick);
         test_sprite->update(tick);
         bgnd_sprite->update(tick);
-        cursor->update(tick);
+        //cursor->update(tick);
 
         if (tick >= next_tick + 1000)
         {
@@ -251,8 +259,22 @@ int main(int, char**)
             if (ind == 1) ind = 0;
             else ind = 1;
         }
+		++fps;
+		++fps_count;
+
+		if (tick >= (fps_ticks + 1000))
+		{
+			fps_ticks = tick;
+			++seconds;
+			fps_text = L"FPS:" + boost::lexical_cast<std::wstring>(fps);
+			fps = 0;			
+		}
+		
 		//driver->set_projection_matrix(fp);
     }
+
+	mhe::utils::global_log::instance().printf("fps: %u %u %f", fps_count, seconds, (float)fps_count / (float)seconds);
+
     return 0;
 }
 
@@ -308,6 +330,7 @@ namespace
 		main_gui->draw(driver);
 		cursor->draw(driver);
 		font.print(driver, L"aabb РУССкий текст", mhe::v2d(30, 30));
+		font.print(driver, fps_text, mhe::v2d(30, 500));
         driver->enable_lighting();
 
         //glFlush();

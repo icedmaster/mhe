@@ -36,8 +36,8 @@ foreach (DIR ${SRC_PATH})
   set (SOURCE ${SOURCE} ${CUR_SRC})
 endforeach ()
 
-#set (SOURCE ${SOURCE} ${CMAKE_SOURCE_DIR}/../main.cpp)
-set (SOURCE ${SOURCE} ${CMAKE_SOURCE_DIR}/../test_main.cpp)
+set (SOURCE ${SOURCE} ${CMAKE_SOURCE_DIR}/../main.cpp)
+#set (SOURCE ${SOURCE} ${CMAKE_SOURCE_DIR}/../test_main.cpp)
 
 # find libraries
 if (CMAKE_HOST_UNIX)
