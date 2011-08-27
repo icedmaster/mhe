@@ -3,10 +3,13 @@
 
 #include "window_system.hpp"
 #include "event.hpp"
-#include "opengl_driver.hpp"
+#include "impl/system_factory.hpp"
 #include "texture_manager.hpp"
+#include "font_manager.hpp"
 #include "mhe_loader.hpp"
-#include "scene.hpp"
+
+#include "mhe_sound.hpp"
+#include "sound_manager.hpp"
 
 #include "lib/pugixml/pugixml.hpp"
 

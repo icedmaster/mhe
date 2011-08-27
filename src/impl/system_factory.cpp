@@ -1,5 +1,7 @@
 #include "impl/system_factory.hpp"
 
+#include "opengl_driver.hpp"
+
 #ifdef __INCLUDE_SDL__
     #include "sdl_input.hpp"
 	#include "sdl_window_system.hpp"
@@ -15,21 +17,32 @@
 #endif
 */
 #include "texture.hpp"
+#include "sound/openal_audio_driver.hpp"
 #include "sound/openal_sound.hpp"
 
 namespace mhe {
 
-iTexture* SystemFactory::createTexture()
+iDriver* SystemFactory::createDriver() const
+{
+	return new OpenGLDriver();
+}
+
+iTexture* SystemFactory::createTexture() const
 {
 	return new Texture();
 }
 
-iSound* SystemFactory::createSound()
+iAudioDriver* SystemFactory::createAudioDriver() const
+{
+	return new OpenALAudioDriver();
+}
+
+iSound* SystemFactory::createSound() const
 {
 	return new OpenALSound();
 }
 
-iWindowSystem* SystemFactory::createWindowSystem()
+iWindowSystem* SystemFactory::createWindowSystem() const
 {
     #ifdef __INCLUDE_SDL__
     return new SDLWindowSystem;
@@ -38,7 +51,7 @@ iWindowSystem* SystemFactory::createWindowSystem()
     return nullptr;
 }	
 
-iInputSystem* SystemFactory::createInputSystem()
+iInputSystem* SystemFactory::createInputSystem() const
 {
     #ifdef __INCLUDE_SDL__
     return new SDLInputSystem;

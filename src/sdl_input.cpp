@@ -11,32 +11,35 @@ namespace mhe
 	void SDLInputSystem::check()
 	{
 		SDL_Event event;
-		SDL_PollEvent(&event);
-		switch (event.type)
+		while (SDL_PollEvent(&event))
 		{
-			case SDL_KEYDOWN:
-				add_keydown_event(event.key.keysym);
-			break;
+			switch (event.type)
+			{
+				case SDL_KEYDOWN:
+					add_keydown_event(event.key.keysym);
+				break;
 
-			case SDL_KEYUP:
-				add_keyup_event(event.key.keysym);
-			break;
+				case SDL_KEYUP:
+					add_keyup_event(event.key.keysym);
+				break;
 
-			case SDL_MOUSEMOTION:
-                add_mouse_move_event(event.motion);
-            break;
+				case SDL_MOUSEMOTION:
+                	add_mouse_move_event(event.motion);
+           		break;
 
-			case SDL_MOUSEBUTTONDOWN:
-			case SDL_MOUSEBUTTONUP:
-                add_mouse_button_event(event.button);
-            break;
+				case SDL_MOUSEBUTTONDOWN:
+				case SDL_MOUSEBUTTONUP:
+                	add_mouse_button_event(event.button);
+            	break;
 
-			case SDL_QUIT:
-                add_quit_event();
-            break;
+				case SDL_QUIT:
+                	add_quit_event();
+            	break;
 
-			default: break;
+				default: break;
+			}
 		}
+		add_tick_event();
 	}
 
 	void SDLInputSystem::handle()
@@ -103,6 +106,12 @@ namespace mhe
 	{
 		SystemEvent se(QUIT);
 		//events.push_back(boost::shared_ptr<Event>(se));
+		check_listeners(se);
+	}
+
+	void SDLInputSystem::add_tick_event()
+	{
+		SystemEvent se(TICK);
 		check_listeners(se);
 	}
 

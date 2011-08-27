@@ -28,6 +28,7 @@ namespace mhe
 			void add_mouse_button_event(const SDL_MouseButtonEvent&);
 			void add_mouse_event(int type, int x, int y, int button);
 			void add_quit_event();
+			void add_tick_event();
 
 			void add_event_timestamp(Event* e);
 		public:

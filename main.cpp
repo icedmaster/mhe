@@ -20,6 +20,9 @@
 #include "camera.hpp"
 #include "mhe_gui.hpp"
 #include "png_image.hpp"
+#include "mhe_sound.hpp"
+#include "sound_manager.hpp"
+#include "utils/fps_counter.hpp"
 
 typedef unsigned int uint;
 
@@ -47,6 +50,8 @@ namespace
 	boost::shared_ptr<mhe::gui::GUIContainer> main_gui;
 
 	mhe::gui::BMFont font;
+
+	std::wstring fps_text;
 
     class QuitListener : public mhe::EventListener
     {
@@ -112,6 +117,16 @@ namespace
 				mhe::utils::global_log::instance().write("label clicked");
 			}
 	};
+
+	class FPSCallback
+	{
+	public:
+		void operator()(const mhe::utils::FPSCounter* fps_counter)
+		{
+			fps_text = L"FPS:" +
+				boost::lexical_cast<std::wstring>(static_cast<int>(fps_counter->average_fps()));
+		}
+	};
 }
 
 int main(int, char**)
@@ -133,7 +148,7 @@ int main(int, char**)
     driver->enable_depth((mhe::DepthFunc)0);
     driver->enable_lighting();
     //driver->enable_blending(mhe::ALPHA_ONE_MINUS_ALPHA);
-    glEnable(GL_LIGHT0);
+    glEnable(GL_LIGHT0);	
 
     float diff[] = {0.0, 0.8, 0.0};
     glLightfv(GL_LIGHT0, GL_DIFFUSE, diff);
@@ -207,6 +222,17 @@ int main(int, char**)
     main_gui.reset(loader.getGUI(L"main"));
     main_gui->setupEvents(is);
 
+	// init audio
+	mhe::OpenALAudioDriver audio_driver;
+	audio_driver.init();
+	mhe::SoundManager sound_manager;
+	boost::shared_ptr<mhe::iSound> sound = sound_manager.get("assets/test.ogg");
+	sound->play();
+
+	mhe::utils::FPSCounter fps_counter(is);
+	fps_counter.set_callback(FPSCallback());
+	fps_text = L"fps:0";
+
     bool asc = true;
     int ind = 1;
     while (running)
@@ -223,7 +249,7 @@ int main(int, char**)
         sprite1.update(tick);
         test_sprite->update(tick);
         bgnd_sprite->update(tick);
-        cursor->update(tick);
+        //cursor->update(tick);
 
         if (tick >= next_tick + 1000)
         {
@@ -241,9 +267,10 @@ int main(int, char**)
             explode_sprite->execute(ind, tick, false);
             if (ind == 1) ind = 0;
             else ind = 1;
-        }
+        }		
 		//driver->set_projection_matrix(fp);
     }
+
     return 0;
 }
 
@@ -299,6 +326,7 @@ namespace
 		main_gui->draw(driver);
 		cursor->draw(driver);
 		font.print(driver, L"aabb РУССкий текст", mhe::v2d(30, 30));
+		font.print(driver, fps_text, mhe::v2d(30, 500));
         driver->enable_lighting();
 
         //glFlush();
