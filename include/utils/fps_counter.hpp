@@ -2,12 +2,15 @@
 #define __FPS_COUNTER_HPP__
 
 #include "event.hpp"
+#include <boost/function.hpp>
 
 namespace mhe {
 namespace utils {
 
 class FPSCounter
 {
+public:
+	typedef boost::function<void (const FPSCounter*)> Callback;
 private:
 	typedef PrivateEventListener<FPSCounter> FPSEventListener;
 	friend class PrivateEventListener<FPSCounter>;
@@ -16,6 +19,7 @@ private:
 	cmn::uint tick;
 	cmn::uint seconds;
 	cmn::uint last_second_fps;
+	Callback callback;
 
 	bool on_tick(const Event& e);
 public:
@@ -39,6 +43,11 @@ public:
 	float average_fps() const
 	{
 		return static_cast<float>(frames) / seconds;
+	}
+
+	void set_callback(Callback cb)
+	{
+		callback = cb;
 	}
 };
 

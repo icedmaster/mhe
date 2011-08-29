@@ -7,6 +7,10 @@ cmake_minimum_required (VERSION 2.8)
 add_definitions(-Wall)
 add_definitions(-Wextra)
 
+if (CMAKE_BUILD_TYPE STREQUAL "Release")
+	add_definitions(-O2)
+endif()
+
 set (SOURCE_ROOT ${CMAKE_SOURCE_DIR}/../src)
 set (INCLUDE_ROOT ${CMAKE_SOURCE_DIR}/../include)
 
@@ -36,8 +40,13 @@ foreach (DIR ${SRC_PATH})
   set (SOURCE ${SOURCE} ${CUR_SRC})
 endforeach ()
 
-set (SOURCE ${SOURCE} ${CMAKE_SOURCE_DIR}/../main.cpp)
-#set (SOURCE ${SOURCE} ${CMAKE_SOURCE_DIR}/../test_main.cpp)
+if (MHE_TEST)
+	set (SOURCE ${SOURCE} ${CMAKE_SOURCE_DIR}/../test_main.cpp)
+elseif (MHE_DEMO)
+	set (SOURCE ${SOURCE} ${CMAKE_SOURCE_DIR}/../demo_main.cpp)	
+else()
+	set (SOURCE ${SOURCE} ${CMAKE_SOURCE_DIR}/../main.cpp)
+endif()
 
 # find libraries
 if (CMAKE_HOST_UNIX)
@@ -83,15 +92,17 @@ find_library(OGG_LIB ogg)
 message("---- ogg ----")
 message(${OGG_LIB})
 
-find_library(GTEST_LIB gtest)
-message("---- gtest ----")
-message(${GTEST_LIB})
-
 set (LIBS ${OPENGL_LIB} ${SDL_LIB} ${PNG_LIB} ${BOOST_DATETIME_LIB} ${OPENAL_LIB}
-	${VORBISFILE_LIB} ${VORBIS_LIB} ${OGG_LIB}
-	${GTEST_LIB})
+	${VORBISFILE_LIB} ${VORBIS_LIB} ${OGG_LIB})
 if (WIN32)
    set (LIBS ${LIBS} Ws2_32)
+endif()
+
+if (MHE_TEST)
+	find_library(GTEST_LIB gtest)
+	message("---- gtest ----")
+	message(${GTEST_LIB})
+	set (LIBS ${LIBS} ${GTEST_LIB})
 endif()
 
 add_executable (${PROJECT} ${SOURCE})

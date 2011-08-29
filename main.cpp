@@ -117,6 +117,16 @@ namespace
 				mhe::utils::global_log::instance().write("label clicked");
 			}
 	};
+
+	class FPSCallback
+	{
+	public:
+		void operator()(const mhe::utils::FPSCounter* fps_counter)
+		{
+			fps_text = L"FPS:" +
+				boost::lexical_cast<std::wstring>(static_cast<int>(fps_counter->average_fps()));
+		}
+	};
 }
 
 int main(int, char**)
@@ -220,7 +230,7 @@ int main(int, char**)
 	sound->play();
 
 	mhe::utils::FPSCounter fps_counter(is);
-	cmn::uint fps = 0;
+	fps_counter.set_callback(FPSCallback());
 	fps_text = L"fps:0";
 
     bool asc = true;
@@ -257,9 +267,6 @@ int main(int, char**)
             explode_sprite->execute(ind, tick, false);
             if (ind == 1) ind = 0;
             else ind = 1;
-
-			fps_text = L"FPS:" +
-				boost::lexical_cast<std::wstring>(static_cast<int>(fps_counter.average_fps()));
         }		
 		//driver->set_projection_matrix(fp);
     }
