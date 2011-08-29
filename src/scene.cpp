@@ -4,6 +4,12 @@ namespace mhe {
 
 void Scene::draw(boost::shared_ptr<iDriver> driver)
 {
+	for (size_t i = 0; i < subscenes.size(); ++i)
+		subscenes[i]->draw(driver);
+
+	if (main_camera)
+		main_camera->update(driver);
+
 	if (callback_)
 		callback_->beforeDraw(this, driver);
 

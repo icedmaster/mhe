@@ -1,4 +1,5 @@
 #include "test/test_engine.hpp"
+#include "test/test_scene.hpp"
 
 int main(int argc, char** argv)
 {

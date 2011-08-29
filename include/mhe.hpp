@@ -1,6 +1,7 @@
 #ifndef _MHE_HPP_
 #define _MHE_HPP_
 
+#include "camera.hpp"
 #include "window_system.hpp"
 #include "event.hpp"
 #include "impl/system_factory.hpp"

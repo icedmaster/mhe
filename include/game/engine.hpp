@@ -34,6 +34,11 @@ namespace mhe
 				bool init(cmn::uint w, cmn::uint h, cmn::uint bpp, bool fullscreen = false);
 				void run();
 				void stop();
+
+				bool is_running() const
+				{
+					return running_;
+				}
 			
 				TextureManager& getTextureManager()
 				{
