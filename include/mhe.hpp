@@ -12,6 +12,10 @@
 #include "mhe_sound.hpp"
 #include "sound_manager.hpp"
 
+#include "mhe_game.hpp"
+
+#include "mhe_utils.hpp"
+
 #include "lib/pugixml/pugixml.hpp"
 
 #endif
