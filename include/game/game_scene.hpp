@@ -19,7 +19,8 @@ namespace mhe
 				
 			boost::shared_ptr<Scene> scene_;
 		private:
-			virtual bool init_impl() {return true;}
+			virtual bool init_impl(const std::string&) {return true;}
+			virtual bool process_impl() {return true;}
 		protected:
 			Engine* get_engine() const
 			{
@@ -32,14 +33,15 @@ namespace mhe
 			}
 		public:
 			GameScene(Engine* engine) :
-				engine_(engine)
+				engine_(engine),
+				scene_(new Scene)
 			{}
 
 			virtual ~GameScene() {}
 				
-			bool init()
+			bool init(const std::string& arg)
 			{
-				return init_impl();
+				return init_impl(arg);
 			}
 				
 			void setNextScene(boost::shared_ptr<GameScene> gs)
@@ -65,6 +67,16 @@ namespace mhe
 			void setScene(boost::shared_ptr<Scene> scene)
 			{
 				scene_ = scene;
+			}
+
+			boost::shared_ptr<Scene> getScene() const
+			{
+				return get_scene();
+			}
+
+			bool process()
+			{
+				return process_impl();
 			}
 		};
 	}

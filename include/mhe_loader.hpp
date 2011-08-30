@@ -20,8 +20,8 @@ namespace mhe
 			bool is_open_;
 			bool parsed_;
 
-			mutable boost::shared_ptr<TextureManager> texture_manager;
-			mutable boost::shared_ptr<FontManager> font_manager;
+			mutable TextureManager* texture_manager;
+			mutable FontManager* font_manager;
 
 			bool find_node(pugi::xml_node& node,
                            const std::wstring& type, const std::wstring& name) const;
@@ -46,19 +46,20 @@ namespace mhe
 			void load_widget(const pugi::xml_node& node,
                              gui::Widget* widget) const;
 		public:
-			mhe_loader(const std::string& filename);
+			mhe_loader(const std::string& filename, TextureManager* tm = 0,
+					   FontManager* fm = 0);
 			~mhe_loader();
 
 			Sprite* getSprite(const std::wstring& name) const;
 			gui::GUIContainer* getGUI(const std::wstring& name) const;
 
 			// addtitional functions
-			void setTextureManager(const boost::shared_ptr<TextureManager>& tm)
+			void setTextureManager(TextureManager* tm)
 			{
                 texture_manager = tm;
 			}
 
-			void setFontManager(const boost::shared_ptr<FontManager>& fm)
+			void setFontManager(FontManager* fm)
 			{
 				font_manager = fm;
 			}

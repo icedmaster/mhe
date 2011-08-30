@@ -2,9 +2,11 @@
 
 namespace mhe
 {
-	mhe_loader::mhe_loader(const std::string& filename) :
+mhe_loader::mhe_loader(const std::string& filename, TextureManager* tm,
+	FontManager* fm) :
 		is_open_(false),
-		parsed_(false)
+		parsed_(false),
+		texture_manager(tm), font_manager(fm)
 	{
 		pugi::xml_parse_result res = doc.load_file(filename.c_str());
 		if (res.status != pugi::status_ok)
@@ -68,8 +70,7 @@ namespace mhe
         // get filename
         std::wstring fn(node.child(L"file").child_value());
         // try to load texture
-		if (!texture_manager)
-			texture_manager.reset(new TextureManager());
+		if (!texture_manager) return boost::shared_ptr<iTexture>();
 		return texture_manager->get(utils::from_wstr(fn));
     }
 
@@ -86,8 +87,7 @@ namespace mhe
         // get filename
         std::wstring fn(node.child(L"file").child_value());
         // try to load font
-		if (!font_manager)
-			font_manager.reset(new FontManager());
+		if (!font_manager) return boost::shared_ptr<gui::iFont>();
 		return font_manager->get(utils::from_wstr(fn));
 	}
 
