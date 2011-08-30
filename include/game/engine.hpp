@@ -52,6 +52,11 @@ namespace mhe
 				{
 					return fm_;
 				}
+
+				WindowSystem& getWindowSystem()
+				{
+					return ws_;
+				}
 			
 				InputSystem& getInputSystem()
 				{

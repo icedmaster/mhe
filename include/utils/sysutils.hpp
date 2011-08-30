@@ -4,6 +4,7 @@
 #include <ctime>
 #include <cstdlib>
 #include "types.hpp"
+#include "config.hpp"
 
 namespace mhe
 {
@@ -28,6 +29,13 @@ namespace mhe
             if (s < probability) return n;
             return -n;
         }
+
+		inline cmn::uint get_current_tick()
+		{
+			#ifdef __INCLUDE_SDL__
+			return SDL_GetTicks();
+			#endif
+		}			
     }
 }
 

@@ -19,12 +19,16 @@ private:
 		mhe::mhe_loader loader(arg, &(get_engine()->getTextureManager()),
 							   &(get_engine()->getFontManager()));
 		boost::shared_ptr<mhe::gui::GUIContainer> gui(loader.getGUI(L"main_menu"));
+		gui->setupEvents(get_engine()->getInputSystem());
 		get_scene()->add(gui);
 		boost::shared_ptr<mhe::Sprite> background(loader.getSprite(L"background"));
 		background->setPriority(1);
-		boost::shared_ptr<mhe::Sprite> animated(loader.getSprite(L"animated"));
+		const mhe::WindowSystem& ws = get_engine()->getWindowSystem();
+		background->setSize(ws.width(), ws.height());
+		background->execute(0, mhe::utils::get_current_tick());
+		//boost::shared_ptr<mhe::Sprite> animated(loader.getSprite(L"animated"));
 		get_scene()->add(background);
-		get_scene()->add(animated);
+		//get_scene()->add(animated);
 	}
 public:
 	MainMenuScene(mhe::game::Engine* engine) : mhe::game::GameScene(engine)
@@ -50,7 +54,7 @@ int main(int argc, char** argv)
 	engine.getDriver()->set_projection_matrix(proj);
 
 	boost::shared_ptr<MainMenuScene> scene(new MainMenuScene(&engine));
-	if (!scene->init(std::string()))
+	if (!scene->init("assets/main_menu.mhe"))
 	{
 		mhe::utils::global_log::instance().write("Scene init failed");
 		return 1;
