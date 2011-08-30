@@ -13,6 +13,8 @@ namespace mhe
     class iNode
     {
         private:
+			int priority_;			
+
             virtual void draw_impl(const boost::shared_ptr<iDriver>&/*,
                                    const boost::shared_ptr<iCamera>&*/) = 0;
             virtual void update_impl(cmn::uint) {}
@@ -25,9 +27,10 @@ namespace mhe
 
             virtual bool is_alive() const {return true;}
 
-			virtual void set_priority(int) {}
-			virtual int get_priority() const {return 2;}	// normal priority						
+			virtual void set_priority(int pri) {priority_ = pri;}
+			virtual int get_priority() const   {return priority_;}	// normal priority						
         public:
+			iNode() : priority_(2) {}
             virtual ~iNode() {}
 
             void draw(const boost::shared_ptr<iDriver>& driver/*,

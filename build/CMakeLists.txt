@@ -36,8 +36,16 @@ foreach (DIR ${SRC_PATH})
   set (SOURCE ${SOURCE} ${CUR_SRC})
 endforeach ()
 
-set (SOURCE ${SOURCE} ${CMAKE_SOURCE_DIR}/../main.cpp)
-#set (SOURCE ${SOURCE} ${CMAKE_SOURCE_DIR}/../test_main.cpp)
+if (MHE_BUILD STREQUAL "test")
+	message("Create test target makefile")
+	set (SOURCE ${SOURCE} ${CMAKE_SOURCE_DIR}/../test_main.cpp)
+elseif (MHE_BUILD STREQUAL "demo")
+	message("Create demo target makefile")
+	set (SOURCE ${SOURCE} ${CMAKE_SOURCE_DIR}/../demo_main.cpp)	
+else()
+	message("Create usual makefile")
+	set (SOURCE ${SOURCE} ${CMAKE_SOURCE_DIR}/../main.cpp)
+endif()
 
 # find libraries
 if (CMAKE_HOST_UNIX)
@@ -85,9 +93,11 @@ find_library(OGG_LIB ogg)
 message("---- ogg ----")
 message(${OGG_LIB})
 
-find_library(GTEST_LIB gtest)
-message("---- gtest ----")
-message(${GTEST_LIB})
+if (MHE_BUILD STREQUAL "test")
+  find_library(GTEST_LIB gtest)
+  message("---- gtest ----")
+  message(${GTEST_LIB})
+endif()
 
 set (LIBS ${OPENGL_LIB} ${SDL_LIB} ${PNG_LIB} ${BOOST_DATETIME_LIB} ${OPENAL_LIB}
 	${VORBISFILE_LIB} ${VORBIS_LIB} ${OGG_LIB}

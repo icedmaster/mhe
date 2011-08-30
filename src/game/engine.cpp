@@ -45,6 +45,10 @@ namespace game {
 			is_.check();
 			driver_->clear_depth();
 			driver_->clear_color();
+
+			if (game_scene_ && game_scene_->process())
+				game_scene_->getScene()->draw(driver_);			
+			
 			ws_.swapBuffers();
 		}
 	}

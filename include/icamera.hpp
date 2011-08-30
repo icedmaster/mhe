@@ -21,6 +21,8 @@ namespace mhe
 										float znear, float zfar) = 0;
 
 			virtual void update(const boost::shared_ptr<iDriver>&) = 0;
+			virtual void set_id(cmn::uint id) = 0;
+			virtual cmn::uint get_id() const = 0;
 	};
 }
 

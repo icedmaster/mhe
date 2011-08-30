@@ -3,7 +3,8 @@
 namespace mhe
 {
 	Camera::Camera() :
-		pos_(0.0, -10.0, 0.0)
+		pos_(0.0, -10.0, 0.0),
+		id(0)
 	{
 		// init default settings
 		setPerspective(45.0, 4.0/3.0, 0.1, 100);

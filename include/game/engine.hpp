@@ -2,6 +2,7 @@
 #define _ENGINE_HPP_
 
 #include "mhe.hpp"
+#include "game_scene.hpp"
 
 namespace mhe
 {
@@ -16,6 +17,8 @@ namespace mhe
 				FontManager fm_;
 				boost::shared_ptr<iDriver> driver_;
 				boost::shared_ptr<iAudioDriver> audio_driver_;
+
+				boost::shared_ptr<GameScene> game_scene_;
 
 				bool running_;		   
 
@@ -34,6 +37,11 @@ namespace mhe
 				bool init(cmn::uint w, cmn::uint h, cmn::uint bpp, bool fullscreen = false);
 				void run();
 				void stop();
+
+				bool is_running() const
+				{
+					return running_;
+				}
 			
 				TextureManager& getTextureManager()
 				{
@@ -43,6 +51,11 @@ namespace mhe
 				FontManager& getFontManager()
 				{
 					return fm_;
+				}
+
+				WindowSystem& getWindowSystem()
+				{
+					return ws_;
 				}
 			
 				InputSystem& getInputSystem()
@@ -58,6 +71,11 @@ namespace mhe
 				boost::shared_ptr<iAudioDriver> getAudioDriver() const
 				{
 					return audio_driver_;
+				}
+
+				void setGameScene(boost::shared_ptr<GameScene> scene)
+				{
+					game_scene_ = scene;
 				}
 		};
 	}	// game

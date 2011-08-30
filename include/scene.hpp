@@ -5,36 +5,64 @@
 #include "icamera.hpp"
 #include <set>
 #include <vector>
+#include <map>
 #include <boost/shared_ptr.hpp>
+#include <iostream>
 
 namespace mhe
 {
-	class Scene;
-
-	class SceneCallback
-	{
-		public:
-			virtual void beforeDraw(Scene* const scene, boost::shared_ptr<iDriver>& driver) {}
-			virtual void afterDraw(Scene* const scene, boost::shared_ptr<iDriver>& driver) {}
-	};
-
 	class Scene
 	{
+		public:
+			struct Callback
+			{
+				virtual ~Callback() {}
+				virtual void beforeDraw(const Scene*, boost::shared_ptr<iDriver>) {}
+				virtual void afterDraw(const Scene*, boost::shared_ptr<iDriver>) {}
+			};
 		private:
 			typedef std::multiset< boost::shared_ptr<iNode>, sort_node_by_pri > nodeset;
 			nodeset nodes_;
-			std::vector< boost::shared_ptr<iCamera> > cameras_;
-			boost::shared_ptr<iCamera> m_camera;	// main camera
-			boost::shared_ptr<SceneCallback> callback_;
+			std::map<cmn::uint, boost::shared_ptr<iCamera> > cameras_;
+			boost::shared_ptr<iCamera> main_camera;	// main camera
+			boost::shared_ptr<Callback> callback_;
+
+			std::vector< boost::shared_ptr<Scene> > subscenes;
 		public:
-			void add(const boost::shared_ptr<iNode>& node);
-			void addCamera(const boost::shared_ptr<iCamera>& camera);
+			void add(boost::shared_ptr<iNode> node)
+			{
+				nodes_.insert(node);
+				std::cout << "nodes: " << nodes_.size() << "\n";
+			}
 
-			void draw(const boost::shared_ptr<iDriver>& driver);
+			void addCamera(boost::shared_ptr<iCamera> camera)
+			{
+				cameras_[camera->get_id()] = camera;
+			}
 
-			void setCallback(SceneCallback* callback)
+			void setMainCamera(cmn::uint id)
+			{
+			    std::map<cmn::uint, boost::shared_ptr<iCamera> >::iterator it =
+					cameras_.find(id);
+				if (it == cameras_.end()) return;
+				main_camera = it->second;
+			}
+
+			void addSubscene(boost::shared_ptr<Scene> scene)
+			{
+				subscenes.push_back(scene);
+			}
+
+			void draw(boost::shared_ptr<iDriver> driver);
+
+			void setCallback(Callback* callback)
 			{
 				callback_.reset(callback);
+			}
+
+			void setCallback(boost::shared_ptr<Callback> callback)
+			{
+				callback_ = callback;
 			}
 	};
 }
