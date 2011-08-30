@@ -56,6 +56,11 @@ namespace test
 		
 				driver->set_clear_color(cfBlack);
 				driver->enable_depth((DepthFunc)0);
+				driver->disable_lighting();
+
+				matrixf om;
+				om.set_ortho(0, 800, 0, 600, -1, 1);
+				driver->set_projection_matrix(om);
 		
 				running = true;
 			} 			
