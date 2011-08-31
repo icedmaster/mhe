@@ -54,7 +54,7 @@ public:
 	boost::shared_ptr<res_type> get(const std::string& name) const
 	{
 		const std::string& sname = get_file_name(name);
-		typename resmap::iterator it = resources_.find(name);
+		typename resmap::iterator it = resources_.find(sname);
 		if (it != resources_.end())
 			return it->second;
 		return load_impl(name, sname);

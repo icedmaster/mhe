@@ -34,6 +34,9 @@ namespace mhe
 			boost::shared_ptr<gui::iFont> get_font(const std::wstring& name) const;
 			boost::shared_ptr<gui::iFont> load_font(const pugi::xml_node& node) const;
 
+			void load_asset_by_type(const pugi::xml_node& node,
+									const std::wstring& type);
+
 			Sprite* load_sprite(const pugi::xml_node& node) const;
 			gui::GUIContainer* load_gui(const pugi::xml_node& node) const;
 
@@ -52,6 +55,8 @@ namespace mhe
 
 			Sprite* getSprite(const std::wstring& name) const;
 			gui::GUIContainer* getGUI(const std::wstring& name) const;
+
+			void load_all_assets();
 
 			// addtitional functions
 			void setTextureManager(TextureManager* tm)

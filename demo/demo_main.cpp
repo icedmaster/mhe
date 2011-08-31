@@ -7,20 +7,12 @@ class MainMenuScene : public mhe::game::GameScene
 	typedef mhe::gui::PrivateGUIEventHandler<MainMenuScene> MainMenuGUIHandler;
 	friend class mhe::gui::PrivateGUIEventHandler<MainMenuScene>;
 
-	boost::shared_ptr<mhe::gui::BMFont> fps_font;
+	boost::shared_ptr<mhe::gui::iFont> fps_font;
 private:
 	bool init_impl(const std::string& arg)
 	{
 		load_scene(arg);
 		setup_events();
-
-		fps_font.reset(new mhe::gui::BMFont);
-		fps_font->load("assets/145.fnt");
-		fps_font->setColor(mhe::cfWhite);
-		boost::shared_ptr<mhe::iNode> fps_node(
-			new mhe::utils::GraphicsFPSCounter(get_engine()->getInputSystem(),
-											   fps_font, mhe::v2d(20, 550)));
-		get_scene()->add(fps_node);
 		return true;
 	}
 
@@ -28,6 +20,7 @@ private:
 	{
 		mhe::mhe_loader loader(arg, &(get_engine()->getTextureManager()),
 							   &(get_engine()->getFontManager()));
+		loader.load_all_assets();
 		boost::shared_ptr<mhe::gui::GUIContainer> gui(loader.getGUI(L"main_menu"));
 		gui->setupEvents(get_engine()->getInputSystem());
 		setup_gui(gui);
@@ -39,6 +32,12 @@ private:
 		background->execute(0, mhe::utils::get_current_tick());
 		//boost::shared_ptr<mhe::Sprite> animated(loader.getSprite(L"animated"));
 		get_scene()->add(background);
+
+		fps_font = get_engine()->getFontManager().get("145.fnt");
+		boost::shared_ptr<mhe::iNode> fps_node(
+			new mhe::utils::GraphicsFPSCounter(get_engine()->getInputSystem(),
+											   fps_font, mhe::v2d(20, 550)));
+		get_scene()->add(fps_node);
 		//get_scene()->add(animated);
 	}
 
