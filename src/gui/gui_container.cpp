@@ -15,6 +15,16 @@ namespace gui {
 		widgets_.push_back(widget);
 	}
 
+	boost::shared_ptr<Widget> GUIContainer::get(const std::string& name) const
+	{
+		for (size_t i = 0; i < widgets_.size(); ++i)
+		{
+			if (widgets_[i]->getName() == name)
+				return widgets_[i];
+		}
+		return boost::shared_ptr<Widget>();
+	}
+
 	void GUIContainer::draw_impl(const boost::shared_ptr<iDriver>& driver)
 	{
 		for (size_t i = 0; i < widgets_.size(); ++i)

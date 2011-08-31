@@ -228,6 +228,9 @@ mhe_loader::mhe_loader(const std::string& filename, TextureManager* tm,
 		n = node.child(L"font");
 		if (n)
 			widget->setFont(get_font(n.child_value()));
+		n = node.child(L"name");
+		if (n)
+			widget->setName(utils::from_wstr(std::wstring(n.child_value())));
 	}
 
 	//------------------ functions ------------------------

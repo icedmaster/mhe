@@ -15,9 +15,9 @@ namespace mhe
 		indicies_.assign(ind, ind + sz);
 	}
 
-	texcoord TextureAtlas::get(cmn::uint quad) const
+	iTexture::texcoord TextureAtlas::get(cmn::uint quad) const
 	{
-		texcoord a;
+		iTexture::texcoord a;
 
 		if ( (quad * 8) >= indicies_.size() )
 		{
@@ -38,9 +38,23 @@ namespace mhe
 		return a;
 	}
 
+	iTexture::texcoord TextureAtlas::get(const rect<float>& quad) const
+	{
+		float x1 = quad.ll().x() / texture_->width();
+		float y1 = quad.ll().y() / texture_->height();
+		float x2 = quad.rh().x() / texture_->width();
+		float y2 = quad.rh().y() / texture_->height();
+
+		iTexture::texcoord tc = {{x1, y1,
+								  x1, y2,
+								  x2, y2,
+								  x2, y1}};
+		return tc;
+	}
+
 	v2d TextureAtlas::get_size(cmn::uint quad) const
 	{
-		const texcoord& tc = get(quad);
+		const iTexture::texcoord& tc = get(quad);
 		v2d v( (tc[4] - tc[0]) * texture_->width(),
 			   (tc[3] - tc[1]) * texture_->height()
 			 );
@@ -67,4 +81,17 @@ namespace mhe
 			}
 		}
 	}
+
+boost::shared_ptr<iTexture> TextureAtlas::createTexture(cmn::uint quad) const
+{
+	boost::shared_ptr<iTexture> new_texture = texture_->clone();
+	new_texture->set_coord(get(quad));
+	return new_texture;
 }
+
+boost::shared_ptr<iTexture> TextureAtlas::createTexture(const rect<float>& coord) const
+{
+	boost::shared_ptr<iTexture> new_texture = texture_->clone();
+	new_texture->set_coord(get(coord));
+	return new_texture;
+}}

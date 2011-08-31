@@ -22,6 +22,26 @@ namespace mhe
 		};
 		typedef boost::shared_ptr<GUIEventHandler> guieventptr;
 
+		// helper class
+		template <class T>
+		class PrivateGUIEventHandler : public GUIEventHandler
+		{
+			typedef void (T::*Handler)(const Widget*);
+			T* object_;
+			Handler handler_;
+		public:
+			PrivateGUIEventHandler(T* object, Handler handler) :
+				object_(object),
+				handler_(handler)
+			{}
+
+			void handle(const Widget* widget)
+			{
+				assert(object_ != 0);
+				(object_->*handler_)(widget);
+			}
+		};
+
 		enum
 		{
 			OnMouseMove = 0,
@@ -44,6 +64,7 @@ namespace mhe
 			private:
 				bool visible_;
                 colorf clr;
+			std::string name_;
 			private:
 				void process_event(int e)
 				{
@@ -246,6 +267,16 @@ namespace mhe
 				{
 				    set_color(c);
 				}
+
+			void setName(const std::string& name)
+			{
+				name_ = name;
+			}
+
+			const std::string& getName() const
+			{
+				return name_;
+			}
 		};
 	}
 }

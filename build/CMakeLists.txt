@@ -16,6 +16,8 @@ set (INCLUDE_ROOT ${CMAKE_SOURCE_DIR}/../include)
 
 set (LIB_DIR ${CMAKE_SOURCE_DIR}/../lib)
 
+set (DEMO_DIR ${CMAKE_SOURCE_DIR}/../demo)
+
 #set (SRC_DIR)
 
 set (SRC_PATH
@@ -27,6 +29,10 @@ set (SRC_PATH
   ${SOURCE_ROOT}/game
   ${LIB_DIR}/pugixml
 )
+
+if (MHE_BUILD STREQUAL "demo")
+  set (SRC_PATH ${SRC_PATH} ${DEMO_DIR})
+endif()
 
 set (INC_PATH
   ${INCLUDE_ROOT}
@@ -45,7 +51,6 @@ if (MHE_BUILD STREQUAL "test")
 	set (SOURCE ${SOURCE} ${CMAKE_SOURCE_DIR}/../test_main.cpp)
 elseif (MHE_BUILD STREQUAL "demo")
 	message("Create demo target makefile")
-	set (SOURCE ${SOURCE} ${CMAKE_SOURCE_DIR}/../demo_main.cpp)	
 else()
 	message("Create usual makefile")
 	set (SOURCE ${SOURCE} ${CMAKE_SOURCE_DIR}/../main.cpp)
