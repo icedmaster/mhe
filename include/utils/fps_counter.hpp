@@ -2,7 +2,12 @@
 #define __FPS_COUNTER_HPP__
 
 #include "event.hpp"
+#include "inode.hpp"
+#include "gui/ifont.hpp"
+#include "strutils.hpp"
 #include <boost/function.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/weak_ptr.hpp>
 
 namespace mhe {
 namespace utils {
@@ -48,6 +53,50 @@ public:
 	void set_callback(Callback cb)
 	{
 		callback = cb;
+	}
+};
+
+class GraphicsFPSCounter : public FPSCounter, public iNode
+{
+private:
+	boost::weak_ptr<gui::iFont> font_;
+	v2d pos_;
+	std::wstring text_;
+
+	class Helper
+	{
+		GraphicsFPSCounter* object_;
+	public:
+		Helper(GraphicsFPSCounter* object) : object_(object) {}
+		void operator()(const FPSCounter* fps_counter)
+		{
+			object_->update_text(fps_counter);
+		}
+	};
+	friend class Helper;
+
+	void update_text(const FPSCounter*)
+	{
+		text_ = boost::lexical_cast<std::wstring>(static_cast<int>(average_fps()));
+	}
+public:
+	GraphicsFPSCounter(InputSystem& is, boost::shared_ptr<gui::iFont> font,
+					   const v2d& position) :
+		FPSCounter(is), font_(font), pos_(position)
+	{
+		set_callback(Helper(this));
+	}
+
+private:
+	void draw_impl(const boost::shared_ptr<iDriver>& driver)
+	{
+		if (font_.expired()) return;
+		font_.lock()->print(driver, text_, pos_);
+	}
+
+	int get_priority() const
+	{
+		return 5;
 	}
 };
 

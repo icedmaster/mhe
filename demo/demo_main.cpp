@@ -6,11 +6,21 @@ class MainMenuScene : public mhe::game::GameScene
 	friend class mhe::PrivateEventListener<MainMenuScene>;
 	typedef mhe::gui::PrivateGUIEventHandler<MainMenuScene> MainMenuGUIHandler;
 	friend class mhe::gui::PrivateGUIEventHandler<MainMenuScene>;
+
+	boost::shared_ptr<mhe::gui::BMFont> fps_font;
 private:
 	bool init_impl(const std::string& arg)
 	{
 		load_scene(arg);
 		setup_events();
+
+		fps_font.reset(new mhe::gui::BMFont);
+		fps_font->load("assets/145.fnt");
+		fps_font->setColor(mhe::cfWhite);
+		boost::shared_ptr<mhe::iNode> fps_node(
+			new mhe::utils::GraphicsFPSCounter(get_engine()->getInputSystem(),
+											   fps_font, mhe::v2d(20, 550)));
+		get_scene()->add(fps_node);
 		return true;
 	}
 
