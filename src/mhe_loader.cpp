@@ -228,6 +228,28 @@ mhe_loader::mhe_loader(const std::string& filename, TextureManager* tm,
 		n = node.child(L"font");
 		if (n)
 			widget->setFont(get_font(n.child_value()));
+		n = node.child(L"name");
+		if (n)
+			widget->setName(utils::from_wstr(std::wstring(n.child_value())));
+	}
+
+	void mhe_loader::load_all_assets()
+	{
+		for (pugi::xml_node node = root.child(L"asset"); node;
+			 node = node.next_sibling(L"asset"))
+		{
+			const std::wstring type = node.attribute(L"type").value();
+			load_asset_by_type(node, type);
+		}
+	}
+
+	void mhe_loader::load_asset_by_type(const pugi::xml_node& node,
+										const std::wstring& type)
+	{
+		if (type == L"texture")
+			load_texture(node);
+		else if (type == L"font")
+			load_font(node);
 	}
 
 	//------------------ functions ------------------------

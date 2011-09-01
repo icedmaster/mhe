@@ -32,6 +32,7 @@ namespace mhe
 				GUIContainer(InputSystem& is);
 
 				void add(const boost::shared_ptr<Widget>& widget);
+				boost::shared_ptr<Widget> get(const std::string& name) const;
 
 				void setupEvents(InputSystem& is);
 		};

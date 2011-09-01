@@ -22,11 +22,15 @@ namespace mhe
 	{
 		size_t slash_pos = filepath.find_last_of('/');
 		// get filename with extension
-		const std::string& fne = filepath.substr(slash_pos + 1, filepath.length() - slash_pos - 1);
+		std::string fne;
+		if (slash_pos == std::string::npos)
+			fne = filepath;
+		else
+			fne = filepath.substr(slash_pos + 1, filepath.length() - slash_pos - 1);
 		// remove extension
 		size_t point_pos = fne.find_last_of('.');
 		std::string fn = fne;
-		if (point_pos)
+		if (point_pos != std::string::npos)
 			fn.erase(point_pos, fn.length() - point_pos);
 		return fn;
 	}

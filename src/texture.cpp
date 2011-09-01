@@ -4,7 +4,12 @@ using namespace mhe;
 
 Texture::Texture() :
 	binded_(false)
-{}
+{
+	coord_[0] = 0.0; coord_[1] = 0.0;
+	coord_[2] = 0.0; coord_[3] = 1.0;
+	coord_[4] = 1.0; coord_[5] = 1.0;
+	coord_[6] = 1.0; coord_[7] = 0.0;
+}
 
 Texture::~Texture()
 {
@@ -72,3 +77,15 @@ void Texture::clean()
 {
 	glDisable(GL_TEXTURE_2D);
 }
+
+boost::shared_ptr<iTexture> Texture::clone() const
+{
+	boost::shared_ptr<Texture> texture_clone(new Texture);
+	texture_clone->w_ = w_;
+	texture_clone->h_ = h_;
+	texture_clone->id_ = id_;
+	// FIXME: we shall not copy bind_ parameter, 'cause we can have a problem with
+	// texture deleting
+	return texture_clone;
+}
+

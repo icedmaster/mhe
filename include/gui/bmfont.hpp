@@ -23,6 +23,8 @@ namespace mhe
 				void load_texture(const std::string& filename);
 				cmn::uint get_char(cmn::uint sym) const;
 			public:
+				BMFont();
+
 				bool load(const std::string& filename);
 
 				void print(const boost::shared_ptr<iDriver>& driver, const std::wstring& text,

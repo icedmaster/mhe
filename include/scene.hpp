@@ -7,7 +7,6 @@
 #include <vector>
 #include <map>
 #include <boost/shared_ptr.hpp>
-#include <iostream>
 
 namespace mhe
 {
@@ -32,7 +31,6 @@ namespace mhe
 			void add(boost::shared_ptr<iNode> node)
 			{
 				nodes_.insert(node);
-				std::cout << "nodes: " << nodes_.size() << "\n";
 			}
 
 			void addCamera(boost::shared_ptr<iCamera> camera)

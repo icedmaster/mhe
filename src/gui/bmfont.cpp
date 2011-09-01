@@ -7,6 +7,10 @@
 namespace mhe {
 namespace gui {
 
+	BMFont::BMFont() :
+		color_(cfBlack)
+	{}
+
 	bool BMFont::load(const std::string& filename)
 	{
 		std::ifstream f(filename.c_str());
@@ -118,7 +122,7 @@ namespace gui {
 			cmn::uint sym = (cmn::uint)text[i];
 			cmn::uint ind = get_char(sym);
 			const v2d& sz = ta_.get_size(ind);
-			const texcoord& tc = ta_.get(ind);
+			const iTexture::texcoord& tc = ta_.get(ind);
 			t.insert(t.end(), tc.data(), tc.data() + tc.size());
 			// prepare vertex coordinates
 			boost::array<float, 12> cc;
