@@ -277,6 +277,10 @@ namespace mhe
 			{
 				return name_;
 			}
+
+			// TODO:
+			virtual void setTexture(const boost::shared_ptr<iTexture>&) {}
+			virtual boost::shared_ptr<iTexture> getTexture() const {return boost::shared_ptr<iTexture>();}
 		};
 	}
 }

@@ -8,6 +8,7 @@ class MainMenuScene : public mhe::game::GameScene
 	friend class mhe::gui::PrivateGUIEventHandler<MainMenuScene>;
 
 	boost::shared_ptr<mhe::gui::iFont> fps_font;
+	boost::shared_ptr<mhe::game::HLWidget> hl_start_button;
 private:
 	bool init_impl(const std::string& arg)
 	{
@@ -41,11 +42,14 @@ private:
 		//get_scene()->add(animated);
 	}
 
-	void setup_gui(boost::shared_ptr<mhe::gui::GUIContainer> gui)
+	void setup_gui(boost::shared_ptr<mhe::gui::GUIContainer> guic)
 	{
-		MainMenuGUIHandler* start_move_handler = new MainMenuGUIHandler(this,
-																		&MainMenuScene::on_start_mouse_move);
-		gui->get("start_button")->setHandler(mhe::gui::OnMouseMove, start_move_handler);
+		// MainMenuGUIHandler* start_move_handler = new MainMenuGUIHandler(this,
+		// 																&MainMenuScene::on_start_mouse_move);
+		boost::shared_ptr<mhe::gui::Widget> start_button = guic->get("start_button");
+		//start_button->setHandler(mhe::gui::OnMouseMove, start_move_handler);
+		hl_start_button.reset(new mhe::game::HLWidget(start_button,
+													  get_engine()->getTextureManager().get("hl_start_button")));
 	}
 
 	void setup_events()
