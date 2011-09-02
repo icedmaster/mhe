@@ -4,13 +4,13 @@
 #include "math/matrix.hpp"
 #include "idriver.hpp"
 #include "types.hpp"
-//#include "icamera.hpp"
+#include "transform.hpp"
 #include <boost/shared_ptr.hpp>
 
 namespace mhe
 {
     // Base renderable class
-    class iNode
+    class iNode : public Transform
     {
         private:
 			int priority_;			
@@ -18,12 +18,6 @@ namespace mhe
             virtual void draw_impl(const boost::shared_ptr<iDriver>&/*,
                                    const boost::shared_ptr<iCamera>&*/) = 0;
             virtual void update_impl(cmn::uint) {}
-            virtual matrixf get_matrix() const
-            {
-                return matrixf::identity();
-            }
-
-            virtual void set_position(const v3d&) {}
 
             virtual bool is_alive() const {return true;}
 
@@ -42,16 +36,6 @@ namespace mhe
             void update(cmn::uint tick)
             {
                 update_impl(tick);
-            }
-
-            void setPosition(const v3d& pos)
-            {
-                set_position(pos);
-            }
-
-            matrixf getMatrix() const
-            {
-                return get_matrix();
             }
 
             bool alive() const
