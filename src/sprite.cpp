@@ -141,7 +141,7 @@ namespace mhe
         driver->enable_blending(ALPHA_ONE_MINUS_ALPHA);
 
         a.texture()->prepare();
-        driver->draw(m_, v, n, t, c, i, 6);
+        driver->draw(get_transform(), v, n, t, c, i, 6);
         a.texture()->clean();
 
         driver->disable_blending();
@@ -164,22 +164,16 @@ namespace mhe
                 set_position(pos_);
             // new frame
             if (current_al_->get(cur_animation))
-                m_ = cur_animation.get_transform() * m_;
+                set_transform(cur_animation.get_transform() * get_transform());
         }
     }
 
     void Sprite::set_position(const v3d& pos)
     {
         matrixf tm;
-        m_.load_identity();
         tm.set_translate(pos);
-        m_ *= tm;
+		set_transform(tm);
         pos_ = pos;
-    }
-
-    matrixf Sprite::get_matrix() const
-    {
-        return m_;
     }
 
     void Sprite::addAnimationList(const AnimationList& al)
@@ -199,7 +193,7 @@ namespace mhe
             set_position(pos_);
         // append first transformation
         if (current_al_->get(cur_animation))
-            m_ = cur_animation.get_transform() * m_;
+            set_transform(cur_animation.get_transform() * get_transform());
     }
 
 	float Sprite::width() const

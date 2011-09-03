@@ -92,7 +92,6 @@ namespace mhe
         private:
             typedef std::map <cmn::uint, AnimationList> almap;
             almap al_;
-            matrixf m_;
             bool is_alive_;
             float x_size_, y_size_;
             bool reset_position_;
@@ -131,6 +130,11 @@ namespace mhe
 
 			float width() const;
 			float height() const;
+
+			void setPosition(const v3d& pos)
+			{
+				set_position(pos);
+			}
 
             // execute animation from list with index <index>
             void execute(cmn::uint index, cmn::uint tick, bool reset_position = false);
