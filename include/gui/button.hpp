@@ -67,6 +67,11 @@ namespace mhe
 				{
 					pressed_texture_ = t;
 				}
+
+			boost::shared_ptr<iTexture> getTexture() const
+			{
+				return texture_;
+			}
 		};
 	}
 }
