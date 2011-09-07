@@ -37,6 +37,8 @@ public:
 	}
 
 protected:
+	Aspect() {}
+
 	void set_parent(Aspect* aspect)
 	{
 		parent_ = aspect;

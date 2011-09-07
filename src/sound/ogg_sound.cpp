@@ -1,4 +1,5 @@
 #include "sound/ogg_sound.hpp"
+#include "utils/logutils.hpp"
 #include <fstream>
 #include <cstring>
 
@@ -49,6 +50,10 @@ namespace mhe
 		// size to read - in bytes
 		total_size *= sizeof(cmn::int16_t);
 
+		#ifdef __DEBUG__
+		std::cout << "loading: " << num_channels << " " << num_samples << " " << sp_.freq << "\n";
+		#endif
+
 		// last - read all samples
 		int rd_sz = 0;		
 		char* ptr = reinterpret_cast<char*>(&data_[0]);
@@ -60,6 +65,10 @@ namespace mhe
 				break;
 			rd_sz += rd;
 		}
+		#ifdef __DEBUG__
+		std::cout << "read: " << rd_sz << "\n";
+		#endif
+
 		ov_clear(&f);
 		
 		return true;

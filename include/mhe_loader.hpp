@@ -6,6 +6,7 @@
 #include "sprite.hpp"
 #include "texture_manager.hpp"
 #include "font_manager.hpp"
+#include "sound_manager.hpp"
 #include "utils/strutils.hpp"
 #include "utils/logutils.hpp"
 #include "mhe_gui.hpp"
@@ -22,6 +23,7 @@ namespace mhe
 
 			mutable TextureManager* texture_manager;
 			mutable FontManager* font_manager;
+			mutable SoundManager* sound_manager;
 
 			bool find_node(pugi::xml_node& node,
                            const std::wstring& type, const std::wstring& name) const;
@@ -33,6 +35,9 @@ namespace mhe
 
 			boost::shared_ptr<gui::iFont> get_font(const std::wstring& name) const;
 			boost::shared_ptr<gui::iFont> load_font(const pugi::xml_node& node) const;
+
+			boost::shared_ptr<iSound> get_sound(const std::wstring& name) const;
+			boost::shared_ptr<iSound> load_sound(const pugi::xml_node& node) const;
 
 			void load_asset_by_type(const pugi::xml_node& node,
 									const std::wstring& type);
@@ -50,7 +55,7 @@ namespace mhe
                              gui::Widget* widget) const;
 		public:
 			mhe_loader(const std::string& filename, TextureManager* tm = 0,
-					   FontManager* fm = 0);
+					   FontManager* fm = 0, SoundManager* sm = 0);
 			~mhe_loader();
 
 			Sprite* getSprite(const std::wstring& name) const;
@@ -67,6 +72,11 @@ namespace mhe
 			void setFontManager(FontManager* fm)
 			{
 				font_manager = fm;
+			}
+
+			void set_sound_manager(SoundManager* sm)
+			{
+				sound_manager = sm;
 			}
 	};
 

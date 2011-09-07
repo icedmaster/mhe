@@ -1,5 +1,7 @@
-//#include "test/test_engine.hpp"
+#include "test/test_sound.hpp"
+#include "test/test_engine.hpp"
 #include "test/test_scene.hpp"
+#include "test/test_aspect.hpp"
 
 int main(int argc, char** argv)
 {

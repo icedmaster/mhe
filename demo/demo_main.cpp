@@ -14,13 +14,16 @@ private:
 	{
 		load_scene(arg);
 		setup_events();
+		// begin to play beautiful music
+		get_engine()->getSoundManager().get("theme")->play();
 		return true;
 	}
 
 	void load_scene(const std::string& arg)
 	{
 		mhe::mhe_loader loader(arg, &(get_engine()->getTextureManager()),
-							   &(get_engine()->getFontManager()));
+							   &(get_engine()->getFontManager()),
+							   &(get_engine()->getSoundManager()));
 		loader.load_all_assets();
 		boost::shared_ptr<mhe::gui::GUIContainer> gui(loader.getGUI(L"main_menu"));
 		gui->setupEvents(get_engine()->getInputSystem());
