@@ -20,19 +20,22 @@ namespace mhe
 struct SoundLoader
 {
 	typedef iSound type;
-	static type* load(const std::string& name);
+	typedef iAudioDriver helper_type;
+	static type* load(const std::string& name, boost::shared_ptr<helper_type> helper);
 };
 
 struct TextureLoader
 {
 	typedef iTexture type;
-	static type* load(const std::string& name);
+	typedef iDriver helper_type;
+	static type* load(const std::string& name, boost::shared_ptr<helper_type> helper);
 };
 
 struct FontLoader
 {
 	typedef gui::iFont type;
-	static type* load(const std::string& name);
+	typedef iDriver helper_type;
+	static type* load(const std::string& name, boost::shared_ptr<helper_type> helper);
 };
 
 }	// namespace

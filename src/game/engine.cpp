@@ -20,11 +20,17 @@ namespace game {
 		
 		// graphics driver initialization
 		driver_->set_window_system(&ws_);
+		driver_->init();
 
 		default_setup();
 
 		// audio driver initialization
 		audio_driver_->init();
+
+		// set helpers for managers
+		tm_.set_helper(driver_);
+		fm_.set_helper(driver_);
+		sm_.set_helper(audio_driver_);
 		return true;
 	}
 

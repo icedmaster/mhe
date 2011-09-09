@@ -2,6 +2,7 @@
 #include "test/test_engine.hpp"
 #include "test/test_scene.hpp"
 #include "test/test_aspect.hpp"
+#include "test/test_python.hpp"
 
 int main(int argc, char** argv)
 {

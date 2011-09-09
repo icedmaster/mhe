@@ -1,28 +1,30 @@
 #include "multitexture.hpp"
+#include "opengl_driver.hpp"
 
 namespace mhe {
 
-void MultiTexture::setImage(const boost::shared_ptr<Image>& image, FilterType ft)
+void MultiTexture::setImage(const boost::shared_ptr<Image>& image,
+							boost::shared_ptr<iDriver> driver, FilterType ft)
 {
 	boost::shared_ptr<Texture> texture(new Texture);
-	texture->setImage(image, ft);
+	texture->setImage(image, driver, ft);
 	textures_.push_back(texture);
 }
 
-void MultiTexture::prepare()
+void MultiTexture::prepare(boost::shared_ptr<iDriver> driver)
 {
 	for (size_t i = 0; i < textures_.size(); ++i)
 	{
-		glActiveTexture(GL_TEXTURE0_ARB + i);
-		textures_[i]->prepare();
+		dynamic_cast<OpenGLDriver*>(driver.get())->get_extensions().glActiveTexture(GL_TEXTURE0_ARB + i);
+		textures_[i]->prepare(driver);
 	}
 }
 
-void MultiTexture::clean()
+void MultiTexture::clean(boost::shared_ptr<iDriver> driver)
 {
 	for (size_t i = 0; i < textures_.size(); ++i)
 	{
-		glActiveTexture(GL_TEXTURE0_ARB + i);
+		dynamic_cast<OpenGLDriver*>(driver.get())->get_extensions().glActiveTexture(GL_TEXTURE0_ARB + i);
 		textures_[i]->clean();
 	}
 }

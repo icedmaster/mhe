@@ -5,11 +5,14 @@ namespace mhe
 
 	OpenGLDriver::OpenGLDriver() :
 		zbuffer_masked_(false)
-	{		
+	{	
 	}
-	/*bool OpenGLDriver::init_impl(const WindowSystem& ws)
+
+	bool OpenGLDriver::init_impl()
 	{
-	}*/
+		extensions_.init_extensions();
+		return true;
+	}
 
 	void OpenGLDriver::close_impl()
 	{

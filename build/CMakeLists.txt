@@ -27,6 +27,7 @@ set (SRC_PATH
   ${SOURCE_ROOT}/utils
   ${SOURCE_ROOT}/sound
   ${SOURCE_ROOT}/game
+  ${SOURCE_ROOT}/script
   ${LIB_DIR}/pugixml
 )
 
@@ -111,6 +112,19 @@ if (MHE_BUILD STREQUAL "test")
 	message("---- gtest ----")
 	message(${GTEST_LIB})
 	set (LIBS ${LIBS} ${GTEST_LIB})
+endif()
+
+# find scripts
+find_library(PYTHON_LIB python3)
+message("---- python ----")
+if (${PYTHON_LIB} STREQUAL "PYTHON_LIB-NOTFOUND")
+  message("Python lib not found. Python scripting not availible")
+else()
+  message(${PYTHON_LIB})
+  message("---- boost_python ----")
+  find_library(BOOST_PYTHON_LIB boost_python3)
+  message(${BOOST_PYTHON_LIB})
+  set(LIBS ${LIBS} ${BOOST_PYTHON_LIB} ${PYTHON_LIB})
 endif()
 
 add_executable (${PROJECT} ${SOURCE})

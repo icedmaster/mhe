@@ -13,18 +13,22 @@ private:
 	cmn::uint id_;	
 	texcoord coord_;
 	bool binded_;
-	void rebuild_texture(const boost::shared_ptr<Image>& im, FilterType ft);
+	void rebuild_texture(const boost::shared_ptr<Image>& im,
+						 boost::shared_ptr<iDriver> driver, FilterType ft);
 public:
 	Texture();
 	~Texture();
 			
-	void setImage(const boost::shared_ptr<Image>& im, FilterType ft = Nearest)
+	void setImage(const boost::shared_ptr<Image>& im, boost::shared_ptr<iDriver> driver,
+				  FilterType ft = Nearest)
 	{
-		rebuild_texture(im, ft);
+		rebuild_texture(im, driver, ft);
 	}
 			
-	void prepare();
-	void clean();
+	void prepare(boost::shared_ptr<iDriver> driver = 
+				 boost::shared_ptr<iDriver>());
+	void clean(boost::shared_ptr<iDriver> driver =
+			   boost::shared_ptr<iDriver>());
 			
 	cmn::uint width() const
 	{
