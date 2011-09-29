@@ -138,7 +138,8 @@ namespace mhe
         glEnableClientState(GL_NORMAL_ARRAY);
         // 3 координаты на вершину, 0 - расстояние между тройками координат
         glVertexPointer(3, GL_FLOAT, 0, v);
-        glNormalPointer(GL_FLOAT, 0, n);
+		if (n)
+			glNormalPointer(GL_FLOAT, 0, n);
         // need to change to nullptr
         if (t)
         {

@@ -6,16 +6,25 @@ iSound* SoundLoader::load(const std::string& name, boost::shared_ptr<helper_type
 {
 	const std::string& ext = get_file_extension(name);
 	boost::shared_ptr<iSoundData> data;
+	bool loaded = false;
 	if (ext == "ogg")
 	{
 		data.reset(new ogg_sound);
 		if (data->load(name))
-		{
-			iSound* sound = SystemFactory::instance().createSound();
-			if (sound->init(data))
-				return sound;
-			delete sound;
-		}
+			loaded = true;
+	}
+	else if (ext == "wav")
+	{
+		data.reset(new wav_sound);
+		if (data->load(name))
+			loaded = true;
+	}
+	if (loaded)
+	{
+		iSound* sound = SystemFactory::instance().createSound();
+		if (sound->init(data))
+			return sound;
+		delete sound;
 	}
 	return nullptr;
 }

@@ -10,13 +10,16 @@ class MainMenuScene : public mhe::game::GameScene
 	boost::shared_ptr<mhe::gui::iFont> fps_font;
 	boost::shared_ptr<mhe::game::HLWidget> hl_start_button;
 	boost::shared_ptr<mhe::game::HLWidget> hl_quit_button;
+	boost::shared_ptr<mhe::iSound> theme_sound;
+	cmn::uint loop_wait_time;
 private:
 	bool init_impl(const std::string& arg)
 	{
 		load_scene(arg);
 		setup_events();
 		// begin to play beautiful music
-		//get_engine()->getSoundManager().get("theme")->play();
+		theme_sound = get_engine()->getSoundManager().get("theme");
+		theme_sound->play();
 		return true;
 	}
 
@@ -67,6 +70,24 @@ private:
 																	this, &MainMenuScene::on_quit);
 		get_engine()->getInputSystem().addListener(listener);
 	}
+
+	// main process function
+	bool process_impl()
+	{
+		if (!theme_sound->is_playing())
+		{
+			// wait 2 seconds and play it again
+			cmn::uint tick = mhe::utils::get_current_tick();
+			if (!loop_wait_time)
+				loop_wait_time = tick + 2000;
+			else if (tick >= loop_wait_time)
+			{
+				theme_sound->play();
+				loop_wait_time = 0;
+			}
+		}
+		return true;
+	}
 private:	// events
 	bool on_quit(const mhe::Event&)
 	{
@@ -80,7 +101,8 @@ private:	// events
 		get_engine()->stop();
 	}
 public:
-	MainMenuScene(mhe::game::Engine* engine) : mhe::game::GameScene(engine)
+	MainMenuScene(mhe::game::Engine* engine) : mhe::game::GameScene(engine),
+											   loop_wait_time(0)
 	{}
 };
 

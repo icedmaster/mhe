@@ -27,7 +27,7 @@ set (SRC_PATH
   ${SOURCE_ROOT}/utils
   ${SOURCE_ROOT}/sound
   ${SOURCE_ROOT}/game
-  ${SOURCE_ROOT}/script
+  #${SOURCE_ROOT}/script
   ${LIB_DIR}/pugixml
 )
 
@@ -85,6 +85,8 @@ message(${BOOST_DATETIME_LIB})
 
 if (WIN32)
    find_library(OPENAL_LIB openal32)
+else()
+	find_library(OPENAL_LIB openal)
 endif()
 message("---- OpenAL -----")
 message(${OPENAL_LIB})
