@@ -56,6 +56,10 @@ private:
 		boost::shared_ptr<mhe::gui::Widget> start_button = guic->get("start_button");
 		hl_start_button.reset(new mhe::game::HLWidget(start_button,
 													  get_engine()->getTextureManager().get("hl_start_button")));
+		// start button
+		MainMenuGUIHandler* start_click_handler = new MainMenuGUIHandler(this,
+		 																&MainMenuScene::on_start_mouse_click);
+		start_button->setHandler(mhe::gui::OnMouseLeftClick, start_click_handler);
 		// quit button
 		/*boost::shared_ptr<mhe::gui::Widget> quit_button = guic->get("quit_button");
 		quit_button->setHandler(mhe::gui::OnMouseLeftClick, quit_click_handler);
@@ -99,6 +103,11 @@ private:	// events
 	void on_quit_mouse_click(const mhe::gui::Widget*)
 	{
 		get_engine()->stop();
+	}
+
+	void on_start_mouse_click(const mhe::gui::Widget*)
+	{
+		get_engine()->getSoundManager().get("click")->play();
 	}
 public:
 	MainMenuScene(mhe::game::Engine* engine) : mhe::game::GameScene(engine),

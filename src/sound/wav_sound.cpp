@@ -2,6 +2,8 @@
 #include "utils/numutils.hpp"
 #include <fstream>
 
+#include <iostream>
+
 namespace mhe {
 
 bool wav_sound::load(const std::string& filename)
@@ -54,8 +56,19 @@ bool wav_sound::load(std::istream& stream)
 	stream.read(reinterpret_cast<char*>(&sh), sizeof(sh));
 	if (utils::char_to_int_le(sh.id) != wav_sample_header_id)
 		return false;
-	data_.resize(sh.len / 2);
-	stream.read(reinterpret_cast<char*>(&data_[0]), sh.len);
+	int num_samples = sh.len / (wh.bits_per_sample / 8);
+	data_.resize(num_samples);
+	if (wh.bits_per_sample == 16)
+		stream.read(reinterpret_cast<char*>(&data_[0]), sh.len);
+	else	// 8bit obly
+	{
+		std::cout << "8bit " << num_samples << std::endl;
+		std::vector<char> tmp(sh.len);
+		stream.read(&tmp[0], sh.len);
+		//data_.assign(tmp.begin(), tmp.end());
+		for (size_t i = 0; i < tmp.size(); ++i)
+			data_[i] = (tmp[i] - 128) << 4;
+	}
 	if (static_cast<cmn::uint32_t>(stream.gcount()) != sh.len) return false;
 	return true;
 }

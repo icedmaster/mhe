@@ -9,7 +9,7 @@ TEST(TestWav, base_test)
 	mhe::OpenALAudioDriver driver;
 	ASSERT_EQ(true, driver.init());
 	mhe::ResourceManager<mhe::SoundLoader> loader;
-	boost::shared_ptr<mhe::iSound> sound = loader.get("assets/test.wav");
+	boost::shared_ptr<mhe::iSound> sound = loader.get("assets/main_menu/button-3.wav");
 	ASSERT_NE(sound, boost::shared_ptr<mhe::iSound>());
 	sound->play();
 	mhe::test::sleep(3000);
