@@ -4,6 +4,7 @@
 #include "idriver.hpp"
 #include "gl_state_attr.hpp"
 #include "mhe_gl.hpp"
+#include "gl_extension.hpp"
 
 namespace mhe
 {
@@ -19,8 +20,10 @@ namespace mhe
 			// state
 			bool zbuffer_masked_;
 			BlendFunc bf_;
+
+		OpenGLExtensions extensions_;
 		private:
-			//bool init_impl(const WindowSystem&);
+			bool init_impl();
 			void close_impl();
 
 			void set_ws(WindowSystem* ws)
@@ -68,6 +71,12 @@ namespace mhe
 
 		public:
 			OpenGLDriver();
+
+		// specific functions
+		OpenGLExtensions& get_extensions()
+		{
+			return extensions_;
+		}
 
 	};
 };

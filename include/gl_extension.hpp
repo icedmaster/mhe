@@ -1,31 +1,53 @@
 #ifndef _GL_EXTENSION_HPP_
 #define _GL_EXTENSION_HPP_
 
-#include <GL/gl.h>
-//#include <GL/glext.h>
-#include "glext.h"
-#include <map>
 #include <string>
-
-//#ifdef __INCLUDE_SDL__
-#include <SDL/SDL.h>
-//#endif
-
-#ifdef __WIN32__
-    extern PFNGLMULTITEXCOORD2FPROC glMultiTexCoord2f;
-    extern PFNGLACTIVETEXTUREPROC glActiveTexture;
-    extern PFNGLCLIENTACTIVETEXTUREPROC glClientActiveTexture;
-
-    extern PFNGLCOMPILESHADERPROC glCompileShader;
-#endif
+#include <map>
+#include "mhe_gl.hpp"
+#include "glext.h"
 
 namespace mhe
 {
-    void load_default_extensions();
-    void* load_extension(const std::string& ext);
-    bool is_extension_present(const std::string& ext);
-	std::string get_availible_extensions();
-	bool is_extension_availible(const char* ext);
+class OpenGLExtensions
+{
+public:
+	void init_extensions();
+	bool is_extension_supported(const std::string& ext_name) const;
+	std::string get_supported_extensions() const;
+
+	//
+	void glActiveTexture(GLenum texture)
+	{
+		(*glActiveTexture_)(texture);
+	}
+
+	void clientActiveTexture(GLenum texture)
+	{
+		(*glClientActiveTexture_)(texture);
+	}
+
+	void glMultiTexCoord2f(GLenum target, GLfloat s, GLfloat t)
+	{
+		(*glMultiTexCoord2f_)(target, s, t);
+	}
+private:
+	template <class T>
+	T load_extension(const char* name)
+	{
+		bool loaded = true;
+		T res = reinterpret_cast<T>(SDL_GL_GetProcAddress(name));
+		if (res == 0) loaded = false;
+		loaded_extensions_[name] = loaded;
+		return res;
+	}
+
+	void get_str_extensions();
+
+	PFNGLMULTITEXCOORD2FPROC glMultiTexCoord2f_;
+    PFNGLACTIVETEXTUREPROC glActiveTexture_;
+    PFNGLCLIENTACTIVETEXTUREPROC glClientActiveTexture_;
+	std::map<std::string, bool> loaded_extensions_;
 };
+}
 
 #endif

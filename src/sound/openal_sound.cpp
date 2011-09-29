@@ -20,7 +20,7 @@ namespace mhe
 		// prepare buffers
 		ALenum format = (data->format() == Mono) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16;
 		alGenBuffers(1, &id_);
-		alBufferData(id_, format, &(data->get()[0]), data->get().size(), data->freq());
+		alBufferData(id_, format, &(data->get()[0]), data->get().size() * 2, data->freq());
 		
 		// prepare source
 		alGenSources(1, &src_id_);

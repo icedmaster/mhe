@@ -14,20 +14,16 @@ private:
 	typedef gui::PrivateGUIEventHandler<HLWidget> HLWidgetEventHandler;
 	friend class gui::PrivateGUIEventHandler<HLWidget>;
 	boost::shared_ptr<gui::Widget> widget_;
-	boost::shared_ptr<iTexture> texture_;
-	boost::shared_ptr<iTexture> hl_texture_;
 				
 	void init_widget();
 				
 	void on_mouse_move(const gui::Widget*);
 	void on_mouse_left(const gui::Widget*);
 public:
-	HLWidget() {}	
-	HLWidget(boost::shared_ptr<gui::Widget> widget,
-			 boost::shared_ptr<iTexture> texture);
+	HLWidget() {}
+	HLWidget(boost::shared_ptr<gui::Widget> widget);
 				
 	void setWidget(boost::shared_ptr<gui::Widget> widget);
-	void setHighlitedTexture(boost::shared_ptr<iTexture> texture);
 
 	boost::shared_ptr<gui::Widget> get() const
 	{

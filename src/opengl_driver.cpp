@@ -5,11 +5,14 @@ namespace mhe
 
 	OpenGLDriver::OpenGLDriver() :
 		zbuffer_masked_(false)
-	{		
+	{	
 	}
-	/*bool OpenGLDriver::init_impl(const WindowSystem& ws)
+
+	bool OpenGLDriver::init_impl()
 	{
-	}*/
+		extensions_.init_extensions();
+		return true;
+	}
 
 	void OpenGLDriver::close_impl()
 	{
@@ -135,7 +138,8 @@ namespace mhe
         glEnableClientState(GL_NORMAL_ARRAY);
         // 3 координаты на вершину, 0 - расстояние между тройками координат
         glVertexPointer(3, GL_FLOAT, 0, v);
-        glNormalPointer(GL_FLOAT, 0, n);
+		if (n)
+			glNormalPointer(GL_FLOAT, 0, n);
         // need to change to nullptr
         if (t)
         {

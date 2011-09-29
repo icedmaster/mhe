@@ -7,9 +7,13 @@ namespace mhe
 {
 class MultiTexture : public iTexture
 {
-	void setImage(const boost::shared_ptr<Image>& image, FilterType ft = Nearest);
-	void prepare();
-	void clean();
+	void setImage(const boost::shared_ptr<Image>& image,
+				  boost::shared_ptr<iDriver> driver, FilterType ft = Nearest);
+
+	void prepare(boost::shared_ptr<iDriver> driver = 
+				 boost::shared_ptr<iDriver>());
+	void clean(boost::shared_ptr<iDriver> driver =
+			   boost::shared_ptr<iDriver>());
 
 	boost::shared_ptr<iTexture> clone() const;
 

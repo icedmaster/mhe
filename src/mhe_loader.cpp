@@ -2,11 +2,11 @@
 
 namespace mhe
 {
-mhe_loader::mhe_loader(const std::string& filename, TextureManager* tm,
-	FontManager* fm) :
+	mhe_loader::mhe_loader(const std::string& filename, TextureManager* tm,
+					   FontManager* fm, SoundManager* sm) :
 		is_open_(false),
 		parsed_(false),
-		texture_manager(tm), font_manager(fm)
+		texture_manager(tm), font_manager(fm), sound_manager(sm)
 	{
 		pugi::xml_parse_result res = doc.load_file(filename.c_str());
 		if (res.status != pugi::status_ok)
@@ -89,6 +89,23 @@ mhe_loader::mhe_loader(const std::string& filename, TextureManager* tm,
         // try to load font
 		if (!font_manager) return boost::shared_ptr<gui::iFont>();
 		return font_manager->get(utils::from_wstr(fn));
+	}
+
+	boost::shared_ptr<iSound> mhe_loader::get_sound(const std::wstring& name) const
+	{
+        pugi::xml_node node;
+        if (find_asset(node, L"sound", name))
+            return load_sound(node);
+        return boost::shared_ptr<iSound>();
+	}
+
+	boost::shared_ptr<iSound> mhe_loader::load_sound(const pugi::xml_node& node) const
+	{
+        // get filename
+        std::wstring fn(node.child(L"file").child_value());
+        // try to load font
+		if (!sound_manager) return boost::shared_ptr<iSound>();
+		return sound_manager->get(utils::from_wstr(fn));
 	}
 
 	Sprite* mhe_loader::getSprite(const std::wstring& name) const
@@ -194,9 +211,6 @@ mhe_loader::mhe_loader(const std::string& filename, TextureManager* tm,
 		// load common widget parameters
 		boost::shared_ptr<gui::Label> lbl(new gui::Label());
 		load_widget(node, lbl.get());
-		pugi::xml_node n = node.child(L"texture");
-		if (n)
-            lbl->setTexture(get_texture(n.child_value()));
 
 		return lbl;
 	}
@@ -206,12 +220,6 @@ mhe_loader::mhe_loader(const std::string& filename, TextureManager* tm,
 		// load common widget parameters
 		boost::shared_ptr<gui::Button> btn(new gui::Button());
 		load_widget(node, btn.get());
-		pugi::xml_node n = node.child(L"texture");
-		if (n)
-            btn->setTexture(get_texture(n.child_value()));
-        n = node.child(L"pressed_texture");
-		if (n)
-            btn->setPressedTexture(get_texture(n.child_value()));
 
 		return btn;
 	}
@@ -220,17 +228,20 @@ mhe_loader::mhe_loader(const std::string& filename, TextureManager* tm,
                                  gui::Widget* widget) const
 	{
 		pugi::xml_node n = node.child(L"rect");
-		widget->setGeometry(read_rect(n));
+		widget->set_geometry(read_rect(n));
 		// optional
 		n = node.child(L"color");
 		if (n)
-			widget->setColor(read_v4d(n));
+			widget->set_color(read_v4d(n));
 		n = node.child(L"font");
 		if (n)
-			widget->setFont(get_font(n.child_value()));
+			widget->set_font(get_font(n.child_value()));
 		n = node.child(L"name");
 		if (n)
-			widget->setName(utils::from_wstr(std::wstring(n.child_value())));
+			widget->set_name(utils::from_wstr(std::wstring(n.child_value())));
+		n = node.child(L"sprite");
+		if (n)
+			widget->set_sprite(boost::shared_ptr<Sprite>(getSprite(n.child_value())));
 	}
 
 	void mhe_loader::load_all_assets()
@@ -250,6 +261,8 @@ mhe_loader::mhe_loader(const std::string& filename, TextureManager* tm,
 			load_texture(node);
 		else if (type == L"font")
 			load_font(node);
+		else if (type == L"sound")
+			load_sound(node);
 	}
 
 	//------------------ functions ------------------------

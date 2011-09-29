@@ -9,18 +9,25 @@ class MainMenuScene : public mhe::game::GameScene
 
 	boost::shared_ptr<mhe::gui::iFont> fps_font;
 	boost::shared_ptr<mhe::game::HLWidget> hl_start_button;
+	boost::shared_ptr<mhe::game::HLWidget> hl_quit_button;
+	boost::shared_ptr<mhe::iSound> theme_sound;
+	cmn::uint loop_wait_time;
 private:
 	bool init_impl(const std::string& arg)
 	{
 		load_scene(arg);
 		setup_events();
+		// begin to play beautiful music
+		theme_sound = get_engine()->getSoundManager().get("theme");
+		theme_sound->play();
 		return true;
 	}
 
 	void load_scene(const std::string& arg)
 	{
 		mhe::mhe_loader loader(arg, &(get_engine()->getTextureManager()),
-							   &(get_engine()->getFontManager()));
+							   &(get_engine()->getFontManager()),
+							   &(get_engine()->getSoundManager()));
 		loader.load_all_assets();
 		boost::shared_ptr<mhe::gui::GUIContainer> gui(loader.getGUI(L"main_menu"));
 		gui->setupEvents(get_engine()->getInputSystem());
@@ -44,12 +51,20 @@ private:
 
 	void setup_gui(boost::shared_ptr<mhe::gui::GUIContainer> guic)
 	{
-		// MainMenuGUIHandler* start_move_handler = new MainMenuGUIHandler(this,
-		// 																&MainMenuScene::on_start_mouse_move);
+		MainMenuGUIHandler* quit_click_handler = new MainMenuGUIHandler(this,
+		 																&MainMenuScene::on_quit_mouse_click);
 		boost::shared_ptr<mhe::gui::Widget> start_button = guic->get("start_button");
-		//start_button->setHandler(mhe::gui::OnMouseMove, start_move_handler);
-		hl_start_button.reset(new mhe::game::HLWidget(start_button,
-													  get_engine()->getTextureManager().get("hl_start_button")));
+		hl_start_button.reset(new mhe::game::HLWidget(start_button));
+													  
+		// start button
+		MainMenuGUIHandler* start_click_handler = new MainMenuGUIHandler(this,
+		 																&MainMenuScene::on_start_mouse_click);
+		start_button->set_handler(mhe::gui::OnMouseLeftClick, start_click_handler);
+		// quit button
+		/*boost::shared_ptr<mhe::gui::Widget> quit_button = guic->get("quit_button");
+		quit_button->setHandler(mhe::gui::OnMouseLeftClick, quit_click_handler);
+		hl_quit_button.reset(new mhe::game::HLWidget(quit_button,
+		get_engine()->getTextureManager().get("hl_quit_button")));*/
 	}
 
 	void setup_events()
@@ -59,6 +74,24 @@ private:
 																	this, &MainMenuScene::on_quit);
 		get_engine()->getInputSystem().addListener(listener);
 	}
+
+	// main process function
+	bool process_impl()
+	{
+		if (!theme_sound->is_playing())
+		{
+			// wait 2 seconds and play it again
+			cmn::uint tick = mhe::utils::get_current_tick();
+			if (!loop_wait_time)
+				loop_wait_time = tick + 2000;
+			else if (tick >= loop_wait_time)
+			{
+				theme_sound->play();
+				loop_wait_time = 0;
+			}
+		}
+		return true;
+	}
 private:	// events
 	bool on_quit(const mhe::Event&)
 	{
@@ -67,12 +100,18 @@ private:	// events
 	}
 
 	// gui events
-	void on_start_mouse_move(const mhe::gui::Widget*)
+	void on_quit_mouse_click(const mhe::gui::Widget*)
 	{
 		get_engine()->stop();
 	}
+
+	void on_start_mouse_click(const mhe::gui::Widget*)
+	{
+		get_engine()->getSoundManager().get("click")->play();
+	}
 public:
-	MainMenuScene(mhe::game::Engine* engine) : mhe::game::GameScene(engine)
+	MainMenuScene(mhe::game::Engine* engine) : mhe::game::GameScene(engine),
+											   loop_wait_time(0)
 	{}
 };
 

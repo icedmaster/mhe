@@ -13,13 +13,15 @@ class ResourceManager
 {
 private:
 	typedef typename Loader::type res_type;
+	typedef typename Loader::helper_type helper_type;
 	typedef std::map< std::string, boost::shared_ptr<res_type> > resmap;
 	mutable resmap resources_;
+	boost::shared_ptr<helper_type> helper_;
 
 	boost::shared_ptr<res_type> load_impl(const std::string& name,
 								   const std::string& sname) const
 	{
-		res_type* res = Loader::load(name);
+		res_type* res = Loader::load(name, helper_);
 		if (res == 0)
 		{
 			utils::global_log::instance().printf("Can't load: %s", name.c_str());
@@ -31,6 +33,11 @@ private:
 		return shared_res;
 	}
 public:
+	void set_helper(boost::shared_ptr<helper_type> helper)
+	{
+		helper_ = helper;
+	}
+
 	bool load(const std::string& name)
 	{
 		return (get(name) != boost::shared_ptr<res_type>());

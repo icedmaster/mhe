@@ -15,6 +15,7 @@ namespace mhe
 				InputSystem is_;
 				TextureManager tm_;
 				FontManager fm_;
+				SoundManager sm_;
 				boost::shared_ptr<iDriver> driver_;
 				boost::shared_ptr<iAudioDriver> audio_driver_;
 
@@ -51,6 +52,11 @@ namespace mhe
 				FontManager& getFontManager()
 				{
 					return fm_;
+				}
+
+				SoundManager& getSoundManager()
+				{
+					return sm_;
 				}
 
 				WindowSystem& getWindowSystem()

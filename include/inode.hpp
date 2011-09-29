@@ -13,7 +13,7 @@ namespace mhe
     class iNode : public Transform
     {
         private:
-			int priority_;			
+			int priority_;						
 
             virtual void draw_impl(const boost::shared_ptr<iDriver>&/*,
                                    const boost::shared_ptr<iCamera>&*/) = 0;

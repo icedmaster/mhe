@@ -19,7 +19,7 @@ namespace gui {
 	{
 		for (size_t i = 0; i < widgets_.size(); ++i)
 		{
-			if (widgets_[i]->getName() == name)
+			if (widgets_[i]->get_name() == name)
 				return widgets_[i];
 		}
 		return boost::shared_ptr<Widget>();

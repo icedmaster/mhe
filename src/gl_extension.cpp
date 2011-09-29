@@ -1,93 +1,49 @@
 #include "gl_extension.hpp"
+#include "utils/logutils.hpp"
 #include <iostream>
-#include <set>
+#include <vector>
+#include <boost/algorithm/string.hpp>
 
-#ifdef WIN32
-PFNGLMULTITEXCOORD2FPROC glMultiTexCoord2f;
-PFNGLACTIVETEXTUREPROC glActiveTexture;
-PFNGLCLIENTACTIVETEXTUREPROC glClientActiveTexture;
-
-PFNGLCOMPILESHADERPROC glCompileShader;
-#endif
-
-namespace
+namespace mhe {
+void OpenGLExtensions::init_extensions()
 {
-    std::map<std::string, void*> ext_;
+	// multitexture
+	glActiveTexture_ = load_extension<PFNGLACTIVETEXTUREPROC>("glActiveTexture");
+	glClientActiveTexture_ = load_extension<PFNGLCLIENTACTIVETEXTUREPROC>("glClientActiveTexture");
+	glMultiTexCoord2f_ = load_extension<PFNGLMULTITEXCOORD2FPROC>("glMultiTexCoord2f");
+
+	get_str_extensions();
+
+	utils::global_log::instance().write("supported extensions");
+	for (std::map<std::string, bool>::iterator it = loaded_extensions_.begin();
+		 it != loaded_extensions_.end(); ++it)
+	{
+		if (it->second)
+			utils::global_log::instance().write(it->first);
+	}
 }
 
-namespace mhe
+bool OpenGLExtensions::is_extension_supported(const std::string& ext_name) const
 {
-    void load_default_extensions()
-    {
-        #ifdef WIN32
-        glActiveTexture = (PFNGLACTIVETEXTUREPROC)SDL_GL_GetProcAddress("glActiveTexture");
-        if (glActiveTexture == 0)
-            std::cout << "Can't find glActiveTexture() extension\n";
-        ext_["glActiveTexture"] = reinterpret_cast<void*>(glActiveTexture);
-        glClientActiveTexture = (PFNGLCLIENTACTIVETEXTUREPROC)SDL_GL_GetProcAddress("glClientActiveTexture");
-        if (glClientActiveTexture == 0)
-            std::cout << "Can't find glClientActiveTexture() extension\n";
-        ext_["glClientActiveTexture"] = reinterpret_cast<void*>(glClientActiveTexture);
-        glMultiTexCoord2f = (PFNGLMULTITEXCOORD2FPROC)SDL_GL_GetProcAddress("glMultiTexCoord2f");
-        if (glMultiTexCoord2f == 0)
-            std::cout << "Can't find glMultiTexCoord2f() extension\n";
-        ext_["glMultiTexCoord2f"] = reinterpret_cast<void*>(glMultiTexCoord2f);
+	std::map<std::string, bool>::const_iterator it = loaded_extensions_.find(ext_name);
+	if (it == loaded_extensions_.end()) return false;
+	return it->second;
+}
 
-        // shaders
-        glCompileShader = (PFNGLCOMPILESHADERPROC)SDL_GL_GetProcAddress("glCompileShader");
-        if (glCompileShader == 0)
-            std::cout << "Can't find glCompileShader() extension\n";
-        ext_["glCompileShader"] = reinterpret_cast<void*>(glCompileShader);
-        #endif
-    }
+std::string OpenGLExtensions::get_supported_extensions() const
+{
+	return std::string(reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS)));
+}
 
-    void* load_extension(const std::string& ext)
-    {
-        std::map<std::string, void*>::iterator it = ext_.find(ext);
-        if (it != ext_.end())
-            return it->second;
-        void* addr = SDL_GL_GetProcAddress(ext.c_str());
-        ext_[ext] = addr;
-        return addr;
-    }
+void OpenGLExtensions::get_str_extensions()
+{
+	const std::string& strext = get_supported_extensions();
+	std::vector<std::string> ext;
 
-    bool is_extension_present(const std::string& ext)
-    {
-        std::map<std::string, void*>::iterator it = ext_.find(ext);
-        if ( (it != ext_.end()) && (it->second != 0) )
-            return true;
-        return false;
-    }
+	boost::split(ext, strext,
+				 boost::is_any_of(" "), boost::token_compress_on);
+	for (size_t i = 0; i < ext.size(); ++i)
+		loaded_extensions_[ext[i]] = true;
+}
 
-	std::string get_availible_extensions()
-	{
-		return std::string(reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS)));
-	}
-
-	bool is_extension_availible(const char* ext)
-	{
-		static std::set<std::string> ext_present;
-		if (ext_present.empty())
-		{
-			std::string e = get_availible_extensions();
-			size_t pos = std::string::npos;
-			do
-			{
-				pos = e.find_first_of(' ');
-				std::string s(e);
-				if (pos != std::string::npos)
-				{
-					s = e.substr(0, pos);
-					e.erase(0, pos + 1);
-				}
-				ext_present.insert(s);
-			}
-			while (pos != std::string::npos);
-		}
-
-		std::set<std::string>::iterator it = ext_present.find(std::string(ext));
-		if (it != ext_present.end())
-			return true;
-		return false;
-	}
-};
+}	// mhe

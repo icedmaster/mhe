@@ -85,6 +85,11 @@ namespace mhe
             {
                 return index_;
             }
+
+			size_t get_frames_number() const
+			{
+				return animations_.size();
+			}
     };
 
     class Sprite : public iNode
@@ -135,6 +140,17 @@ namespace mhe
 			{
 				set_position(pos);
 			}
+
+			size_t get_frames_number() const
+			{
+				if (current_al_) return current_al_->get_frames_number();
+				return 0;
+			}	
+
+			size_t get_animations_number() const
+			{
+				return al_.size();
+			}				
 
             // execute animation from list with index <index>
             void execute(cmn::uint index, cmn::uint tick, bool reset_position = false);

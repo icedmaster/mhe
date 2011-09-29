@@ -43,4 +43,20 @@ TEST(TestSound, test)
 */
 }
 
+TEST(TestSound, longplay)
+{
+	mhe::OpenALAudioDriver driver;
+	ASSERT_EQ(true, driver.init());
+
+	mhe::ResourceManager<mhe::SoundLoader> loader;
+	boost::shared_ptr<mhe::iSound> sound = loader.get("assets/main_menu/theme.ogg");
+	sound->play();
+	for (cmn::uint i = 0; i < 6; ++i)
+	{
+		ASSERT_TRUE(sound->is_playing());
+		mhe::test::sleep(10000);
+	}
+	sound->stop();
+}
+
 #endif

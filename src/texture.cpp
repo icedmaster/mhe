@@ -1,4 +1,5 @@
 #include "texture.hpp"
+#include "opengl_driver.hpp"
 
 using namespace mhe;
 
@@ -17,7 +18,8 @@ Texture::~Texture()
 		glDeleteTextures(1, &id_);
 }
 
-void Texture::rebuild_texture(const boost::shared_ptr<Image>& im, FilterType/* ft*/)
+void Texture::rebuild_texture(const boost::shared_ptr<Image>& im,
+							  boost::shared_ptr<iDriver> driver, FilterType/* ft*/)
 {
 	glGenTextures(1, &id_);
 	glBindTexture(GL_TEXTURE_2D, id_);
@@ -31,7 +33,9 @@ void Texture::rebuild_texture(const boost::shared_ptr<Image>& im, FilterType/* f
 	w_ = im->width();
     h_ = im->height();
 
-	bool pot_support = is_extension_availible("GL_ARB_texture_non_power_of_two");
+	bool pot_support = false;
+	if (driver)
+		pot_support = dynamic_cast<OpenGLDriver*>(driver.get())->get_extensions().is_extension_supported("GL_ARB_texture_non_power_of_two");
 	bool rebuild = false;
 	if (!pot_support)
 	{
@@ -67,13 +71,13 @@ void Texture::rebuild_texture(const boost::shared_ptr<Image>& im, FilterType/* f
 				 0, format, GL_UNSIGNED_BYTE, data);
 }
 
-void Texture::prepare()
+void Texture::prepare(boost::shared_ptr<iDriver> /*driver*/)
 {
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, id_);
 }
 
-void Texture::clean()
+void Texture::clean(boost::shared_ptr<iDriver> /*driver*/)
 {
 	glDisable(GL_TEXTURE_2D);
 }
