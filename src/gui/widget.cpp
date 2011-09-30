@@ -1,56 +1,34 @@
 #include "gui/widget.hpp"
+#include "utils/sysutils.hpp"
 
 namespace mhe {
 namespace gui {
 
 	Widget::Widget() :
 		visible_(true),
+		enabled_(true),
+		mouse_on_(false),
 		clr(cfWhite)
 	{}
 
-	void Widget::draw_rect(const boost::shared_ptr<iDriver>& driver,
-						   const boost::shared_ptr<iTexture>& texture)
+	void Widget::draw_rect(const boost::shared_ptr<iDriver>& driver)						   
 	{
 		if (!visible_) return;
 
-		const rect<float>& g = get_geometry();
-		const colorf& clr = get_color();
-		const boost::shared_ptr<iFont>& font = get_font();
-
-		float v[12] = {g.ll().x(), g.ll().y(), 0,
-					   g.ll().x(), g.rh().y(), 0,
-					   g.rh().x(), g.rh().y(), 0,
-                       g.rh().x(), g.ll().y(), 0};
-		const float n[] = {0.0, 0.0, 1.0,
-                           0.0, 0.0, 1.0,
-                           0.0, 0.0, 1.0,
-                           0.0, 0.0, 1.0};
-		const float c[] = {clr.r(), clr.g(), clr.b(), clr.a(),
-                           clr.r(), clr.g(), clr.b(), clr.a(),
-                           clr.r(), clr.g(), clr.b(), clr.a(),
-                           clr.r(), clr.g(), clr.b(), clr.a()};
-		const float t[] = {0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0};
-        const cmn::uint i[] = {0, 1, 2, 2, 3, 0};
-
-		const float* tc = (texture) ? t : 0;
-
-		driver->mask_zbuffer();
-        driver->enable_blending(ALPHA_ONE_MINUS_ALPHA);
-
-		if (texture)
-			texture->prepare();
-		driver->draw(v, n, tc, c, i, 6);
-		if (texture)
-			texture->clean();
-
-		if (font)
+		sprite_->setSize(geom_.width(), geom_.height());
+		sprite_->setPosition(v3d(geom_.ll().x(), geom_.ll().y(), 0));
+		sprite_->draw(driver);
+		if (font_)
 		{
-			v2d coord(g.ll().x(), g.ll().y() + g.height() / 2);
-			font->print(driver, get_caption(), coord);
+			v2d coord(geom_.ll().x(), geom_.ll().y() + geom_.height() / 2);
+			font_->print(driver, caption_, coord);
 		}
+	}
 
-		driver->unmask_zbuffer();
-        driver->disable_blending();
+	void Widget::set_handler(int event, const guieventptr& handler)
+	{
+		if (!is_handler_supported(event)) return;
+		handlers_[event] = handler;
 	}
 
 }

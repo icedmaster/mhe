@@ -211,9 +211,6 @@ namespace mhe
 		// load common widget parameters
 		boost::shared_ptr<gui::Label> lbl(new gui::Label());
 		load_widget(node, lbl.get());
-		pugi::xml_node n = node.child(L"texture");
-		if (n)
-            lbl->setTexture(get_texture(n.child_value()));
 
 		return lbl;
 	}
@@ -223,12 +220,6 @@ namespace mhe
 		// load common widget parameters
 		boost::shared_ptr<gui::Button> btn(new gui::Button());
 		load_widget(node, btn.get());
-		pugi::xml_node n = node.child(L"texture");
-		if (n)
-            btn->setTexture(get_texture(n.child_value()));
-        n = node.child(L"pressed_texture");
-		if (n)
-            btn->setPressedTexture(get_texture(n.child_value()));
 
 		return btn;
 	}
@@ -237,17 +228,20 @@ namespace mhe
                                  gui::Widget* widget) const
 	{
 		pugi::xml_node n = node.child(L"rect");
-		widget->setGeometry(read_rect(n));
+		widget->set_geometry(read_rect(n));
 		// optional
 		n = node.child(L"color");
 		if (n)
-			widget->setColor(read_v4d(n));
+			widget->set_color(read_v4d(n));
 		n = node.child(L"font");
 		if (n)
-			widget->setFont(get_font(n.child_value()));
+			widget->set_font(get_font(n.child_value()));
 		n = node.child(L"name");
 		if (n)
-			widget->setName(utils::from_wstr(std::wstring(n.child_value())));
+			widget->set_name(utils::from_wstr(std::wstring(n.child_value())));
+		n = node.child(L"sprite");
+		if (n)
+			widget->set_sprite(boost::shared_ptr<Sprite>(getSprite(n.child_value())));
 	}
 
 	void mhe_loader::load_all_assets()

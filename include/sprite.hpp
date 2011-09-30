@@ -85,6 +85,11 @@ namespace mhe
             {
                 return index_;
             }
+
+			size_t get_frames_number() const
+			{
+				return animations_.size();
+			}
     };
 
     class Sprite : public iNode
@@ -93,6 +98,7 @@ namespace mhe
             typedef std::map <cmn::uint, AnimationList> almap;
             almap al_;
             bool is_alive_;
+			bool is_running_;
             float x_size_, y_size_;
             bool reset_position_;
             v3d pos_;   // need while we use reset position
@@ -105,10 +111,10 @@ namespace mhe
             void set_position(const v3d& pos);
             matrixf get_matrix() const;
         public:
-            Sprite() : is_alive_(true), x_size_(0.0), y_size_(0.0), reset_position_(true),
+		Sprite() : is_alive_(true), is_running_(false), x_size_(0.0), y_size_(0.0), reset_position_(true),
 				current_al_(0)
 			{}
-            Sprite(const AnimationList& al) : is_alive_(true), x_size_(0.0), y_size_(0.0),
+		Sprite(const AnimationList& al) : is_alive_(true), is_running_(false), x_size_(0.0), y_size_(0.0),
                 reset_position_(false), current_al_(0)
             {
                 al_[al.getIndex()] = al;
@@ -136,8 +142,19 @@ namespace mhe
 				set_position(pos);
 			}
 
+			size_t get_frames_number() const
+			{
+				if (current_al_) return current_al_->get_frames_number();
+				return 0;
+			}	
+
+			size_t get_animations_number() const
+			{
+				return al_.size();
+			}				
+
             // execute animation from list with index <index>
-            void execute(cmn::uint index, cmn::uint tick, bool reset_position = false);
+            void start(cmn::uint index, bool reset_position = false);
     };
 }
 

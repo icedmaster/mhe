@@ -37,7 +37,7 @@ private:
 		background->setPriority(1);
 		const mhe::WindowSystem& ws = get_engine()->getWindowSystem();
 		background->setSize(ws.width(), ws.height());
-		background->execute(0, mhe::utils::get_current_tick());
+		background->start(0);
 		//boost::shared_ptr<mhe::Sprite> animated(loader.getSprite(L"animated"));
 		get_scene()->add(background);
 
@@ -54,12 +54,12 @@ private:
 		MainMenuGUIHandler* quit_click_handler = new MainMenuGUIHandler(this,
 		 																&MainMenuScene::on_quit_mouse_click);
 		boost::shared_ptr<mhe::gui::Widget> start_button = guic->get("start_button");
-		hl_start_button.reset(new mhe::game::HLWidget(start_button,
-													  get_engine()->getTextureManager().get("hl_start_button")));
+		hl_start_button.reset(new mhe::game::HLWidget(start_button));
+													  
 		// start button
 		MainMenuGUIHandler* start_click_handler = new MainMenuGUIHandler(this,
 		 																&MainMenuScene::on_start_mouse_click);
-		start_button->setHandler(mhe::gui::OnMouseLeftClick, start_click_handler);
+		start_button->set_handler(mhe::gui::OnMouseLeftClick, start_click_handler);
 		// quit button
 		/*boost::shared_ptr<mhe::gui::Widget> quit_button = guic->get("quit_button");
 		quit_button->setHandler(mhe::gui::OnMouseLeftClick, quit_click_handler);
@@ -108,6 +108,13 @@ private:	// events
 	void on_start_mouse_click(const mhe::gui::Widget*)
 	{
 		get_engine()->getSoundManager().get("click")->play();
+		// create fade effect
+		boost::shared_ptr<mhe::game::FadeSprite> fade(
+			new mhe::game::FadeSprite(mhe::rect<float>(0.0, 0.0, 
+													   get_engine()->getWindowSystem().width(),
+													   get_engine()->getWindowSystem().height()),
+									  2000));
+		get_scene()->add(fade);
 	}
 public:
 	MainMenuScene(mhe::game::Engine* engine) : mhe::game::GameScene(engine),

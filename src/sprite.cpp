@@ -1,4 +1,5 @@
 #include "sprite.hpp"
+#include "utils/sysutils.hpp"
 
 namespace mhe
 {
@@ -96,6 +97,7 @@ namespace mhe
     //------------------ Sprite class -------------------------
     Sprite::Sprite(const AnimationList& al, const v3d& position) :
         is_alive_(true),
+		is_running_(false),
         x_size_(0.0), y_size_(0.0),
         reset_position_(false)
     {
@@ -105,6 +107,8 @@ namespace mhe
 
     void Sprite::draw_impl(const boost::shared_ptr<iDriver>& driver)
     {
+		if (!is_running_)
+			start(0);
         if (!current_al_) return;
 
         Animation a;
@@ -181,19 +185,20 @@ namespace mhe
         al_[al.getIndex()] = al;
     }
 
-    void Sprite::execute(cmn::uint index, cmn::uint tick, bool reset_position)
+    void Sprite::start(cmn::uint index, bool reset_position)
     {
         almap::iterator it = al_.find(index);
         if (it == al_.end())
             return;
         current_al_ = &(it->second);
         current_al_->reset();
-        current_al_->start(tick);
+        current_al_->start(utils::get_current_tick());
         if (reset_position)
             set_position(pos_);
         // append first transformation
         if (current_al_->get(cur_animation))
             set_transform(cur_animation.get_transform() * get_transform());
+		is_running_ = true;
     }
 
 	float Sprite::width() const

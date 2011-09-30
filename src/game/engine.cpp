@@ -53,7 +53,10 @@ namespace game {
 			driver_->clear_color();
 
 			if (game_scene_ && game_scene_->process())
+			{
+				game_scene_->getScene()->update(utils::get_current_tick());
 				game_scene_->getScene()->draw(driver_);			
+			}
 			
 			ws_.swapBuffers();
 		}

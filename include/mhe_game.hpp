@@ -4,6 +4,7 @@
 #include "game/engine.hpp"
 #include "game/game_scene.hpp"
 #include "game/highlited_widget.hpp"
+#include "game/fade_sprite.hpp"
 #include "game/graphics_aspect.hpp"
 
 #endif

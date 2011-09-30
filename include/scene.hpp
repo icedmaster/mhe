@@ -51,6 +51,7 @@ namespace mhe
 				subscenes.push_back(scene);
 			}
 
+			void update(cmn::uint tick);
 			void draw(boost::shared_ptr<iDriver> driver);
 
 			void setCallback(Callback* callback)

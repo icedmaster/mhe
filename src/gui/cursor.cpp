@@ -34,7 +34,7 @@ namespace gui {
 			clicked_ = true;
 		int anum = (clicked_) ? clicked_animation_number : 
 								default_animation_number;
-		sprite_->execute(anum, e.timestamp());			
+		sprite_->start(anum);			
 		return true;
 	}
 
