@@ -14,11 +14,21 @@ namespace mhe
 			typedef std::multimap< cmn::uint, boost::shared_ptr<EventListener> > mlisteners;
 			typedef std::pair< mlisteners::iterator, mlisteners::iterator > mlitpair;
 
+			struct TimerListener
+			{
+				cmn::uint start;
+				boost::shared_ptr<EventListener> listener;
+				bool once;
+			};
+
+			std::vector<TimerListener> timer_listeners_;
+
 			mlisteners listmap;
 			mlisteners arg_listmap;
 			mlisteners gl_listmap;
 			//std::vector< boost::shared_ptr<Event> > events;
 			WindowSystem* ws_;
+			bool input_enabled_;
 
 			void check_listeners(Event& e);
 
@@ -31,6 +41,11 @@ namespace mhe
 			void add_tick_event();
 
 			void add_event_timestamp(Event* e);
+
+			void add_timer_listener(EventListener* el);
+			void check_timer_events();
+
+			bool filter_event(const Event& e) const;
 		public:
 			SDLInputSystem();
 
@@ -41,6 +56,8 @@ namespace mhe
 			{
 				ws_ = ws;
 			}
+
+			void set_input_state(bool enable);
 	};
 }
 

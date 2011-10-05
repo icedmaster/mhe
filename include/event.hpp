@@ -16,7 +16,8 @@ namespace mhe
 		NullEventType,
 		KeyboardEventType,
 		MouseEventType,
-		SystemEventType
+		SystemEventType,
+		TimerEventType
 	};
 
 	// helper functions
@@ -182,9 +183,8 @@ namespace mhe
 	enum
 	{
 		QUIT = 1,
-		TICK,
-		TIMER
-	};
+		TICK		
+	};	
 
 	// system event class
 	class SystemEvent : public Event
@@ -200,6 +200,27 @@ namespace mhe
 				set_event_id(create_event_id(SystemEventType, event, arg));
 			}
 	};
+
+	class TimerEvent : public Event
+	{
+		private:
+			int get_type() const
+			{
+				return TimerEventType;
+			}
+		public:
+			enum
+			{
+				TIMER = 0,
+				TIMER_ONCE
+			};
+
+			TimerEvent(int event, int arg = 0)
+			{
+				set_event_id(create_event_id(TimerEventType, event, arg));
+			}
+	};
+
 
 	// 
 	// If we need to handle all events of concrete type - 
@@ -221,6 +242,7 @@ namespace mhe
 
 			virtual bool handle(const Event&/* event*/) {return true;}
 	};
+
 
 	// If you derived from EventListenerEx class, you can
 	// override handle() function, or handle_ex() function, that
@@ -261,6 +283,7 @@ namespace mhe
 			virtual void handle() = 0;
 			virtual void addListener(EventListener* el) = 0;
 			virtual void setWindowSystem(WindowSystem*) {}
+			virtual void set_input_state(bool) = 0;
 	};
 
 	class InputSystem
@@ -290,6 +313,16 @@ namespace mhe
 			void setWindowSystem(WindowSystem* ws)
 			{
 				impl_->setWindowSystem(ws);
+			}
+
+			void disable_input()
+			{
+				impl_->set_input_state(false);
+			}
+	
+			void enable_input()
+			{
+				impl_->set_input_state(true);
 			}
 	};
 

@@ -3,7 +3,8 @@
 namespace mhe
 {
 	SDLInputSystem::SDLInputSystem() :
-        ws_(0)
+        ws_(0),
+		input_enabled_(true)
 	{
 		SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 	}
@@ -51,6 +52,11 @@ namespace mhe
 
 	void SDLInputSystem::addListener(EventListener* el)
 	{
+		if (get_event_type(el->id()) == TimerEventType)
+		{
+			add_timer_listener(el);
+			return;
+		}
 		if (!get_event_optarg(el->id()) && get_event_arg(el->id()))
 			arg_listmap.insert(mlisteners::value_type(el->id(),
 		                                              boost::shared_ptr<EventListener>(el)));
@@ -60,6 +66,20 @@ namespace mhe
 		else
 			gl_listmap.insert(mlisteners::value_type(el->id(),
                                                      boost::shared_ptr<EventListener>(el)));
+	}
+
+	void SDLInputSystem::set_input_state(bool enable)
+	{
+		input_enabled_ = enable;
+	}
+
+	void SDLInputSystem::add_timer_listener(EventListener* el)
+	{
+		TimerListener tl;
+		tl.start = SDL_GetTicks();
+		tl.once = (get_event_optarg(el->id()) == TimerEvent::TIMER_ONCE) ? true : false;
+		tl.listener = boost::shared_ptr<EventListener>(el);
+		timer_listeners_.push_back(tl);
 	}
 
 	void SDLInputSystem::add_keydown_event(const SDL_keysym& sym)
@@ -113,6 +133,30 @@ namespace mhe
 	{
 		SystemEvent se(TICK);
 		check_listeners(se);
+		check_timer_events();
+	}
+
+	void SDLInputSystem::check_timer_events()
+	{
+		cmn::uint now = SDL_GetTicks();
+		for (std::vector<TimerListener>::iterator it = timer_listeners_.begin();
+			 it != timer_listeners_.end();)
+		{
+			const TimerListener& tl = *it;
+			cmn::uint delay = get_event_arg(tl.listener->id());
+			if (now >= (tl.start + delay))
+			{
+				SystemEvent se(TimerEventType);
+				add_event_timestamp(&se);
+				tl.listener->handle(se);
+				if (tl.once)
+				{
+					it = timer_listeners_.erase(it);
+					continue;
+			    }
+			}
+			++it;
+		}
 	}
 
 	void SDLInputSystem::add_event_timestamp(Event* e)
@@ -122,6 +166,7 @@ namespace mhe
 
 	void SDLInputSystem::check_listeners(Event& e)
 	{
+		if (!filter_event(e)) return;
 		add_event_timestamp(&e);
 		mlitpair pit = listmap.equal_range(e.id());
         for (mlisteners::iterator it = pit.first; it != pit.second; ++it)
@@ -142,5 +187,22 @@ namespace mhe
 			for (mlisteners::iterator it = pit.first; it != pit.second; ++it)
 				it->second->handle(e);
 		}
+	}
+
+	bool SDLInputSystem::filter_event(const Event& e) const
+	{
+		if (input_enabled_) return true;
+		if (e.type() == MouseEventType)
+		{
+			if (get_event_arg(e.id()) != MOUSE_BUTTON_RELEASED)
+				return false;
+		}
+
+		if (e.type() == KeyboardEventType)
+		{
+			if (get_event_arg(e.id()) != KEY_UP)
+				return false;
+		}
+		return true;
 	}
 }

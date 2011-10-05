@@ -113,8 +113,9 @@ private:	// events
 			new mhe::game::FadeSprite(mhe::rect<float>(0.0, 0.0, 
 													   get_engine()->getWindowSystem().width(),
 													   get_engine()->getWindowSystem().height()),
-									  2000));
+									  1000));
 		get_scene()->add(fade);
+		get_engine()->getInputSystem().disable_input();
 	}
 public:
 	MainMenuScene(mhe::game::Engine* engine) : mhe::game::GameScene(engine),
