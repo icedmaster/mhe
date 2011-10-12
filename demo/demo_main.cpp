@@ -1,4 +1,5 @@
 #include "mhe.hpp"
+#include "demo_game_scene.hpp"
 
 class MainMenuScene : public mhe::game::GameScene
 {
@@ -104,7 +105,9 @@ private:	// events
 
 	bool set_next_scene(const mhe::Event&)
 	{
-		get_engine()->set_next_scene();
+		boost::shared_ptr<DemoGameScene> next(new DemoGameScene(get_engine()));
+		setNextScene(next);
+		get_engine()->set_next_scene("assets/game.mhe");
 		return true;
 	}
 

@@ -76,12 +76,12 @@ void Engine::free_all()
 	sm_.free_all();
 }
 
-void Engine::set_next_scene()
+void Engine::set_next_scene(const std::string& arg)
 {
 	utils::global_log::instance().write("set_next_scene() called");
 	game_scene_->deinit();
 	game_scene_ = game_scene_->getNextScene();
-	if (game_scene_) game_scene_->init("");	// TODO:
+	if (game_scene_) game_scene_->init(arg);	
 }
 
 }

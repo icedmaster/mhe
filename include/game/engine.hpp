@@ -86,7 +86,7 @@ namespace mhe
 				}
 
 				void free_all();
-				void set_next_scene();
+				void set_next_scene(const std::string& arg);
 		};
 	}	// game
 }       // mhe
