@@ -67,5 +67,20 @@ namespace game {
 		running_ = false;
 	}
 
+void Engine::free_all()
+{
+	tm_.free_all();
+	fm_.free_all();
+	sm_.free_all();
+}
+
+void Engine::set_next_scene()
+{
+	utils::global_log::instance().write("set_next_scene() called");
+	game_scene_->deinit();
+	game_scene_ = game_scene_->getNextScene();
+	if (game_scene_) game_scene_->init("");	// TODO:
+}
+
 }
 }

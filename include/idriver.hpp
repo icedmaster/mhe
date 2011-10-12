@@ -223,7 +223,6 @@ public:
 		end_draw_impl();
 	}
 
-
 	// Save display data to vector. Can be used for screenshots,
 	// for example.
 	void get_display_data(std::vector<char>& pb)

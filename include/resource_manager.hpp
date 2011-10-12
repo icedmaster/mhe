@@ -66,6 +66,11 @@ public:
 			return it->second;
 		return load_impl(name, sname);
 	}
+
+	void free_all()
+	{
+		resources_.clear();
+	}
 };
 
 }	// namespace mhe

@@ -20,6 +20,7 @@ namespace mhe
 			boost::shared_ptr<Scene> scene_;
 		private:
 			virtual bool init_impl(const std::string&) {return true;}
+			virtual void deinit_impl() {}
 			virtual bool process_impl() {return true;}
 		protected:
 			Engine* get_engine() const
@@ -31,6 +32,8 @@ namespace mhe
 			{
 				return scene_;
 			}
+
+			virtual void free_resources();
 		public:
 			GameScene(Engine* engine) :
 				engine_(engine),
@@ -43,6 +46,8 @@ namespace mhe
 			{
 				return init_impl(arg);
 			}
+
+			void deinit();
 				
 			void setNextScene(boost::shared_ptr<GameScene> gs)
 			{
