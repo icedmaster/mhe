@@ -12,12 +12,12 @@ namespace mhe
 		{
 			private:
 				WindowSystem ws_;
-				InputSystem is_;
 				TextureManager tm_;
 				FontManager fm_;
 				SoundManager sm_;
 				boost::shared_ptr<iDriver> driver_;
 				boost::shared_ptr<iAudioDriver> audio_driver_;
+				boost::shared_ptr<iInputSystem> is_;
 
 				boost::shared_ptr<GameScene> game_scene_;
 
@@ -25,6 +25,7 @@ namespace mhe
 
 				typedef PrivateEventListener<Engine> EngineEventListener;
 				friend class PrivateEventListener<Engine>;
+				boost::shared_ptr<EngineEventListener> quit_listener_;
 				bool stop_p(const Event&)
 				{
 					stop();
@@ -64,7 +65,7 @@ namespace mhe
 					return ws_;
 				}
 			
-				InputSystem& getInputSystem()
+				boost::shared_ptr<iInputSystem> getInputSystem() const
 				{
 					return is_;
 				}

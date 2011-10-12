@@ -3,12 +3,14 @@
 namespace mhe {
 namespace gui {
 
-	Cursor::Cursor(InputSystem& is)
+Cursor::Cursor(boost::shared_ptr<iInputSystem> is) :
+		move_handler_(new cursor_event_handler(MouseEventType, MOUSE_MOVE, 0,
+												this, &Cursor::handle_mouse_move)),
+		click_handler_(new cursor_event_handler(MouseEventType, MOUSE_BUTTON_PRESSED, 0,
+												this, &Cursor::handle_mouse_click))
 	{
-		is.addListener(new cursor_event_handler(MouseEventType, MOUSE_BUTTON_PRESSED, 0,
-												this, &Cursor::handle_mouse_click));
-		is.addListener(new cursor_event_handler(MouseEventType, MOUSE_MOVE, 0,
-												this, &Cursor::handle_mouse_move));
+		is->addListener(move_handler_);
+		is->addListener(click_handler_);
 	}
 
 	void Cursor::setSprite(const boost::shared_ptr<Sprite>& sprite)

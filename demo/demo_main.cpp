@@ -12,6 +12,7 @@ class MainMenuScene : public mhe::game::GameScene
 	boost::shared_ptr<mhe::game::HLWidget> hl_quit_button;
 	boost::shared_ptr<mhe::iSound> theme_sound;
 	bool need_check_playing;
+	boost::shared_ptr<MainMenuEventListener> quit_listener_;
 private:
 	bool init_impl(const std::string& arg)
 	{
@@ -21,6 +22,7 @@ private:
 		theme_sound = get_engine()->getSoundManager().get("theme");
 		theme_sound->play();
 		need_check_playing = true;
+		mhe::utils::global_log::instance().write("MainMenu initialized");
 		return true;
 	}
 
@@ -70,10 +72,7 @@ private:
 
 	void setup_events()
 	{
-		MainMenuEventListener* listener = new MainMenuEventListener(mhe::KeyboardEventType,
-																	mhe::KEY_DOWN, SDLK_ESCAPE,
-																	this, &MainMenuScene::on_quit);
-		get_engine()->getInputSystem().addListener(listener);
+		get_engine()->getInputSystem()->addListener(quit_listener_);
 	}
 
 	// main process function
@@ -84,7 +83,7 @@ private:
 			MainMenuEventListener* listener = new MainMenuEventListener(mhe::TimerEventType,
 																		2000, mhe::TimerEvent::TIMER_ONCE,
 																		this, &MainMenuScene::repeat_theme);
-			get_engine()->getInputSystem().addListener(listener);
+			get_engine()->getInputSystem()->addListener(listener);
 			need_check_playing = false;
 		}
 		return true;
@@ -125,15 +124,18 @@ private:	// events
 													   get_engine()->getWindowSystem().height()),
 									  1000));
 		get_scene()->add(fade);
-		get_engine()->getInputSystem().disable_input();
+		get_engine()->getInputSystem()->disable_input();
 		// add new event for change scene
 		MainMenuEventListener* listener = new MainMenuEventListener(mhe::TimerEventType,
 																	1000, mhe::TimerEvent::TIMER_ONCE,
 																	this, &MainMenuScene::set_next_scene);
-		get_engine()->getInputSystem().addListener(listener);
+		get_engine()->getInputSystem()->addListener(listener);
 	}
 public:
-	MainMenuScene(mhe::game::Engine* engine) : mhe::game::GameScene(engine)
+	MainMenuScene(mhe::game::Engine* engine) : mhe::game::GameScene(engine),
+		quit_listener_(new MainMenuEventListener(mhe::KeyboardEventType,
+																	mhe::KEY_DOWN, SDLK_ESCAPE,
+																	this, &MainMenuScene::on_quit))
 	{}
 };
 

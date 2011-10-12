@@ -3,9 +3,29 @@
 namespace mhe {
 namespace gui {
 
-	GUIContainer::GUIContainer() {}
+	GUIContainer::GUIContainer() :
+		mouse_move_listener_(new gui_event_handler(MouseEventType, MOUSE_MOVE, 0,
+												   this,
+	                                               &GUIContainer::handle_mouse_move)),
+		mouse_click_listener_(new gui_event_handler(MouseEventType, MOUSE_BUTTON_PRESSED, 0,
+											 		this,
+		                                            &GUIContainer::handle_mouse_click)),
+		mouse_release_listener_(new gui_event_handler(MouseEventType, MOUSE_BUTTON_RELEASED, 0,
+											 		  this,
+		                                              &GUIContainer::handle_mouse_click))
+	{}
 
-	GUIContainer::GUIContainer(InputSystem& is)
+
+	GUIContainer::GUIContainer(boost::shared_ptr<iInputSystem> is) :
+		mouse_move_listener_(new gui_event_handler(MouseEventType, MOUSE_MOVE, 0,
+												   this,
+	                                               &GUIContainer::handle_mouse_move)),
+		mouse_click_listener_(new gui_event_handler(MouseEventType, MOUSE_BUTTON_PRESSED, 0,
+											 		this,
+		                                            &GUIContainer::handle_mouse_click)),
+		mouse_release_listener_(new gui_event_handler(MouseEventType, MOUSE_BUTTON_RELEASED, 0,
+											 		  this,
+		                                              &GUIContainer::handle_mouse_click))
 	{
         setupEvents(is);
 	}
@@ -57,22 +77,11 @@ namespace gui {
 		return true;
 	}
 
-	bool GUIContainer::handle_keyboard(const Event&)
+	void GUIContainer::setupEvents(boost::shared_ptr<iInputSystem> is)
 	{
-		return true;
-	}
-
-	void GUIContainer::setupEvents(InputSystem& is)
-	{
-        is.addListener(new gui_event_handler(MouseEventType, MOUSE_BUTTON_PRESSED, 0,
-											 this,
-                                             &GUIContainer::handle_mouse_click));
-		is.addListener(new gui_event_handler(MouseEventType, MOUSE_BUTTON_RELEASED, 0,
-											 this,
-                                             &GUIContainer::handle_mouse_click));
-		is.addListener(new gui_event_handler(MouseEventType, MOUSE_MOVE, 0,
-											 this,
-                                             &GUIContainer::handle_mouse_move));
+        is->addListener(mouse_move_listener_);
+		is->addListener(mouse_click_listener_);
+		is->addListener(mouse_release_listener_);
 	}
 
 }

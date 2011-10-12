@@ -25,10 +25,11 @@ private:
 	cmn::uint seconds;
 	cmn::uint last_second_fps;
 	Callback callback;
+	boost::shared_ptr<FPSEventListener> event_listener_;
 
 	bool on_tick(const Event& e);
 public:
-	FPSCounter(InputSystem& is);
+	FPSCounter(boost::shared_ptr<iInputSystem> is);
 
 	cmn::uint frames_number() const
 	{
@@ -80,7 +81,8 @@ private:
 		text_ = boost::lexical_cast<std::wstring>(static_cast<int>(average_fps()));
 	}
 public:
-	GraphicsFPSCounter(InputSystem& is, boost::shared_ptr<gui::iFont> font,
+	GraphicsFPSCounter(boost::shared_ptr<iInputSystem> is,
+					   boost::shared_ptr<gui::iFont> font,
 					   const v2d& position) :
 		FPSCounter(is), font_(font), pos_(position)
 	{

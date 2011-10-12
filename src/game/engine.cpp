@@ -6,17 +6,19 @@ namespace game {
 	Engine::Engine() :
 		driver_(SystemFactory::instance().createDriver()),
 		audio_driver_(SystemFactory::instance().createAudioDriver()),
-		running_(false)
+		is_(SystemFactory::instance().createInputSystem()),
+		running_(false),
+		quit_listener_(new EngineEventListener(mhe::SystemEventType, mhe::QUIT, 0, 
+												this, &Engine::stop_p))
 	{}
 	
 	bool Engine::init(cmn::uint w, cmn::uint h, cmn::uint bpp, bool fullscreen)
 	{
 		if (!ws_.init(w, h, bpp, fullscreen))
 			return false;
-		is_.setWindowSystem(&ws_);
+		is_->setWindowSystem(&ws_);
 		// init quit event listener
-		is_.addListener(new EngineEventListener(mhe::SystemEventType, mhe::QUIT, 0, 
-												this, &Engine::stop_p));
+		is_->addListener(quit_listener_);
 		
 		// graphics driver initialization
 		driver_->set_window_system(&ws_);
@@ -48,7 +50,7 @@ namespace game {
 		running_ = true;
 		while (running_)
 		{
-			is_.check();
+			is_->check();
 			driver_->clear_depth();
 			driver_->clear_color();
 
