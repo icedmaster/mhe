@@ -6,6 +6,8 @@
 
 namespace mhe
 {
+class OpenGLDriver;
+
 class Texture : public iTexture
 {
 private:
@@ -14,7 +16,9 @@ private:
 	texcoord coord_;
 	bool binded_;
 	void rebuild_texture(const boost::shared_ptr<Image>& im,
-						 boost::shared_ptr<iDriver> driver, FilterType ft);
+						 boost::shared_ptr<iDriver> driver, FilterType ft);	
+
+	friend class OpenGLDriver;
 public:
 	Texture();
 	~Texture();

@@ -18,7 +18,10 @@ namespace mhe
 				typedef PrivateEventListener<GUIContainer> gui_event_handler;
 				friend class PrivateEventListener<GUIContainer>;
 
-				bool handle_keyboard(const Event& e);
+				boost::shared_ptr<gui_event_handler> mouse_move_listener_;				
+				boost::shared_ptr<gui_event_handler> mouse_click_listener_;
+				boost::shared_ptr<gui_event_handler> mouse_release_listener_;
+
 				bool handle_mouse_click(const Event& e);
 				bool handle_mouse_move(const Event& e);
 			private:
@@ -29,12 +32,12 @@ namespace mhe
 				}
 			public:
 				GUIContainer();
-				GUIContainer(InputSystem& is);
+				GUIContainer(boost::shared_ptr<iInputSystem> is);
 
 				void add(const boost::shared_ptr<Widget>& widget);
 				boost::shared_ptr<Widget> get(const std::string& name) const;
 
-				void setupEvents(InputSystem& is);
+				void setupEvents(boost::shared_ptr<iInputSystem> is);
 		};
 	}
 }

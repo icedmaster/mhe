@@ -141,7 +141,6 @@ int main(int, char**)
     driver->set_window_system(&ws);
 
     mhe::load_default_extensions();
-	mhe::utils::global_log::instance().write(std::string((char*)glGetString(GL_RENDERER)));
     mhe::utils::global_log::instance().write(mhe::get_availible_extensions());
 
     driver->set_clear_color(mhe::cfBlack);

@@ -98,6 +98,7 @@ namespace mhe
             typedef std::map <cmn::uint, AnimationList> almap;
             almap al_;
             bool is_alive_;
+			bool is_running_;
             float x_size_, y_size_;
             bool reset_position_;
             v3d pos_;   // need while we use reset position
@@ -110,10 +111,10 @@ namespace mhe
             void set_position(const v3d& pos);
             matrixf get_matrix() const;
         public:
-            Sprite() : is_alive_(true), x_size_(0.0), y_size_(0.0), reset_position_(true),
+		Sprite() : is_alive_(true), is_running_(false), x_size_(0.0), y_size_(0.0), reset_position_(true),
 				current_al_(0)
 			{}
-            Sprite(const AnimationList& al) : is_alive_(true), x_size_(0.0), y_size_(0.0),
+		Sprite(const AnimationList& al) : is_alive_(true), is_running_(false), x_size_(0.0), y_size_(0.0),
                 reset_position_(false), current_al_(0)
             {
                 al_[al.getIndex()] = al;
@@ -153,7 +154,7 @@ namespace mhe
 			}				
 
             // execute animation from list with index <index>
-            void execute(cmn::uint index, cmn::uint tick, bool reset_position = false);
+            void start(cmn::uint index, bool reset_position = false);
     };
 }
 

@@ -1,4 +1,5 @@
 #include "mhe.hpp"
+#include "demo_game_scene.hpp"
 
 class MainMenuScene : public mhe::game::GameScene
 {
@@ -11,7 +12,8 @@ class MainMenuScene : public mhe::game::GameScene
 	boost::shared_ptr<mhe::game::HLWidget> hl_start_button;
 	boost::shared_ptr<mhe::game::HLWidget> hl_quit_button;
 	boost::shared_ptr<mhe::iSound> theme_sound;
-	cmn::uint loop_wait_time;
+	bool need_check_playing;
+	boost::shared_ptr<MainMenuEventListener> quit_listener_;
 private:
 	bool init_impl(const std::string& arg)
 	{
@@ -20,6 +22,8 @@ private:
 		// begin to play beautiful music
 		theme_sound = get_engine()->getSoundManager().get("theme");
 		theme_sound->play();
+		need_check_playing = true;
+		mhe::utils::global_log::instance().write("MainMenu initialized");
 		return true;
 	}
 
@@ -37,7 +41,7 @@ private:
 		background->setPriority(1);
 		const mhe::WindowSystem& ws = get_engine()->getWindowSystem();
 		background->setSize(ws.width(), ws.height());
-		background->execute(0, mhe::utils::get_current_tick());
+		background->start(0);
 		//boost::shared_ptr<mhe::Sprite> animated(loader.getSprite(L"animated"));
 		get_scene()->add(background);
 
@@ -69,26 +73,19 @@ private:
 
 	void setup_events()
 	{
-		MainMenuEventListener* listener = new MainMenuEventListener(mhe::KeyboardEventType,
-																	mhe::KEY_DOWN, SDLK_ESCAPE,
-																	this, &MainMenuScene::on_quit);
-		get_engine()->getInputSystem().addListener(listener);
+		get_engine()->getInputSystem()->addListener(quit_listener_);
 	}
 
 	// main process function
 	bool process_impl()
 	{
-		if (!theme_sound->is_playing())
+		if (need_check_playing && !theme_sound->is_playing())
 		{
-			// wait 2 seconds and play it again
-			cmn::uint tick = mhe::utils::get_current_tick();
-			if (!loop_wait_time)
-				loop_wait_time = tick + 2000;
-			else if (tick >= loop_wait_time)
-			{
-				theme_sound->play();
-				loop_wait_time = 0;
-			}
+			MainMenuEventListener* listener = new MainMenuEventListener(mhe::TimerEventType,
+																		2000, mhe::TimerEvent::TIMER_ONCE,
+																		this, &MainMenuScene::repeat_theme);
+			get_engine()->getInputSystem()->addListener(listener);
+			need_check_playing = false;
 		}
 		return true;
 	}
@@ -96,6 +93,21 @@ private:	// events
 	bool on_quit(const mhe::Event&)
 	{
 		get_engine()->stop();
+		return true;
+	}
+
+	bool repeat_theme(const mhe::Event&)
+	{
+		theme_sound->play();
+		need_check_playing = true;
+		return true;
+	}
+
+	bool set_next_scene(const mhe::Event&)
+	{
+		boost::shared_ptr<DemoGameScene> next(new DemoGameScene(get_engine()));
+		setNextScene(next);
+		get_engine()->set_next_scene("assets/game.mhe");
 		return true;
 	}
 
@@ -108,10 +120,25 @@ private:	// events
 	void on_start_mouse_click(const mhe::gui::Widget*)
 	{
 		get_engine()->getSoundManager().get("click")->play();
+		// create fade effect
+		boost::shared_ptr<mhe::game::FadeSprite> fade(
+			new mhe::game::FadeSprite(mhe::rect<float>(0.0, 0.0, 
+													   get_engine()->getWindowSystem().width(),
+													   get_engine()->getWindowSystem().height()),
+									  1000));
+		get_scene()->add(fade);
+		get_engine()->getInputSystem()->disable_input();
+		// add new event for change scene
+		MainMenuEventListener* listener = new MainMenuEventListener(mhe::TimerEventType,
+																	1000, mhe::TimerEvent::TIMER_ONCE,
+																	this, &MainMenuScene::set_next_scene);
+		get_engine()->getInputSystem()->addListener(listener);
 	}
 public:
 	MainMenuScene(mhe::game::Engine* engine) : mhe::game::GameScene(engine),
-											   loop_wait_time(0)
+		quit_listener_(new MainMenuEventListener(mhe::KeyboardEventType,
+																	mhe::KEY_DOWN, SDLK_ESCAPE,
+																	this, &MainMenuScene::on_quit))
 	{}
 };
 
@@ -142,6 +169,7 @@ int main(int argc, char** argv)
 
 	engine.setGameScene(scene);
 	engine.getDriver()->disable_lighting();
+	scene.reset();
 
 	engine.run();
 	mhe::utils::global_log::instance().write("Engine stopped");

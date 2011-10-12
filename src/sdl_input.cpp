@@ -8,7 +8,7 @@ namespace mhe
 		SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 	}
 
-	void SDLInputSystem::check()
+	void SDLInputSystem::check_impl()
 	{
 		SDL_Event event;
 		while (SDL_PollEvent(&event))
@@ -42,24 +42,11 @@ namespace mhe
 		add_tick_event();
 	}
 
-	void SDLInputSystem::handle()
+	void SDLInputSystem::handle_impl()
 	{
 		/*for (size_t i = 0; i < events.size(); ++i)
 			check_listeners(events[i].get());
 		events.clear();*/
-	}
-
-	void SDLInputSystem::addListener(EventListener* el)
-	{
-		if (!get_event_optarg(el->id()) && get_event_arg(el->id()))
-			arg_listmap.insert(mlisteners::value_type(el->id(),
-		                                              boost::shared_ptr<EventListener>(el)));
-		else if (get_event_arg(el->id()))
-			listmap.insert(mlisteners::value_type(el->id(),
-                                                  boost::shared_ptr<EventListener>(el)));
-		else
-			gl_listmap.insert(mlisteners::value_type(el->id(),
-                                                     boost::shared_ptr<EventListener>(el)));
 	}
 
 	void SDLInputSystem::add_keydown_event(const SDL_keysym& sym)
@@ -113,34 +100,6 @@ namespace mhe
 	{
 		SystemEvent se(TICK);
 		check_listeners(se);
-	}
-
-	void SDLInputSystem::add_event_timestamp(Event* e)
-	{
-		e->set_timestamp(SDL_GetTicks());
-	}
-
-	void SDLInputSystem::check_listeners(Event& e)
-	{
-		add_event_timestamp(&e);
-		mlitpair pit = listmap.equal_range(e.id());
-        for (mlisteners::iterator it = pit.first; it != pit.second; ++it)
-            it->second->handle(e);
-		// check for global listeners
-		if (arg_listmap.size())
-		{
-			int t = get_event_type(e.id());
-			int gl_arg = get_event_arg(e.id());
-			mlitpair pit = arg_listmap.equal_range(create_event_id(t, gl_arg, 0));
-            for (mlisteners::iterator it = pit.first; it != pit.second; ++it)
-                it->second->handle(e);
-		}
-		if (gl_listmap.size())
-		{
-			cmn::uint gl_id = get_event_type(e.id());
-			mlitpair pit = gl_listmap.equal_range(gl_id);
-			for (mlisteners::iterator it = pit.first; it != pit.second; ++it)
-				it->second->handle(e);
-		}
+		check_timer_events();
 	}
 }

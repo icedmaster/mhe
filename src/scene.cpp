@@ -20,4 +20,13 @@ void Scene::draw(boost::shared_ptr<iDriver> driver)
 		callback_->afterDraw(this, driver);
 }
 
+void Scene::update(cmn::uint tick)
+{
+	for (size_t i = 0; i < subscenes.size(); ++i)
+		subscenes[i]->update(tick);
+	for (nodeset::iterator it = nodes_.begin(); it != nodes_.end(); ++it)
+		(*it)->update(tick);
+
+}
+
 }	// namespace mhe

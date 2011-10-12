@@ -18,6 +18,7 @@
 *.bmp
 *.zip
 *.ede
+*#*
 
 !/build/CMakeLists.txt
 

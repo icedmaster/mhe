@@ -6,6 +6,9 @@
 #include "window_system.hpp"
 #include "impl/system_factory.hpp"
 #include <boost/shared_ptr.hpp>
+#include <boost/weak_ptr.hpp>
+#include <map>
+#include <vector>
 
 namespace mhe
 {
@@ -16,7 +19,8 @@ namespace mhe
 		NullEventType,
 		KeyboardEventType,
 		MouseEventType,
-		SystemEventType
+		SystemEventType,
+		TimerEventType
 	};
 
 	// helper functions
@@ -182,9 +186,8 @@ namespace mhe
 	enum
 	{
 		QUIT = 1,
-		TICK,
-		TIMER
-	};
+		TICK		
+	};	
 
 	// system event class
 	class SystemEvent : public Event
@@ -200,6 +203,27 @@ namespace mhe
 				set_event_id(create_event_id(SystemEventType, event, arg));
 			}
 	};
+
+	class TimerEvent : public Event
+	{
+		private:
+			int get_type() const
+			{
+				return TimerEventType;
+			}
+		public:
+			enum
+			{
+				TIMER = 0,
+				TIMER_ONCE
+			};
+
+			TimerEvent(int event, int arg = 0)
+			{
+				set_event_id(create_event_id(TimerEventType, event, arg));
+			}
+	};
+
 
 	// 
 	// If we need to handle all events of concrete type - 
@@ -221,6 +245,7 @@ namespace mhe
 
 			virtual bool handle(const Event&/* event*/) {return true;}
 	};
+
 
 	// If you derived from EventListenerEx class, you can
 	// override handle() function, or handle_ex() function, that
@@ -253,43 +278,76 @@ namespace mhe
 			}
 	};
 
-	// platform-specific input class
 	class iInputSystem
 	{
-		public:
-			virtual void check() = 0;
-			virtual void handle() = 0;
-			virtual void addListener(EventListener* el) = 0;
-			virtual void setWindowSystem(WindowSystem*) {}
-	};
-
-	class InputSystem
-	{
 		private:
-			boost::shared_ptr<iInputSystem> impl_;
+			struct Listener
+			{
+				boost::weak_ptr<EventListener> listener;
+				boost::shared_ptr<EventListener> once_listener;
+			};
+			typedef std::multimap< cmn::uint, Listener > mlisteners;
+			typedef std::pair< mlisteners::iterator, mlisteners::iterator > mlitpair;
+
+			struct TimerListener
+			{
+				cmn::uint start;
+				Listener listener;
+				bool once;
+			};
+
+			std::vector<TimerListener> timer_listeners_;
+
+			mlisteners listmap;
+			mlisteners arg_listmap;
+			mlisteners gl_listmap;
+			bool input_enabled_;
+
+			void set_input_state(bool state);
+
+			void add_listener(const Listener& l);
+			void add_timer_listener(const Listener& l);
+			void add_event_timestamp(Event* e);
+
+			bool filter_event(const Event& e) const;
+		private:
+			virtual	void check_impl() = 0;
+			virtual void handle_impl() = 0;
+			virtual void set_window_system_impl(WindowSystem*) {}
+		protected:
+			void check_timer_events();
+			void check_listeners(Event& e);
 		public:
-			InputSystem() :
-				impl_(SystemFactory::instance().createInputSystem())
+			iInputSystem() :
+				input_enabled_(true)
 			{}
 
 			void check()
 			{
-				impl_->check();
+				check_impl();
 			}
 
 			void handle()
 			{
-				impl_->handle();
+				handle_impl();
 			}
 
-			void addListener(EventListener* el)
-			{
-				impl_->addListener(el);
-			}
+			void addListener(boost::shared_ptr<EventListener> el);
+			void addListener(EventListener* el);				
 
 			void setWindowSystem(WindowSystem* ws)
 			{
-				impl_->setWindowSystem(ws);
+				set_window_system_impl(ws);
+			}
+
+			void disable_input()
+			{
+				set_input_state(false);
+			}
+	
+			void enable_input()
+			{
+				set_input_state(true);
 			}
 	};
 

@@ -4,6 +4,7 @@
 #include "event.hpp"
 #include <map>
 #include <vector>
+#include <boost/weak_ptr.hpp>
 #include <SDL/SDL.h>
 
 namespace mhe
@@ -11,16 +12,8 @@ namespace mhe
 	class SDLInputSystem : public iInputSystem
 	{
 		private:
-			typedef std::multimap< cmn::uint, boost::shared_ptr<EventListener> > mlisteners;
-			typedef std::pair< mlisteners::iterator, mlisteners::iterator > mlitpair;
-
-			mlisteners listmap;
-			mlisteners arg_listmap;
-			mlisteners gl_listmap;
 			//std::vector< boost::shared_ptr<Event> > events;
 			WindowSystem* ws_;
-
-			void check_listeners(Event& e);
 
 			void add_keydown_event(const SDL_keysym&);
 			void add_keyup_event(const SDL_keysym&);
@@ -30,17 +23,15 @@ namespace mhe
 			void add_quit_event();
 			void add_tick_event();
 
-			void add_event_timestamp(Event* e);
+			void check_impl();
+			void handle_impl();
+			void set_window_system_impl(WindowSystem* ws)
+			{
+				ws_ = ws;
+			}			
 		public:
 			SDLInputSystem();
 
-			void check();
-			void handle();
-			void addListener(EventListener* el);
-			void setWindowSystem(WindowSystem* ws)
-			{
-				ws_ = ws;
-			}
 	};
 }
 

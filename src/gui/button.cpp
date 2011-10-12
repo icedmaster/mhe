@@ -15,19 +15,19 @@ namespace gui {
 
 	void Button::process_mouse_left_click(const MouseEvent& me)
 	{
-		get_sprite()->execute(1, utils::get_current_tick());
+		get_sprite()->start(1);
 		Widget::process_mouse_left_click(me);
 	}
 
 	void Button::process_mouse_button_release(const MouseEvent& me)
 	{
-		get_sprite()->execute(0, utils::get_current_tick());
+		get_sprite()->start(0);
 		Widget::process_mouse_button_release(me);
 	}
 
 	void Button::process_mouse_left(const MouseEvent& me)
 	{
-		get_sprite()->execute(0, utils::get_current_tick());
+		get_sprite()->start(0);
 		Widget::process_mouse_left(me);
 	}
 

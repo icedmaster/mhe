@@ -72,7 +72,6 @@ namespace mhe
 				rect<float> geom_;
 				boost::shared_ptr<iFont> font_;
 				std::map <int, guieventptr> handlers_;
-				bool first_draw_;
 			private:
 				void process_event(int e)
 				{

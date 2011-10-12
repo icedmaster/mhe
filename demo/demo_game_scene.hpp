@@ -3,8 +3,10 @@
 
 #include "mhe.hpp"
 
-class DemoScene : public mhe::game::GameScene
+class DemoGameScene : public mhe::game::GameScene
 {
+public:
+	DemoGameScene(mhe::game::Engine* engine) : mhe::game::GameScene(engine) {}
 };
 
 #endif

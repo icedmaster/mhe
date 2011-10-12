@@ -28,12 +28,12 @@ void HLWidget::on_mouse_move(const gui::Widget* /*widget*/)
 {
 	size_t i = widget_->get_sprite()->get_animations_number();
 	if (i)
-		widget_->get_sprite()->execute(i - 1, utils::get_current_tick());
+		widget_->get_sprite()->start(i - 1);
 }
 	
 void HLWidget::on_mouse_left(const gui::Widget* /*widget*/)
 {
-	widget_->get_sprite()->execute(0, utils::get_current_tick());
+	widget_->get_sprite()->start(0);
 }
 	
 }}

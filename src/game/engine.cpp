@@ -6,17 +6,19 @@ namespace game {
 	Engine::Engine() :
 		driver_(SystemFactory::instance().createDriver()),
 		audio_driver_(SystemFactory::instance().createAudioDriver()),
-		running_(false)
+		is_(SystemFactory::instance().createInputSystem()),
+		running_(false),
+		quit_listener_(new EngineEventListener(mhe::SystemEventType, mhe::QUIT, 0, 
+												this, &Engine::stop_p))
 	{}
 	
 	bool Engine::init(cmn::uint w, cmn::uint h, cmn::uint bpp, bool fullscreen)
 	{
 		if (!ws_.init(w, h, bpp, fullscreen))
 			return false;
-		is_.setWindowSystem(&ws_);
+		is_->setWindowSystem(&ws_);
 		// init quit event listener
-		is_.addListener(new EngineEventListener(mhe::SystemEventType, mhe::QUIT, 0, 
-												this, &Engine::stop_p));
+		is_->addListener(quit_listener_);
 		
 		// graphics driver initialization
 		driver_->set_window_system(&ws_);
@@ -48,12 +50,15 @@ namespace game {
 		running_ = true;
 		while (running_)
 		{
-			is_.check();
+			is_->check();
 			driver_->clear_depth();
 			driver_->clear_color();
 
 			if (game_scene_ && game_scene_->process())
+			{
+				game_scene_->getScene()->update(utils::get_current_tick());
 				game_scene_->getScene()->draw(driver_);			
+			}
 			
 			ws_.swapBuffers();
 		}
@@ -63,6 +68,21 @@ namespace game {
 	{
 		running_ = false;
 	}
+
+void Engine::free_all()
+{
+	tm_.free_all();
+	fm_.free_all();
+	sm_.free_all();
+}
+
+void Engine::set_next_scene(const std::string& arg)
+{
+	utils::global_log::instance().write("set_next_scene() called");
+	game_scene_->deinit();
+	game_scene_ = game_scene_->getNextScene();
+	if (game_scene_) game_scene_->init(arg);	
+}
 
 }
 }
