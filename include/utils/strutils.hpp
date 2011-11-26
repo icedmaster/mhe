@@ -26,10 +26,23 @@ namespace mhe
 			#endif
 		}
 
+		template <class T>
+		inline std::string to_string(T n)
+		{
+			#ifdef USE_BOOST_STRINGS
+			return boost::lexical_cast<std::string>(n);
+			#endif
+		}
+
 		inline std::string from_wstr(const std::wstring& ws)
 		{
 			// TODO:!!!!
 			return std::string(ws.begin(), ws.end());						
+		}
+
+		inline std::wstring to_wstring(const std::string& s)
+		{
+			return std::wstring(s.begin(), s.end());
 		}
 		
 		inline void rtrim(std::string& s, const std::string& c = " ")

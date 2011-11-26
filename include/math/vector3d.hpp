@@ -114,7 +114,7 @@ namespace mhe
                 return vector3(-v_[0], -v_[1], -v_[2]);
             }
 
-            vector3 operator+ (const vector3& v)
+            vector3 operator+ (const vector3& v) const
             {
                 vector3 vv = *this;
                 return vv += v;

@@ -16,7 +16,8 @@ namespace gui {
 		if (!visible_) return;
 
 		sprite_->setSize(geom_.width(), geom_.height());
-		sprite_->setPosition(v3d(geom_.ll().x(), geom_.ll().y(), 0));
+		sprite_->identity();
+		sprite_->translate(v3d(geom_.ll().x(), geom_.ll().y(), 0));
 		sprite_->draw(driver);
 		if (font_)
 		{

@@ -3,6 +3,7 @@
 
 #include "mhe.hpp"
 #include "game_scene.hpp"
+#include "aspect_manager.hpp"
 
 namespace mhe
 {
@@ -20,6 +21,8 @@ namespace mhe
 				boost::shared_ptr<iInputSystem> is_;
 
 				boost::shared_ptr<GameScene> game_scene_;
+
+				AspectManager aspect_manager_;
 
 				bool running_;		   
 
@@ -87,6 +90,16 @@ namespace mhe
 
 				void free_all();
 				void set_next_scene(const std::string& arg);
+
+				boost::shared_ptr<GameScene> get_game_scene() const
+				{
+					return game_scene_;
+				}
+
+				AspectManager& get_aspect_manager()
+				{
+					return aspect_manager_;
+				}
 		};
 	}	// game
 }       // mhe

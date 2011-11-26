@@ -1,12 +1,11 @@
-#include "mhe_loader.hpp"
+#include "game/mhe_loader.hpp"
 
-namespace mhe
-{
-	mhe_loader::mhe_loader(const std::string& filename, TextureManager* tm,
-					   FontManager* fm, SoundManager* sm) :
+namespace mhe {
+namespace game {
+	mhe_loader::mhe_loader(const std::string& filename, Engine* engine) :
 		is_open_(false),
 		parsed_(false),
-		texture_manager(tm), font_manager(fm), sound_manager(sm)
+		engine_(engine)
 	{
 		pugi::xml_parse_result res = doc.load_file(filename.c_str());
 		if (res.status != pugi::status_ok)
@@ -70,8 +69,7 @@ namespace mhe
         // get filename
         std::wstring fn(node.child(L"file").child_value());
         // try to load texture
-		if (!texture_manager) return boost::shared_ptr<iTexture>();
-		return texture_manager->get(utils::from_wstr(fn));
+		return engine_->getTextureManager().get(utils::from_wstr(fn));
     }
 
 	boost::shared_ptr<gui::iFont> mhe_loader::get_font(const std::wstring& name) const
@@ -86,9 +84,8 @@ namespace mhe
 	{
         // get filename
         std::wstring fn(node.child(L"file").child_value());
-        // try to load font
-		if (!font_manager) return boost::shared_ptr<gui::iFont>();
-		return font_manager->get(utils::from_wstr(fn));
+        // try to load font		
+		return engine_->getFontManager().get(utils::from_wstr(fn));
 	}
 
 	boost::shared_ptr<iSound> mhe_loader::get_sound(const std::wstring& name) const
@@ -104,8 +101,7 @@ namespace mhe
         // get filename
         std::wstring fn(node.child(L"file").child_value());
         // try to load font
-		if (!sound_manager) return boost::shared_ptr<iSound>();
-		return sound_manager->get(utils::from_wstr(fn));
+		return engine_->getSoundManager().get(utils::from_wstr(fn));
 	}
 
 	Sprite* mhe_loader::getSprite(const std::wstring& name) const
@@ -140,7 +136,7 @@ namespace mhe
 	    for (pugi::xml_node it = al_node; it; it = it.next_sibling(L"animation_list"))
 	        sprite->addAnimationList(read_animationList(it));
 
-		sprite->setPosition(pos);
+		sprite->translate(pos);
 		sprite->setSize(size.x(), size.y());
 		return sprite;
 	}
@@ -323,4 +319,4 @@ namespace mhe
 
 		return rect<float>(x, y, w, h);
 	}
-}
+}}	// namespaces

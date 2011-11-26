@@ -10,9 +10,10 @@
 #include "utils/strutils.hpp"
 #include "utils/logutils.hpp"
 #include "mhe_gui.hpp"
+#include "engine.hpp"
 
-namespace mhe
-{
+namespace mhe {
+namespace game {
 	class mhe_loader
 	{
 		private:
@@ -21,9 +22,7 @@ namespace mhe
 			bool is_open_;
 			bool parsed_;
 
-			mutable TextureManager* texture_manager;
-			mutable FontManager* font_manager;
-			mutable SoundManager* sound_manager;
+			Engine* engine_;
 
 			bool find_node(pugi::xml_node& node,
                            const std::wstring& type, const std::wstring& name) const;
@@ -54,8 +53,7 @@ namespace mhe
 			void load_widget(const pugi::xml_node& node,
                              gui::Widget* widget) const;
 		public:
-			mhe_loader(const std::string& filename, TextureManager* tm = 0,
-					   FontManager* fm = 0, SoundManager* sm = 0);
+			mhe_loader(const std::string& filename, Engine* engine);
 			~mhe_loader();
 
 			Sprite* getSprite(const std::wstring& name) const;
@@ -63,20 +61,9 @@ namespace mhe
 
 			void load_all_assets();
 
-			// addtitional functions
-			void setTextureManager(TextureManager* tm)
+			const Engine* get_engine() const
 			{
-                texture_manager = tm;
-			}
-
-			void setFontManager(FontManager* fm)
-			{
-				font_manager = fm;
-			}
-
-			void set_sound_manager(SoundManager* sm)
-			{
-				sound_manager = sm;
+				return engine_;
 			}
 	};
 
@@ -101,6 +88,6 @@ namespace mhe
 	v3d read_v3d(const pugi::xml_node& node);
 	v4d read_v4d(const pugi::xml_node& node);
 	rect<float> read_rect(const pugi::xml_node& node);
-}
+}}	// namespaces
 
 #endif

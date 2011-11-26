@@ -5,6 +5,7 @@
 #include "gl_state_attr.hpp"
 #include "mhe_gl.hpp"
 #include "gl_extension.hpp"
+#include "itexture.hpp"
 
 namespace mhe
 {
@@ -60,8 +61,13 @@ namespace mhe
 			void restore_color();
             void begin_draw_impl(const float*, const float*, const float*, const float*,
                                  cmn::uint);
+			void begin_draw_impl(boost::shared_ptr<iTexture>,
+								 const float*, const float*, const float*, const float*,
+								 cmn::uint);
+
             void draw_impl(const cmn::uint*, cmn::uint);
             void end_draw_impl();
+			void end_draw_impl(boost::shared_ptr<iTexture> texture);
 
             void set_color_impl(const colorf&);
 

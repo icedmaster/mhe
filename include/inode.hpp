@@ -5,6 +5,7 @@
 #include "idriver.hpp"
 #include "types.hpp"
 #include "transform.hpp"
+#include "utils/sysutils.hpp"
 #include <boost/shared_ptr.hpp>
 
 namespace mhe
@@ -14,6 +15,8 @@ namespace mhe
     {
         private:
 			int priority_;						
+			std::string name_;
+			std::vector< boost::shared_ptr<iNode> > childs_;
 
             virtual void draw_impl(const boost::shared_ptr<iDriver>&/*,
                                    const boost::shared_ptr<iCamera>&*/) = 0;
@@ -22,7 +25,9 @@ namespace mhe
             virtual bool is_alive() const {return true;}
 
 			virtual void set_priority(int pri) {priority_ = pri;}
-			virtual int get_priority() const   {return priority_;}	// normal priority						
+			virtual int get_priority() const   {return priority_;}	// normal priority	
+
+			virtual void start_impl(cmn::uint) {}					
         public:
 			iNode() : priority_(2) {}
             virtual ~iNode() {}
@@ -30,6 +35,8 @@ namespace mhe
             void draw(const boost::shared_ptr<iDriver>& driver/*,
                       const boost::shared_ptr<iCamera>& camera = boost::shared_ptr<iCamera>()*/)
             {
+				for (size_t i = 0; i < childs_.size(); ++i)
+					childs_[i]->draw(driver);
                 draw_impl(driver/*, camera*/);
             }
 
@@ -51,7 +58,27 @@ namespace mhe
 			int priority() const
 			{
 				return get_priority();
-			}						
+			}				
+
+			void set_name(const std::string& name)
+			{
+				name_ = name;
+			}
+
+			const std::string& name() const
+			{
+				return name_;
+			}
+
+			void add_node(boost::shared_ptr<iNode> node)
+			{
+				childs_.push_back(node);
+			}
+
+			void start()
+			{
+				start_impl(utils::get_current_tick());
+			}	
     };
 	
 	// helper classes

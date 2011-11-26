@@ -79,6 +79,11 @@ namespace mhe
 			{
 				scale(s.x(), s.y(), s.z());
 			}
+
+			void identity()
+			{
+				m.load_identity();
+			}
 	};
 }
 

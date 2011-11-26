@@ -110,17 +110,19 @@ namespace mhe
             void update_impl(cmn::uint tick);
             void set_position(const v3d& pos);
             matrixf get_matrix() const;
+			void start_impl(cmn::uint)
+			{
+				execute(0);
+			}
         public:
-		Sprite() : is_alive_(true), is_running_(false), x_size_(0.0), y_size_(0.0), reset_position_(true),
+		Sprite() : is_alive_(true), is_running_(false), x_size_(0.0), y_size_(0.0),
 				current_al_(0)
 			{}
-		Sprite(const AnimationList& al) : is_alive_(true), is_running_(false), x_size_(0.0), y_size_(0.0),
-                reset_position_(false), current_al_(0)
+			Sprite(const AnimationList& al) : is_alive_(true), is_running_(false), x_size_(0.0), y_size_(0.0),
+                current_al_(0)
             {
                 al_[al.getIndex()] = al;
             }
-
-            Sprite(const AnimationList& al, const v3d& position);
 
             void addAnimationList(const AnimationList& al);
 			void setSize(float size)
@@ -137,11 +139,6 @@ namespace mhe
 			float width() const;
 			float height() const;
 
-			void setPosition(const v3d& pos)
-			{
-				set_position(pos);
-			}
-
 			size_t get_frames_number() const
 			{
 				if (current_al_) return current_al_->get_frames_number();
@@ -154,7 +151,7 @@ namespace mhe
 			}				
 
             // execute animation from list with index <index>
-            void start(cmn::uint index, bool reset_position = false);
+            void execute(cmn::uint index);
     };
 }
 

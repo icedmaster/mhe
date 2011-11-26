@@ -2,6 +2,7 @@
 #define _SYSTEM_FACTORY_HPP_
 
 #include "config.hpp"
+#include <boost/shared_ptr.hpp>
 
 namespace mhe
 {
@@ -12,6 +13,15 @@ namespace mhe
 	class iAudioDriver;
 	class iSound;
 
+	// if we want to use custom factory
+	class iSystemFactory
+	{
+	public:
+		virtual ~iSystemFactory() {}
+		virtual iWindowSystem* create_window_system() const = 0;
+		virtual iInputSystem* create_input_system() const = 0;
+	};
+
     class SystemFactory
     {
         private:
@@ -19,6 +29,8 @@ namespace mhe
             SystemFactory(const SystemFactory&) {}
             ~SystemFactory() {}
             SystemFactory& operator= (const SystemFactory&) {return *this;}
+
+			boost::shared_ptr<iSystemFactory> factory_;
         public:
             static SystemFactory& instance()
             {
@@ -30,8 +42,14 @@ namespace mhe
 			iWindowSystem* createWindowSystem() const;
 			iInputSystem* createInputSystem() const;
 			iTexture* createTexture() const;
+			iTexture* create_multitexture() const;
 			iAudioDriver* createAudioDriver() const;
-			iSound* createSound() const;	
+			iSound* createSound() const;
+
+			void set_system_factory(iSystemFactory* factory)
+			{
+				factory_.reset(factory);
+			}	
 
     };
 

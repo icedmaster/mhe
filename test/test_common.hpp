@@ -39,7 +39,7 @@ namespace test
 
 		protected:
 			WindowSystem window_system;
-			InputSystem input_system;
+			boost::shared_ptr<iInputSystem> input_system;
 			TextureManager texture_manager;
 			boost::shared_ptr<iDriver> driver;
 			bool running;
@@ -47,9 +47,10 @@ namespace test
 			virtual void SetUp()
 			{
 				window_system.init(800, 600, 32);
-				input_system.setWindowSystem(&window_system);
-				input_system.addListener(new TestEventListener(SystemEventType, QUIT, 0,
-															   this, &TestCommon::stop));
+				input_system.reset(SystemFactory::instance().createInputSystem());
+				input_system->setWindowSystem(&window_system);
+				input_system->addListener(new TestEventListener(SystemEventType, QUIT, 0,
+									       this, &TestCommon::stop));
 				driver.reset(SystemFactory::instance().createDriver());
 				driver->set_window_system(&window_system);
 				window_system.showCursor(true);

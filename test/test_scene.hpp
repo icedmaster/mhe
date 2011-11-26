@@ -36,7 +36,7 @@ TEST_F(TestScene, base_test)
 	scene.add(quad1);
 	while (running)
 	{
-		input_system.check();
+		input_system->check();
 		driver->clear_depth();
 		driver->clear_color();
 		driver->set_modelview_matrix(mhe::matrixf::identity());
@@ -63,7 +63,7 @@ TEST_F(TestScene, priority_test)
 	scene.add(quad3);
 	while (running)
 	{
-		input_system.check();
+		input_system->check();
 		driver->clear_depth();
 		driver->clear_color();
 		driver->set_modelview_matrix(mhe::matrixf::identity());
@@ -86,7 +86,7 @@ TEST_F(TestScene, subscene_test)
 	scene.addSubscene(subscene);
 	while (running)
 	{
-		input_system.check();
+		input_system->check();
 		driver->clear_depth();
 		driver->clear_color();
 		driver->set_modelview_matrix(mhe::matrixf::identity());

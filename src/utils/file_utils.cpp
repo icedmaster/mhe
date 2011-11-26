@@ -1,6 +1,7 @@
 #include "utils/file_utils.hpp"
 #include <algorithm>
 #include <cctype>
+#include <iostream>
 
 namespace mhe
 {
@@ -21,17 +22,18 @@ std::string get_file_extension(const std::string& filename)
 std::string get_file_name(const std::string& filepath)
 {
 	size_t slash_pos = filepath.find_last_of('/');
-// get filename with extension
+	// get filename with extension
 	std::string fne;
 	if (slash_pos == std::string::npos)
 		fne = filepath;
 	else
 		fne = filepath.substr(slash_pos + 1, filepath.length() - slash_pos - 1);
-// remove extension
+	// remove extension
 	size_t point_pos = fne.find_last_of('.');
 	std::string fn = fne;
 	if (point_pos != std::string::npos)
 		fn.erase(point_pos, fn.length() - point_pos);
+	std::cout << fne << " " << fn << std::endl;
 	return fn;
 }
 };

@@ -156,6 +156,14 @@ namespace mhe
         }
     }
 
+	void OpenGLDriver::begin_draw_impl(boost::shared_ptr<iTexture> texture,
+									   const float* v, const float* n, const float* t, const float* c,
+									   cmn::uint size)
+	{
+		texture->prepare();
+		begin_draw_impl(v, n, t, c, size);
+	}
+
     void OpenGLDriver::draw_impl(const cmn::uint* i, cmn::uint size)
     {
         glDrawElements(GL_TRIANGLES, size, GL_UNSIGNED_INT, i);
@@ -173,6 +181,15 @@ namespace mhe
         glDisableClientState(GL_NORMAL_ARRAY);
         glDisableClientState(GL_VERTEX_ARRAY);
     }
+
+	void OpenGLDriver::end_draw_impl(boost::shared_ptr<iTexture> texture)
+	{
+        if (using_color_)
+            glDisableClientState(GL_COLOR_ARRAY);
+		texture->clean();		
+        glDisableClientState(GL_NORMAL_ARRAY);
+        glDisableClientState(GL_VERTEX_ARRAY);
+	}
 
     void OpenGLDriver::set_color_impl(const colorf& c)
     {

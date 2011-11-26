@@ -7,7 +7,7 @@
 #include "impl/system_factory.hpp"
 #include "texture_manager.hpp"
 #include "font_manager.hpp"
-#include "mhe_loader.hpp"
+#include "particle_system.hpp"
 
 #include "mhe_sound.hpp"
 #include "sound_manager.hpp"

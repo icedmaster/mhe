@@ -17,6 +17,7 @@
 #endif
 */
 #include "texture.hpp"
+#include "multitexture.hpp"
 #include "sound/openal_audio_driver.hpp"
 #include "sound/openal_sound.hpp"
 
@@ -32,6 +33,11 @@ iTexture* SystemFactory::createTexture() const
 	return new Texture();
 }
 
+iTexture* SystemFactory::create_multitexture() const
+{
+	return new MultiTexture();
+}
+
 iAudioDriver* SystemFactory::createAudioDriver() const
 {
 	return new OpenALAudioDriver();
@@ -44,6 +50,7 @@ iSound* SystemFactory::createSound() const
 
 iWindowSystem* SystemFactory::createWindowSystem() const
 {
+	if (factory_ != nullptr) return factory_->create_window_system();
     #ifdef __INCLUDE_SDL__
     return new SDLWindowSystem;
     #endif
@@ -53,6 +60,7 @@ iWindowSystem* SystemFactory::createWindowSystem() const
 
 iInputSystem* SystemFactory::createInputSystem() const
 {
+	if (factory_ != nullptr) return factory_->create_input_system();
     #ifdef __INCLUDE_SDL__
     return new SDLInputSystem;
     #endif

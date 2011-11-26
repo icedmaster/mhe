@@ -15,7 +15,7 @@ class MainMenuScene : public mhe::game::GameScene
 	bool need_check_playing;
 	boost::shared_ptr<MainMenuEventListener> quit_listener_;
 private:
-	bool init_impl(const std::string& arg)
+	bool init_impl(const std::string& arg, void*)
 	{
 		load_scene(arg);
 		setup_events();
@@ -29,9 +29,7 @@ private:
 
 	void load_scene(const std::string& arg)
 	{
-		mhe::mhe_loader loader(arg, &(get_engine()->getTextureManager()),
-							   &(get_engine()->getFontManager()),
-							   &(get_engine()->getSoundManager()));
+		mhe::game::mhe_loader loader(arg, get_engine());
 		loader.load_all_assets();
 		boost::shared_ptr<mhe::gui::GUIContainer> gui(loader.getGUI(L"main_menu"));
 		gui->setupEvents(get_engine()->getInputSystem());
@@ -41,11 +39,11 @@ private:
 		background->setPriority(1);
 		const mhe::WindowSystem& ws = get_engine()->getWindowSystem();
 		background->setSize(ws.width(), ws.height());
-		background->start(0);
+		//background->start();
 		//boost::shared_ptr<mhe::Sprite> animated(loader.getSprite(L"animated"));
 		get_scene()->add(background);
 
-		fps_font = get_engine()->getFontManager().get("145.fnt");
+		fps_font = get_engine()->getFontManager().get("145");
 		boost::shared_ptr<mhe::iNode> fps_node(
 			new mhe::utils::GraphicsFPSCounter(get_engine()->getInputSystem(),
 											   fps_font, mhe::v2d(20, 550)));
@@ -107,7 +105,7 @@ private:	// events
 	{
 		boost::shared_ptr<DemoGameScene> next(new DemoGameScene(get_engine()));
 		setNextScene(next);
-		get_engine()->set_next_scene("assets/game.mhe");
+		get_engine()->set_next_scene("assets/demo_scene.mhe");
 		return true;
 	}
 
@@ -142,7 +140,7 @@ public:
 	{}
 };
 
-int main(int argc, char** argv)
+int main(int /*argc*/, char** /*argv*/)
 {
 	mhe::utils::createStandartLog();
     mhe::utils::init_randomizer();

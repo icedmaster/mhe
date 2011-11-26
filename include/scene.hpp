@@ -33,6 +33,21 @@ namespace mhe
 				nodes_.insert(node);
 			}
 
+			void remove(boost::shared_ptr<iNode> node)
+			{
+				//nodes_.erase(node);
+				for (nodeset::iterator it = nodes_.begin(); it != nodes_.end(); ++it)
+				{
+					if (*it == node)
+					{
+						nodes_.erase(it);
+						return;
+					}
+				}
+			}
+
+			void remove(const std::string& name);
+
 			void addCamera(boost::shared_ptr<iCamera> camera)
 			{
 				cameras_[camera->get_id()] = camera;
@@ -63,6 +78,8 @@ namespace mhe
 			{
 				callback_ = callback;
 			}
+
+			boost::shared_ptr<iNode> get_node(const std::string& name) const;
 	};
 }
 

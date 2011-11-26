@@ -3,25 +3,24 @@
 
 #include "aspect.hpp"
 #include "inode.hpp"
+#include <boost/bind.hpp>
 
 namespace mhe {
 namespace game {
 
-struct GraphicsAspectParam : public AspectParam
-{
-	boost::shared_ptr<iDriver> driver;
-};
-
 class GraphicsAspect : public Aspect
 {
 public:
-	GraphicsAspect(boost::shared_ptr<iNode> node) :
+	GraphicsAspect(const std::string name, boost::shared_ptr<iNode> node) :
+		Aspect(name),
 		node_(node)
-	{}
+	{
+	}
 
-protected:
-	void update_impl(int aspect_event, cmn::uint tick, const AspectParam& prm);
+	virtual ~GraphicsAspect() {}
 private:
+	virtual void do_subscribe(Aspect* parent);
+	bool update_impl(int, const void*) {return true;}
 	boost::shared_ptr<iNode> node_;
 };
 

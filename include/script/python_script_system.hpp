@@ -1,8 +1,8 @@
 #ifndef __PYTHON_SCRIPT_SYSTEM_HPP__
 #define __PYTHON_SCRIPT_SYSTEM_HPP__
 
-#include <string>
 #include <boost/python.hpp>
+#include <string>
 
 namespace mhe {
 namespace script {

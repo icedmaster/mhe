@@ -68,6 +68,22 @@ namespace mhe
                 return in(v.x(), v.y());
             }
 
+			template <class Y>
+			bool in_without_border(Y x, Y y) const
+			{
+                if ( (x > p1.x()) && (x < p2.x()) &&
+                     (y > p1.y()) && (y < p2.y()) )
+                    return true;
+                return false;
+            }
+
+            template <class Y>
+            bool in_without_border(const vector2<Y>& v) const
+            {
+                return in_without_border(v.x(), v.y());
+            }
+
+
             rect& operator= (const rect& r)
             {
                 p1 = r.p1;

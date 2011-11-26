@@ -19,7 +19,7 @@ namespace mhe
 				
 			boost::shared_ptr<Scene> scene_;
 		private:
-			virtual bool init_impl(const std::string&) {return true;}
+			virtual bool init_impl(const std::string&, void*) {return true;}
 			virtual void deinit_impl() {}
 			virtual bool process_impl() {return true;}
 		protected:
@@ -42,9 +42,9 @@ namespace mhe
 
 			virtual ~GameScene() {}
 				
-			bool init(const std::string& arg)
+			bool init(const std::string& arg, void* add_arg = 0)
 			{
-				return init_impl(arg);
+				return init_impl(arg, add_arg);
 			}
 
 			void deinit();

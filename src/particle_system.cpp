@@ -17,7 +17,7 @@ namespace mhe
     {
         init_particles(num);
         // setup transformation
-        m.set_translate(pos);
+        Transform::translate(pos);
     }
 
     void ParticleSystem::init_particles(cmn::uint num)
@@ -82,7 +82,7 @@ namespace mhe
         float* tp = (texture_) ? &tbuf[0] : 0;
         if (texture_)
             texture_->prepare();
-        driver->draw(m, &vbuf[0], &nbuf[0], tp, &cbuf[0], &ibuf[0], ibuf.size());
+        driver->draw(Transform::get_transform(), &vbuf[0], &nbuf[0], tp, &cbuf[0], &ibuf[0], ibuf.size());
         if (texture_)
             texture_->clean();
         driver->disable_blending();
@@ -136,7 +136,7 @@ namespace mhe
         effect_->init(particles_);
     }
 
-    void ParticleSystem::start(cmn::uint tick)
+    void ParticleSystem::start_impl(cmn::uint tick)
     {
         //
         for (size_t i = 0; i < particles_.size(); ++i)

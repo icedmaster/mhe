@@ -36,7 +36,7 @@ Cursor::Cursor(boost::shared_ptr<iInputSystem> is) :
 			clicked_ = true;
 		int anum = (clicked_) ? clicked_animation_number : 
 								default_animation_number;
-		sprite_->start(anum);			
+		sprite_->execute(anum);			
 		return true;
 	}
 
@@ -47,8 +47,9 @@ Cursor::Cursor(boost::shared_ptr<iInputSystem> is) :
 
 	void Cursor::draw_impl(const boost::shared_ptr<iDriver>& driver)
 	{
-		sprite_->setPosition(v3d(pos_.x() - sprite_->width() / 2,
-								 pos_.y() - sprite_->height() / 2, 0));
+		sprite_->identity();
+		sprite_->translate(v3d(pos_.x() - sprite_->width() / 2,
+							   pos_.y() - sprite_->height() / 2, 0));
 		sprite_->draw(driver);
 	}
 

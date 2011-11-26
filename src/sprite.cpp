@@ -95,20 +95,10 @@ namespace mhe
     }
 
     //------------------ Sprite class -------------------------
-    Sprite::Sprite(const AnimationList& al, const v3d& position) :
-        is_alive_(true),
-		is_running_(false),
-        x_size_(0.0), y_size_(0.0),
-        reset_position_(false)
-    {
-        addAnimationList(al);
-        set_position(position);
-    }
-
     void Sprite::draw_impl(const boost::shared_ptr<iDriver>& driver)
     {
 		if (!is_running_)
-			start(0);
+			execute(0);
         if (!current_al_) return;
 
         Animation a;
@@ -164,20 +154,10 @@ namespace mhe
                 is_alive_ = false;
                 return;
             }
-            if ( (ct == AnimationList::FirstAnimation) && reset_position_ )
-                set_position(pos_);
             // new frame
             if (current_al_->get(cur_animation))
                 set_transform(cur_animation.get_transform() * get_transform());
         }
-    }
-
-    void Sprite::set_position(const v3d& pos)
-    {
-        matrixf tm;
-        tm.set_translate(pos);
-		set_transform(tm);
-        pos_ = pos;
     }
 
     void Sprite::addAnimationList(const AnimationList& al)
@@ -185,7 +165,7 @@ namespace mhe
         al_[al.getIndex()] = al;
     }
 
-    void Sprite::start(cmn::uint index, bool reset_position)
+    void Sprite::execute(cmn::uint index)
     {
         almap::iterator it = al_.find(index);
         if (it == al_.end())
@@ -193,8 +173,6 @@ namespace mhe
         current_al_ = &(it->second);
         current_al_->reset();
         current_al_->start(utils::get_current_tick());
-        if (reset_position)
-            set_position(pos_);
         // append first transformation
         if (current_al_->get(cur_animation))
             set_transform(cur_animation.get_transform() * get_transform());

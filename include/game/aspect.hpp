@@ -3,52 +3,54 @@
 
 #include <string>
 #include <vector>
+#include <map>
+#include <boost/shared_ptr.hpp>
+#include <boost/weak_ptr.hpp>
+#include "aspect_event_types.hpp"
 #include "types.hpp"
 
 namespace mhe {
 namespace game {
 
-struct AspectParam
-{
-	virtual ~AspectParam() {}
-};
+class Aspect;
+typedef boost::shared_ptr<Aspect> aspect_ptr;
 
 class Aspect
 {
 public:
-enum
-{
-	DrawEvent,
-	TickEvent
-};
+	static const int invalid_type = -1;
 public:
 	virtual ~Aspect() {}
 
-	const std::string& get_name() const
+	const std::string& name() const
 	{
 		return name_;
 	}
 
-	void add(Aspect* aspect);
+	void attach(aspect_ptr aspect);
+	void attach(aspect_ptr aspect, int type);
+	void attach(aspect_ptr aspect, const std::vector<int>& types);
+	void update(int type, const void* prm);
 
-	void update(int aspect_event, cmn::uint tick, const AspectParam& prm)
-	{
-		update_impl(aspect_event, tick, prm);
-	}
-
+	void subscribe(int type, Aspect* aspect);
 protected:
-	Aspect() {}
+	Aspect(const std::string& name) : name_(name) {}
 
 	void set_parent(Aspect* aspect)
 	{
 		parent_ = aspect;
 	}
 
-	virtual void update_impl(int aspect_event, cmn::uint tick, const AspectParam& prm);
+	virtual void do_subscribe(Aspect* aspect) = 0;
+	void update_childs(int type, const void* prm); 
+	virtual	bool update_impl(int type, const void* prm) = 0;
 private:
+	typedef boost::weak_ptr<Aspect> aspect_weak_ptr;
 	std::string name_;
 	Aspect* parent_;
-	std::vector<Aspect*> childs_;
+	std::vector<aspect_weak_ptr> childs_;
+	typedef std::map< int, std::vector<Aspect*> > subsmap;
+	subsmap subscribers_;
 };
 
 }}	// namespaces

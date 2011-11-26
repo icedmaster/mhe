@@ -1,4 +1,3 @@
-#include <python/Python.h>
 #include "script/python_script_system.hpp"
 
 namespace mhe {

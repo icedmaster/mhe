@@ -29,4 +29,33 @@ void Scene::update(cmn::uint tick)
 
 }
 
+boost::shared_ptr<iNode> Scene::get_node(const std::string& name) const
+{
+	if (name.empty()) return boost::shared_ptr<iNode>();
+	for (size_t i = 0; i < subscenes.size(); ++i)
+	{
+		boost::shared_ptr<iNode> n = subscenes[i]->get_node(name);
+		if (n != nullptr) return n;
+	}
+	for (nodeset::const_iterator it = nodes_.begin(); it != nodes_.end(); ++it)
+	{
+		if ( (*it)->name() == name ) return *it;
+	}
+	return boost::shared_ptr<iNode>();		
+}
+
+void Scene::remove(const std::string& name)
+{
+	for (size_t i = 0; i < subscenes.size(); ++i)
+		subscenes[i]->remove(name);
+	for (nodeset::const_iterator it = nodes_.begin(); it != nodes_.end(); ++it)
+	{
+		if ( (*it)->name() == name )
+		{
+			nodes_.erase(it);
+	        break;
+		}
+	}
+}
+
 }	// namespace mhe

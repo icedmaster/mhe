@@ -6,7 +6,7 @@
 #include "types.hpp"
 #include "mhe_math.hpp"
 //#include "geom.hpp"
-//#include "iTexture.hpp"
+//#include "itexture.hpp"
 #include "window_system.hpp"
 //#include "viewport.hpp"
 
@@ -20,6 +20,8 @@ enum BlendFunc
 enum DepthFunc
 {
 };
+
+class iTexture;
 
 class iDriver
 {
@@ -58,8 +60,12 @@ private:
 	virtual void restore_color() {}
 	virtual void begin_draw_impl(const float*, const float*, const float*, const float*,
 								 cmn::uint) = 0;
+	virtual void begin_draw_impl(boost::shared_ptr<iTexture>,
+								 const float*, const float*, const float*, const float*,
+								 cmn::uint) = 0;
 	virtual void draw_impl(const cmn::uint*, cmn::uint) = 0;
 	virtual void end_draw_impl() = 0;
+	virtual void end_draw_impl(boost::shared_ptr<iTexture> texture) = 0;
 
 	virtual void set_color_impl(const colorf&) {}
 
@@ -221,6 +227,18 @@ public:
 		begin_draw_impl(v, n, t, c, size);
 		draw_impl(i, size);
 		end_draw_impl();
+	}
+
+	void draw(const matrixf& m, boost::shared_ptr<iTexture> texture,
+			  const float* v, const float* n, const float* t, const float* c,
+			  const cmn::uint* i, cmn::uint size)
+	{
+		save_view_matrix();
+		setup_view_matrix(m);
+		begin_draw_impl(texture, v, n, t, c, size);
+		draw_impl(i, size);
+		end_draw_impl(texture);
+		restore_view_matrix();
 	}
 
 	// Save display data to vector. Can be used for screenshots,
