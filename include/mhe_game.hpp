@@ -6,6 +6,7 @@
 #include "game/highlited_widget.hpp"
 #include "game/fade_sprite.hpp"
 #include "game/graphics_aspect.hpp"
+#include "game/move_aspect.hpp"
 #include "game/gui_aspect.hpp"
 #include "game/mhe_loader.hpp"
 

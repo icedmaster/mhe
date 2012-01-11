@@ -14,12 +14,12 @@ void OpenGLExtensions::init_extensions()
 
 	get_str_extensions();
 
-	utils::global_log::instance().write("supported extensions");
+	INFO_LOG("supported extensions:");
 	for (std::map<std::string, bool>::iterator it = loaded_extensions_.begin();
 		 it != loaded_extensions_.end(); ++it)
 	{
 		if (it->second)
-			utils::global_log::instance().write(it->first);
+			INFO_LOG(it->first);
 	}
 }
 

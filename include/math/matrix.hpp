@@ -321,6 +321,11 @@ namespace mhe
 			{
 			    return matrix();
 			}
+
+			bool is_identity() const
+			{
+				return *this == identity();
+			}
 	};
 
 	// helper functions

@@ -62,7 +62,6 @@ bool wav_sound::load(std::istream& stream)
 		stream.read(reinterpret_cast<char*>(&data_[0]), sh.len);
 	else	// 8bit obly
 	{
-		std::cout << "8bit " << num_samples << std::endl;
 		std::vector<char> tmp(sh.len);
 		stream.read(&tmp[0], sh.len);
 		//data_.assign(tmp.begin(), tmp.end());

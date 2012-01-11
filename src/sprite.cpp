@@ -20,6 +20,9 @@ namespace mhe
     void AnimationList::add(const Animation& a)
     {
         animations_.push_back(a);
+		size_t sz = animations_.size();
+		if ( !a.texture() && (sz > 1) )
+			animations_[sz - 1].set_texture(animations_[sz - 2].texture());			
     }
 
     void AnimationList::remove(cmn::uint begin, cmn::uint number)
@@ -101,18 +104,11 @@ namespace mhe
 			execute(0);
         if (!current_al_) return;
 
-        Animation a;
-        if (!current_al_->get(a))
-        {
-            is_alive_ = false;
-            return;
-        }
-
 		float x_sz = x_size_, y_sz = y_size_;
 		if (!x_size_ || !y_size_)
 		{
-			x_sz = a.texture()->width();
-			y_sz = a.texture()->height();
+			x_sz = cur_animation.texture()->width();
+			y_sz = cur_animation.texture()->height();
 		}
 
         // prepare buffers for drawing
@@ -134,9 +130,9 @@ namespace mhe
         driver->mask_zbuffer();
         driver->enable_blending(ALPHA_ONE_MINUS_ALPHA);
 
-        a.texture()->prepare();
+        cur_animation.texture()->prepare();
         driver->draw(get_transform(), v, n, t, c, i, 6);
-        a.texture()->clean();
+        cur_animation.texture()->clean();
 
         driver->disable_blending();
         driver->unmask_zbuffer();
@@ -155,10 +151,9 @@ namespace mhe
                 return;
             }
             // new frame
-            if (current_al_->get(cur_animation))
-                set_transform(cur_animation.get_transform() * get_transform());
+            current_al_->get(cur_animation);            
         }
-    }
+	}
 
     void Sprite::addAnimationList(const AnimationList& al)
     {
@@ -174,8 +169,7 @@ namespace mhe
         current_al_->reset();
         current_al_->start(utils::get_current_tick());
         // append first transformation
-        if (current_al_->get(cur_animation))
-            set_transform(cur_animation.get_transform() * get_transform());
+        current_al_->get(cur_animation);
 		is_running_ = true;
     }
 

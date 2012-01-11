@@ -24,10 +24,10 @@ namespace mhe
 				
 		if (alGetError() != AL_NO_ERROR)
 		{
-			utils::global_log::instance().write("OpenAL initialization failed");
+			ERROR_LOG("OpenAL initialization failed");
 			return false;
 		}
-		utils::global_log::instance().write("OpenAL initialization successfull");
+		INFO_LOG("OpenAL initialization successfull");
 		return true;
 	}
 }

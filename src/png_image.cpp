@@ -1,4 +1,5 @@
 #include "png_image.hpp"
+#include "utils/logutils.hpp"
 #include <fstream>
 
 extern "C"
@@ -6,12 +7,6 @@ extern "C"
 	#include <png.h>
 	#include <zlib.h>
 };
-
-#define __debug__
-
-#ifdef __debug__
-	#include <iostream>
-#endif
 
 namespace
 {
@@ -72,9 +67,7 @@ namespace mhe
 			}
 			else
 			{
-				#ifdef __debug__
-				std::cout << "Invalid PNG signature\n";
-				#endif
+				WARN_LOG(fn << "Invalid PNG signature");
 				png_destroy_read_struct(&png, &info, &endinfo);
 				f.close();
 				return false;
@@ -90,10 +83,7 @@ namespace mhe
 			fi.width  = w;
 			fi.height = h;
 			fi.bpp    = bpp;
-			#ifdef __debug__
-			std::cout << fn << " w:" << fi.width << " h:" << fi.height << " b:" << fi.bpp << "\n";
-			std::cout << "color:" << color << "\n";
-			#endif
+			DEBUG_LOG(fn << " w:" << fi.width << " h:" << fi.height << " b:" << fi.bpp << " color: " << color);
 
 			if (color == 2)	// haven't alpha channel
 				fi.bpp = bpp * 3;
@@ -136,9 +126,7 @@ namespace mhe
 			}
 			catch (mhe::exception& e)
 			{
-				#ifdef __debug__
-				std::cout << "png_read_end() thrown: " << e.what() << "\n";
-				#endif
+				WARN_LOG("png_read_end() thrown: " << e.what());
 			}
 
 			png_destroy_read_struct(&png, &info, &endinfo);
@@ -147,9 +135,7 @@ namespace mhe
 		}
 		catch (mhe::exception& e)
 		{
-			#ifdef __debug__
-			std::cout << "load_image exception: " << e.what() << std::endl;
-			#endif
+			WARN_LOG("load_image exception: " << e.what());
 			f.close();
 			return false;
 		}

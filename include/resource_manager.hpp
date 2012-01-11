@@ -24,10 +24,10 @@ private:
 		res_type* res = Loader::load(name, helper_);
 		if (res == 0)
 		{
-			utils::global_log::instance().printf("Can't load: %s", name.c_str());
+			ERROR_LOG("Can't load: " << name.c_str());
 			return boost::shared_ptr<res_type>();
 		}
-		utils::global_log::instance().printf("Resource %s loaded", name.c_str());
+		INFO_LOG("Resource " << name << " loaded");
 		boost::shared_ptr<res_type> shared_res(res);
 		resources_[sname] = shared_res;
 		return shared_res;

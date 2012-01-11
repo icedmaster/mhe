@@ -15,6 +15,9 @@ void AspectManager::add(boost::shared_ptr<Aspect> aspect)
 
 void AspectManager::update(cmn::uint tick)
 {
+	// send tick_event to all aspects
+	for (size_t i = 0; i < aspects_.size(); ++i)
+		aspects_[i]->update(tick);
 }
 
 void AspectManager::remove(const std::string& name)
@@ -45,7 +48,7 @@ void AspectManager::remove(Aspect* aspect)
 	}
 }
 
-void AspectManager::remove(boost::shared_ptr<Aspect> aspect)
+void AspectManager::remove(boost::shared_ptr<Aspect> /*aspect*/)
 {
 	
 }

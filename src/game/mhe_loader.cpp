@@ -10,10 +10,10 @@ namespace game {
 		pugi::xml_parse_result res = doc.load_file(filename.c_str());
 		if (res.status != pugi::status_ok)
 		{
-			utils::global_log::instance().write("Can't parse mhe file " + filename);
+			ERROR_LOG("Can't parse mhe file " << filename);
 			return;
 		}
-		utils::global_log::instance().write("File " + filename + " loaded");
+		INFO_LOG("File " << filename << " loaded");
 		// test - is mhe document
 		root = doc.child(L"mhe");
 		if (root)

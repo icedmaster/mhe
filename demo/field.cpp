@@ -71,7 +71,8 @@ GameField::GameField(const mhe::game::mhe_loader& loader, const mhe::rect<int>& 
 			sp.sprite_name = get_sprite_name(stones[i][j]);
 			sp.pos = mhe::rect<int>(coord.ll().x() + j * size, coord.ll().y() + i * size, 
 									size, size);
-			boost::shared_ptr<mhe::game::Aspect> aspect = create_stone(loader, sp);
+			boost::shared_ptr<StoneSpriteAspect> aspect = create_stone(loader, sp);
+			context->stone_aspects[stone_index(j, i)] = aspect;
 		}
 	}	
 }

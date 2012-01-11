@@ -36,6 +36,7 @@ namespace mhe
 				}
 
 				void default_setup();
+				void update();
 			public:
 				Engine();
 			

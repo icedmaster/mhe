@@ -21,6 +21,10 @@ namespace mhe
             {
             }
 
+			Animation(cmn::uint animation_time) :
+				atime(animation_time)
+			{}
+
             Animation(cmn::uint animation_time,
                       const boost::shared_ptr<iTexture>& animation_texture) :
                 atime(animation_time),
@@ -37,6 +41,11 @@ namespace mhe
             {
                 return atexture;
             }
+
+			void set_texture(boost::shared_ptr<iTexture> t)
+			{
+				atexture = t;
+			}
     };
 
     class AnimationList
@@ -104,7 +113,7 @@ namespace mhe
             v3d pos_;   // need while we use reset position
             AnimationList* current_al_;
 			Animation cur_animation;
-        private:
+		private:
             // implementations
             void draw_impl(const boost::shared_ptr<iDriver>& driver);
             void update_impl(cmn::uint tick);
@@ -125,6 +134,12 @@ namespace mhe
             }
 
             void addAnimationList(const AnimationList& al);
+
+			const AnimationList* get_current_animation_list() const
+			{
+				return current_al_;
+			}
+
 			void setSize(float size)
 			{
 				x_size_ = y_size_ = size;

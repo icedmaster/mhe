@@ -12,6 +12,11 @@ private:
 	std::string get_sprite_name(int value) const;
 };
 
+inline int stone_index(int x, int y)
+{
+	return (x << 8) | y;
+}
+
 struct GameContext
 {	
 	mhe::rect<int> geom;
@@ -21,7 +26,7 @@ struct GameContext
 	mhe::vector2<int> selected;
 	mhe::vector2<int> clicked;
 	mhe::vector2<int> previous_clicked;
-	std::map< int, boost::weak_ptr<mhe::game::Aspect> > stone_aspects;
+	std::map< int, boost::weak_ptr<StoneSpriteAspect> > stone_aspects;
 	const void* magic;
 };
 

@@ -4,30 +4,17 @@
 #ifndef _LOGUTILS_HPP_
 #define _LOGUTILS_HPP_
 
-#include "netlog.hpp"
+#include "global_log.hpp"
 
-namespace mhe
+namespace mhe {
+namespace utils {
+
+inline void create_standart_log()
 {
-	namespace utils
-	{
-		// Create std|file|net log
-		bool createStandartLog();
+	GlobalLog::instance().add(new StdLog);
+	GlobalLog::instance().add(new FileLog("log.txt"));
+}
 
-		// Singleton class for easy logging in project
-		class global_log : public mixlog
-		{
-			private:
-				global_log() {}
-				~global_log() {}
-			public:
-				static global_log& instance()
-				{
-					static global_log log;
-					return log;
-				}
-		};
-
-	}
-};
+}}
 
 #endif

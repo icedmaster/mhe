@@ -10,7 +10,32 @@ struct StoneParameters
 	mhe::rect<int> pos;
 };
 
-mhe::game::aspect_ptr create_stone(const mhe::game::mhe_loader& loader, const StoneParameters& sp);
+class StoneSpriteAspect : public mhe::game::Aspect
+{
+public:
+	StoneSpriteAspect(const std::string& name) :
+		mhe::game::Aspect(name),
+		speed_(10.0)
+	{}
+
+	void set_speed(float speed)
+	{
+		speed_ = speed;
+	}	
+
+	void move(const mhe::v3d& direction);
+private:
+	void do_subscribe(mhe::game::Aspect*)
+	{}
+
+	bool update_impl(int, const void*)
+	{
+		return true;
+	}
+	float speed_;
+};
+
+boost::shared_ptr<StoneSpriteAspect> create_stone(const mhe::game::mhe_loader& loader, const StoneParameters& sp);
 
 class StoneAffectorAspect : public mhe::game::Aspect
 {
@@ -41,7 +66,7 @@ private:
 
 	virtual void process_on_event(int /*type*/, const void* arg)
 	{
-		std::cout << name() << " on\n";
+		DEBUG_LOG("Effect: " << name() << " on");
 		const mhe::v3d* pos = static_cast<const mhe::v3d*>(arg);
 		node_->identity();
 		node_->translate(*pos + pos_correction_);
@@ -51,7 +76,7 @@ private:
 
 	virtual void process_off_event(int /*type*/, const void* /*arg*/)
 	{
-		std::cout << name() << " off\n";
+		DEBUG_LOG("Effect: " << name() << " off");
 		scene_->remove(node_);
 	}
 

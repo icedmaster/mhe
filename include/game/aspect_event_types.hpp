@@ -14,7 +14,12 @@ enum
 	mouse_release_event, // 5
 	mouse_move_int_event,
 	enable_event,
-	disable_event
+	disable_event,
+	transform_event,
+	start_animation_event,
+	stop_animation_event,
+	begin_event,
+	end_event
 	
 	// user aspect types began from 1000
 };

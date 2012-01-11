@@ -10,13 +10,21 @@
 
 namespace mhe
 {
+	class iNode;
+
+	class NodeCallback
+	{
+	public:
+		virtual void process(int state, iNode* node) = 0;
+	};
+
     // Base renderable class
     class iNode : public Transform
     {
         private:
 			int priority_;						
 			std::string name_;
-			std::vector< boost::shared_ptr<iNode> > childs_;
+			std::vector< boost::shared_ptr<iNode> > childs_;			
 
             virtual void draw_impl(const boost::shared_ptr<iDriver>&/*,
                                    const boost::shared_ptr<iCamera>&*/) = 0;

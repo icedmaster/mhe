@@ -23,7 +23,7 @@ private:
 		theme_sound = get_engine()->getSoundManager().get("theme");
 		theme_sound->play();
 		need_check_playing = true;
-		mhe::utils::global_log::instance().write("MainMenu initialized");
+		INFO_LOG("MainMenu initialized");
 		return true;
 	}
 
@@ -142,16 +142,16 @@ public:
 
 int main(int /*argc*/, char** /*argv*/)
 {
-	mhe::utils::createStandartLog();
+	mhe::utils::create_standart_log();
     mhe::utils::init_randomizer();
 
 	mhe::game::Engine engine;
 	if (!engine.init(800, 600, 32))
 	{
-		mhe::utils::global_log::instance().write("engine init failed");
+		ERROR_LOG("engine init failed");
 		return 1;
 	}
-	mhe::utils::global_log::instance().write("Engine successfully initialized");
+	INFO_LOG("Engine successfully initialized");
 
 	// setup ortho projection by default
 	mhe::matrixf proj;
@@ -161,7 +161,7 @@ int main(int /*argc*/, char** /*argv*/)
 	boost::shared_ptr<MainMenuScene> scene(new MainMenuScene(&engine));
 	if (!scene->init("assets/main_menu.mhe"))
 	{
-		mhe::utils::global_log::instance().write("Scene init failed");
+		ERROR_LOG("Scene init failed");
 		return 1;
 	}
 
@@ -170,6 +170,6 @@ int main(int /*argc*/, char** /*argv*/)
 	scene.reset();
 
 	engine.run();
-	mhe::utils::global_log::instance().write("Engine stopped");
+	INFO_LOG("Engine stopped");
 	return 0;
 }

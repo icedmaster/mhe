@@ -1,7 +1,6 @@
 #include "utils/file_utils.hpp"
 #include <algorithm>
 #include <cctype>
-#include <iostream>
 
 namespace mhe
 {
@@ -33,7 +32,6 @@ std::string get_file_name(const std::string& filepath)
 	std::string fn = fne;
 	if (point_pos != std::string::npos)
 		fn.erase(point_pos, fn.length() - point_pos);
-	std::cout << fne << " " << fn << std::endl;
 	return fn;
 }
 };

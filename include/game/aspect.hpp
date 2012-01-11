@@ -31,6 +31,10 @@ public:
 	void attach(aspect_ptr aspect, int type);
 	void attach(aspect_ptr aspect, const std::vector<int>& types);
 	void update(int type, const void* prm);
+	void update(cmn::uint tick)
+	{
+		update_impl(tick);
+	}
 
 	void subscribe(int type, Aspect* aspect);
 protected:
@@ -43,6 +47,7 @@ protected:
 
 	virtual void do_subscribe(Aspect* aspect) = 0;
 	void update_childs(int type, const void* prm); 
+	virtual void update_impl(cmn::uint) {}
 	virtual	bool update_impl(int type, const void* prm) = 0;
 private:
 	typedef boost::weak_ptr<Aspect> aspect_weak_ptr;

@@ -95,6 +95,12 @@ namespace mhe
                 return *this;
             }
 
+			vector3 operator/ (const T n) const
+			{
+				vector3 vv = *this;
+				return vv /= n;
+			}
+
             vector3& operator*= (const T n)
             {
                 v_[0] *= n;

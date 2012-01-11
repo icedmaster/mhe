@@ -1,23 +1,59 @@
-#ifndef _GLOBAL_LOG_HPP_
-#define _GLOBAL_LOG_HPP_
+#ifndef __GLOBAL_LOG_HPP__
+#define __GLOBAL_LOG_HPP__
 
 #include "log.hpp"
 
-namespace mhe
+namespace mhe {
+namespace utils {
+
+class GlobalLog : public MixLog
 {
-	class global_log : public mixlog
+public:
+	static GlobalLog& instance()
 	{
-		private:
-			global_log() {}
-			~global_log() {}			
-		public:
-			const global_log& instance() const
-			{
-				static global_log log;
-				return log;
-			}					
-	};
-	
+		static GlobalLog log;
+		return log;
+	}
+private:
+	GlobalLog() {}
+	~GlobalLog() {}
 };
 
-#endif
+}}
+
+#define GLOBAL_LOG(level, arg)										\
+{																	\
+	std::stringstream ss;											\
+	ss << arg;														\
+	mhe::utils::GlobalLog::instance().write(level, ss);				\
+}
+
+#define DEBUG_LOG(arg)														\
+{																			\
+	std::stringstream ss;													\
+	ss << arg;																\
+	mhe::utils::GlobalLog::instance().write(mhe::utils::Log::debug, ss);	\
+}
+
+#define INFO_LOG(arg)														\
+{																			\
+	std::stringstream ss;													\
+	ss << arg;																\
+	mhe::utils::GlobalLog::instance().write(mhe::utils::Log::info, ss);		\
+}
+
+#define WARN_LOG(arg)														\
+{																			\
+	std::stringstream ss;													\
+	ss << arg;																\
+	mhe::utils::GlobalLog::instance().write(mhe::utils::Log::warning, ss);	\
+}
+
+#define ERROR_LOG(arg)														\
+{																			\
+	std::stringstream ss;													\
+	ss << arg;																\
+	mhe::utils::GlobalLog::instance().write(mhe::utils::Log::error, ss);	\
+}
+
+#endif	// __GLOBAL_LOG_HPP__
