@@ -27,6 +27,16 @@ public:
 		return name_;
 	}
 
+	const std::string& add_name() const
+	{
+		return add_name_;
+	}
+
+	std::string full_name() const
+	{
+		return name_ + "." + add_name_;
+	}
+
 	void attach(aspect_ptr aspect);
 	void attach(aspect_ptr aspect, int type);
 	void attach(aspect_ptr aspect, const std::vector<int>& types);
@@ -38,7 +48,15 @@ public:
 
 	void subscribe(int type, Aspect* aspect);
 protected:
-	Aspect(const std::string& name) : name_(name) {}
+	Aspect(const std::string& fullname) :
+		parent_(nullptr)
+	{
+		divide_full_name(fullname);
+	}
+
+	Aspect(const std::string& name, const std::string& add_name) :
+		name_(name), add_name_(add_name), parent_(nullptr)
+	{}
 
 	void set_parent(Aspect* aspect)
 	{
@@ -50,8 +68,21 @@ protected:
 	virtual void update_impl(cmn::uint) {}
 	virtual	bool update_impl(int type, const void* prm) = 0;
 private:
+	void divide_full_name(const std::string& fullname)
+	{
+		size_t point_pos = fullname.find(".");
+		if ( (point_pos != std::string::npos) && 
+			 (point_pos < (fullname.length() - 1)) )
+		{
+			name_ = fullname.substr(0, point_pos);
+			add_name_ = fullname.substr(point_pos + 1, fullname.length() - point_pos);
+		}
+		else name_ = fullname;
+	}
+
 	typedef boost::weak_ptr<Aspect> aspect_weak_ptr;
 	std::string name_;
+	std::string add_name_;
 	Aspect* parent_;
 	std::vector<aspect_weak_ptr> childs_;
 	typedef std::map< int, std::vector<Aspect*> > subsmap;
