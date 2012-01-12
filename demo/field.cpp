@@ -3,7 +3,10 @@
 
 void GameField::init_field(mhe::game::mhe_loader& loader)
 {
+	// first, init game context
 	context_.stone_size = 50;
+	context_.selected.set(-1, -1);
+	context_.prev_selected.set(-1, -1);
 	int stone_size = context_.stone_size;
 	for (size_t i = 0; i < stones_.size(); ++i)
 	{
@@ -33,6 +36,8 @@ bool GameField::on_mouse_move(const mhe::Event& e)
 {
 	const mhe::MouseEvent& me = dynamic_cast<const mhe::MouseEvent&>(e);
 	if (!mouse_on_field(me)) return true;
+	const mhe::vector2<int>& pos = get_stone_by_mouse_position(me);
+	handle_move(pos);
 	return true;
 }
 
@@ -55,5 +60,29 @@ mhe::vector2<int> GameField::get_stone_by_mouse_position(const mhe::MouseEvent& 
 	int x = (me.x() - coord_.ll().x()) / context_.stone_size;
 	int y = (me.y() - coord_.ll().y()) / context_.stone_size;
 	return mhe::vector2<int>(x, y);
+}
+
+void GameField::handle_move(const mhe::vector2<int>& pos)
+{
+	if (context_.prev_selected.x() < 0)
+	{
+		translate_move_effect(pos);
+		engine_->get_game_scene()->getScene()->add(move_effect_);
+		move_effect_->start();
+		context_.prev_selected = pos;
+	}
+}
+
+void GameField::translate_move_effect(const mhe::vector2<int>& pos)
+{
+	move_effect_->identity();
+	move_effect_->translate(get_global_pos(pos));
+}
+
+mhe::v3d GameField::get_global_pos(const mhe::vector2<int>& pos) const
+{
+	return mhe::v3d(pos.x() * context_.stone_size + coord_.ll().x(),
+					pos.y() * context_.stone_size + coord_.ll().y(), 
+					0);
 }
 

@@ -5,6 +5,39 @@
 #include "game_stone.hpp"
 #include "field.hpp"
 
+class DemoStoneEffectFactory : public StoneEffectFactory
+{
+public:
+	DemoStoneEffectFactory(mhe::game::mhe_loader& loader)
+	{
+		init_move_effect(loader);
+		//init_select_effect(loader);
+	}
+
+	boost::shared_ptr<mhe::iNode> create_move_stone_effect() const
+	{
+		return move_effect_;
+	}
+
+	boost::shared_ptr<mhe::iNode> create_select_stone_effect() const
+	{
+		return boost::shared_ptr<mhe::iNode>();
+	}
+
+	boost::shared_ptr<mhe::iNode> create_remove_stone_effect() const
+	{
+		return boost::shared_ptr<mhe::iNode>();
+	}
+private:
+	void init_move_effect(mhe::game::mhe_loader& loader)
+	{
+		move_effect_.reset(new mhe::Sprite(loader.getSprite(L"stone_highlight")));
+		move_effect_->setPriority(4);
+	}
+
+	boost::shared_ptr<mhe::iNode> move_effect_;
+};
+
 class DemoGameScene : public mhe::game::GameScene
 {
 public:
@@ -38,7 +71,8 @@ private:
 		stones.push_back(row);
 		row[0] = 1; row[1] = 0; row[2] = 1;
 		stones.push_back(row);
-		game_field.reset(new GameField(loader, mhe::rect<int>(200, 200, 150, 100), stones, nullptr));
+		game_field.reset(new GameField(loader, mhe::rect<int>(200, 200, 150, 100), stones, 
+									   new DemoStoneEffectFactory(loader)));
 	}
 private:
 	boost::shared_ptr<mhe::gui::iFont> fps_font;	

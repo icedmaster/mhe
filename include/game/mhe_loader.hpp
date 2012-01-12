@@ -16,55 +16,60 @@ namespace mhe {
 namespace game {
 	class mhe_loader
 	{
-		private:
-            pugi::xml_document doc;
-			pugi::xml_node root;
-			bool is_open_;
-			bool parsed_;
+	private:
+		pugi::xml_document doc;
+		pugi::xml_node root;
+		bool is_open_;
+		bool parsed_;
 
-			Engine* engine_;
+		Engine* engine_;
 
-			bool find_node(pugi::xml_node& node,
-                           const std::wstring& type, const std::wstring& name) const;
-            bool find_asset(pugi::xml_node& node,
-                            const std::wstring& type, const std::wstring& name) const;
+		bool find_node(pugi::xml_node& node,
+					   const std::wstring& type, const std::wstring& name) const;
+		bool find_asset(pugi::xml_node& node,
+						const std::wstring& type, const std::wstring& name) const;
 
-            boost::shared_ptr<iTexture> get_texture(const std::wstring& name) const;
-            boost::shared_ptr<iTexture> load_texture(const pugi::xml_node& node) const;
+		boost::shared_ptr<iTexture> get_texture(const std::wstring& name) const;
+		boost::shared_ptr<iTexture> load_texture(const pugi::xml_node& node) const;
 
-			boost::shared_ptr<gui::iFont> get_font(const std::wstring& name) const;
-			boost::shared_ptr<gui::iFont> load_font(const pugi::xml_node& node) const;
+		boost::shared_ptr<gui::iFont> get_font(const std::wstring& name) const;
+		boost::shared_ptr<gui::iFont> load_font(const pugi::xml_node& node) const;
 
-			boost::shared_ptr<iSound> get_sound(const std::wstring& name) const;
-			boost::shared_ptr<iSound> load_sound(const pugi::xml_node& node) const;
+		boost::shared_ptr<iSound> get_sound(const std::wstring& name) const;
+		boost::shared_ptr<iSound> load_sound(const pugi::xml_node& node) const;
 
-			void load_asset_by_type(const pugi::xml_node& node,
-									const std::wstring& type);
+		void load_asset_by_type(const pugi::xml_node& node,
+								const std::wstring& type);
 
-			Sprite* load_sprite(const pugi::xml_node& node) const;
-			gui::GUIContainer* load_gui(const pugi::xml_node& node) const;
+		Sprite* load_sprite(const pugi::xml_node& node) const;
+		gui::GUIContainer* load_gui(const pugi::xml_node& node) const;
 
-			AnimationList read_animationList(const pugi::xml_node& node) const;
-			Animation read_animation(const pugi::xml_node& node) const;
+		AnimationList read_animationList(const pugi::xml_node& node) const;
+		Animation read_animation(const pugi::xml_node& node) const;
 
-			boost::shared_ptr<gui::Widget> read_widget(const pugi::xml_node& node) const;
-			boost::shared_ptr<gui::Label> load_label_widget(const pugi::xml_node& node) const;
-			boost::shared_ptr<gui::Button> load_button_widget(const pugi::xml_node& node) const;
-			void load_widget(const pugi::xml_node& node,
-                             gui::Widget* widget) const;
-		public:
-			mhe_loader(const std::string& filename, Engine* engine);
-			~mhe_loader();
+		boost::shared_ptr<gui::Widget> read_widget(const pugi::xml_node& node) const;
+		boost::shared_ptr<gui::Label> load_label_widget(const pugi::xml_node& node) const;
+		boost::shared_ptr<gui::Button> load_button_widget(const pugi::xml_node& node) const;
+		void load_widget(const pugi::xml_node& node,
+						 gui::Widget* widget) const;
+	public:
+		mhe_loader(const std::string& filename, Engine* engine);
+		~mhe_loader();
 
-			Sprite* getSprite(const std::wstring& name) const;
-			gui::GUIContainer* getGUI(const std::wstring& name) const;
+		Sprite* getSprite(const std::wstring& name) const;
+		gui::GUIContainer* getGUI(const std::wstring& name) const;
 
-			void load_all_assets();
+		void load_all_assets();
 
-			const Engine* get_engine() const
-			{
-				return engine_;
-			}
+		const Engine* get_engine() const
+		{
+			return engine_;
+		}
+
+		Engine* get_engine()
+		{
+			return engine_;
+		}
 	};
 
 	// helper functions
