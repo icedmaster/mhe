@@ -3,15 +3,6 @@
 
 #include "game_stone.hpp"
 
-class GameField
-{
-public:
-	GameField(const mhe::game::mhe_loader& loader, const mhe::rect<int>& coord, 
-			  const std::vector< std::vector<int> >& stones);
-private:
-	std::string get_sprite_name(int value) const;
-};
-
 inline int stone_index(int x, int y)
 {
 	return (x << 8) | y;
@@ -19,126 +10,54 @@ inline int stone_index(int x, int y)
 
 struct GameContext
 {	
-	mhe::rect<int> geom;
 	int stone_size;
-	std::vector< std::vector<int> > stones;
-	mhe::vector2<int> previous_selected;
-	mhe::vector2<int> selected;
-	mhe::vector2<int> clicked;
-	mhe::vector2<int> previous_clicked;
-	std::map< int, boost::weak_ptr<StoneSpriteAspect> > stone_aspects;
-	const void* magic;
+	std::map< int, boost::weak_ptr<mhe::game::Aspect> > stone_aspects;
 };
 
-class FieldGUIAspect : public mhe::game::Aspect
+class StoneEffectFactory
 {
 public:
-	FieldGUIAspect(const std::string& name,
-				   boost::shared_ptr<GameContext> context) :
-		mhe::game::Aspect(name),
-		context_(context)
-	{
-		context_->selected.set(-1, -1);
-		context_->previous_selected.set(-1, -1);
-		context_->clicked.set(-1, -1);
-		context_->previous_clicked.set(-1, -1);
-	}
-private:
-	void do_subscribe(Aspect* parent)
-	{
-		parent->subscribe(mhe::game::mouse_on_event, this);
-		parent->subscribe(mhe::game::mouse_move_int_event, this);
-		parent->subscribe(mhe::game::mouse_left_event, this);
-		parent->subscribe(mhe::game::mouse_click_event, this);
-	}
+	virtual mhe::iNode* create_move_stone_effect() = 0;
+	virtual mhe::iNode* create_select_stone_effect() = 0;
+	virtual mhe::iNode* create_remove_stone_effect() = 0;
+}; 
 
-	bool update_impl(int type, const void* arg)	
-	{		
-		const mhe::MouseEvent* me = static_cast<const mhe::MouseEvent*>(arg);
-		if ( (type == mhe::game::mouse_on_event) || (type == mhe::game::mouse_move_int_event) )
-			process_mouse_on_event(me);
-		else if (type == mhe::game::mouse_left_event)
-			process_mouse_left_event(me);
-		else if (type == mhe::game::mouse_click_event)
-			process_mouse_click_event(me);
-		return true;
-	}
-
-	void process_mouse_on_event(const mhe::MouseEvent* me)
-	{		
-		const mhe::rect<int>& coord = context_->geom;
-		mhe::vector2<int> pos((me->x() - coord.ll().x()) / context_->stone_size,
-							  (me->y() - coord.ll().y()) / context_->stone_size);	
-		if (context_->selected != pos)
-		{
-			if (context_->selected.x() < 0)
-			{
-				// first time
-				context_->selected = pos;
-				update_childs(mhe::game::mouse_on_event, me);
-			}
-			else
-			{
-				context_->previous_selected = context_->selected;
-				context_->selected = pos;
-				update_childs(mhe::game::mouse_left_event, me);				
-				update_childs(mhe::game::mouse_on_event, me);
-			}
-		}	
-	}
-
-	void process_mouse_click_event(const mhe::MouseEvent* me)
-	{
-		const mhe::rect<int>& coord = context_->geom;
-		mhe::vector2<int> pos((me->x() - coord.ll().x()) / context_->stone_size,
-							  (me->y() - coord.ll().y()) / context_->stone_size);
-		if (context_->clicked != pos)
-		{
-			context_->previous_clicked = context_->clicked;
-			context_->clicked = pos;
-			update_childs(mhe::game::mouse_click_event, me);
-		}
-	}
-
-	void process_mouse_left_event(const mhe::MouseEvent* me)
-	{
-		if (context_->selected.x() >= 0)
-		{
-			context_->previous_selected = context_->selected;
-			update_childs(mhe::game::mouse_left_event, me);
-			context_->previous_selected.set(-1, -1);
-			context_->selected.set(-1, -1);
-		}
-	}
-
-	boost::shared_ptr<GameContext> context_;
-};
-
-class FieldMouseMoveAspect : public mhe::game::Aspect
+class GameField
 {
-public:
-	FieldMouseMoveAspect(const std::string& name, boost::shared_ptr<GameContext> context) :
-		mhe::game::Aspect(name), context_(context)
-	{}
 private:
-	void do_subscribe(Aspect* parent)
+	// helper class for handling events
+	typedef mhe::PrivateEventListener<GameField> GameFieldEventListener;
+	friend class mhe::PrivateEventListener<GameField>;
+public:
+	GameField(mhe::game::mhe_loader& loader,
+			  const mhe::rect<int>& coord,
+			  const std::vector< std::vector<int> >& stones,
+			  StoneEffectFactory* effect_factory) :
+		coord_(coord), stones_(stones), effect_factory_(effect_factory),
+		move_listener_(new GameFieldEventListener(mhe::MouseEventType, mhe::MOUSE_MOVE, 0, this, &GameField::on_mouse_move)),
+		click_listener_(new GameFieldEventListener(mhe::MouseEventType, mhe::MOUSE_BUTTON_PRESSED, 0, this, &GameField::on_mouse_click))
 	{
-		parent->subscribe(mhe::game::mouse_on_event, this);
-		parent->subscribe(mhe::game::mouse_left_event, this);
+		loader.get_engine()->getInputSystem()->addListener(move_listener_);
+		loader.get_engine()->getInputSystem()->addListener(click_listener_);
+		init_field(loader);
 	}
+private:
+	void init_field(mhe::game::mhe_loader& loader);
+	std::string get_sprite_name(int value) const;
+	bool on_mouse_move(const mhe::Event& e);
+	bool on_mouse_click(const mhe::Event& e);
+	bool mouse_on_field(const mhe::MouseEvent& me) const;
+	mhe::vector2<int> get_stone_by_mouse_position(const mhe::MouseEvent& me) const;
 
-	bool update_impl(int type, const void* arg)
-	{		
-		mhe::v3d pos(context_->geom.ll().x() + context_->selected.x() * context_->stone_size,
-					 context_->geom.ll().y() + context_->selected.y() * context_->stone_size, 0);
-		if (type == mhe::game::mouse_left_event)
-			update_childs(mhe::game::mouse_left_event, arg);
-		else
-			update_childs(type, &pos);		
-		return true;
-	}
+	typedef std::vector< std::vector<int> > field_type;
+	mhe::rect<int> coord_;
+	field_type stones_;
+	boost::shared_ptr<StoneEffectFactory> effect_factory_;
+	GameContext context_;
 
-	boost::shared_ptr<GameContext> context_; 
+	// events
+	boost::shared_ptr<GameFieldEventListener> move_listener_;
+	boost::shared_ptr<GameFieldEventListener> click_listener_;
 };
 
 #endif

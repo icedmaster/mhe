@@ -30,7 +30,7 @@ private:
 		get_engine()->getInputSystem()->enable_input();
 	}
 
-	void create_field(const mhe::game::mhe_loader& loader, const std::string& arg)
+	void create_field(mhe::game::mhe_loader& loader, const std::string& arg)
 	{
 		std::vector<int> row(3);
 		std::vector< std::vector<int> > stones;
@@ -38,10 +38,11 @@ private:
 		stones.push_back(row);
 		row[0] = 1; row[1] = 0; row[2] = 1;
 		stones.push_back(row);
-		GameField game_field(loader, mhe::rect<int>(200, 200, 150, 100), stones);
+		game_field.reset(new GameField(loader, mhe::rect<int>(200, 200, 150, 100), stones, nullptr));
 	}
 private:
 	boost::shared_ptr<mhe::gui::iFont> fps_font;	
+	boost::shared_ptr<GameField> game_field;
 };
 
 #endif

@@ -3,6 +3,8 @@
 
 #include "field.hpp"
 
+#if 0
+
 namespace
 {
 
@@ -127,5 +129,7 @@ private:
 
 	boost::shared_ptr<GameContext> context_;
 };
+
+#endif
 
 #endif

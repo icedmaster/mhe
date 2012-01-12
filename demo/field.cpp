@@ -1,80 +1,22 @@
 #include "field.hpp"
 #include "field_logic.hpp"
-#include "circle_particle_effect.hpp"
-#include "test_particle_effect.hpp"
 
-GameField::GameField(const mhe::game::mhe_loader& loader, const mhe::rect<int>& coord, 
-					 const std::vector< std::vector<int> >& stones)
+void GameField::init_field(mhe::game::mhe_loader& loader)
 {
-	const int size = 50;	
-	boost::shared_ptr<mhe::CircleParticleEffect> peffect(new mhe::CircleParticleEffect(mhe::cfYellow, 25));
-	boost::shared_ptr<mhe::ParticleSystem> ps(new mhe::ParticleSystem(20, mhe::v3d(), true));
-	ps->addEffect(peffect);
-	ps->setSize(5);
-	ps->setPriority(4);
-	// click
-	boost::shared_ptr<mhe::Sprite> hl_sprite(loader.getSprite(L"stone_highlight"));
-	hl_sprite->setSize(size);	
-	hl_sprite->setPriority(4);
-
-	mhe::game::Engine* engine = const_cast<mhe::game::Engine*>(loader.get_engine());
-
-	boost::shared_ptr<GameContext> context(new GameContext);
-	context->stone_size = size;
-	context->stones = stones;	
-	mhe::rect<int> input_coord(coord.ll().x() + 1, coord.ll().y() + 1, 
-							   coord.width() - 1, coord.height() - 1);
-	context->geom = input_coord;
-	boost::shared_ptr<mhe::game::MouseInputAspect> mouse_aspect(
-		new mhe::game::MouseInputAspect("field", engine->getInputSystem(), input_coord));
-	boost::shared_ptr<FieldGUIAspect> gui_aspect(
-		new FieldGUIAspect("field.gui", context));
-	mouse_aspect->attach(gui_aspect);
-	boost::shared_ptr<FieldMouseMoveAspect> move_aspect(
-		new FieldMouseMoveAspect("field.move", context));
-	gui_aspect->attach(move_aspect);
-
-	engine->get_aspect_manager().add(mouse_aspect);
-	engine->get_aspect_manager().add(gui_aspect);	
-	engine->get_aspect_manager().add(move_aspect);
-
-	boost::shared_ptr<StoneAffectorAspect> effect(new StoneAffectorAspect("effect",
-																	  	  ps,
-																	  	  engine->get_game_scene()->getScene(),
-																	  	  mhe::game::enable_event,
-																	  	  mhe::game::disable_event,
-																		  mhe::v3d(25, 25, 0)));	
-	boost::shared_ptr<StoneAffectorAspect> effect1(new StoneAffectorAspect("effect1",
-																		   hl_sprite,	
-																	   	   engine->get_game_scene()->getScene(),
-																	   	   mhe::game::mouse_on_event,
-																	   	   mhe::game::mouse_left_event
-																		   ));
-
-	engine->get_aspect_manager().add(effect);
-	engine->get_aspect_manager().add(effect1);
-
-	boost::shared_ptr<FieldLogicAspect> field_logic_aspect(
-		new FieldLogicAspect("field.logic", context));
-	engine->get_aspect_manager().add(field_logic_aspect);
-	field_logic_aspect->attach(effect);
-	gui_aspect->attach(field_logic_aspect);
-
-	move_aspect->attach(effect1);
-
-	for (size_t i = 0; i < stones.size(); ++i)
+	context_.stone_size = 50;
+	int stone_size = context_.stone_size;
+	for (size_t i = 0; i < stones_.size(); ++i)
 	{
-		for (size_t j = 0; j < stones[i].size(); ++j)
+		for (size_t j = 0; j < stones_[i].size(); ++j)
 		{
 			StoneParameters sp;
-			sp.name = "stone" + mhe::utils::to_string(i + j);
-			sp.sprite_name = get_sprite_name(stones[i][j]);
-			sp.pos = mhe::rect<int>(coord.ll().x() + j * size, coord.ll().y() + i * size, 
-									size, size);
-			boost::shared_ptr<StoneSpriteAspect> aspect = create_stone(loader, sp);
-			context->stone_aspects[stone_index(j, i)] = aspect;
+			sp.name = "sprite" + mhe::utils::to_string(i) + mhe::utils::to_string(j);
+			sp.sprite_name = get_sprite_name(stones_[i][j]);
+			sp.pos = mhe::rect<int>(coord_.ll().x() + j * stone_size, coord_.ll().y() + i * stone_size,
+									stone_size, stone_size);
+			context_.stone_aspects[stone_index(j, i)] = create_stone(loader, sp);
 		}
-	}	
+	}
 }
 
 std::string GameField::get_sprite_name(int value) const
@@ -85,5 +27,33 @@ std::string GameField::get_sprite_name(int value) const
 	case 1: return "test_stone2";
 	default: return "";
 	}
+}
+
+bool GameField::on_mouse_move(const mhe::Event& e)
+{
+	const mhe::MouseEvent& me = dynamic_cast<const mhe::MouseEvent&>(e);
+	if (!mouse_on_field(me)) return true;
+	return true;
+}
+
+bool GameField::on_mouse_click(const mhe::Event& e)
+{
+	const mhe::MouseEvent& me = dynamic_cast<const mhe::MouseEvent&>(e);
+	if (!mouse_on_field(me)) return true;
+	const mhe::vector2<int>& pos = get_stone_by_mouse_position(me);
+	DEBUG_LOG("Mouse click: " << pos.x() << " " << pos.y());
+	return true;
+}
+
+bool GameField::mouse_on_field(const mhe::MouseEvent& me) const
+{
+	return coord_.in(me.x(), me.y());
+}
+
+mhe::vector2<int> GameField::get_stone_by_mouse_position(const mhe::MouseEvent& me) const
+{
+	int x = (me.x() - coord_.ll().x()) / context_.stone_size;
+	int y = (me.y() - coord_.ll().y()) / context_.stone_size;
+	return mhe::vector2<int>(x, y);
 }
 
