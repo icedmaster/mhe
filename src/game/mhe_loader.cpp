@@ -138,6 +138,8 @@ namespace game {
 
 		sprite->translate(pos);
 		sprite->setSize(size.x(), size.y());
+		sprite->set_name(utils::from_wstr(node.child_value(L"name")));
+		DEBUG_LOG("Load sprite: name=" + sprite->name() + " size_x: " << size.x() << " size_y: " << size.y());
 		return sprite;
 	}
 

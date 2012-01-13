@@ -35,7 +35,11 @@ namespace mhe
 			virtual void set_priority(int pri) {priority_ = pri;}
 			virtual int get_priority() const   {return priority_;}	// normal priority	
 
-			virtual void start_impl(cmn::uint) {}					
+			virtual void start_impl(cmn::uint) {}	
+		virtual iNode* clone_impl() const
+		{
+			return nullptr;
+		}				
         public:
 			iNode() : priority_(2) {}
             virtual ~iNode() {}
@@ -87,6 +91,11 @@ namespace mhe
 			{
 				start_impl(utils::get_current_tick());
 			}	
+
+			virtual iNode* clone() const
+			{
+				return clone_impl();
+			}
     };
 	
 	// helper classes

@@ -1,5 +1,6 @@
 #include "sprite.hpp"
 #include "utils/sysutils.hpp"
+#include "utils/logutils.hpp"
 
 namespace mhe
 {
@@ -155,6 +156,15 @@ namespace mhe
         }
 	}
 
+iNode* Sprite::clone_impl() const
+{
+	Sprite* cloned = new Sprite(this);
+	cloned->is_alive_ = true;
+	cloned->is_running_ = false;
+	cloned->current_al_ = nullptr;
+	return cloned;
+}
+
     void Sprite::addAnimationList(const AnimationList& al)
     {
         al_[al.getIndex()] = al;
@@ -162,6 +172,7 @@ namespace mhe
 
     void Sprite::execute(cmn::uint index)
     {
+		DEBUG_LOG("Sprite::execute() name=" << name() << " index=" << index);
         almap::iterator it = al_.find(index);
         if (it == al_.end())
             return;

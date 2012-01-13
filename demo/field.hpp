@@ -2,6 +2,7 @@
 #define __FIELD_HPP__
 
 #include "game_stone.hpp"
+#include "utils/logutils.hpp"
 
 inline int stone_index(int x, int y)
 {
@@ -13,16 +14,43 @@ struct GameContext
 	int stone_size;
 	mhe::vector2<int> selected;
 	mhe::vector2<int> prev_selected;
+	mhe::vector2<int> clicked;
+	mhe::vector2<int> prev_clicked;
 	std::map< int, boost::weak_ptr<mhe::game::Aspect> > stone_aspects;
 };
 
 class StoneEffectFactory
 {
 public:
+	virtual ~StoneEffectFactory() {}
 	virtual boost::shared_ptr<mhe::iNode> create_move_stone_effect() const = 0;
 	virtual boost::shared_ptr<mhe::iNode> create_select_stone_effect() const = 0;
 	virtual boost::shared_ptr<mhe::iNode> create_remove_stone_effect() const = 0;
 }; 
+
+class StoneRemoveAspect : public mhe::game::Aspect
+{
+public:
+	StoneRemoveAspect(const std::string& name, const std::string& add_name,
+					  GameContext* game_context, const std::pair< mhe::vector2<int>, mhe::vector2<int> >& row) :
+		mhe::game::Aspect(name, add_name),
+		context_(game_context),
+		remove_row_(row)
+	{}
+private:
+	void do_subscribe(mhe::game::Aspect* parent)
+	{
+		parent->subscribe(mhe::game::end_event, this);
+	}
+
+	bool update_impl(int type, const void* arg)
+	{
+		return true;
+	}
+
+	GameContext* context_; 
+	std::pair< mhe::vector2<int>, mhe::vector2<int> > remove_row_;
+};
 
 class GameField
 {
@@ -44,6 +72,7 @@ public:
 		{
 			move_effect_ = effect_factory_->create_move_stone_effect();
 			select_effect_ = effect_factory_->create_select_stone_effect();
+			remove_effect_ = effect_factory_->create_remove_stone_effect();
 		}
 		loader.get_engine()->getInputSystem()->addListener(move_listener_);
 		loader.get_engine()->getInputSystem()->addListener(click_listener_);
@@ -57,8 +86,11 @@ private:
 	bool mouse_on_field(const mhe::MouseEvent& me) const;
 	mhe::vector2<int> get_stone_by_mouse_position(const mhe::MouseEvent& me) const;
 	void handle_move(const mhe::vector2<int>& pos);
-	void translate_move_effect(const mhe::vector2<int>& pos);
+	void handle_click(const mhe::vector2<int>& pos);
+	void translate_effect(boost::shared_ptr<mhe::iNode> effect, const mhe::vector2<int>& pos,
+						  const mhe::v3d& correction = mhe::v3d());
 	mhe::v3d get_global_pos(const mhe::vector2<int>& pos) const;
+	void do_logic(const mhe::vector2<int>& pos);
 
 	typedef std::vector< std::vector<int> > field_type;
 	mhe::rect<int> coord_;
@@ -67,6 +99,7 @@ private:
 	GameContext context_;
 	boost::shared_ptr<mhe::iNode> move_effect_;
 	boost::shared_ptr<mhe::iNode> select_effect_;
+	boost::shared_ptr<mhe::iNode> remove_effect_;
 
 	// events
 	boost::shared_ptr<GameFieldEventListener> move_listener_;

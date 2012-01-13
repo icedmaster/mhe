@@ -103,70 +103,72 @@ namespace mhe
 
     class Sprite : public iNode
     {
-        private:
-            typedef std::map <cmn::uint, AnimationList> almap;
-            almap al_;
-            bool is_alive_;
-			bool is_running_;
-            float x_size_, y_size_;
-            bool reset_position_;
-            v3d pos_;   // need while we use reset position
-            AnimationList* current_al_;
-			Animation cur_animation;
-		private:
-            // implementations
-            void draw_impl(const boost::shared_ptr<iDriver>& driver);
-            void update_impl(cmn::uint tick);
-            void set_position(const v3d& pos);
-            matrixf get_matrix() const;
-			void start_impl(cmn::uint)
-			{
-				execute(0);
-			}
-        public:
+	private:
+		typedef std::map <cmn::uint, AnimationList> almap;
+		almap al_;
+		bool is_alive_;
+		bool is_running_;
+		float x_size_, y_size_;
+		bool reset_position_;
+		v3d pos_;   // need while we use reset position
+		AnimationList* current_al_;
+		Animation cur_animation;
+	private:
+		// implementations
+		void draw_impl(const boost::shared_ptr<iDriver>& driver);
+		void update_impl(cmn::uint tick);
+		void set_position(const v3d& pos);
+		matrixf get_matrix() const;
+		void start_impl(cmn::uint)
+		{
+			execute(0);
+		}
+
+		iNode* clone_impl() const;
+	public:
 		Sprite() : is_alive_(true), is_running_(false), x_size_(0.0), y_size_(0.0),
-				current_al_(0)
-			{}
-			Sprite(const AnimationList& al) : is_alive_(true), is_running_(false), x_size_(0.0), y_size_(0.0),
-                current_al_(0)
-            {
-                al_[al.getIndex()] = al;
-            }
+				   current_al_(0)
+		{}
+		Sprite(const AnimationList& al) : is_alive_(true), is_running_(false), x_size_(0.0), y_size_(0.0),
+										  current_al_(0)
+		{
+			al_[al.getIndex()] = al;
+		}
 
-            void addAnimationList(const AnimationList& al);
+		void addAnimationList(const AnimationList& al);
 
-			const AnimationList* get_current_animation_list() const
-			{
-				return current_al_;
-			}
+		const AnimationList* get_current_animation_list() const
+		{
+			return current_al_;
+		}
 
-			void setSize(float size)
-			{
-				x_size_ = y_size_ = size;
-			}
+		void setSize(float size)
+		{
+			x_size_ = y_size_ = size;
+		}
 
-			void setSize(float xsize, float ysize)
-			{
-				x_size_ = xsize;
-				y_size_ = ysize;
-			}
+		void setSize(float xsize, float ysize)
+		{
+			x_size_ = xsize;
+			y_size_ = ysize;
+		}
 
-			float width() const;
-			float height() const;
+		float width() const;
+		float height() const;
 
-			size_t get_frames_number() const
-			{
-				if (current_al_) return current_al_->get_frames_number();
-				return 0;
-			}	
+		size_t get_frames_number() const
+		{
+			if (current_al_) return current_al_->get_frames_number();
+			return 0;
+		}	
 
-			size_t get_animations_number() const
-			{
-				return al_.size();
-			}				
+		size_t get_animations_number() const
+		{
+			return al_.size();
+		}				
 
-            // execute animation from list with index <index>
-            void execute(cmn::uint index);
+		// execute animation from list with index <index>
+		void execute(cmn::uint index);
     };
 }
 

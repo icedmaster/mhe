@@ -11,27 +11,27 @@ struct MoveParams
 {
 	matrixf m;
 	cmn::uint upd_time;
-	cmn::uint move_time;
+	cmn::uint move_count;
 };
 
 class NodeAspect : public Aspect
 {
 public:
 	NodeAspect(const std::string& name, boost::shared_ptr<iNode> node) :
-		Aspect(name), node_(node), move_end_time_(0)
+		Aspect(name), node_(node), moved_count_(0), last_time_(0)
 	{}
 
 	NodeAspect(const std::string& name, const std::string& add_name,
 			   boost::shared_ptr<iNode> node) :
-		Aspect(name, add_name), node_(node), move_end_time_(0)
+		Aspect(name, add_name), node_(node), moved_count_(0), last_time_(0)
 	{}
 
 	void set(const MoveParams& mp)
 	{
 		move_params_ = mp;
 		cmn::uint now = utils::get_current_tick();
-		move_end_time_ = now + mp.move_time + mp.upd_time;
 		last_time_ = now;
+		moved_count_ = 0;
 	}
 private:
 	void do_subscribe(Aspect* parent)
@@ -53,12 +53,12 @@ private:
 
 	bool update_node(cmn::uint tick)
 	{
-		if (!move_end_time_) return false;
+		if (!last_time_) return false;
 		if ((tick - last_time_) < move_params_.upd_time) return false;
-		if (tick > move_end_time_)
+		if (++moved_count_ > move_params_.move_count)
 		{
 			update_childs(end_event, this);
-			move_end_time_ = 0;
+			last_time_ = 0;
 			return false;
 		}
 		last_time_ = tick;
@@ -67,7 +67,7 @@ private:
 	}
 
 	boost::shared_ptr<iNode> node_;
-	cmn::uint move_end_time_;
+	cmn::uint moved_count_;
 	cmn::uint last_time_;
 	MoveParams move_params_;
 };
