@@ -32,10 +32,12 @@ class StoneRemoveAspect : public mhe::game::Aspect
 {
 public:
 	StoneRemoveAspect(const std::string& name, const std::string& add_name,
-					  GameContext* game_context, const std::pair< mhe::vector2<int>, mhe::vector2<int> >& row) :
+					  GameContext* game_context, const std::pair< mhe::v3d, mhe::v3d >& row,
+					  boost::shared_ptr<StoneEffectFactory> effect_factory,
+					  boost::shared_ptr<mhe::Scene> scene) :
 		mhe::game::Aspect(name, add_name),
 		context_(game_context),
-		remove_row_(row)
+		remove_row_(row), effect_factory_(effect_factory), scene_(scene)
 	{}
 private:
 	void do_subscribe(mhe::game::Aspect* parent)
@@ -43,13 +45,28 @@ private:
 		parent->subscribe(mhe::game::end_event, this);
 	}
 
-	bool update_impl(int type, const void* arg)
-	{
+	bool update_impl(int /*type*/, const void* /*arg*/)
+	{		
+		// create effects for each stone that will be removed
+		if (remove_row_.first.y() == remove_row_.second.y())	// hor
+		{
+			float max_x = remove_row_.second.x() + context_->stone_size;
+			DEBUG_LOG("StoneRemoveAspect update_impl():" << remove_row_.first.x() << " " << max_x);
+			for (float x = remove_row_.first.x(); x < max_x; x += context_->stone_size)
+			{
+				boost::shared_ptr<mhe::iNode> effect = effect_factory_->create_remove_stone_effect();
+				effect->translate(mhe::v3d(x, remove_row_.first.y(), 0));
+				scene_->add(effect);
+				effect->start();
+			}
+		}
 		return true;
 	}
 
 	GameContext* context_; 
-	std::pair< mhe::vector2<int>, mhe::vector2<int> > remove_row_;
+	std::pair< mhe::v3d, mhe::v3d > remove_row_;
+	boost::shared_ptr<StoneEffectFactory> effect_factory_;
+	boost::shared_ptr<mhe::Scene> scene_; 
 };
 
 class GameField

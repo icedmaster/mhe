@@ -28,7 +28,12 @@ public:
 
 	boost::shared_ptr<mhe::iNode> create_remove_stone_effect() const
 	{
-		return remove_effect_;
+		boost::shared_ptr<mhe::CircleParticleEffect> peffect(new mhe::CircleParticleEffect(mhe::cfGreen, 25));
+		boost::shared_ptr<mhe::ParticleSystem> ps(new mhe::ParticleSystem(20, mhe::v3d(), true));
+		ps->addEffect(peffect);
+		ps->setSize(5);
+		ps->setPriority(4);
+		return ps;
 	}
 private:
 	void init_move_effect(mhe::game::mhe_loader& loader)
@@ -49,17 +54,10 @@ private:
 
 	void init_remove_effect(mhe::game::mhe_loader& /*loader*/)
 	{
-		boost::shared_ptr<mhe::CircleParticleEffect> peffect(new mhe::CircleParticleEffect(mhe::cfWhite, 25));
-		boost::shared_ptr<mhe::ParticleSystem> ps(new mhe::ParticleSystem(20, mhe::v3d(), true));
-		ps->addEffect(peffect);
-		ps->setSize(5);
-		ps->setPriority(4);
-		remove_effect_ = ps;
 	}
 
 	boost::shared_ptr<mhe::iNode> move_effect_;
 	boost::shared_ptr<mhe::iNode> select_effect_;
-	boost::shared_ptr<mhe::iNode> remove_effect_;
 };
 
 class DemoGameScene : public mhe::game::GameScene

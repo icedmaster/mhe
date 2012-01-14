@@ -1,15 +1,18 @@
 #include "game/aspect_manager.hpp"
+#include "utils/logutils.hpp"
 
 namespace mhe {
 namespace game {
 
 void AspectManager::add(Aspect* aspect)
 {
+	DEBUG_LOG("AspectManager: add aspect: " << aspect->full_name());
 	aspects_[aspect->full_name()] = aspect_ptr(aspect);
 }
 
 void AspectManager::add(boost::shared_ptr<Aspect> aspect)
 {
+	DEBUG_LOG("AspectManager: add aspect: " << aspect->full_name());
 	aspects_[aspect->full_name()] = aspect;
 }
 
@@ -22,6 +25,7 @@ void AspectManager::update(cmn::uint tick)
 
 void AspectManager::remove(const std::string& fullname)
 {
+	DEBUG_LOG("AspectManager: remove aspect: " << fullname);
 	aspects_.erase(fullname);
 }
 

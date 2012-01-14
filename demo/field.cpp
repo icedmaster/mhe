@@ -143,8 +143,18 @@ void GameField::do_logic(const mhe::vector2<int>& pos)
 		m.load_identity();
 		m.set_translate(-v);
 		mp.m = m;
-		context_.stone_aspects[stone_index(context_.prev_clicked.x(), context_.prev_clicked.y())].
-			lock()->update(mhe::game::transform_event, &mp);
+		// attach new aspect before moving
+		boost::shared_ptr<mhe::game::Aspect> aspect =
+			context_.stone_aspects[stone_index(context_.prev_clicked.x(), context_.prev_clicked.y())].lock();
+		const mhe::v3d correction(context_.stone_size / 2, context_.stone_size / 2, 0);
+		boost::shared_ptr<StoneRemoveAspect> remove_aspect(
+			new StoneRemoveAspect(aspect->name(), "remove", &context_,
+								  std::make_pair(mhe::v3d(get_global_pos(del.first) + correction),
+												 mhe::v3d(get_global_pos(del.second) + correction)),
+								  effect_factory_, engine_->get_game_scene()->getScene()));
+		engine_->get_aspect_manager().add(remove_aspect);
+		aspect->attach(remove_aspect);
+		aspect->update(mhe::game::transform_event, &mp);
 		engine_->get_game_scene()->getScene()->remove(select_effect_);
 	}
 	else

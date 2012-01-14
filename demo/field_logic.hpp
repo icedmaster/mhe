@@ -36,8 +36,8 @@ inline bool check_match_horizontal(const std::vector< std::vector<int> >& stones
 			}
 			if (test_result && (matched >= match_need))
 			{
-				del.first = mhe::vector2<int>(i, j + 1 - matched);
-				del.second = mhe::vector2<int>(i, j);
+				del.first = mhe::vector2<int>(j + 1 - matched, i);
+				del.second = mhe::vector2<int>(j, i);
 				return true;
 			}
 			matched = 1;					

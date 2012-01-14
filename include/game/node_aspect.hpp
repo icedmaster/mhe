@@ -17,14 +17,24 @@ struct MoveParams
 class NodeAspect : public Aspect
 {
 public:
-	NodeAspect(const std::string& name, boost::shared_ptr<iNode> node) :
-		Aspect(name), node_(node), moved_count_(0), last_time_(0)
-	{}
+	NodeAspect(const std::string& name, boost::shared_ptr<iNode> node,
+			   boost::shared_ptr<Scene> scene) :
+		Aspect(name), node_(node), scene_(scene), moved_count_(0), last_time_(0)
+	{
+		init();
+	}
 
 	NodeAspect(const std::string& name, const std::string& add_name,
-			   boost::shared_ptr<iNode> node) :
-		Aspect(name, add_name), node_(node), moved_count_(0), last_time_(0)
-	{}
+			   boost::shared_ptr<iNode> node, boost::shared_ptr<Scene> scene) :
+		Aspect(name, add_name), node_(node), scene_(scene), moved_count_(0), last_time_(0)
+	{
+		init();
+	}
+
+	~NodeAspect()
+	{
+		scene_->remove(node_);
+	}
 
 	void set(const MoveParams& mp)
 	{
@@ -66,7 +76,14 @@ private:
 		return true;
 	}
 
+	void init()
+	{
+		scene_->add(node_);
+		node_->start();
+	}
+
 	boost::shared_ptr<iNode> node_;
+	boost::shared_ptr<Scene> scene_;
 	cmn::uint moved_count_;
 	cmn::uint last_time_;
 	MoveParams move_params_;
