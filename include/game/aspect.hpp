@@ -19,6 +19,7 @@ class Aspect
 {
 public:
 	static const int invalid_type = -1;
+	static const cmn::uint lifetime_infinite = 0;
 public:
 	virtual ~Aspect() {}
 
@@ -43,19 +44,43 @@ public:
 	void update(int type, const void* prm);
 	void update(cmn::uint tick)
 	{
+		if (!start_time_) start_time_ = tick;
 		update_impl(tick);
 	}
 
 	void subscribe(int type, Aspect* aspect);
+
+	void set_lifetime(cmn::uint lifetime)
+	{
+		lifetime_ = lifetime;
+	}
+
+	cmn::uint lifetime() const
+	{
+		return lifetime_;
+	}
+
+	cmn::uint start_time() const
+	{
+		return start_time_;
+	}
+
+	const std::vector< boost::weak_ptr<Aspect> >& childs() const
+	{
+		return childs_;
+	}
 protected:
 	Aspect(const std::string& fullname) :
-		parent_(nullptr)
+		parent_(nullptr),
+		lifetime_(lifetime_infinite),
+		start_time_(0)
 	{
 		divide_full_name(fullname);
 	}
 
 	Aspect(const std::string& name, const std::string& add_name) :
-		name_(name), add_name_(add_name), parent_(nullptr)
+		name_(name), add_name_(add_name), parent_(nullptr),
+		lifetime_(lifetime_infinite), start_time_(0)
 	{}
 
 	void set_parent(Aspect* aspect)
@@ -65,8 +90,9 @@ protected:
 
 	virtual void do_subscribe(Aspect* aspect) = 0;
 	void update_childs(int type, const void* prm); 
-	virtual void update_impl(cmn::uint) {}
+	virtual void update_impl(cmn::uint)	{}
 	virtual	bool update_impl(int type, const void* prm) = 0;
+	virtual void destroy_impl() {}
 private:
 	void divide_full_name(const std::string& fullname)
 	{
@@ -87,6 +113,8 @@ private:
 	std::vector<aspect_weak_ptr> childs_;
 	typedef std::map< int, std::vector<Aspect*> > subsmap;
 	subsmap subscribers_;
+	cmn::uint lifetime_;
+	cmn::uint start_time_;
 };
 
 }}	// namespaces

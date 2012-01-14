@@ -25,6 +25,8 @@ public:
 						   std::vector< boost::weak_ptr<Aspect> >& aspects) const;
 	bool get_by_fullname(const std::string& fullname, boost::weak_ptr<Aspect>& aspect) const;
 private:
+	bool check_aspect_lifetime(cmn::uint tick, boost::shared_ptr<Aspect> aspect) const;
+	void destroy_aspect(Aspect* aspect);
 	typedef boost::shared_ptr<Aspect> aspect_ptr;
 	typedef std::map<std::string, aspect_ptr> aspects_map;
 	aspects_map aspects_;

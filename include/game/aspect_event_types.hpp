@@ -19,7 +19,9 @@ enum
 	start_animation_event,
 	stop_animation_event,
 	begin_event,
-	end_event
+	end_event,
+	create_event,
+	destroy_event
 	
 	// user aspect types began from 1000
 };

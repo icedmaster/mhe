@@ -27,7 +27,12 @@ void Aspect::attach(aspect_ptr aspect, int type)
 
 void Aspect::update(int type, const void* prm)
 {
-	if (update_impl(type, prm))
+	if (type == destroy_event)
+	{
+		destroy_impl();
+		update_childs(destroy_event, nullptr);
+	}
+	else if (update_impl(type, prm))
 		update_childs(type, prm);
 }
 

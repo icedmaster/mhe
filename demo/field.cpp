@@ -9,6 +9,7 @@ void GameField::init_field(mhe::game::mhe_loader& loader)
 	context_.prev_selected.set(-1, -1);
 	context_.clicked.set(-1, -1);
 	context_.prev_clicked.set(-1, -1);
+	context_.aspect_manager = &(engine_->get_aspect_manager());
 	int stone_size = context_.stone_size;
 	for (size_t i = 0; i < stones_.size(); ++i)
 	{
@@ -120,15 +121,15 @@ mhe::v3d GameField::get_global_pos(const mhe::vector2<int>& pos) const
 void GameField::do_logic(const mhe::vector2<int>& pos)
 {
 	if (!is_neighbor(context_.prev_clicked, pos)) return;
-	std::pair< mhe::vector2<int>, mhe::vector2<int> > del;	
+	std::vector< mhe::vector2<int> > del;	
 	// before check
 	int saved_stone = stones_[pos.y()][pos.x()];
 	stones_[pos.y()][pos.x()] = stones_[context_.prev_clicked.y()][context_.prev_clicked.x()];
 	stones_[context_.prev_clicked.y()][context_.prev_clicked.x()] = saved_stone;
 	if (check_match(stones_, del))
 	{
-		DEBUG_LOG("Delete row: " << del.first.x() << " " << del.first.y() << " " <<
-				  del.second.x() << " " << del.second.y());
+		DEBUG_LOG("Delete row: " << del.front().x() << " " << del.front().y() << " " <<
+				  del.back().x() << " " << del.back().y());
 		// move 2 aspects
 		mhe::vector2<int> move_dir = context_.prev_clicked - pos;
 		mhe::v3d v(move_dir.x() * context_.stone_size / 5,
@@ -146,11 +147,24 @@ void GameField::do_logic(const mhe::vector2<int>& pos)
 		// attach new aspect before moving
 		boost::shared_ptr<mhe::game::Aspect> aspect =
 			context_.stone_aspects[stone_index(context_.prev_clicked.x(), context_.prev_clicked.y())].lock();
+		std::vector< mhe::vector2<int> > indexes(del);
+		for (size_t i = 0; i < indexes.size(); ++i)
+		{
+			if (indexes[i] == pos)
+			{
+				indexes[i] = context_.prev_clicked;
+				context_.prev_clicked.set(-1, -1);
+				break;
+			}
+		}
 		const mhe::v3d correction(context_.stone_size / 2, context_.stone_size / 2, 0);
+		std::vector<mhe::v3d> row(del.size());
+		for (size_t i = 0; i < del.size(); ++i)
+			row[i] = mhe::v3d(get_global_pos(del[i]) + correction);
 		boost::shared_ptr<StoneRemoveAspect> remove_aspect(
 			new StoneRemoveAspect(aspect->name(), "remove", &context_,
-								  std::make_pair(mhe::v3d(get_global_pos(del.first) + correction),
-												 mhe::v3d(get_global_pos(del.second) + correction)),
+								  indexes,
+								  row,
 								  effect_factory_, engine_->get_game_scene()->getScene()));
 		engine_->get_aspect_manager().add(remove_aspect);
 		aspect->attach(remove_aspect);

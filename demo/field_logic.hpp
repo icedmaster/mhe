@@ -13,7 +13,7 @@ inline bool is_neighbor(const mhe::vector2<int>& pos1, const mhe::vector2<int>& 
 }
 
 inline bool check_match_horizontal(const std::vector< std::vector<int> >& stones,
-								   std::pair< mhe::vector2<int>, mhe::vector2<int> >& del)
+								   std::vector< mhe::vector2<int> >& del)
 {
 	const int match_need = 3;
 	for (size_t i = 0; i < stones.size(); ++i)
@@ -36,8 +36,8 @@ inline bool check_match_horizontal(const std::vector< std::vector<int> >& stones
 			}
 			if (test_result && (matched >= match_need))
 			{
-				del.first = mhe::vector2<int>(j + 1 - matched, i);
-				del.second = mhe::vector2<int>(j, i);
+				for (size_t index = j + 1 - matched; index <= j; ++index)
+					del.push_back(mhe::vector2<int>(index, i));
 				return true;
 			}
 			matched = 1;					
@@ -47,14 +47,14 @@ inline bool check_match_horizontal(const std::vector< std::vector<int> >& stones
 }
 
 inline bool check_match_vertical(const std::vector< std::vector<int> >& /*stones*/, 
-								 std::pair< mhe::vector2<int>, mhe::vector2<int> >& /*del*/)	
+								 std::vector< mhe::vector2<int> >& /*del*/)	
 {
 	return false;
 }
 
 
 inline bool check_match(const std::vector< std::vector<int> >& stones, 
-						std::pair< mhe::vector2<int>, mhe::vector2<int> >& del)	
+						std::vector< mhe::vector2<int> >& del)	
 {
 	if (check_match_horizontal(stones, del)) return true;
 	if (check_match_vertical(stones, del)) return true;

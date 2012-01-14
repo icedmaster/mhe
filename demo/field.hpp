@@ -17,6 +17,7 @@ struct GameContext
 	mhe::vector2<int> clicked;
 	mhe::vector2<int> prev_clicked;
 	std::map< int, boost::weak_ptr<mhe::game::Aspect> > stone_aspects;
+	mhe::game::AspectManager* aspect_manager;
 };
 
 class StoneEffectFactory
@@ -32,12 +33,15 @@ class StoneRemoveAspect : public mhe::game::Aspect
 {
 public:
 	StoneRemoveAspect(const std::string& name, const std::string& add_name,
-					  GameContext* game_context, const std::pair< mhe::v3d, mhe::v3d >& row,
+					  GameContext* game_context,
+					  const std::vector< mhe::vector2<int> >& index_row,
+					  const std::vector<mhe::v3d>& row,
 					  boost::shared_ptr<StoneEffectFactory> effect_factory,
 					  boost::shared_ptr<mhe::Scene> scene) :
 		mhe::game::Aspect(name, add_name),
 		context_(game_context),
-		remove_row_(row), effect_factory_(effect_factory), scene_(scene)
+		index_row_(index_row), remove_row_(row),
+		effect_factory_(effect_factory), scene_(scene)
 	{}
 private:
 	void do_subscribe(mhe::game::Aspect* parent)
@@ -48,23 +52,25 @@ private:
 	bool update_impl(int /*type*/, const void* /*arg*/)
 	{		
 		// create effects for each stone that will be removed
-		if (remove_row_.first.y() == remove_row_.second.y())	// hor
+		for (size_t i = 0; i < index_row_.size(); ++i)	
 		{
-			float max_x = remove_row_.second.x() + context_->stone_size;
-			DEBUG_LOG("StoneRemoveAspect update_impl():" << remove_row_.first.x() << " " << max_x);
-			for (float x = remove_row_.first.x(); x < max_x; x += context_->stone_size)
-			{
-				boost::shared_ptr<mhe::iNode> effect = effect_factory_->create_remove_stone_effect();
-				effect->translate(mhe::v3d(x, remove_row_.first.y(), 0));
-				scene_->add(effect);
-				effect->start();
-			}
+			boost::shared_ptr<mhe::iNode> effect = effect_factory_->create_remove_stone_effect();
+			effect->translate(mhe::v3d(remove_row_[i].x(), remove_row_[i].y(), 0));
+			// get aspect
+			boost::shared_ptr<mhe::game::Aspect> aspect =
+				context_->stone_aspects[stone_index(index_row_[i].x(), index_row_[i].y())].lock();
+			boost::shared_ptr<mhe::game::NodeAspect> effect_aspect(
+				new mhe::game::NodeAspect(aspect->name(), "remove_effect", effect, scene_));
+			context_->aspect_manager->add(effect_aspect);
+			aspect->attach(effect_aspect);
+			aspect->set_lifetime(5000);
 		}
 		return true;
 	}
 
 	GameContext* context_; 
-	std::pair< mhe::v3d, mhe::v3d > remove_row_;
+	std::vector< mhe::vector2<int> > index_row_;
+	std::vector<mhe::v3d> remove_row_;
 	boost::shared_ptr<StoneEffectFactory> effect_factory_;
 	boost::shared_ptr<mhe::Scene> scene_; 
 };
