@@ -14,6 +14,15 @@ struct MoveParams
 	cmn::uint move_count;
 };
 
+inline MoveParams make_move_params(const mhe::matrixf& m, cmn::uint upd_time, cmn::uint move_count)
+{
+	MoveParams mp;
+	mp.m = m;
+	mp.upd_time = upd_time;
+	mp.move_count = move_count;
+	return mp;
+}
+
 class NodeAspect : public Aspect
 {
 public:

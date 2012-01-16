@@ -1,5 +1,4 @@
 #include "field.hpp"
-#include "field_logic.hpp"
 
 void GameField::init_field(mhe::game::mhe_loader& loader)
 {
@@ -10,15 +9,17 @@ void GameField::init_field(mhe::game::mhe_loader& loader)
 	context_.clicked.set(-1, -1);
 	context_.prev_clicked.set(-1, -1);
 	context_.aspect_manager = &(engine_->get_aspect_manager());
+	context_.upd_time = 20;
+	context_.stone_moves = 5;
 	int stone_size = context_.stone_size;
-	for (size_t i = 0; i < stones_.size(); ++i)
+	for (size_t i = 0; i < context_.stones.size(); ++i)
 	{
-		for (size_t j = 0; j < stones_[i].size(); ++j)
+		for (size_t j = 0; j < context_.stones[i].size(); ++j)
 		{
 			StoneParameters sp;
 			sp.name = "sprite" + mhe::utils::to_string(i) + mhe::utils::to_string(j);
-			sp.sprite_name = get_sprite_name(stones_[i][j]);
-			sp.pos = mhe::rect<int>(coord_.ll().x() + j * stone_size, coord_.ll().y() + i * stone_size,
+			sp.sprite_name = get_sprite_name(context_.stones[i][j]);
+			sp.pos = mhe::rect<int>(context_.coord.ll().x() + j * stone_size, context_.coord.ll().y() + i * stone_size,
 									stone_size, stone_size);
 			context_.stone_aspects[stone_index(j, i)] = create_stone(loader, sp);
 		}
@@ -63,16 +64,14 @@ bool GameField::on_mouse_click(const mhe::Event& e)
 
 bool GameField::mouse_on_field(const mhe::MouseEvent& me) const
 {
-	return mhe::rect<int>(coord_.ll().x() + 1, coord_.ll().y() + 1,
-						  coord_.width() - 1, coord_.height() - 1).
+	return mhe::rect<int>(context_.coord.ll().x() + 1, context_.coord.ll().y() + 1,
+						  context_.coord.width() - 1, context_.coord.height() - 1).
 						 in(me.x(), me.y());
 }
 
 mhe::vector2<int> GameField::get_stone_by_mouse_position(const mhe::MouseEvent& me) const
 {
-	int x = (me.x() - coord_.ll().x()) / context_.stone_size;
-	int y = (me.y() - coord_.ll().y()) / context_.stone_size;
-	return mhe::vector2<int>(x, y);
+	return get_local_pos(context_, mhe::v3d(me.x(), me.y(), 0));
 }
 
 void GameField::handle_move(const mhe::vector2<int>& pos)
@@ -108,14 +107,7 @@ void GameField::translate_effect(boost::shared_ptr<mhe::iNode> effect, const mhe
 								 const mhe::v3d& correction)
 {
 	effect->identity();
-	effect->translate(get_global_pos(pos) + correction);
-}
-
-mhe::v3d GameField::get_global_pos(const mhe::vector2<int>& pos) const
-{
-	return mhe::v3d(pos.x() * context_.stone_size + coord_.ll().x(),
-					pos.y() * context_.stone_size + coord_.ll().y(), 
-					0);
+	effect->translate(get_global_pos(context_, pos) + correction);
 }
 
 void GameField::do_logic(const mhe::vector2<int>& pos)
@@ -123,47 +115,44 @@ void GameField::do_logic(const mhe::vector2<int>& pos)
 	if (!is_neighbor(context_.prev_clicked, pos)) return;
 	std::vector< mhe::vector2<int> > del;	
 	// before check
-	int saved_stone = stones_[pos.y()][pos.x()];
-	stones_[pos.y()][pos.x()] = stones_[context_.prev_clicked.y()][context_.prev_clicked.x()];
-	stones_[context_.prev_clicked.y()][context_.prev_clicked.x()] = saved_stone;
-	if (check_match(stones_, del))
+	int cur_index = stone_index(pos.x(), pos.y());
+	int prev_index = stone_index(context_.prev_clicked.x(), context_.prev_clicked.y());
+	// swap aspects
+	boost::weak_ptr<mhe::game::Aspect> tmp = context_.stone_aspects[cur_index];
+	context_.stone_aspects[cur_index] = context_.stone_aspects[prev_index];
+	context_.stone_aspects[prev_index] = tmp;
+	// swap stones
+	int saved_stone = context_.stones[pos.y()][pos.x()];
+	context_.stones[pos.y()][pos.x()] = context_.stones[context_.prev_clicked.y()][context_.prev_clicked.x()];
+	context_.stones[context_.prev_clicked.y()][context_.prev_clicked.x()] = saved_stone;
+	if (check_match(context_.stones, del))
 	{
 		DEBUG_LOG("Delete row: " << del.front().x() << " " << del.front().y() << " " <<
 				  del.back().x() << " " << del.back().y());
 		// move 2 aspects
 		mhe::vector2<int> move_dir = context_.prev_clicked - pos;
-		mhe::v3d v(move_dir.x() * context_.stone_size / 5,
-				   move_dir.y() * context_.stone_size / 5, 0);
+		mhe::v3d v(move_dir.x() * context_.stone_size / context_.stone_moves,
+				   move_dir.y() * context_.stone_size / context_.stone_moves, 0);
 		mhe::game::MoveParams mp;
 		mhe::matrixf m;
 		m.set_translate(v);
 		mp.m = m;
-		mp.move_count = 5;
-		mp.upd_time = 20;
-		context_.stone_aspects[stone_index(pos.x(), pos.y())].lock()->update(mhe::game::transform_event, &mp);
+		mp.move_count = context_.stone_moves;
+		mp.upd_time = context_.upd_time;
+		context_.stone_aspects[prev_index].lock()->update(mhe::game::transform_event, &mp);
 		m.load_identity();
 		m.set_translate(-v);
 		mp.m = m;
 		// attach new aspect before moving
 		boost::shared_ptr<mhe::game::Aspect> aspect =
-			context_.stone_aspects[stone_index(context_.prev_clicked.x(), context_.prev_clicked.y())].lock();
-		std::vector< mhe::vector2<int> > indexes(del);
-		for (size_t i = 0; i < indexes.size(); ++i)
-		{
-			if (indexes[i] == pos)
-			{
-				indexes[i] = context_.prev_clicked;
-				context_.prev_clicked.set(-1, -1);
-				break;
-			}
-		}
+			context_.stone_aspects[cur_index].lock();
 		const mhe::v3d correction(context_.stone_size / 2, context_.stone_size / 2, 0);
 		std::vector<mhe::v3d> row(del.size());
 		for (size_t i = 0; i < del.size(); ++i)
-			row[i] = mhe::v3d(get_global_pos(del[i]) + correction);
+			row[i] = mhe::v3d(get_global_pos(context_, del[i]) + correction);
 		boost::shared_ptr<StoneRemoveAspect> remove_aspect(
 			new StoneRemoveAspect(aspect->name(), "remove", &context_,
-								  indexes,
+								  del,
 								  row,
 								  effect_factory_, engine_->get_game_scene()->getScene()));
 		engine_->get_aspect_manager().add(remove_aspect);
@@ -173,7 +162,7 @@ void GameField::do_logic(const mhe::vector2<int>& pos)
 	}
 	else
 	{
-		stones_[context_.prev_clicked.y()][context_.prev_clicked.x()] = stones_[pos.y()][pos.x()];
-		stones_[pos.y()][pos.x()] = saved_stone;
+		context_.stones[context_.prev_clicked.y()][context_.prev_clicked.x()] = context_.stones[pos.y()][pos.x()];
+		context_.stones[pos.y()][pos.x()] = saved_stone;
 	}
 }

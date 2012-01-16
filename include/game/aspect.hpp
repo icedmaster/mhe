@@ -44,7 +44,7 @@ public:
 	void update(int type, const void* prm);
 	void update(cmn::uint tick)
 	{
-		if (!start_time_) start_time_ = tick;
+		if (lifetime_ && !start_time_) start_time_ = tick;
 		update_impl(tick);
 	}
 
