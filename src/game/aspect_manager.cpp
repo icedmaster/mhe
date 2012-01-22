@@ -37,7 +37,7 @@ void AspectManager::update(cmn::uint tick)
 
 bool AspectManager::check_aspect_lifetime(cmn::uint tick, boost::shared_ptr<Aspect> aspect) const
 {
-	if (aspect->lifetime())
+	if (aspect->lifetime() && aspect->start_time())
 	{
 		if (tick > (aspect->start_time() + aspect->lifetime()))
 		{
@@ -79,10 +79,10 @@ void AspectManager::remove(boost::shared_ptr<Aspect> aspect)
 void AspectManager::destroy_aspect(Aspect* aspect)
 {
 	DEBUG_LOG("AspectManager: remove aspect: " << aspect->full_name());
+	aspect->update(destroy_event, 0);
 	const std::vector< boost::weak_ptr<Aspect> >& childs = aspect->childs();
 	for (size_t i = 0; i < childs.size(); ++i)
 		aspects_.erase(childs[i].lock()->full_name());
-	aspect->update(destroy_event, 0);
 }
 
 size_t AspectManager::get_by_name(const std::string& name,

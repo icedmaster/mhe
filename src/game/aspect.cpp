@@ -1,4 +1,5 @@
 #include "game/aspect.hpp"
+#include "utils/logutils.hpp"
 
 namespace mhe {
 namespace game {
@@ -29,8 +30,14 @@ void Aspect::update(int type, const void* prm)
 {
 	if (type == destroy_event)
 	{
+		DEBUG_LOG("Aspect " << full_name() << " receive destroy event");
 		destroy_impl();
-		update_childs(destroy_event, nullptr);
+		for (size_t i = 0; i < childs_.size(); ++i)
+		{
+			if (childs_[i].expired())
+				WARN_LOG("Aspect " << full_name() << " child " << i << " expired");
+			childs_[i].lock()->update(destroy_event, nullptr);
+		}
 	}
 	else if (update_impl(type, prm))
 		update_childs(type, prm);
