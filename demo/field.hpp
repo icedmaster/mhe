@@ -45,14 +45,21 @@ private:
 		columns.reserve(indexes_.size());
 		for (size_t i = 0; i < indexes_.size(); ++i)
 		{
-			int column = indexes_[i].y();
+			int column = indexes_[i].x();
 			if (std::find(columns.begin(), columns.end(), column) != columns.end()) continue;
-			mhe::v3d move_dir(0, -1 * context_->stone_size / (int)context_->stone_moves, 0);
+			int up_pos = get_unblocked_in_vertical_up(context_->stones, column, indexes_[i].y());
+			int down_pos = get_unblocked_in_vertical_down(context_->stones, column, indexes_[i].y());
+			int moves = down_pos - up_pos + 1;
+			DEBUG_LOG("FieldUpdateAspect::destroy up_pos=" << up_pos << " down_pos=" << down_pos);
+			mhe::v3d move_dir(0, moves * context_->stone_size / (int)context_->stone_moves, 0);
 			mhe::game::MoveParams mp;
 			mp.m.set_translate(move_dir);
 			mp.move_count = context_->stone_moves;
 			mp.upd_time = context_->upd_time;
-			context_->stone_aspects[stone_index(indexes_[i].x(), indexes_[i].y() + 1)].lock()->update(mhe::game::transform_event, &mp);
+			for (size_t y = indexes_[i].y() + 1; y < context_->stones.size(); ++y)
+			{
+				context_->stone_aspects[stone_index(indexes_[i].x(), y)].lock()->update(mhe::game::transform_event, &mp);
+			}
 		}
 	}
 
@@ -101,7 +108,7 @@ private:
 			}
 			context_->aspect_manager->add(effect_aspect);
 			aspect->attach(effect_aspect);
-			aspect->set_lifetime(5000);
+			aspect->set_lifetime(1000);
 		}
 		return true;
 	}
