@@ -129,6 +129,8 @@ void GameField::do_logic(const mhe::vector2<int>& pos)
 	{
 		DEBUG_LOG("Delete row: " << del.front().x() << " " << del.front().y() << " " <<
 				  del.back().x() << " " << del.back().y());
+		for (size_t i = 0; i < del.size(); ++i)
+			context_.stones[del[i].y()][del[i].x()] = 9;
 		// move 2 aspects
 		mhe::vector2<int> move_dir = context_.prev_clicked - pos;
 		mhe::v3d v(move_dir.x() * context_.stone_size / context_.stone_moves,

@@ -24,9 +24,9 @@ class FieldUpdateAspect : public mhe::game::Aspect
 {
 public:
 	FieldUpdateAspect(const std::string& name, const std::string& add_name,
-					  GameContext* context) :
+					  GameContext* context, const std::vector< mhe::vector2<int> >& indexes) :
 		mhe::game::Aspect(name, add_name),
-		context_(context)
+		context_(context), indexes_(indexes)
 	{}
 
 private:
@@ -38,7 +38,26 @@ private:
 		return true;
 	}
 
+	void destroy_impl()
+	{
+		std::cout << "update field\n";
+		std::vector<int> columns;
+		columns.reserve(indexes_.size());
+		for (size_t i = 0; i < indexes_.size(); ++i)
+		{
+			int column = indexes_[i].y();
+			if (std::find(columns.begin(), columns.end(), column) != columns.end()) continue;
+			mhe::v3d move_dir(0, -1 * context_->stone_size / (int)context_->stone_moves, 0);
+			mhe::game::MoveParams mp;
+			mp.m.set_translate(move_dir);
+			mp.move_count = context_->stone_moves;
+			mp.upd_time = context_->upd_time;
+			context_->stone_aspects[stone_index(indexes_[i].x(), indexes_[i].y() + 1)].lock()->update(mhe::game::transform_event, &mp);
+		}
+	}
+
 	GameContext* context_;
+	std::vector< mhe::vector2<int> > indexes_;
 };
 
 class StoneRemoveAspect : public mhe::game::Aspect
@@ -73,6 +92,13 @@ private:
 				context_->stone_aspects[stone_index(index_row_[i].x(), index_row_[i].y())].lock();
 			boost::shared_ptr<mhe::game::NodeAspect> effect_aspect(
 				new mhe::game::NodeAspect(aspect->name(), "remove_effect", effect, scene_));
+			if (!i)
+			{
+				boost::shared_ptr<FieldUpdateAspect> update_aspect(
+					new FieldUpdateAspect("field", "update", context_, index_row_));
+				context_->aspect_manager->add(update_aspect);
+				aspect->attach(update_aspect);
+			}
 			context_->aspect_manager->add(effect_aspect);
 			aspect->attach(effect_aspect);
 			aspect->set_lifetime(5000);

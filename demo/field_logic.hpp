@@ -46,9 +46,39 @@ inline bool check_match_horizontal(const std::vector< std::vector<int> >& stones
 	return false;
 }
 
-inline bool check_match_vertical(const std::vector< std::vector<int> >& /*stones*/, 
-								 std::vector< mhe::vector2<int> >& /*del*/)	
+inline bool check_match_vertical(const std::vector< std::vector<int> >& stones, 
+								 std::vector< mhe::vector2<int> >& del)	
 {
+	const int match_need = 3;
+	const size_t columns_number = stones[0].size();
+	const size_t rows_number = stones.size();
+
+	for (size_t i = 0; i < columns_number; ++i)
+	{
+		int matched = 1;
+		int stone = stones[0][i];
+		bool test_result = false;
+		for (size_t j = 1; j < rows_number; ++j)
+		{
+			if ( j == (rows_number - 1) ) test_result = true;			
+			if (stones[i][j] == stone)
+			{
+				++matched;
+				if (!test_result) continue;
+			}
+			else
+			{
+			    stone = stones[i][j];
+				test_result = true;								
+			}
+			if (test_result && (matched >= match_need))
+			{
+				for (size_t index = j + 1 - matched; index <= j; ++index)
+					del.push_back(mhe::vector2<int>(i, index));
+				return true;
+			}
+			matched = 1;	
+	}
 	return false;
 }
 
