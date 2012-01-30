@@ -28,14 +28,16 @@ class NodeAspect : public Aspect
 public:
 	NodeAspect(const std::string& name, boost::shared_ptr<iNode> node,
 			   boost::shared_ptr<Scene> scene) :
-		Aspect(name), node_(node), scene_(scene), moved_count_(0), last_time_(0)
+		Aspect(name), node_(node), scene_(scene), moved_count_(0), last_time_(0),
+		current_move_params_(0)
 	{
 		init();
 	}
 
 	NodeAspect(const std::string& name, const std::string& add_name,
 			   boost::shared_ptr<iNode> node, boost::shared_ptr<Scene> scene) :
-		Aspect(name, add_name), node_(node), scene_(scene), moved_count_(0), last_time_(0)
+		Aspect(name, add_name), node_(node), scene_(scene), moved_count_(0), last_time_(0),
+		current_move_params_(0)
 	{
 		init();
 	}
@@ -47,10 +49,9 @@ public:
 
 	void set(const MoveParams& mp)
 	{
-		move_params_ = mp;
-		cmn::uint now = utils::get_current_tick();
-		last_time_ = now;
-		moved_count_ = 0;
+		if (move_params_.empty())
+			init_moving();
+		move_params_.push_back(mp);
 	}
 private:
 	void do_subscribe(Aspect* parent)
@@ -70,18 +71,33 @@ private:
 		return true;
 	}
 
+	void init_moving()
+	{
+		DEBUG_LOG("NodeAspect::init_moving " << full_name() << " " << current_move_params_);
+		last_time_ = utils::get_current_tick();
+		moved_count_ = 0;
+	}
+
 	bool update_node(cmn::uint tick)
 	{
 		if (!last_time_) return false;
-		if ((tick - last_time_) < move_params_.upd_time) return false;
-		if (++moved_count_ > move_params_.move_count)
+		if ((tick - last_time_) < move_params_[current_move_params_].upd_time) return false;
+		if (++moved_count_ > move_params_[current_move_params_].move_count)
 		{
-			update_childs(end_event, this);
-			last_time_ = 0;
+			if (++current_move_params_ == move_params_.size())
+			{
+				update_childs(end_event, this);
+				last_time_ = 0;
+				move_params_.clear();
+				current_move_params_ = 0;
+				return false;
+			}
+			// set next move params
+			init_moving();
 			return false;
 		}
 		last_time_ = tick;
-		node_->set_transform(move_params_.m * node_->get_transform());
+		node_->set_transform(move_params_[current_move_params_].m * node_->get_transform());
 		return true;
 	}
 
@@ -95,7 +111,8 @@ private:
 	boost::shared_ptr<Scene> scene_;
 	cmn::uint moved_count_;
 	cmn::uint last_time_;
-	MoveParams move_params_;
+	std::vector<MoveParams> move_params_;
+	size_t current_move_params_;
 };
 
 }}

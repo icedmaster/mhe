@@ -40,7 +40,6 @@ private:
 
 	void destroy_impl()
 	{
-		std::cout << "update field\n";
 		std::vector<int> columns;
 		columns.reserve(indexes_.size());
 		for (size_t i = 0; i < indexes_.size(); ++i)
