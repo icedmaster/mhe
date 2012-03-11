@@ -99,6 +99,15 @@ namespace mhe
     }
 
     //------------------ Sprite class -------------------------
+Sprite::Sprite(const Sprite& sprite) :
+	al_(sprite.al_), is_alive_(true), is_running_(false),
+	x_size_(sprite.x_size_), y_size_(sprite.y_size_),
+	reset_position_(sprite.reset_position_),
+	pos_(sprite.pos_),
+	current_al_(nullptr)
+{
+}
+
     void Sprite::draw_impl(const boost::shared_ptr<iDriver>& driver)
     {
 		if (!is_running_)
@@ -158,7 +167,7 @@ namespace mhe
 
 iNode* Sprite::clone_impl() const
 {
-	Sprite* cloned = new Sprite(this);
+	Sprite* cloned = new Sprite(*this);
 	cloned->is_alive_ = true;
 	cloned->is_running_ = false;
 	cloned->current_al_ = nullptr;

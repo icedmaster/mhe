@@ -4,105 +4,111 @@
 #include "mhe.hpp"
 #include "game_scene.hpp"
 #include "aspect_manager.hpp"
+#include "timed_events.hpp"
 
-namespace mhe
+namespace mhe {
+namespace game {
+
+class Engine
 {
-	namespace game
+private:
+	WindowSystem ws_;
+	TextureManager tm_;
+	FontManager fm_;
+	SoundManager sm_;
+	boost::shared_ptr<iDriver> driver_;
+	boost::shared_ptr<iAudioDriver> audio_driver_;
+	boost::shared_ptr<iInputSystem> is_;
+
+	boost::shared_ptr<GameScene> game_scene_;
+
+	AspectManager aspect_manager_;
+	TimedEventsManager timed_events_manager_;
+
+	bool running_;		   
+
+	typedef PrivateEventListener<Engine> EngineEventListener;
+	friend class PrivateEventListener<Engine>;
+	boost::shared_ptr<EngineEventListener> quit_listener_;
+	bool stop_p(const Event&)
 	{
-		class Engine
-		{
-			private:
-				WindowSystem ws_;
-				TextureManager tm_;
-				FontManager fm_;
-				SoundManager sm_;
-				boost::shared_ptr<iDriver> driver_;
-				boost::shared_ptr<iAudioDriver> audio_driver_;
-				boost::shared_ptr<iInputSystem> is_;
+		stop();
+		return true;
+	}
 
-				boost::shared_ptr<GameScene> game_scene_;
-
-				AspectManager aspect_manager_;
-
-				bool running_;		   
-
-				typedef PrivateEventListener<Engine> EngineEventListener;
-				friend class PrivateEventListener<Engine>;
-				boost::shared_ptr<EngineEventListener> quit_listener_;
-				bool stop_p(const Event&)
-				{
-					stop();
-					return true;
-				}
-
-				void default_setup();
-				void update();
-			public:
-				Engine();
+	void default_setup();
+	void update();
+public:
+	Engine();
 			
-				bool init(cmn::uint w, cmn::uint h, cmn::uint bpp, bool fullscreen = false);
-				void run();
-				void stop();
+	bool init(cmn::uint w, cmn::uint h, cmn::uint bpp, bool fullscreen = false);
+	void run();
+	void stop();
 
-				bool is_running() const
-				{
-					return running_;
-				}
+	bool is_running() const
+	{
+		return running_;
+	}
 			
-				TextureManager& getTextureManager()
-				{
-					return tm_;
-				}
+	TextureManager& getTextureManager()
+	{
+		return tm_;
+	}
 			
-				FontManager& getFontManager()
-				{
-					return fm_;
-				}
+	FontManager& getFontManager()
+	{
+		return fm_;
+	}
 
-				SoundManager& getSoundManager()
-				{
-					return sm_;
-				}
+	SoundManager& getSoundManager()
+	{
+		return sm_;
+	}
 
-				WindowSystem& getWindowSystem()
-				{
-					return ws_;
-				}
+	WindowSystem& getWindowSystem()
+	{
+		return ws_;
+	}
 			
-				boost::shared_ptr<iInputSystem> getInputSystem() const
-				{
-					return is_;
-				}
+	boost::shared_ptr<iInputSystem> getInputSystem() const
+	{
+		return is_;
+	}
 			
-				boost::shared_ptr<iDriver> getDriver() const
-				{
-					return driver_;
-				}
+	boost::shared_ptr<iDriver> getDriver() const
+	{
+		return driver_;
+	}
 
-				boost::shared_ptr<iAudioDriver> getAudioDriver() const
-				{
-					return audio_driver_;
-				}
+	boost::shared_ptr<iAudioDriver> getAudioDriver() const
+	{
+		return audio_driver_;
+	}
 
-				void setGameScene(boost::shared_ptr<GameScene> scene)
-				{
-					game_scene_ = scene;
-				}
+	void setGameScene(boost::shared_ptr<GameScene> scene)
+	{
+		game_scene_ = scene;
+	}
 
-				void free_all();
-				void set_next_scene(const std::string& arg);
+	void free_all();
+	void set_next_scene(const std::string& arg);
 
-				boost::shared_ptr<GameScene> get_game_scene() const
-				{
-					return game_scene_;
-				}
+	boost::shared_ptr<GameScene> get_game_scene() const
+	{
+		return game_scene_;
+	}
 
-				AspectManager& get_aspect_manager()
-				{
-					return aspect_manager_;
-				}
-		};
-	}	// game
-}       // mhe
+	AspectManager& get_aspect_manager()
+	{
+		return aspect_manager_;
+	}
+
+	TimedEventsManager& get_timed_events_manager()
+	{
+		return timed_events_manager_;
+	}
+};
+
+}}       // namespaces
 
 #endif

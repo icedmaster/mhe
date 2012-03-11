@@ -49,6 +49,7 @@ public:
 
 	void set(const MoveParams& mp)
 	{
+		DEBUG_LOG("NodeAspect::set():" << full_name() << " " << move_params_.size());
 		if (move_params_.empty())
 			init_moving();
 		move_params_.push_back(mp);
@@ -86,10 +87,11 @@ private:
 		{
 			if (++current_move_params_ == move_params_.size())
 			{
-				update_childs(end_event, this);
+				DEBUG_LOG("NodeAspect::update_node(): " << full_name() << " end move");
 				last_time_ = 0;
 				move_params_.clear();
 				current_move_params_ = 0;
+				update_children(end_event, this);
 				return false;
 			}
 			// set next move params

@@ -135,6 +135,8 @@ namespace mhe
 			al_[al.getIndex()] = al;
 		}
 
+		Sprite(const Sprite& sprite);
+
 		void addAnimationList(const AnimationList& al);
 
 		const AnimationList* get_current_animation_list() const

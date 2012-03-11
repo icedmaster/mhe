@@ -1,5 +1,6 @@
 #include "mhe.hpp"
 #include "demo_game_scene.hpp"
+#include "math/vector4d.hpp"
 
 class MainMenuScene : public mhe::game::GameScene
 {
@@ -146,7 +147,7 @@ int main(int /*argc*/, char** /*argv*/)
     mhe::utils::init_randomizer();
 
 	mhe::game::Engine engine;
-	if (!engine.init(800, 600, 32))
+	if (!engine.init(1024, 768, 32))
 	{
 		ERROR_LOG("engine init failed");
 		return 1;
@@ -155,7 +156,7 @@ int main(int /*argc*/, char** /*argv*/)
 
 	// setup ortho projection by default
 	mhe::matrixf proj;
-	proj.set_ortho(0, 800, 0, 600, -1, 1);
+	proj.set_ortho(0, 1024, 0, 768, -1, 1);
 	engine.getDriver()->set_projection_matrix(proj);
 
 	boost::shared_ptr<MainMenuScene> scene(new MainMenuScene(&engine));
@@ -167,6 +168,7 @@ int main(int /*argc*/, char** /*argv*/)
 
 	engine.setGameScene(scene);
 	engine.getDriver()->disable_lighting();
+	engine.getDriver()->set_clear_color(mhe::cfWhite);
 	scene.reset();
 
 	engine.run();

@@ -47,7 +47,7 @@ private:
 			if (mouse_on_) event = mouse_move_int_event;
 			else return false;
 		}
-		update_childs(event, &me);	
+		update_children(event, &me);	
 		return true;
 	}
 
@@ -57,7 +57,7 @@ private:
 		bool mouse_on = geom_.in(me.position());
 		if (!mouse_on) return false;
 		mouse_on_ = true;
-		update_childs(mouse_click_event, &me);
+		update_children(mouse_click_event, &me);
 		return true;
 	}
 

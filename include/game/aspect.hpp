@@ -41,6 +41,7 @@ public:
 	void attach(aspect_ptr aspect);
 	void attach(aspect_ptr aspect, int type);
 	void attach(aspect_ptr aspect, const std::vector<int>& types);
+	void detach(Aspect* aspect);
 	void update(int type, const void* prm);
 	void update(cmn::uint tick)
 	{
@@ -88,8 +89,13 @@ protected:
 		parent_ = aspect;
 	}
 
+	void detach_self()
+	{
+		parent_->detach(this);
+	}
+
 	virtual void do_subscribe(Aspect* aspect) = 0;
-	void update_childs(int type, const void* prm); 
+	void update_children(int type, const void* prm); 
 	virtual void update_impl(cmn::uint)	{}
 	virtual	bool update_impl(int type, const void* prm) = 0;
 	virtual void destroy_impl() {}

@@ -2,31 +2,41 @@
 #include "game/node_aspect.hpp"
 #include "utils/logutils.hpp"
 
-boost::shared_ptr<mhe::game::Aspect> create_stone(mhe::game::mhe_loader& loader,
-	 			  				   				  const StoneParameters& sp)
+void StoneFactory::init(mhe::game::mhe_loader& loader,
+						const std::map<int, std::string>& stones)
 {
-	mhe::game::Engine* engine = const_cast<mhe::game::Engine*>(loader.get_engine());
-	
-	boost::shared_ptr<mhe::iNode> sprite;
-	boost::shared_ptr<mhe::iNode> tmp_sprite = engine->get_game_scene()->getScene()->get_node(sp.sprite_name);
-	if (sprite == nullptr)
+	for (std::map<int, std::string>::const_iterator it = stones.begin();
+		 it != stones.end(); ++it)
 	{
-		boost::shared_ptr<mhe::Sprite> loaded_sprite(loader.getSprite(mhe::utils::to_wstring(sp.sprite_name)));
-		sprite = loaded_sprite;
+		boost::shared_ptr<mhe::Sprite> sprite(loader.getSprite(mhe::utils::to_wstring(it->second)));
+		if (sprite == nullptr)
+		{
+			WARN_LOG("StoneFactory cannot load sprite: " << it->second);
+		}
+		else
+		{
+			INFO_LOG("StoneFactory: load sprite:" << sprite->name() << " type:" << it->first);
+		}
+		sprites_[it->first] = sprite;
+		available_types_.push_back(it->first);
 	}
-	else sprite.reset(tmp_sprite->clone());
-
-	if (sprite == nullptr)
-	{
-		return boost::shared_ptr<mhe::game::Aspect>();
-	}
-	sprite->translate(mhe::v3d(sp.pos.ll().x(), sp.pos.ll().y(), 0));
-	//sprite->setSize(50);	
-
-	boost::shared_ptr<mhe::game::NodeAspect> node(new mhe::game::NodeAspect(sp.name, "node", sprite, engine->get_game_scene()->getScene()));
-
-	engine->get_aspect_manager().add(node);
-	 
-	return node;
+	engine_ = loader.get_engine();
 }
 
+boost::shared_ptr<mhe::game::Aspect> StoneFactory::create_stone(int type,
+																const mhe::v3d& pos) const
+{
+	stone_sprite_map::const_iterator it = sprites_.find(type);
+	if (it == sprites_.end())
+	{
+		ERROR_LOG("StoneFactory::create_stone stone for type " << type << " not found");
+		return boost::shared_ptr<mhe::game::Aspect>();
+	}
+	boost::shared_ptr<mhe::iNode> sprite(it->second->clone());
+	sprite->translate(pos);
+	const std::string name = "stone" + mhe::utils::to_string(get_next_id());
+	boost::shared_ptr<mhe::game::NodeAspect> node(
+		new mhe::game::NodeAspect(name, "node", sprite, engine_->get_game_scene()->getScene()));
+	engine_->get_aspect_manager().add(node);
+	return node;
+}

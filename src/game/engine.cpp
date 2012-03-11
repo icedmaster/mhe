@@ -75,6 +75,7 @@ void Engine::update()
 {
 	cmn::uint now = utils::get_current_tick();
 	aspect_manager_.update(now);
+	timed_events_manager_.update(now);
 }
 
 void Engine::free_all()

@@ -21,8 +21,10 @@ enum
 	begin_event,
 	end_event,
 	create_event,
-	destroy_event
-	
+	destroy_event,
+	success_event,
+	process_event,
+	error_event	
 	// user aspect types began from 1000
 };
 

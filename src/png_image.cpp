@@ -61,7 +61,7 @@ namespace mhe
 			// read first 8 bytes - PNG header
 			cmn::uchar header[8];
 			f.read((char*)header, 8);
-			if ( (f.gcount() == 8) && png_check_sig((png_byte*)header, 8) )
+			if ( (f.gcount() == 8) /*&& png_check_sig((png_byte*)header, 8)*/ )
 			{
 				png_set_read_fn(png, &f, mhe_png_read);
 			}

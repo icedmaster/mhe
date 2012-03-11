@@ -62,8 +62,16 @@ private:
 
 class DemoGameScene : public mhe::game::GameScene
 {
+	typedef mhe::PrivateEventListener<DemoGameScene> DemoGameSceneListener;
+	friend class mhe::PrivateEventListener<DemoGameScene>; 
 public:
-	DemoGameScene(mhe::game::Engine* engine) : mhe::game::GameScene(engine) {}
+	DemoGameScene(mhe::game::Engine* engine) :
+		mhe::game::GameScene(engine),
+		reset_listener_(new DemoGameSceneListener(mhe::KeyboardEventType, mhe::KEY_DOWN, SDLK_r,
+												  this, &DemoGameScene::reset_field))
+	{
+		get_engine()->getInputSystem()->addListener(reset_listener_);
+	}
 private:
 	bool init_impl(const std::string& arg, void*)
 	{
@@ -89,16 +97,25 @@ private:
 	{
 		std::vector<int> row(3);
 		std::vector< std::vector<int> > stones;
-		row[0] = 0; row[1] = 1; row[2] = 1;
+		row[0] = 0; row[1] = 2; row[2] = 3;
 		stones.push_back(row);
 		row[0] = 1; row[1] = 0; row[2] = 1;
 		stones.push_back(row);
-		game_field.reset(new GameField(loader, mhe::rect<int>(200, 200, 150, 100), stones, 
+		row[0] = 1; row[1] = 1; row[2] = 0;
+		stones.push_back(row);
+		game_field.reset(new GameField(loader, mhe::rect<int>(200, 200, 96 * 3, 96 * 3), stones, 
 									   new DemoStoneEffectFactory(loader)));
 	}
 private:
+	bool reset_field(const mhe::Event&)
+	{
+		game_field->reload_field();
+		return true;
+	}
+
 	boost::shared_ptr<mhe::gui::iFont> fps_font;	
 	boost::shared_ptr<GameField> game_field;
+	boost::shared_ptr<DemoGameSceneListener> reset_listener_;
 };
 
 #endif

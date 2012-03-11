@@ -92,7 +92,7 @@ namespace mhe
 				start_impl(utils::get_current_tick());
 			}	
 
-			virtual iNode* clone() const
+			iNode* clone() const
 			{
 				return clone_impl();
 			}
