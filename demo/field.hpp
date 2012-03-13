@@ -144,27 +144,25 @@ private:
 			for (size_t j = 0; j < row_indexes.size(); ++j)
 			{
 				int up_pos = get_unblocked_in_vertical_up(context_->stones, column, row_indexes[j] - moves_total);
-				int down_pos = get_unblocked_in_vertical_down(context_->stones, column, row_indexes[j] - moves_total);
-				int moves = up_pos - down_pos - 1;
-				DEBUG_LOG("FieldUpdateAspect::destroy up_pos=" << up_pos << " down_pos=" << down_pos);
-				if (moves > 0)
+				DEBUG_LOG("FieldUpdateAspect::destroy up_pos=" << up_pos);
+				if (up_pos > 0)
 				{
-					mhe::v3d move_dir(0, -moves * context_->stone_size / (int)context_->stone_moves, 0);
+					mhe::v3d move_dir(0, -context_->stone_size / (int)context_->stone_moves, 0);
 					mhe::game::MoveParams mp;
 					mp.m.set_translate(move_dir);
 					mp.move_count = context_->stone_moves;
 					mp.upd_time = context_->upd_time;
-					for (size_t y = up_pos; y < context_->stones.size(); ++y)
+					for (size_t y = row_indexes[j] - moves_total + 1; y < context_->stones.size(); ++y)
 					{
 						if (context_->stone_aspects[stone_index(column, y)].expired()) continue;
 						context_->stone_aspects[stone_index(column, y)].lock()->update(mhe::game::transform_event, &mp);
-						context_->stones[y - moves][column] = context_->stones[y][column];
-						context_->stone_aspects[stone_index(column, y - moves)] = context_->stone_aspects[stone_index(column, y)];
+						context_->stones[y - 1][column] = context_->stones[y][column];
+						context_->stone_aspects[stone_index(column, y - 1)] = context_->stone_aspects[stone_index(column, y)];
 						if (parent == nullptr)
-							parent = context_->stone_aspects[stone_index(column, y - moves)].lock();
+							parent = context_->stone_aspects[stone_index(column, y - 1)].lock();
 						context_->stone_aspects[stone_index(column, y)].reset();
 					}
-					moves_total += moves;
+					++moves_total;
 				}
 				else add_indexes.push_back(mhe::vector2<int>(column, row_indexes[j] - moves_total));
 			}
