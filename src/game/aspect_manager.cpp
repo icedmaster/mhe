@@ -21,7 +21,7 @@ void AspectManager::update(cmn::uint tick)
 	// send tick_event to all aspects
 	for (aspects_map::iterator it = aspects_.begin(); it != aspects_.end();)
 	{
-		if (check_aspect_lifetime(tick, it->second))
+		if (check_aspect_lifetime(tick, it->second) && check_aspect_refs(it->second))
 		{
 			it->second->update(tick);
 			++it;
@@ -44,6 +44,16 @@ bool AspectManager::check_aspect_lifetime(cmn::uint tick, boost::shared_ptr<Aspe
 			DEBUG_LOG("AspectManager: aspect lifetime finished: " << aspect->full_name());
 			return false;
 		}
+	}
+	return true;
+}
+
+bool AspectManager::check_aspect_refs(boost::shared_ptr<Aspect> aspect) const
+{
+	if (boost::weak_ptr<Aspect>(aspect).use_count() == 1)
+	{
+		DEBUG_LOG("AspectManager: aspect hasn't any refs:" << aspect->full_name());
+		return false;
 	}
 	return true;
 }

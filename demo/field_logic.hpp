@@ -97,8 +97,9 @@ inline bool check_match_vertical(const std::vector< std::vector<int> >& stones,
 inline bool check_match(const std::vector< std::vector<int> >& stones, 
 						std::vector< std::vector< mhe::vector2<int> > >& del)	
 {
-	return (check_match_horizontal(stones, del) &&
-			check_match_vertical(stones, del));	
+	if (check_match_horizontal(stones, del)) return true;
+	if (check_match_vertical(stones, del)) return true;
+	return false;
 }
 
 inline int get_unblocked_in_vertical_up(const std::vector< std::vector<int> >& stones,
@@ -115,26 +116,26 @@ inline int get_unblocked_in_vertical_down(const std::vector< std::vector<int> >&
 										  int column, int pos)
 {
 	if (!pos) return invalid_pos;
-	for (size_t i = static_cast<size_t>(pos) - 1; i >= 0; --i)
+	for (size_t i = pos; i > 0; --i)
 	{
-		if (stones[i][column] != blocked_pos) return i;
+		if (stones[i - 1][column] != blocked_pos) return i - 1;
 	}
 	return invalid_pos;
 }
 
 inline void print_field(const std::vector< std::vector<int> >& stones)
 {
-	/*DEBUG_LOG("Print field:");
+	DEBUG_LOG("Print field:\t");
 	std::string value;
-	for (size_t i = (stones.size() - 1); i >= 0; --i)
+	for (size_t i = 0; i < stones.size(); ++i)
 	{
 		for (size_t j = 0; j < stones[i].size(); ++j)
 		{
 			value += (mhe::utils::to_string(stones[i][j]) + " ");
 		}
-		value += "\n";
+		value += "\n\t";
 	}
-	DEBUG_LOG(value);*/
+	DEBUG_LOG(value);
 }
 
 #endif

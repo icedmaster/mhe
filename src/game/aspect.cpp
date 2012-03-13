@@ -40,6 +40,7 @@ void Aspect::detach(Aspect* aspect)
 		{
 			if (*vit == aspect)
 			{
+				DEBUG_LOG("Aspect removed from subscribers:" << full_name() << " " << aspect->full_name());
 				childs.erase(vit);
 				break;
 			}
@@ -50,6 +51,7 @@ void Aspect::detach(Aspect* aspect)
 	{
 		if ((*it).lock().get() == aspect)
 		{
+			DEBUG_LOG("Aspect detached:" << full_name() << " " << aspect->full_name());
 			childs_.erase(it);
 			break;
 		}

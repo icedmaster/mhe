@@ -10,8 +10,7 @@ void swap_stones(GameContext& context, const mhe::vector2<int>& prev, const mhe:
 void move_stone(GameContext& context, int index, const mhe::v3d& direction);
 bool remove_stone_logic(GameContext& context);
 void remove_stones(GameContext& context, const std::vector< mhe::vector2<int> >& index_row,
-				   const std::vector<mhe::v3d>& row,
-				   boost::shared_ptr<StoneEffectFactory> effect_factory);
+				   const std::vector<mhe::v3d>& row);
 void add_stone(GameContext& context, const mhe::vector2<int>& pos);
 
 class RemoveStoneLogicEvent : public mhe::TimedEventBase
@@ -80,7 +79,7 @@ class AddStoneAspect : public mhe::game::Aspect
 {
 public:
 	AddStoneAspect(const std::string& name, const std::string& add_name,
-				   GameContext* context, const mhe::vector2<int>& pos) :
+				   GameContext* context, const std::vector< mhe::vector2<int> >& pos) :
 		mhe::game::Aspect(name, add_name),
 		context_(context), pos_(pos)
 	{}
@@ -90,12 +89,17 @@ private:
 
 	bool update_impl(int /*type*/, const void* /*arg*/)
 	{
-		add_stone(*context_, pos_);				
+		DEBUG_LOG("AddStoneAspect::update_impl():" << full_name());
+		for (size_t i = 0; i < pos_.size(); ++i)
+			add_stone(*context_, pos_[i]);	
+		context_->engine->get_timed_events_manager().add(
+			new RemoveStoneLogicEvent(200, context_));	
+		detach_self();		
 		return true;
 	}
 
 	GameContext* context_;
-	mhe::vector2<int> pos_;
+	std::vector< mhe::vector2<int> > pos_;
 };
 
 class FieldUpdateAspect : public mhe::game::Aspect
@@ -119,59 +123,69 @@ private:
 	void destroy_impl()
 	{
 		std::vector<int> columns;
-		size_t counter = 0;
 		columns.reserve(indexes_.size());
+		std::vector< mhe::vector2<int> > add_indexes;
+		add_indexes.reserve(indexes_.size());
+		boost::shared_ptr<mhe::game::Aspect> parent;
 		for (size_t i = 0; i < indexes_.size(); ++i)
 		{
 			DEBUG_LOG("FieldUpdateAspect: " << indexes_[i].x() << " " << indexes_[i].y());
 			int column = indexes_[i].x();
 			if (std::find(columns.begin(), columns.end(), column) != columns.end()) continue;
-			int up_pos = get_unblocked_in_vertical_up(context_->stones, column, indexes_[i].y());
-			int down_pos = get_unblocked_in_vertical_down(context_->stones, column, indexes_[i].y());
-			int moves = up_pos - down_pos - 1;
-			DEBUG_LOG("FieldUpdateAspect::destroy up_pos=" << up_pos << " down_pos=" << down_pos);
-			if (moves > 0)
+			std::vector<int> row_indexes;
+			row_indexes.reserve(indexes_.size());
+			for (size_t j = 0; j < indexes_.size(); ++j)
 			{
-				mhe::v3d move_dir(0, -moves * context_->stone_size / (int)context_->stone_moves, 0);
-				mhe::game::MoveParams mp;
-				mp.m.set_translate(move_dir);
-				mp.move_count = context_->stone_moves;
-				mp.upd_time = context_->upd_time;
-				for (size_t y = up_pos; y < context_->stones.size(); ++y)
-				{
-					if (context_->stone_aspects[stone_index(column, y)].expired()) continue;
-					context_->stone_aspects[stone_index(column, y)].lock()->update(mhe::game::transform_event, &mp);
-					context_->stones[y - moves][column] = context_->stones[y][column];
-					context_->stone_aspects[stone_index(column, y - moves)] = context_->stone_aspects[stone_index(column, y)];
-					context_->stone_aspects[stone_index(column, y)].reset();
-					boost::shared_ptr<mhe::game::Aspect> parent =
-						context_->stone_aspects[stone_index(column, y - moves)].lock();
-					boost::shared_ptr<AddStoneAspect> add_aspect(
-						new AddStoneAspect(parent->name(), "add_stone", context_,
-										   mhe::vector2<int>(column, y)));
-					context_->engine->get_aspect_manager().add(add_aspect);
-					parent->attach(add_aspect, mhe::game::end_event);
-				}
-				
-				// attach new aspect for creating stones
-				for (int j = 0; j < moves; ++j, ++counter)
-				{
-					boost::shared_ptr<mhe::game::Aspect> parent = 
-						get_aspect(*context_,
-								   mhe::vector2<int>(column,
-													 context_->stones.size() - moves - 1));
-					if (parent == nullptr) break;
-					const std::string& parent_name = parent->name();
-					boost::shared_ptr<AddStoneAspect> add_aspect(
-						new AddStoneAspect(parent_name, "add_stone" + mhe::utils::to_string(j), context_,
-										   mhe::vector2<int>(column, context_->stones.size() - j - 1)));
-					context_->engine->get_aspect_manager().add(add_aspect);
-					parent->attach(add_aspect, mhe::game::end_event);
-				}				
-				columns.push_back(column);
+				if (indexes_[j].x() == column) row_indexes.push_back(indexes_[j].y());
 			}
-			else
-				add_stone(*context_, indexes_[i]);
+			std::sort(row_indexes.begin(), row_indexes.end());
+			int moves_total = 0;
+
+			for (size_t j = 0; j < row_indexes.size(); ++j)
+			{
+				int up_pos = get_unblocked_in_vertical_up(context_->stones, column, row_indexes[j] - moves_total);
+				int down_pos = get_unblocked_in_vertical_down(context_->stones, column, row_indexes[j] - moves_total);
+				int moves = up_pos - down_pos - 1;
+				DEBUG_LOG("FieldUpdateAspect::destroy up_pos=" << up_pos << " down_pos=" << down_pos);
+				if (moves > 0)
+				{
+					mhe::v3d move_dir(0, -moves * context_->stone_size / (int)context_->stone_moves, 0);
+					mhe::game::MoveParams mp;
+					mp.m.set_translate(move_dir);
+					mp.move_count = context_->stone_moves;
+					mp.upd_time = context_->upd_time;
+					for (size_t y = up_pos; y < context_->stones.size(); ++y)
+					{
+						if (context_->stone_aspects[stone_index(column, y)].expired()) continue;
+						context_->stone_aspects[stone_index(column, y)].lock()->update(mhe::game::transform_event, &mp);
+						context_->stones[y - moves][column] = context_->stones[y][column];
+						context_->stone_aspects[stone_index(column, y - moves)] = context_->stone_aspects[stone_index(column, y)];
+						if (parent == nullptr)
+							parent = context_->stone_aspects[stone_index(column, y - moves)].lock();
+						context_->stone_aspects[stone_index(column, y)].reset();
+					}
+					moves_total += moves;
+				}
+				else add_indexes.push_back(mhe::vector2<int>(column, row_indexes[j] - moves_total));
+			}
+			//
+			for (int j = 0; j < moves_total; ++j)
+				add_indexes.push_back(mhe::vector2<int>(column, context_->stones.size() - j - 1));
+			columns.push_back(column);
+		}
+		if (parent != nullptr)
+		{
+			boost::shared_ptr<AddStoneAspect> aspect(
+				new AddStoneAspect(parent->name(), "add_stone", context_, add_indexes));
+			context_->engine->get_aspect_manager().add(aspect);
+			parent->attach(aspect, mhe::game::end_event);
+		}
+		else
+		{
+			for (size_t i = 0; i < add_indexes.size(); ++i)
+				add_stone(*context_, add_indexes[i]);
+			context_->engine->get_timed_events_manager().add(
+				new RemoveStoneLogicEvent(200, context_));	
 		}
 	}
 

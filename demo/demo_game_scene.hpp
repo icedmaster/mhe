@@ -97,9 +97,9 @@ private:
 	{
 		std::vector<int> row(3);
 		std::vector< std::vector<int> > stones;
-		row[0] = 0; row[1] = 2; row[2] = 3;
+		row[0] = 0; row[1] = 1; row[2] = 1;
 		stones.push_back(row);
-		row[0] = 1; row[1] = 0; row[2] = 1;
+		row[0] = 1; row[1] = 0; row[2] = 0;
 		stones.push_back(row);
 		row[0] = 1; row[1] = 1; row[2] = 0;
 		stones.push_back(row);

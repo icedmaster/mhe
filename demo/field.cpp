@@ -37,6 +37,7 @@ void GameField::reload_field()
 		{
 			const mhe::v3d& pos = get_global_pos(context_, mhe::vector2<int>(j, i));
 			int type = context_.stone_factory->get_random_type();
+			engine_->get_aspect_manager().remove(context_.stone_aspects[stone_index(j, i)].lock());
 			context_.stone_aspects[stone_index(j, i)] =
 				context_.stone_factory->create_stone(type, pos);
 			context_.stones[i][j] = type;
@@ -51,8 +52,6 @@ std::string GameField::get_sprite_name(int value) const
 	{
 	case 0: return "test_stone";
 	case 1: return "test_stone2";
-		case 2: return "test_stone3";
-		case 3: return "test_stone4";
 	default: return "";
 	}
 }
@@ -200,6 +199,9 @@ bool remove_stone_logic(GameContext& context)
 	print_field(context.stones);
 	std::vector< std::vector< mhe::vector2<int> > > del;	
 	int count_deleted = 0;
+	std::vector<mhe::v3d> coord;
+	std::vector< mhe::vector2<int> > indexes;
+	const mhe::v3d correction(context.stone_size / 2, context.stone_size / 2, 0);
 	while (check_match(context.stones, del))
 	{
 		for (size_t d = 0; d < del.size(); ++d)
@@ -207,31 +209,26 @@ bool remove_stone_logic(GameContext& context)
 			DEBUG_LOG("Delete row: " << del[d].front().x() << " " << del[d].front().y() << " " <<
 					  del[d].back().x() << " " << del[d].back().y());
 			for (size_t i = 0; i < del[d].size(); ++i)
-				context.stones[del[d][i].y()][del[d][i].x()] = blocked_pos;
-			// attach new aspect before moving
-			boost::shared_ptr<mhe::game::Aspect> aspect =
-				context.stone_aspects[stone_index(del[d][0].x(), del[d][0].y())].lock();
-			const mhe::v3d correction(context.stone_size / 2, context.stone_size / 2, 0);
-			std::vector<mhe::v3d> row(del[d].size());
+				context.stones[del[d][i].y()][del[d][i].x()] = blocked_pos;			
 			for (size_t i = 0; i < del[d].size(); ++i)
-				row[i] = mhe::v3d(get_global_pos(context, del[d][i]) + correction);
-			remove_stones(context, del[d], row, context.effect_factory);
+				coord.push_back(mhe::v3d(get_global_pos(context, del[d][i]) + correction));				
+			indexes.insert(indexes.end(), del[d].begin(), del[d].end());
 			context.prev_clicked.set(-1, -1);
 			++count_deleted;
 		}
 		del.clear();
 	}
+	remove_stones(context, indexes, coord);
 	return count_deleted;
 }
 
 void remove_stones(GameContext& context, const std::vector< mhe::vector2<int> >& index_row,
-				   const std::vector<mhe::v3d>& row,
-				   boost::shared_ptr<StoneEffectFactory> effect_factory)
+				   const std::vector<mhe::v3d>& row)
 {
 	// create effects for each stone that will be removed
 	for (size_t i = 0; i < index_row.size(); ++i)	
 	{
-		boost::shared_ptr<mhe::iNode> effect = effect_factory->create_remove_stone_effect();
+		boost::shared_ptr<mhe::iNode> effect = context.effect_factory->create_remove_stone_effect();
 		effect->translate(mhe::v3d(row[i].x(), row[i].y(), 0));
 		// get aspect
 		boost::shared_ptr<mhe::game::Aspect> aspect =
@@ -260,6 +257,4 @@ void add_stone(GameContext& context, const mhe::vector2<int>& pos)
 	context.stones[pos.y()][pos.x()] = type;
 	context.stone_aspects[stone_index(pos.x(), pos.y())] =
 		context.stone_factory->create_stone(type, gl_pos);
-	context.engine->get_timed_events_manager().add(
-		new RemoveStoneLogicEvent(200, &context));
 }
