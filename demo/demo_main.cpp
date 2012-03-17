@@ -168,7 +168,7 @@ int main(int /*argc*/, char** /*argv*/)
 
 	engine.setGameScene(scene);
 	engine.getDriver()->disable_lighting();
-	engine.getDriver()->set_clear_color(mhe::cfWhite);
+	engine.getDriver()->set_clear_color(mhe::cfGreen);
 	scene.reset();
 
 	engine.run();

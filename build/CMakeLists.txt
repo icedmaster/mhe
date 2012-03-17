@@ -1,4 +1,3 @@
-
 set (PROJECT mhe_test)
 project (${PROJECT})
 

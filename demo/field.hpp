@@ -158,8 +158,7 @@ private:
 						context_->stone_aspects[stone_index(column, y)].lock()->update(mhe::game::transform_event, &mp);
 						context_->stones[y - 1][column] = context_->stones[y][column];
 						context_->stone_aspects[stone_index(column, y - 1)] = context_->stone_aspects[stone_index(column, y)];
-						if (parent == nullptr)
-							parent = context_->stone_aspects[stone_index(column, y - 1)].lock();
+						parent = context_->stone_aspects[stone_index(column, y - 1)].lock();
 						context_->stone_aspects[stone_index(column, y)].reset();
 					}
 					++moves_total;
