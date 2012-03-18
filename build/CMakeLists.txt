@@ -1,4 +1,4 @@
-set (PROJECT mhe_test)
+set (PROJECT mhe)
 project (${PROJECT})
 
 cmake_minimum_required (VERSION 2.8)
@@ -15,8 +15,6 @@ set (INCLUDE_ROOT ${CMAKE_SOURCE_DIR}/../include)
 
 set (LIB_DIR ${CMAKE_SOURCE_DIR}/../lib)
 
-set (DEMO_DIR ${CMAKE_SOURCE_DIR}/../demo)
-
 #set (SRC_DIR)
 
 set (SRC_PATH
@@ -29,10 +27,6 @@ set (SRC_PATH
   #${SOURCE_ROOT}/script
   ${LIB_DIR}/pugixml
 )
-
-if (MHE_BUILD STREQUAL "demo")
-  set (SRC_PATH ${SRC_PATH} ${DEMO_DIR})
-endif()
 
 set (INC_PATH
   ${INCLUDE_ROOT}
@@ -49,11 +43,6 @@ endforeach ()
 if (MHE_BUILD STREQUAL "test")
 	message("Create test target makefile")
 	set (SOURCE ${SOURCE} ${CMAKE_SOURCE_DIR}/../test_main.cpp)
-elseif (MHE_BUILD STREQUAL "demo")
-	message("Create demo target makefile")
-else()
-	message("Create usual makefile")
-	set (SOURCE ${SOURCE} ${CMAKE_SOURCE_DIR}/../main.cpp)
 endif()
 
 # find libraries
@@ -77,10 +66,6 @@ message(${SDL_LIB})
 find_library(PNG_LIB png)
 message("---- png ------")
 message(${PNG_LIB})
-
-find_library(BOOST_DATETIME_LIB boost_date_time)
-message("---- boost_date_time ------")
-message(${BOOST_DATETIME_LIB})
 
 if (WIN32)
    find_library(OPENAL_LIB openal32)
@@ -128,7 +113,7 @@ else()
   set(LIBS ${LIBS} ${BOOST_PYTHON_LIB} ${PYTHON_LIB})
 endif()
 
-add_executable (${PROJECT} ${SOURCE})
+add_library(${PROJECT} ${SOURCE})
 target_link_libraries(${PROJECT} ${LIBS})
 
 if (WIN32)
