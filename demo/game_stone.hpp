@@ -37,9 +37,9 @@ class StoneEffectFactory
 {
 public:
 	virtual ~StoneEffectFactory() {}
-	virtual boost::shared_ptr<mhe::iNode> create_move_stone_effect() const = 0;
-	virtual boost::shared_ptr<mhe::iNode> create_select_stone_effect() const = 0;
-	virtual boost::shared_ptr<mhe::iNode> create_remove_stone_effect() const = 0;
+	virtual boost::shared_ptr<mhe::Node> create_move_stone_effect() const = 0;
+	virtual boost::shared_ptr<mhe::Node> create_select_stone_effect() const = 0;
+	virtual boost::shared_ptr<mhe::Node> create_remove_stone_effect() const = 0;
 };
 
 #endif

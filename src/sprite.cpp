@@ -108,7 +108,7 @@ Sprite::Sprite(const Sprite& sprite) :
 {
 }
 
-    void Sprite::draw_impl(const boost::shared_ptr<iDriver>& driver)
+    void Sprite::draw_impl(boost::shared_ptr<Driver> driver)
     {
 		if (!is_running_)
 			execute(0);
@@ -165,7 +165,7 @@ Sprite::Sprite(const Sprite& sprite) :
         }
 	}
 
-iNode* Sprite::clone_impl() const
+Node* Sprite::clone_impl() const
 {
 	Sprite* cloned = new Sprite(*this);
 	cloned->is_alive_ = true;

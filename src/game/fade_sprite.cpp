@@ -10,7 +10,7 @@ FadeSprite::FadeSprite(const rect<float>& geom, cmn::uint fade_time,
 {
 }
 
-void FadeSprite::draw_impl(const boost::shared_ptr<iDriver>& driver)
+void FadeSprite::draw_impl(boost::shared_ptr<Driver> driver)
 {
 	const float v[] = {geom_.ll().x(), geom_.ll().y(), 0.0,
 					   geom_.ll().x(), geom_.rh().y(), 0.0,

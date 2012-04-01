@@ -2,7 +2,7 @@
 
 namespace mhe {
 
-void Scene::draw(boost::shared_ptr<iDriver> driver)
+void Scene::draw(boost::shared_ptr<Driver> driver)
 {
 	for (size_t i = 0; i < subscenes.size(); ++i)
 		subscenes[i]->draw(driver);
@@ -29,19 +29,19 @@ void Scene::update(cmn::uint tick)
 
 }
 
-boost::shared_ptr<iNode> Scene::get_node(const std::string& name) const
+boost::shared_ptr<Node> Scene::get_node(const std::string& name) const
 {
-	if (name.empty()) return boost::shared_ptr<iNode>();
+	if (name.empty()) return boost::shared_ptr<Node>();
 	for (size_t i = 0; i < subscenes.size(); ++i)
 	{
-		boost::shared_ptr<iNode> n = subscenes[i]->get_node(name);
+		boost::shared_ptr<Node> n = subscenes[i]->get_node(name);
 		if (n != nullptr) return n;
 	}
 	for (nodeset::const_iterator it = nodes_.begin(); it != nodes_.end(); ++it)
 	{
 		if ( (*it)->name() == name ) return *it;
 	}
-	return boost::shared_ptr<iNode>();		
+	return boost::shared_ptr<Node>();		
 }
 
 void Scene::remove(const std::string& name)

@@ -21,7 +21,7 @@ iSound* SoundLoader::load(const std::string& name, boost::shared_ptr<helper_type
 	}
 	if (loaded)
 	{
-		iSound* sound = SystemFactory::instance().createSound();
+		iSound* sound = SystemFactory::instance().create_sound();
 		if (sound->init(data))
 			return sound;
 		delete sound;
@@ -29,7 +29,7 @@ iSound* SoundLoader::load(const std::string& name, boost::shared_ptr<helper_type
 	return nullptr;
 }
 
-iTexture* TextureLoader::load(const std::string& filename, boost::shared_ptr<helper_type> helper)
+Texture* TextureLoader::load(const std::string& filename, boost::shared_ptr<helper_type> helper)
 {
 	const std::string& ext = get_file_extension(filename);
 	if (ext.empty()) return nullptr;
@@ -56,8 +56,8 @@ iTexture* TextureLoader::load(const std::string& filename, boost::shared_ptr<hel
 	}
 	if (loaded)
 	{
-		iTexture* texture = SystemFactory::instance().createTexture();
-		texture->setImage(im, helper);
+		Texture* texture = SystemFactory::instance().create_texture();
+		texture->set_image(im, helper);
 		return texture;
 	}
 	return nullptr;

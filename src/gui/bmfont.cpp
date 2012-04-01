@@ -103,7 +103,7 @@ namespace gui {
 	}
 
 	// must called from 2d mode
-	void BMFont::print(const boost::shared_ptr<iDriver>& driver, const std::wstring& text,
+	void BMFont::print(boost::shared_ptr<Driver> driver, const std::wstring& text,
 					   const v2d& coord)
 	{
 		std::vector<float> t;	// texture coordinates
@@ -122,7 +122,7 @@ namespace gui {
 			cmn::uint sym = (cmn::uint)text[i];
 			cmn::uint ind = get_char(sym);
 			const v2d& sz = ta_.get_size(ind);
-			const iTexture::texcoord& tc = ta_.get(ind);
+			const Texture::texcoord& tc = ta_.get(ind);
 			t.insert(t.end(), tc.data(), tc.data() + tc.size());
 			// prepare vertex coordinates
 			boost::array<float, 12> cc;

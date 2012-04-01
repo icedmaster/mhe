@@ -2,7 +2,7 @@
 #define _IFONT_HPP_
 
 #include <string>
-#include "idriver.hpp"
+#include "video_driver.hpp"
 #include "mhe_math.hpp"
 
 namespace mhe
@@ -14,7 +14,7 @@ namespace mhe
 			public:
 				virtual ~iFont() {}
 
-				virtual void print(const boost::shared_ptr<iDriver>& driver,
+				virtual void print(boost::shared_ptr<Driver> driver,
                                    const std::wstring& text,
                                    const v2d& coord) = 0;
 				virtual void setColor(const colorf& color) = 0;

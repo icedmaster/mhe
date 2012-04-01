@@ -6,7 +6,7 @@
 namespace mhe {
 namespace game {
 
-class FadeSprite : public iNode
+class FadeSprite : public Node
 {
 public:
 	FadeSprite(const rect<float>& geom, cmn::uint fade_time, 
@@ -18,7 +18,7 @@ private:
 	colorf color_;
 	cmn::uint prev_tick_;
 private:
-	virtual void draw_impl(const boost::shared_ptr<iDriver>& driver);
+	virtual void draw_impl(boost::shared_ptr<Driver> driver);
 	virtual void update_impl(cmn::uint tick);
 	virtual int get_priority() const   {return 5;}	// high priority
 };

@@ -1,66 +1,50 @@
-#ifndef _TEXTURE_HPP_
-#define _TEXTURE_HPP_
+#ifndef __TEXTURE_HPP__
+#define __TEXTURE_HPP__
 
-#include "itexture.hpp"
-#include "mhe_gl.hpp"
+#include "image.hpp"
+#include "video_driver.hpp"
+#include <boost/shared_ptr.hpp>
+#include <boost/array.hpp>
 
 namespace mhe
 {
-class OpenGLDriver;
-
-class Texture : public iTexture
-{
-private:
-	cmn::uint w_, h_;
-	cmn::uint id_;	
-	texcoord coord_;
-	bool binded_;
-	void rebuild_texture(const boost::shared_ptr<Image>& im,
-						 boost::shared_ptr<iDriver> driver, FilterType ft);	
-
-	friend class OpenGLDriver;
-public:
-	Texture();
-	~Texture();
-			
-	void setImage(const boost::shared_ptr<Image>& im, boost::shared_ptr<iDriver> driver,
-				  FilterType ft = Nearest)
+	enum FilterType
 	{
-		rebuild_texture(im, driver, ft);
-	}
-			
-	void prepare(boost::shared_ptr<iDriver> driver = 
-				 boost::shared_ptr<iDriver>());
-	void clean(boost::shared_ptr<iDriver> driver =
-			   boost::shared_ptr<iDriver>());
-			
-	cmn::uint width() const
-	{
-		return w_;
-	}
-			
-	cmn::uint height() const
-	{
-		return h_;
-	}
+		Nearest
+	};
 
-	TextureType type() const
+	enum TextureType
 	{
-		return Texture2D;
-	}
+		Texture2D,
+		Multitexture
+	};
 
-	boost::shared_ptr<iTexture> clone() const;
-
-	texcoord get_coord() const
+	class Texture
 	{
-		return coord_;
-	}
+	public:
+		typedef boost::array<float, 8> texcoord;
+	public:
+		virtual void set_image(boost::shared_ptr<Image>, boost::shared_ptr<Driver>,
+							   FilterType ft = Nearest) = 0;
+		virtual void prepare(boost::shared_ptr<Driver> driver =
+							 boost::shared_ptr<Driver>()) = 0;
+		virtual void clean(boost::shared_ptr<Driver> driver = 
+						   boost::shared_ptr<Driver>()) = 0;
 
-	void set_coord(const texcoord& tc)
-	{
-		coord_ = tc;
-	}
-};
+		virtual boost::shared_ptr<Texture> clone() const = 0;
+
+		virtual cmn::uint width() const = 0;
+		virtual cmn::uint height() const = 0;
+		virtual TextureType type() const = 0;		   
+
+		virtual texcoord get_coord() const
+		{
+			texcoord tc = {{0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0}};
+			return tc;
+		}
+
+		virtual void set_coord(const texcoord&) {}
+	};
 }
 
 #endif

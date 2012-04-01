@@ -3,12 +3,12 @@
 namespace mhe {
 namespace utils {
 
-FPSCounter::FPSCounter(boost::shared_ptr<iInputSystem> is) :
+FPSCounter::FPSCounter(boost::shared_ptr<InputSystem> is) :
 	frames(0), tick(0), seconds(0), last_second_fps(0), callback(0),
 	event_listener_(new FPSEventListener(SystemEventType, TICK, 0,
 										this, &FPSCounter::on_tick))
 {
-	is->addListener(event_listener_);
+	is->add_listener(event_listener_);
 }
 
 bool FPSCounter::on_tick(const Event& e)

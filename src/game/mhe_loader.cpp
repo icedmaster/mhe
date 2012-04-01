@@ -56,15 +56,15 @@ namespace game {
 		return false;
     }
 
-    boost::shared_ptr<iTexture> mhe_loader::get_texture(const std::wstring& name) const
+    boost::shared_ptr<Texture> mhe_loader::get_texture(const std::wstring& name) const
     {
         pugi::xml_node node;
         if (find_asset(node, L"texture", name))
             return load_texture(node);
-        return boost::shared_ptr<iTexture>();
+        return boost::shared_ptr<Texture>();
     }
 
-    boost::shared_ptr<iTexture> mhe_loader::load_texture(const pugi::xml_node& node) const
+    boost::shared_ptr<Texture> mhe_loader::load_texture(const pugi::xml_node& node) const
     {
         // get filename
         std::wstring fn(node.child(L"file").child_value());

@@ -2,7 +2,7 @@
 #define __FPS_COUNTER_HPP__
 
 #include "event.hpp"
-#include "inode.hpp"
+#include "node.hpp"
 #include "gui/ifont.hpp"
 #include "strutils.hpp"
 #include <boost/function.hpp>
@@ -29,7 +29,7 @@ private:
 
 	bool on_tick(const Event& e);
 public:
-	FPSCounter(boost::shared_ptr<iInputSystem> is);
+	FPSCounter(boost::shared_ptr<InputSystem> is);
 
 	cmn::uint frames_number() const
 	{
@@ -57,7 +57,7 @@ public:
 	}
 };
 
-class GraphicsFPSCounter : public FPSCounter, public iNode
+class GraphicsFPSCounter : public FPSCounter, public Node
 {
 private:
 	boost::weak_ptr<gui::iFont> font_;
@@ -81,7 +81,7 @@ private:
 		text_ = boost::lexical_cast<std::wstring>(static_cast<int>(average_fps()));
 	}
 public:
-	GraphicsFPSCounter(boost::shared_ptr<iInputSystem> is,
+	GraphicsFPSCounter(boost::shared_ptr<InputSystem> is,
 					   boost::shared_ptr<gui::iFont> font,
 					   const v2d& position) :
 		FPSCounter(is), font_(font), pos_(position)
@@ -90,7 +90,7 @@ public:
 	}
 
 private:
-	void draw_impl(const boost::shared_ptr<iDriver>& driver)
+	void draw_impl(boost::shared_ptr<Driver> driver)
 	{
 		if (font_.expired()) return;
 		font_.lock()->print(driver, text_, pos_);

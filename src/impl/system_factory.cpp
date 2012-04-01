@@ -1,93 +1,64 @@
 #include "impl/system_factory.hpp"
+#include "platform/platform.hpp"
 
-#include "opengl_driver.hpp"
-
-#ifdef __INCLUDE_SDL__
-    #include "sdl_input.hpp"
-	#include "sdl_window_system.hpp"
-#endif
-/*
-
-#ifdef __INCLUDE_OGLFT__
-    #include "gui/oglft_font.hpp"
-#endif
-
-#ifdef __INCLUDE_MHE_GUI__
-    #include "gui/mhe_label.hpp"
-#endif
-*/
+#include "video_driver.hpp"
 #include "texture.hpp"
-#include "multitexture.hpp"
-#include "sound/openal_audio_driver.hpp"
-#include "sound/openal_sound.hpp"
+#include "sound/isound.hpp"
+#include "sound/iaudio_driver.hpp"
 
 namespace mhe {
 
-iDriver* SystemFactory::createDriver() const
+Driver* SystemFactory::create_driver() const
 {
-	return new OpenGLDriver();
+#ifdef MHE_OPENGL
+	return new opengl::OpenGLDriver();
+#endif
 }
 
-iTexture* SystemFactory::createTexture() const
+Texture* SystemFactory::create_texture() const
 {
-	return new Texture();
+#ifdef MHE_OPENGL
+	return new opengl::OpenGLTexture();
+#endif
+	return nullptr;
 }
 
-iTexture* SystemFactory::create_multitexture() const
+Texture* SystemFactory::create_multitexture() const
 {
-	return new MultiTexture();
+#ifdef MHE_OPENGL
+	return new opengl::OpenGLMultiTexture();
+#endif
+	return nullptr;
 }
 
-iAudioDriver* SystemFactory::createAudioDriver() const
+iAudioDriver* SystemFactory::create_audio_driver() const
 {
 	return new OpenALAudioDriver();
 }
 
-iSound* SystemFactory::createSound() const
+iSound* SystemFactory::create_sound() const
 {
 	return new OpenALSound();
 }
 
-iWindowSystem* SystemFactory::createWindowSystem() const
+iWindowSystem* SystemFactory::create_window_system() const
 {
 	if (factory_ != nullptr) return factory_->create_window_system();
-    #ifdef __INCLUDE_SDL__
-    return new SDLWindowSystem;
+    #ifdef MHE_SDL
+    return new sdl::SDLWindowSystem;
     #endif
 
     return nullptr;
 }	
 
-iInputSystem* SystemFactory::createInputSystem() const
+InputSystem* SystemFactory::create_input_system() const
 {
 	if (factory_ != nullptr) return factory_->create_input_system();
-    #ifdef __INCLUDE_SDL__
-    return new SDLInputSystem;
-    #endif
-
-    return nullptr;
-}
-/*
-
-namespace gui {
-iFontManager* GUIFactory::createFontManager()
-{
-    #ifdef __INCLUDE_OGLFT__
-    return new gui::oglftFontManager;
+    #ifdef MHE_SDL
+    return new sdl::SDLInputSystem;
     #endif
 
     return nullptr;
 }
 
-LabelImpl* GUIFactory::createLabel()
-{
-    #ifdef __INCLUDE_MHE_GUI__
-    return new mheLabel;
-    #endif
-
-    return nullptr;
-}
-
-};  // gui*/
-
-};  // mhe
+}  // mhe

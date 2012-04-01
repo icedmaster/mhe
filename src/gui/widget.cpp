@@ -11,7 +11,7 @@ namespace gui {
 		clr(cfWhite)
 	{}
 
-	void Widget::draw_rect(const boost::shared_ptr<iDriver>& driver)						   
+	void Widget::draw_rect(const boost::shared_ptr<Driver>& driver)						   
 	{
 		if (!visible_) return;
 

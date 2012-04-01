@@ -1,8 +1,8 @@
 #ifndef _SPRITE_HPP_
 #define _SPRITE_HPP_
 
-#include "inode.hpp"
-#include "itexture.hpp"
+#include "node.hpp"
+#include "texture.hpp"
 #include "mhe_math.hpp"
 #include "transform.hpp"
 #include <vector>
@@ -14,7 +14,7 @@ namespace mhe
     {
         private:
             cmn::uint atime;    // time of playing current animation
-            boost::shared_ptr<iTexture> atexture;
+            boost::shared_ptr<Texture> atexture;
         public:
             Animation() :
                 atime(0)
@@ -26,7 +26,7 @@ namespace mhe
 			{}
 
             Animation(cmn::uint animation_time,
-                      const boost::shared_ptr<iTexture>& animation_texture) :
+                      const boost::shared_ptr<Texture>& animation_texture) :
                 atime(animation_time),
                 atexture(animation_texture)
             {
@@ -37,12 +37,12 @@ namespace mhe
                 return atime;
             }
 
-            const boost::shared_ptr<iTexture>& texture() const
+            const boost::shared_ptr<Texture>& texture() const
             {
                 return atexture;
             }
 
-			void set_texture(boost::shared_ptr<iTexture> t)
+			void set_texture(boost::shared_ptr<Texture> t)
 			{
 				atexture = t;
 			}
@@ -101,7 +101,7 @@ namespace mhe
 			}
     };
 
-    class Sprite : public iNode
+    class Sprite : public Node
     {
 	private:
 		typedef std::map <cmn::uint, AnimationList> almap;
@@ -115,7 +115,7 @@ namespace mhe
 		Animation cur_animation;
 	private:
 		// implementations
-		void draw_impl(const boost::shared_ptr<iDriver>& driver);
+		void draw_impl(boost::shared_ptr<Driver> driver);
 		void update_impl(cmn::uint tick);
 		void set_position(const v3d& pos);
 		matrixf get_matrix() const;
@@ -124,7 +124,7 @@ namespace mhe
 			execute(0);
 		}
 
-		iNode* clone_impl() const;
+		Node* clone_impl() const;
 	public:
 		Sprite() : is_alive_(true), is_running_(false), x_size_(0.0), y_size_(0.0),
 				   current_al_(0)

@@ -134,7 +134,7 @@ void GameField::handle_click(const mhe::vector2<int>& pos)
 	}
 }
 
-void GameField::translate_effect(boost::shared_ptr<mhe::iNode> effect, const mhe::vector2<int>& pos,
+void GameField::translate_effect(boost::shared_ptr<mhe::Node> effect, const mhe::vector2<int>& pos,
 								 const mhe::v3d& correction)
 {
 	effect->identity();
@@ -228,7 +228,7 @@ void remove_stones(GameContext& context, const std::vector< mhe::vector2<int> >&
 	// create effects for each stone that will be removed
 	for (size_t i = 0; i < index_row.size(); ++i)	
 	{
-		boost::shared_ptr<mhe::iNode> effect = context.effect_factory->create_remove_stone_effect();
+		boost::shared_ptr<mhe::Node> effect = context.effect_factory->create_remove_stone_effect();
 		effect->translate(mhe::v3d(row[i].x(), row[i].y(), 0));
 		// get aspect
 		boost::shared_ptr<mhe::game::Aspect> aspect =

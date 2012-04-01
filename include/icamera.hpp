@@ -2,7 +2,7 @@
 #define _ICAMERA_HPP_
 
 #include "mhe_math.hpp"
-#include "idriver.hpp"
+#include "video_driver.hpp"
 #include "transform.hpp"
 
 namespace mhe
@@ -20,7 +20,7 @@ namespace mhe
 			virtual void setPerspective(float fov, float aspect,
 										float znear, float zfar) = 0;
 
-			virtual void update(const boost::shared_ptr<iDriver>&) = 0;
+			virtual void update(boost::shared_ptr<Driver>) = 0;
 			virtual void set_id(cmn::uint id) = 0;
 			virtual cmn::uint get_id() const = 0;
 	};

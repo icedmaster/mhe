@@ -6,7 +6,7 @@
 #include "impl/system_factory.hpp"
 
 // texture
-#include "itexture.hpp"
+#include "texture.hpp"
 #include "png_image.hpp"
 #include "siwa_image.hpp"
 #include "bmp_image.hpp"
@@ -26,15 +26,15 @@ struct SoundLoader
 
 struct TextureLoader
 {
-	typedef iTexture type;
-	typedef iDriver helper_type;
+	typedef Texture type;
+	typedef Driver helper_type;
 	static type* load(const std::string& name, boost::shared_ptr<helper_type> helper);
 };
 
 struct FontLoader
 {
 	typedef gui::iFont type;
-	typedef iDriver helper_type;
+	typedef Driver helper_type;
 	static type* load(const std::string& name, boost::shared_ptr<helper_type> helper);
 };
 

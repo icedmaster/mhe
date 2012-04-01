@@ -45,7 +45,7 @@ private:
 		get_scene()->add(background);
 
 		fps_font = get_engine()->getFontManager().get("145");
-		boost::shared_ptr<mhe::iNode> fps_node(
+		boost::shared_ptr<mhe::Node> fps_node(
 			new mhe::utils::GraphicsFPSCounter(get_engine()->getInputSystem(),
 											   fps_font, mhe::v2d(20, 550)));
 		get_scene()->add(fps_node);
@@ -72,7 +72,7 @@ private:
 
 	void setup_events()
 	{
-		get_engine()->getInputSystem()->addListener(quit_listener_);
+		get_engine()->getInputSystem()->add_listener(quit_listener_);
 	}
 
 	// main process function
@@ -83,7 +83,7 @@ private:
 			MainMenuEventListener* listener = new MainMenuEventListener(mhe::TimerEventType,
 																		2000, mhe::TimerEvent::TIMER_ONCE,
 																		this, &MainMenuScene::repeat_theme);
-			get_engine()->getInputSystem()->addListener(listener);
+			get_engine()->getInputSystem()->add_listener(listener);
 			need_check_playing = false;
 		}
 		return true;
@@ -131,7 +131,7 @@ private:	// events
 		MainMenuEventListener* listener = new MainMenuEventListener(mhe::TimerEventType,
 																	1000, mhe::TimerEvent::TIMER_ONCE,
 																	this, &MainMenuScene::set_next_scene);
-		get_engine()->getInputSystem()->addListener(listener);
+		get_engine()->getInputSystem()->add_listener(listener);
 	}
 public:
 	MainMenuScene(mhe::game::Engine* engine) : mhe::game::GameScene(engine),

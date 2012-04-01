@@ -32,7 +32,7 @@ boost::shared_ptr<mhe::game::Aspect> StoneFactory::create_stone(int type,
 		ERROR_LOG("StoneFactory::create_stone stone for type " << type << " not found");
 		return boost::shared_ptr<mhe::game::Aspect>();
 	}
-	boost::shared_ptr<mhe::iNode> sprite(it->second->clone());
+	boost::shared_ptr<mhe::Node> sprite(it->second->clone());
 	sprite->translate(pos);
 	const std::string name = "stone" + mhe::utils::to_string(get_next_id());
 	boost::shared_ptr<mhe::game::NodeAspect> node(

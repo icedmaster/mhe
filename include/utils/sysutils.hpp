@@ -3,8 +3,7 @@
 
 #include <ctime>
 #include <cstdlib>
-#include "types.hpp"
-#include "config.hpp"
+#include "platform/platform_system.hpp"
 
 namespace mhe
 {
@@ -20,6 +19,16 @@ namespace mhe
             return (rand() % limit);
         }
 
+		inline cmn::uint range_random(cmn::uint min, cmn::uint max)
+		{
+			return (rand() % (max - min) + min);
+		}
+
+		inline float range_random(float min, float max)
+		{
+			return rand() * (1.0 / 65535.0) * (max - min) + (max - min);
+		}
+
         // with sign
         inline int srandom(cmn::uint limit, int probability = 50)
         {
@@ -32,9 +41,7 @@ namespace mhe
 
 		inline cmn::uint get_current_tick()
 		{
-			#ifdef __INCLUDE_SDL__
-			return SDL_GetTicks();
-			#endif
+			return impl::get_current_tick();
 		}			
     }
 }

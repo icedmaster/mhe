@@ -1,7 +1,7 @@
 #ifndef _GUI_CONTAINER_HPP_
 #define _GUI_CONTAINER_HPP_
 
-#include "inode.hpp"
+#include "node.hpp"
 #include "event.hpp"
 #include "widget.hpp"
 #include <vector>
@@ -10,7 +10,7 @@ namespace mhe
 {
 	namespace gui
 	{
-		class GUIContainer : public iNode
+		class GUIContainer : public Node
 		{
 			private:
 				std::vector< boost::shared_ptr<Widget> > widgets_;
@@ -25,19 +25,19 @@ namespace mhe
 				bool handle_mouse_click(const Event& e);
 				bool handle_mouse_move(const Event& e);
 			private:
-				void draw_impl(const boost::shared_ptr<iDriver>& driver);
+				void draw_impl(boost::shared_ptr<Driver> driver);
 				int get_priority() const
 				{
 					return 5;	// GUI will draw at last point
 				}
 			public:
 				GUIContainer();
-				GUIContainer(boost::shared_ptr<iInputSystem> is);
+				GUIContainer(boost::shared_ptr<InputSystem> is);
 
 				void add(const boost::shared_ptr<Widget>& widget);
 				boost::shared_ptr<Widget> get(const std::string& name) const;
 
-				void setupEvents(boost::shared_ptr<iInputSystem> is);
+				void setupEvents(boost::shared_ptr<InputSystem> is);
 		};
 	}
 }

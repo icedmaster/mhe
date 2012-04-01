@@ -2,7 +2,6 @@
 #define _HIGHLIGHTED_WIDGET_HPP_
 
 #include "gui/widget.hpp"
-#include "itexture.hpp"
 
 namespace mhe
 {

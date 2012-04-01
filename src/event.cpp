@@ -3,7 +3,7 @@
 
 namespace mhe {
 
-void iInputSystem::addListener(boost::shared_ptr<EventListener> el)
+void InputSystem::add_listener(boost::shared_ptr<EventListener> el)
 {
 	Listener listener;
 	listener.listener = boost::weak_ptr<EventListener>(el);
@@ -16,7 +16,7 @@ void iInputSystem::addListener(boost::shared_ptr<EventListener> el)
 	add_listener(listener);
 }
 
-void iInputSystem::add_listener(const Listener& l)
+void InputSystem::add_listener(const Listener& l)
 {
 	boost::shared_ptr<EventListener> el = l.listener.lock();	
 	if (!get_event_optarg(el->id()) && get_event_arg(el->id()))
@@ -28,12 +28,12 @@ void iInputSystem::add_listener(const Listener& l)
 												 
 }
 
-void iInputSystem::set_input_state(bool enable)
+void InputSystem::set_input_state(bool enable)
 {
 	input_enabled_ = enable;
 }
 
-void iInputSystem::add_timer_listener(const Listener& listener)
+void InputSystem::add_timer_listener(const Listener& listener)
 {
 	TimerListener tl;
 	boost::shared_ptr<EventListener> el = listener.listener.lock();
@@ -43,7 +43,7 @@ void iInputSystem::add_timer_listener(const Listener& listener)
 	timer_listeners_.push_back(tl);
 }
 
-void iInputSystem::addListener(EventListener* el)
+void InputSystem::add_listener(EventListener* el)
 {
 	// once listener
 	Listener listener;
@@ -58,7 +58,7 @@ void iInputSystem::addListener(EventListener* el)
 	add_listener(listener);
 }
 
-void iInputSystem::check_timer_events()
+void InputSystem::check_timer_events()
 {
 	cmn::uint now = utils::get_current_tick();
 	for (std::vector<TimerListener>::iterator it = timer_listeners_.begin();
@@ -87,12 +87,12 @@ void iInputSystem::check_timer_events()
 	}
 }
 
-void iInputSystem::add_event_timestamp(Event* e)
+void InputSystem::add_event_timestamp(Event* e)
 {
 	e->set_timestamp(utils::get_current_tick());
 }
 
-void iInputSystem::check_listeners(Event& e)
+void InputSystem::check_listeners(Event& e)
 {
 	if (!filter_event(e)) return;
 	add_event_timestamp(&e);
@@ -144,7 +144,7 @@ void iInputSystem::check_listeners(Event& e)
 	}
 }
 
-bool iInputSystem::filter_event(const Event& e) const
+bool InputSystem::filter_event(const Event& e) const
 {
 	if (input_enabled_) return true;
 	if (e.type() == MouseEventType)

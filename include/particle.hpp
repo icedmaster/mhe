@@ -1,114 +1,71 @@
 #ifndef _PARTICLE_HPP_
 #define _PARTICLE_HPP_
 
-#include "inode.hpp"
 #include "mhe_math.hpp"
-#include "idriver.hpp"
+#include "types.hpp"
+#include "video_driver.hpp"
 #include <boost/array.hpp>
 
 namespace mhe
 {
-    const size_t particle_vertexes_num = 12;
-    const size_t particle_indices_num  = 6;
-	class Particle : public iNode
+const size_t particle_vertexes_num = 12;
+const size_t particle_indices_num  = 6;
+
+class Particle
+{
+public:
+	Particle(float size, float size_delta,
+			 const colorf& color, const colorf& color_delta, float alpha_delta,
+			 const v3d& speed, const v3d& accel, cmn::uint lifetime) :
+		size_(size), size_delta_(size_delta),
+		color_(color), color_delta_(color_delta), alpha_delta_(alpha_delta),
+		speed_(speed), accel_(accel), 
+		start_time_(0), lifetime_(lifetime)
+	{}
+
+	const v3d& position() const 
 	{
-        public:
-            typedef boost::array<float, particle_vertexes_num> varray;
-            typedef boost::array<cmn::uint, particle_indices_num> iarray;
-		private:
-			v3d pos_;
-			v3d vel_;	// velocity
-			cmn::uint lifetime_;
-			colorf begin_color_;
-			colorf end_color_;
-			colorf cur_color_;
-			bool is_alive_;
-			cmn::uint start_time_;
-			cmn::uint before_die_;
-			float size_;
-            varray v;
-            varray n;
-            iarray i;
-		private:
-			void draw_impl(const boost::shared_ptr<iDriver>& driver);
-			void update_impl(cmn::uint tick);
-		public:
-			Particle();
-			Particle(const Particle&);
+		return position_;
+	}
 
-			void start(cmn::uint tick);
-			void kill();
+	const colorf& color() const
+	{
+		return color_;
+	}
 
-			const v3d& position() const
-			{
-				return pos_;
-			}
+	bool is_alive(cmn::uint tick) const
+	{
+		return ((tick - start_time_) > lifetime_);
+	}
 
-			void set_position(const v3d& position)
-			{
-			    pos_ = position;
-			}
+	float size() const
+	{
+		return size_;
+	}
 
-			const v3d& velocity() const
-			{
-			    return vel_;
-			}
-
-			void set_velocity(const v3d& velocity)
-			{
-			    vel_ = velocity;
-			}
-
-			const colorf& color() const
-			{
-				return cur_color_;
-			}
-
-			void set_color(const colorf& c)
-			{
-			    cur_color_ = c;
-			}
-
-			bool alive() const
-			{
-				return is_alive_;
-			}
-
-			cmn::uint before_die() const
-			{
-			    return before_die_;
-			}
-
-			cmn::uint lifetime() const
-			{
-			    return lifetime_;
-			}
-
-			void set_lifetime(cmn::uint lftime)
-			{
-			    lifetime_ = lftime;
-			}
-
-			void set_size(float size)
-			{
-			    size_ = size;
-			}
-
-			const varray& get_vertexes() const
-			{
-			    return v;
-			}
-
-			const varray& get_normals() const
-			{
-			    return v;
-			}
-
-			const iarray& get_indices() const
-			{
-			    return i;
-			}
-	};
+	void update(cmn::uint tick)
+	{
+		if (!is_alive(tick)) return;
+		size_ += size_delta_;
+		color_ += color_delta_;
+		color_.set_w(color_.a() + alpha_delta_);
+		position_ += speed_;
+		speed_ *= accel_;
+	}
+private:
+	float size_;
+	float size_delta_;
+	colorf color_;
+	colorf color_delta_;
+	float alpha_delta_;
+	v3d speed_;
+	v3d accel_;
+	v3d position_;
+	v3d direction_;
+	cmn::uint start_time_;
+	cmn::uint lifetime_;
 };
+
+}
 
 #endif

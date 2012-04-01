@@ -8,7 +8,7 @@ namespace mhe
 {
 	namespace gui
 	{
-		class Cursor : public iNode
+		class Cursor : public Node
 		{
 			private:
 				boost::shared_ptr<Sprite> sprite_;
@@ -22,10 +22,10 @@ namespace mhe
 				bool handle_mouse_move(const Event& e);
 				bool handle_mouse_click(const Event& e);
 			private:
-				void draw_impl(const boost::shared_ptr<iDriver>& driver);
+				void draw_impl(boost::shared_ptr<Driver> driver);
 				void update_impl(cmn::uint tick);
 			public:
-				Cursor(boost::shared_ptr<iInputSystem> is);
+				Cursor(boost::shared_ptr<InputSystem> is);
 
 				void setSprite(const boost::shared_ptr<Sprite>& sprite);
 		};

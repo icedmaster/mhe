@@ -16,17 +16,17 @@ public:
 		init_remove_effect(loader);
 	}
 
-	boost::shared_ptr<mhe::iNode> create_move_stone_effect() const
+	boost::shared_ptr<mhe::Node> create_move_stone_effect() const
 	{
 		return move_effect_;
 	}
 
-	boost::shared_ptr<mhe::iNode> create_select_stone_effect() const
+	boost::shared_ptr<mhe::Node> create_select_stone_effect() const
 	{
 		return select_effect_;
 	}
 
-	boost::shared_ptr<mhe::iNode> create_remove_stone_effect() const
+	boost::shared_ptr<mhe::Node> create_remove_stone_effect() const
 	{
 		boost::shared_ptr<mhe::CircleParticleEffect> peffect(new mhe::CircleParticleEffect(mhe::cfGreen, 25));
 		boost::shared_ptr<mhe::ParticleSystem> ps(new mhe::ParticleSystem(20, mhe::v3d(), true));
@@ -56,8 +56,8 @@ private:
 	{
 	}
 
-	boost::shared_ptr<mhe::iNode> move_effect_;
-	boost::shared_ptr<mhe::iNode> select_effect_;
+	boost::shared_ptr<mhe::Node> move_effect_;
+	boost::shared_ptr<mhe::Node> select_effect_;
 };
 
 class DemoGameScene : public mhe::game::GameScene
@@ -70,7 +70,7 @@ public:
 		reset_listener_(new DemoGameSceneListener(mhe::KeyboardEventType, mhe::KEY_DOWN, SDLK_r,
 												  this, &DemoGameScene::reset_field))
 	{
-		get_engine()->getInputSystem()->addListener(reset_listener_);
+		get_engine()->getInputSystem()->add_listener(reset_listener_);
 	}
 private:
 	bool init_impl(const std::string& arg, void*)
@@ -85,7 +85,7 @@ private:
 		loader.load_all_assets();
 		fps_font = get_engine()->getFontManager().get("145");
 		fps_font->setColor(mhe::cfWhite);
-		boost::shared_ptr<mhe::iNode> fps_node(
+		boost::shared_ptr<mhe::Node> fps_node(
 			new mhe::utils::GraphicsFPSCounter(get_engine()->getInputSystem(),
 											   fps_font, mhe::v2d(20, 550)));
 		get_scene()->add(fps_node);

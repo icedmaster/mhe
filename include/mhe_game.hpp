@@ -5,9 +5,7 @@
 #include "game/game_scene.hpp"
 #include "game/highlited_widget.hpp"
 #include "game/fade_sprite.hpp"
-#include "game/graphics_aspect.hpp"
 #include "game/node_aspect.hpp"
-#include "game/gui_aspect.hpp"
 #include "game/mhe_loader.hpp"
 
 #endif

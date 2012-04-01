@@ -29,8 +29,8 @@ namespace game {
 		bool find_asset(pugi::xml_node& node,
 						const std::wstring& type, const std::wstring& name) const;
 
-		boost::shared_ptr<iTexture> get_texture(const std::wstring& name) const;
-		boost::shared_ptr<iTexture> load_texture(const pugi::xml_node& node) const;
+		boost::shared_ptr<Texture> get_texture(const std::wstring& name) const;
+		boost::shared_ptr<Texture> load_texture(const pugi::xml_node& node) const;
 
 		boost::shared_ptr<gui::iFont> get_font(const std::wstring& name) const;
 		boost::shared_ptr<gui::iFont> load_font(const pugi::xml_node& node) const;

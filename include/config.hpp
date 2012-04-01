@@ -1,12 +1,32 @@
-#ifndef _CONFIG_HPP_
-#define _CONFIG_HPP_
+#ifndef __CONFIG_HPP__
+#define __CONFIG_HPP__
 
-#define __INCLUDE_OGLFT__
-#define __INCLUDE_SDL__
-#define __INCLUDE_MHE_GUI__
+// OS
+#ifdef __linux__
+	#define MHE_LINUX
+#elif __WIN32__
+	#define MHE_WIN
+#else
+	#error Unknown operation system
+#endif
 
-#ifdef __INCLUDE_SDL__
-	#include <SDL/SDL.h>
+// window system
+#ifdef MHE_HAS_SDL
+	#define MHE_SDL
+#endif
+
+#ifdef MHE_HAS_QT
+	#define MHE_QT
+#endif
+
+// video driver
+#ifdef MHE_HAS_OPENGL
+	#define MHE_OPENGL
+#endif
+
+// audio driver
+#ifdef MHE_HAS_OPENAL
+	#define MHE_OPENAL
 #endif
 
 #endif

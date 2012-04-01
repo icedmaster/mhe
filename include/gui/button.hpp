@@ -2,7 +2,6 @@
 #define _BUTTON_HPP_
 
 #include "widget.hpp"
-#include "itexture.hpp"
 #include <map>
 
 namespace mhe

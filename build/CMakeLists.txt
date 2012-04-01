@@ -1,3 +1,8 @@
+# flags
+# MHE_DISABLE_AUDIO
+# MHE_DISABLE_SDL
+
+
 set (PROJECT mhe)
 project (${PROJECT})
 
@@ -15,7 +20,7 @@ add_definitions(-Wall)
 add_definitions(-Wextra)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
-	add_definitions(-O2)
+add_definitions(-O2)
 endif()
 
 set (SOURCE_ROOT ${CMAKE_SOURCE_DIR}/../src)
@@ -30,11 +35,14 @@ set (SRC_PATH
   ${SOURCE_ROOT}/gui
   ${SOURCE_ROOT}/impl
   ${SOURCE_ROOT}/utils
-  ${SOURCE_ROOT}/sound
   ${SOURCE_ROOT}/game
   #${SOURCE_ROOT}/script
   ${LIB_DIR}/pugixml
 )
+
+if (NOT DEFINED MHE_DISABLE_SOUND)
+   set(SRC_PATH ${SRC_PATH} ${SOURCE_ROOT}/sound)
+endif()
 
 set (INC_PATH
   ${INCLUDE_ROOT}
@@ -44,13 +52,13 @@ set (INC_PATH
 set(PLATFORM_IMPL_SOURCES ${SOURCE_ROOT}/platform)
 set(OPENGL_IMPL_SOURCES ${PLATFORM_IMPL_SOURCES}/opengl)
 set(LINUX_PLATFORM_SOURCES ${PLATFORM_IMPL_SOURCES}/linux)
+set(WIN_PLATFORM_SOURCES ${PLATFORM_IMPL_SOURCES}/win)
 
 # platform
 if (WIN32)
-   add_definitions(-DMHE_WIN32)
+   set(SRC_PATH ${WIN_PLATFORM_SOURCES} ${SRC_PATH})
 else()
-	add_definitions(-DMHE_LINUX)		
-	set(SRC_PATH ${LINUX_PLATFORM_SOURCES} ${SRC_PATH})
+   set(SRC_PATH ${LINUX_PLATFORM_SOURCES} ${SRC_PATH})
 endif()
 
 include_directories (${INC_PATH})
@@ -63,28 +71,30 @@ else (CMAKE_HOST_UNIX)
    find_library(OPENGL_LIB opengl32)
 endif()
 if (${OPENGL_LIB} STREQUAL "OPENGL_LIB-NOTFOUND")
-	message("OpenGL lib not found")
+message("OpenGL lib not found")
 else()
-	message("---- opengl ------")
-	message(${OPENGL_LIB})
-	add_definitions(-DMHE_OPENGL)
-	# add platform sources
-	set(SRC_PATH ${OPENGL_IMPL_SOURCES} ${SRC_PATH})
+message("---- opengl ------")
+message(${OPENGL_LIB})
+add_definitions(-DMHE_HAS_OPENGL)
+# add platform sources
+set(SRC_PATH ${OPENGL_IMPL_SOURCES} ${SRC_PATH})
 endif()
 
-find_library(SDL_LIB SDL)
-if (${SDL_LIB} STREQUAL "SDL_LIB-NOTFOUND")
-	message("SDL not found")
-else()
-	if (WIN32)
-	    find_library(SDLMAIN_LIB SDLmain)		
-   		set(SDL_LIB mingw32 ${SDLMAIN_LIB} ${SDL_LIB})
-	endif()
-	message("---- sdl ------")
-	message(${SDL_LIB})
-	add_definitions(-DMHE_SDL)
-	set(SRC_PATH ${SRC_PATH} ${PLATFORM_IMPL_SOURCES}/sdl)
-endif()	
+if (NOT DEFINED MHE_DISABLE_SDL)
+   find_library(SDL_LIB SDL)
+   if (${SDL_LIB} STREQUAL "SDL_LIB-NOTFOUND")
+   message("SDL not found")
+   else()
+   if (WIN32)
+   	  find_library(SDLMAIN_LIB SDLmain)
+   	  set(SDL_LIB mingw32 ${SDLMAIN_LIB} ${SDL_LIB})
+   endif()
+   message("---- sdl ------")
+   message(${SDL_LIB})
+   add_definitions(-DMHE_HAS_SDL)
+   set(SRC_PATH ${SRC_PATH} ${PLATFORM_IMPL_SOURCES}/sdl)
+   endif()
+endif()
 
 find_library(PNG_LIB png)
 message("---- png ------")
@@ -93,14 +103,14 @@ message(${PNG_LIB})
 if (WIN32)
     find_library(OPENAL_LIB openal32)
 else()
-	find_library(OPENAL_LIB openal)
+find_library(OPENAL_LIB openal)
 endif()
 if (${OPENAL_LIB} STREQUAL "OPENAL_LIB-NOTFOUND")
   message("OpenAL not found")
 else()
   message("---- OpenAL -----")
   message(${OPENAL_LIB})
-  add_definitions(-DMHE_OPENAL)
+  add_definitions(-DMHE_HAS_OPENAL)
 endif()
 
 find_library(VORBISFILE_LIB vorbisfile)
@@ -116,16 +126,16 @@ message("---- ogg ----")
 message(${OGG_LIB})
 
 set (LIBS ${OPENGL_LIB} ${SDL_LIB} ${PNG_LIB} ${BOOST_DATETIME_LIB} ${OPENAL_LIB}
-	${VORBISFILE_LIB} ${VORBIS_LIB} ${OGG_LIB})
+${VORBISFILE_LIB} ${VORBIS_LIB} ${OGG_LIB})
 if (WIN32)
    set (LIBS ${LIBS} Ws2_32)
 endif()
 
 if (MHE_BUILD STREQUAL "test")
-	find_library(GTEST_LIB gtest)
-	message("---- gtest ----")
-	message(${GTEST_LIB})
-	set (LIBS ${LIBS} ${GTEST_LIB})
+find_library(GTEST_LIB gtest)
+message("---- gtest ----")
+message(${GTEST_LIB})
+set (LIBS ${LIBS} ${GTEST_LIB})
 endif()
 
 # find scripts
@@ -147,20 +157,26 @@ foreach (DIR ${SRC_PATH})
 endforeach ()
 
 if (MHE_BUILD STREQUAL "test")
-	message("Create test target makefile")
-	set (SOURCE ${SOURCE} ${CMAKE_SOURCE_DIR}/../test_main.cpp)
+message("Create test target makefile")
+set (SOURCE ${SOURCE} ${CMAKE_SOURCE_DIR}/../test_main.cpp)
+endif()
+
+# system
+if (CMAKE_HOST_UNIX)
+   find_library(RT_LIB rt)
+   set(LIBS ${LIBS} ${RT_LIB})
 endif()
 
 set(DEP_LIBS ${LIBS})
-
-if (MHE_BUILD_DEMO)
-	message("Build demo")
-	add_subdirectory(${CMAKE_SOURCE_DIR}/../demo/build/ ${CMAKE_SOURCE_DIR}/../demo/build/)
-endif()
 
 add_library(${PROJECT} ${SOURCE})
 target_link_libraries(${PROJECT} ${LIBS})
 
 if (WIN32)
    set_target_properties(${PROJECT} PROPERTIES LINK_FLAGS "-Wl,--enable-stdcall-fixup")
+endif()
+
+if (MHE_BUILD_DEMO)
+	message("Build demo")
+	add_subdirectory(${CMAKE_SOURCE_DIR}/../demo/build/ ${CMAKE_SOURCE_DIR}/../demo/build/)
 endif()

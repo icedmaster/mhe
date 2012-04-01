@@ -37,7 +37,7 @@ namespace mhe
 		proj_m.set_perspective(fov, aspect, znear, zfar);
 	}
 
-	void Camera::update(const boost::shared_ptr<iDriver>& driver)
+	void Camera::update(boost::shared_ptr<Driver> driver)
 	{
 		// update matricies
 		driver->set_projection_matrix(proj_m);

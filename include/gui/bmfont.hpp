@@ -27,7 +27,7 @@ namespace mhe
 
 				bool load(const std::string& filename);
 
-				void print(const boost::shared_ptr<iDriver>& driver, const std::wstring& text,
+				void print(boost::shared_ptr<Driver> driver, const std::wstring& text,
 						   const v2d& coord);
 				void setColor(const colorf& color)
 				{

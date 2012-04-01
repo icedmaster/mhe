@@ -16,7 +16,7 @@ namespace gui {
 	{}
 
 
-	GUIContainer::GUIContainer(boost::shared_ptr<iInputSystem> is) :
+	GUIContainer::GUIContainer(boost::shared_ptr<InputSystem> is) :
 		mouse_move_listener_(new gui_event_handler(MouseEventType, MOUSE_MOVE, 0,
 												   this,
 	                                               &GUIContainer::handle_mouse_move)),
@@ -45,7 +45,7 @@ namespace gui {
 		return boost::shared_ptr<Widget>();
 	}
 
-	void GUIContainer::draw_impl(const boost::shared_ptr<iDriver>& driver)
+	void GUIContainer::draw_impl(boost::shared_ptr<Driver> driver)
 	{
 		for (size_t i = 0; i < widgets_.size(); ++i)
 			widgets_[i]->draw(driver);
@@ -77,11 +77,11 @@ namespace gui {
 		return true;
 	}
 
-	void GUIContainer::setupEvents(boost::shared_ptr<iInputSystem> is)
+	void GUIContainer::setupEvents(boost::shared_ptr<InputSystem> is)
 	{
-        is->addListener(mouse_move_listener_);
-		is->addListener(mouse_click_listener_);
-		is->addListener(mouse_release_listener_);
+        is->add_listener(mouse_move_listener_);
+		is->add_listener(mouse_click_listener_);
+		is->add_listener(mouse_release_listener_);
 	}
 
 }

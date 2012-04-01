@@ -15,9 +15,9 @@ namespace mhe
 
 			virtual bool init(const vector2<int>&, int, bool) = 0;
 			virtual void close() = 0;
-			virtual void setCaption(const std::string&) = 0;
-			virtual void swapBuffers() = 0;
-			virtual void showCursor(bool) = 0;
+			virtual void set_caption(const std::string&) = 0;
+			virtual void swap_buffers() = 0;
+			virtual void show_cursor(bool) = 0;
 	};
 
 	class WindowSystem
@@ -29,7 +29,7 @@ namespace mhe
 			bool fullscreen_;
 		public:
 			WindowSystem() :
-				impl_(SystemFactory::instance().createWindowSystem())
+				impl_(SystemFactory::instance().create_window_system())
 			{}
 
 			~WindowSystem()
@@ -45,13 +45,13 @@ namespace mhe
 				fullscreen_ = fullscreen;
 				bool res = impl_->init(win_dim_, bpp, fullscreen);
 				if (res)
-					impl_->setCaption(caption);
+					impl_->set_caption(caption);
 				return res;
 			}
 
-			void swapBuffers()
+			void swap_buffers()
 			{
-				impl_->swapBuffers();
+				impl_->swap_buffers();
 			}
 
 			int width() const
@@ -64,9 +64,9 @@ namespace mhe
 				return win_dim_.y();
 			}
 
-			void showCursor(bool show)
+			void show_cursor(bool show)
 			{
-				impl_->showCursor(show);
+				impl_->show_cursor(show);
 			}
 	};
 

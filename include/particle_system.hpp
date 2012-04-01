@@ -1,50 +1,55 @@
 #ifndef _PARTICLE_SYSTEM_HPP_
 #define _PARTICLE_SYSTEM_HPP_
 
-#include "particle.hpp"
-#include "particle_effect.hpp"
+#include "particle_emitter.hpp"
 #include "mhe_math.hpp"
-#include "itexture.hpp"
+#include "texture.hpp"
+#include "node.hpp"
 #include <boost/shared_ptr.hpp>
+#include <list>
 
 namespace mhe
 {
-    class ParticleSystem : public iNode
-    {
-        private:
-            std::vector<Particle> particles_;
-            boost::shared_ptr<ParticleEffect> effect_;            
-            bool autorestart_;
-            bool alive_;
-            boost::shared_ptr<iTexture> texture_;
-            std::vector<float> vbuf;
-            std::vector<float> nbuf;
-            std::vector<cmn::uint> ibuf;
-            std::vector<float> cbuf;
-            std::vector<float> tbuf;
 
-            void init_particles(cmn::uint num);
-        private:
-            void draw_impl(const boost::shared_ptr<iDriver>& driver);
-            void update_impl(cmn::uint tick);
-            bool is_alive() const
-            {
-                return alive_;
-            }
+class ParticleSystem : public Node
+{
+public:
+	ParticleSystem()
+	{}
 
-            void start_impl(cmn::uint tick);
-        public:
-            ParticleSystem(cmn::uint num);
-            ParticleSystem(cmn::uint num, const v3d& pos, bool autorestart = false);
+	ParticleSystem(const v3d& pos)
+	{
+		matrixf m;
+		m.set_translate(pos);
+		Transform::set_transform(m);
+	}
 
-            void addEffect(ParticleEffect* pe);
-            void addEffect(const boost::shared_ptr<ParticleEffect>& pe);
+	void set_emitter(boost::shared_ptr<ParticleEmitter> emitter)
+	{
+		emitter_ = emitter;
+	}
 
-            // particles modification
-            void setSize(float size);
+	void set_texture(boost::shared_ptr<Texture> texture)
+	{
+		texture_ = texture;
+	}
 
-            void setTexture(const boost::shared_ptr<iTexture>& t);
-    };
+	bool is_alive() const;
+private:
+	void draw_impl(boost::shared_ptr<Driver> driver);
+	void update_impl(cmn::uint tick);
+	void start_impl(cmn::uint tick);
+private:
+	std::list<Particle> particles_;
+	boost::shared_ptr<ParticleEmitter> emitter_;          
+	boost::shared_ptr<Texture> texture_;
+	std::vector<float> vbuf;
+	std::vector<float> nbuf;
+	std::vector<cmn::uint> ibuf;
+	std::vector<float> cbuf;
+	std::vector<float> tbuf;
 };
+
+}
 
 #endif

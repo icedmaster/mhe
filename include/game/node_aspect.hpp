@@ -1,7 +1,7 @@
 #ifndef __NODE_ASPECT_HPP__
 #define __NODE_ASPECT_HPP__
 
-#include "inode.hpp"
+#include "node.hpp"
 #include "aspect.hpp"
 
 namespace mhe {
@@ -26,7 +26,7 @@ inline MoveParams make_move_params(const mhe::matrixf& m, cmn::uint upd_time, cm
 class NodeAspect : public Aspect
 {
 public:
-	NodeAspect(const std::string& name, boost::shared_ptr<iNode> node,
+	NodeAspect(const std::string& name, boost::shared_ptr<Node> node,
 			   boost::shared_ptr<Scene> scene) :
 		Aspect(name), node_(node), scene_(scene), moved_count_(0), last_time_(0),
 		current_move_params_(0)
@@ -35,7 +35,7 @@ public:
 	}
 
 	NodeAspect(const std::string& name, const std::string& add_name,
-			   boost::shared_ptr<iNode> node, boost::shared_ptr<Scene> scene) :
+			   boost::shared_ptr<Node> node, boost::shared_ptr<Scene> scene) :
 		Aspect(name, add_name), node_(node), scene_(scene), moved_count_(0), last_time_(0),
 		current_move_params_(0)
 	{
@@ -109,7 +109,7 @@ private:
 		node_->start();
 	}
 
-	boost::shared_ptr<iNode> node_;
+	boost::shared_ptr<Node> node_;
 	boost::shared_ptr<Scene> scene_;
 	cmn::uint moved_count_;
 	cmn::uint last_time_;

@@ -36,7 +36,7 @@ namespace mhe
 			void setPerspective(float fov, float aspect,
 								float znear, float zfar);
 										
-			void update(const boost::shared_ptr<iDriver>& driver);
+			void update(boost::shared_ptr<Driver> driver);
 
 			void set_id(cmn::uint value)
 			{

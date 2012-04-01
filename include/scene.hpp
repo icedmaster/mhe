@@ -1,7 +1,7 @@
 #ifndef _SCENE_HPP_
 #define _SCENE_HPP_
 
-#include "inode.hpp"
+#include "node.hpp"
 #include "icamera.hpp"
 #include <set>
 #include <vector>
@@ -16,11 +16,11 @@ namespace mhe
 			struct Callback
 			{
 				virtual ~Callback() {}
-				virtual void beforeDraw(const Scene*, boost::shared_ptr<iDriver>) {}
-				virtual void afterDraw(const Scene*, boost::shared_ptr<iDriver>) {}
+				virtual void beforeDraw(const Scene*, boost::shared_ptr<Driver>) {}
+				virtual void afterDraw(const Scene*, boost::shared_ptr<Driver>) {}
 			};
 		private:
-			typedef std::multiset< boost::shared_ptr<iNode>, sort_node_by_pri > nodeset;
+			typedef std::multiset< boost::shared_ptr<Node>, sort_node_by_pri > nodeset;
 			nodeset nodes_;
 			std::map<cmn::uint, boost::shared_ptr<iCamera> > cameras_;
 			boost::shared_ptr<iCamera> main_camera;	// main camera
@@ -28,12 +28,12 @@ namespace mhe
 
 			std::vector< boost::shared_ptr<Scene> > subscenes;
 		public:
-			void add(boost::shared_ptr<iNode> node)
+			void add(boost::shared_ptr<Node> node)
 			{
 				nodes_.insert(node);
 			}
 
-			void remove(boost::shared_ptr<iNode> node)
+			void remove(boost::shared_ptr<Node> node)
 			{
 				//nodes_.erase(node);
 				for (nodeset::iterator it = nodes_.begin(); it != nodes_.end(); ++it)
@@ -67,7 +67,7 @@ namespace mhe
 			}
 
 			void update(cmn::uint tick);
-			void draw(boost::shared_ptr<iDriver> driver);
+			void draw(boost::shared_ptr<Driver> driver);
 
 			void setCallback(Callback* callback)
 			{
@@ -79,7 +79,7 @@ namespace mhe
 				callback_ = callback;
 			}
 
-			boost::shared_ptr<iNode> get_node(const std::string& name) const;
+			boost::shared_ptr<Node> get_node(const std::string& name) const;
 	};
 }
 

@@ -2,7 +2,7 @@
 #define _WIDGET_HPP_
 
 #include "mhe_math.hpp"
-#include "idriver.hpp"
+#include "video_driver.hpp"
 #include "event.hpp"
 #include "ifont.hpp"
 #include "sprite.hpp"
@@ -80,7 +80,7 @@ namespace mhe
                     	it->second->handle(this);
 				}
 			private:
-				virtual void draw_impl(const boost::shared_ptr<iDriver>& driver)
+				virtual void draw_impl(boost::shared_ptr<Driver> driver)
 				{
 					draw_rect(driver);
 				}
@@ -125,7 +125,7 @@ namespace mhe
 					process_event(OnMouseButtonRelease);
 				}
 
-				virtual void draw_rect(const boost::shared_ptr<iDriver>& driver);                                       
+				virtual void draw_rect(const boost::shared_ptr<Driver>& driver);                                       
 			public:
 				Widget();
 				virtual ~Widget() {}
@@ -151,7 +151,7 @@ namespace mhe
 				    set_parent(parent);
 				}
 
-				void draw(const boost::shared_ptr<iDriver>& driver)
+				void draw(boost::shared_ptr<Driver> driver)
 				{
 					draw_impl(driver);
 				}

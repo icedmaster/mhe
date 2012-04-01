@@ -215,7 +215,7 @@ private:
 		// create effects for each stone that will be removed
 		for (size_t i = 0; i < index_row_.size(); ++i)	
 		{
-			boost::shared_ptr<mhe::iNode> effect = effect_factory_->create_remove_stone_effect();
+			boost::shared_ptr<mhe::Node> effect = effect_factory_->create_remove_stone_effect();
 			effect->translate(mhe::v3d(remove_row_[i].x(), remove_row_[i].y(), 0));
 			// get aspect
 			boost::shared_ptr<mhe::game::Aspect> aspect =
@@ -265,8 +265,8 @@ public:
 			select_effect_ = effect_factory_->create_select_stone_effect();
 			remove_effect_ = effect_factory_->create_remove_stone_effect();
 		}
-		loader.get_engine()->getInputSystem()->addListener(move_listener_);
-		loader.get_engine()->getInputSystem()->addListener(click_listener_);
+		loader.get_engine()->getInputSystem()->add_listener(move_listener_);
+		loader.get_engine()->getInputSystem()->add_listener(click_listener_);
 		context_.coord = coord;
 		context_.stones = stones;
 		init_field(loader);
@@ -282,16 +282,16 @@ private:
 	mhe::vector2<int> get_stone_by_mouse_position(const mhe::MouseEvent& me) const;
 	void handle_move(const mhe::vector2<int>& pos);
 	void handle_click(const mhe::vector2<int>& pos);
-	void translate_effect(boost::shared_ptr<mhe::iNode> effect, const mhe::vector2<int>& pos,
+	void translate_effect(boost::shared_ptr<mhe::Node> effect, const mhe::vector2<int>& pos,
 						  const mhe::v3d& correction = mhe::v3d());
 	bool do_logic(const mhe::vector2<int>& pos);
 
 	typedef std::vector< std::vector<int> > field_type;
 	boost::shared_ptr<StoneEffectFactory> effect_factory_;
 	GameContext context_;
-	boost::shared_ptr<mhe::iNode> move_effect_;
-	boost::shared_ptr<mhe::iNode> select_effect_;
-	boost::shared_ptr<mhe::iNode> remove_effect_;
+	boost::shared_ptr<mhe::Node> move_effect_;
+	boost::shared_ptr<mhe::Node> select_effect_;
+	boost::shared_ptr<mhe::Node> remove_effect_;
 
 	// events
 	boost::shared_ptr<GameFieldEventListener> move_listener_;

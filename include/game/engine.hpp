@@ -16,9 +16,9 @@ private:
 	TextureManager tm_;
 	FontManager fm_;
 	SoundManager sm_;
-	boost::shared_ptr<iDriver> driver_;
+	boost::shared_ptr<Driver> driver_;
 	boost::shared_ptr<iAudioDriver> audio_driver_;
-	boost::shared_ptr<iInputSystem> is_;
+	boost::shared_ptr<InputSystem> is_;
 
 	boost::shared_ptr<GameScene> game_scene_;
 
@@ -70,12 +70,12 @@ public:
 		return ws_;
 	}
 			
-	boost::shared_ptr<iInputSystem> getInputSystem() const
+	boost::shared_ptr<InputSystem> getInputSystem() const
 	{
 		return is_;
 	}
 			
-	boost::shared_ptr<iDriver> getDriver() const
+	boost::shared_ptr<Driver> getDriver() const
 	{
 		return driver_;
 	}

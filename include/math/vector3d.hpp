@@ -109,6 +109,14 @@ namespace mhe
                 return *this;
             }
 
+			vector3& operator*= (const vector3& v)
+			{
+				v_[0] *= v.v_[0];
+				v_[1] *= v.v_[1];
+				v_[2] *= v.v_[2];
+				return *this;
+			}
+
             vector3 operator- (const vector3& v) const
             {
                 vector3 vv = *this;
