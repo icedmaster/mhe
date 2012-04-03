@@ -34,7 +34,7 @@ public:
 		texture_ = texture;
 	}
 
-	bool is_alive() const;
+	//bool is_alive() const;
 private:
 	void draw_impl(boost::shared_ptr<Driver> driver);
 	void update_impl(cmn::uint tick);
@@ -43,11 +43,6 @@ private:
 	std::list<Particle> particles_;
 	boost::shared_ptr<ParticleEmitter> emitter_;          
 	boost::shared_ptr<Texture> texture_;
-	std::vector<float> vbuf;
-	std::vector<float> nbuf;
-	std::vector<cmn::uint> ibuf;
-	std::vector<float> cbuf;
-	std::vector<float> tbuf;
 };
 
 }

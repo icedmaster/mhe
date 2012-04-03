@@ -7,6 +7,7 @@ namespace mhe {
 namespace winsys {
 
 void start_platform();
+void stop_platform();
 cmn::uint get_current_tick();
 
 }}

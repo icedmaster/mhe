@@ -43,7 +43,7 @@ void Engine::default_setup()
 	//load_default_extensions();
 	driver_->set_clear_color(mhe::cfBlack);
 	driver_->enable_depth((mhe::DepthFunc)0);
-	driver_->enable_lighting();
+	driver_->disable_lighting();
 }
 	
 void Engine::run()

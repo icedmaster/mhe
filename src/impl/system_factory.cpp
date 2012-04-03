@@ -33,12 +33,18 @@ Texture* SystemFactory::create_multitexture() const
 
 iAudioDriver* SystemFactory::create_audio_driver() const
 {
+#ifdef MHE_OPENAL
 	return new OpenALAudioDriver();
+#endif
+	return nullptr;
 }
 
 iSound* SystemFactory::create_sound() const
 {
+#ifdef MHE_OPENAL
 	return new OpenALSound();
+#endif
+	return nullptr;
 }
 
 iWindowSystem* SystemFactory::create_window_system() const

@@ -4,10 +4,9 @@
 // OS
 #ifdef __linux__
 	#define MHE_LINUX
-#elif __WIN32__
+#endif
+#ifdef __WIN32__
 	#define MHE_WIN
-#else
-	#error Unknown operation system
 #endif
 
 // window system

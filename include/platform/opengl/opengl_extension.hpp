@@ -5,6 +5,7 @@
 #include <map>
 #include "mhe_gl.hpp"
 #include "glext.h"
+#include "platform/platform_so.hpp"
 
 namespace mhe {
 namespace opengl {
@@ -35,7 +36,7 @@ private:
 	T load_extension(const char* name)
 	{
 		bool loaded = true;
-		T res = reinterpret_cast<T>(SDL_GL_GetProcAddress(name));
+		T res = reinterpret_cast<T>(impl::get_opengl_proc_addr(name));
 		if (res == 0) loaded = false;
 		loaded_extensions_[name] = loaded;
 		return res;

@@ -52,7 +52,7 @@ public:
 
 	boost::shared_ptr<Scene> get_scene() const
 	{
-		return get_scene();
+		return scene_;
 	}
 
 	bool process()

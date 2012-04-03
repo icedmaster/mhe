@@ -1,19 +1,24 @@
-# flags
-# MHE_DISABLE_AUDIO
-# MHE_DISABLE_SDL
-
-
 set (PROJECT mhe)
 project (${PROJECT})
 
 cmake_minimum_required (VERSION 2.8)
 
+# add cmake modules
+set(CMAKE_MODULES_DIR ${CMAKE_SOURCE_DIR}/cmake_modules)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_MODULES_DIR})
+
+include(add_subproject)
+
 # defaults for build
-set(MHE_BUILD_DEMO TRUE)
+set(MHE_BUILD_DEMO FALSE)
+set(MHE_BUILD_EXAMPLES FALSE)
+set(MHE_DISABLE_AUDIO TRUE)
+set(MHE_DISABLE_SDL TRUE)
 
 if (DEFINED LIB_ONLY)
     message("Build mhelib only")
     set(MHE_BUILD_DEMO FALSE)
+	set(MHE_BUILD_EXAMPLES FALSE)
 endif()
 
 add_definitions(-Wall)
@@ -35,14 +40,11 @@ set (SRC_PATH
   ${SOURCE_ROOT}/gui
   ${SOURCE_ROOT}/impl
   ${SOURCE_ROOT}/utils
+  ${SOURCE_ROOT}/sound
   ${SOURCE_ROOT}/game
   #${SOURCE_ROOT}/script
   ${LIB_DIR}/pugixml
 )
-
-if (NOT DEFINED MHE_DISABLE_SOUND)
-   set(SRC_PATH ${SRC_PATH} ${SOURCE_ROOT}/sound)
-endif()
 
 set (INC_PATH
   ${INCLUDE_ROOT}
@@ -55,10 +57,10 @@ set(LINUX_PLATFORM_SOURCES ${PLATFORM_IMPL_SOURCES}/linux)
 set(WIN_PLATFORM_SOURCES ${PLATFORM_IMPL_SOURCES}/win)
 
 # platform
-if (WIN32)
-   set(SRC_PATH ${WIN_PLATFORM_SOURCES} ${SRC_PATH})
+if (WIN32)   
+  set(SRC_PATH ${WIN_PLATFORM_SOURCES} ${SRC_PATH})
 else()
-   set(SRC_PATH ${LINUX_PLATFORM_SOURCES} ${SRC_PATH})
+  set(SRC_PATH ${LINUX_PLATFORM_SOURCES} ${SRC_PATH})
 endif()
 
 include_directories (${INC_PATH})
@@ -81,36 +83,38 @@ set(SRC_PATH ${OPENGL_IMPL_SOURCES} ${SRC_PATH})
 endif()
 
 if (NOT DEFINED MHE_DISABLE_SDL)
-   find_library(SDL_LIB SDL)
-   if (${SDL_LIB} STREQUAL "SDL_LIB-NOTFOUND")
-   message("SDL not found")
-   else()
-   if (WIN32)
-   	  find_library(SDLMAIN_LIB SDLmain)
-   	  set(SDL_LIB mingw32 ${SDLMAIN_LIB} ${SDL_LIB})
-   endif()
-   message("---- sdl ------")
-   message(${SDL_LIB})
-   add_definitions(-DMHE_HAS_SDL)
-   set(SRC_PATH ${SRC_PATH} ${PLATFORM_IMPL_SOURCES}/sdl)
-   endif()
+    find_library(SDL_LIB SDL)
+    if (${SDL_LIB} STREQUAL "SDL_LIB-NOTFOUND")
+	message("SDL not found")
+    else()
+	if (WIN32)
+	    find_library(SDLMAIN_LIB SDLmain)
+    	    set(SDL_LIB mingw32 ${SDLMAIN_LIB} ${SDL_LIB})
+	endif()
+	message("---- sdl ------")
+	message(${SDL_LIB})
+	add_definitions(-DMHE_HAS_SDL)
+	set(SRC_PATH ${SRC_PATH} ${PLATFORM_IMPL_SOURCES}/sdl)
+    endif()
 endif()
 
 find_library(PNG_LIB png)
 message("---- png ------")
 message(${PNG_LIB})
 
-if (WIN32)
-    find_library(OPENAL_LIB openal32)
-else()
-find_library(OPENAL_LIB openal)
-endif()
-if (${OPENAL_LIB} STREQUAL "OPENAL_LIB-NOTFOUND")
-  message("OpenAL not found")
-else()
-  message("---- OpenAL -----")
-  message(${OPENAL_LIB})
-  add_definitions(-DMHE_HAS_OPENAL)
+if (NOT DEFINED MHE_DISABLE_AUDIO)
+    if (WIN32)
+	find_library(OPENAL_LIB openal32)
+    else()
+    find_library(OPENAL_LIB openal)
+    endif()
+    if (${OPENAL_LIB} STREQUAL "OPENAL_LIB-NOTFOUND")
+	message("OpenAL not found")
+    else()
+	message("---- OpenAL -----")
+	message(${OPENAL_LIB})
+	add_definitions(-DMHE_HAS_OPENAL)
+    endif()
 endif()
 
 find_library(VORBISFILE_LIB vorbisfile)
@@ -161,12 +165,12 @@ message("Create test target makefile")
 set (SOURCE ${SOURCE} ${CMAKE_SOURCE_DIR}/../test_main.cpp)
 endif()
 
-# system
-if (CMAKE_HOST_UNIX)
-   find_library(RT_LIB rt)
-   set(LIBS ${LIBS} ${RT_LIB})
+# additional libraries
+if (WIN32)
+	set(LIBS ${LIBS} winmm)
 endif()
 
+set(MHE_LIB_DIR ${CMAKE_SOURCE_DIR})
 set(DEP_LIBS ${LIBS})
 
 add_library(${PROJECT} ${SOURCE})
@@ -180,3 +184,9 @@ if (MHE_BUILD_DEMO)
 	message("Build demo")
 	add_subdirectory(${CMAKE_SOURCE_DIR}/../demo/build/ ${CMAKE_SOURCE_DIR}/../demo/build/)
 endif()
+
+if (MHE_BUILD_EXAMPLES)
+	message("Build examples")
+	add_subdirectory(${CMAKE_SOURCE_DIR}/../examples/build/ ${CMAKE_SOURCE_DIR}/../examples/build/)
+endif()
+

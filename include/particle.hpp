@@ -13,6 +13,7 @@ const size_t particle_indices_num  = 6;
 
 class Particle
 {
+	static const cmn::uint update_interval = 5;
 public:
 	Particle(float size, float size_delta,
 			 const colorf& color, const colorf& color_delta, float alpha_delta,
@@ -35,7 +36,8 @@ public:
 
 	bool is_alive(cmn::uint tick) const
 	{
-		return ((tick - start_time_) > lifetime_);
+		if (!start_time_) return true;
+		return ((tick - start_time_) < lifetime_);
 	}
 
 	float size() const
@@ -45,12 +47,15 @@ public:
 
 	void update(cmn::uint tick)
 	{
+		if (!start_time_) start_time_ = tick;
 		if (!is_alive(tick)) return;
+		if (tick < next_tick_) return;
 		size_ += size_delta_;
 		color_ += color_delta_;
 		color_.set_w(color_.a() + alpha_delta_);
 		position_ += speed_;
 		speed_ *= accel_;
+		next_tick_ = tick + update_interval;
 	}
 private:
 	float size_;
@@ -64,6 +69,8 @@ private:
 	v3d direction_;
 	cmn::uint start_time_;
 	cmn::uint lifetime_;
+	// update parameters
+	cmn::uint next_tick_;
 };
 
 }

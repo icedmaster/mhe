@@ -1,7 +1,8 @@
-#ifndef __PLATFORM_SYSUTILS_HPP__
-#define __PLATFORM_SYSUTILS_HPP__
+#ifndef __PLATFORM_SYSTEM_HPP__
+#define __PLATFORM_SYSTEM_HPP__
 
 #include "config.hpp"
+#include "utils/logutils.hpp"
 
 #ifdef MHE_LINUX
 #include "linux/linux_system.hpp"
@@ -10,6 +11,8 @@
 #ifdef MHE_WIN
 #include "win/win_system.hpp"
 #endif
+
+#include "platform_so.hpp"
 
 namespace mhe {
 namespace impl {
@@ -23,7 +26,34 @@ inline void start_platform()
 #ifdef MHE_WIN
 	winsys::start_platform();
 #endif
+
+#ifdef MHE_OPENGL
+	if (impl::init_opengl_so())
+	{
+		INFO_LOG("Loaded OpenGL lib");
+	}
+	else 
+	{
+		ERROR_LOG("Can not load OpenGL lib");
+	}
+#endif
 }
+
+inline void stop_platform()
+{
+#ifdef MHE_LINUX
+	linuxsys::stop_platform();
+#endif
+
+#ifdef MHE_WIN
+	winsys::stop_platform();
+#endif
+
+#ifdef MHE_OPENGL
+	deinit_opengl_so();
+#endif
+}
+
 
 inline cmn::uint get_current_tick()
 {

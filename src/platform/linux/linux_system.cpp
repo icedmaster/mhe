@@ -16,6 +16,9 @@ void start_platform()
 	clock_gettime(CLOCK_MONOTONIC, &start);
 }
 
+void stop_platform()
+{}
+
 cmn::uint get_current_tick()
 {
 	timespec now;

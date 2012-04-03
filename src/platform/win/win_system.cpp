@@ -16,6 +16,9 @@ void start_platform()
 	start = timeGetTime();
 }
 
+void stop_platform()
+{}
+
 cmn::uint get_current_tick()
 {
 	const DWORD dword_max = ~0;

@@ -1,0 +1,7 @@
+/build/*
+/01_init/build/*
+/particles/build/*
+
+!/build/CMakeLists.txt
+!/01_init/build/CMakeLists.txt
+!/particles/build/CMakeLists.txt
