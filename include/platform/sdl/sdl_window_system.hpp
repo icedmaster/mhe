@@ -6,17 +6,20 @@
 
 namespace mhe {
 namespace sdl {
-	class SDLWindowSystem : public iWindowSystem
-	{
-		private:
-			SDL_Surface *srf;
-		public:
-			bool init(const vector2<int>& r, int bpp, bool fullscreen);
-			void close();
-			void set_caption(const std::string& caption);
-			void swap_buffers();
-			void show_cursor(bool show);
-	};
+
+class SDLWindowSystem : public iWindowSystem
+{
+public:
+	bool init(const vector2<int>& r, int bpp, bool fullscreen);
+	void close();
+	void set_caption(const std::string& caption);
+	void swap_buffers();
+	void show_cursor(bool show);
+	// TODO:
+	void resize(const vector2<int>&) {}
+private:
+	SDL_Surface *srf;
+};
 }}
 
 #endif

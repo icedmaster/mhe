@@ -1,6 +1,8 @@
 #ifndef _VECTOR2D_HPP_
 #define _VECTOR2D_HPP_
 
+#include <ostream>
+
 namespace mhe {
 
 template <class T>
@@ -88,8 +90,14 @@ public:
 		x_ = v.x;
 		y_ = v.y;
 		return *this;
-	}
+	}	
 };
+
+template <class T>
+inline std::ostream& operator<< (std::ostream& s, const vector2<T>& v)
+{
+	return s << '(' << v.x() << ", " << v.y() << ')';
+}
 
 typedef vector2<float> v2d;
 }

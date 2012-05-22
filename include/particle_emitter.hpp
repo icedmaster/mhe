@@ -8,22 +8,17 @@ namespace mhe {
 
 struct ParticleEmitterParameters
 {
-	cmn::uint min_emit_count;
-	cmn::uint max_emit_count;
-	cmn::uint min_emit_interval;
-	cmn::uint max_emit_interval;
-	float min_size;
-	float max_size;
+	range<cmn::uint> emit_count;
+	range<cmn::uint> emit_interval;
+	range<float> size;
 	float size_delta;
-	colorf min_color;
-	colorf max_color;
+	range<colorf> color;
 	colorf color_delta;
-	v3d min_speed;
-	v3d max_speed;
-	v3d min_accel;
-	v3d max_accel;
-	cmn::uint min_lifetime;
-	cmn::uint max_lifetime;
+	range<v3d> speed;
+	range<float> spread;
+	range<v3d> accel;
+	range<float> angle;
+	range<cmn::uint> lifetime;
 };
 
 class ParticleEmitter
@@ -35,14 +30,14 @@ public:
 	virtual std::vector<Particle> emit_particles(cmn::uint tick) = 0;
 };
 
-class DefaultParticleEmitter : public ParticleEmitter
+class PointParticleEmitter : public ParticleEmitter
 {
 public:
-	DefaultParticleEmitter() :
+	PointParticleEmitter() :
 		next_emit_(0), is_alive_(false)
 	{}
 
-	void init_with_parameters(const ParticleEmitterParameters& params)
+	void init_with_parameters(const ParticleEmitterParameters& params, boost::shared_ptr<Driver> /*driver*/)
 	{
 		params_ = params;
 	}

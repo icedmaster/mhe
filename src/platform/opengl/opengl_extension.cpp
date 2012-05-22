@@ -33,7 +33,9 @@ bool OpenGLExtensions::is_extension_supported(const std::string& ext_name) const
 
 std::string OpenGLExtensions::get_supported_extensions() const
 {
-	return std::string(reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS)));
+	const char* ext = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));
+	if (ext == nullptr) return std::string();
+	return std::string(ext);
 }
 
 void OpenGLExtensions::get_str_extensions()

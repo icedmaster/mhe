@@ -14,6 +14,7 @@ Engine::Engine() :
 	
 bool Engine::init(cmn::uint w, cmn::uint h, cmn::uint bpp, bool fullscreen)
 {
+	INFO_LOG("Engine init:" << w << " " << h << " " << bpp);
 	if (!ws_.init(w, h, bpp, fullscreen))
 		return false;	
 	is_->set_window_system(&ws_);
@@ -51,25 +52,36 @@ void Engine::run()
 	running_ = true;
 	while (running_)
 	{
-		is_->check();
-		driver_->clear_depth();
-		driver_->clear_color();
-
-		if (game_scene_ && game_scene_->process())
-		{
-			game_scene_->get_scene()->update(utils::get_current_tick());
-			game_scene_->get_scene()->draw(driver_);			
-		}
-
-		update();
-		
-		ws_.swap_buffers();
+		process();
 	}
+}
+
+void Engine::process()
+{
+	is_->check();
+	driver_->clear_depth();
+	driver_->clear_color();
+
+	if (game_scene_ && game_scene_->process())
+	{
+		game_scene_->get_scene()->update(utils::get_current_tick());
+		game_scene_->get_scene()->draw(driver_);			
+	}
+
+	update();
+		
+	ws_.swap_buffers();
 }
 	
 void Engine::stop()
 {
 	running_ = false;
+}
+
+void Engine::resize(cmn::uint w, cmn::uint h)
+{
+	ws_.resize(w, h);
+	driver_->set_viewport(0, 0, w, h);
 }
 
 void Engine::update()

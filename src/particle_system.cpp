@@ -34,7 +34,7 @@ void ParticleSystem::draw_impl(boost::shared_ptr<Driver> driver)
 		for (size_t j = 0; j < 6; ++j)
 			ibuf.push_back(v_sz + i[j]);
 		// fill color for each vertex
-		for (cmn::uint j = 0; j < particle_vertexes_num; ++j)
+		for (cmn::uint j = 0; j < 4; ++j)
 			cbuf.insert(cbuf.end(), p.color().get(),
 						p.color().get() + 4);
 		// init texture coordinates (for all particles they are the same)

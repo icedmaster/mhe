@@ -1,6 +1,8 @@
 #ifndef _MHE_HPP_
 #define _MHE_HPP_
 
+#include "mhe_math.hpp"
+
 #include "camera.hpp"
 #include "window_system.hpp"
 #include "event.hpp"

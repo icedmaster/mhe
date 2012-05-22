@@ -44,6 +44,8 @@ public:
 	bool init(cmn::uint w, cmn::uint h, cmn::uint bpp, bool fullscreen = false);
 	void run();
 	void stop();
+	void process();
+	void resize(cmn::uint w, cmn::uint h);
 
 	bool is_running() const
 	{
@@ -85,7 +87,7 @@ public:
 		return audio_driver_;
 	}
 
-	void setGameScene(boost::shared_ptr<GameScene> scene)
+	void set_game_scene(boost::shared_ptr<GameScene> scene)
 	{
 		game_scene_ = scene;
 	}

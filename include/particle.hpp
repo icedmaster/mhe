@@ -5,6 +5,7 @@
 #include "types.hpp"
 #include "video_driver.hpp"
 #include <boost/array.hpp>
+#include <iostream>
 
 namespace mhe
 {
@@ -13,15 +14,15 @@ const size_t particle_indices_num  = 6;
 
 class Particle
 {
-	static const cmn::uint update_interval = 5;
+	static const cmn::uint update_interval = 20;
 public:
 	Particle(float size, float size_delta,
 			 const colorf& color, const colorf& color_delta, float alpha_delta,
-			 const v3d& speed, const v3d& accel, cmn::uint lifetime) :
+			 const v3d& speed, const v3d& accel, float angle, cmn::uint lifetime) :
 		size_(size), size_delta_(size_delta),
 		color_(color), color_delta_(color_delta), alpha_delta_(alpha_delta),
-		speed_(speed), accel_(accel), 
-		start_time_(0), lifetime_(lifetime)
+		speed_(speed), accel_(accel), angle_(angle),
+		start_time_(0), lifetime_(lifetime), next_tick_(0)
 	{}
 
 	const v3d& position() const 
@@ -53,7 +54,9 @@ public:
 		size_ += size_delta_;
 		color_ += color_delta_;
 		color_.set_w(color_.a() + alpha_delta_);
-		position_ += speed_;
+		v3d add_pos(speed_.x() * (1 + cos(angle_)),
+					speed_.y() * (1 + sin(angle_)), 0);
+		position_ += (speed_ + add_pos);		
 		speed_ *= accel_;
 		next_tick_ = tick + update_interval;
 	}
@@ -67,6 +70,7 @@ private:
 	v3d accel_;
 	v3d position_;
 	v3d direction_;
+	float angle_;
 	cmn::uint start_time_;
 	cmn::uint lifetime_;
 	// update parameters

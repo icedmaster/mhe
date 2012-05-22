@@ -19,18 +19,6 @@ namespace mhe
             return (rand() % limit);
         }
 
-		inline cmn::uint range_random(cmn::uint min, cmn::uint max)
-		{
-			if (min == max) return min;
-			return (rand() % (max - min) + min);
-		}
-
-		inline float range_random(float min, float max)
-		{
-			if (min == max) return min;
-			return (static_cast<float>(rand()) / static_cast<float>(RAND_MAX)) * (max - min) + min;
-		}
-
         // with sign
         inline int srandom(cmn::uint limit, int probability = 50)
         {
