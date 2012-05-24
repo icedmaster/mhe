@@ -7,13 +7,14 @@ Engine::Engine() :
 	driver_(SystemFactory::instance().create_driver()),
 	audio_driver_(SystemFactory::instance().create_audio_driver()),
 	is_(SystemFactory::instance().create_input_system()),
-	running_(false),
+	running_(false), initialized_(false),
 	quit_listener_(new EngineEventListener(mhe::SystemEventType, mhe::QUIT, 0, 
 											this, &Engine::stop_p))
 {}
 	
 bool Engine::init(cmn::uint w, cmn::uint h, cmn::uint bpp, bool fullscreen)
 {
+	if (initialized_) return true;
 	INFO_LOG("Engine init:" << w << " " << h << " " << bpp);
 	if (!ws_.init(w, h, bpp, fullscreen))
 		return false;	
@@ -35,6 +36,7 @@ bool Engine::init(cmn::uint w, cmn::uint h, cmn::uint bpp, bool fullscreen)
 	tm_.set_helper(driver_);
 	fm_.set_helper(driver_);
 	sm_.set_helper(audio_driver_);
+	initialized_ = true;
 	return true;
 }
 

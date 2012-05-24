@@ -11,33 +11,6 @@ namespace game {
 
 class Engine
 {
-private:
-	WindowSystem ws_;
-	TextureManager tm_;
-	FontManager fm_;
-	SoundManager sm_;
-	boost::shared_ptr<Driver> driver_;
-	boost::shared_ptr<iAudioDriver> audio_driver_;
-	boost::shared_ptr<InputSystem> is_;
-
-	boost::shared_ptr<GameScene> game_scene_;
-
-	AspectManager aspect_manager_;
-	TimedEventsManager timed_events_manager_;
-
-	bool running_;		   
-
-	typedef PrivateEventListener<Engine> EngineEventListener;
-	friend class PrivateEventListener<Engine>;
-	boost::shared_ptr<EngineEventListener> quit_listener_;
-	bool stop_p(const Event&)
-	{
-		stop();
-		return true;
-	}
-
-	void default_setup();
-	void update();
 public:
 	Engine();
 			
@@ -109,6 +82,40 @@ public:
 	{
 		return timed_events_manager_;
 	}
+
+	bool initialized() const
+	{
+		return initialized_;
+	}
+private:
+	typedef PrivateEventListener<Engine> EngineEventListener;
+	friend class PrivateEventListener<Engine>;
+	bool stop_p(const Event&)
+	{
+		stop();
+		return true;
+	}
+
+	void default_setup();
+	void update();
+
+	WindowSystem ws_;
+	TextureManager tm_;
+	FontManager fm_;
+	SoundManager sm_;
+	boost::shared_ptr<Driver> driver_;
+	boost::shared_ptr<iAudioDriver> audio_driver_;
+	boost::shared_ptr<InputSystem> is_;
+
+	boost::shared_ptr<GameScene> game_scene_;
+
+	AspectManager aspect_manager_;
+	TimedEventsManager timed_events_manager_;
+
+	bool running_;
+	bool initialized_;		   
+
+	boost::shared_ptr<EngineEventListener> quit_listener_;
 };
 
 }}       // namespaces
