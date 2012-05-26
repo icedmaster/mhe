@@ -65,6 +65,16 @@ public:
 		low_ = high_ = value;
 	}
 
+	void set_low(const T& low)
+	{
+		low_ = low;
+	}
+
+	void set_high(const T& high)
+	{
+		high_ = high;
+	}
+
 	T get_random() const
 	{
 		return static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * (high_ - low_) + low_;

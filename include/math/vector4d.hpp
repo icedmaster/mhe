@@ -165,6 +165,13 @@ public:
 		return vv;
 	}
 
+	vector4 operator/ (T n) const
+	{
+		vector4 vv(*this);
+		vv /= n;
+		return vv;
+	}
+
 	vector4 operator- (const vector4& v) const
 	{
 		vector4 vv(*this);

@@ -25,8 +25,12 @@ std::vector<Particle> PointParticleEmitter::emit_particles(cmn::uint tick)
 	// init particles parameters
 	for (cmn::uint i = 0; i < number; ++i)
 	{
+		cmn::uint lifetime = params_.lifetime.get_random();
+		float div = lifetime / Particle::update_interval;
 		float size = params_.size.get_random();
+		float size_delta = (params_.end_size - size) / div;
 		const colorf& color = params_.color.get_random();
+		colorf color_delta = (params_.end_color - color) / div;
 		float spread = params_.spread.get_random();
 		const v3d& speed = params_.speed.get_random();
 		v3d particle_speed = (!params_.spread.high() && !params_.spread.low()) ?
@@ -35,9 +39,8 @@ std::vector<Particle> PointParticleEmitter::emit_particles(cmn::uint tick)
 						speed.z());		
 		const v3d& accel = params_.accel.get_random();
 		float angle = params_.angle.get_random();
-		cmn::uint lifetime = params_.lifetime.get_random();
-		particles.push_back(Particle(size, params_.size_delta, color, params_.color_delta,
-									 params_.color_delta.a(),
+		particles.push_back(Particle(size, size_delta, color, color_delta,
+									 color_delta.a(),
 									 particle_speed, accel, angle, lifetime));
 	}
 	cmn::uint emit_delta = params_.emit_interval.get_random();

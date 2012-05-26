@@ -14,6 +14,7 @@ const size_t particle_indices_num  = 6;
 
 class Particle
 {
+public:
 	static const cmn::uint update_interval = 20;
 public:
 	Particle(float size, float size_delta,
