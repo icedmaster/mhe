@@ -31,14 +31,14 @@ std::vector<Particle> PointParticleEmitter::emit_particles(cmn::uint tick)
 		float size_delta = (params_.end_size - size) / div;
 		const colorf& color = params_.color.get_random();
 		colorf color_delta = (params_.end_color - color) / div;
-		float spread = params_.spread.get_random();
+		float spread = deg_to_rad(params_.spread.get_random());
 		const v3d& speed = params_.speed.get_random();
 		v3d particle_speed = (!params_.spread.high() && !params_.spread.low()) ?
 			speed : v3d(speed.x() * cosf(spread),
 					 	speed.y() * sinf(spread),
 						speed.z());		
 		const v3d& accel = params_.accel.get_random();
-		float angle = params_.angle.get_random();
+		float angle = deg_to_rad(params_.angle.get_random());
 		particles.push_back(Particle(size, size_delta, color, color_delta,
 									 color_delta.a(),
 									 particle_speed, accel, angle, lifetime));
