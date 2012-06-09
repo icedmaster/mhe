@@ -18,6 +18,8 @@ public:
 	{
 		start_tick_ = (start) ? utils::get_current_tick() : 0; 
 	}
+	
+	virtual ~TimedEventBase() {}
 
 	void start(cmn::uint tick)
 	{

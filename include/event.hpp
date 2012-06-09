@@ -237,6 +237,8 @@ public:
 	EventListener(int type, int event, int event_opt = 0) :
 		event_id(create_event_id(type, event, event_opt))
 	{}
+	
+	virtual ~EventListener() {}
 
 	cmn::uint id() const
 	{
@@ -284,6 +286,8 @@ public:
 	InputSystem() :
 		input_enabled_(true)
 	{}
+	
+	virtual ~InputSystem() {}
 
 	void check()
 	{
@@ -378,6 +382,8 @@ public:
 		EventListener(et, event, arg),
 		dest(d), h(hnd)
 	{}
+	
+	virtual ~PrivateEventListener() {}
 
 	bool handle(const Event& e)
 	{

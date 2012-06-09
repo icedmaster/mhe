@@ -12,6 +12,10 @@
 #include "linux/linux_so.hpp"
 #endif
 
+#ifdef MHE_MACOS
+#include "macos/macos_so.hpp"
+#endif
+
 namespace mhe {
 namespace impl {
 
@@ -23,6 +27,10 @@ typedef winsys::so_handle so_handle;
 typedef linuxsys::so_handle so_handle;
 #endif
 
+#ifdef MHE_MACOS
+typedef macossys::so_handle so_handle;
+#endif
+
 inline so_handle open_so(const std::string& name)
 {
 #ifdef MHE_WIN
@@ -31,6 +39,10 @@ inline so_handle open_so(const std::string& name)
 
 #ifdef MHE_LINUX
 	return linuxsys::open_so(name);
+#endif
+
+#ifdef MHE_MACOS
+	return macossys::open_so(name);
 #endif
 	return nullptr;
 }
@@ -44,6 +56,10 @@ inline void close_so(so_handle handle)
 #ifdef MHE_LINUX
 	linuxsys::close_so(handle);
 #endif
+
+#ifdef MHE_MACOS
+	macossys::close_so(handle);
+#endif
 }
 
 inline void* get_proc_addr(so_handle handle, const std::string& name)
@@ -54,6 +70,10 @@ inline void* get_proc_addr(so_handle handle, const std::string& name)
 
 #ifdef MHE_LINUX
 	return linuxsys::get_proc_addr(handle, name);
+#endif
+
+#ifdef MHE_MACOS
+	return macossys::get_proc_addr(handle, name);
 #endif
 	return nullptr;
 }
@@ -68,12 +88,24 @@ inline bool init_opengl_so()
 #ifdef MHE_LINUX
 	return linuxsys::init_opengl_so();
 #endif
+
+#ifdef MHE_MACOS
+	return macossys::init_opengl_so();
+#endif
 }
 
 inline void deinit_opengl_so()
 {
 #ifdef MHE_WIN
 	winsys::deinit_opengl_so();
+#endif
+
+#ifdef MHE_LINUX
+	linuxsys::deinit_opengl_so();
+#endif
+
+#ifdef MHE_MACOS
+	macossys::deinit_opengl_so();
 #endif
 }
 
@@ -84,6 +116,10 @@ inline void* get_opengl_proc_addr(const std::string& name)
 #endif
 #ifdef MHE_LINUX
 	return linuxsys::get_opengl_proc_addr(name);
+#endif
+
+#ifdef MHE_MACOS
+	return macossys::get_opengl_proc_addr(name);
 #endif
 	return nullptr;
 }

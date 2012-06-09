@@ -8,6 +8,9 @@
 #ifdef __WIN32__
 	#define MHE_WIN
 #endif
+#ifdef __APPLE__
+	#define MHE_MACOS
+#endif
 
 // window system
 #ifdef MHE_HAS_SDL
