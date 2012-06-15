@@ -1,7 +1,7 @@
 #ifndef _QUAT_HPP_
 #define _QUAT_HPP_
 
-#include "vector3d.hpp"
+#include "vector3.hpp"
 //#include "vector4d.hpp"
 
 namespace mhe

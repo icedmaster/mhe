@@ -5,7 +5,7 @@
 #include <cstring>	// for memcpy()
 #include <cmath>
 #include "math/math_utils.hpp"
-#include "math/vector3d.hpp"
+#include "math/vector3.hpp"
 
 namespace mhe
 {

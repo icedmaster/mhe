@@ -3,7 +3,7 @@
 
 #include <cmath>
 #include <ostream>
-#include "math/vector3d.hpp"
+#include "math/vector3.hpp"
 
 namespace mhe
 {

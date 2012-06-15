@@ -1,7 +1,7 @@
 #ifndef _RECT_HPP_
 #define _RECT_HPP_
 
-#include "vector2d.hpp"
+#include "vector2.hpp"
 #include <cmath>
 
 namespace mhe
