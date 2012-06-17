@@ -49,7 +49,17 @@ public:
 		return low_;
 	}
 
+	T& rlow()
+	{
+		return low_;
+	}
+
 	const T& high() const
+	{
+		return high_;
+	}
+
+	T rhigh()
 	{
 		return high_;
 	}
