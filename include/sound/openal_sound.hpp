@@ -2,7 +2,13 @@
 #define _OPENAL_SOUND_HPP_
 
 #include "isound.hpp"
+#include "config.hpp"
+
+#ifndef MHE_MACOS
 #include <AL/al.h>
+#else
+#include <al.h>
+#endif
 
 namespace mhe
 {

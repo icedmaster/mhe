@@ -12,6 +12,10 @@
 #include "win/win_system.hpp"
 #endif
 
+#ifdef MHE_MACOS
+#include "macos/macos_system.hpp"
+#endif
+
 #include "platform_so.hpp"
 
 namespace mhe {
@@ -25,6 +29,10 @@ inline void start_platform()
 
 #ifdef MHE_WIN
 	winsys::start_platform();
+#endif
+
+#ifdef MHE_MACOS
+    macossys::start_platform();
 #endif
 
 #ifdef MHE_OPENGL
@@ -49,6 +57,10 @@ inline void stop_platform()
 	winsys::stop_platform();
 #endif
 
+#ifdef MHE_MACOS
+    macossys::stop_platform();
+#endif
+
 #ifdef MHE_OPENGL
 	deinit_opengl_so();
 #endif
@@ -63,6 +75,10 @@ inline cmn::uint get_current_tick()
 
 #ifdef MHE_WIN
 	return winsys::get_current_tick();
+#endif
+
+#ifdef MHE_MACOS
+    return macossys::get_current_tick();
 #endif
 }
 

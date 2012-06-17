@@ -18,6 +18,7 @@ namespace mhe
 		class GUIEventHandler
 		{
 			public:
+			    virtual ~GUIEventHandler() {}
 				virtual void handle(const Widget*) {}
 		};
 		typedef boost::shared_ptr<GUIEventHandler> guieventptr;

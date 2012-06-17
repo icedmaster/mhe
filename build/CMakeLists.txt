@@ -34,12 +34,13 @@ set (LIB_DIR ${CMAKE_SOURCE_DIR}/../lib)
 #set (SRC_DIR)
 
 set (SRC_PATH
-  ${SOURCE_ROOT}
-  ${SOURCE_ROOT}/gui
-  ${SOURCE_ROOT}/impl
-  ${SOURCE_ROOT}/utils
-  ${SOURCE_ROOT}/sound
-  ${SOURCE_ROOT}/game
+  #${SOURCE_ROOT}
+  #${SOURCE_ROOT}/gui
+  #${SOURCE_ROOT}/impl
+  #${SOURCE_ROOT}/utils
+  #${SOURCE_ROOT}/sound
+  #${SOURCE_ROOT}/game
+  ${SOURCE_ROOT}/events
   #${SOURCE_ROOT}/script
   ${LIB_DIR}/pugixml
 )
@@ -53,14 +54,23 @@ set(PLATFORM_IMPL_SOURCES ${SOURCE_ROOT}/platform)
 set(OPENGL_IMPL_SOURCES ${PLATFORM_IMPL_SOURCES}/opengl)
 set(LINUX_PLATFORM_SOURCES ${PLATFORM_IMPL_SOURCES}/linux)
 set(WIN_PLATFORM_SOURCES ${PLATFORM_IMPL_SOURCES}/win)
+set(MACOS_PLATFORM_SOURCES ${PLATFORM_IMPL_SOURCES}/macos)
 
 # platform
 if (WIN32)
    add_definitions(-DMHE_OS_WIN)
    set(SRC_PATH ${WIN_PLATFORM_SOURCES} ${SRC_PATH})
-else()
+elseif (LINUX)
 add_definitions(-DMHE_OS_LINUX)
 set(SRC_PATH ${LINUX_PLATFORM_SOURCES} ${SRC_PATH})
+endif()
+
+if (APPLE)
+    add_definitions(-DMHE_OS_MAC)
+    include_directories("/opt/local/include")
+    include_directories("/usr/X11R6/include")
+    include_directories("/System/Library/Frameworks/OpenAL.framework/Headers")
+    set(SRC_PATH ${MACOS_PLATFORM_SOURCES} ${SRC_PATH})
 endif()
 
 include_directories (${INC_PATH})
@@ -164,6 +174,9 @@ endif()
 # additional libraries
 if (WIN32)
 	set(LIBS ${LIBS} winmm)
+endif()
+if (APPLE)
+    set(LIBS ${LIBS} dl)
 else()
     set(LIBS ${LIBS} dl rt)
 endif()

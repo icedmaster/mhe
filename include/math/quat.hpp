@@ -1,7 +1,7 @@
 #ifndef _QUAT_HPP_
 #define _QUAT_HPP_
 
-#include "vector3d.hpp"
+#include "vector3.hpp"
 //#include "vector4d.hpp"
 
 namespace mhe
@@ -72,16 +72,17 @@ namespace mhe
 			{
 				return w_;
 			}
-			
+						
 			T length() const
 			{
-				return sqrt(v.length2() + w_ * w_);
+				return sqrt(v_.length() + w_ * w_);
 			}
 			
 			T norm() const
 			{
-				return v.length2() + w_ * w_;
-			}
+			    // TODO:
+				return v_.length() + w_ * w_;
+			}			
 			
 			quat& conj()
 			{

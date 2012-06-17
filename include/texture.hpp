@@ -24,6 +24,7 @@ namespace mhe
 	public:
 		typedef boost::array<float, 8> texcoord;
 	public:
+		virtual ~Texture() {}
 		virtual void set_image(boost::shared_ptr<Image>, boost::shared_ptr<Driver>,
 							   FilterType ft = Nearest) = 0;
 		virtual void prepare(boost::shared_ptr<Driver> driver =
