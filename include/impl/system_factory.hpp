@@ -2,6 +2,8 @@
 #define __SYSTEM_FACTORY_HPP__
 
 #include <boost/shared_ptr.hpp>
+#include <boost/scoped_ptr.hpp>
+#include "input_factory.hpp"
 
 namespace mhe
 {
@@ -32,16 +34,37 @@ public:
 
 	Driver* create_driver() const;
 	iWindowSystem* create_window_system() const;
-	InputSystem* create_input_system() const;
 	Texture* create_texture() const;
 	Texture* create_multitexture() const;
 	iAudioDriver* create_audio_driver() const;
 	iSound* create_sound() const;
 
+	// input devices
+	KeyboardDeviceImpl* create_keyboard_device_impl() const
+	{
+		if (input_factory_ == nullptr) return nullptr;
+		return input_factory_->create_keyboard_device_impl();
+	}
+
+	MouseDeviceImpl* create_mouse_device_impl() const
+	{
+		return input_factory_->create_mouse_device_impl();
+	}
+
+	SystemDeviceImpl* create_system_device_impl() const
+	{
+		return input_factory_->create_system_device_impl();
+	}
+
 	void set_system_factory(iSystemFactory* factory)
 	{
 		factory_.reset(factory);
 	}	
+
+	void set_input_factory(InputFactory* factory)
+	{
+		input_factory_ .reset(factory);
+	}
 private:
 	SystemFactory() {}
 	SystemFactory(const SystemFactory&) {}
@@ -49,6 +72,7 @@ private:
 	SystemFactory& operator= (const SystemFactory&) {return *this;}
 
 	boost::shared_ptr<iSystemFactory> factory_;
+	boost::scoped_ptr<InputFactory> input_factory_;
 };
 }
 

@@ -10,9 +10,7 @@ namespace mhe {
 class SystemDevice : public Device
 {
 public:
-	SystemDevice(const std::string& name) :
-		Device(name)		
-	{}
+	SystemDevice(const std::string& name);
 private:
 	std::vector< boost::shared_ptr<Event> > check_impl();
 

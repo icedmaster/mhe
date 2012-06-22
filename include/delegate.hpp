@@ -2,6 +2,7 @@
 #define __DELEGATE_HPP__
 
 #include <list>
+#include <boost/shared_ptr.hpp>
 
 namespace mhe {
 

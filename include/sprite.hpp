@@ -144,12 +144,12 @@ namespace mhe
 			return current_al_;
 		}
 
-		void setSize(float size)
+		void set_size(float size)
 		{
 			x_size_ = y_size_ = size;
 		}
 
-		void setSize(float xsize, float ysize)
+		void set_size(float xsize, float ysize)
 		{
 			x_size_ = xsize;
 			y_size_ = ysize;

@@ -1,11 +1,13 @@
 #include "events/keyboard_device.hpp"
 
 #include "events/keyboard_event.hpp"
+#include "impl/system_factory.hpp"
 
 namespace mhe {
 
 KeyboardDevice::KeyboardDevice(const std::string& name) :
-	Device(name)
+	Device(name),
+	impl_(SystemFactory::instance().create_keyboard_device_impl())
 {}
 
 std::vector< boost::shared_ptr<Event> > KeyboardDevice::check_impl()
