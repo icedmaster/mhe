@@ -40,7 +40,9 @@ public:
 	void process_mouse_press_event(const boost::shared_ptr<MouseEvent>& event);
 	void process_mouse_release_event(const boost::shared_ptr<MouseEvent>& event);
 private:
-	void process_event(int event);
+	virtual void process_event_impl(int /*event*/, const boost::shared_ptr<MouseEvent>&) {}
+private:
+	void process_event(int event, const boost::shared_ptr<MouseEvent>& mouse_event);
 
 	rect<int> geom_;
 	bool mouse_on_;

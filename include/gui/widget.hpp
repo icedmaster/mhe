@@ -45,6 +45,16 @@ public:
 		return sprite_;
 	}
 
+	void set_highlighted_sprite(const boost::shared_ptr<Sprite>& sprite)
+	{
+		highlighted_sprite_ = sprite;
+	}
+
+	const boost::shared_ptr<Sprite>& highlighted_sprite() const
+	{
+		return highlighted_sprite_;
+	}
+
 	void set_caption(const std::wstring& caption)
 	{
 		caption_ = caption;
@@ -99,6 +109,7 @@ private:
 	std::map<std::string, widgetptr> children_;	
 	// draw
 	boost::shared_ptr<Sprite> sprite_;
+	boost::shared_ptr<Sprite> highlighted_sprite_;
 	// basic widget parameters
 	std::string name_;
 	// text parameters

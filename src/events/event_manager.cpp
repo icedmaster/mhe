@@ -19,6 +19,11 @@ void EventManager::add_listener(const boost::shared_ptr<EventListener>& listener
 	listeners_.insert(std::make_pair(listener->id(), listener));
 }
 
+void EventManager::add_listener(EventListener* listener)
+{
+	add_listener(boost::shared_ptr<EventListener>(listener));
+}
+
 void EventManager::check()
 {
 	for (devices_map::iterator it = devices_.begin(); it != devices_.end(); ++it)
