@@ -45,7 +45,7 @@ public:
 
 	bool unload(const std::string& name)
 	{
-		typename resmap::iterator it = resources_.find(get_file_name(name));
+		typename resmap::iterator it = resources_.find(utils::get_file_name(name));
 		if (it == resources_.end()) return false;
 		resources_.erase(it);
 		return true;
@@ -60,7 +60,7 @@ public:
 
 	boost::shared_ptr<res_type> get(const std::string& name) const
 	{
-		const std::string& sname = get_file_name(name);
+		const std::string& sname = utils::get_file_name(name);
 		typename resmap::iterator it = resources_.find(sname);
 		if (it != resources_.end())
 			return it->second;

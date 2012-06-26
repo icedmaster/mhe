@@ -2,8 +2,9 @@
 #include <algorithm>
 #include <cctype>
 
-namespace mhe
-{
+namespace mhe {
+namespace utils {
+
 std::string get_file_extension(const std::string& filename)
 {
 	size_t point_pos = filename.find_last_of('.');
@@ -34,4 +35,5 @@ std::string get_file_name(const std::string& filepath)
 		fn.erase(point_pos, fn.length() - point_pos);
 	return fn;
 }
-};
+
+}}
