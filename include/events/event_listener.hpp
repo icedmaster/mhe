@@ -10,7 +10,7 @@ namespace mhe {
 class EventListener
 {
 public:
-	typedef Delegate1< bool, const boost::shared_ptr<Event>& > EventHandler;
+	typedef Delegate1< bool, Event* > EventHandler;
 	EventListener(EventType type, int arg, int optarg,
 				  const EventHandler& handler);
 
@@ -36,7 +36,7 @@ public:
 
 	bool handle(const boost::shared_ptr<Event>& event)
 	{
-		return handler_(event);
+		return handler_(event.get());
 	}
 private:
 	int id_;

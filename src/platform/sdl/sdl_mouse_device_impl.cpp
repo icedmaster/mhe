@@ -6,9 +6,9 @@
 namespace mhe {
 namespace sdl {
 
-std::vector< boost::shared_ptr<MouseEvent> > SDLMouseDeviceImpl::check()
+std::vector< boost::shared_ptr<Event> > SDLMouseDeviceImpl::check()
 {
-	std::vector< boost::shared_ptr<MouseEvent> > events;
+	std::vector< boost::shared_ptr<Event> > events;
 	std::vector<SDL_Event> sdl_events;
 	int cnt = check_for_events(SDL_MOUSEMOTION | SDL_MOUSEBUTTONDOWN | SDL_MOUSEBUTTONUP, sdl_events);
 	if (cnt <= 0) return events;

@@ -10,7 +10,7 @@ namespace sdl {
 class SDLKeyboardDeviceImpl : public KeyboardDeviceImpl
 {
 public:
-	std::vector< boost::shared_ptr<KeyboardEvent> > check();
+	std::vector< boost::shared_ptr<Event> > check();
 private:
 	boost::shared_ptr<KeyboardEvent> create_event(const SDL_Event& sdl_event) const;
 };

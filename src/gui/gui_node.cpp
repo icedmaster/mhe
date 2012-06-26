@@ -37,21 +37,21 @@ widgetptr GUINode::get_widget(const std::string& name) const
 	return widget_->get_widget(name);
 }
 
-bool GUINode::on_mouse_move(const boost::shared_ptr<Event>& event)
+bool GUINode::on_mouse_move(Event* event)
 {
-	widget_->process_mouse_move_event(boost::static_pointer_cast<MouseEvent>(event));
+	widget_->process_mouse_move_event(static_cast<MouseEvent*>(event));
 	return true;
 }
 
-bool GUINode::on_mouse_button_pressed(const boost::shared_ptr<Event>& event)
+bool GUINode::on_mouse_button_pressed(Event* event)
 {
-	widget_->process_mouse_press_event(boost::static_pointer_cast<MouseEvent>(event));
+	widget_->process_mouse_press_event(static_cast<MouseEvent*>(event));
 	return true;
 }
 
-bool GUINode::on_mouse_button_released(const boost::shared_ptr<Event>& event)
+bool GUINode::on_mouse_button_released(Event* event)
 {
-	widget_->process_mouse_release_event(boost::static_pointer_cast<MouseEvent>(event));
+	widget_->process_mouse_release_event(static_cast<MouseEvent*>(event));
 	return true;
 }
 

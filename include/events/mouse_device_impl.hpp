@@ -6,13 +6,14 @@
 
 namespace mhe {
 
+class Event;
 class MouseEvent;
 
 class MouseDeviceImpl
 {
 public:
 	virtual ~MouseDeviceImpl() {}
-	virtual std::vector< boost::shared_ptr<MouseEvent> > check();
+	virtual std::vector< boost::shared_ptr<Event> > check();
 };
 
 }

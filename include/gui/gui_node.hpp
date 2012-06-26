@@ -21,9 +21,9 @@ public:
 	void add_widget(Widget* widget);
 	widgetptr get_widget(const std::string& name) const;
 private:
-	bool on_mouse_move(const boost::shared_ptr<Event>& event);
-	bool on_mouse_button_pressed(const boost::shared_ptr<Event>& event);
-	bool on_mouse_button_released(const boost::shared_ptr<Event>& event);
+	bool on_mouse_move(Event* event);
+	bool on_mouse_button_pressed(Event* event);
+	bool on_mouse_button_released(Event* event);
 private:
 	widgetptr widget_;
 };

@@ -6,13 +6,14 @@
 
 namespace mhe {
 
+class Event;
 class SystemEvent;
 
 class SystemDeviceImpl
 {
 public:
 	virtual ~SystemDeviceImpl() {}
-	virtual std::vector< boost::shared_ptr<SystemEvent> > check() = 0;
+	virtual std::vector< boost::shared_ptr<Event> > check() = 0;
 };
 
 }

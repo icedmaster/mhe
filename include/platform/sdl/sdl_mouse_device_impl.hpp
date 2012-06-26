@@ -10,7 +10,7 @@ namespace sdl {
 class SDLMouseDeviceImpl : public MouseDeviceImpl
 {
 public:
-	std::vector< boost::shared_ptr<MouseEvent> > check();
+	std::vector< boost::shared_ptr<Event> > check();
 private:
 	boost::shared_ptr<MouseEvent> create_event(const SDL_Event& event) const;
 };

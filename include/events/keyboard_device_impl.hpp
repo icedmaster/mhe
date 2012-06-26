@@ -6,13 +6,14 @@
 
 namespace mhe {
 
+class Event;
 class KeyboardEvent;
 
 class KeyboardDeviceImpl
 {
 public:
 	virtual ~KeyboardDeviceImpl() {}
-	virtual std::vector< boost::shared_ptr<KeyboardEvent> > check() = 0;
+	virtual std::vector< boost::shared_ptr<Event> > check() = 0;
 };
 
 }

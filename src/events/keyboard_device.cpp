@@ -12,15 +12,12 @@ KeyboardDevice::KeyboardDevice(const std::string& name) :
 
 std::vector< boost::shared_ptr<Event> > KeyboardDevice::check_impl()
 {
-	const std::vector< boost::shared_ptr<KeyboardEvent> >& events = impl_->check();
-	std::vector< boost::shared_ptr<Event> > out;
-	out.reserve(events.size());
+	const std::vector< boost::shared_ptr<Event> >& events = impl_->check();
 	for (size_t i = 0; i < events.size(); ++i)
-	{
-		keys_[events[i]->sym()] = (events[i]->state() == KeyboardEvent::key_down) ? true : false;
-		out.push_back(events[i]);
-	}
-	return out;
+		// for KeyboardEvent optarg() == sym() and arg() == state()
+		// see keyboard_event.hpp
+		keys_[events[i]->optarg()] = (events[i]->arg() == KeyboardEvent::key_down) ? true : false;
+	return events;
 }
 
 bool KeyboardDevice::is_key_pressed(int sym) const
