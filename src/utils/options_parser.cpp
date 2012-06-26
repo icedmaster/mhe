@@ -53,17 +53,17 @@ namespace utils {
 		m[first] = second;
 	}
 
-	bool OptionsParser::getString(const std::string& name, std::string& value, const std::string& def_value) const
+	bool OptionsParser::get_string(const std::string& name, std::string& value, const std::string& def_value) const
 	{
 		return get_option(name, value, def_value);
 	}
 
-	bool OptionsParser::getInteger(const std::string& name, int& value, int def_value) const
+	bool OptionsParser::get_integer(const std::string& name, int& value, int def_value) const
 	{
 		return get_option(name, value, def_value);
 	}
 
-	bool OptionsParser::getBool(const std::string& name, bool& value, bool def_value) const
+	bool OptionsParser::get_bool(const std::string& name, bool& value, bool def_value) const
 	{
 		return get_option(name, value, def_value);
 	}
