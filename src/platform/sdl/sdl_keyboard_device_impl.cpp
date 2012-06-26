@@ -6,9 +6,9 @@
 namespace mhe {
 namespace sdl {
 
-std::vector< boost::shared_ptr<KeyboardEvent> > SDLKeyboardDeviceImpl::check()
+std::vector< boost::shared_ptr<Event> > SDLKeyboardDeviceImpl::check()
 {
-	std::vector< boost::shared_ptr<KeyboardEvent> > events;
+	std::vector< boost::shared_ptr<Event> > events;
 	std::vector<SDL_Event> sdl_events;
 	int cnt = check_for_events(SDL_KEYDOWN | SDL_KEYUP, sdl_events);
 	if (cnt <= 0) return events;

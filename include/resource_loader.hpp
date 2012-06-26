@@ -11,32 +11,22 @@
 #include "siwa_image.hpp"
 #include "bmp_image.hpp"
 
-// font
-//#include "mhe_gui.hpp"
-
 namespace mhe
 {
 
 struct SoundLoader
 {
 	typedef iSound type;
-	typedef iAudioDriver helper_type;
-	static type* load(const std::string& name, boost::shared_ptr<helper_type> helper);
+	typedef boost::shared_ptr<iAudioDriver> helper_type;
+	static type* load(const std::string& name, const helper_type& helper);
 };
 
 struct TextureLoader
 {
 	typedef Texture type;
-	typedef Driver helper_type;
-	static type* load(const std::string& name, boost::shared_ptr<helper_type> helper);
+	typedef boost::shared_ptr<Driver> helper_type;
+	static type* load(const std::string& name, const helper_type& helper);
 };
-
-/*struct FontLoader
-{
-	typedef gui::iFont type;
-	typedef Driver helper_type;
-	static type* load(const std::string& name, boost::shared_ptr<helper_type> helper);
-	};*/
 
 }	// namespace
 

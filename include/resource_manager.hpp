@@ -16,10 +16,10 @@ private:
 	typedef typename Loader::helper_type helper_type;
 	typedef std::map< std::string, boost::shared_ptr<res_type> > resmap;
 	mutable resmap resources_;
-	boost::shared_ptr<helper_type> helper_;
+	helper_type helper_;
 
 	boost::shared_ptr<res_type> load_impl(const std::string& name,
-								   const std::string& sname) const
+					      const std::string& sname) const
 	{
 		res_type* res = Loader::load(name, helper_);
 		if (res == 0)
@@ -33,7 +33,7 @@ private:
 		return shared_res;
 	}
 public:
-	void set_helper(boost::shared_ptr<helper_type> helper)
+	void set_helper(const helper_type& helper)
 	{
 		helper_ = helper;
 	}
@@ -45,7 +45,7 @@ public:
 
 	bool unload(const std::string& name)
 	{
-		typename resmap::iterator it = resources_.find(get_file_name(name));
+		typename resmap::iterator it = resources_.find(utils::get_file_name(name));
 		if (it == resources_.end()) return false;
 		resources_.erase(it);
 		return true;
@@ -60,7 +60,7 @@ public:
 
 	boost::shared_ptr<res_type> get(const std::string& name) const
 	{
-		const std::string& sname = get_file_name(name);
+		const std::string& sname = utils::get_file_name(name);
 		typename resmap::iterator it = resources_.find(sname);
 		if (it != resources_.end())
 			return it->second;

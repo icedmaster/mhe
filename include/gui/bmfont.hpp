@@ -1,52 +1,41 @@
-#ifndef _BMFONT_HPP_
-#define _BMFONT_HPP_
+#ifndef __BMFONT_HPP__
+#define __BMFONT_HPP__
 
-#include "ifont.hpp"
-#include "texture_atlas.hpp"
 #include <map>
+#include "font.hpp"
+#include "texture_atlas.hpp"
 
-namespace mhe
+namespace mhe {
+namespace gui {
+
+class BMFont : public Font
 {
-	namespace gui
+public:
+	bool load(const std::string& filename);
+	void print(const boost::shared_ptr<Driver>& driver, const std::wstring& text,
+			   const vector2<int>& coord, const colorf& color = cfWhite);
+	std::string name() const
 	{
-		class BMFont : public iFont
-		{
-			private:
-                TextureAtlas ta_;
-				cmn::uint height_;
-				std::string name_;
-				colorf color_;
-				std::map<cmn::uint, cmn::uint> chars_;
-
-				void load_char(const std::string& str,
-							   std::vector<float>& texc);
-				void load_texture(const std::string& filename);
-				cmn::uint get_char(cmn::uint sym) const;
-			public:
-				BMFont();
-
-				bool load(const std::string& filename);
-
-				void print(boost::shared_ptr<Driver> driver, const std::wstring& text,
-						   const v2d& coord);
-				void setColor(const colorf& color)
-				{
-					color_ = color;
-				}
-
-				cmn::uint height() const
-				{
-					return height_;
-				}
-
-				std::string name() const
-				{
-					return name_;
-				}
-
-				iFont* clone() const;
-		};
+		return name_;
 	}
+
+	cmn::uint height() const
+	{
+		return height_;
+	}
+private:
+	void load_char(const std::string& str,
+				   std::vector<float>& texc);
+	void load_texture(const std::string& filename);
+	cmn::uint get_char(cmn::uint sym) const;
+
+	TextureAtlas ta_;
+	std::map<cmn::uint, cmn::uint> chars_;
+	std::string name_;
+	cmn::uint height_;
+};
+
+}
 }
 
 #endif

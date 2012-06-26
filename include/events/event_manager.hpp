@@ -14,6 +14,7 @@ public:
 	boost::shared_ptr<Device> get_device(const std::string& name) const;
 
 	void add_listener(const boost::shared_ptr<EventListener>& listener);
+	void add_listener(EventListener* listener);
 	void check();
 private:
 	void process_event(const boost::shared_ptr<Event>& event);

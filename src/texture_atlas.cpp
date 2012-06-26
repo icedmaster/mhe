@@ -2,14 +2,14 @@
 
 namespace mhe
 {
-	void TextureAtlas::setTexture(const boost::shared_ptr<Texture>& tex, int sz)
+	void TextureAtlas::set_texture(const boost::shared_ptr<Texture>& tex, int sz)
 	{
 		texture_ = tex;
 		if (sz)
 			calc_indicies(sz);
 	}
 
-	void TextureAtlas::setIndicies(const float* ind, int sz)
+	void TextureAtlas::set_indicies(const float* ind, int sz)
 	{
 		indicies_.clear();
 		indicies_.assign(ind, ind + sz);
@@ -46,9 +46,9 @@ namespace mhe
 		float y2 = quad.rh().y() / texture_->height();
 
 		Texture::texcoord tc = {{x1, y1,
-								  x1, y2,
-								  x2, y2,
-								  x2, y1}};
+								 x1, y2,
+								 x2, y2,
+								 x2, y1}};
 		return tc;
 	}
 
@@ -82,14 +82,14 @@ namespace mhe
 		}
 	}
 
-boost::shared_ptr<Texture> TextureAtlas::createTexture(cmn::uint quad) const
+boost::shared_ptr<Texture> TextureAtlas::create_texture(cmn::uint quad) const
 {
 	boost::shared_ptr<Texture> new_texture = texture_->clone();
 	new_texture->set_coord(get(quad));
 	return new_texture;
 }
 
-boost::shared_ptr<Texture> TextureAtlas::createTexture(const rect<float>& coord) const
+boost::shared_ptr<Texture> TextureAtlas::create_texture(const rect<float>& coord) const
 {
 	boost::shared_ptr<Texture> new_texture = texture_->clone();
 	new_texture->set_coord(get(coord));

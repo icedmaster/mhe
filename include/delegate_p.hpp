@@ -66,11 +66,13 @@ public:
 	{
 		delegates.clear();
 		delegates.push_back(delegate);
+		return *this;
 	}
 
 	DELEGATE& operator+= (Delegate* delegate)
 	{
 		delegates.push_back(boost::shared_ptr<Delegate>(delegate));
+		return *this;
 	}
 
 	bool is_null() const
@@ -80,10 +82,11 @@ public:
 
 	Ret operator() (METHOD_ARGS)
 	{
-		Ret result;
-		for (typename DelegatesList::iterator it = delegates.begin(); it != delegates.end(); ++it)		
-			result = (*(*it))(ARGS);
-		return result;
+		typename DelegatesList::iterator prevend = delegates.end();
+		--prevend;
+		for (typename DelegatesList::iterator it = delegates.begin(); it != prevend; ++it)		
+			(*(*it))(ARGS);
+		return (*(*delegates.end()))(ARGS);
 	}
 private:
 	DelegatesList delegates;

@@ -1,15 +1,12 @@
 #include "gui/bmfont.hpp"
+
+#include <fstream>
 #include "utils/options_parser.hpp"
 #include "utils/logutils.hpp"
 #include "texture_manager.hpp"
-#include <fstream>
 
 namespace mhe {
 namespace gui {
-
-	BMFont::BMFont() :
-		color_(cfBlack)
-	{}
 
 	bool BMFont::load(const std::string& filename)
 	{
@@ -21,7 +18,7 @@ namespace gui {
 		// first string - info
 		std::getline(f, str);
 		mhe::utils::OptionsParser op(str, ' ');
-		op.getString("face", name_, "");
+		op.get_string("face", name_, "");
 		name_ = utils::replace(name_, '"');
 		op.get<cmn::uint>("size", height_, 0);
 		// second string - draw info
@@ -30,7 +27,7 @@ namespace gui {
 		std::getline(f, str);
 		op.process(str, ' ');
 		std::string texture_filename;
-		op.getString("file", texture_filename, "");
+		op.get_string("file", texture_filename, "");
 		if (texture_filename.empty())
 			return false;
         texture_filename = utils::replace(texture_filename, '"');
@@ -39,7 +36,7 @@ namespace gui {
 		std::getline(f, str);
 	    op.process(str, ' ');
 		int chars_num;
-		op.getInteger("count", chars_num, 0);
+		op.get_integer("count", chars_num, 0);
 
 		std::vector<float> texc;
 		texc.reserve(chars_num * 8);
@@ -51,14 +48,14 @@ namespace gui {
 		}
 		f.close();
 
-		ta_.setIndicies(&texc[0], texc.size());
+		ta_.set_indicies(&texc[0], texc.size());
 		return true;
 	}
 
 	void BMFont::load_texture(const std::string& filename)
 	{
 		TextureManager tm;
-		ta_.setTexture(tm.get(filename));
+		ta_.set_texture(tm.get(filename));
 	}
 
 	void BMFont::load_char(const std::string& str,
@@ -72,8 +69,8 @@ namespace gui {
 		op.get<unsigned int>("width", width, 0);
 		op.get<unsigned int>("height", height, 0);
 
-		const float texture_width  = ta_.getTexture()->width();
-		const float texture_height = ta_.getTexture()->height();
+		const float texture_width  = ta_.texture()->width();
+		const float texture_height = ta_.texture()->height();
 		y = texture_height - y;
 
 		float tc[8];
@@ -103,8 +100,8 @@ namespace gui {
 	}
 
 	// must called from 2d mode
-	void BMFont::print(boost::shared_ptr<Driver> driver, const std::wstring& text,
-					   const v2d& coord)
+	void BMFont::print(const boost::shared_ptr<Driver>& driver, const std::wstring& text,
+					   const vector2<int>& coord, const colorf& color)
 	{
 		std::vector<float> t;	// texture coordinates
 		std::vector<cmn::uint> ibuf;
@@ -136,7 +133,7 @@ namespace gui {
 
 			// colors are the same for all vertexes
 			for (int j = 0; j < 4; ++j)
-				c.insert(c.end(), color_.get(), color_.get() + 4);
+				c.insert(c.end(), color.get(), color.get() + 4);
 			// setup indicies
 			cmn::uint isz = i * 4;
 			cmn::uint indicies[6] = {isz, isz + 1, isz + 2,
@@ -147,19 +144,12 @@ namespace gui {
 		driver->mask_zbuffer();
         driver->enable_blending(ALPHA_ONE_MINUS_ALPHA);
 
-		ta_.getTexture()->prepare();
+		ta_.texture()->prepare();
 		driver->draw(&v[0], 0, &t[0], &c[0], &ibuf[0], ibuf.size());
-		ta_.getTexture()->clean();
+		ta_.texture()->clean();
 
 		driver->unmask_zbuffer();
         driver->disable_blending();
 	}
-
-	iFont* BMFont::clone() const
-	{
-		BMFont* font = new BMFont(*this);
-		return font;
-	}
-
 }
 }
