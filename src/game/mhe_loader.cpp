@@ -80,13 +80,13 @@ namespace game {
         return boost::shared_ptr<gui::iFont>();
 	}
 
-	boost::shared_ptr<gui::iFont> mhe_loader::load_font(const pugi::xml_node& node) const
+/*boost::shared_ptr<gui::iFont> mhe_loader::load_font(const pugi::xml_node& node) const
 	{
         // get filename
         std::wstring fn(node.child(L"file").child_value());
         // try to load font		
 		return engine_->getFontManager().get(utils::from_wstr(fn));
-	}
+		}*/
 
 	boost::shared_ptr<iSound> mhe_loader::get_sound(const std::wstring& name) const
 	{
@@ -114,7 +114,7 @@ namespace game {
         return 0;
 	}
 
-	gui::GUIContainer* mhe_loader::getGUI(const std::wstring& name) const
+/*gui::GUIContainer* mhe_loader::getGUI(const std::wstring& name) const
 	{
 		if (!is_open_) return 0;
 
@@ -123,6 +123,7 @@ namespace game {
             return load_gui(node);
         return 0;
 	}
+*/
 
 	Sprite* mhe_loader::load_sprite(const pugi::xml_node& node) const
 	{
@@ -143,6 +144,7 @@ namespace game {
 		return sprite;
 	}
 
+/*
 	gui::GUIContainer* mhe_loader::load_gui(const pugi::xml_node& node) const
 	{
 		// create new gui container and find all widgets that it hold
@@ -154,6 +156,7 @@ namespace game {
 
 		return gui;
 	}
+*/
 
 	AnimationList mhe_loader::read_animationList(const pugi::xml_node& node) const
 	{
@@ -191,6 +194,7 @@ namespace game {
         return a;
 	}
 
+/*
 	boost::shared_ptr<gui::Widget> mhe_loader::read_widget(const pugi::xml_node& node) const
 	{
 		// load widget by type
@@ -241,6 +245,7 @@ namespace game {
 		if (n)
 			widget->set_sprite(boost::shared_ptr<Sprite>(getSprite(n.child_value())));
 	}
+*/
 
 	void mhe_loader::load_all_assets()
 	{

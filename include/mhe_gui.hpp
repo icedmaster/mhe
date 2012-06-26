@@ -4,7 +4,6 @@
 #include "gui/gui_container.hpp"
 #include "gui/label.hpp"
 #include "gui/button.hpp"
-#include "gui/cursor.hpp"
 #include "gui/bmfont.hpp"
 
 #endif

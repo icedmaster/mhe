@@ -6,7 +6,7 @@
 
 namespace mhe
 {
-typedef ResourceManager<FontLoader> FontManager;
+//typedef ResourceManager<FontLoader> FontManager;
 }
 
 #if 0

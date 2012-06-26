@@ -6,7 +6,6 @@ namespace game {
 Engine::Engine() :
 	driver_(SystemFactory::instance().create_driver()),
 	audio_driver_(SystemFactory::instance().create_audio_driver()),
-	is_(SystemFactory::instance().create_input_system()),
 	running_(false), initialized_(false),
 	quit_listener_(new EngineEventListener(mhe::SystemEventType, mhe::QUIT, 0, 
 											this, &Engine::stop_p))
@@ -18,7 +17,6 @@ bool Engine::init(cmn::uint w, cmn::uint h, cmn::uint bpp, bool fullscreen)
 	INFO_LOG("Engine init:" << w << " " << h << " " << bpp);
 	if (!ws_.init(w, h, bpp, fullscreen))
 		return false;	
-	is_->set_window_system(&ws_);
 	// init quit event listener
 	is_->add_listener(quit_listener_);
 		
@@ -60,7 +58,7 @@ void Engine::run()
 
 void Engine::process()
 {
-	is_->check();
+	event_manager_.check();
 	driver_->clear_depth();
 	driver_->clear_color();
 

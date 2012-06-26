@@ -3,8 +3,6 @@
 
 #include "game/engine.hpp"
 #include "game/game_scene.hpp"
-#include "game/highlited_widget.hpp"
-#include "game/fade_sprite.hpp"
 #include "game/node_aspect.hpp"
 #include "game/mhe_loader.hpp"
 

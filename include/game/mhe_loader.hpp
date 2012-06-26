@@ -9,7 +9,7 @@
 #include "sound_manager.hpp"
 #include "utils/strutils.hpp"
 #include "utils/logutils.hpp"
-#include "mhe_gui.hpp"
+//#include "mhe_gui.hpp"
 #include "engine.hpp"
 
 namespace mhe {
@@ -32,8 +32,8 @@ namespace game {
 		boost::shared_ptr<Texture> get_texture(const std::wstring& name) const;
 		boost::shared_ptr<Texture> load_texture(const pugi::xml_node& node) const;
 
-		boost::shared_ptr<gui::iFont> get_font(const std::wstring& name) const;
-		boost::shared_ptr<gui::iFont> load_font(const pugi::xml_node& node) const;
+		//boost::shared_ptr<gui::iFont> get_font(const std::wstring& name) const;
+		//boost::shared_ptr<gui::iFont> load_font(const pugi::xml_node& node) const;
 
 		boost::shared_ptr<iSound> get_sound(const std::wstring& name) const;
 		boost::shared_ptr<iSound> load_sound(const pugi::xml_node& node) const;
@@ -42,22 +42,22 @@ namespace game {
 								const std::wstring& type);
 
 		Sprite* load_sprite(const pugi::xml_node& node) const;
-		gui::GUIContainer* load_gui(const pugi::xml_node& node) const;
+		//gui::GUIContainer* load_gui(const pugi::xml_node& node) const;
 
 		AnimationList read_animationList(const pugi::xml_node& node) const;
 		Animation read_animation(const pugi::xml_node& node) const;
 
-		boost::shared_ptr<gui::Widget> read_widget(const pugi::xml_node& node) const;
+		/*boost::shared_ptr<gui::Widget> read_widget(const pugi::xml_node& node) const;
 		boost::shared_ptr<gui::Label> load_label_widget(const pugi::xml_node& node) const;
 		boost::shared_ptr<gui::Button> load_button_widget(const pugi::xml_node& node) const;
 		void load_widget(const pugi::xml_node& node,
-						 gui::Widget* widget) const;
+		gui::Widget* widget) const;*/
 	public:
 		mhe_loader(const std::string& filename, Engine* engine);
 		~mhe_loader();
 
 		Sprite* getSprite(const std::wstring& name) const;
-		gui::GUIContainer* getGUI(const std::wstring& name) const;
+		//gui::GUIContainer* getGUI(const std::wstring& name) const;
 
 		void load_all_assets();
 

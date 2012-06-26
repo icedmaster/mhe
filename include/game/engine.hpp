@@ -5,6 +5,7 @@
 #include "game_scene.hpp"
 #include "aspect_manager.hpp"
 #include "timed_events.hpp"
+#include "mhe_event.hpp"
 
 namespace mhe {
 namespace game {
@@ -25,37 +26,37 @@ public:
 		return running_;
 	}
 			
-	TextureManager& getTextureManager()
+	TextureManager& texture_manager()
 	{
 		return tm_;
 	}
 			
-	FontManager& getFontManager()
+	/*FontManager& font_manager()
 	{
 		return fm_;
-	}
+		}*/
 
-	SoundManager& getSoundManager()
+	SoundManager& sound_manager()
 	{
 		return sm_;
 	}
 
-	WindowSystem& getWindowSystem()
+	WindowSystem& window_system()
 	{
 		return ws_;
 	}
 			
-	boost::shared_ptr<InputSystem> getInputSystem() const
+	EventManager& input_system()
 	{
-		return is_;
+		return event_manager_;
 	}
 			
-	boost::shared_ptr<Driver> getDriver() const
+	boost::shared_ptr<Driver> driver() const
 	{
 		return driver_;
 	}
 
-	boost::shared_ptr<iAudioDriver> getAudioDriver() const
+	boost::shared_ptr<iAudioDriver> audio_driver() const
 	{
 		return audio_driver_;
 	}
@@ -88,8 +89,7 @@ public:
 		return initialized_;
 	}
 private:
-	typedef PrivateEventListener<Engine> EngineEventListener;
-	friend class PrivateEventListener<Engine>;
+	friend class EventListener;
 	bool stop_p(const Event&)
 	{
 		stop();
@@ -101,11 +101,11 @@ private:
 
 	WindowSystem ws_;
 	TextureManager tm_;
-	FontManager fm_;
+	//FontManager fm_;
 	SoundManager sm_;
+	EventManager event_manager_;
 	boost::shared_ptr<Driver> driver_;
 	boost::shared_ptr<iAudioDriver> audio_driver_;
-	boost::shared_ptr<InputSystem> is_;
 
 	boost::shared_ptr<GameScene> game_scene_;
 
@@ -114,8 +114,6 @@ private:
 
 	bool running_;
 	bool initialized_;		   
-
-	boost::shared_ptr<EngineEventListener> quit_listener_;
 };
 
 }}       // namespaces

@@ -4,23 +4,22 @@
 #include "widget.hpp"
 #include <map>
 
-namespace mhe
+namespace mhe {
+namespace gui {
+
+class Label : public Widget
 {
-	namespace gui
+private:
+	bool is_handler_supported(int event) const
 	{
-		class Label : public Widget
-		{
-			private:
-				bool is_handler_supported(int event) const
-				{
-					static int supported[] = {OnMouseMove, OnMouseLeft, OnMouseLeftClick,
-											  OnMouseRightClick};
-					if (std::find(supported, supported + 4, event) == (supported + 4))
-						return false;
-					return true;
-				}
-		};
+		static int supported[] = {on_mouse_move, on_mouse_left, on_mouse_left_click,
+								  on_mouse_right_click};
+		if (std::find(supported, supported + 4, event) == (supported + 4))
+			return false;
+		return true;
 	}
-}
+};
+
+}}
 
 #endif

@@ -63,7 +63,8 @@ Texture* TextureLoader::load(const std::string& filename, boost::shared_ptr<help
 	return nullptr;
 }
 
-gui::iFont* FontLoader::load(const std::string& name, boost::shared_ptr<helper_type> /*helper*/)
+/*
+gui::iFont* FontLoader::load(const std::string& name, boost::shared_ptr<helper_type> helper)
 {
 	const std::string& ext = get_file_extension(name);
 	if (ext.empty()) return 0;
@@ -81,5 +82,6 @@ gui::iFont* FontLoader::load(const std::string& name, boost::shared_ptr<helper_t
 
 	return 0;
 }
+*/
 
 }	// mhe

@@ -12,7 +12,7 @@
 #include "bmp_image.hpp"
 
 // font
-#include "mhe_gui.hpp"
+//#include "mhe_gui.hpp"
 
 namespace mhe
 {
@@ -31,12 +31,12 @@ struct TextureLoader
 	static type* load(const std::string& name, boost::shared_ptr<helper_type> helper);
 };
 
-struct FontLoader
+/*struct FontLoader
 {
 	typedef gui::iFont type;
 	typedef Driver helper_type;
 	static type* load(const std::string& name, boost::shared_ptr<helper_type> helper);
-};
+	};*/
 
 }	// namespace
 
