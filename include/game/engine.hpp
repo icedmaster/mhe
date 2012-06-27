@@ -4,7 +4,6 @@
 #include "mhe.hpp"
 #include "game_scene.hpp"
 #include "aspect_manager.hpp"
-#include "timed_events.hpp"
 #include "mhe_event.hpp"
 
 namespace mhe {
@@ -79,18 +78,13 @@ public:
 		return aspect_manager_;
 	}
 
-	TimedEventsManager& get_timed_events_manager()
-	{
-		return timed_events_manager_;
-	}
-
 	bool initialized() const
 	{
 		return initialized_;
 	}
 private:
 	friend class EventListener;
-	bool stop_p(const Event&)
+	bool stop_p(Event*)
 	{
 		stop();
 		return true;
@@ -110,7 +104,6 @@ private:
 	boost::shared_ptr<GameScene> game_scene_;
 
 	AspectManager aspect_manager_;
-	TimedEventsManager timed_events_manager_;
 
 	bool running_;
 	bool initialized_;		   

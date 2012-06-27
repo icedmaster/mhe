@@ -4,6 +4,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
 #include "input_factory.hpp"
+#include "types.hpp"
 
 namespace mhe
 {

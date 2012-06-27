@@ -6,9 +6,7 @@ namespace game {
 Engine::Engine() :
 	driver_(SystemFactory::instance().create_driver()),
 	audio_driver_(SystemFactory::instance().create_audio_driver()),
-	running_(false), initialized_(false),
-	quit_listener_(new EngineEventListener(mhe::SystemEventType, mhe::QUIT, 0, 
-											this, &Engine::stop_p))
+	running_(false), initialized_(false)
 {}
 	
 bool Engine::init(cmn::uint w, cmn::uint h, cmn::uint bpp, bool fullscreen)
@@ -18,7 +16,8 @@ bool Engine::init(cmn::uint w, cmn::uint h, cmn::uint bpp, bool fullscreen)
 	if (!ws_.init(w, h, bpp, fullscreen))
 		return false;	
 	// init quit event listener
-	is_->add_listener(quit_listener_);
+	event_manager_.add_listener(new EventListener(system_event_type, SystemEvent::quit, Event::any_event,
+						      create_delegate(this, &Engine::stop_p)));
 		
 	// graphics driver initialization
 	driver_->set_window_system(&ws_);
@@ -32,7 +31,7 @@ bool Engine::init(cmn::uint w, cmn::uint h, cmn::uint bpp, bool fullscreen)
 
 	// set helpers for managers
 	tm_.set_helper(driver_);
-	fm_.set_helper(driver_);
+	//fm_.set_helper(driver_);
 	sm_.set_helper(audio_driver_);
 	initialized_ = true;
 	return true;
@@ -88,13 +87,12 @@ void Engine::update()
 {
 	cmn::uint now = utils::get_current_tick();
 	aspect_manager_.update(now);
-	timed_events_manager_.update(now);
 }
 
 void Engine::free_all()
 {
 	tm_.free_all();
-	fm_.free_all();
+	//fm_.free_all();
 	sm_.free_all();
 }
 

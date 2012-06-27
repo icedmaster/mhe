@@ -4,6 +4,5 @@
 #include "game/engine.hpp"
 #include "game/game_scene.hpp"
 #include "game/node_aspect.hpp"
-#include "game/mhe_loader.hpp"
 
 #endif

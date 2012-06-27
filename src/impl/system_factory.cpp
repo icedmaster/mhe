@@ -49,22 +49,15 @@ iSound* SystemFactory::create_sound() const
 
 iWindowSystem* SystemFactory::create_window_system() const
 {
+	// TODO:
+	/*
 	if (factory_ != nullptr) return factory_->create_window_system();
     #ifdef MHE_SDL
     return new sdl::SDLWindowSystem;
     #endif
+	*/
 
     return nullptr;
 }	
-
-InputSystem* SystemFactory::create_input_system() const
-{
-	if (factory_ != nullptr) return factory_->create_input_system();
-    #ifdef MHE_SDL
-    return new sdl::SDLInputSystem;
-    #endif
-
-    return nullptr;
-}
 
 }  // mhe
