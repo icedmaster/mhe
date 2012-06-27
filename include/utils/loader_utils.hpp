@@ -1,8 +1,10 @@
 #ifndef __LOADER_UTILS_HPP__
 #define __LOADER_UTILS_HPP__
 
+#include <boost/lexical_cast.hpp>
 #include "lib/pugixml/pugixml.hpp"
 #include "mhe_math.hpp"
+#include "strutils.hpp"
 
 namespace mhe {
 namespace utils {
@@ -22,7 +24,7 @@ inline T read_number(const pugi::xml_node& node)
 
 template <class T>
 inline T read_number(const pugi::xml_node& node,
-					 const wstring& attr_name)
+					 const std::wstring& attr_name)
 {
 	std::wstring v = node.attribute(attr_name.c_str()).value();
 	T n = 0;
@@ -34,29 +36,29 @@ inline T read_number(const pugi::xml_node& node,
 	return n;
 }
 
-inline vector3<float> read_vector3(const pugi::xml_node& n)
+inline vector3<float> read_vector3(const pugi::xml_node& node)
 {
-	float x = read_number(node, L"x");
-	float y = read_number(node, L"y");
-	float z = read_number(node, L"z");
+	float x = read_number<float>(node, L"x");
+	float y = read_number<float>(node, L"y");
+	float z = read_number<float>(node, L"z");
 	return vector3<float>(x, y, z);
 }
 
-inline vector4<float> read_vector4(const pugi::xml_node& n)
+inline vector4<float> read_vector4(const pugi::xml_node& node)
 {
-	float x = read_number(node, L"x");
-	float y = read_number(node, L"y");
-	float z = read_number(node, L"z");
-	float w = read_number(node, L"w");
+	float x = read_number<float>(node, L"x");
+	float y = read_number<float>(node, L"y");
+	float z = read_number<float>(node, L"z");
+	float w = read_number<float>(node, L"w");
 	return vector4<float>(x, y, z, w);
 }
 
-inline pugi::xml_node find_asset_with_type(const pugi::xml_node& root,
-										   const std::wstring& type, const std::wstring& name)
+inline pugi::xml_node find_node(const pugi::xml_node& root,
+								const std::wstring& type, const std::wstring& name)
 {
-	for (pugi::xml_node n = root.child(type); n; n = n.next_sibling(type)
+	for (pugi::xml_node n = root.child(type.c_str()); n; n = n.next_sibling(type.c_str()))
 	{
-		if (n.attribute(L"name") == name)
+		if (std::wstring(n.attribute(L"name").value()) == name)
 			return n;
 	}
 	return pugi::xml_node();

@@ -34,7 +34,7 @@ set (LIB_DIR ${CMAKE_SOURCE_DIR}/../lib)
 #set (SRC_DIR)
 
 set (SRC_PATH
-  #${SOURCE_ROOT}
+  ${SOURCE_ROOT}
   ${SOURCE_ROOT}/gui
   #${SOURCE_ROOT}/impl
   #${SOURCE_ROOT}/utils

@@ -2,6 +2,7 @@
 #define __XML_FONT_LOADER_HPP__
 
 #include "utils/loader_utils.hpp"
+#include "font_manager.hpp"
 
 namespace mhe {
 namespace gui {

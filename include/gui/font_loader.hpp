@@ -2,11 +2,10 @@
 #define __FONT_LOADER_HPP__
 
 #include <string>
+#include "font.hpp"
 
 namespace mhe {
 namespace gui {
-
-class Font;
 
 struct FontLoader
 {

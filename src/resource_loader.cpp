@@ -4,7 +4,7 @@ namespace mhe {
 
 iSound* SoundLoader::load(const std::string& name, const helper_type& /*helper*/)
 {
-	const std::string& ext = get_file_extension(name);
+	const std::string& ext = utils::get_file_extension(name);
 	boost::shared_ptr<iSoundData> data;
 	bool loaded = false;
 	if (ext == "ogg")
@@ -31,7 +31,7 @@ iSound* SoundLoader::load(const std::string& name, const helper_type& /*helper*/
 
 Texture* TextureLoader::load(const std::string& filename, const helper_type& helper)
 {
-	const std::string& ext = get_file_extension(filename);
+	const std::string& ext = utils::get_file_extension(filename);
 	if (ext.empty()) return nullptr;
 
 	boost::shared_ptr<Image> im;
