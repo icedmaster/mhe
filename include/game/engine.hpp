@@ -45,7 +45,7 @@ public:
 		return ws_;
 	}
 			
-	EventManager& input_system()
+	EventManager& event_manager()
 	{
 		return event_manager_;
 	}
@@ -68,12 +68,12 @@ public:
 	void free_all();
 	void set_next_scene(const std::string& arg);
 
-	boost::shared_ptr<GameScene> get_game_scene() const
+	boost::shared_ptr<GameScene> game_scene() const
 	{
 		return game_scene_;
 	}
 
-	AspectManager& get_aspect_manager()
+	AspectManager& aspect_manager()
 	{
 		return aspect_manager_;
 	}
