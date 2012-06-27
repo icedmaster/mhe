@@ -73,7 +73,7 @@ namespace game {
 	};
 
 	// helper functions
-	float read_float(const pugi::xml_node& node);
+    float read_float(const pugi::xml_node& node);
     float read_float(const pugi::xml_node& node,
                      const std::wstring& attr_name);
 
