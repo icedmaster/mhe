@@ -4,25 +4,14 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
 #include "input_factory.hpp"
+#include "video_driver_factory.hpp"
+#include "window_system_factory.hpp"
 #include "types.hpp"
 
 namespace mhe
 {
-class Driver;
-class iWindowSystem;
-class InputSystem;
-class Texture;
 class iAudioDriver;
 class iSound;
-
-// if we want to use custom factory
-class iSystemFactory
-{
-public:
-	virtual ~iSystemFactory() {}
-	virtual iWindowSystem* create_window_system() const = 0;
-	virtual InputSystem* create_input_system() const = 0;
-};
 
 class SystemFactory
 {
@@ -34,9 +23,8 @@ public:
 	}
 
 	Driver* create_driver() const;
-	iWindowSystem* create_window_system() const;
+	WindowSystemImpl* create_window_system() const;
 	Texture* create_texture() const;
-	Texture* create_multitexture() const;
 	iAudioDriver* create_audio_driver() const;
 	iSound* create_sound() const;
 
@@ -57,14 +45,19 @@ public:
 		return input_factory_->create_system_device_impl();
 	}
 
-	void set_system_factory(iSystemFactory* factory)
-	{
-		factory_.reset(factory);
-	}	
-
 	void set_input_factory(InputFactory* factory)
 	{
 		input_factory_ .reset(factory);
+	}
+
+	VideoDriverFactory& video_driver_factory()
+	{
+		return video_driver_factory_;
+	}
+
+	WindowSystemFactory& window_system_factory()
+	{
+		return window_system_factory_;
 	}
 private:
 	SystemFactory() {}
@@ -72,8 +65,9 @@ private:
 	~SystemFactory() {}
 	SystemFactory& operator= (const SystemFactory&) {return *this;}
 
-	boost::shared_ptr<iSystemFactory> factory_;
 	boost::scoped_ptr<InputFactory> input_factory_;
+	VideoDriverFactory video_driver_factory_;
+	WindowSystemFactory window_system_factory_;
 };
 }
 

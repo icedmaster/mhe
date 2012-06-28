@@ -13,7 +13,7 @@ class MouseDeviceImpl
 {
 public:
 	virtual ~MouseDeviceImpl() {}
-	virtual std::vector< boost::shared_ptr<Event> > check();
+	virtual std::vector< boost::shared_ptr<Event> > check() = 0;
 };
 
 }

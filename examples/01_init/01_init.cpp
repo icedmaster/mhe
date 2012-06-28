@@ -6,6 +6,8 @@ int main(int argc, char** argv)
 {
 	mhe::utils::create_standart_log();
 	mhe::impl::start_platform();
+	std::cout << mhe::utils::join(mhe::SystemFactory::instance().video_driver_factory().available_drivers_list(), "\n");
+	std::cout << mhe::SystemFactory::instance().video_driver_factory().current_driver_name() << std::endl;
 	mhe::game::Engine engine;
 	if (!engine.init(800, 600, 32))
 	{

@@ -7,7 +7,7 @@
 namespace mhe {
 namespace sdl {
 
-class SDLWindowSystem : public iWindowSystem
+class SDLWindowSystem : public WindowSystemImpl
 {
 public:
 	bool init(const vector2<int>& r, int bpp, bool fullscreen);

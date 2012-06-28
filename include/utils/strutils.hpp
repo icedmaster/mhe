@@ -7,6 +7,8 @@
 	#include <boost/lexical_cast.hpp>
 #endif
 
+#include <vector>
+
 namespace mhe {
 namespace utils {
 
@@ -74,6 +76,17 @@ inline std::string replace(const std::string& s, char from, char to = 0)
 		out_str += c;
 	}
 	return out_str;
+}
+
+inline std::string join(const std::vector<std::string>& str, const std::string& del = std::string())
+{
+	std::string out;
+	for (size_t i = 0; i < str.size(); ++i)
+	{
+		out += str[i];
+		out += del;
+	}
+	return out;
 }
 
 }}	// namespaces

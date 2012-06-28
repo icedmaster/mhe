@@ -8,10 +8,10 @@
 
 namespace mhe
 {
-class iWindowSystem
+class WindowSystemImpl
 {
 public:
-	virtual ~iWindowSystem() {}
+	virtual ~WindowSystemImpl() {}
 
 	virtual bool init(const vector2<int>&, int, bool) = 0;
 	virtual void close() = 0;
@@ -71,7 +71,7 @@ public:
 		impl_->resize(win_dim_);
 	}
 private:
-	boost::shared_ptr<iWindowSystem> impl_;
+	boost::shared_ptr<WindowSystemImpl> impl_;
 	vector2<int> win_dim_;
 	int bpp_;
 	bool fullscreen_;

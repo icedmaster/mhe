@@ -5,5 +5,6 @@
 #include "opengl_texture.hpp"
 #include "opengl_multitexture.hpp"
 #include "opengl_extension.hpp"
+#include "opengl_video_driver_factory.hpp"
 
 #endif
