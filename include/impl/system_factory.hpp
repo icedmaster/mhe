@@ -31,23 +31,17 @@ public:
 	// input devices
 	KeyboardDeviceImpl* create_keyboard_device_impl() const
 	{
-		if (input_factory_ == nullptr) return nullptr;
-		return input_factory_->create_keyboard_device_impl();
+		return window_system_factory_.create_keyboard_device();
 	}
 
 	MouseDeviceImpl* create_mouse_device_impl() const
 	{
-		return input_factory_->create_mouse_device_impl();
+		return window_system_factory_.create_mouse_device();
 	}
 
 	SystemDeviceImpl* create_system_device_impl() const
 	{
-		return input_factory_->create_system_device_impl();
-	}
-
-	void set_input_factory(InputFactory* factory)
-	{
-		input_factory_ .reset(factory);
+		return window_system_factory_.create_system_device();
 	}
 
 	VideoDriverFactory& video_driver_factory()
@@ -65,7 +59,6 @@ private:
 	~SystemFactory() {}
 	SystemFactory& operator= (const SystemFactory&) {return *this;}
 
-	boost::scoped_ptr<InputFactory> input_factory_;
 	VideoDriverFactory video_driver_factory_;
 	WindowSystemFactory window_system_factory_;
 };
