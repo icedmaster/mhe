@@ -6,7 +6,7 @@
 namespace mhe {
 namespace sdl {
 
-std::vector< boost::shared_ptr<Event> > SDLSystemDeviceImpl::check()
+std::vector< boost::shared_ptr<Event> > SDLSystemDeviceImpl::check(const WindowSystem&)
 {
 	std::vector< boost::shared_ptr<Event> > events;
 	std::vector<SDL_Event> sdl_events;

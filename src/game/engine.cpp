@@ -57,7 +57,7 @@ void Engine::run()
 
 void Engine::process()
 {
-	event_manager_.check();
+	event_manager_.check(ws_);
 	driver_->clear_depth();
 	driver_->clear_color();
 

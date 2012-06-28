@@ -8,12 +8,13 @@ namespace mhe {
 
 class Event;
 class KeyboardEvent;
+class WindowSystem;
 
 class KeyboardDeviceImpl
 {
 public:
 	virtual ~KeyboardDeviceImpl() {}
-	virtual std::vector< boost::shared_ptr<Event> > check() = 0;
+	virtual std::vector< boost::shared_ptr<Event> > check(const WindowSystem&) = 0;
 };
 
 }

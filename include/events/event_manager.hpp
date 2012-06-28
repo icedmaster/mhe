@@ -4,6 +4,7 @@
 #include <map>
 #include "device.hpp"
 #include "event_listener.hpp"
+#include "window_system.hpp"
 
 namespace mhe {
 
@@ -15,7 +16,7 @@ public:
 
 	void add_listener(const boost::shared_ptr<EventListener>& listener);
 	void add_listener(EventListener* listener);
-	void check();
+	void check(const WindowSystem& window_system);
 private:
 	void process_event(const boost::shared_ptr<Event>& event);
 	void process_event_with_id(int id, const boost::shared_ptr<Event>& event);

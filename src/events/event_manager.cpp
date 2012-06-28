@@ -24,11 +24,11 @@ void EventManager::add_listener(EventListener* listener)
 	add_listener(boost::shared_ptr<EventListener>(listener));
 }
 
-void EventManager::check()
+void EventManager::check(const WindowSystem& ws)
 {
 	for (devices_map::iterator it = devices_.begin(); it != devices_.end(); ++it)
 	{
-		const std::vector< boost::shared_ptr<Event> >& events = it->second->check();
+		const std::vector< boost::shared_ptr<Event> >& events = it->second->check(ws);
 		for (size_t i = 0; i < events.size(); ++i)
 		{
 			process_event(events[i]);

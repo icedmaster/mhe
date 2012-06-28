@@ -4,6 +4,7 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include "event.hpp"
+#include "window_system.hpp"
 
 namespace mhe {
 
@@ -21,9 +22,9 @@ public:
 		return name_;
 	}
 
-	std::vector< boost::shared_ptr<Event> > check();
+	std::vector< boost::shared_ptr<Event> > check(const WindowSystem& ws);
 private:
-	virtual std::vector< boost::shared_ptr<Event> > check_impl() = 0;
+	virtual std::vector< boost::shared_ptr<Event> > check_impl(const WindowSystem&) = 0;
 
 	std::string name_;
 };

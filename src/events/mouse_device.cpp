@@ -10,9 +10,9 @@ MouseDevice::MouseDevice(const std::string& name) :
 	impl_(SystemFactory::instance().create_mouse_device_impl())
 {}
 
-std::vector< boost::shared_ptr<Event> > MouseDevice::check_impl()
+std::vector< boost::shared_ptr<Event> > MouseDevice::check_impl(const WindowSystem& ws)
 {
-	const std::vector< boost::shared_ptr<Event> >& events = impl_->check();
+	const std::vector< boost::shared_ptr<Event> >& events = impl_->check(ws);
 	return events;
 }
 

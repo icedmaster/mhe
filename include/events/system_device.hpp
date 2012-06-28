@@ -12,7 +12,7 @@ class SystemDevice : public Device
 public:
 	SystemDevice(const std::string& name);
 private:
-	std::vector< boost::shared_ptr<Event> > check_impl();
+	std::vector< boost::shared_ptr<Event> > check_impl(const WindowSystem&);
 
 	boost::scoped_ptr<SystemDeviceImpl> impl_;
 };

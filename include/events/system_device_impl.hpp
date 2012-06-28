@@ -8,12 +8,13 @@ namespace mhe {
 
 class Event;
 class SystemEvent;
+class WindowSystem;
 
 class SystemDeviceImpl
 {
 public:
 	virtual ~SystemDeviceImpl() {}
-	virtual std::vector< boost::shared_ptr<Event> > check() = 0;
+	virtual std::vector< boost::shared_ptr<Event> > check(const WindowSystem&) = 0;
 };
 
 }

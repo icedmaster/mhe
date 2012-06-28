@@ -13,7 +13,7 @@ public:
 	KeyboardDevice(const std::string& name);
 	bool is_key_pressed(int sym) const;
 private:
-	std::vector< boost::shared_ptr<Event> > check_impl();
+	std::vector< boost::shared_ptr<Event> > check_impl(const WindowSystem&);
 
 	boost::scoped_ptr<KeyboardDeviceImpl> impl_;
 	bool keys_[256];

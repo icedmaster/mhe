@@ -10,9 +10,9 @@ KeyboardDevice::KeyboardDevice(const std::string& name) :
 	impl_(SystemFactory::instance().create_keyboard_device_impl())
 {}
 
-std::vector< boost::shared_ptr<Event> > KeyboardDevice::check_impl()
+std::vector< boost::shared_ptr<Event> > KeyboardDevice::check_impl(const WindowSystem& ws)
 {
-	const std::vector< boost::shared_ptr<Event> >& events = impl_->check();
+	const std::vector< boost::shared_ptr<Event> >& events = impl_->check(ws);
 	for (size_t i = 0; i < events.size(); ++i)
 		// for KeyboardEvent optarg() == sym() and arg() == state()
 		// see keyboard_event.hpp

@@ -11,9 +11,9 @@ SystemDevice::SystemDevice(const std::string& name) :
 {
 }
 
-std::vector< boost::shared_ptr<Event> > SystemDevice::check_impl()
+std::vector< boost::shared_ptr<Event> > SystemDevice::check_impl(const WindowSystem& ws)
 {
-	const std::vector< boost::shared_ptr<Event> >& events = impl_->check();
+	const std::vector< boost::shared_ptr<Event> >& events = impl_->check(ws);
 	return events;
 }
 
