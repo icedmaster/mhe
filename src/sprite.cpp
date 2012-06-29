@@ -108,7 +108,7 @@ Sprite::Sprite(const Sprite& sprite) :
 {
 }
 
-    void Sprite::draw_impl(boost::shared_ptr<Driver> driver)
+    void Sprite::draw_impl(const Context& context)
     {
 		if (!is_running_)
 			execute(0);
@@ -131,6 +131,8 @@ Sprite::Sprite(const Sprite& sprite) :
                            0.0, 0.0, 1.0,
                            0.0, 0.0, 1.0};
         const cmn::uint i[] = {0, 1, 2, 2, 3, 0};
+
+		boost::shared_ptr<Driver> driver = context.driver();
 
         driver->mask_zbuffer();
         driver->enable_blending(ALPHA_ONE_MINUS_ALPHA);

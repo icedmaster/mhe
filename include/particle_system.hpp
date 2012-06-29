@@ -29,20 +29,14 @@ public:
 		emitter_ = emitter;
 	}
 
-	void set_texture(boost::shared_ptr<Texture> texture)
-	{
-		texture_ = texture;
-	}
-
 	//bool is_alive() const;
 private:
-	void draw_impl(boost::shared_ptr<Driver> driver);
+	void draw_impl(const Context& context);
 	void update_impl(cmn::uint tick);
 	void start_impl(cmn::uint tick);
 private:
 	std::list<Particle> particles_;
 	boost::shared_ptr<ParticleEmitter> emitter_;          
-	boost::shared_ptr<Texture> texture_;
 };
 
 }

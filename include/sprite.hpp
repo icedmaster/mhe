@@ -115,7 +115,7 @@ namespace mhe
 		Animation cur_animation;
 	private:
 		// implementations
-		void draw_impl(boost::shared_ptr<Driver> driver);
+		void draw_impl(const Context& context);
 		void update_impl(cmn::uint tick);
 		void set_position(const v3d& pos);
 		matrixf get_matrix() const;

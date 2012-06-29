@@ -2,7 +2,7 @@
 
 namespace mhe
 {
-void ParticleSystem::draw_impl(boost::shared_ptr<Driver> driver)
+void ParticleSystem::draw_impl(const Context& context)
 {
 	std::vector<float> vbuf;
 	std::vector<float> nbuf;
@@ -14,6 +14,7 @@ void ParticleSystem::draw_impl(boost::shared_ptr<Driver> driver)
 						 0.0, 0.0, 1.0, 
 						 0.0, 0.0, 1.0};
 	const cmn::uint i[6] = {0, 1, 2, 2, 3, 0};
+	boost::shared_ptr<Texture> tex = texture();
 	// assign particles data to buffers
 	for (std::list<Particle>::iterator it = particles_.begin(); it != particles_.end(); ++it)
 	{
@@ -38,7 +39,7 @@ void ParticleSystem::draw_impl(boost::shared_ptr<Driver> driver)
 			cbuf.insert(cbuf.end(), p.color().get(),
 						p.color().get() + 4);
 		// init texture coordinates (for all particles they are the same)
-		if (texture_ != nullptr)
+		if (tex != nullptr)
 		{
 			tbuf.push_back(0.0); tbuf.push_back(0.0);
 			tbuf.push_back(0.0); tbuf.push_back(1.0);
@@ -47,16 +48,18 @@ void ParticleSystem::draw_impl(boost::shared_ptr<Driver> driver)
 		}
 	}
 
+	boost::shared_ptr<Driver> driver = context.driver();
+
 	driver->mask_zbuffer();
 	driver->enable_blending(ALPHA_ONE_MINUS_ALPHA);
 
 	// setup texture pointer
-	float* tp = (texture_ != nullptr) ? &tbuf[0] : 0;
-	if (texture_ != nullptr)
-		texture_->prepare();
+	float* tp = (tex != nullptr) ? &tbuf[0] : 0;
+	if (tex != nullptr)
+		tex->prepare();
 	driver->draw(Transform::get_transform(), &vbuf[0], &nbuf[0], tp, &cbuf[0], &ibuf[0], ibuf.size());
-	if (texture_ != nullptr)
-		texture_->clean();
+	if (tex != nullptr)
+		tex->clean();
 	driver->disable_blending();
 	driver->unmask_zbuffer();
 }

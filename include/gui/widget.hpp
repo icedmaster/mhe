@@ -102,7 +102,7 @@ public:
 		return parent_;
 	}
 protected:
-	void draw(const boost::shared_ptr<Driver>& driver);
+	void draw(const Context& context);
 private:
 	// hierarhy
 	Widget* parent_;

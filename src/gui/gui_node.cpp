@@ -5,16 +5,19 @@ namespace gui {
 
 GUINode::GUINode()
 {
+	set_priority(Node::priority_high);
 }
 
 GUINode::GUINode(EventManager& event_manager)
 {
 	setup_events(event_manager);
+	set_priority(Node::priority_high);
 }
 
 GUINode::GUINode(Widget* widget) :
 	widget_(widget)
 {
+	set_priority(Node::priority_high);
 }
 
 void GUINode::setup_events(EventManager& event_manager)
@@ -35,6 +38,11 @@ void GUINode::add_widget(Widget* widget)
 widgetptr GUINode::get_widget(const std::string& name) const
 {
 	return widget_->get_widget(name);
+}
+
+void GUINode::draw_impl(const Context& context)
+{
+	widget_->draw(context);
 }
 
 bool GUINode::on_mouse_move(Event* event)

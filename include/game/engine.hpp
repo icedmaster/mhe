@@ -5,6 +5,7 @@
 #include "game_scene.hpp"
 #include "aspect_manager.hpp"
 #include "mhe_event.hpp"
+#include "context.hpp"
 
 namespace mhe {
 namespace game {
@@ -23,37 +24,22 @@ public:
 	bool is_running() const
 	{
 		return running_;
-	}
-			
-	TextureManager& texture_manager()
+	}	
+
+	Context& context()
 	{
-		return tm_;
-	}
-			
-	/*FontManager& font_manager()
-	{
-		return fm_;
-		}*/
+		return context_;
+	}	   
 
 	SoundManager& sound_manager()
 	{
 		return sm_;
 	}
-
-	WindowSystem& window_system()
-	{
-		return ws_;
-	}
 			
 	EventManager& event_manager()
 	{
 		return event_manager_;
-	}
-			
-	boost::shared_ptr<Driver> driver() const
-	{
-		return driver_;
-	}
+	}		  
 
 	boost::shared_ptr<iAudioDriver> audio_driver() const
 	{
@@ -94,11 +80,10 @@ private:
 	void update();
 
 	WindowSystem ws_;
-	TextureManager tm_;
+	Context context_;
 	//FontManager fm_;
 	SoundManager sm_;
 	EventManager event_manager_;
-	boost::shared_ptr<Driver> driver_;
 	boost::shared_ptr<iAudioDriver> audio_driver_;
 
 	boost::shared_ptr<GameScene> game_scene_;

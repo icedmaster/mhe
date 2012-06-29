@@ -2,22 +2,22 @@
 
 namespace mhe {
 
-void Scene::draw(boost::shared_ptr<Driver> driver)
+void Scene::draw(const Context& context)
 {
 	for (size_t i = 0; i < subscenes.size(); ++i)
-		subscenes[i]->draw(driver);
+		subscenes[i]->draw(context);
 
 	if (main_camera)
-		main_camera->update(driver);
+		main_camera->update(context.driver());
 
 	if (callback_)
-		callback_->beforeDraw(this, driver);
+		callback_->beforeDraw(this, context.driver());
 
 	for (nodeset::iterator it = nodes_.begin(); it != nodes_.end(); ++it)
-		(*it)->draw(driver);
+		(*it)->draw(context);
 
 	if (callback_)
-		callback_->afterDraw(this, driver);
+		callback_->afterDraw(this, context.driver());
 }
 
 void Scene::update(cmn::uint tick)

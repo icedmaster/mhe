@@ -21,6 +21,8 @@ public:
 	void add_widget(Widget* widget);
 	widgetptr get_widget(const std::string& name) const;
 private:
+	void draw_impl(const Context& context);
+private:
 	bool on_mouse_move(Event* event);
 	bool on_mouse_button_pressed(Event* event);
 	bool on_mouse_button_released(Event* event);

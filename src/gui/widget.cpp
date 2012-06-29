@@ -27,13 +27,13 @@ widgetptr Widget::get_widget(const std::string& name) const
 	return it->second;
 }
 
-void Widget::draw(const boost::shared_ptr<Driver>& driver)
+void Widget::draw(const Context& context)
 {
 	if (!visible_) return;
 	sprite_->set_size(geom().width(), geom().height());
 	sprite_->identity();
 	sprite_->translate(geom().ll().x(), geom().ll().y(), 0);
-	sprite_->draw(driver);
+	sprite_->draw(context);
 }
 
 }}

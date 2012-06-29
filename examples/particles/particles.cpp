@@ -30,7 +30,7 @@ private:
 		emitter->init_with_parameters(prm);
 		boost::shared_ptr<mhe::ParticleSystem> ps(new mhe::ParticleSystem(mhe::v3d(400, 300, 0)));
 		ps->set_emitter(emitter);
-		ps->set_texture(get_engine()->texture_manager().get("../../../assets/star.png"));
+		ps->set_texture(get_engine()->context().texture_manager().get("../../../assets/star.png"));
 		get_scene()->add(ps);
 		ps->start();
 		return true;
@@ -51,7 +51,7 @@ int main(int /*argc*/, char** /*argv*/)
 	std::cout << "Engine initialized sucessfully\n";
 	mhe::matrixf proj;
 	proj.set_ortho(0, 800, 0, 600, -1, 1);
-	engine.driver()->set_projection_matrix(proj);
+	engine.context().driver()->set_projection_matrix(proj);
 	boost::shared_ptr<TestGameScene> game_scene(new TestGameScene(&engine));
 	game_scene->init("", nullptr);
 	engine.set_game_scene(game_scene);

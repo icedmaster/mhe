@@ -30,11 +30,11 @@ public:
 
 	virtual ~Node() {}
 
-	void draw(boost::shared_ptr<Driver> driver)												
+	void draw(const Context& context)												
 	{
 		for (size_t i = 0; i < childs_.size(); ++i)
-			childs_[i]->draw(driver);
-		draw_impl(driver);
+			childs_[i]->draw(context);
+		draw_impl(context);
 	}
 
 	void update(cmn::uint tick)
@@ -112,7 +112,7 @@ protected:
 		return texcoord_;
 	}
 private:
-	virtual void draw_impl(boost::shared_ptr<Driver>) = 0;
+	virtual void draw_impl(const Context&) = 0;
 	virtual void update_impl(cmn::uint) {}
 
 	virtual bool is_alive() const {return true;}
