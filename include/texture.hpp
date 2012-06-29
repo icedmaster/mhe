@@ -37,14 +37,6 @@ namespace mhe
 		virtual cmn::uint width() const = 0;
 		virtual cmn::uint height() const = 0;
 		virtual TextureType type() const = 0;		   
-
-		virtual texcoord get_coord() const
-		{
-			texcoord tc = {{0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0}};
-			return tc;
-		}
-
-		virtual void set_coord(const texcoord&) {}
 	};
 }
 

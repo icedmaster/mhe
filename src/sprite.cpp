@@ -130,18 +130,13 @@ Sprite::Sprite(const Sprite& sprite) :
                            0.0, 0.0, 1.0,
                            0.0, 0.0, 1.0,
                            0.0, 0.0, 1.0};
-        const float t[] = {0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0};
-        const float c[] = {1.0, 1.0, 1.0, 1.0,
-                           1.0, 1.0, 1.0, 1.0,
-                           1.0, 1.0, 1.0, 1.0,
-                           1.0, 1.0, 1.0, 1.0};
         const cmn::uint i[] = {0, 1, 2, 2, 3, 0};
 
         driver->mask_zbuffer();
         driver->enable_blending(ALPHA_ONE_MINUS_ALPHA);
 
         cur_animation.texture()->prepare();
-        driver->draw(get_transform(), v, n, t, c, i, 6);
+        driver->draw(get_transform(), v, n, texcoord().data(), color().get(), i, 6);
         cur_animation.texture()->clean();
 
         driver->disable_blending();

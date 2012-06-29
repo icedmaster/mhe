@@ -21,8 +21,6 @@ public:
 	Texture::texcoord get(cmn::uint quad) const;
 	Texture::texcoord get(const rect<float>& quad) const;
 	v2d get_size(cmn::uint quad) const;
-	boost::shared_ptr<Texture> create_texture(cmn::uint quad) const;
-	boost::shared_ptr<Texture> create_texture(const rect<float>& coord) const;
 private:
 	void calc_indicies(int sz);
 
