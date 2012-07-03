@@ -1,130 +1,51 @@
 #include "game/aspect_manager.hpp"
-#include "utils/logutils.hpp"
+
+#include "utils/global_log.hpp"
 
 namespace mhe {
 namespace game {
 
-void AspectManager::add(Aspect* aspect)
+void AspectManager::add(const aspect_ptr& aspect)
 {
-	DEBUG_LOG("AspectManager: add aspect: " << aspect->full_name());
-	aspects_[aspect->full_name()] = aspect_ptr(aspect);
+	aspects_.insert(std::make_pair(aspect->full_name(), aspect));
 }
 
-void AspectManager::add(boost::shared_ptr<Aspect> aspect)
+aspect_ptr AspectManager::get(const std::string& fullname) const
 {
-	DEBUG_LOG("AspectManager: add aspect: " << aspect->full_name());
-	aspects_[aspect->full_name()] = aspect;
+	aspect_map::const_iterator it = aspects_.find(fullname);
+	if (it == aspects_.end()) return aspect_ptr();
+	return it->second;
 }
 
 void AspectManager::update(cmn::uint tick)
 {
-	// send tick_event to all aspects
-	for (aspects_map::iterator it = aspects_.begin(); it != aspects_.end();)
+	for (aspect_map::iterator it = aspects_.begin(); it != aspects_.end();)
 	{
-		if (check_aspect_lifetime(tick, it->second) && check_aspect_refs(it->second))
+		if (check_for_aspect_delete(it->second))
+		{
+			DEBUG_LOG("destroy aspect:" << it->second->full_name());
+			destroy_aspect(it->second);
+			aspects_.erase(it++);
+		}
+		else
 		{
 			it->second->update(tick);
 			++it;
 		}
-		else
-		{
-			DEBUG_LOG("Destroy aspect: " << it->second->full_name());
-			destroy_aspect(it->second.get());
-			aspects_.erase(it++);
-		}
 	}
 }
 
-bool AspectManager::check_aspect_lifetime(cmn::uint tick, boost::shared_ptr<Aspect> aspect) const
+bool AspectManager::check_for_aspect_delete(const aspect_ptr& aspect) const
 {
-	if (aspect->lifetime() && aspect->start_time())
-	{
-		if (tick > (aspect->start_time() + aspect->lifetime()))
-		{
-			DEBUG_LOG("AspectManager: aspect lifetime finished: " << aspect->full_name());
-			return false;
-		}
-	}
-	return true;
+	return (aspect.use_count() == 1);
 }
 
-bool AspectManager::check_aspect_refs(boost::shared_ptr<Aspect> aspect) const
+void AspectManager::destroy_aspect(const aspect_ptr& aspect)
 {
-	if (boost::weak_ptr<Aspect>(aspect).use_count() == 1)
-	{
-		DEBUG_LOG("AspectManager: aspect hasn't any refs:" << aspect->full_name());
-		return false;
-	}
-	return true;
-}
-
-void AspectManager::remove(const std::string& fullname)
-{
-	aspects_map::iterator it = aspects_.find(fullname);
-	if (it == aspects_.end()) return;
-	destroy_aspect(it->second.get());
-	aspects_.erase(fullname);
-}
-
-void AspectManager::remove(Aspect* aspect)
-{
-	for (aspects_map::iterator it = aspects_.begin();
-		 it != aspects_.end(); ++it)
-	{
-		aspect_ptr as = it->second;
-		if (as.get() == aspect)
-		{
-			destroy_aspect(aspect);
-			aspects_.erase(it);
-			return;
-		}
-	}
-}
-
-void AspectManager::remove(boost::shared_ptr<Aspect> aspect)
-{
-	remove(aspect.get());
-}
-
-void AspectManager::destroy_aspect(Aspect* aspect)
-{
-	DEBUG_LOG("AspectManager: remove aspect: " << aspect->full_name());
-	aspect->update(destroy_event, 0);
-	const std::vector< boost::weak_ptr<Aspect> >& childs = aspect->childs();
-	for (size_t i = 0; i < childs.size(); ++i)
-		aspects_.erase(childs[i].lock()->full_name());
-}
-
-size_t AspectManager::get_by_name(const std::string& name,
-								  std::vector< boost::weak_ptr<Aspect> >& aspects) const
-{
-	for (aspects_map::const_iterator it = aspects_.begin();
-		 it != aspects_.end(); ++it)
-	{
-		if (it->second->name() == name)
-			aspects.push_back(boost::weak_ptr<Aspect>(it->second));
-	}
-	return aspects.size();
-}
-
-size_t AspectManager::get_by_add_name(const std::string& name,
-									  std::vector< boost::weak_ptr<Aspect> >& aspects) const
-{
-	for (aspects_map::const_iterator it = aspects_.begin();
-		 it != aspects_.end(); ++it)
-	{
-		if (it->second->add_name() == name)
-			aspects.push_back(boost::weak_ptr<Aspect>(it->second));
-	}
-	return aspects.size();
-}
-
-bool AspectManager::get_by_fullname(const std::string& fullname, boost::weak_ptr<Aspect>& aspect) const
-{
-	aspects_map::const_iterator it = aspects_.find(fullname);
-	if (it == aspects_.end()) return false;
-	aspect = boost::weak_ptr<Aspect>(it->second);
-	return true;
+	aspect->update(destroy_event, nullptr);
+	const std::vector<aspect_ptr>& children = aspect->children();
+	for (size_t i = 0; i < children.size(); ++i)
+		aspects_.erase(children[i]->full_name());
 }
 
 }}

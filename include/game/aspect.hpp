@@ -66,9 +66,9 @@ public:
 		return start_time_;
 	}
 
-	const std::vector< boost::weak_ptr<Aspect> >& childs() const
+	const std::vector<aspect_ptr>& children() const
 	{
-		return childs_;
+		return children_;
 	}
 protected:
 	Aspect(const std::string& fullname) :
@@ -112,11 +112,10 @@ private:
 		else name_ = fullname;
 	}
 
-	typedef boost::weak_ptr<Aspect> aspect_weak_ptr;
 	std::string name_;
 	std::string add_name_;
 	Aspect* parent_;
-	std::vector<aspect_weak_ptr> childs_;
+	std::vector<aspect_ptr> children_;
 	typedef std::map< int, std::vector<Aspect*> > subsmap;
 	subsmap subscribers_;
 	cmn::uint lifetime_;

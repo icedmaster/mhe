@@ -4,20 +4,16 @@ namespace mhe {
 namespace gui {
 
 GUINode::GUINode()
-{
-	set_priority(Node::priority_high);
-}
+{}
 
 GUINode::GUINode(EventManager& event_manager)
 {
 	setup_events(event_manager);
-	set_priority(Node::priority_high);
 }
 
 GUINode::GUINode(Widget* widget) :
 	widget_(widget)
 {
-	set_priority(Node::priority_high);
 }
 
 void GUINode::setup_events(EventManager& event_manager)

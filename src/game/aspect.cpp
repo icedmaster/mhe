@@ -7,7 +7,7 @@ namespace game {
 void Aspect::attach(aspect_ptr aspect)
 {
 	DEBUG_LOG("Aspect::attach() " << full_name() << " " << aspect->full_name());
-	childs_.push_back(aspect_weak_ptr(aspect));
+	children_.push_back(aspect);
 	aspect->set_parent(this);
 	aspect->do_subscribe(this);
 }
@@ -15,7 +15,7 @@ void Aspect::attach(aspect_ptr aspect)
 void Aspect::attach(aspect_ptr aspect, const std::vector<int>& types)
 {
 	DEBUG_LOG("Aspect::attach() " << full_name() << " " << aspect->full_name());
-	childs_.push_back(aspect_weak_ptr(aspect));
+	children_.push_back(aspect);
 	aspect->set_parent(this);
 	for (size_t i = 0; i < types.size(); ++i)
 		subscribe(types[i], aspect.get());
@@ -24,7 +24,7 @@ void Aspect::attach(aspect_ptr aspect, const std::vector<int>& types)
 void Aspect::attach(aspect_ptr aspect, int type)
 {
 	DEBUG_LOG("Aspect::attach() " << full_name() << " " << aspect->full_name());
-	childs_.push_back(aspect_weak_ptr(aspect));
+	children_.push_back(aspect);
 	aspect->set_parent(this);
 	subscribe(type, aspect.get());
 }
@@ -47,12 +47,12 @@ void Aspect::detach(Aspect* aspect)
 		}
 	}
 	// remove aspect from childs
-	for (std::vector<aspect_weak_ptr>::iterator it = childs_.begin(); it != childs_.end(); ++it)
+	for (std::vector<aspect_ptr>::iterator it = children_.begin(); it != children_.end(); ++it)
 	{
-		if ((*it).lock().get() == aspect)
+		if ((*it).get() == aspect)
 		{
 			DEBUG_LOG("Aspect detached:" << full_name() << " " << aspect->full_name());
-			childs_.erase(it);
+			children_.erase(it);
 			break;
 		}
 	}
@@ -64,11 +64,9 @@ void Aspect::update(int type, const void* prm)
 	{
 		DEBUG_LOG("Aspect " << full_name() << " receive destroy event");
 		destroy_impl();
-		for (size_t i = 0; i < childs_.size(); ++i)
+		for (size_t i = 0; i < children_.size(); ++i)
 		{
-			if (childs_[i].expired())
-				WARN_LOG("Aspect " << full_name() << " child " << i << " expired");
-			childs_[i].lock()->update(destroy_event, nullptr);
+			children_[i]->update(destroy_event, nullptr);
 		}
 	}
 	else if (update_impl(type, prm))

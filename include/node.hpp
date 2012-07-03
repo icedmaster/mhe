@@ -14,6 +14,7 @@ namespace mhe
 // Base renderable class
 class Node : public Transform
 {	
+	friend class Scene;
 public:
 	enum
 	{
@@ -45,11 +46,6 @@ public:
 	bool alive() const
 	{
 		return is_alive();
-	}
-
-	void set_priority(int pri)
-	{
-		priority_ = pri;
 	}
 
 	int priority() const
@@ -123,6 +119,11 @@ private:
 	{
 		return nullptr;
 	}		
+
+	void set_priority(int pri)
+	{
+		priority_ = pri;
+	}
 	
 	int priority_;						
 	std::string name_;
@@ -131,6 +132,8 @@ private:
 	Texture::texcoord texcoord_;
 	colorf color_;
 };
+
+typedef boost::shared_ptr<Node> nodeptr;
 	
 // helper classes
 class sort_node_by_pri
