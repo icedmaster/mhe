@@ -6,6 +6,7 @@ namespace game {
 
 enum
 {
+	empty_event,
 	tick_event,        	// 0
 	draw_event,         // 1
 	mouse_on_event,     // 2

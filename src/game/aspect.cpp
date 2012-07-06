@@ -58,27 +58,27 @@ void Aspect::detach(Aspect* aspect)
 	}
 }
 
-void Aspect::update(int type, const void* prm)
+void Aspect::update(const Message& message)
 {
-	if (type == destroy_event)
+	if (message.type() == destroy_event)
 	{
 		DEBUG_LOG("Aspect " << full_name() << " receive destroy event");
 		destroy_impl();
 		for (size_t i = 0; i < children_.size(); ++i)
 		{
-			children_[i]->update(destroy_event, nullptr);
+			children_[i]->update(message);
 		}
 	}
-	else if (update_impl(type, prm))
-		update_children(type, prm);
+	else if (update_impl(message))
+		update_children(message);
 }
 
-void Aspect::update_children(int type, const void* prm)
+void Aspect::update_children(const Message& message)
 {
-	subsmap::iterator it = subscribers_.find(type);
+	subsmap::iterator it = subscribers_.find(message.type());
 	if (it == subscribers_.end()) return;
 	for (size_t i = 0; i < it->second.size(); ++i)
-		it->second[i]->update_impl(type, prm);
+		it->second[i]->update_impl(message);
 }
 
 void Aspect::subscribe(int type, Aspect* aspect)

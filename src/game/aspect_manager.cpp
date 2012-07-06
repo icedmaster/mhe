@@ -1,5 +1,6 @@
 #include "game/aspect_manager.hpp"
 
+#include "game/message_destroy.hpp"
 #include "utils/global_log.hpp"
 
 namespace mhe {
@@ -42,7 +43,7 @@ bool AspectManager::check_for_aspect_delete(const aspect_ptr& aspect) const
 
 void AspectManager::destroy_aspect(const aspect_ptr& aspect)
 {
-	aspect->update(destroy_event, nullptr);
+	aspect->update(DestroyMessage());
 	const std::vector<aspect_ptr>& children = aspect->children();
 	for (size_t i = 0; i < children.size(); ++i)
 		aspects_.erase(children[i]->full_name());

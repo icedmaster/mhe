@@ -7,6 +7,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
 #include "aspect_event_types.hpp"
+#include "message.hpp"
 #include "types.hpp"
 
 namespace mhe {
@@ -42,7 +43,7 @@ public:
 	void attach(aspect_ptr aspect, int type);
 	void attach(aspect_ptr aspect, const std::vector<int>& types);
 	void detach(Aspect* aspect);
-	void update(int type, const void* prm);
+	void update(const Message& message);
 	void update(cmn::uint tick)
 	{
 		if (lifetime_ && !start_time_) start_time_ = tick;
@@ -95,9 +96,9 @@ protected:
 	}
 
 	virtual void do_subscribe(Aspect* aspect) = 0;
-	void update_children(int type, const void* prm); 
+	void update_children(const Message& message); 
 	virtual void update_impl(cmn::uint)	{}
-	virtual	bool update_impl(int type, const void* prm) = 0;
+	virtual	bool update_impl(const Message& message) = 0;
 	virtual void destroy_impl() {}
 private:
 	void divide_full_name(const std::string& fullname)
