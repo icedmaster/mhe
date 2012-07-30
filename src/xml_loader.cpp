@@ -66,7 +66,7 @@ AnimationList XMLLoader::read_animation_list(const pugi::xml_node& node)
 	cmn::uint num = node.attribute(L"number").as_uint();
 	bool repeat = node.attribute(L"repeat").as_bool();
 	AnimationList a_list(repeat);
-	a_list.setIndex(num);
+	a_list.set_index(num);
 	for (pugi::xml_node it = node.child(L"animation"); it;
 		 it = it.next_sibling(L"animation"))
 	{
