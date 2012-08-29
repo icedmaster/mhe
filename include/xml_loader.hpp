@@ -25,8 +25,8 @@ public:
 	boost::shared_ptr<Texture> load_texture(const std::wstring& name);
 private:
 	boost::shared_ptr<Sprite> load_sprite_impl(const pugi::xml_node& node);
-	AnimationList read_animation_list(const pugi::xml_node& node);
-	Animation read_animation(const pugi::xml_node& node);
+	AnimationListBase* read_animation_list(const pugi::xml_node& node);
+	Animation* read_animation(const pugi::xml_node& node);
 
 	pugi::xml_document doc_;
 	pugi::xml_node root_;

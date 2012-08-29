@@ -2,72 +2,38 @@
 #define __ANIMATION_LIST_HPP__
 
 #include <vector>
+#include "animation_list_base.hpp"
 #include "animation.hpp"
-#include "delegate.hpp"
 
 namespace mhe {
 
-class AnimationList
+class AnimationList : public AnimationListBase
 {
 public:
-	enum AnimationChangeType
-	{
-		first_animation,
-		next_animation,
-		last_animation,
-		no_change
-	};
-
-	typedef DelegateFunc2<void, AnimationList*, AnimationChangeType> AnimationListDelegate;
-public:
-	AnimationList(bool repeat = false);
+	AnimationList(size_t index, bool repeat = false);
 
 	void reset();
-	void add(const Animation& a);
+	void add(Animation* a);
 	void remove(cmn::uint begin, cmn::uint number);
-	void start(cmn::uint tick);
-	void stop();
+
+	Animation* current_animation() const;
+private:
 	bool next();
-
-	AnimationChangeType update(cmn::uint tick);
-
-	bool get(Animation& a) const;
-	bool get(cmn::uint tick, Animation& a);
-
-	bool is_running() const
+	size_t current_frame_duration_impl() const
 	{
-		return next_tick_;
+		return animations_[cur_animation_]->duration();
 	}
 
-	// index getter/setter
-	void set_index(cmn::uint index)
-	{
-		index_ = index;
-	}
-
-	cmn::uint index() const
-	{
-		return index_;
-	}
-
-	size_t get_frames_number() const
+	size_t frames_number_impl() const
 	{
 		return animations_.size();
 	}
 
-	void add_delegate(AnimationListDelegate* delegate)
-	{
-		delegates_ += delegate;
-	}
+	void start_impl();
+	void update_node_impl(Node* node);
 private:
-	std::vector<Animation> animations_;
-	bool autorepeat_;
-	cmn::uint next_tick_;
+	std::vector< boost::shared_ptr<Animation> > animations_;
 	size_t cur_animation_;
-	cmn::uint index_;
-
-	typedef Delegate2<void, AnimationList*, AnimationChangeType> delegate_type;
-	delegate_type delegates_;
 };
 
 }

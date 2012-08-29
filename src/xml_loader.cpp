@@ -1,6 +1,7 @@
 #include "xml_loader.hpp"
 
 #include "utils/global_log.hpp"
+#include "texture_animation.hpp"
 
 namespace mhe {
 
@@ -61,39 +62,24 @@ boost::shared_ptr<Sprite> XMLLoader::load_sprite_impl(const pugi::xml_node& node
 	return sprite;
 }
 
-AnimationList XMLLoader::read_animation_list(const pugi::xml_node& node)
+AnimationListBase* XMLLoader::read_animation_list(const pugi::xml_node& node)
 {
 	cmn::uint num = node.attribute(L"number").as_uint();
 	bool repeat = node.attribute(L"repeat").as_bool();
-	AnimationList a_list(repeat);
-	a_list.set_index(num);
+	AnimationList* a_list = new AnimationList(repeat, num);
 	for (pugi::xml_node it = node.child(L"animation"); it;
 		 it = it.next_sibling(L"animation"))
 	{
-		a_list.add(read_animation(it));
+		a_list->add(read_animation(it));
 	}
 	return a_list;
 }
 
-Animation XMLLoader::read_animation(const pugi::xml_node& node)
+Animation* XMLLoader::read_animation(const pugi::xml_node& node)
 {
-	Animation a(utils::read_number<cmn::uint>(node.child(L"duration")),
-				load_texture(node.child(L"texture").child_value()));
+	Animation* a = new TextureAnimation(utils::read_number<cmn::uint>(node.child(L"duration")),
+										load_texture(node.child(L"texture").child_value()));
 
-	// read transformations
-	for (pugi::xml_node it = node.first_child(); it; it = it.next_sibling())
-	{
-		if (std::wstring(it.name()) == L"translate")
-			a.translate(utils::read_vector3(it));
-		else if (std::wstring(it.name()) == L"rotate")
-		{
-			float angle = utils::read_number<float>(it, L"angle");
-			const v3d& v = utils::read_vector3(it);
-			a.rotate(v, angle);
-		}
-		else if (std::wstring(it.name()) == L"scale")
-			a.scale(utils::read_vector3(it));
-	}
 	return a;
 }
 

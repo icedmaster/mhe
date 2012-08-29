@@ -23,8 +23,8 @@ void Sprite::draw_impl(const Context& context)
 	float x_sz = x_size_, y_sz = y_size_;
 	if (!x_size_ || !y_size_)
 	{
-		x_sz = cur_animation.texture()->width();
-		y_sz = cur_animation.texture()->height();
+		x_sz = texture()->width();
+		y_sz = texture()->height();
 	}
 
 	// prepare buffers for drawing
@@ -43,9 +43,9 @@ void Sprite::draw_impl(const Context& context)
 	driver->mask_zbuffer();
 	driver->enable_blending(ALPHA_ONE_MINUS_ALPHA);
 
-	cur_animation.texture()->prepare();
+	texture()->prepare();
 	driver->draw(get_transform(), v, n, texcoord().data(), color().get(), i, 6);
-	cur_animation.texture()->clean();
+	texture()->clean();
 
 	driver->disable_blending();
 	driver->unmask_zbuffer();
@@ -54,7 +54,7 @@ void Sprite::draw_impl(const Context& context)
 void Sprite::update_impl(cmn::uint tick)
 {
 	if (!current_al_) return;
-	AnimationList::AnimationChangeType ct = current_al_->update(tick);
+	AnimationListBase::AnimationChangeType ct = current_al_->update(tick);
 	if (ct != AnimationList::no_change)
 	{
 		if (ct == AnimationList::last_animation)
@@ -64,7 +64,7 @@ void Sprite::update_impl(cmn::uint tick)
 			return;
 		}
 		// new frame
-		current_al_->get(cur_animation);            
+		current_al_->update_node(this);        
 	}
 }
 
@@ -77,9 +77,9 @@ Node* Sprite::clone_impl() const
 	return cloned;
 }
 
-void Sprite::addAnimationList(const AnimationList& al)
+void Sprite::addAnimationList(AnimationListBase* al)
 {
-	al_[al.index()] = al;
+	al_[al->index()] = boost::shared_ptr<AnimationListBase>(al);
 }
 
 void Sprite::execute(cmn::uint index)
@@ -88,23 +88,19 @@ void Sprite::execute(cmn::uint index)
 	almap::iterator it = al_.find(index);
 	if (it == al_.end())
 		return;
-	current_al_ = &(it->second);
-	current_al_->reset();
-	current_al_->start(utils::get_current_tick());
-	// append first transformation
-	current_al_->get(cur_animation);
 	is_running_ = true;
+	current_al_ = it->second.get();
 }
 
 float Sprite::width() const
 {
 	if (x_size_) return x_size_;
-	return cur_animation.texture()->width();
+	return texture()->width();
 }
 
 float Sprite::height() const
 {
 	if (y_size_) return y_size_;
-	return cur_animation.texture()->height();
+	return texture()->height();
 }
 }

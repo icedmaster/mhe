@@ -44,9 +44,9 @@ private:
 
 	void get_str_extensions();
 
-	PFNGLMULTITEXCOORD2FPROC glMultiTexCoord2f_;
-    PFNGLACTIVETEXTUREPROC glActiveTexture_;
-    PFNGLCLIENTACTIVETEXTUREPROC glClientActiveTexture_;
+	PFNGLMULTITEXCOORD2FARBPROC glMultiTexCoord2f_;
+        PFNGLACTIVETEXTUREARBPROC glActiveTexture_;
+	PFNGLCLIENTACTIVETEXTUREARBPROC glClientActiveTexture_;
 	std::map<std::string, bool> loaded_extensions_;
 };
 

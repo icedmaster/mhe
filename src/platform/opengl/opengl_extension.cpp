@@ -9,9 +9,9 @@ namespace opengl {
 void OpenGLExtensions::init_extensions()
 {
 	// multitexture
-	glActiveTexture_ = load_extension<PFNGLACTIVETEXTUREPROC>("glActiveTexture");
-	glClientActiveTexture_ = load_extension<PFNGLCLIENTACTIVETEXTUREPROC>("glClientActiveTexture");
-	glMultiTexCoord2f_ = load_extension<PFNGLMULTITEXCOORD2FPROC>("glMultiTexCoord2f");
+	glActiveTexture_ = load_extension<PFNGLACTIVETEXTUREARBPROC>("glActiveTexture");
+	glClientActiveTexture_ = load_extension<PFNGLCLIENTACTIVETEXTUREARBPROC>("glClientActiveTexture");
+	glMultiTexCoord2f_ = load_extension<PFNGLMULTITEXCOORD2FARBPROC>("glMultiTexCoord2f");
 
 	get_str_extensions();
 

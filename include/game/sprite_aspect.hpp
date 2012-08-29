@@ -2,6 +2,8 @@
 #define __SPRITE_ASPECT_HPP__
 
 #include "aspect.hpp"
+#include "sprite.hpp"
+#include "scene.hpp"
 
 namespace mhe {
 namespace game {

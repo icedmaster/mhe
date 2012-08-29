@@ -12,11 +12,12 @@ include(add_subproject)
 # defaults for build
 set(MHE_BUILD_DEMO FALSE)
 set(MHE_BUILD_EXAMPLES TRUE)
+set(LIB_ONLY TRUE)
 
 if (DEFINED LIB_ONLY)
     message("Build mhelib only")
     set(MHE_BUILD_DEMO FALSE)
-	set(MHE_BUILD_EXAMPLES FALSE)
+set(MHE_BUILD_EXAMPLES FALSE)
 endif()
 
 add_definitions(-Wall)
@@ -77,7 +78,9 @@ include_directories (${INC_PATH})
 
 # find libraries
 if (CMAKE_HOST_UNIX)
-   set(ADD_GL_PATH "/usr/lib/fglrx")
+   if (APPLE)
+	set(ADD_GL_PATH "/System/Library/Frameworks/OpenGL.framework/Libraries")
+   endif()
    find_library(OPENGL_LIB GL ${ADD_GL_PATH})
 else (CMAKE_HOST_UNIX)
    find_library(OPENGL_LIB opengl32)
