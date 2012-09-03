@@ -6,7 +6,6 @@
 #include <map>
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
-#include "aspect_event_types.hpp"
 #include "message.hpp"
 #include "types.hpp"
 

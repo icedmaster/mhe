@@ -1,6 +1,6 @@
 #include "game/aspect_manager.hpp"
 
-#include "game/message_destroy.hpp"
+#include "game/simple_messages.hpp"
 #include "utils/global_log.hpp"
 
 namespace mhe {

@@ -77,7 +77,7 @@ Node* Sprite::clone_impl() const
 	return cloned;
 }
 
-void Sprite::addAnimationList(AnimationListBase* al)
+void Sprite::add_animation_list(AnimationListBase* al)
 {
 	al_[al->index()] = boost::shared_ptr<AnimationListBase>(al);
 }

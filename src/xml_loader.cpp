@@ -53,7 +53,7 @@ boost::shared_ptr<Sprite> XMLLoader::load_sprite_impl(const pugi::xml_node& node
 
 	boost::shared_ptr<Sprite> sprite(new Sprite);
 	for (pugi::xml_node it = al_node; it; it = it.next_sibling(L"animation_list"))
-		sprite->addAnimationList(read_animation_list(it));
+		sprite->add_animation_list(read_animation_list(it));
 
 	sprite->translate(pos);
 	sprite->set_size(size.x(), size.y());

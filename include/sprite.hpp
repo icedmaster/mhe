@@ -23,7 +23,11 @@ namespace mhe
 
 		Sprite(const Sprite& sprite);
 
-		void addAnimationList(AnimationListBase* al);
+		void add_animation_list(AnimationListBase* al);
+		AnimationListBase* current_animation_list() const
+		{
+			return current_al_;
+		}
 
 		void set_size(float size)
 		{
