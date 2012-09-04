@@ -1,5 +1,6 @@
 #include "game/sprite_aspect.hpp"
 #include "game/message_transform.hpp"
+#include "game/simple_messages.hpp"
 
 namespace mhe {
 namespace game {
@@ -37,9 +38,11 @@ bool SpriteAspect::update_impl(const Message& message)
 	return true;
 }
 
-void SpriteAspect::on_animation_completed(AnimationListBase* animation_list,
+void SpriteAspect::on_animation_completed(AnimationListBase* /*animation_list*/,
 										  AnimationListBase::AnimationChangeType change_type)
 {
+	if (change_type != AnimationListBase::last_animation) return;
+	update_children(EndEventMessage());
 }
 
 }}
