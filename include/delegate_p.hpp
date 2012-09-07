@@ -86,7 +86,7 @@ public:
 		--prevend;
 		for (typename DelegatesList::iterator it = delegates.begin(); it != prevend; ++it)		
 			(*(*it))(ARGS);
-		return (*(*delegates.end()))(ARGS);
+		return (*(*prevend))(ARGS);
 	}
 private:
 	DelegatesList delegates;

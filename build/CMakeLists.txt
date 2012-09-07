@@ -12,12 +12,11 @@ include(add_subproject)
 # defaults for build
 set(MHE_BUILD_DEMO FALSE)
 set(MHE_BUILD_EXAMPLES TRUE)
-set(LIB_ONLY TRUE)
 
 if (DEFINED LIB_ONLY)
     message("Build mhelib only")
     set(MHE_BUILD_DEMO FALSE)
-set(MHE_BUILD_EXAMPLES FALSE)
+    set(MHE_BUILD_EXAMPLES FALSE)
 endif()
 
 add_definitions(-Wall)
