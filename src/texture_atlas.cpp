@@ -15,9 +15,9 @@ void TextureAtlas::set_indicies(const float* ind, int sz)
 	indicies_.assign(ind, ind + sz);
 }
 
-Texture::texcoord TextureAtlas::get(cmn::uint quad) const
+std::vector<float> TextureAtlas::get(cmn::uint quad) const
 {
-	Texture::texcoord a;
+	std::vector<float> a(8);
 
 	if ( (quad * 8) >= indicies_.size() )
 	{
@@ -38,23 +38,24 @@ Texture::texcoord TextureAtlas::get(cmn::uint quad) const
 	return a;
 }
 
-Texture::texcoord TextureAtlas::get(const rect<float>& quad) const
+std::vector<float> TextureAtlas::get(const rect<float>& quad) const
 {
+	std::vector<float> tc(8);
 	float x1 = quad.ll().x() / texture_->width();
 	float y1 = quad.ll().y() / texture_->height();
 	float x2 = quad.rh().x() / texture_->width();
 	float y2 = quad.rh().y() / texture_->height();
 
-	Texture::texcoord tc = {{x1, y1,
-							 x1, y2,
-							 x2, y2,
-							 x2, y1}};
+	tc[0] = x1; tc[1] = y1;
+	tc[2] = x1; tc[3] = y2;
+	tc[4] = x2; tc[5] = y2;
+	tc[6] = x2; tc[7] = y1;
 	return tc;
 }
 
 v2d TextureAtlas::get_size(cmn::uint quad) const
 {
-	const Texture::texcoord& tc = get(quad);
+	const std::vector<float>& tc = get(quad);
 	v2d v( (tc[4] - tc[0]) * texture_->width(),
 		   (tc[3] - tc[1]) * texture_->height()
 		);

@@ -119,7 +119,7 @@ namespace gui {
 			cmn::uint sym = (cmn::uint)text[i];
 			cmn::uint ind = get_char(sym);
 			const v2d& sz = ta_.get_size(ind);
-			const Texture::texcoord& tc = ta_.get(ind);
+			const std::vector<float>& tc = ta_.get(ind);
 			t.insert(t.end(), tc.data(), tc.data() + tc.size());
 			// prepare vertex coordinates
 			boost::array<float, 12> cc;

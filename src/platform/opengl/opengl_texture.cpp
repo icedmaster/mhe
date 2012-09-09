@@ -6,12 +6,7 @@ namespace opengl {
 
 OpenGLTexture::OpenGLTexture() :
 	binded_(false)
-{
-	coord_[0] = 0.0; coord_[1] = 0.0;
-	coord_[2] = 0.0; coord_[3] = 1.0;
-	coord_[4] = 1.0; coord_[5] = 1.0;
-	coord_[6] = 1.0; coord_[7] = 0.0;
-}
+{}
 
 OpenGLTexture::~OpenGLTexture()
 {

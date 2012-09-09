@@ -3,41 +3,42 @@
 
 #include "image.hpp"
 #include "video_driver.hpp"
+#include "utils/noncopyable.hpp"
 #include <boost/shared_ptr.hpp>
 #include <boost/array.hpp>
 
-namespace mhe
+namespace mhe {
+
+enum FilterType
 {
-	enum FilterType
-	{
-		Nearest
-	};
+	Nearest
+};
 
-	enum TextureType
-	{
-		Texture2D,
-		Multitexture
-	};
+enum TextureType
+{
+	Texture2D,
+	Multitexture
+};
 
-	class Texture
-	{
-	public:
-		typedef boost::array<float, 8> texcoord;
-	public:
-		virtual ~Texture() {}
-		virtual void set_image(boost::shared_ptr<Image>, boost::shared_ptr<Driver>,
-							   FilterType ft = Nearest) = 0;
-		virtual void prepare(boost::shared_ptr<Driver> driver =
-							 boost::shared_ptr<Driver>()) = 0;
-		virtual void clean(boost::shared_ptr<Driver> driver = 
-						   boost::shared_ptr<Driver>()) = 0;
+class Texture : public utils::noncopyable
+{
+public:
+	virtual ~Texture() {}
+	virtual void set_image(boost::shared_ptr<Image>, boost::shared_ptr<Driver>,
+						   FilterType ft = Nearest) = 0;
+	virtual void prepare(boost::shared_ptr<Driver> driver =
+						 boost::shared_ptr<Driver>()) = 0;
+	virtual void clean(boost::shared_ptr<Driver> driver = 
+					   boost::shared_ptr<Driver>()) = 0;
 
-		virtual boost::shared_ptr<Texture> clone() const = 0;
+	virtual boost::shared_ptr<Texture> clone() const = 0;
 
-		virtual cmn::uint width() const = 0;
-		virtual cmn::uint height() const = 0;
-		virtual TextureType type() const = 0;		   
-	};
+	virtual cmn::uint width() const = 0;
+	virtual cmn::uint height() const = 0;
+	virtual TextureType type() const = 0;		   
+	virtual bool is_equal(const Texture& other) const = 0;
+};
+
 }
 
 #endif

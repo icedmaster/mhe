@@ -40,6 +40,12 @@ public:
 		assert(index < textures_.size());
 		return textures_[index];
 	}
+
+	// TODO:
+	bool is_equal(const Texture& /*other*/) const
+	{
+		return false;
+	}
 private:
 	std::vector< boost::shared_ptr<OpenGLTexture> > textures_;
 };
