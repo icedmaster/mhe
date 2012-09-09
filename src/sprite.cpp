@@ -37,6 +37,13 @@ void Sprite::draw_impl(const Context& context)
 					   0.0, 0.0, 1.0,
 					   0.0, 0.0, 1.0};
 	const cmn::uint i[] = {0, 1, 2, 2, 3, 0};
+	// fill color for 4 vertexes
+	float c[16];
+	for (int i = 0; i < 16; i += 4)
+	{
+		c[i] = color().r(); c[i + 1] = color().g();
+		c[i + 2] = color().b(); c[i + 3] = color().a();
+	}
 
 	boost::shared_ptr<Driver> driver = context.driver();
 
@@ -44,7 +51,7 @@ void Sprite::draw_impl(const Context& context)
 	driver->enable_blending(ALPHA_ONE_MINUS_ALPHA);
 
 	texture()->prepare();
-	driver->draw(get_transform(), v, n, texcoord().data(), color().get(), i, 6);
+	driver->draw(get_transform(), v, n, texcoord().data(), c, i, 6);
 	texture()->clean();
 
 	driver->disable_blending();
@@ -55,9 +62,9 @@ void Sprite::update_impl(cmn::uint tick)
 {
 	if (!current_al_) return;
 	AnimationListBase::AnimationChangeType ct = current_al_->update(tick);
-	if (ct != AnimationList::no_change)
+	if (ct != AnimationListBase::no_change)
 	{
-		if (ct == AnimationList::last_animation)
+		if (ct == AnimationListBase::last_animation)
 		{
 			current_al_ = 0;
 			is_alive_ = false;
@@ -90,6 +97,7 @@ void Sprite::execute(cmn::uint index)
 		return;
 	is_running_ = true;
 	current_al_ = it->second.get();
+	current_al_->update_node(this);
 }
 
 float Sprite::width() const

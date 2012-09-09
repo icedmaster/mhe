@@ -23,7 +23,7 @@ public:
 		priority_high = 10
 	};
 public:
-	Node() : priority_(priority_normal)
+	Node() : priority_(priority_normal), color_(cfWhite)
 	{
 		texcoord_[0] = 0.0; texcoord_[1] = 0.0; texcoord_[2] = 0.0; texcoord_[3] = 1.0;
 		texcoord_[4] = 1.0; texcoord_[5] = 1.0; texcoord_[6] = 1.0; texcoord_[7] = 0.0;

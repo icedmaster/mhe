@@ -6,6 +6,7 @@
 #include "sdl_keyboard_device_impl.hpp"
 #include "sdl_mouse_device_impl.hpp"
 #include "sdl_system_device_impl.hpp"
+#include "sdl_event_system.hpp"
 
 namespace mhe {
 namespace sdl {
@@ -36,6 +37,11 @@ public:
 	SystemDeviceImpl* create_system_device_impl() const
 	{
 		return new SDLSystemDeviceImpl();
+	}
+
+	EventSystem* create_event_system() const
+	{
+		return new SDLEventSystem();
 	}
 };
 

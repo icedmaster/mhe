@@ -12,7 +12,7 @@ inline int check_for_events(int mask, std::vector<SDL_Event>& events)
 	const int max_number_of_events = 4;
 	events.resize(max_number_of_events);
 	SDL_PumpEvents();
-	return SDL_PeepEvents(&events[0], max_number_of_events, SDL_GETEVENT, SDL_EVENTMASK(mask));
+	return SDL_PeepEvents(&events[0], max_number_of_events, SDL_GETEVENT, mask);
 }
 
 }}

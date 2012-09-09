@@ -11,7 +11,9 @@ std::vector< boost::shared_ptr<Event> > SDLMouseDeviceImpl::check(const WindowSy
 {
 	std::vector< boost::shared_ptr<Event> > events;
 	std::vector<SDL_Event> sdl_events;
-	int cnt = check_for_events(SDL_MOUSEMOTION | SDL_MOUSEBUTTONDOWN | SDL_MOUSEBUTTONUP, sdl_events);
+	int cnt = check_for_events(SDL_EVENTMASK(SDL_MOUSEMOTION) |
+							   SDL_EVENTMASK(SDL_MOUSEBUTTONDOWN) |
+							   SDL_EVENTMASK(SDL_MOUSEBUTTONUP), sdl_events);
 	if (cnt <= 0) return events;
 	for (int i = 0; i < cnt; ++i)
 		events.push_back(create_event(sdl_events[i], ws));

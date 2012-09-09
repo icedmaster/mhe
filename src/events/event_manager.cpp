@@ -1,6 +1,19 @@
 #include "events/event_manager.hpp"
 
+#include "impl/system_factory.hpp"
+
 namespace mhe {
+
+EventManager::EventManager() :
+	backend_(SystemFactory::instance().create_event_system())
+{
+	backend_->init();
+}
+
+EventManager::~EventManager()
+{
+	backend_->deinit();
+}
 
 void EventManager::add_device(Device* device)
 {
@@ -26,6 +39,7 @@ void EventManager::add_listener(EventListener* listener)
 
 void EventManager::check(const WindowSystem& ws)
 {
+	backend_->update_event_queue();
 	for (devices_map::iterator it = devices_.begin(); it != devices_.end(); ++it)
 	{
 		const std::vector< boost::shared_ptr<Event> >& events = it->second->check(ws);
@@ -34,6 +48,7 @@ void EventManager::check(const WindowSystem& ws)
 			process_event(events[i]);
 		}
 	}
+	backend_->clear_event_queue();
 }
 
 void EventManager::process_event(const boost::shared_ptr<Event>& event)

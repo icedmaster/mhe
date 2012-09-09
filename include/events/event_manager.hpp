@@ -4,6 +4,7 @@
 #include <map>
 #include "device.hpp"
 #include "event_listener.hpp"
+#include "event_system.hpp"
 #include "window_system.hpp"
 
 namespace mhe {
@@ -11,6 +12,9 @@ namespace mhe {
 class EventManager
 {
 public:
+	EventManager();
+	~EventManager();
+
 	void add_device(Device* device);
 	boost::shared_ptr<Device> get_device(const std::string& name) const;
 
@@ -25,6 +29,7 @@ private:
 	typedef std::multimap< int, boost::shared_ptr<EventListener> > listeners_map;
 	devices_map devices_;
 	listeners_map listeners_;
+	boost::scoped_ptr<EventSystem> backend_;
 };
 
 }

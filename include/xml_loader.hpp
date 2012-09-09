@@ -7,6 +7,8 @@
 
 namespace mhe {
 
+class Animation;
+
 class XMLLoader
 {
 	struct SpriteDummyLoader

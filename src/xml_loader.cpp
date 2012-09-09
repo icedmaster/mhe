@@ -2,6 +2,7 @@
 
 #include "utils/global_log.hpp"
 #include "texture_animation.hpp"
+#include "animation_list.hpp"
 
 namespace mhe {
 

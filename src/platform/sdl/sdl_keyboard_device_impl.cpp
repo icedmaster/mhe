@@ -10,7 +10,7 @@ std::vector< boost::shared_ptr<Event> > SDLKeyboardDeviceImpl::check(const Windo
 {
 	std::vector< boost::shared_ptr<Event> > events;
 	std::vector<SDL_Event> sdl_events;
-	int cnt = check_for_events(SDL_KEYDOWN | SDL_KEYUP, sdl_events);
+	int cnt = check_for_events(SDL_EVENTMASK(SDL_KEYDOWN) | SDL_EVENTMASK(SDL_KEYUP), sdl_events);
 	if (cnt <= 0) return events;
 	for (int i = 0; i < cnt; ++i)
 		events.push_back(create_event(sdl_events[i]));

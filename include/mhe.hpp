@@ -9,6 +9,8 @@
 #include "texture_manager.hpp"
 #include "particle_system.hpp"
 
+#include "mhe_graphics.hpp"
+
 #include "mhe_sound.hpp"
 #include "sound_manager.hpp"
 

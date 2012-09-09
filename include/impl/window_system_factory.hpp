@@ -19,6 +19,7 @@ public:
 	KeyboardDeviceImpl* create_keyboard_device() const;
 	MouseDeviceImpl* create_mouse_device() const;
 	SystemDeviceImpl* create_system_device() const;
+	EventSystem* create_event_system() const;
 private:
 	std::vector< boost::shared_ptr<AbstractWindowSystemFactory> > systems_;
 	boost::shared_ptr<AbstractWindowSystemFactory> current_system_factory_;

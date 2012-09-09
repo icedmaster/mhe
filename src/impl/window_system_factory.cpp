@@ -50,4 +50,9 @@ SystemDeviceImpl* WindowSystemFactory::create_system_device() const
 	return current_system_factory_->create_system_device_impl();
 }
 
+EventSystem* WindowSystemFactory::create_event_system() const
+{
+	return current_system_factory_->create_event_system();
+}
+
 }

@@ -44,6 +44,11 @@ public:
 		return window_system_factory_.create_system_device();
 	}
 
+	EventSystem* create_event_system() const
+	{
+		return window_system_factory_.create_event_system();
+	}
+
 	VideoDriverFactory& video_driver_factory()
 	{
 		return video_driver_factory_;

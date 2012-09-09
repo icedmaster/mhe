@@ -10,7 +10,7 @@ std::vector< boost::shared_ptr<Event> > SDLSystemDeviceImpl::check(const WindowS
 {
 	std::vector< boost::shared_ptr<Event> > events;
 	std::vector<SDL_Event> sdl_events;
-	int cnt = check_for_events(SDL_QUIT, sdl_events);
+	int cnt = check_for_events(SDL_EVENTMASK(SDL_QUIT), sdl_events);
 	if (cnt <= 0) return events;
 	for (int i = 0; i < cnt; ++i)
 		events.push_back(create_event(sdl_events[i]));

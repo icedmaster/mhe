@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <map>
-#include "animation_list.hpp"
+#include "animation_list_base.hpp"
 #include "node.hpp"
 
 namespace mhe
@@ -15,8 +15,8 @@ namespace mhe
 		Sprite() : is_alive_(true), is_running_(false), x_size_(0.0), y_size_(0.0),
 				   current_al_(0)
 		{}
-		Sprite(AnimationList* al) : is_alive_(true), is_running_(false), x_size_(0.0), y_size_(0.0),
-									current_al_(0)
+		Sprite(AnimationListBase* al) : is_alive_(true), is_running_(false), x_size_(0.0), y_size_(0.0),
+										current_al_(0)
 		{
 			al_[al->index()] = boost::shared_ptr<AnimationListBase>(al);
 		}

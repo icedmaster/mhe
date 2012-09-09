@@ -3,7 +3,8 @@
 namespace mhe {
 
 AnimationList::AnimationList(size_t index, bool repeat) :
-	AnimationListBase(index, repeat)
+	AnimationListBase(index, repeat),
+	cur_animation_(0)
 {
 }
 

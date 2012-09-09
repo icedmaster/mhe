@@ -42,7 +42,6 @@ bool Engine::init(cmn::uint w, cmn::uint h, cmn::uint bpp, bool fullscreen)
 void Engine::default_setup()
 {
 	ws_.show_cursor(true);
-	//load_default_extensions();
 	context_.driver()->set_clear_color(mhe::cfBlack);
 	context_.driver()->enable_depth((mhe::DepthFunc)0);
 	context_.driver()->disable_lighting();
