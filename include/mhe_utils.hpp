@@ -6,5 +6,6 @@
 #include "utils/options_parser.hpp"
 #include "utils/strutils.hpp"
 #include "utils/sysutils.hpp"
+#include "utils/timer.hpp"
 
 #endif

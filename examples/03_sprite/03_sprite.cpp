@@ -4,23 +4,43 @@ class TestGameScene : public mhe::game::GameScene
 {
 public:
 	TestGameScene(mhe::game::Engine* engine) :
-		mhe::game::GameScene(engine)
+		mhe::game::GameScene(engine),
+		timer_(1000), frames_(0)
 	{}
 
 private:
 	bool init_impl(const std::string& /*arg*/, void* /*prm*/)
 	{
-		// create one sprite
-		mhe::AnimationList* al = new mhe::AnimationList(0, true);
-		boost::shared_ptr<mhe::Texture> texture =
-			get_engine()->context().texture_manager().get("../../../assets/test_sprite.png");
-		mhe::Animation* a = new mhe::TextureAnimation(1000, texture);
-		al->add(a);
-		boost::shared_ptr<mhe::Sprite> sprite(new mhe::Sprite(al));
-		get_scene()->add(sprite);
-		sprite->start();
+		// create 100 sprites
+		for (int i = 0; i < 100; ++i)
+		{
+			mhe::AnimationList* al = new mhe::AnimationList(0, true);
+			boost::shared_ptr<mhe::Texture> texture =
+				get_engine()->context().texture_manager().get("../../../assets/test_sprite.png");
+			mhe::Animation* a = new mhe::TextureAnimation(1000, texture);
+			al->add(a);
+			boost::shared_ptr<mhe::Sprite> sprite(new mhe::Sprite(al));
+			get_scene()->add(sprite);
+			sprite->translate(mhe::utils::random(800), mhe::utils::random(600), 0);
+			sprite->start();
+		}
+		timer_.start();
 		return true;
 	}
+
+	bool process_impl()
+	{
+		if (timer_.elapsed())
+		{
+			std::cout << "fps:" << frames_ << "\n";
+			frames_ = 0;
+			timer_.start();
+		}
+		else ++frames_;
+	}
+
+	mhe::utils::Timer timer_;
+	cmn::uint frames_;
 };
 
 int main(int /*argc*/, char** /*argv*/)
