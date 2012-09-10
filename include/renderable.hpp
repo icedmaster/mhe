@@ -8,12 +8,18 @@
 
 namespace mhe {
 
+enum BlendMode
+{
+	no_blend,
+	alpha_one_minus_alpha,
+};
+
 class Renderable : public Transform
 {
 	static const cmn::uint default_texcoord_size = 8;
 public:
 	Renderable(bool default_initialization = false) :
-		render_flags_(0)
+		render_flags_(0), blend_mode_(no_blend)
 	{ 
 		if (default_initialization)
 		{
@@ -61,6 +67,26 @@ public:
 	const std::vector<cmn::uint> indicies() const
 	{
 		return indicies_;
+	}
+
+	void set_flags(uint32_t flags)
+	{
+		render_flags_ = flags;
+	}
+
+	uint32_t render_flags() const
+	{
+		return render_flags_;
+	}
+
+	void set_blend_mode(BlendMode mode)
+	{
+		blend_mode_ = mode;
+	}
+
+	BlendMode blend_mode() const
+	{
+		return blend_mode_;
 	}
 
 	void attach(const Renderable& other)
@@ -126,6 +152,7 @@ private:
 	std::vector<cmn::uint> indicies_;
 	colorf color_;
 	uint32_t render_flags_;
+	BlendMode blend_mode_;
 };
 
 }

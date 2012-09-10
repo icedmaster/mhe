@@ -51,7 +51,7 @@ void ParticleSystem::draw_impl(const Context& context)
 	boost::shared_ptr<Driver> driver = context.driver();
 
 	driver->mask_zbuffer();
-	driver->enable_blending(ALPHA_ONE_MINUS_ALPHA);
+	driver->enable_blending(alpha_one_minus_alpha);
 
 	// setup texture pointer
 	float* tp = (tex != nullptr) ? &tbuf[0] : 0;

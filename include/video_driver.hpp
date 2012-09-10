@@ -7,28 +7,26 @@
 #include "types.hpp"
 #include "mhe_math.hpp"
 #include "window_system.hpp"
+#include "renderable.hpp"
 
 namespace mhe
 {
-enum BlendFunc
-{
-	ALPHA_ONE_MINUS_ALPHA
-};
 
 enum DepthFunc
 {
 };
 
 class Texture;
-class Renderable;
 
 class Driver
 {
 public:
 	enum RenderFlags
 	{
+		default_render = 0, 
 		mask_z_buffer = 1,
-		lighting_disable = (1 << 1)
+		lighting_disabled = (1 << 1),
+		blending_enabled = (1 << 2)
 	};
 
 	class Stats
@@ -39,10 +37,11 @@ public:
 
 		void reset()
 		{
-			tris_ = batches_ = 0;
+			tris_ = batches_ = frames_ = 0;
 		}
 
 		void update(const Renderable& renderable);
+		void update_frames();
 
 		cmn::uint tris() const
 		{
@@ -53,9 +52,15 @@ public:
 		{
 			return batches_;
 		}
+
+		cmn::uint frames() const
+		{
+			return frames_;
+		}
 	private:
 		cmn::uint tris_;
 		cmn::uint batches_;
+		cmn::uint frames_;
 	};
 public:
 	virtual ~Driver() {}
@@ -85,7 +90,7 @@ public:
 		disable_lighting_impl();
 	}
 
-	void enable_blending(BlendFunc bf)
+	void enable_blending(BlendMode bf)
 	{
 		enable_blending_impl();
 		set_blend_func(bf);
@@ -218,7 +223,7 @@ private:
 	virtual void disable_lighting_impl() = 0;
 	virtual void enable_blending_impl() = 0;
 	virtual void disable_blending_impl() = 0;
-	virtual void set_blend_func(BlendFunc) = 0;
+	virtual void set_blend_func(BlendMode) = 0;
 
 	virtual void enable_depth_impl() = 0;
 	virtual void disable_depth_impl() = 0;
@@ -252,6 +257,8 @@ private:
 private:
 	std::vector<Renderable> perform_batch(const std::list<Renderable*>& elements) const;
 	void perform_render(const Renderable& renderable);
+	void set_render_flags(const Renderable& renderable);
+	void clear_render_flags(const Renderable& renderable);
 
 	std::list<Renderable*> renderable_elements_;
 	Stats stats_;

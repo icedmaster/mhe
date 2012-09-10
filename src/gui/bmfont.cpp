@@ -142,7 +142,7 @@ namespace gui {
 		}
 
 		driver->mask_zbuffer();
-        driver->enable_blending(ALPHA_ONE_MINUS_ALPHA);
+        driver->enable_blending(alpha_one_minus_alpha);
 
 		ta_.texture()->prepare();
 		driver->draw(&v[0], 0, &t[0], &c[0], &ibuf[0], ibuf.size());

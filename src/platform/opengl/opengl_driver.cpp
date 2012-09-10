@@ -65,11 +65,11 @@ namespace opengl {
 		GLStateAttr::instance().clr(GL_BLEND);
 	}
 
-	void OpenGLDriver::set_blend_func(BlendFunc bf)
+	void OpenGLDriver::set_blend_func(BlendMode bf)
 	{
 	    switch (bf)
 	    {
-	        case ALPHA_ONE_MINUS_ALPHA:
+	        case alpha_one_minus_alpha:
                 glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
             break;
 

@@ -20,35 +20,7 @@ void Sprite::draw_impl(const Context& context)
 		execute(0);
 	if (!current_al_) return;
 
-	float x_sz = x_size_, y_sz = y_size_;
-	if (!x_size_ || !y_size_)
-	{
-		x_sz = texture()->width();
-		y_sz = texture()->height();
-	}
-
-	// prepare buffers for drawing
-	const float v[] = {0.0, 0.0, 0.0,
-					   0.0, y_sz, 0.0,
-					   x_sz, y_sz, 0.0,
-					   x_sz, 0.0, 0.0};
-	const float n[] = {0.0, 0.0, 1.0,
-					   0.0, 0.0, 1.0,
-					   0.0, 0.0, 1.0,
-					   0.0, 0.0, 1.0};
-	const cmn::uint i[] = {0, 1, 2, 2, 3, 0};
-
-	boost::shared_ptr<Driver> driver = context.driver();
-
-	driver->mask_zbuffer();
-	driver->enable_blending(ALPHA_ONE_MINUS_ALPHA);
-
-	texture()->prepare();
-	driver->draw(get_transform(), v, n, texcoord().data(), color().get(), i, 6);
-	texture()->clean();
-
-	driver->disable_blending();
-	driver->unmask_zbuffer();
+	Node::draw_impl(context);
 }
 
 void Sprite::update_impl(cmn::uint tick)
@@ -64,7 +36,7 @@ void Sprite::update_impl(cmn::uint tick)
 			return;
 		}
 		// new frame
-		current_al_->update_node(this);        
+		current_al_->update_node(this);        		
 	}
 }
 
@@ -103,4 +75,40 @@ float Sprite::height() const
 	if (y_size_) return y_size_;
 	return texture()->height();
 }
+
+void Sprite::init()
+{
+	Node::rvertexcoord().resize(12);
+	std::vector<float>& n = Node::rnormalscoord();
+	n.resize(12);
+	n[0] = 0.0; n[1] = 0.0; n[2] = 1.0;
+	n[3] = 0.0; n[4] = 0.0; n[5] = 1.0;
+	n[6] = 0.0; n[7] = 0.0; n[8] = 1.0;
+	n[9] = 0.0; n[10] = 0.0; n[11] = 1.0;
+	
+	std::vector<cmn::uint>& i = Node::rindicies();
+	i.resize(6);
+	i[0] = 0; i[1] = 1; i[2] = 2;
+	i[3] = 2; i[4] = 3; i[5] = 0;
+
+	Renderable::set_flags(Driver::mask_z_buffer | Driver::blending_enabled);
+	set_blend_mode(alpha_one_minus_alpha);
+}
+
+void Sprite::update_buffers()
+{
+	std::vector<float>& v = Node::rvertexcoord();
+	float x_sz = x_size_, y_sz = y_size_;
+	if (!x_size_ || !y_size_)
+	{
+		x_sz = texture()->width();
+		y_sz = texture()->height();
+	}
+
+	v[0] = 0.0; v[1] = 0.0; v[2] = 0.0;
+	v[3] = 0.0; v[4] = y_sz; v[5] = 0.0;
+	v[6] = x_sz; v[7] = y_sz; v[8] = 0.0;
+	v[9] = x_sz; v[10] = 0.0; v[11] = 0.0;
+}
+
 }

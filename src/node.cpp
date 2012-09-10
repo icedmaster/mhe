@@ -10,6 +10,7 @@ Node::Node() :
 
 void Node::draw_impl(const Context& context)
 {
+	context.driver()->draw(this);
 }
 
 }
