@@ -20,7 +20,6 @@ namespace opengl {
 
 			// state
 			bool zbuffer_masked_;
-			BlendFunc bf_;
 
 		OpenGLExtensions extensions_;
 		private:
@@ -43,7 +42,7 @@ namespace opengl {
 			void disable_lighting_impl();
 			void enable_blending_impl();
 			void disable_blending_impl();
-			void set_blend_func(BlendFunc bf);
+			void set_blend_func(BlendMode bf);
 
 			void enable_depth_impl();
 			void disable_depth_impl();

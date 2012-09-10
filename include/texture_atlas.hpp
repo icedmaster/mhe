@@ -18,8 +18,8 @@ public:
 	}
 			
 	void set_indicies(const float* ind, int sz);									
-	Texture::texcoord get(cmn::uint quad) const;
-	Texture::texcoord get(const rect<float>& quad) const;
+	std::vector<float> get(cmn::uint quad) const;
+	std::vector<float> get(const rect<float>& quad) const;
 	v2d get_size(cmn::uint quad) const;
 private:
 	void calc_indicies(int sz);

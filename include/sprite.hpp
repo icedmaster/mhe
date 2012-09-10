@@ -69,6 +69,9 @@ namespace mhe
 
 		Node* clone_impl() const;
 	private:
+		void init();
+		void update_buffers();
+
 		typedef std::map < cmn::uint, boost::shared_ptr<AnimationListBase> > almap;
 		almap al_;
 		bool is_alive_;

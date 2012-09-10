@@ -12,14 +12,6 @@ namespace opengl {
 
 class OpenGLTexture : public Texture
 {
-private:
-	cmn::uint w_, h_;
-	cmn::uint id_;	
-	texcoord coord_;
-	bool binded_;
-	void rebuild_texture(boost::shared_ptr<Image> im,
-						 boost::shared_ptr<Driver> driver, FilterType ft);	
-
 	friend class OpenGLDriver;
 public:
 	OpenGLTexture();
@@ -53,15 +45,16 @@ public:
 
 	boost::shared_ptr<Texture> clone() const;
 
-	texcoord get_coord() const
+	bool is_equal(const Texture& other) const
 	{
-		return coord_;
+		return id_ == static_cast<const OpenGLTexture&>(other).id_;
 	}
-
-	void set_coord(const texcoord& tc)
-	{
-		coord_ = tc;
-	}
+private:
+	cmn::uint w_, h_;
+	cmn::uint id_;	
+	bool binded_;
+	void rebuild_texture(boost::shared_ptr<Image> im,
+						 boost::shared_ptr<Driver> driver, FilterType ft);	
 };
 
 }}

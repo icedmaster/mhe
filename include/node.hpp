@@ -1,20 +1,22 @@
-#ifndef _INODE_HPP_
-#define _INODE_HPP_
+#ifndef __INODE_HPP__
+#define __INODE_HPP__
 
 #include <boost/shared_ptr.hpp>
 #include "math/matrix.hpp"
 #include "context.hpp"
 #include "texture.hpp"
 #include "types.hpp"
-#include "transform.hpp"
+#include "renderable.hpp"
 #include "utils/sysutils.hpp"
 
 namespace mhe
 {
 // Base renderable class
-class Node : public Transform
+class Node : public Renderable
 {	
 	friend class Scene;
+
+	static const size_t default_texcoord_size = 8;
 public:
 	enum
 	{
@@ -22,13 +24,15 @@ public:
 		priority_normal = 5,
 		priority_high = 10
 	};
-public:
-	Node() : priority_(priority_normal), color_(cfWhite)
-	{
-		texcoord_[0] = 0.0; texcoord_[1] = 0.0; texcoord_[2] = 0.0; texcoord_[3] = 1.0;
-		texcoord_[4] = 1.0; texcoord_[5] = 1.0; texcoord_[6] = 1.0; texcoord_[7] = 0.0;
-	}
 
+	enum
+	{
+		visible = 1,
+		frozen = (1 << 1),
+		alive = (1 << 2)
+	};
+public:
+	Node();
 	virtual ~Node() {}
 
 	void draw(const Context& context)												
@@ -40,12 +44,23 @@ public:
 
 	void update(cmn::uint tick)
 	{
-		update_impl(tick);
+		if (!is_frozen())
+			update_impl(tick);
 	}
 
-	bool alive() const
+	bool is_alive() const
 	{
-		return is_alive();
+		return (flags_ & alive);
+	}
+
+	bool is_visible() const
+	{
+		return (flags_ & visible);
+	}
+
+	bool is_frozen() const
+	{
+		return (flags_ & frozen);
 	}
 
 	int priority() const
@@ -70,7 +85,8 @@ public:
 
 	void start()
 	{
-		start_impl(utils::get_current_tick());
+		if (!is_frozen())
+			start_impl(utils::get_current_tick());
 	}	
 
 	Node* clone() const
@@ -78,40 +94,10 @@ public:
 		return clone_impl();
 	}
 
-	void set_texture(const boost::shared_ptr<Texture>& texture)
-	{
-		texture_ = texture;
-	}
-
-	const boost::shared_ptr<Texture> texture() const
-	{
-		return texture_;
-	}
-
-	void set_texcoord(const Texture::texcoord& coord)
-	{
-		texcoord_ = coord;
-	}
-
-	void set_color(const colorf& color)
-	{
-		color_ = color;
-	}
-
-	const colorf& color() const
-	{
-		return color_;
-	}
 protected:
-	Texture::texcoord texcoord() const
-	{
-		return texcoord_;
-	}
+	virtual void draw_impl(const Context&);
 private:
-	virtual void draw_impl(const Context&) = 0;
 	virtual void update_impl(cmn::uint) {}
-
-	virtual bool is_alive() const {return true;}
 	
 	virtual void start_impl(cmn::uint) {}	
 private:
@@ -128,9 +114,7 @@ private:
 	int priority_;						
 	std::string name_;
 	std::vector< boost::shared_ptr<Node> > childs_;	
-	boost::shared_ptr<Texture> texture_;
-	Texture::texcoord texcoord_;
-	colorf color_;
+	uint32_t flags_;
 };
 
 typedef boost::shared_ptr<Node> nodeptr;
@@ -145,6 +129,7 @@ public:
 		return (node1->priority() < node2->priority());
 	}
 };
-};
+
+}
 
 #endif

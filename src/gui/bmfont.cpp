@@ -119,7 +119,7 @@ namespace gui {
 			cmn::uint sym = (cmn::uint)text[i];
 			cmn::uint ind = get_char(sym);
 			const v2d& sz = ta_.get_size(ind);
-			const Texture::texcoord& tc = ta_.get(ind);
+			const std::vector<float>& tc = ta_.get(ind);
 			t.insert(t.end(), tc.data(), tc.data() + tc.size());
 			// prepare vertex coordinates
 			boost::array<float, 12> cc;
@@ -142,7 +142,7 @@ namespace gui {
 		}
 
 		driver->mask_zbuffer();
-        driver->enable_blending(ALPHA_ONE_MINUS_ALPHA);
+        driver->enable_blending(alpha_one_minus_alpha);
 
 		ta_.texture()->prepare();
 		driver->draw(&v[0], 0, &t[0], &c[0], &ibuf[0], ibuf.size());
