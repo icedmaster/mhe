@@ -12,6 +12,7 @@ Sprite::Sprite(const Sprite& sprite) :
 	pos_(sprite.pos_),
 	current_al_(nullptr)
 {
+	init();
 }
 
 void Sprite::draw_impl(const Context& context)
@@ -27,16 +28,17 @@ void Sprite::update_impl(cmn::uint tick)
 {
 	if (!current_al_) return;
 	AnimationListBase::AnimationChangeType ct = current_al_->update(tick);
-	if (ct != AnimationList::no_change)
+	if (ct != AnimationListBase::no_change)
 	{
-		if (ct == AnimationList::last_animation)
+		if (ct == AnimationListBase::last_animation)
 		{
 			current_al_ = 0;
 			is_alive_ = false;
 			return;
 		}
 		// new frame
-		current_al_->update_node(this);        		
+		current_al_->update_node(this);  
+		update_buffers();
 	}
 }
 
@@ -62,6 +64,8 @@ void Sprite::execute(cmn::uint index)
 		return;
 	is_running_ = true;
 	current_al_ = it->second.get();
+	current_al_->update_node(this);
+	update_buffers();
 }
 
 float Sprite::width() const
@@ -90,6 +94,11 @@ void Sprite::init()
 	i.resize(6);
 	i[0] = 0; i[1] = 1; i[2] = 2;
 	i[3] = 2; i[4] = 3; i[5] = 0;
+
+	std::vector<float>& t = Node::rtexcoord();
+	t.resize(8);
+	t[0] = 0.0; t[1] = 0.0; t[2] = 0.0; t[3] = 1.0;
+	t[4] = 1.0; t[5] = 1.0; t[6] = 1.0; t[7] = 0.0;
 
 	Renderable::set_flags(Driver::mask_z_buffer | Driver::blending_enabled);
 	set_blend_mode(alpha_one_minus_alpha);

@@ -32,11 +32,15 @@ private:
 	{
 		if (timer_.elapsed())
 		{
-			std::cout << "fps:" << frames_ << "\n";
+			std::cout << "fps:" << frames_ << " tris:" <<
+				get_engine()->context().driver()->stats().tris() / frames_ <<
+				" dips:" << get_engine()->context().driver()->stats().batches() / frames_ << "\n";
+			get_engine()->context().driver()->stats().reset();
 			frames_ = 0;
 			timer_.start();
 		}
 		else ++frames_;
+		return true;
 	}
 
 	mhe::utils::Timer timer_;

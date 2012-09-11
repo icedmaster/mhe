@@ -19,7 +19,7 @@ class Renderable : public Transform
 	static const cmn::uint default_texcoord_size = 8;
 public:
 	Renderable(bool default_initialization = false) :
-		render_flags_(0), blend_mode_(no_blend)
+		color_(cfWhite), render_flags_(0), blend_mode_(no_blend)
 	{ 
 		if (default_initialization)
 		{
@@ -64,6 +64,11 @@ public:
 		return normalscoord_;
 	}
 
+	const std::vector<float>& colorcoord() const
+	{
+		return colorcoord_;
+	}
+
 	const std::vector<cmn::uint> indicies() const
 	{
 		return indicies_;
@@ -92,16 +97,17 @@ public:
 	void attach(const Renderable& other)
 	{
 		texcoord_.insert(texcoord_.end(), other.texcoord_.begin(), other.texcoord_.end());
-		for (cmn::uint i = 0; i < other.vertexcoord_.size(); i += 3)
+		for (size_t i = 0; i < other.vertexcoord_.size(); i += 3)
 		{
 			v3d v(other.vertexcoord_[i], other.vertexcoord_[i + 1], other.vertexcoord_[i + 2]);
 			v = v * other.get_transform();
 			vertexcoord_.insert(vertexcoord_.end(), v.get(), v.get() + 3);
+			colorcoord_.insert(colorcoord_.end(), other.color().get(), other.color().get() + 4);
 		}
 		normalscoord_.insert(normalscoord_.end(), other.normalscoord_.begin(), other.normalscoord_.end());	
 		size_t indicies_count = indicies_.size();
 		for (size_t i = 0; i < other.indicies_.size(); ++i)
-			indicies_.push_back(other.indicies_[i] + indicies_count); 
+			indicies_.push_back(other.indicies_[i] + indicies_count); 		
 	}
 protected:
 	std::vector<float>& rtexcoord()

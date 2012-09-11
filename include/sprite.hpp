@@ -14,11 +14,15 @@ namespace mhe
 	public:
 		Sprite() : is_alive_(true), is_running_(false), x_size_(0.0), y_size_(0.0),
 				   current_al_(0)
-		{}
+		{
+			init();
+		}
+
 		Sprite(AnimationListBase* al) : is_alive_(true), is_running_(false), x_size_(0.0), y_size_(0.0),
 										current_al_(0)
 		{
 			al_[al->index()] = boost::shared_ptr<AnimationListBase>(al);
+			init();
 		}
 
 		Sprite(const Sprite& sprite);

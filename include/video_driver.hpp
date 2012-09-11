@@ -206,6 +206,11 @@ public:
 	{
 		return stats_;
 	}
+
+	Stats& stats()
+	{
+		return stats_;
+	}
 private:
 	virtual bool init_impl() = 0;
 	virtual void close_impl() = 0;
@@ -255,7 +260,7 @@ private:
 	virtual void set_viewport_impl(int x, int y, int w, int h) = 0;
 
 private:
-	std::vector<Renderable> perform_batch(const std::list<Renderable*>& elements) const;
+	std::vector<Renderable> perform_batch() const;
 	void perform_render(const Renderable& renderable);
 	void set_render_flags(const Renderable& renderable);
 	void clear_render_flags(const Renderable& renderable);

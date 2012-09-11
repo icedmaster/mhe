@@ -31,7 +31,7 @@ public:
 		return *window_system_;
 	}
 
-	TextureManager texture_manager() const
+	const TextureManager& texture_manager() const
 	{
 		return texture_manager_;
 	}

@@ -3,6 +3,7 @@
 
 #include <string>
 #include <cstdlib>
+#include <stdint.h>
 
 namespace cmn
 {

@@ -45,7 +45,10 @@ public:
 		const std::string& sname = utils::get_file_name(name);
 		typename resmap::iterator it = resources_.find(sname);
 		if (it != resources_.end())
+		{
+			INFO_LOG("get resource:" << sname);
 			return it->second;
+		}
 		return load_impl(name, sname);
 	}
 
@@ -65,15 +68,15 @@ public:
 	}
 private:
 	boost::shared_ptr<res_type> load_impl(const std::string& name,
-					      const std::string& sname) const
+										  const std::string& sname) const
 	{
 		res_type* res = Loader::load(name, helper_);
-		if (res == 0)
+		if (res == nullptr)
 		{
 			ERROR_LOG("Can't load: " << name.c_str());
 			return boost::shared_ptr<res_type>();
 		}
-		INFO_LOG("Resource " << name << " loaded");
+		INFO_LOG("Resource " << name << " loaded with sname:" << sname);
 		boost::shared_ptr<res_type> shared_res(res);
 		resources_[sname] = shared_res;
 		return shared_res;

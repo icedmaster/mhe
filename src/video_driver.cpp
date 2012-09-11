@@ -23,8 +23,8 @@ void Driver::begin_render()
 }
 
 void Driver::end_render()
-{
-	const std::vector<Renderable>& batched = perform_batch(renderable_elements_);
+{	
+	const std::vector<Renderable>& batched = perform_batch();
 	for (size_t i = 0; i < batched.size(); ++i)
 		perform_render(batched[i]);
 }
@@ -34,12 +34,13 @@ void Driver::draw(Renderable* renderable)
 	renderable_elements_.push_back(renderable);
 }
 
-std::vector<Renderable> Driver::perform_batch(const std::list<Renderable*>& elements) const
+std::vector<Renderable> Driver::perform_batch() const
 {
 	boost::shared_ptr<Texture> last_texture;
 	std::vector<Renderable> batches;
-	batches.reserve(elements.size());
-	for (std::list<Renderable*>::const_iterator it = elements.begin(); it != elements.end(); ++it)
+	batches.reserve(renderable_elements_.size());
+	for (std::list<Renderable*>::const_iterator it = renderable_elements_.begin();
+		 it != renderable_elements_.end(); ++it)
 	{
 		Renderable* renderable = *it;
 		if ( (last_texture == nullptr) || !last_texture->is_equal(*(renderable->texture())))
@@ -47,7 +48,8 @@ std::vector<Renderable> Driver::perform_batch(const std::list<Renderable*>& elem
 			batches.push_back(Renderable(false));
 			last_texture = renderable->texture();
 			batches.front().set_texture(last_texture);
-			continue;
+			batches.front().set_flags(renderable->render_flags());
+			batches.front().set_blend_mode(renderable->blend_mode());
 		}
 		Renderable& current_batch = batches.front();			
 		current_batch.attach(*renderable);
@@ -57,14 +59,17 @@ std::vector<Renderable> Driver::perform_batch(const std::list<Renderable*>& elem
 
 void Driver::perform_render(const Renderable& renderable)
 {
-	set_render_flags(renderable.render_flags());
-	begin_draw_impl(renderable.texture(), renderable.vertexcoord().data(),
+	set_render_flags(renderable);
+	renderable.texture()->prepare();
+
+	begin_draw_impl(renderable.vertexcoord().data(),
 					renderable.normalscoord().data(), renderable.texcoord().data(),
-					renderable.color().get(), renderable.indicies().size());
+					renderable.colorcoord().data(), renderable.indicies().size());
 	draw_impl(renderable.indicies().data(), renderable.indicies().size());
-	end_draw_impl(renderable.texture());
+	end_draw_impl();
+	renderable.texture()->clean();
 	stats_.update(renderable);
-	clear_render_flags(renderable.render_flags());
+	clear_render_flags(renderable);
 }
 
 void Driver::set_render_flags(const Renderable& renderable)

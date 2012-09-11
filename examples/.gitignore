@@ -1,7 +1,9 @@
 /build/*
 /01_init/build/*
 /particles/build/*
+/03_sprite/build/*
 
 !/build/CMakeLists.txt
 !/01_init/build/CMakeLists.txt
 !/particles/build/CMakeLists.txt
+!/03_sprite/build/CMakeLists.txt
