@@ -97,6 +97,7 @@ public:
 	void attach(const Renderable& other)
 	{
 		texcoord_.insert(texcoord_.end(), other.texcoord_.begin(), other.texcoord_.end());
+		size_t v_sz = vertexcoord_.size() / 3;
 		for (size_t i = 0; i < other.vertexcoord_.size(); i += 3)
 		{
 			v3d v(other.vertexcoord_[i], other.vertexcoord_[i + 1], other.vertexcoord_[i + 2]);
@@ -105,9 +106,8 @@ public:
 			colorcoord_.insert(colorcoord_.end(), other.color().get(), other.color().get() + 4);
 		}
 		normalscoord_.insert(normalscoord_.end(), other.normalscoord_.begin(), other.normalscoord_.end());	
-		size_t indicies_count = indicies_.size();
 		for (size_t i = 0; i < other.indicies_.size(); ++i)
-			indicies_.push_back(other.indicies_[i] + indicies_count); 		
+			indicies_.push_back(other.indicies_[i] + v_sz); 		
 	}
 protected:
 	std::vector<float>& rtexcoord()
