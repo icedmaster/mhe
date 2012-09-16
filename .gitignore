@@ -1,5 +1,4 @@
 /prj/codeblocks/bin/Debug/mhe
-/assets/*
 /bin/*
 /obj/*
 /old/*
@@ -15,7 +14,6 @@
 *.log
 *.txt
 *.o
-*.png
 *.bmp
 *.zip
 *.ede
