@@ -26,7 +26,8 @@ public:
 		default_render = 0, 
 		mask_z_buffer = 1,
 		lighting_disabled = (1 << 1),
-		blending_enabled = (1 << 2)
+		blending_enabled = (1 << 2),
+		batching_disabled = (1 << 3)
 	};
 
 	class Stats

@@ -84,6 +84,11 @@ public:
 		return render_flags_;
 	}
 
+	bool has_flag(RenredFlag flag) const
+	{
+		return render_flags_ & flag;
+	}
+
 	void set_blend_mode(BlendMode mode)
 	{
 		blend_mode_ = mode;
