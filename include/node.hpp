@@ -8,6 +8,7 @@
 #include "types.hpp"
 #include "renderable.hpp"
 #include "utils/sysutils.hpp"
+#include "node_visitor.hpp"
 
 namespace mhe
 {
@@ -94,11 +95,18 @@ public:
 		return clone_impl();
 	}
 
+	void apply(NodeVisitor* visitor)
+	{
+		apply_impl(visitor);
+	}
 protected:
 	virtual void draw_impl(const Context&);
+	virtual void apply_impl(NodeVisitor* visitor)
+	{
+		visitor->visit(this);
+	}
 private:
-	virtual void update_impl(cmn::uint) {}
-	
+	virtual void update_impl(cmn::uint) {}	
 	virtual void start_impl(cmn::uint) {}	
 private:
 	virtual Node* clone_impl() const
