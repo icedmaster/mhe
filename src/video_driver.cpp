@@ -48,8 +48,6 @@ std::vector<Renderable> Driver::perform_batch() const
 			batches.push_back(Renderable(false));
 			last_texture = renderable->texture();
 			batches.front().set_texture(last_texture);
-			batches.front().set_flags(renderable->render_flags());
-			batches.front().set_blend_mode(renderable->blend_mode());
 		}
 		Renderable& current_batch = batches.front();			
 		current_batch.attach(*renderable);
@@ -74,12 +72,11 @@ void Driver::perform_render(const Renderable& renderable)
 
 void Driver::set_render_flags(const Renderable& renderable)
 {
-	uint32_t flags = renderable.render_flags();
-	if (flags & mask_z_buffer)
+	if (renderable.is_z_buffer_masked())
 		mask_zbuffer_impl();
-	if (flags & lighting_disabled)
+	if (!renderable.is_lighting_enabled())
 		disable_lighting_impl();
-	if (flags & blending_enabled)
+	if (renderable.is_blending_enabled())
 	{
 		enable_blending_impl();
 		set_blend_func(renderable.blend_mode());
@@ -88,12 +85,11 @@ void Driver::set_render_flags(const Renderable& renderable)
 
 void Driver::clear_render_flags(const Renderable& renderable)
 {
-	uint32_t flags = renderable.render_flags();
-	if (flags & mask_z_buffer)
+	if (renderable.is_z_buffer_masked())
 		unmask_zbuffer_impl();
-	if (flags & lighting_disabled)
+	if (!renderable.is_lighting_enabled())
 		enable_lighting_impl();
-	if (flags & blending_enabled)
+	if (renderable.is_blending_enabled())
 		disable_blending_impl();
 }
 

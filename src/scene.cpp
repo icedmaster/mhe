@@ -7,16 +7,17 @@ void Scene::draw(const Context& context)
 	for (nodelist::iterator it = nodes_.begin(); it != nodes_.end();)
 	{
 		Node* node = (*it).get();
-		if (node->has_flag(Node::invisible))
+		if (!node->is_visible())
 		{
 			++it; continue;
 		}
-		if (!node->has_flag(Node::alive))
+		if (!node->is_alive())
 		{
 			it = nodes_.erase(it);
 			continue;
 		}
 		context.driver()->draw(node);
+		++it;
 	}
 }
 
@@ -27,7 +28,7 @@ void Scene::update(cmn::uint tick)
 		
 	for (nodelist::iterator it = nodes_.begin(); it != nodes_.end(); ++it)
 	{
-		if ((*it)->has_flag(Node::frozen)) continue;
+		if ((*it)->is_frozen()) continue;
 		(*it)->update(tick);	   			
 	}
 
@@ -113,7 +114,7 @@ void Scene::apply_visitors()
 {
 	for (size_t i = 0; i < visitors_.size(); ++i)
 	{
-		NodeVisitor* visitor = visitors_[i];
+		NodeVisitor* visitor = visitors_[i].get();
 		visitor->begin_traverse();
 		for (nodelist::iterator it = nodes_.begin(); it != nodes_.end(); ++it)
 			(*it)->apply(visitor);

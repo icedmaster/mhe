@@ -100,7 +100,8 @@ void Sprite::init()
 	t[0] = 0.0; t[1] = 0.0; t[2] = 0.0; t[3] = 1.0;
 	t[4] = 1.0; t[5] = 1.0; t[6] = 1.0; t[7] = 0.0;
 
-	Renderable::set_flags(Driver::mask_z_buffer | Driver::blending_enabled);
+	set_mask_z_buffer();
+	set_blending_enabled();
 	set_blend_mode(alpha_one_minus_alpha);
 }
 

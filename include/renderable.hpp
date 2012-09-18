@@ -18,6 +18,15 @@ class Renderable : public Transform
 {
 	static const cmn::uint default_texcoord_size = 8;
 public:
+	enum
+	{
+		default_render = 0, 
+		mask_z_buffer = 1,
+		lighting_disabled = (1 << 1),
+		blending_enabled = (1 << 2),
+		batching_disabled = (1 << 3)
+	};
+public:
 	Renderable(bool default_initialization = false) :
 		color_(cfWhite), render_flags_(0), blend_mode_(no_blend)
 	{ 
@@ -74,19 +83,69 @@ public:
 		return indicies_;
 	}
 
-	void set_flags(uint32_t flags)
+	void clear_render_flags()
 	{
-		render_flags_ = flags;
+		render_flags_ = default_render;
 	}
 
-	uint32_t render_flags() const
+	void set_mask_z_buffer()
 	{
-		return render_flags_;
+		render_flags_ |= mask_z_buffer;
 	}
 
-	bool has_flag(RenredFlag flag) const
+	void set_unmask_z_buffer()
 	{
-		return render_flags_ & flag;
+		render_flags_ &= ~mask_z_buffer;
+	}
+
+	bool is_z_buffer_masked() const
+	{
+		return render_flags_ & mask_z_buffer;
+	}
+
+	void set_lightning_enabled()
+	{
+		render_flags_ &= ~lighting_disabled;
+	}
+
+	void set_lighting_disabled()
+	{
+		render_flags_ |= lighting_disabled;
+	}
+
+	bool is_lighting_enabled() const
+	{
+		return !(render_flags_ & lighting_disabled);
+	}
+
+	void set_blending_enabled()
+	{
+		render_flags_ |= blending_enabled;
+	}
+
+	void set_blending_disabled()
+	{
+		render_flags_ &= ~blending_enabled;
+	}
+
+	bool is_blending_enabled() const
+	{
+		return render_flags_ & blending_enabled;
+	}
+
+	void set_batching_disabled()
+	{
+		render_flags_ |= batching_disabled;
+	}
+
+	void set_batching_enabled()
+	{
+		render_flags_ &= ~batching_disabled;
+	}
+
+	bool is_batching_disabled() const
+	{
+		return render_flags_ & batching_disabled;
 	}
 
 	void set_blend_mode(BlendMode mode)
@@ -112,7 +171,9 @@ public:
 		}
 		normalscoord_.insert(normalscoord_.end(), other.normalscoord_.begin(), other.normalscoord_.end());	
 		for (size_t i = 0; i < other.indicies_.size(); ++i)
-			indicies_.push_back(other.indicies_[i] + v_sz); 		
+			indicies_.push_back(other.indicies_[i] + v_sz); 
+		render_flags_ |= other.render_flags_;
+		blend_mode_ = other.blend_mode_;
 	}
 protected:
 	std::vector<float>& rtexcoord()

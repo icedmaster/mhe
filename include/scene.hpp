@@ -35,13 +35,13 @@ public:
 
 	void add_modifier(SceneModifier* modifier)
 	{
-		modifiers_.push_back(modifier);
+		modifiers_.push_back(boost::shared_ptr<SceneModifier>(modifier));
 	}
 
 	void remove_modifier(const std::string& name);
 private:
 	void apply_visitors();
-	void apply_modifiers();
+	void apply_scene_modifiers();
 
 	typedef std::list<nodeptr> nodelist;
 	nodelist nodes_;

@@ -1,5 +1,7 @@
 #include "batch_scene_modifier.hpp"
 
+#include "node.hpp"
+
 namespace mhe {
 
 void BatchSceneModifier::apply(std::list< boost::shared_ptr<Node> >& nodes)
@@ -10,25 +12,25 @@ void BatchSceneModifier::apply(std::list< boost::shared_ptr<Node> >& nodes)
 		 it != nodes.end(); ++it)
 	{
 		const boost::shared_ptr<Node>& node = *it;
-		bool update_first_node = node->has_flag(batching_disabled);
+		bool update_first_node = node->is_batching_disabled();
 		bool inserted = false;
 		if (!update_first_node)
 		{
-			for (std::list<Node*>::iterator bit = first_; bit != batched_.end(); ++bit)
+			for (std::list< boost::shared_ptr<Node> >::iterator bit = first; bit != batched.end(); ++bit)
 			{
 				const Texture& other_texture = *(node->texture());
 				if ((*bit)->texture()->is_equal(other_texture))
 				{
-					batched_.insert(bit, node);
+					batched.insert(bit, node);
 					inserted = true;
 					break;
 				}
 			}
 		}
 		if (!inserted)
-			batched_.push_back(node);
+			batched.push_back(node);
 		if (update_first_node)
-			first_ = batched_.end();
+			first = batched.end();
 	}
 }
 
