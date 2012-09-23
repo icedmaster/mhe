@@ -99,6 +99,11 @@ public:
 	{
 		apply_impl(visitor);
 	}
+
+	void set_priority(int pri)
+	{
+		priority_ = pri;
+	}
 protected:
 	virtual void draw_impl(const Context&);
 	virtual void apply_impl(NodeVisitor* visitor)
@@ -113,11 +118,6 @@ private:
 	{
 		return nullptr;
 	}		
-
-	void set_priority(int pri)
-	{
-		priority_ = pri;
-	}
 	
 	int priority_;						
 	std::string name_;

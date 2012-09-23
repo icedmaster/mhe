@@ -21,7 +21,7 @@ void BatchSceneModifier::apply(std::list< boost::shared_ptr<Node> >& nodes)
 				const Texture& other_texture = *(node->texture());
 				if ((*bit)->texture()->is_equal(other_texture))
 				{
-					batched.insert(bit, node);
+					batched.insert(++bit, node);
 					inserted = true;
 					break;
 				}

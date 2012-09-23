@@ -11,7 +11,15 @@ public:
 private:
 	bool init_impl(const std::string& /*arg*/, void* /*prm*/)
 	{
+		get_scene()->add_modifier(new mhe::LayerSceneModifier);
 		get_scene()->add_modifier(new mhe::BatchSceneModifier);
+		// init foreground
+		boost::shared_ptr<mhe::Sprite> foreground(
+			mhe::utils::create_sprite("../../../assets/star.png",
+									  get_engine()->context()));
+		foreground->set_priority(mhe::Node::priority_high);
+		foreground->translate(400, 300, 0);
+		get_scene()->add(foreground);		
 		// create 100 sprites
 		for (int i = 0; i < 100; ++i)
 		{
@@ -20,10 +28,17 @@ private:
 			boost::shared_ptr<mhe::Sprite> sprite(
 				mhe::utils::create_sprite(filename,
 										  get_engine()->context()));
+			if (!(i % 4)) sprite->set_priority(mhe::Node::priority_normal + 1);
 			get_scene()->add(sprite);
 			sprite->translate(mhe::utils::random(800), mhe::utils::random(600), 0);
 			sprite->start();
 		}
+		// init background
+		boost::shared_ptr<mhe::Sprite> background(
+			mhe::utils::create_sprite("../../../assets/background.png",
+									  get_engine()->context()));
+		background->set_priority(mhe::Node::priority_low);
+		get_scene()->add(background);
 		timer_.start();
 		return true;
 	}
