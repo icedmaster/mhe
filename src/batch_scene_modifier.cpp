@@ -7,7 +7,7 @@ namespace mhe {
 void BatchSceneModifier::apply(std::list< boost::shared_ptr<Node> >& nodes)
 {
 	std::list< boost::shared_ptr<Node> > batched;
-	std::list< boost::shared_ptr<Node> >::iterator first = batched.end();
+	std::list< boost::shared_ptr<Node> >::iterator first = batched.begin();
 	for (std::list< boost::shared_ptr<Node> >::iterator it = nodes.begin();
 		 it != nodes.end(); ++it)
 	{
@@ -31,7 +31,14 @@ void BatchSceneModifier::apply(std::list< boost::shared_ptr<Node> >& nodes)
 			batched.push_back(node);
 		if (update_first_node)
 			first = batched.end();
+		else first = batched.begin();
 	}
+	nodes = batched;
+}
+
+SceneModifier::UpdateMode BatchSceneModifier::update_mode() const
+{
+	return node_add;
 }
 
 }

@@ -23,6 +23,7 @@ namespace mhe
 		{
 			al_[al->index()] = boost::shared_ptr<AnimationListBase>(al);
 			init();
+			execute(0);
 		}
 
 		Sprite(const Sprite& sprite);

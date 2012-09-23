@@ -103,6 +103,8 @@ void Sprite::init()
 	set_mask_z_buffer();
 	set_blending_enabled();
 	set_blend_mode(alpha_one_minus_alpha);
+
+	DEBUG_LOG("Create sprite " << name() << " with animationLists number:" << al_.size());
 }
 
 void Sprite::update_buffers()

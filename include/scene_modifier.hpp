@@ -11,6 +11,13 @@ class Node;
 class SceneModifier
 {
 public:
+	enum UpdateMode
+	{
+		frame_update,
+		node_add,
+		node_remove
+	};
+public:
 	SceneModifier(const std::string& name) : 
 		name_(name)
 	{}
@@ -22,6 +29,7 @@ public:
 
 	virtual ~SceneModifier() {}
 	virtual void apply(std::list< boost::shared_ptr<Node> >& nodes) = 0;
+	virtual UpdateMode update_mode() const = 0;
 private:
 	std::string name_;
 };

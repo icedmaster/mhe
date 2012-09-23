@@ -47,9 +47,9 @@ std::vector<Renderable> Driver::perform_batch() const
 		{
 			batches.push_back(Renderable(false));
 			last_texture = renderable->texture();
-			batches.front().set_texture(last_texture);
+			batches.back().set_texture(last_texture);
 		}
-		Renderable& current_batch = batches.front();			
+		Renderable& current_batch = batches.back();			
 		current_batch.attach(*renderable);
 	}
 	return batches;

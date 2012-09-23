@@ -33,7 +33,7 @@ void Scene::update(cmn::uint tick)
 	}
 
 	apply_visitors();
-	apply_scene_modifiers();
+	apply_scene_modifiers(SceneModifier::frame_update);
 }
 
 boost::shared_ptr<Node> Scene::get_node(const std::string& name) const
@@ -55,6 +55,7 @@ boost::shared_ptr<Node> Scene::get_node(const std::string& name) const
 void Scene::add(const nodeptr& node)
 {
 	nodes_.push_back(node);
+	apply_scene_modifiers(SceneModifier::node_add);
 }
 
 void Scene::remove(const nodeptr& node)
@@ -64,6 +65,7 @@ void Scene::remove(const nodeptr& node)
 		if (*it == node)
 		{
 			nodes_.erase(it);
+			apply_scene_modifiers(SceneModifier::node_remove);
 			return;
 		}
 	}
@@ -122,10 +124,13 @@ void Scene::apply_visitors()
 	}
 }
 
-void Scene::apply_scene_modifiers()
+void Scene::apply_scene_modifiers(SceneModifier::UpdateMode mode)
 {
 	for (size_t i = 0; i < modifiers_.size(); ++i)
-		modifiers_[i]->apply(nodes_);
+	{
+		if (modifiers_[i]->update_mode() == mode)
+			modifiers_[i]->apply(nodes_);
+	}
 }
 
 }	// namespace mhe

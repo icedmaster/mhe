@@ -3,10 +3,13 @@
 /particles/build/*
 /03_sprite/build/*
 /04_texture_atlas/build/*
+/05_scene/build/*
 
 !/build/CMakeLists.txt
 !/01_init/build/CMakeLists.txt
 !/particles/build/CMakeLists.txt
 !/03_sprite/build/CMakeLists.txt
 !/04_texture_atlas/build/CMakeLists.txt
+!/05_scene/build/CMakeLists.txt
+
 

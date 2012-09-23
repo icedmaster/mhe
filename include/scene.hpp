@@ -41,7 +41,7 @@ public:
 	void remove_modifier(const std::string& name);
 private:
 	void apply_visitors();
-	void apply_scene_modifiers();
+	void apply_scene_modifiers(SceneModifier::UpdateMode mode);
 
 	typedef std::list<nodeptr> nodelist;
 	nodelist nodes_;
