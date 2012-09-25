@@ -57,7 +57,7 @@ void ParticleSystem::draw_impl(const Context& context)
 	float* tp = (tex != nullptr) ? &tbuf[0] : 0;
 	if (tex != nullptr)
 		tex->prepare();
-	driver->draw(Transform::get_transform(), &vbuf[0], &nbuf[0], tp, &cbuf[0], &ibuf[0], ibuf.size());
+	driver->draw(Transform::transform(), &vbuf[0], &nbuf[0], tp, &cbuf[0], &ibuf[0], ibuf.size());
 	if (tex != nullptr)
 		tex->clean();
 	driver->disable_blending();

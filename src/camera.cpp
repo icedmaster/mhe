@@ -41,6 +41,6 @@ namespace mhe
 	{
 		// update matricies
 		driver->set_projection_matrix(proj_m);
-		driver->set_modelview_matrix(Transform::get_transform());
+		driver->set_modelview_matrix(Transform::transform());
 	}
 }

@@ -1,7 +1,14 @@
 #include "texture_atlas.hpp"
 
-namespace mhe
+namespace mhe {
+
+TextureAtlas::TextureAtlas(const boost::shared_ptr<Texture>& tex, int sz) :
+	texture_(tex)
 {
+	if (sz)
+		calc_indicies(sz);
+}
+
 void TextureAtlas::set_texture(const boost::shared_ptr<Texture>& tex, int sz)
 {
 	texture_ = tex;
@@ -51,6 +58,14 @@ std::vector<float> TextureAtlas::get(const rect<float>& quad) const
 	tc[4] = x2; tc[5] = y2;
 	tc[6] = x2; tc[7] = y1;
 	return tc;
+}
+
+std::vector<float> TextureAtlas::get(const std::string& name) const
+{
+	std::map< std::string, rect<float> >::const_iterator it = elements_.find(name);
+	if (it == elements_.end()) return std::vector<float>();
+	const rect<float>& geom = it->second;
+	return get(geom);
 }
 
 v2d TextureAtlas::get_size(cmn::uint quad) const

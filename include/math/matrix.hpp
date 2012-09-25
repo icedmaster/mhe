@@ -143,6 +143,16 @@ public:
 		return *this;
 	}
 
+	matrix& operator/= (T v)
+	{
+		for (int i = 0; i < 4; ++i)
+		{
+			for (int j = 0; j < 4; ++j)
+				m_[i][j] /= v;
+		}
+		return *this;
+	}
+
 	matrix& operator+= (const matrix& m)
 	{
 		for (int i = 0; i < 4; ++i)
@@ -183,6 +193,13 @@ public:
 	matrix operator* (T v) const
 	{
 		return mult(*this, v);
+	}
+
+	matrix operator/ (T v) const
+	{
+		matrix m(*this);
+		m /= v;
+		return m;
 	}
 
 	// projection and view manipulation
@@ -270,6 +287,23 @@ public:
 			0, 0,  0,  1);
 	}
 
+	void set_rotate(float x_angle, float y_angle, float z_angle)
+	{
+		x_angle = deg_to_rad(x_angle);
+		y_angle = deg_to_rad(y_angle);
+		z_angle = deg_to_rad(z_angle);
+		float sx = sin(x_angle), cx = cos(x_angle);
+		float sy = sin(y_angle), cy = cos(y_angle);
+		float sz = sin(z_angle), cz = cos(z_angle);
+		// www.gamedev.ru/code/articles/faq_matrix_quat?page=4
+		float ad = cx * sy;
+		float bd = sx * sy;
+		set(cy * cz, -cy * sz, -sy, 0,
+			-bd * cz + cx * sz, bd * sz + cx * cz, -sx * cy, 0,
+			ad * cz + sx * sz, -ad * sz + sx * cz, cx * cy, 0,
+			0, 0, 0, 1);
+	}
+
 	void set_scale(const v3d& s)
 	{
 		set_scale(s.x(), s.y(), s.z());
@@ -321,6 +355,27 @@ public:
 	static matrix identity()
 	{
 		return matrix();
+	}
+
+	static matrix translation_matrix(const v3d& v)
+	{
+		matrix m;
+		m.set_translate(v);
+		return m;
+	}
+
+	static matrix scaling_matrix(const v3d& v)
+	{
+		matrix m;
+		m.set_scale(v);
+		return m;
+	}
+
+	static matrix rotation_matrix(float x_angle, float y_angle, float z_angle)
+	{
+		matrix m;
+		m.set_rotate(x_angle, y_angle, z_angle);
+		return m;
 	}
 
 	bool is_identity() const

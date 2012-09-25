@@ -32,7 +32,7 @@ bool SpriteAspect::update_impl(const Message& message)
 	if (message.type() == transform_event)
 	{
 		const TransformMessage& tr_message = static_cast<const TransformMessage&>(message);
-		sprite_->set_transform(tr_message.get_transform());
+		sprite_->set_transform(tr_message.transform());
 		update_children(message);
 	}
 	return true;
