@@ -7,15 +7,20 @@ cmake_minimum_required (VERSION 2.8)
 set(CMAKE_MODULES_DIR ${CMAKE_SOURCE_DIR}/cmake_modules)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_MODULES_DIR})
 
+# init build options
+option(BUILD_EXAMPLES "Build mhe examples" OFF)
+option(BUILD_LIB_ONLY "Build only libmhe, without examples and demo" ON)
+
 include(add_subproject)
 
 # defaults for build
-set(MHE_BUILD_DEMO FALSE)
-set(MHE_BUILD_EXAMPLES TRUE)
+if (BUILD_EXAMPLES)
+   message("Build examples option is ON")
+   set(MHE_BUILD_EXAMPLES TRUE)
+endif()
 
-if (DEFINED LIB_ONLY)
+if (BUILD_LIB_ONLY)
     message("Build mhelib only")
-    set(MHE_BUILD_DEMO FALSE)
     set(MHE_BUILD_EXAMPLES FALSE)
 endif()
 
@@ -23,7 +28,7 @@ add_definitions(-Wall)
 add_definitions(-Wextra)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
-add_definitions(-O2)
+   add_definitions(-O2)
 endif()
 
 set (SOURCE_ROOT ${CMAKE_SOURCE_DIR}/../src)
@@ -75,79 +80,24 @@ endif()
 
 include_directories (${INC_PATH})
 
+include(find_libraries)
+
+mhe_find_libraries()
+
 # find libraries
-if (CMAKE_HOST_UNIX)
-   if (APPLE)
-	set(ADD_GL_PATH "/System/Library/Frameworks/OpenGL.framework/Libraries")
-   endif()
-   find_library(OPENGL_LIB GL ${ADD_GL_PATH})
-else (CMAKE_HOST_UNIX)
-   find_library(OPENGL_LIB opengl32)
-endif()
-if (${OPENGL_LIB} STREQUAL "OPENGL_LIB-NOTFOUND")
-message("OpenGL lib not found")
-else()
-message("---- opengl ------")
-message(${OPENGL_LIB})
-add_definitions(-DMHE_HAS_OPENGL)
-# add platform sources
-set(SRC_PATH ${OPENGL_IMPL_SOURCES} ${SRC_PATH})
+if (MHE_OPENGL_FOUND)
+   # add platform sources
+   set(SRC_PATH ${OPENGL_IMPL_SOURCES} ${SRC_PATH})
 endif()
 
-find_library(SDL_LIB SDL)
-if (${SDL_LIB} STREQUAL "SDL_LIB-NOTFOUND")
-message("SDL not found")
-else()
-if (WIN32)
-find_library(SDLMAIN_LIB SDLmain)
-    set(SDL_LIB mingw32 ${SDLMAIN_LIB} ${SDL_LIB})
-endif()
-message("---- sdl ------")
-message(${SDL_LIB})
-add_definitions(-DMHE_HAS_SDL)
-set(SRC_PATH ${SRC_PATH} ${PLATFORM_IMPL_SOURCES}/sdl)
+if (MHE_SDL_FOUND)
+   set(SRC_PATH ${SRC_PATH} ${PLATFORM_IMPL_SOURCES}/sdl)
 endif()
 
-find_library(PNG_LIB png)
-message("---- png ------")
-message(${PNG_LIB})
-
-if (WIN32)
-    find_library(OPENAL_LIB openal32)
-else()
-find_library(OPENAL_LIB openal)
-endif()
-if (${OPENAL_LIB} STREQUAL "OPENAL_LIB-NOTFOUND")
-  message("OpenAL not found")
-else()
-  message("---- OpenAL -----")
-  message(${OPENAL_LIB})
-  add_definitions(-DMHE_HAS_OPENAL)
-endif()
-
-find_library(VORBISFILE_LIB vorbisfile)
-message("---- vorbisfile ----")
-message(${VORBISFILE_LIB})
-
-find_library(VORBIS_LIB vorbis)
-message("---- vorbis ----")
-message(${VORBIS_LIB})
-
-find_library(OGG_LIB ogg)
-message("---- ogg ----")
-message(${OGG_LIB})
-
-set (LIBS ${OPENGL_LIB} ${SDL_LIB} ${PNG_LIB} ${BOOST_DATETIME_LIB} ${OPENAL_LIB}
+set (LIBS ${OPENGL_LIB} ${SDL_LIB} ${PNG_LIB} ${OPENAL_LIB}
 ${VORBISFILE_LIB} ${VORBIS_LIB} ${OGG_LIB})
 if (WIN32)
    set (LIBS ${LIBS} Ws2_32)
-endif()
-
-if (MHE_BUILD STREQUAL "test")
-find_library(GTEST_LIB gtest)
-message("---- gtest ----")
-message(${GTEST_LIB})
-set (LIBS ${LIBS} ${GTEST_LIB})
 endif()
 
 # find scripts
@@ -167,11 +117,6 @@ foreach (DIR ${SRC_PATH})
   aux_source_directory (${DIR} CUR_SRC)
   set (SOURCE ${SOURCE} ${CUR_SRC})
 endforeach ()
-
-if (MHE_BUILD STREQUAL "test")
-message("Create test target makefile")
-set (SOURCE ${SOURCE} ${CMAKE_SOURCE_DIR}/../test_main.cpp)
-endif()
 
 # additional libraries
 if (WIN32)

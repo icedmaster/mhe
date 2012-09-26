@@ -1,0 +1,68 @@
+macro(mhe_find_libraries)
+
+	#find OpenGL
+	if (CMAKE_HOST_UNIX)
+	   if (APPLE)
+	   	set(ADD_GL_PATH "/System/Library/Frameworks/OpenGL.framework/Libraries")
+	   endif()
+       find_library(OPENGL_LIB GL ${ADD_GL_PATH})
+	else (CMAKE_HOST_UNIX)
+	    find_library(OPENGL_LIB opengl32)
+	endif()
+	if (${OPENGL_LIB} STREQUAL "OPENGL_LIB-NOTFOUND")
+	   message("OpenGL lib not found")
+	else()
+	   message("---- opengl ------")
+	   message(${OPENGL_LIB})
+	   add_definitions(-DMHE_HAS_OPENGL)
+	   set(MHE_OPENGL_FOUND TRUE)
+	endif()
+
+	# find SDL
+	find_library(SDL_LIB SDL)
+	if (${SDL_LIB} STREQUAL "SDL_LIB-NOTFOUND")
+		message("SDL not found")
+	else()
+		if (WIN32)
+			find_library(SDLMAIN_LIB SDLmain)
+	    	set(SDL_LIB mingw32 ${SDLMAIN_LIB} ${SDL_LIB})
+		endif()
+		message("---- sdl ------")
+		message(${SDL_LIB})
+		add_definitions(-DMHE_HAS_SDL)
+		set(MHE_SDL_FOUND TRUE)
+	endif()
+
+	# find libpng
+	find_library(PNG_LIB png)
+	message("---- png ------")
+	message(${PNG_LIB})
+
+	# find OpenAL
+	if (WIN32)
+	    find_library(OPENAL_LIB openal32)
+	else()					
+		find_library(OPENAL_LIB openal)
+	endif()
+	if (${OPENAL_LIB} STREQUAL "OPENAL_LIB-NOTFOUND")
+       message("OpenAL not found")
+	else()
+	   message("---- OpenAL -----")
+	   message(${OPENAL_LIB})
+	   add_definitions(-DMHE_HAS_OPENAL)
+	   set(MHE_OPENAL_FOUND TRUE)
+	endif()	
+
+	find_library(VORBISFILE_LIB vorbisfile)
+	message("---- vorbisfile ----")
+	message(${VORBISFILE_LIB})
+
+	find_library(VORBIS_LIB vorbis)
+	message("---- vorbis ----")
+	message(${VORBIS_LIB})
+
+	find_library(OGG_LIB ogg)
+	message("---- ogg ----")
+	message(${OGG_LIB})
+
+endmacro()
