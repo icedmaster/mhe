@@ -15,7 +15,7 @@ namespace mhe
 				m = nm;
 			}
 
-			const matrixf& get_transform() const
+			const matrixf& transform() const
 			{
 				return m;
 			}

@@ -8,7 +8,8 @@
 namespace mhe {
 namespace gui {
 
-class BMFont : public Font
+class 
+BMFont : public Font
 {
 public:
 	bool load(const std::string& filename);

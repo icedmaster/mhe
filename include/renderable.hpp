@@ -165,7 +165,7 @@ public:
 		for (size_t i = 0; i < other.vertexcoord_.size(); i += 3)
 		{
 			v3d v(other.vertexcoord_[i], other.vertexcoord_[i + 1], other.vertexcoord_[i + 2]);
-			v = v * other.get_transform();
+			v = v * other.transform();
 			vertexcoord_.insert(vertexcoord_.end(), v.get(), v.get() + 3);
 			colorcoord_.insert(colorcoord_.end(), other.color().get(), other.color().get() + 4);
 		}
