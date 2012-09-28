@@ -13,13 +13,21 @@ public:
 		Animation(duration),
 		texture_(texture)
 	{}
+
+	void set_texcoord(const std::vector<float>& coord)
+	{
+		texcoord_ = coord;
+	}
 private:
 	void update_impl(Node* node)
 	{
 		node->set_texture(texture_);
+		if (!texcoord_.empty())
+			node->set_texcoord(texcoord_);
 	}
 
 	boost::shared_ptr<Texture> texture_;
+	std::vector<float> texcoord_;
 };
 
 }
