@@ -19,6 +19,13 @@ inline float to_float(const std::wstring& ws)
 #endif
 }
 
+inline float to_number(const std::string& s)
+{
+#ifdef USE_BOOST_STRINGS
+	return boost::lexical_cast<float>(s);
+#endif
+}
+
 template <class T>
 inline T to_number(const std::wstring& ws)
 {
@@ -87,6 +94,24 @@ inline std::string join(const std::vector<std::string>& str, const std::string& 
 		out += del;
 	}
 	return out;
+}
+
+inline std::vector<std::string> split(const std::string& str, const std::string& del)
+{
+	std::vector<std::string> splitted;
+	size_t index = 0;
+	while (index <= str.length())
+	{
+		size_t pos = str.find_first_of(del, index);
+		size_t len = ((pos == std::string::npos) ? str.length() : pos) - index;
+		if (len)
+		{
+			const std::string& element = str.substr(index, len);
+			splitted.push_back(element);
+		}
+		index += (len + 1);
+	}
+	return splitted;
 }
 
 }}	// namespaces

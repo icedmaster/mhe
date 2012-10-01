@@ -10,6 +10,15 @@ public:
 private:
 	bool init_impl(const std::string& /*arg*/, void* /*prm*/)
 	{
+		const boost::shared_ptr<mhe::TextureAtlas>& atlas = 
+			get_engine()->context().texture_atlas_manager().get("../../../assets/test_atlas.atlas");
+		mhe::TextureAnimation* animation = new mhe::TextureAnimation(1000, atlas->texture());
+		animation->set_texcoord(atlas->get("1.png"));		
+		mhe::AnimationList* al1 = new mhe::AnimationList(0);
+		al1->add(animation);
+		boost::shared_ptr<mhe::Sprite> sprite1(new mhe::Sprite(al1));
+		get_scene()->add(sprite1);
+		sprite1->start();
 		return true;
 	}
 };

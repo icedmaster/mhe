@@ -4,6 +4,7 @@
 #include "video_driver.hpp"
 #include "window_system.hpp"
 #include "texture_manager.hpp"
+#include "texture_atlas_manager.hpp"
 
 namespace mhe {
 
@@ -36,6 +37,11 @@ public:
 		return texture_manager_;
 	}
 
+	const TextureAtlasManager& texture_atlas_manager() const
+	{
+		return texture_atlas_manager_;
+	}
+
 	void reset()
 	{
 		// TODO: implement full reset
@@ -45,6 +51,7 @@ private:
 	boost::shared_ptr<Driver> driver_;
 	WindowSystem* window_system_;
 	TextureManager texture_manager_;
+	TextureAtlasManager texture_atlas_manager_;
 };
 
 }

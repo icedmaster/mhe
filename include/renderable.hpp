@@ -63,6 +63,11 @@ public:
 		return texcoord_;
 	}
 
+	void set_texcoord(const std::vector<float>& coord)
+	{
+		texcoord_ = coord;
+	}
+
 	const std::vector<float>& vertexcoord() const
 	{
 		return vertexcoord_;
@@ -179,11 +184,6 @@ protected:
 	std::vector<float>& rtexcoord()
 	{
 		return texcoord_;
-	}
-
-	void set_texcoord(const std::vector<float>& coord)
-	{
-		texcoord_ = coord;
 	}
 
 	std::vector<float>& rvertexcoord()
