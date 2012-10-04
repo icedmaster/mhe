@@ -70,7 +70,7 @@ public:
 	}
 private:
 	friend class EventListener;
-	bool stop_p(Event*)
+	bool stop_p(const Event*)
 	{
 		stop();
 		return true;

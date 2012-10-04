@@ -39,7 +39,7 @@ bool SpriteAspect::update_impl(const Message& message)
 }
 
 void SpriteAspect::on_animation_completed(AnimationListBase* /*animation_list*/,
-										  AnimationListBase::AnimationChangeType change_type)
+					  AnimationListBase::AnimationChangeType change_type)
 {
 	if (change_type != AnimationListBase::last_animation) return;
 	update_children(EndEventMessage());

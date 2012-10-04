@@ -12,7 +12,7 @@ void EventWidget::add_handler(int event, EventHandler* handler)
 	handlers_[event] += handler;
 }
 
-void EventWidget::process_mouse_move_event(MouseEvent* event)
+void EventWidget::process_mouse_move_event(const MouseEvent* event)
 {
 	if (geom_.in(event->pos()))
 	{
@@ -28,7 +28,7 @@ void EventWidget::process_mouse_move_event(MouseEvent* event)
 	}
 }
 
-void EventWidget::process_mouse_press_event(MouseEvent* event)
+void EventWidget::process_mouse_press_event(const MouseEvent* event)
 {
 	if (geom_.in(event->pos()))
 	{
@@ -37,7 +37,7 @@ void EventWidget::process_mouse_press_event(MouseEvent* event)
 	}
 }
 
-void EventWidget::process_mouse_release_event(MouseEvent* event)
+void EventWidget::process_mouse_release_event(const MouseEvent* event)
 {
 	if (button_pressed_)
 	{
@@ -46,7 +46,7 @@ void EventWidget::process_mouse_release_event(MouseEvent* event)
 	}
 }
 
-void EventWidget::process_event(int event, MouseEvent* mouse_event)
+void EventWidget::process_event(int event, const MouseEvent* mouse_event)
 {
 	std::map<int, Delegate>::iterator it = handlers_.find(event);
 	if (it == handlers_.end()) return;

@@ -18,12 +18,12 @@ GUINode::GUINode(Widget* widget) :
 
 void GUINode::setup_events(EventManager& event_manager)
 {
-	event_manager.add_listener(new EventListener(mouse_event_type, MouseEvent::move, Event::any_event,
-												 create_delegate(this, &GUINode::on_mouse_move)));
-	event_manager.add_listener(new EventListener(mouse_event_type, MouseEvent::button_pressed, Event::any_event,
+	event_manager.add_listener(new DelegateEventListener(mouse_event_type, MouseEvent::move, Event::any_event,
+														 create_delegate(this, &GUINode::on_mouse_move)));
+	event_manager.add_listener(new DelegateEventListener(mouse_event_type, MouseEvent::button_pressed, Event::any_event,
 												 create_delegate(this, &GUINode::on_mouse_button_pressed)));
-	event_manager.add_listener(new EventListener(mouse_event_type, MouseEvent::button_released, Event::any_event,
-												 create_delegate(this, &GUINode::on_mouse_button_released)));
+	event_manager.add_listener(new DelegateEventListener(mouse_event_type, MouseEvent::button_released, Event::any_event,
+														 create_delegate(this, &GUINode::on_mouse_button_released)));
 }
 
 void GUINode::add_widget(Widget* widget)
@@ -41,21 +41,21 @@ void GUINode::draw_impl(const Context& context)
 	widget_->draw(context);
 }
 
-bool GUINode::on_mouse_move(Event* event)
+bool GUINode::on_mouse_move(const Event* event)
 {
-	widget_->process_mouse_move_event(static_cast<MouseEvent*>(event));
+	widget_->process_mouse_move_event(static_cast<const MouseEvent*>(event));
 	return true;
 }
 
-bool GUINode::on_mouse_button_pressed(Event* event)
+bool GUINode::on_mouse_button_pressed(const Event* event)
 {
-	widget_->process_mouse_press_event(static_cast<MouseEvent*>(event));
+	widget_->process_mouse_press_event(static_cast<const MouseEvent*>(event));
 	return true;
 }
 
-bool GUINode::on_mouse_button_released(Event* event)
+bool GUINode::on_mouse_button_released(const Event* event)
 {
-	widget_->process_mouse_release_event(static_cast<MouseEvent*>(event));
+	widget_->process_mouse_release_event(static_cast<const MouseEvent*>(event));
 	return true;
 }
 

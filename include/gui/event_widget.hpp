@@ -36,13 +36,13 @@ public:
 
 	void add_handler(int event, EventHandler* handler);
 
-	void process_mouse_move_event(MouseEvent* event);
-	void process_mouse_press_event(MouseEvent* event);
-	void process_mouse_release_event(MouseEvent* event);
+	void process_mouse_move_event(const MouseEvent* event);
+	void process_mouse_press_event(const MouseEvent* event);
+	void process_mouse_release_event(const MouseEvent* event);
 private:
-	virtual void process_event_impl(int /*event*/, MouseEvent*) {}
+	virtual void process_event_impl(int /*event*/, const MouseEvent*) {}
 private:
-	void process_event(int event, MouseEvent* mouse_event);
+	void process_event(int event, const MouseEvent* mouse_event);
 
 	rect<int> geom_;
 	bool mouse_on_;
