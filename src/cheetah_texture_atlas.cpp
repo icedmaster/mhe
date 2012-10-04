@@ -28,11 +28,19 @@ TextureAtlas* CheetahTextureAtlas::load(const std::string& filename)
 TextureAtlas* CheetahTextureAtlas::load_atlas_from_file(std::ifstream& stream)
 {
 	TextureAtlas* atlas = new TextureAtlas;
+	// we need to ignore first line in file. It contains texture filenames, but we
+	// think that texture has same name as atlas.
+	bool first_line = true;	
 	while (!stream.eof())
 	{
 		std::string str;
 		std::getline(stream, str);
 		if (str.empty()) continue;
+		if (first_line)
+		{
+			first_line = false;
+			continue;
+		}
 		add_texture_atlas_element(atlas, str);
 	}
 	// add texture

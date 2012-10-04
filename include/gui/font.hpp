@@ -14,7 +14,8 @@ class Font
 public:
 	virtual ~Font() {}
 	virtual bool load(const std::string& filename) = 0;
-	virtual void print(const boost::shared_ptr<Driver>&, const std::wstring&, const vector2<int>&, const colorf& color = cfWhite) = 0;
+	virtual void print(const boost::shared_ptr<Driver>&, const std::wstring&,
+					   const vector2<int>&, const colorf& color = color_white) = 0;
 	virtual std::string name() const = 0;
 };
 

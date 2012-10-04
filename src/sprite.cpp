@@ -53,7 +53,10 @@ Node* Sprite::clone_impl() const
 
 void Sprite::add_animation_list(AnimationListBase* al)
 {
+	bool empty = al_.empty();
 	al_[al->index()] = boost::shared_ptr<AnimationListBase>(al);
+	if (empty)
+		execute(al->index());
 }
 
 void Sprite::execute(cmn::uint index)

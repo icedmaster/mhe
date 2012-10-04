@@ -28,7 +28,7 @@ public:
 	};
 public:
 	Renderable(bool default_initialization = false) :
-		color_(cfWhite), render_flags_(0), blend_mode_(no_blend)
+		color_(color_white), render_flags_(0), blend_mode_(no_blend)
 	{ 
 		if (default_initialization)
 		{

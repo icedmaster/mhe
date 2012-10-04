@@ -3,3 +3,4 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../particles/build/ ${CMAKE_CURRENT
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../03_sprite/build/ ${CMAKE_CURRENT_SOURCE_DIR}/../03_sprite/build/)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../04_texture_atlas/build/ ${CMAKE_CURRENT_SOURCE_DIR}/../04_texture_atlas/build/)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../05_scene/build/ ${CMAKE_CURRENT_SOURCE_DIR}/../05_scene/build/)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../06_animation/build/ ${CMAKE_CURRENT_SOURCE_DIR}/../06_animation/build/)

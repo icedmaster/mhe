@@ -14,7 +14,7 @@ BMFont : public Font
 public:
 	bool load(const std::string& filename);
 	void print(const boost::shared_ptr<Driver>& driver, const std::wstring& text,
-			   const vector2<int>& coord, const colorf& color = cfWhite);
+			   const vector2<int>& coord, const colorf& color = color_white);
 	std::string name() const
 	{
 		return name_;
