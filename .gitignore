@@ -3,6 +3,7 @@
 /obj/*
 /old/*
 /new/*
+/test/*
 /demo/build/*
 /prj/codeblocks/mhe.depend
 /prj/codeblocks/mhe.cbp.bak

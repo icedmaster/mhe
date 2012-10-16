@@ -1,11 +1,15 @@
 #include "animation_list_base.hpp"
 
+#include "utils/global_log.hpp"
+#include <iostream>
+
 namespace mhe {
 
 void AnimationListBase::start(cmn::uint tick)
 {
 	if (next_tick_) return;	// animation already running
 	next_tick_ = tick + current_frame_duration_impl();
+	DEBUG_LOG("AnimationList " << index_ << " start:" << tick  << " " << next_tick_);
 	start_impl();
 }
 
@@ -21,8 +25,10 @@ AnimationListBase::AnimationChangeType AnimationListBase::update(cmn::uint tick)
 	{
 		if (!next())
 		{
+			DEBUG_LOG("AnimationList " << index_ << " need to stop");
 			if (!repeat_)
-			{
+			{				
+				stop();
 				delegates_(this, last_animation);
 				return last_animation;
 			}

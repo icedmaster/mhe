@@ -27,13 +27,18 @@ void Sprite::draw_impl(const Context& context)
 void Sprite::update_impl(cmn::uint tick)
 {
 	if (!current_al_) return;
+	size_t current_index = current_al_->index();
 	AnimationListBase::AnimationChangeType ct = current_al_->update(tick);
 	if (ct != AnimationListBase::no_change)
 	{
 		if (ct == AnimationListBase::last_animation)
 		{
-			current_al_ = 0;
-			is_alive_ = false;
+			// hack - animation list can be changed in AnimationList delegate
+			if (current_index == current_al_->index())
+			{
+				current_al_ = 0;
+				is_alive_ = false;
+			}
 			return;
 		}
 		// new frame
@@ -64,11 +69,16 @@ void Sprite::execute(cmn::uint index)
 	DEBUG_LOG("Sprite::execute() name=" << name() << " index=" << index);
 	almap::iterator it = al_.find(index);
 	if (it == al_.end())
+	{
+		if (texture() != nullptr)
+			update_buffers();
 		return;
+	}
 	is_running_ = true;
 	current_al_ = it->second.get();
 	current_al_->update_node(this);
 	update_buffers();
+	current_al_->start(utils::get_current_tick());
 }
 
 float Sprite::width() const

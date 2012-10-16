@@ -82,6 +82,7 @@ public:
 
 	Ret operator() (METHOD_ARGS)
 	{
+		if (is_null()) return Ret();
 		typename DelegatesList::iterator prevend = delegates.end();
 		--prevend;
 		for (typename DelegatesList::iterator it = delegates.begin(); it != prevend; ++it)		

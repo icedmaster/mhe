@@ -40,6 +40,11 @@ private:
 		return animation_part_time_;
 	}
 
+	void start_impl()
+	{
+		current_animation_ = 0;
+	}
+
 	bool next()
 	{
 		if (++current_animation_ >= animations_count_)
@@ -61,6 +66,16 @@ private:
 			init_animation_delta();
 		}
 	}
+protected:
+	void set_current_value(const T& value)
+	{
+		current_ = value;
+	}
+
+	void set_delta(const T& delta)
+	{
+		delta_ = delta;
+	}
 private:
 	virtual void update_node_for_value(Node* node, const T& value) = 0;
 	virtual T get_current_node_value(Node* node) const = 0;
@@ -75,7 +90,8 @@ private:
 
 	void init_animation_delta()
 	{
-		delta_ = (from_ - to_) / animations_count_;
+		delta_ = (to_ - from_) / animations_count_;
+		current_ = from_;
 	}
 
 	T from_;

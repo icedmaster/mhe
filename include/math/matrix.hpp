@@ -68,6 +68,14 @@ public:
 		m_[3][0] = a41; m_[3][1] = a42; m_[3][2] = a43; m_[3][3] = a44;
 	}
 
+	void fill(T value)
+	{
+		for (int i = 0; i < 4; ++i)
+		{
+			m_[i][0] = m_[i][1] = m_[i][2] = m_[i][3] = value;
+		}				
+	}
+
 	const T* get() const
 	{
 		return (T*)m_;
@@ -375,6 +383,13 @@ public:
 	{
 		matrix m;
 		m.set_rotate(x_angle, y_angle, z_angle);
+		return m;
+	}
+
+	static matrix empty_matrix()
+	{
+		matrix m;
+		m.fill(0);
 		return m;
 	}
 

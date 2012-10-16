@@ -45,7 +45,7 @@ public:
 								 cmn::uint animation_part_time, cmn::uint total_animation_time)
 	{
 		apply_transform_ = true;
-		set_range(matrixf::identity(), matrixf::translation_matrix(translate),
+		set_range(matrixf::empty_matrix(), matrixf::translation_matrix(translate),
 				  animation_part_time, total_animation_time);
 	}
 
@@ -53,7 +53,7 @@ public:
 							 cmn::uint animation_part_time, cmn::uint total_animation_time)
 	{
 		apply_transform_ = true;
-		set_range(matrixf::identity(), matrixf::scaling_matrix(scale),
+		set_range(matrixf::empty_matrix(), matrixf::scaling_matrix(scale),
 				  animation_part_time, total_animation_time);
 	}
 
@@ -61,7 +61,7 @@ public:
 								cmn::uint animation_part_time, cmn::uint total_animation_time)
 	{
 		apply_transform_ = true;
-		set_range(matrixf::identity(), matrixf::rotation_matrix(degrees, 0, 0),
+		set_range(matrixf::empty_matrix(), matrixf::rotation_matrix(degrees, 0, 0),
 				  animation_part_time, total_animation_time);
 	}
 

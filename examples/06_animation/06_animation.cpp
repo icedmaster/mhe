@@ -12,7 +12,8 @@ public:
 	void on_animation_end(mhe::AnimationListBase* /*animation_list*/,
 						  mhe::AnimationListBase::AnimationChangeType change_type)
 	{
-		if (!change_type == mhe::AnimationListBase::last_animation) return;
+		if (change_type != mhe::AnimationListBase::last_animation) return;
+		DEBUG_LOG("animation end:" << change_type);
 		set_next_animation();
 	}
 private:
@@ -23,7 +24,8 @@ private:
 		add_linear_color_animation();
 		add_position_animation();
 		get_scene()->add(sprite_);
-		sprite_->current_animation_list()->add_delegate(mhe::create_delegate(this, &TestGameScene::on_animation_end));
+		timer_.start();
+		set_next_animation();
 		return true;
 	}
 
@@ -47,6 +49,7 @@ private:
 		mhe::ColorLinearAnimationList* al = new mhe::ColorLinearAnimationList(0);
 		al->set_range(mhe::color_white, mhe::color_black, 100, 2000);
 		sprite_->add_animation_list(al);
+		al->add_delegate(mhe::create_delegate(this, &TestGameScene::on_animation_end));
 	}
 
 	void add_position_animation()
@@ -54,10 +57,13 @@ private:
 		mhe::TransformLinearAnimationList* al = new mhe::TransformLinearAnimationList(1);
 		al->set_translate_animation(mhe::v3d(300, 300, 0), 100, 2000);
 		sprite_->add_animation_list(al);
+		al->add_delegate(mhe::create_delegate(this, &TestGameScene::on_animation_end));
 	}
 
 	void set_next_animation()
 	{
+		sprite_->set_color(mhe::color_white);
+		sprite_->identity();
 		sprite_->execute(current_animation_++);
 		if (current_animation_ >= 2)
 			current_animation_ = 0;
