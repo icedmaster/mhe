@@ -29,6 +29,15 @@ public:
 	{
 		init_animation_parameters(to, animation_part_time, total_animation_time);
 	}
+
+	void set_animation(const T& delta, cmn::uint animation_part_time,
+					   cmn::uint animations_count)
+	{
+		delta_ = delta;
+		animation_part_time_ = animation_part_time;
+		animations_count_ = animations_count;
+		get_from_value_ = false;
+	}
 private:
 	size_t frames_number_impl() const
 	{
@@ -42,6 +51,7 @@ private:
 
 	void start_impl()
 	{
+		current_ = from_;
 		current_animation_ = 0;
 	}
 
@@ -56,7 +66,7 @@ private:
 	{
 		if (!get_from_value_)
 		{
-			current_ += delta_;
+			update_current_value(current_, delta_);
 			update_node_for_value(node, current_);
 			get_from_value_ = false;
 		}
@@ -79,6 +89,10 @@ protected:
 private:
 	virtual void update_node_for_value(Node* node, const T& value) = 0;
 	virtual T get_current_node_value(Node* node) const = 0;
+	virtual void update_current_value(T& current, const T& delta) const
+	{
+		current += delta;
+	}
 private:
 	void init_animation_parameters(const T& to,
 								   cmn::uint animation_part_time, cmn::uint total_animation_time)

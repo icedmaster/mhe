@@ -45,8 +45,10 @@ public:
 								 cmn::uint animation_part_time, cmn::uint total_animation_time)
 	{
 		apply_transform_ = true;
-		set_range(matrixf::empty_matrix(), matrixf::translation_matrix(translate),
-				  animation_part_time, total_animation_time);
+		cmn::uint count = total_animation_time / animation_part_time;
+		const v3d& translate_part = translate / count;
+		set_animation(matrixf::translation_matrix(translate_part),
+					  animation_part_time, count);
 	}
 
 	void set_scale_animation(const v3d& scale,
@@ -92,6 +94,13 @@ private:
 	{
 		apply_transform_ = false;
 		return node->transform();
+	}
+
+	void update_current_value(matrixf& current, const matrixf& delta) const
+	{
+		if (apply_transform_)
+			current = delta;
+		else current += delta;
 	}
 private:
 	mutable bool apply_transform_;
