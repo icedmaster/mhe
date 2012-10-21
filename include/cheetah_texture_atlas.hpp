@@ -15,11 +15,13 @@ public:
 
 	TextureAtlas* load(const std::string& filename);
 private:
+	bool load_texture(const std::string& filename);
 	TextureAtlas* load_atlas_from_file(std::ifstream& stream);
 	void add_texture_atlas_element(TextureAtlas* atlas,
 								   const std::string& element_str) const;
 
 	TextureManager* texture_manager_;
+	boost::shared_ptr<Texture> texture_;
 };
 
 }

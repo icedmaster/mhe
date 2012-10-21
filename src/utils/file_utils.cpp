@@ -36,4 +36,11 @@ std::string get_file_name(const std::string& filepath)
 	return fn;
 }
 
+std::string get_file_name_with_path(const std::string& filepath)
+{
+	size_t point_pos = filepath.find_last_of('.');
+	if (point_pos == std::string::npos) return filepath;
+	return filepath.substr(0, point_pos);
+}
+
 }}

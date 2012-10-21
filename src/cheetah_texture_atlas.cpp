@@ -8,6 +8,8 @@ namespace mhe {
 
 TextureAtlas* CheetahTextureAtlas::load(const std::string& filename)
 {
+	if (!load_texture(filename))
+		return nullptr;
 	std::ifstream f(filename.c_str());
 	if (!f.is_open())
 	{
@@ -18,11 +20,22 @@ TextureAtlas* CheetahTextureAtlas::load(const std::string& filename)
 	f.close();
 	if (atlas != nullptr)
 	{
-		const std::string cheetah_texture_extension = ".png";
-		std::string texture_filename = utils::get_file_name(filename) + cheetah_texture_extension;
-		atlas->set_texture(texture_manager_->get(texture_filename));
+		atlas->set_texture(texture_);
+	}
+	else
+	{
+		// TODO: remove texture from manager
 	}
 	return atlas;
+}
+
+bool CheetahTextureAtlas::load_texture(const std::string& filename)
+{
+	const std::string cheetah_texture_extension = ".png";
+	std::string texture_filename = utils::get_file_name_with_path(filename) +
+		cheetah_texture_extension;
+	texture_ = texture_manager_->get(texture_filename);
+	return (texture_ != nullptr);
 }
 
 TextureAtlas* CheetahTextureAtlas::load_atlas_from_file(std::ifstream& stream)
@@ -57,12 +70,15 @@ void CheetahTextureAtlas::add_texture_atlas_element(TextureAtlas* atlas,
 	// for format see https://github.com/scriptum/Cheetah-Texture-Packer
 	// Name  X pos   Y pos   Width   Height   Xoffset  Yoffset  Orig W   Orig H   Rot
 	const std::string& name = params[0];
-	const std::string& x = params[1];
-	const std::string& y = params[2];
-	const std::string& width = params[3];
-	const std::string& height = params[4];
-	rect<float> r(utils::to_number(x), utils::to_number(y),
-				  utils::to_number(width), utils::to_number(height));
+	const std::string& str_x = params[1];
+	const std::string& str_y = params[2];
+	const std::string& str_width = params[3];
+	const std::string& str_height = params[4];
+	float x = utils::to_number(str_x);
+	float y = utils::to_number(str_y);
+	float width = utils::to_number(str_width);
+	float height = utils::to_number(str_height);
+	rect<float> r(x, texture_->height() - height - y, width, height);
 	atlas->add(name, r);
 }
 

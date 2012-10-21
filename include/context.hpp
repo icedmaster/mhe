@@ -15,6 +15,7 @@ public:
 	{
 		driver_ = driver;
 		texture_manager_.set_helper(driver_);
+		texture_atlas_manager_.set_helper(&texture_manager_);
 	}
 
 	boost::shared_ptr<Driver> driver() const

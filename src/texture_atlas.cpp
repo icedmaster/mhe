@@ -1,5 +1,7 @@
 #include "texture_atlas.hpp"
 
+#include "utils/global_log.hpp"
+
 namespace mhe {
 
 TextureAtlas::TextureAtlas(const boost::shared_ptr<Texture>& tex, int sz) :
@@ -53,6 +55,8 @@ std::vector<float> TextureAtlas::get(const rect<float>& quad) const
 	float x2 = quad.rh().x() / texture_->width();
 	float y2 = quad.rh().y() / texture_->height();
 
+	DEBUG_LOG("TextureAtlas get:" << x1 << " " << y1 << " " << x2 << " " << y2);
+
 	tc[0] = x1; tc[1] = y1;
 	tc[2] = x1; tc[3] = y2;
 	tc[4] = x2; tc[5] = y2;
@@ -75,6 +79,13 @@ v2d TextureAtlas::get_size(cmn::uint quad) const
 		   (tc[3] - tc[1]) * texture_->height()
 		);
 	return v;	
+}
+
+rect<float> TextureAtlas::get_rect(const std::string& name) const
+{
+	std::map< std::string, rect<float> >::const_iterator it = elements_.find(name);
+	if (it == elements_.end()) return rect<float>();
+	return it->second;
 }
 
 void TextureAtlas::calc_indicies(int sz)

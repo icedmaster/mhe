@@ -13,10 +13,12 @@ private:
 		const boost::shared_ptr<mhe::TextureAtlas>& atlas = 
 			get_engine()->context().texture_atlas_manager().get("../../../assets/test_atlas.atlas");
 		mhe::TextureAnimation* animation = new mhe::TextureAnimation(1000, atlas->texture());
-		animation->set_texcoord(atlas->get("1.png"));		
+		animation->set_texcoord(atlas->get("test_sprite.png"));		
 		mhe::AnimationList* al1 = new mhe::AnimationList(0);
 		al1->add(animation);
 		boost::shared_ptr<mhe::Sprite> sprite1(new mhe::Sprite(al1));
+		const mhe::rect<float>& rect = atlas->get_rect("test_sprite.png");
+		sprite1->set_size(rect.width(), rect.height());
 		get_scene()->add(sprite1);
 		sprite1->start();
 		return true;

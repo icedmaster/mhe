@@ -30,6 +30,7 @@ public:
 	std::vector<float> get(const rect<float>& quad) const;
 	std::vector<float> get(const std::string& name) const;
 	v2d get_size(cmn::uint quad) const;
+	rect<float> get_rect(const std::string& name) const;
 private:
 	void calc_indicies(int sz);
 
