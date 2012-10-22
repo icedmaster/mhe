@@ -22,10 +22,11 @@ public:
 		x_ = x; y_ = y;
 	}
 
-	vector2(const vector2& v)
+	template <class U>
+	vector2(const vector2<U>& v)
 	{
-		x_ = v.x_;
-		y_ = v.y_;
+		x_ = v.x();
+		y_ = v.y();
 	}
 
 	~vector2() {} // do nothing

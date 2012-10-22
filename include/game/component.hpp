@@ -74,7 +74,7 @@ public:
 	}	
 protected:
 	Component(const std::string& fullname) :
-		parent_(nullptr),
+		parent_(nullptr), root_(nullptr),
 		lifetime_(lifetime_infinite),
 		start_time_(0)
 	{
@@ -119,6 +119,7 @@ private:
 	std::string name_;
 	std::string add_name_;
 	Component* parent_;
+	Component* root_;
 	std::vector<component_ptr> children_;
 	typedef std::map< int, std::vector<Component*> > subsmap;
 	subsmap subscribers_;

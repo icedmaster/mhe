@@ -9,6 +9,7 @@ void Component::attach(component_ptr component)
 	DEBUG_LOG("Component::attach() " << full_name() << " " << component->full_name());
 	children_.push_back(component);
 	component->set_parent(this);
+	component->root_ = (root_ == nullptr) ? this : root_;
 	component->do_subscribe(this);
 }
 
@@ -90,7 +91,8 @@ void Component::subscribe(int type, Component* component)
 void Component::send_message(const Message& message)
 {
 	update_children(message);
-	parent_->update(message);
+	if (root_ != nullptr)
+		root_->update(message);
 }
 
 }}	// namespaces
