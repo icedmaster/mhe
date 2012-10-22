@@ -70,7 +70,7 @@ void EventManager::process_event_with_id(int id, const boost::shared_ptr<Event>&
 	typedef std::pair<listeners_map::iterator, listeners_map::iterator> find_result;
 	find_result res = listeners_.equal_range(id);
 	for (listeners_map::iterator it = res.first; it != res.second; ++it)
-		it->second->handle(event);
+		it->second->handle(event.get());
 }
 
 }

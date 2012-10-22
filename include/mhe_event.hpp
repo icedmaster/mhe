@@ -5,5 +5,6 @@
 #include "events/mouse_event.hpp"
 #include "events/keyboard_event.hpp"
 #include "events/system_event.hpp"
+#include "events/delegate_event_listener.hpp"
 
 #endif

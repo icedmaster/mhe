@@ -4,8 +4,8 @@
 #include <vector>
 #include <cstring>	// for memcpy()
 #include <cmath>
-#include "math/math_utils.hpp"
-#include "math/vector3.hpp"
+#include "math_utils.hpp"
+#include "vector3.hpp"
 
 namespace mhe
 {
@@ -429,6 +429,25 @@ template <class T>
 inline vector3<T> operator* (const vector3<T>& v, const matrix<T>& m)
 {
 	return m.premult(v);
+}
+
+template <class T>
+inline std::ostream& operator<< (std::ostream& stream, const matrix<T>& m)
+{
+	stream << "{";
+	for (int i = 0; i < 4; ++i)
+	{
+		stream << "{";
+		for (int j = 0; j < 4; ++j)
+		{
+			stream << m.get()[i * 4 + j];
+			if (j != 3) stream << ",";
+		}
+		stream << "}";
+		if (i != 3)	stream << ",";
+	}
+	stream << "}";
+	return stream;
 }
 
 typedef matrix<float>  matrixf;

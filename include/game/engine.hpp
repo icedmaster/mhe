@@ -3,7 +3,7 @@
 
 #include "mhe.hpp"
 #include "game_scene.hpp"
-#include "aspect_manager.hpp"
+#include "component_manager.hpp"
 #include "mhe_event.hpp"
 #include "context.hpp"
 
@@ -59,9 +59,9 @@ public:
 		return game_scene_;
 	}
 
-	AspectManager& aspect_manager()
+	ComponentManager& component_manager()
 	{
-		return aspect_manager_;
+		return component_manager_;
 	}
 
 	bool initialized() const
@@ -70,7 +70,7 @@ public:
 	}
 private:
 	friend class EventListener;
-	bool stop_p(Event*)
+	bool stop_p(const Event*)
 	{
 		stop();
 		return true;
@@ -88,7 +88,7 @@ private:
 
 	boost::shared_ptr<GameScene> game_scene_;
 
-	AspectManager aspect_manager_;
+	ComponentManager component_manager_;
 
 	bool running_;
 	bool initialized_;		   

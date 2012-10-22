@@ -29,6 +29,11 @@ public:
 	{
 		init_animation_parameters(to, animation_part_time, total_animation_time);
 	}
+
+	T current_value() const
+	{
+		return current_;
+	}
 private:
 	size_t frames_number_impl() const
 	{

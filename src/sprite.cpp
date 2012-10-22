@@ -59,14 +59,18 @@ void Sprite::add_animation_list(AnimationListBase* al)
 		execute(al->index());
 }
 
-void Sprite::execute(cmn::uint index)
+void Sprite::execute(cmn::uint index, cmn::uint tick)
 {
 	DEBUG_LOG("Sprite::execute() name=" << name() << " index=" << index);
 	almap::iterator it = al_.find(index);
 	if (it == al_.end())
-		return;
+	{
+	    WARN_LOG("Animation " << index << " not found for sprite:" << name());
+	    return;
+	}
 	is_running_ = true;
 	current_al_ = it->second.get();
+	current_al_->start(tick);
 	current_al_->update_node(this);
 	update_buffers();
 }

@@ -21,7 +21,7 @@ bool Engine::init(cmn::uint w, cmn::uint h, cmn::uint bpp, bool fullscreen)
 	context_.set_driver(driver);
 	// init quit event listener
 	event_manager_.add_device(new SystemDevice("sys"));
-	event_manager_.add_listener(new EventListener(system_event_type, SystemEvent::quit, Event::any_event,
+	event_manager_.add_listener(new DelegateEventListener(system_event_type, SystemEvent::quit, Event::any_event,
 						      create_delegate(this, &Engine::stop_p)));
 		
 	// graphics driver initialization

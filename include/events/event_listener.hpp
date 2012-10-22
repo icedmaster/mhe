@@ -2,7 +2,6 @@
 #define __EVENT_LISTENER_HPP__
 
 #include <boost/shared_ptr.hpp>
-#include "delegate.hpp"
 #include "event.hpp"
 
 namespace mhe {
@@ -10,37 +9,17 @@ namespace mhe {
 class EventListener
 {
 public:
-	typedef Delegate1< bool, Event* > EventHandler;
-	EventListener(EventType type, int arg, int optarg,
-				  const EventHandler& handler);
+	virtual ~EventListener() {}
 
-	int id() const
+	virtual int id() const
 	{
-		return id_;
+		return Event::create_event_id(type(), arg(), optarg());
 	}
 
-	EventType type() const
-	{
-		return Event::get_event_type(id_);
-	}
-
-	int arg() const
-	{
-		return Event::get_event_arg(id_);
-	}
-
-	int optarg() const
-	{
-		return Event::get_event_optarg(id_);
-	}
-
-	bool handle(const boost::shared_ptr<Event>& event)
-	{
-		return handler_(event.get());
-	}
-private:
-	int id_;
-	EventHandler handler_;
+	virtual EventType type() const = 0;
+	virtual int arg() const = 0;
+	virtual int optarg() const { return Event::any_event; }
+	virtual bool handle(const Event* event) = 0;
 };
 
 }
