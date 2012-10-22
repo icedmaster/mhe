@@ -7,14 +7,25 @@
 namespace mhe {
 namespace game {
 
+class Component;
+
 class Message
 {
 public:
+	Message(Component* sender):
+	sender_(sender)
+	{}
+
 	virtual ~Message() {}
 
 	int type() const
 	{
 		return get_type_impl();
+	}
+
+	const Component* sender() const
+	{
+		return sender_;
 	}
 	
 	template <class T>
@@ -32,12 +43,17 @@ private:
 	virtual int get_type_impl() const = 0;
 private:
 	utils::PropertiesList properties_;
+	Component* sender_;
 };
 
 /// Helper class for creating simple messages
 template <int Type>
 class SimpleMessage : public Message
 {
+public:
+	SimpleMessage(Component* sender) :
+	Message(sender)
+	{}
 private:
 	int get_type_impl() const
 	{

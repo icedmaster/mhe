@@ -1,5 +1,5 @@
-#ifndef __ASPECT_HPP__
-#define __ASPECT_HPP__
+#ifndef __COMPONENT_HPP__
+#define __COMPONENT_HPP__
 
 #include <string>
 #include <vector>
@@ -12,16 +12,16 @@
 namespace mhe {
 namespace game {
 
-class Aspect;
-typedef boost::shared_ptr<Aspect> aspect_ptr;
+class Component;
+typedef boost::shared_ptr<Component> component_ptr;
 
-class Aspect
+class Component
 {
 public:
 	static const int invalid_type = -1;
 	static const cmn::uint lifetime_infinite = 0;
 public:
-	virtual ~Aspect() {}
+	virtual ~Component() {}
 
 	const std::string& name() const
 	{
@@ -38,18 +38,20 @@ public:
 		return name_ + "." + add_name_;
 	}
 
-	void attach(aspect_ptr aspect);
-	void attach(aspect_ptr aspect, int type);
-	void attach(aspect_ptr aspect, const std::vector<int>& types);
-	void detach(Aspect* aspect);
+	void attach(component_ptr component);
+	void attach(component_ptr component, int type);
+	void attach(component_ptr component, const std::vector<int>& types);
+	void detach(Component* component);
 	void update(const Message& message);
 	void update(cmn::uint tick)
 	{
 		if (lifetime_ && !start_time_) start_time_ = tick;
 		update_impl(tick);
+		for (size_t i = 0; i < children_.size(); ++i)
+			children_[i]->update(tick);
 	}
 
-	void subscribe(int type, Aspect* aspect);
+	void subscribe(int type, Component* component);
 
 	void set_lifetime(cmn::uint lifetime)
 	{
@@ -66,12 +68,12 @@ public:
 		return start_time_;
 	}
 
-	const std::vector<aspect_ptr>& children() const
+	const std::vector<component_ptr>& children() const
 	{
 		return children_;
-	}
+	}	
 protected:
-	Aspect(const std::string& fullname) :
+	Component(const std::string& fullname) :
 		parent_(nullptr),
 		lifetime_(lifetime_infinite),
 		start_time_(0)
@@ -79,14 +81,14 @@ protected:
 		divide_full_name(fullname);
 	}
 
-	Aspect(const std::string& name, const std::string& add_name) :
+	Component(const std::string& name, const std::string& add_name) :
 		name_(name), add_name_(add_name), parent_(nullptr),
 		lifetime_(lifetime_infinite), start_time_(0)
 	{}
 
-	void set_parent(Aspect* aspect)
+	void set_parent(Component* component)
 	{
-		parent_ = aspect;
+		parent_ = component;
 	}
 
 	void detach_self()
@@ -94,7 +96,7 @@ protected:
 		parent_->detach(this);
 	}
 
-	virtual void do_subscribe(Aspect* aspect) = 0;
+	virtual void do_subscribe(Component* component) = 0;
 	void update_children(const Message& message); 
 	virtual void update_impl(cmn::uint)	{}
 	virtual	bool update_impl(const Message& message) = 0;
@@ -112,11 +114,13 @@ private:
 		else name_ = fullname;
 	}
 
+	void send_message(const Message& message);
+
 	std::string name_;
 	std::string add_name_;
-	Aspect* parent_;
-	std::vector<aspect_ptr> children_;
-	typedef std::map< int, std::vector<Aspect*> > subsmap;
+	Component* parent_;
+	std::vector<component_ptr> children_;
+	typedef std::map< int, std::vector<Component*> > subsmap;
 	subsmap subscribers_;
 	cmn::uint lifetime_;
 	cmn::uint start_time_;
