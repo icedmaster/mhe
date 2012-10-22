@@ -3,6 +3,7 @@
 
 #include "utils/properties_list.hpp"
 #include "message_event_types.hpp"
+#include "types.hpp"
 
 namespace mhe {
 namespace game {
@@ -11,8 +12,8 @@ class Component;
 
 class Message
 {
-public:
-	Message(Component* sender):
+public:	
+	Message(Component* sender = nullptr):
 	sender_(sender)
 	{}
 
@@ -51,7 +52,7 @@ template <int Type>
 class SimpleMessage : public Message
 {
 public:
-	SimpleMessage(Component* sender) :
+	SimpleMessage(Component* sender = nullptr) :
 	Message(sender)
 	{}
 private:

@@ -2,6 +2,8 @@
 #define __LINEAR_ANIMATION_LIST_IMPL_HPP__
 
 #include "linear_animation_list.hpp"
+#include "math/vector4.hpp"
+#include "math/matrix.hpp"
 
 namespace mhe {
 

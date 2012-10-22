@@ -4,6 +4,7 @@
 #include "component.hpp"
 #include "node.hpp"
 #include "scene.hpp"
+#include "message_transform.hpp"
 
 namespace mhe {
 namespace game {
@@ -26,6 +27,7 @@ public:
 private:
 	void do_subscribe(Component* parent);
 	bool update_impl(const Message& message);
+	void process_transform_event(const TransformMessage& message);
 
 	nodeptr node_;
 	boost::shared_ptr<Scene> scene_;

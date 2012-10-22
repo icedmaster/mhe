@@ -9,15 +9,15 @@ namespace game {
 
 class TransformMessage : public Message, public Transform
 {
-private:
-	TransformMessage(Component* sender) :
+public:
+	TransformMessage(Component* sender = nullptr) :
 	Message(sender), Transform()
 	{}
 
-	TransformMessage(Component* sender, const matrixf& transform) :
+	TransformMessage(const matrixf& transform, Component* sender = nullptr) :
 		Message(sender), Transform(transform)
 	{}
-
+private:
 	int get_type_impl() const
 	{
 		return transform_event;

@@ -89,7 +89,7 @@ void Engine::resize(cmn::uint w, cmn::uint h)
 void Engine::update()
 {
 	cmn::uint now = utils::get_current_tick();
-	aspect_manager_.update(now);
+	component_manager_.update(now);
 }
 
 void Engine::free_all()

@@ -96,6 +96,8 @@ protected:
 		parent_->detach(this);
 	}
 
+	void send_message(const Message& message);
+
 	virtual void do_subscribe(Component* component) = 0;
 	void update_children(const Message& message); 
 	virtual void update_impl(cmn::uint)	{}
@@ -113,8 +115,6 @@ private:
 		}
 		else name_ = fullname;
 	}
-
-	void send_message(const Message& message);
 
 	std::string name_;
 	std::string add_name_;

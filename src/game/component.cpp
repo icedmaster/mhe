@@ -4,49 +4,49 @@
 namespace mhe {
 namespace game {
 
-void Component::attach(component_ptr aspect)
+void Component::attach(component_ptr component)
 {
-	DEBUG_LOG("Component::attach() " << full_name() << " " << aspect->full_name());
-	children_.push_back(aspect);
-	aspect->set_parent(this);
-	aspect->do_subscribe(this);
+	DEBUG_LOG("Component::attach() " << full_name() << " " << component->full_name());
+	children_.push_back(component);
+	component->set_parent(this);
+	component->do_subscribe(this);
 }
 
-void Component::attach(component_ptr aspect, const std::vector<int>& types)
+void Component::attach(component_ptr component, const std::vector<int>& types)
 {
-	DEBUG_LOG("Component::attach() " << full_name() << " " << aspect->full_name());
-	children_.push_back(aspect);
-	aspect->set_parent(this);
+	DEBUG_LOG("Component::attach() " << full_name() << " " << component->full_name());
+	children_.push_back(component);
+	component->set_parent(this);
 	for (size_t i = 0; i < types.size(); ++i)
-		subscribe(types[i], aspect.get());
+		subscribe(types[i], component.get());
 }
 
-void Component::attach(component_ptr aspect, int type)
+void Component::attach(component_ptr component, int type)
 {
-	DEBUG_LOG("Component::attach() " << full_name() << " " << aspect->full_name());
-	children_.push_back(aspect);
-	aspect->set_parent(this);
-	subscribe(type, aspect.get());
+	DEBUG_LOG("Component::attach() " << full_name() << " " << component->full_name());
+	children_.push_back(component);
+	component->set_parent(this);
+	subscribe(type, component.get());
 }
 
-void Component::detach(Component* aspect)
+void Component::detach(Component* component)
 {
-	DEBUG_LOG("Component::detach():" << full_name() << " " << aspect->full_name());
-	// remove aspect from subscribers
+	DEBUG_LOG("Component::detach():" << full_name() << " " << component->full_name());
+	// remove component from subscribers
 	for (subsmap::iterator it = subscribers_.begin(); it != subscribers_.end(); ++it)
 	{
 		std::vector<Component*>& childs = it->second;
 		for (std::vector<Component*>::iterator vit = childs.begin(); vit != childs.end(); ++vit)
 		{
-			if (*vit == aspect)
+			if (*vit == component)
 			{
-				DEBUG_LOG("Component removed from subscribers:" << full_name() << " " << aspect->full_name());
+				DEBUG_LOG("Component removed from subscribers:" << full_name() << " " << component->full_name());
 				childs.erase(vit);
 				break;
 			}
 		}
 	}
-	// remove aspect from childs
+	// remove component from childs
 	for (std::vector<component_ptr>::iterator it = children_.begin(); it != children_.end(); ++it)
 	{
 		if ((*it).get() == component)

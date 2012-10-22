@@ -60,16 +60,16 @@ public:
 	}				
 
 	// execute animation from list with index <index>
-	void execute(cmn::uint index, cmn::uint tick);
+	void execute(cmn::uint index);
 private:
 	// implementations
 	void draw_impl(const Context& context);
 	void update_impl(cmn::uint tick);
 	void set_position(const v3d& pos);
 	matrixf get_matrix() const;
-	void start_impl(cmn::uint tick)
+	void start_impl(cmn::uint /*tick*/)
 	{
-		execute(0, tick);
+		execute(0);
 	}
 
 	Node* clone_impl() const;

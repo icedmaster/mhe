@@ -38,6 +38,11 @@ public:
 		animations_count_ = animations_count;
 		get_from_value_ = false;
 	}
+
+	T current_value() const
+	{
+		return current_;
+	}
 private:
 	size_t frames_number_impl() const
 	{

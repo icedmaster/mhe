@@ -19,7 +19,7 @@ void AnimationComponent::update_impl(cmn::uint tick)
 // TransformAnimationComponent
 void TransformAnimationComponent::send_animation_message()
 {
-	send_message(TransformMessage(this, get_animation_list<TransformLinearAnimationList>()->current_value()));
+	send_message(TransformMessage(get_animation_list<TransformLinearAnimationList>()->current_value(), this));
 }
 
 }}

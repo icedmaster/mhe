@@ -3,10 +3,9 @@
 
 #include "delegate.hpp"
 #include "types.hpp"
+#include "node.hpp"
 
 namespace mhe {
-
-class Node;
 
 class AnimationListBase
 {
