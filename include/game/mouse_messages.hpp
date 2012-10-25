@@ -32,6 +32,33 @@ private:
 	}
 };
 
+class MouseButtonPressMessage : public Message
+{
+public:
+	MouseButtonPressMessage(int button, const vector2<int>& position,
+							Component* sender = nullptr) :
+		Message(sender), button_(button), pos_(position)
+	{}
+
+	int button() const
+	{
+		return button_;
+	}
+
+	const vector2<int>& position() const
+	{
+		return pos_;
+	}
+private:
+	int get_type_impl() const
+	{
+		return mouse_click_event;
+	}
+
+	int button_;
+	vector2<int> pos_;
+};
+
 }}
 
 #endif

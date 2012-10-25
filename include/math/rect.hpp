@@ -97,6 +97,11 @@ public:
 	{
 		return (!w_ || !h_);
 	}
+
+	vector2<T> convert(const vector2<T>& point) const
+	{
+		return vector2<T>(point.x() - p1.x(), point.y() - p1.y());
+	}
 private:
 	void do_cache()
 	{

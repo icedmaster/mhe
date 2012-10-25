@@ -7,6 +7,7 @@
 #include "events/mouse_device.hpp"
 #include "events/keyboard_event.hpp"
 #include "events/mouse_event.hpp"
+#include "math/rect.hpp"
 
 namespace mhe {
 namespace game {
@@ -76,9 +77,14 @@ public:
 		return mouse_event_type;
 	}
 
-	int arg() const
+	virtual int arg() const
 	{
 		return Event::any_event;
+	}
+
+	const rect<float>& geometry() const
+	{
+		return rect_;
 	}
 
 	bool handle(const Event* event);

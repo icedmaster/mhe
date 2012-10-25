@@ -13,11 +13,13 @@ class NodeComponent : public Component
 {
 public:
 	NodeComponent(const std::string& name, const std::string& add_name,
-				  Node* node, const boost::shared_ptr<Scene>& scene):
+				  Node* node, const boost::shared_ptr<Scene>& scene,
+				  bool add_to_scene = true):
 		Component(name, add_name),
-		node_(node), scene_(scene)
+		node_(node), scene_(scene), at_scene_(add_to_scene)
 	{
-		scene->add(node_);
+		if (add_to_scene)
+			scene->add(node_);		
 	}
 
 	~NodeComponent()
@@ -28,9 +30,11 @@ private:
 	void do_subscribe(Component* parent);
 	bool update_impl(const Message& message);
 	void process_transform_event(const TransformMessage& message);
+	void process_enable_event(const EnableMessage& message);
 
 	nodeptr node_;
 	boost::shared_ptr<Scene> scene_;
+	bool at_scene_;
 };
 
 }}

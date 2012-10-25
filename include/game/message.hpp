@@ -62,6 +62,45 @@ private:
 	}
 };
 
+/// Helper class for creating switch type messages
+template <int Type>
+class AbstractEnableMessage : public Message
+{
+public:
+	AbstractEnableMessage(Component* sender = nullptr, bool enabled = true) :
+		Message(sender), enabled_(enabled)
+	{}
+
+	void set_enabled(bool enabled)
+	{
+		enabled_ = enabled;
+	}
+
+	bool enabled() const
+	{
+		return enabled_;
+	}
+
+	void enable()
+	{
+		enabled_ = true;
+	}
+
+	void disable()
+	{
+		enabled_ = false;
+	}
+private:
+	int get_type_impl() const
+	{
+		return Type;
+	}
+private:
+	bool enabled_;
+};
+
+typedef AbstractEnableMessage<enable_event> EnableMessage;
+
 }}
 
 #endif
