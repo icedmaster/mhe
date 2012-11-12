@@ -3,5 +3,7 @@
 
 #include "game/engine.hpp"
 #include "game/game_scene.hpp"
+#include "game/input_component.hpp"
+#include "game/node_component.hpp"
 
 #endif

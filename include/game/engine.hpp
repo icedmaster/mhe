@@ -31,6 +31,11 @@ public:
 		return context_;
 	}	   
 
+	const Context& context() const
+	{
+		return context_;
+	}
+
 	SoundManager& sound_manager()
 	{
 		return sm_;

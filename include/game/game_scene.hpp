@@ -50,7 +50,7 @@ public:
 		scene_ = scene;
 	}
 
-	boost::shared_ptr<Scene> get_scene() const
+	boost::shared_ptr<Scene> scene() const
 	{
 		return scene_;
 	}

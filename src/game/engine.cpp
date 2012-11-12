@@ -65,8 +65,8 @@ void Engine::process()
 	if (game_scene_ && game_scene_->process())
 	{
 		context_.driver()->begin_render();
-		game_scene_->get_scene()->update(utils::get_current_tick());
-		game_scene_->get_scene()->draw(context());			
+		game_scene_->scene()->update(utils::get_current_tick());
+		game_scene_->scene()->draw(context());			
 		context_.driver()->end_render();
 	}
 

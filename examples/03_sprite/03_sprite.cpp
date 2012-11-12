@@ -20,7 +20,7 @@ private:
 			mhe::Animation* a = new mhe::TextureAnimation(1000, texture);
 			al->add(a);
 			boost::shared_ptr<mhe::Sprite> sprite(new mhe::Sprite(al));
-			get_scene()->add(sprite);
+			scene()->add(sprite);
 			sprite->translate(mhe::utils::random(800), mhe::utils::random(600), 0);
 			sprite->start();
 		}

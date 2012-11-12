@@ -62,7 +62,8 @@ class MouseInputComponent : public BaseInputComponent
 {
 public:
 	MouseInputComponent(const std::string& name, const std::string& add_name) :
-		BaseInputComponent(name, add_name)
+		BaseInputComponent(name, add_name),
+		mouse_on_(false)
 	{}
 
 	MouseInputComponent(const std::string& name, const std::string& add_name, 
@@ -80,6 +81,11 @@ public:
 	virtual int arg() const
 	{
 		return Event::any_event;
+	}
+	
+	void set_geometry(const rect<float>& rect)
+	{
+	    rect_ = rect;
 	}
 
 	const rect<float>& geometry() const

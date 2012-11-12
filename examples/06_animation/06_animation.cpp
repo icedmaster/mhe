@@ -23,7 +23,7 @@ private:
 		sprite_->set_texture(get_engine()->context().texture_manager().get("../../../assets/test_sprite.png"));
 		add_linear_color_animation();
 		add_position_animation();
-		get_scene()->add(sprite_);
+		scene()->add(sprite_);
 		timer_.start();
 		set_next_animation();
 		return true;

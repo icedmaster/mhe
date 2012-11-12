@@ -19,7 +19,7 @@ private:
 		boost::shared_ptr<mhe::Sprite> sprite1(new mhe::Sprite(al1));
 		const mhe::rect<float>& rect = atlas->get_rect("test_sprite.png");
 		sprite1->set_size(rect.width(), rect.height());
-		get_scene()->add(sprite1);
+		scene()->add(sprite1);
 		sprite1->start();
 		return true;
 	}
