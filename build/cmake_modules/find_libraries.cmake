@@ -78,4 +78,10 @@ macro(mhe_find_libraries)
 	message(${OGG_LIB})
     set(MHE_LIBS_FOUND ${MHE_LIBS_FOUND} ${OGG_LIB})
 
+	if (APPLE)
+	    set(MHE_LIBS_FOUND ${MHE_LIBS_FOUND} dl)
+	else()
+		set(MHE_LIBS_FOUND ${MHE_LIBS_FOUND} dl rt)
+	endif()
+
 endmacro()
