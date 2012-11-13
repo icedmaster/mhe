@@ -4,7 +4,7 @@
 # INCLUDE_ROOT
 
 macro(mhe_based_project NAME)
-	set(PROJECT NAME)
+	set(PROJECT ${NAME})
 	project(${PROJECT})
 
 	set(CMAKE_MODULES_DIR ${MHE_DIR}/build/cmake_modules)
@@ -13,6 +13,7 @@ macro(mhe_based_project NAME)
 	include(mhe_compiler_defs)
 	include(mhe_directories)
 	include(find_libraries)
+	include(mhe_platform_specific)
 
 	mhe_setup_directories()
 	mhe_setup_compiler_defs()
@@ -30,8 +31,9 @@ macro(mhe_based_project NAME)
 
 	mhe_find_libraries()
 
-	set(LIBS ${LIBS} ${MHE_LIB})
+	set(LIBS ${LIBS} ${MHE_LIB} ${MHE_LIBS_FOUND})
 
 	add_executable(${PROJECT} ${SOURCES})    						  
-    target_link_libraries(${PROJECT} ${LIBS})
+        target_link_libraries(${PROJECT} ${LIBS})
+        mhe_link_platform_specific(${NAME})
 endmacro()

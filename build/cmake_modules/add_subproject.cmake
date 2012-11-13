@@ -3,14 +3,6 @@ macro(mhe_add_subproject NAME)
   project(${TARGET_NAME})
   cmake_minimum_required (VERSION 2.8)
 
-  # TODO: move to complilers_def.cmake
-  add_definitions(-Wall)
-  add_definitions(-Wextra)
-
-  if (CMAKE_BUILD_TYPE STREQUAL "Release")
-	add_definitions(-O2)
-  endif()
-
   set (TARGET_SOURCE_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/..)
   # main mhe include
   set (TARGET_INCLUDE_ROOT ${INCLUDE_ROOT})
@@ -31,7 +23,6 @@ macro(mhe_add_subproject NAME)
   add_executable(${TARGET_NAME} ${TARGET_SOURCE})
   target_link_libraries(${TARGET_NAME} ${TARGET_LIBS})
 
-  if (WIN32)
-	set_target_properties(${TARGET_NAME} PROPERTIES LINK_FLAGS "-Wl,--enable-stdcall-fixup")
-  endif()
+  include(mhe_platform_specific)
+  mhe_link_platform_specific(${TARGET_NAME})
 endmacro()

@@ -372,6 +372,13 @@ public:
 		return m;
 	}
 
+	static matrix translation_matrix(T x, T y, T z)
+	{
+		matrix m;
+		m.set_translate(x, y, z);
+		return m;
+	}
+
 	static matrix scaling_matrix(const v3d& v)
 	{
 		matrix m;

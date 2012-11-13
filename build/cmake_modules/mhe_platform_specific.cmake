@@ -1,0 +1,8 @@
+macro(mhe_link_platform_specific TARGET)
+if (WIN32)
+   set_target_properties(${TARGET} PROPERTIES LINK_FLAGS "-Wl,--enable-stdcall-fixup")
+endif()
+if (APPLE)
+   set_target_properties(${TARGET} PROPERTIES LINK_FLAGS "-Wl,-framework,Cocoa")
+endif()
+endmacro()

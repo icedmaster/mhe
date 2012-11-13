@@ -1,3 +1,5 @@
+#output all libs in MHE_LIBS_FOUND
+
 macro(mhe_find_libraries)
 
 	#find OpenGL
@@ -16,6 +18,7 @@ macro(mhe_find_libraries)
 	   message(${OPENGL_LIB})
 	   add_definitions(-DMHE_HAS_OPENGL)
 	   set(MHE_OPENGL_FOUND TRUE)
+	   set(MHE_LIBS_FOUND ${MHE_LIBS_FOUND} ${OPENGL_LIB})
 	endif()
 
 	# find SDL
@@ -35,12 +38,14 @@ macro(mhe_find_libraries)
 		message(${SDL_LIB})
 		add_definitions(-DMHE_HAS_SDL)
 		set(MHE_SDL_FOUND TRUE)
+	   set(MHE_LIBS_FOUND ${MHE_LIBS_FOUND} ${SDL_LIB})
 	endif()
 
 	# find libpng
 	find_library(PNG_LIB png)
 	message("---- png ------")
 	message(${PNG_LIB})
+	 set(MHE_LIBS_FOUND ${MHE_LIBS_FOUND} ${PNG_LIB})		
 
 	# find OpenAL
 	if (WIN32)
@@ -55,18 +60,22 @@ macro(mhe_find_libraries)
 	   message(${OPENAL_LIB})
 	   add_definitions(-DMHE_HAS_OPENAL)
 	   set(MHE_OPENAL_FOUND TRUE)
+	   set(MHE_LIBS_FOUND ${MHE_LIBS_FOUND} ${OPENAL_LIB})
 	endif()	
 
 	find_library(VORBISFILE_LIB vorbisfile)
 	message("---- vorbisfile ----")
 	message(${VORBISFILE_LIB})
+	set(MHE_LIBS_FOUND ${MHE_LIBS_FOUND} ${VORBISFILE_LIB})
 
 	find_library(VORBIS_LIB vorbis)
 	message("---- vorbis ----")
 	message(${VORBIS_LIB})
+    set(MHE_LIBS_FOUND ${MHE_LIBS_FOUND} ${VORBIS_LIB})
 
 	find_library(OGG_LIB ogg)
 	message("---- ogg ----")
 	message(${OGG_LIB})
+    set(MHE_LIBS_FOUND ${MHE_LIBS_FOUND} ${OGG_LIB})
 
 endmacro()
