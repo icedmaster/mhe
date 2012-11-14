@@ -95,4 +95,13 @@ void Component::send_message(const Message& message)
 		root_->update(message);
 }
 
+component_ptr Component::child_by_add_name(const std::string& add_name) const
+{
+	for (size_t i = 0; i < children_.size(); ++i)
+	{
+		if (children_[i]->add_name() == add_name) return children_[i];
+	}
+	return component_ptr();
+}
+
 }}	// namespaces

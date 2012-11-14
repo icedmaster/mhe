@@ -1,72 +1,63 @@
 #include "utils/options_parser.hpp"
 
+#include "utils/strutils.hpp"
+
 namespace mhe {
 namespace utils {
 
-	OptionsParser::OptionsParser(const std::string& options, char delimiter)
-	{
-		parse(options, delimiter);
-	}
+OptionsParser::OptionsParser(const std::string& options, char delimiter)
+{
+	parse(options, delimiter);
+}
 
-	void OptionsParser::process(const std::string& opt, char delimiter)
-	{
-		m.clear();
-		parse(opt, delimiter);
-	}
+void OptionsParser::process(const std::string& opt, char delimiter)
+{
+	m.clear();
+	parse(opt, delimiter);
+}
 
-	void OptionsParser::parse(const std::string& options, char delimiter)
-	{
-		std::string opt = replace(options, '\r');
-		// разделяем на пары
-		size_t pos = 0;
-		do
-		{
-			pos = opt.find_first_of(delimiter);
-			std::string pr = opt;
-			if (pos != std::string::npos)
-			{
-				pr = opt.substr(0, pos);
-				opt.erase(0, pos + 1);
-			}
-			parse_pair(pr);
-		}
-		while (pos != std::string::npos);
-	}
+void OptionsParser::parse(const std::string& options, char delimiter)
+{
+	std::string opt = replace(options, '\r');
+	const std::vector<std::string> pairs = split(opt, &delimiter);
+	for (size_t i = 0; i < pairs.size(); ++i)
+		parse_optpair(pairs[i]);
+}
 
-	void OptionsParser::parse_pair(const std::string& opt_pr)
-	{
-		// удалим лишние пробелы
-		std::string pr = opt_pr;
-		trim(pr);
-		size_t pos = pr.find_first_of('=');
-		if (pos == std::string::npos)
-		{
-			// считаем сие как bool значение
-			m[pr] = "t";
-			return;
-		}
+void OptionsParser::parse_optpair(const std::string& opt_pr)
+{
+	const std::pair<std::string, std::string>& pair = parse_pair(opt_pr);
+	m[pair.first] = (pair.second.empty()) ? "t" : pair.second;
+}
 
-		std::string first = pr.substr(0, pos);
-		trim(first);
-		std::string second = pr.substr(pos + 1, pr.length() - pos - 1);
-		trim(second);
-		m[first] = second;
-	}
+bool OptionsParser::get_string(const std::string& name, std::string& value, const std::string& def_value) const
+{
+	return get_option(name, value, def_value);
+}
 
-	bool OptionsParser::get_string(const std::string& name, std::string& value, const std::string& def_value) const
-	{
-		return get_option(name, value, def_value);
-	}
+bool OptionsParser::get_integer(const std::string& name, int& value, int def_value) const
+{
+	return get_option(name, value, def_value);
+}
 
-	bool OptionsParser::get_integer(const std::string& name, int& value, int def_value) const
-	{
-		return get_option(name, value, def_value);
-	}
+bool OptionsParser::get_bool(const std::string& name, bool& value, bool def_value) const
+{
+	return get_option(name, value, def_value);
+}
 
-	bool OptionsParser::get_bool(const std::string& name, bool& value, bool def_value) const
+std::pair<std::string, std::string> OptionsParser::parse_pair(const std::string& str)
+{
+	std::string key, value;
+	const std::vector<std::string>& res = split(str, "=");
+	if (res.size() < 2)
+		key = trim_copy(str);
+	else
 	{
-		return get_option(name, value, def_value);
+		key = trim_copy(res[0]);
+		value = trim_copy(res[1]);
 	}
+	return std::make_pair(key, value);
+}
 
 }
 }

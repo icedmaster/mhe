@@ -63,11 +63,28 @@ inline void ltrim(std::string& s, const std::string& c = " ")
 	s.erase(0, s.find_first_not_of(c));
 }
 
+inline std::string rtrim_copy(const std::string& s, const std::string& c = " ")
+{
+	size_t pos = s.find_last_not_of(c);
+	return s.substr(pos, s.length() - pos);
+}
+
+inline std::string ltrim_copy(const std::string& s, const std::string& c = " ")
+{
+	size_t pos = s.find_first_not_of(c);
+	return s.substr(0, pos);
+}
+
 inline void trim(std::string& s, const std::string& c = " ")
 {
 	rtrim(s, c);
 	ltrim(s, c);
 }		
+
+inline std::string trim_copy(const std::string& s, const std::string& c = " ")
+{
+	return rtrim_copy(ltrim_copy(s, c), c);
+}
 
 inline std::string replace(const std::string& s, char from, char to = 0)
 {

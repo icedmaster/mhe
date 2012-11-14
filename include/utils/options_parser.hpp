@@ -60,9 +60,11 @@ public:
 	{
 		return get_option(name, value, def_value);
 	}
+
+	static std::pair<std::string, std::string> parse_pair(const std::string& str);
 private:
 	void parse(const std::string& options, char delimiter);
-	void parse_pair(const std::string& pr);
+	void parse_optpair(const std::string& pr);
 
 	typedef std::map<std::string, std::string> optmap;
 	optmap m;

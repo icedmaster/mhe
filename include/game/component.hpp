@@ -72,6 +72,8 @@ public:
 	{
 		return children_;
 	}	
+
+	component_ptr child_by_add_name(const std::string& add_name) const;
 protected:
 	Component(const std::string& fullname) :
 		parent_(nullptr), root_(nullptr),
