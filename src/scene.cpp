@@ -4,6 +4,12 @@ namespace mhe {
 
 void Scene::draw(const Context& context)
 {
+	for (size_t i = 0; i < subscenes_.size(); ++i)
+		subscenes_[i]->draw(context);
+
+	assert(active_camera_ != nullptr);
+	active_camera_->update(context.driver());
+
 	for (nodelist::iterator it = nodes_.begin(); it != nodes_.end();)
 	{
 		Node* node = (*it).get();
@@ -110,6 +116,26 @@ void Scene::remove_modifier(const std::string& name)
 			return;
 		}
 	}
+}
+
+void Scene::add_camera(Camera* camera, bool set_active)
+{
+	boost::shared_ptr<Camera> new_camera(camera);
+	cameras_[camera->name()] = new_camera;
+	if (set_active)
+		active_camera_ = new_camera;
+}
+
+void Scene::remove_camera(const std::string& name)
+{
+	cameras_.erase(name);
+}
+
+void Scene::set_active_camera(const std::string& name)
+{
+	std::map< std::string, boost::shared_ptr<Camera> >::iterator it = cameras_.find(name);
+	if (it == cameras_.end()) return;
+	active_camera_ = it->second;
 }
 
 void Scene::apply_visitors()

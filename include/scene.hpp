@@ -3,6 +3,7 @@
 
 #include "node.hpp"
 #include "scene_modifier.hpp"
+#include "camera.hpp"
 #include <list>
 #include <vector>
 #include <map>
@@ -39,6 +40,10 @@ public:
 	}
 
 	void remove_modifier(const std::string& name);
+
+	void add_camera(Camera* camera, bool set_active = false);
+	void remove_camera(const std::string& name);
+	void set_active_camera(const std::string& name);
 private:
 	void apply_visitors();
 	void apply_scene_modifiers(SceneModifier::UpdateMode mode);
@@ -48,6 +53,8 @@ private:
 	std::vector< boost::shared_ptr<Scene> > subscenes_;
     std::vector< boost::shared_ptr<NodeVisitor> > visitors_;
 	std::vector< boost::shared_ptr<SceneModifier> > modifiers_;
+	std::map<std::string, boost::shared_ptr<Camera> > cameras_;
+	boost::shared_ptr<Camera> active_camera_;
 };
 
 }

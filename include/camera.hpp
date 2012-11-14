@@ -1,53 +1,45 @@
-#ifndef _CAMERA_HPP_
-#define _CAMERA_HPP_
+#ifndef __CAMERA_HPP__
+#define __CAMERA_HPP__
 
-#include "icamera.hpp"
+#include <boost/shared_ptr.hpp>
+#include "transform.hpp"
 
-namespace mhe
+namespace mhe {
+
+class Driver;
+
+class Camera : public Transform
 {
-	class Camera : public iCamera
+public:
+	Camera();
+	virtual ~Camera() {}
+	void update(const boost::shared_ptr<Driver>& driver);
+
+	void enable_each_frame_updating(bool enable)
 	{
-		private:
-			matrixf proj_m;
-			// modelview matrix keep in Transform class
-			v3d pos_;
-			v3d dir_;
+		update_each_frame_ = enable;
+	}
 
-			cmn::uint id;
-			
-			void set_lookAt();
-		public:
-			Camera();	// with default settings
-			
-			void setPosition(const v3d& pos);			
-			
-			const v3d& getPosition() const
-			{
-				return pos_;
-			}
-			
-			void setDirection(const v3d& dir);
-			
-			const v3d& getDirection() const
-			{
-				return dir_;
-			}			
-			
-			void setPerspective(float fov, float aspect,
-								float znear, float zfar);
-										
-			void update(boost::shared_ptr<Driver> driver);
+	void set_need_update()
+	{
+		updated_ = false;
+	}
 
-			void set_id(cmn::uint value)
-			{
-				id = value;
-			}
+	void set_name(const std::string& name)
+	{
+		name_ = name;
+	}
 
-			cmn::uint get_id() const
-			{
-				return id;
-			}
-	};
+	const std::string& name() const
+	{
+		return name_;
+	}
+private:
+	bool update_each_frame_;
+	bool updated_;
+	std::string name_;
+};
+
 }
 
 #endif
