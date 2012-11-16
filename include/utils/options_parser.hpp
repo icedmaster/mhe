@@ -61,6 +61,14 @@ public:
 		return get_option(name, value, def_value);
 	}
 
+	template <class Type>
+	Type get(const std::string& name) const
+	{
+		Type t;
+		get_option(name, t, Type());
+		return t;
+	}
+
 	static std::pair<std::string, std::string> parse_pair(const std::string& str);
 private:
 	void parse(const std::string& options, char delimiter);

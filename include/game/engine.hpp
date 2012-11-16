@@ -1,11 +1,12 @@
 #ifndef _ENGINE_HPP_
 #define _ENGINE_HPP_
 
-#include "mhe.hpp"
 #include "game_scene.hpp"
 #include "component_manager.hpp"
 #include "mhe_event.hpp"
 #include "context.hpp"
+#include "sound_manager.hpp"
+#include "sound/iaudio_driver.hpp"
 
 namespace mhe {
 namespace game {

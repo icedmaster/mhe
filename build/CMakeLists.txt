@@ -48,6 +48,7 @@ set (SRC_PATH
   ${SOURCE_ROOT}/sound
   ${SOURCE_ROOT}/game
   ${SOURCE_ROOT}/events
+  ${SOURCE_ROOT}/app
   #${SOURCE_ROOT}/script
   ${LIB_DIR}/pugixml
 )

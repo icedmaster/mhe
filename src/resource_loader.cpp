@@ -1,5 +1,7 @@
 #include "resource_loader.hpp"
 
+#include "mhe_sound.hpp"
+
 namespace mhe {
 
 iSound* SoundLoader::load(const std::string& name, const helper_type& /*helper*/)

@@ -1,7 +1,6 @@
 #ifndef __RESOURCE_LOADER_HPP__
 #define __RESOURCE_LOADER_HPP__
 
-#include "mhe_sound.hpp"
 #include "utils/file_utils.hpp"
 #include "impl/system_factory.hpp"
 

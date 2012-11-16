@@ -1,5 +1,7 @@
 #include "node.hpp"
 
+#include "utils/sysutils.hpp"
+
 namespace mhe {
 
 Node::Node() : 
@@ -12,5 +14,11 @@ void Node::draw_impl(const Context& context)
 {
 	context.driver()->draw(this);
 }
+
+void Node::start()
+{
+	if (!is_frozen())
+		start_impl(utils::get_current_tick());
+}	
 
 }

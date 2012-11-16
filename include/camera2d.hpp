@@ -1,5 +1,5 @@
-#ifndef __CAMERA_2D_HPP__
-#define __CAMERA_2D_HPP__
+#ifndef __CAMERA2D_HPP__
+#define __CAMERA2D_HPP__
 
 #include "camera.hpp"
 

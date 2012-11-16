@@ -1,7 +1,7 @@
 #ifndef __MHE_GRAPHICS_HPP__
 #define __MHE_GRAPHICS_HPP__
 
-#include "camera_2d.hpp"
+#include "camera2d.hpp"
 
 #include "sprite.hpp"
 #include "animation_list.hpp"

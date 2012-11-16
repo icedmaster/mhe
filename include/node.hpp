@@ -7,7 +7,6 @@
 #include "texture.hpp"
 #include "types.hpp"
 #include "renderable.hpp"
-#include "utils/sysutils.hpp"
 #include "node_visitor.hpp"
 
 namespace mhe
@@ -64,6 +63,8 @@ public:
 		return (flags_ & frozen);
 	}
 
+	void start();
+
 	int priority() const
 	{
 		return priority_;
@@ -83,12 +84,6 @@ public:
 	{
 		childs_.push_back(node);
 	}
-
-	void start()
-	{
-		if (!is_frozen())
-			start_impl(utils::get_current_tick());
-	}	
 
 	Node* clone() const
 	{

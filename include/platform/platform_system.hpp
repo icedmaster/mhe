@@ -1,7 +1,7 @@
 #ifndef __PLATFORM_SYSTEM_HPP__
 #define __PLATFORM_SYSTEM_HPP__
 
-#include "config.hpp"
+#include "../config.hpp"
 #include "utils/logutils.hpp"
 
 #ifdef MHE_LINUX

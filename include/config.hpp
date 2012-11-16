@@ -4,12 +4,12 @@
 // OS
 #ifdef __linux__
 	#define MHE_LINUX
-#endif
-#ifdef __WIN32__
+#elif defined(__WIN32__)
 	#define MHE_WIN
-#endif
-#ifdef __APPLE__
+#elif defined(__APPLE__) || defined(__MACH__)
 	#define MHE_MACOS
+#else
+	#error Unknown operation system
 #endif
 
 // window system

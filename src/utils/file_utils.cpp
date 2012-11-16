@@ -43,4 +43,9 @@ std::string get_file_name_with_path(const std::string& filepath)
 	return filepath.substr(0, point_pos);
 }
 
+std::string read_whole_file(std::ifstream& stream)
+{
+	return std::string((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
+}
+
 }}

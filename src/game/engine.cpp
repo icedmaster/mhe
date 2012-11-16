@@ -1,6 +1,7 @@
 #include "game/engine.hpp"
 
 #include "events/system_device.hpp"
+#include "utils/sysutils.hpp"
 
 namespace mhe  { 
 namespace game {

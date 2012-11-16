@@ -1,6 +1,7 @@
 #ifndef _MHE_HPP_
 #define _MHE_HPP_
 
+#include "config.hpp"
 #include "mhe_math.hpp"
 
 #include "camera.hpp"

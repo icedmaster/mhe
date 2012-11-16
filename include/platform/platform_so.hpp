@@ -1,7 +1,7 @@
 #ifndef __PLATFORM_SO_HPP__
 #define __PLATFORM_SO_HPP__
 
-#include "config.hpp"
+#include "../config.hpp"
 #include "types.hpp"
 
 #ifdef MHE_WIN

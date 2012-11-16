@@ -60,6 +60,11 @@ public:
 		return win_dim_.y();
 	}
 
+	const vector2<int>& screen_size() const
+	{
+		return win_dim_;
+	}
+
 	void show_cursor(bool show)
 	{
 		impl_->show_cursor(show);
@@ -69,6 +74,11 @@ public:
 	{
 		win_dim_.set(w, h);
 		impl_->resize(win_dim_);
+	}
+
+	void set_caption(const std::string& caption)
+	{
+		impl_->set_caption(caption);
 	}
 private:
 	boost::shared_ptr<WindowSystemImpl> impl_;
