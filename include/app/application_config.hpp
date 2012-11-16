@@ -8,7 +8,7 @@ namespace mhe {
 
 static const std::string default_config_filename = "mhe.config";
 
-struct Config
+struct ApplicationConfig
 {
 	cmn::uint width;
 	cmn::uint height;
@@ -17,7 +17,7 @@ struct Config
 	std::string assets_path;	
 };
 
-bool load_config(Config& config, const std::string& filename = default_config_filename);
+bool load_config(ApplicationConfig& config, const std::string& filename = default_config_filename);
 
 }
 

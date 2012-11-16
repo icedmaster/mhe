@@ -11,7 +11,7 @@ Application::Application(const ArgumentsParser& /*arguments_parser*/)
 {
 }
 
-bool Application::init(const std::string& name, const Config& config)
+bool Application::init(const std::string& name, const ApplicationConfig& config)
 {
 	name_ = name;
 	if (!mhe_app_init(config)) return false;
@@ -25,11 +25,13 @@ void Application::deinit()
 	mhe_app_deinit();
 }
 
-bool Application::mhe_app_init(const Config& config)
+bool Application::mhe_app_init(const ApplicationConfig& config)
 {
 	mhe::utils::create_standart_log();
 	mhe::utils::init_randomizer();
 	mhe::impl::start_platform();
+	INFO_LOG("Init application with name:" << name_ << " w:" << config.width <<
+			 " h:" << config.height << " bpp:" << config.bpp);
 	bool result = engine_.init(config.width, config.height, config.bpp, config.fullscreen);
 	if (result)
 		engine_.context().window_system().set_caption(name_);

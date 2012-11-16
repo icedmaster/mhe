@@ -4,7 +4,7 @@
 
 namespace mhe {
 
-bool Application2D::mhe_app_init(const Config& config)
+bool Application2D::mhe_app_init(const ApplicationConfig& config)
 {
 	if (!Application::mhe_app_init(config))
 		return false;

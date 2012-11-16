@@ -10,7 +10,7 @@ class Application2D : public Application
 public:
 	virtual ~Application2D() {}
 protected:
-	virtual bool mhe_app_init(const Config& config);
+	virtual bool mhe_app_init(const ApplicationConfig& config);
 };
 
 }

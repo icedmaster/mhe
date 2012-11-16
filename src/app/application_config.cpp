@@ -7,7 +7,7 @@
 
 namespace mhe {
 
-bool load_config(Config& config, const std::string& filename)
+bool load_config(ApplicationConfig& config, const std::string& filename)
 {
 	std::ifstream f(filename.c_str());
 	if (!f.is_open())

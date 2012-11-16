@@ -13,9 +13,17 @@ public:
 	Application();
 	Application(const ArgumentsParser& arg_parser);
 	virtual ~Application() {}
-	bool init(const std::string& name, const Config& config);
+	bool init(const std::string& name, const ApplicationConfig& config);
 	void deinit();
-	int run(const boost::shared_ptr<game::GameScene>& first_scene);
+	int run(const boost::shared_ptr<game::GameScene>& first_scene)
+	{
+		return run_impl(first_scene);
+	}
+
+	int run(game::GameScene* first_scene)
+	{
+		return run(boost::shared_ptr<game::GameScene>(first_scene));
+	}
 
 	const std::string& name() const
 	{
@@ -28,7 +36,7 @@ public:
 	}
 protected:
 	// methods with default implementation
-	virtual bool mhe_app_init(const Config& config);
+	virtual bool mhe_app_init(const ApplicationConfig& config);
 	virtual void mhe_app_deinit();
 	virtual int run_impl(const boost::shared_ptr<game::GameScene>& first_scene);
 

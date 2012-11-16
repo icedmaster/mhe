@@ -21,6 +21,8 @@
 
 #include "mhe_event.hpp"
 
+#include "mhe_application.hpp"
+
 #include "lib/pugixml/pugixml.hpp"
 
 #endif
