@@ -1,7 +1,11 @@
 #include "mhe.hpp"
 
-class TestApplication : public mhe::Application2D
+class TestApplication : public mhe::app::Application2D
 {
+public:
+	TestApplication(const std::string& name) :
+		mhe::app::Application2D(name)
+	{}
 private:
 	void init_impl()
 	{
@@ -13,24 +17,25 @@ private:
 		std::cout << "TestApp deinit\n";
 	}
 
-	int run_impl(const boost::shared_ptr<mhe::game::GameScene>&)
+	int run_impl()
 	{
 		std::cout << "run\n";
+		deinit();
 		return 0;
 	}
 };
 
 int main(int, char**)
 {
-	mhe::ApplicationConfig config;
-	if (!mhe::load_config(config))
+	mhe::app::ApplicationConfig config;
+	if (!mhe::app::load_config(config))
 	{
 		config.width = 800;
 		config.height = 600;
 		config.bpp = 32;
 		config.fullscreen = false;
 	}
-	TestApplication app;
-	app.init("07_application", config);
-	return app.run(nullptr);
+	TestApplication app("07_application");
+	app.init(config, nullptr);
+	return app.run();
 }

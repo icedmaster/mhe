@@ -5,6 +5,7 @@
 #include "types.hpp"
 
 namespace mhe {
+namespace app {
 
 static const std::string default_config_filename = "mhe.config";
 
@@ -19,6 +20,6 @@ struct ApplicationConfig
 
 bool load_config(ApplicationConfig& config, const std::string& filename = default_config_filename);
 
-}
+}}
 
 #endif

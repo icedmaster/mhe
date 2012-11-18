@@ -6,6 +6,7 @@
 #include "utils/file_utils.hpp"
 
 namespace mhe {
+namespace app {
 
 bool load_config(ApplicationConfig& config, const std::string& filename)
 {
@@ -34,4 +35,4 @@ bool load_config(ApplicationConfig& config, const std::string& filename)
 	return true;
 }
 
-}
+}}
