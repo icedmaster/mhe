@@ -8,6 +8,12 @@
 
 namespace mhe
 {
+class Surface
+{
+public:
+	virtual ~Surface() {}
+};
+
 class WindowSystemImpl
 {
 public:
@@ -19,6 +25,7 @@ public:
 	virtual void swap_buffers() = 0;
 	virtual void show_cursor(bool) = 0;
 	virtual void resize(const vector2<int>&) = 0;
+	virtual const Surface* surface() const = 0;
 };
 
 class WindowSystem
@@ -79,6 +86,11 @@ public:
 	void set_caption(const std::string& caption)
 	{
 		impl_->set_caption(caption);
+	}
+
+	const Surface* surface() const
+	{
+		return impl_->surface();
 	}
 private:
 	boost::shared_ptr<WindowSystemImpl> impl_;

@@ -3,11 +3,13 @@
 
 #include "config.hpp"
 
-#ifndef MHE_MACOS
-    #include <GL/gl.h>
+#ifdef MHE_IOS
+#include <OpenGLES/ES2/gl.h>
+#elif defined(MHE_MACOS)
+#define GL_GLEXT_LEGACY
+#include <OpenGL/gl.h>
 #else
-    #define GL_GLEXT_LEGACY
-    #include <OpenGL/gl.h>
+    #include <GL/gl.h>
 #endif
 
 #endif

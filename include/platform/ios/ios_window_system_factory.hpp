@@ -3,6 +3,8 @@
 
 #include "impl/abstract_window_system_factory.hpp"
 #include "ios_window_system.hpp"
+#include "ios_event_system.hpp"
+#include "ios_system_device_impl.hpp"
 
 namespace mhe {
 namespace ios {
@@ -32,12 +34,12 @@ public:
 
 	SystemDeviceImpl* create_system_device_impl() const
 	{
-		return nullptr;
+		return new iOSSystemDeviceImpl;
 	}
 
 	EventSystem* create_event_system() const
 	{
-		return nullptr;
+		return new iOSEventSystem;
 	}
 };
 
