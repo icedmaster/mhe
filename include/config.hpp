@@ -6,6 +6,8 @@
 	#define MHE_LINUX
 #elif defined(__WIN32__)
 	#define MHE_WIN
+#elif defined(__IOS__) // define before apple
+    #define MHE_IOS
 #elif defined(__APPLE__) || defined(__MACH__)
 	#define MHE_MACOS
 #else
@@ -24,6 +26,10 @@
 // video driver
 #ifdef MHE_HAS_OPENGL
 	#define MHE_OPENGL
+#endif
+
+#ifdef MHE_HAS_OPENGLES
+    #define MHE_OPENGLES
 #endif
 
 // audio driver

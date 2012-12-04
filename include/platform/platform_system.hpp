@@ -16,6 +16,10 @@
 #include "macos/macos_system.hpp"
 #endif
 
+#ifdef MHE_IOS
+#include "ios/ios_system.hpp"
+#endif
+
 #include "platform_so.hpp"
 
 namespace mhe {
@@ -79,6 +83,10 @@ inline cmn::uint get_current_tick()
 
 #ifdef MHE_MACOS
     return macossys::get_current_tick();
+#endif
+    
+#ifdef MHE_IOS
+    return iossys::get_current_tick();
 #endif
 }
 

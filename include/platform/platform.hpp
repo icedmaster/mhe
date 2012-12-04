@@ -7,6 +7,10 @@
 #include "platform/opengl/opengl_platform.hpp"
 #endif
 
+#ifdef MHE_OPENGLES
+#include "platform/opengles/opengles_platform.hpp"
+#endif
+
 #ifdef MHE_SDL
 #include "platform/sdl/sdl_platform.hpp"
 #endif

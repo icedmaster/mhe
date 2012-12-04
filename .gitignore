@@ -18,6 +18,6 @@
 *.zip
 *.ede
 *#*
-
+*.DS_Store*
 
 
