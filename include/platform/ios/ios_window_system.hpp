@@ -3,25 +3,26 @@
 
 #include "window_system.hpp"
 
-#import <GLKit/GLKit.h>
-
 namespace mhe {
 namespace ios {
+
+class iOSWindowSystemImpl;
 
 class iOSWindowSystem : public WindowSystemImpl
 {
 public:
+	iOSWindowSystem();
 	bool init(const vector2<int>& r, int bpp, bool fullscreen);
 	void close();
 	void set_caption(const std::string& /*caption*/)
 	{}
 	void swap_buffers();
-	void show_cursor(bool show)
+	void show_cursor(bool /*show*/)
 	{}
 	// TODO:
 	void resize(const vector2<int>&) {}
 private:
-	
+	boost::scoped_ptr<iOSWindowSystemImpl> impl_;
 };
 
 }}

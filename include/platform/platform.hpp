@@ -21,4 +21,8 @@
 #include "sound/ogg_sound.hpp"
 #endif
 
+#ifdef MHE_IOS
+#include "platform/ios/ios_platform.hpp"
+#endif
+
 #endif
