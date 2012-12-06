@@ -1,4 +1,4 @@
-#include "sound/ogg_sound.hpp"
+#include "sound/vorbis/ogg_sound.hpp"
 #include "utils/logutils.hpp"
 #include <fstream>
 #include <cstring>

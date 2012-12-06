@@ -16,17 +16,28 @@ class iOSSurface : public Surface
 public:
     ~iOSSurface();
     
-	mheGLView* get() const
+	mheGLView* delegate() const
 	{		
-		return view_;
+		return delegate_;
 	}
 
-	void set(mheGLView* view)
+	void set(mheGLView* delegate)
 	{
-		view_ = view;
+		delegate_ = delegate;
 	}
+    
+    void set_view(GLKView* view)
+    {
+        view_ = view;
+    }
+    
+    GLKView* view() const
+    {
+        return view_;
+    }
 private:
-	mheGLView* view_;
+	mheGLView* delegate_;
+    GLKView* view_;
 };
 
 class iOSWindowSystemImpl

@@ -8,6 +8,7 @@
 #include "mhe_math.hpp"
 #include "window_system.hpp"
 #include "renderable.hpp"
+#include "shader_program.hpp"
 
 namespace mhe
 {
@@ -194,6 +195,11 @@ public:
 		set_viewport_impl(x, y, w, h);
 	}
 
+	void set_shader_program(const boost::shared_ptr<ShaderProgram>& program)
+	{
+		set_shader_program_impl(program);
+	}
+
 	const Stats& stats() const
 	{
 		return stats_;
@@ -251,6 +257,10 @@ private:
 
 	virtual void set_viewport_impl(int x, int y, int w, int h) = 0;
 
+	virtual void set_shader_program_impl(const boost::shared_ptr<ShaderProgram>& program) = 0;
+    
+    virtual void begin_render_impl() {}
+    virtual void end_render_impl() {}
 private:
 	std::vector<Renderable> perform_batch() const;
 	void perform_render(const Renderable& renderable);

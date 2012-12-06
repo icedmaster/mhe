@@ -37,4 +37,8 @@
 	#define MHE_OPENAL
 #endif
 
+#ifdef MHE_HAS_VORBIS
+	#define MHE_VORBIS
+#endif
+
 #endif

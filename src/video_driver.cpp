@@ -20,6 +20,7 @@ void Driver::begin_render()
 {
 	renderable_elements_.clear();
 	stats_.update_frames();
+    begin_render_impl();
 }
 
 void Driver::end_render()
@@ -27,6 +28,7 @@ void Driver::end_render()
 	const std::vector<Renderable>& batched = perform_batch();
 	for (size_t i = 0; i < batched.size(); ++i)
 		perform_render(batched[i]);
+    end_render_impl();
 }
 
 void Driver::draw(Renderable* renderable)

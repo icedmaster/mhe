@@ -17,9 +17,12 @@
 
 @implementation AppDelegate
 
+@synthesize rootViewController;
+
 - (void)dealloc
 {
     [_window release];
+    [rootViewController release];
     [super dealloc];
 }
 

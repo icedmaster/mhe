@@ -59,21 +59,24 @@ void Engine::run()
 
 void Engine::process()
 {
+	update();
+	render();
+}
+
+void Engine::update()
+{
 	event_manager_.check(ws_);
-	context_.driver()->clear_depth();
-	context_.driver()->clear_color();
+	update_internal();
 
 	if (game_scene_ && game_scene_->process())
-	{
-		context_.driver()->begin_render();
 		game_scene_->scene()->update(utils::get_current_tick());
-		game_scene_->scene()->draw(context());			
-		context_.driver()->end_render();
-	}
+}
 
-	update();
-		
-	ws_.swap_buffers();
+void Engine::render()
+{
+	context_.update();
+	game_scene_->scene()->draw(context_);
+	context_.flush();
 }
 	
 void Engine::stop()
@@ -87,7 +90,7 @@ void Engine::resize(cmn::uint w, cmn::uint h)
 	context_.driver()->set_viewport(0, 0, w, h);
 }
 
-void Engine::update()
+void Engine::update_internal()
 {
 	cmn::uint now = utils::get_current_tick();
 	component_manager_.update(now);

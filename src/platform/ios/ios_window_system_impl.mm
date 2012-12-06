@@ -9,6 +9,7 @@ namespace ios {
 iOSSurface::~iOSSurface()
 {
     [view_ release];
+    [delegate_ release];    
 }
 
 bool iOSWindowSystemImpl::init(const vector2<int>& r, int /*bpp*/, bool /*fullscreen*/)
@@ -20,10 +21,14 @@ bool iOSWindowSystemImpl::init(const vector2<int>& r, int /*bpp*/, bool /*fullsc
 		return false;
 	}
 	[EAGLContext setCurrentContext:context_];
-	mheGLView* view = [[mheGLView alloc] initWithFrame:CGRectMake(0, 0, r.x(), r.y())];
+	GLKView* view = [[GLKView alloc] initWithFrame:CGRectMake(0, 0, r.x(), r.y())];
 	view.context = context_;
 	view.drawableDepthFormat = GLKViewDrawableDepthFormat24; // TODO:
-	surface_.set(view);
+	surface_.set_view(view);
+    mheGLView* delegate = [[mheGLView alloc] init];
+    view.delegate = delegate;
+    surface_.set(delegate);
+    [view setNeedsDisplay];
 	return true;
 }
 

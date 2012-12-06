@@ -1,7 +1,7 @@
 #ifndef _OGG_SOUND_HPP_
 #define _OGG_SOUND_HPP_
 
-#include "isound_data.hpp"
+#include "../isound_data.hpp"
 #include <ogg/ogg.h>
 #include <vorbis/vorbisfile.h>
 #include <vector>

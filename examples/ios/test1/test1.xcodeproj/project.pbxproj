@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B1D8F277166F8ADD003FD04C /* TestScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B1D8F275166F8ADD003FD04C /* TestScene.cpp */; };
+		B1D8F279166F8CED003FD04C /* test_sprite.png in Resources */ = {isa = PBXBuildFile; fileRef = B1D8F278166F8CED003FD04C /* test_sprite.png */; };
+		B1D8F295166F94C7003FD04C /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = B1D8F294166F94C7003FD04C /* libz.dylib */; };
+		B1D8F2A316706F9E003FD04C /* libpng.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B1D8F2A216706F9E003FD04C /* libpng.a */; };
+		B1D8F2D816709A9D003FD04C /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B1D8F2D716709A9D003FD04C /* QuartzCore.framework */; };
 		B1F11F86166E0E85002B8C35 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B1F11F85166E0E85002B8C35 /* UIKit.framework */; };
 		B1F11F88166E0E85002B8C35 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B1F11F87166E0E85002B8C35 /* Foundation.framework */; };
 		B1F11F8A166E0E85002B8C35 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B1F11F89166E0E85002B8C35 /* CoreGraphics.framework */; };
@@ -35,12 +40,18 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = B1F11FAF166E0FBC002B8C35 /* mhe.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = 52AC8C1974BE42C19E1F8C53;
+			remoteGlobalIDString = B715FBC0A79F4640A45E1EB5;
 			remoteInfo = mhe;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		B1D8F275166F8ADD003FD04C /* TestScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestScene.cpp; sourceTree = "<group>"; };
+		B1D8F276166F8ADD003FD04C /* TestScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestScene.h; sourceTree = "<group>"; };
+		B1D8F278166F8CED003FD04C /* test_sprite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = test_sprite.png; path = ../../../../assets/test_sprite.png; sourceTree = "<group>"; };
+		B1D8F294166F94C7003FD04C /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
+		B1D8F2A216706F9E003FD04C /* libpng.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libpng.a; path = ../../../../lib/ios/debug/libpng.a; sourceTree = "<group>"; };
+		B1D8F2D716709A9D003FD04C /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		B1F11F81166E0E85002B8C35 /* test1.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = test1.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B1F11F85166E0E85002B8C35 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		B1F11F87166E0E85002B8C35 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -69,6 +80,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B1D8F2D816709A9D003FD04C /* QuartzCore.framework in Frameworks */,
+				B1D8F295166F94C7003FD04C /* libz.dylib in Frameworks */,
 				B1F11F88166E0E85002B8C35 /* Foundation.framework in Frameworks */,
 				B1F11FC8166E1593002B8C35 /* OpenAL.framework in Frameworks */,
 				B1F11FC1166E143C002B8C35 /* GLKit.framework in Frameworks */,
@@ -76,6 +89,7 @@
 				B1F11FBD166E1407002B8C35 /* libmhe.a in Frameworks */,
 				B1F11F86166E0E85002B8C35 /* UIKit.framework in Frameworks */,
 				B1F11F8A166E0E85002B8C35 /* CoreGraphics.framework in Frameworks */,
+				B1D8F2A316706F9E003FD04C /* libpng.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -85,6 +99,8 @@
 		B1F11F76166E0E85002B8C35 = {
 			isa = PBXGroup;
 			children = (
+				B1D8F2D716709A9D003FD04C /* QuartzCore.framework */,
+				B1D8F294166F94C7003FD04C /* libz.dylib */,
 				B1F11FC7166E1593002B8C35 /* OpenAL.framework */,
 				B1F11FC5166E1582002B8C35 /* libc++.dylib */,
 				B1F11FC2166E144E002B8C35 /* libstdc++.dylib */,
@@ -117,12 +133,16 @@
 		B1F11F8B166E0E85002B8C35 /* test1 */ = {
 			isa = PBXGroup;
 			children = (
+				B1D8F2A216706F9E003FD04C /* libpng.a */,
+				B1D8F278166F8CED003FD04C /* test_sprite.png */,
 				B1F11FAF166E0FBC002B8C35 /* mhe.xcodeproj */,
 				B1F11F94166E0E85002B8C35 /* AppDelegate.h */,
 				B1F11F95166E0E85002B8C35 /* AppDelegate.m */,
 				B1F11F8C166E0E85002B8C35 /* Supporting Files */,
 				B1F11FBA166E102E002B8C35 /* RootViewController.h */,
 				B1F11FBB166E102E002B8C35 /* RootViewController.mm */,
+				B1D8F275166F8ADD003FD04C /* TestScene.cpp */,
+				B1D8F276166F8ADD003FD04C /* TestScene.h */,
 			);
 			path = test1;
 			sourceTree = "<group>";
@@ -221,6 +241,7 @@
 				B1F11F98166E0E85002B8C35 /* Default.png in Resources */,
 				B1F11F9A166E0E85002B8C35 /* Default@2x.png in Resources */,
 				B1F11F9C166E0E85002B8C35 /* Default-568h@2x.png in Resources */,
+				B1D8F279166F8CED003FD04C /* test_sprite.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -234,6 +255,7 @@
 				B1F11F92166E0E85002B8C35 /* main.m in Sources */,
 				B1F11F96166E0E85002B8C35 /* AppDelegate.m in Sources */,
 				B1F11FBC166E102E002B8C35 /* RootViewController.mm in Sources */,
+				B1D8F277166F8ADD003FD04C /* TestScene.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -268,6 +290,7 @@
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COMPRESS_PNG_FILES = NO;
 				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -296,6 +319,7 @@
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COMPRESS_PNG_FILES = NO;
 				COPY_PHASE_STRIP = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -323,7 +347,10 @@
 				);
 				INFOPLIST_FILE = "test1/test1-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
-				LIBRARY_SEARCH_PATHS = "../../../build/**";
+				LIBRARY_SEARCH_PATHS = (
+					"../../../build/**",
+					"\"$(SRCROOT)/../../../lib/ios/debug\"",
+				);
 				OTHER_CFLAGS = (
 					"-D__IOS__",
 					"-DMHE_HAS_OPENAL",
@@ -349,7 +376,10 @@
 				);
 				INFOPLIST_FILE = "test1/test1-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
-				LIBRARY_SEARCH_PATHS = "../../../build/**";
+				LIBRARY_SEARCH_PATHS = (
+					"../../../build/**",
+					"\"$(SRCROOT)/../../../lib/ios/debug\"",
+				);
 				OTHER_CFLAGS = (
 					"-D__IOS__",
 					"-DMHE_HAS_OPENAL",

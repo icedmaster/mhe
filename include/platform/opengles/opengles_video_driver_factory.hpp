@@ -4,6 +4,7 @@
 #include "impl/abstract_video_driver_factory.hpp"
 #include "types.hpp"
 #include "opengles_driver.hpp"
+#include "../opengl/opengl_texture.hpp"
 
 namespace mhe {
 namespace opengl {
@@ -23,7 +24,7 @@ public:
 
 	Texture* create_texture() const 
 	{
-		return nullptr;
+		return new OpenGLTexture;
 	}
 
 	Texture* create_multitexture() const

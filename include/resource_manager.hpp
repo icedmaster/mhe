@@ -49,7 +49,7 @@ public:
 			INFO_LOG("get resource:" << sname);
 			return it->second;
 		}
-		return load_impl(name, sname);
+		return load_impl(utils::path_join(base_path_, name), sname);
 	}
 
 	void add(const std::string& name, res_type* res)
@@ -66,6 +66,11 @@ public:
 	{
 		resources_.clear();
 	}
+    
+    void set_base_path(const std::string& path)
+    {
+        base_path_ = path;
+    }
 private:
 	boost::shared_ptr<res_type> load_impl(const std::string& name,
 										  const std::string& sname) const
@@ -84,6 +89,7 @@ private:
 
 	mutable resmap resources_;
 	helper_type helper_;
+    std::string base_path_;
 };
 
 }	// namespace mhe

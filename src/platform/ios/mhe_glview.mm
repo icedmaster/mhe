@@ -1,5 +1,7 @@
 #include "platform/ios/mhe_glview.h"
 
+#include "utils/unused.hpp"
+
 @interface mheGLView()
 {
 	mhe::game::Engine* engine_;
@@ -13,11 +15,11 @@
 	engine_ = engine;
 }
 
--(void) drawRect:(CGRect)rect
+-(void)glkView:(GLKView *)view drawInRect:(CGRect)rect
 {
-    (void)rect;
+    UNUSED(view); UNUSED(rect);
     if (engine_ != nullptr)
-        engine_->process();
+        engine_->render();
 }
 
 @end

@@ -21,8 +21,8 @@ void OpenGLTexture::rebuild_texture(boost::shared_ptr<Image> im,
 	glBindTexture(GL_TEXTURE_2D, id_);
 	//switch (ft_)
 	//glBindOpenGLTexture(GL_OpenGLTexture_2D, id_);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_FALSE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_FALSE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
@@ -31,7 +31,7 @@ void OpenGLTexture::rebuild_texture(boost::shared_ptr<Image> im,
 
 	bool pot_support = false;
 	if (driver)
-		pot_support = dynamic_cast<OpenGLDriver*>(driver.get())->get_extensions().is_extension_supported("GL_ARB_TEXTURE_non_power_of_two");
+		pot_support = OpenGLExtensions::instance().is_extension_supported("GL_ARB_TEXTURE_non_power_of_two");
 	bool rebuild = false;
 	if (!pot_support)
 	{

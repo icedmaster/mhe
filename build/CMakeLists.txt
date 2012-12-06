@@ -27,7 +27,11 @@ if (BUILD_LIB_ONLY)
     set(MHE_BUILD_EXAMPLES FALSE)
 endif()
 
-if (BUILD_IOS)
+if (BUILD_OS)
+  set(IO TRUE)
+endif()
+
+if (IOS)
    message("Build for iOS")
    include(mhe_ios)
    mhe_ios_build() 
@@ -62,6 +66,8 @@ set (SRC_PATH
   ${LIB_DIR}/pugixml
 )
 
+set (STANDALONE_SOURCES "")
+
 set (INC_PATH
   ${INCLUDE_ROOT}
   ${INCLUDE_ROOT}/..
@@ -74,6 +80,8 @@ set(LINUX_PLATFORM_SOURCES ${PLATFORM_IMPL_SOURCES}/linux)
 set(WIN_PLATFORM_SOURCES ${PLATFORM_IMPL_SOURCES}/win)
 set(MACOS_PLATFORM_SOURCES ${PLATFORM_IMPL_SOURCES}/macos)
 set(IOS_PLATFORM_SOURCES ${PLATFORM_IMPL_SOURCES}/ios)
+
+set(VORBIS_SOURCES ${SOURCE_ROOT}/sound/vorbis)
 
 # platform
 if (WIN32)
@@ -113,11 +121,17 @@ endif()
 if (MHE_OPENGLES_FOUND)
    set(SRC_PATH ${OPENGLES_IMPL_SOURCES} ${SRC_PATH})
    set(LIBS ${LIBS} ${OPENGLES_LIB})
+   set(STANDALONE_SOURCES ${STANDALONE_SOURCES} ${OPENGL_IMPL_SOURCES}/opengl_texture.cpp
+	 ${OPENGL_IMPL_SOURCES}/opengl_extension.cpp)
 endif()
 
 if (MHE_SDL_FOUND)
    set(SRC_PATH ${SRC_PATH} ${PLATFORM_IMPL_SOURCES}/sdl)
    set(LIBS ${LIBS} ${SDL_LIB})
+endif()
+
+if (MHE_VORBIS_FOUND)
+  set(SRC_PATH ${SRC_PATH} ${VORBIS_SOURCES})
 endif()
 
 set (LIBS ${LIBS} ${PNG_LIB})
@@ -149,6 +163,8 @@ foreach (DIR ${SRC_PATH})
   aux_source_directory (${DIR} CUR_SRC)
   set (SOURCE ${SOURCE} ${CUR_SRC})
 endforeach ()
+
+set(SOURCE ${SOURCE} ${STANDALONE_SOURCES})
 
 # additional libraries
 if (WIN32)
