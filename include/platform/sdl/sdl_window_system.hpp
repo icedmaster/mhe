@@ -7,6 +7,26 @@
 namespace mhe {
 namespace sdl {
 
+class SDLSurface : public Surface
+{
+public:
+	SDLSurface() :
+		surface_(nullptr)
+	{}
+
+	void set(SDL_Surface* surface)
+	{
+		surface_ = surface;
+	}
+
+	const SDL_Surface* get() const
+	{
+		return surface_;
+	}
+private:
+	SDL_Surface* surface_;
+};
+
 class SDLWindowSystem : public WindowSystemImpl
 {
 public:
@@ -17,9 +37,15 @@ public:
 	void show_cursor(bool show);
 	// TODO:
 	void resize(const vector2<int>&) {}
+
+	Surface* surface() const
+	{
+		return &surface_;
+	}
 private:
-	SDL_Surface *srf;
+	SDLSurface surface_;
 };
+
 }}
 
 #endif

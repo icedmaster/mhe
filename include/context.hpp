@@ -28,15 +28,25 @@ public:
 		window_system_ = window_system;
 	}
 
-	WindowSystem window_system() const
+	const WindowSystem& window_system() const
 	{
 		return *window_system_;
 	}
+    
+    WindowSystem& window_system()
+    {
+        return *window_system_;
+    }
 
 	const TextureManager& texture_manager() const
 	{
 		return texture_manager_;
 	}
+    
+    TextureManager& texture_manager()
+    {
+        return texture_manager_;
+    }
 
 	TextureManager& texture_manager()
 	{
@@ -53,6 +63,9 @@ public:
 		// TODO: implement full reset
 		texture_manager_.free_all();
 	}
+
+	void update();
+	void flush();
 private:
 	boost::shared_ptr<Driver> driver_;
 	WindowSystem* window_system_;

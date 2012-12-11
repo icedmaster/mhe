@@ -20,6 +20,7 @@ void Driver::begin_render()
 {
 	renderable_elements_.clear();
 	stats_.update_frames();
+    begin_render_impl();
 }
 
 void Driver::end_render()
@@ -27,6 +28,7 @@ void Driver::end_render()
 	const std::vector<Renderable>& batched = perform_batch();
 	for (size_t i = 0; i < batched.size(); ++i)
 		perform_render(batched[i]);
+    end_render_impl();
 }
 
 void Driver::draw(Renderable* renderable)
@@ -62,14 +64,33 @@ void Driver::perform_render(const Renderable& renderable)
 	set_render_flags(renderable);
 	renderable.texture()->prepare();
 
-	begin_draw_impl(renderable.vertexcoord().data(),
-					renderable.normalscoord().data(), renderable.texcoord().data(),
-					renderable.colorcoord().data(), renderable.indicies().size());
-	draw_impl(renderable.indicies().data(), renderable.indicies().size());
-	end_draw_impl();
+	if (!support_buffered_render())
+	{
+		begin_draw_impl(renderable.vertexcoord().data(),
+						renderable.normalscoord().data(), renderable.texcoord().data(),
+						renderable.colorcoord().data(), renderable.indicies().size());
+		draw_impl(renderable.indicies().data(), renderable.indicies().size());
+		end_draw_impl();
+	}
+	else perform_buffered_render(renderable);
 	renderable.texture()->clean();
 	stats_.update(renderable);
 	clear_render_flags(renderable);
+}
+
+void Driver::perform_buffered_render(const Renderable& renderable)
+{
+	boost::scoped_ptr<RenderBuffer> buffer(create_render_buffer());
+	buffer->attach_data(vertex_position_attribute_name, renderable.vertexcoord().data(), renderable.vertexcoord().size());
+	buffer->attach_data(vertex_normal_attribute_name, renderable.normalscoord().data(), renderable.normalscoord().size());
+	buffer->attach_data(vertex_texcoord_attribute_name, renderable.texcoord().data(), renderable.texcoord().size());
+	buffer->attach_data(vertex_color_attribute_name, renderable.colorcoord().data(), renderable.colorcoord().size());
+	if (!buffer->init()) return;
+	buffer->enable();
+	begin_draw_impl(buffer.get());
+	draw_impl(renderable.indicies().data(), renderable.indicies().size());
+	end_draw_impl(buffer.get());
+	buffer->disable();
 }
 
 void Driver::set_render_flags(const Renderable& renderable)

@@ -31,6 +31,10 @@ typedef linuxsys::so_handle so_handle;
 typedef macossys::so_handle so_handle;
 #endif
 
+#ifdef MHE_IOS
+typedef void* so_handle;
+#endif
+
 inline so_handle open_so(const std::string& name)
 {
 #ifdef MHE_WIN
@@ -44,6 +48,7 @@ inline so_handle open_so(const std::string& name)
 #ifdef MHE_MACOS
 	return macossys::open_so(name);
 #endif
+    (void)name;
 	return nullptr;
 }
 
@@ -60,6 +65,7 @@ inline void close_so(so_handle handle)
 #ifdef MHE_MACOS
 	macossys::close_so(handle);
 #endif
+    (void)handle;
 }
 
 inline void* get_proc_addr(so_handle handle, const std::string& name)
@@ -75,6 +81,7 @@ inline void* get_proc_addr(so_handle handle, const std::string& name)
 #ifdef MHE_MACOS
 	return macossys::get_proc_addr(handle, name);
 #endif
+    (void)name; (void)handle;
 	return nullptr;
 }
 
@@ -120,7 +127,7 @@ inline void* get_opengl_proc_addr(const std::string& name)
 
 #ifdef MHE_MACOS
 	return macossys::get_opengl_proc_addr(name);
-#endif
+#endif    
 	return nullptr;
 }
 #endif	// MHE_OPENGL

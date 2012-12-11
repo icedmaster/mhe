@@ -18,6 +18,8 @@
 *.zip
 *.ede
 *#*
-
+*.DS_Store*
+*xcworkspace*
+*xcuserdata*
 
 

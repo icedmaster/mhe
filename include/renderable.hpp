@@ -14,6 +14,11 @@ enum BlendMode
 	alpha_one_minus_alpha,
 };
 
+const std::string vertex_position_attribute_name = "position";
+const std::string vertex_normal_attribute_name = "normals";
+const std::string vertex_color_attribute_name = "color";
+const std::string vertex_texcoord_attribute_name = "texcoord";
+
 class Renderable : public Transform
 {
 	static const cmn::uint default_texcoord_size = 8;

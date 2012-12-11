@@ -20,6 +20,8 @@ public:
 	void run();
 	void stop();
 	void process();
+	void update();
+	void render();
 	void resize(cmn::uint w, cmn::uint h);
 
 	bool is_running() const
@@ -83,7 +85,7 @@ private:
 	}
 
 	void default_setup();
-	void update();
+	void update_internal();
 
 	WindowSystem ws_;
 	Context context_;

@@ -10,8 +10,10 @@ namespace sdl {
 		int flags = SDL_OPENGL;
 		if (fullscreen)
 			flags |= SDL_FULLSCREEN;
-        srf = SDL_SetVideoMode(r.x(), r.y(), bpp, flags);
+        SDL_Surface* srf = SDL_SetVideoMode(r.x(), r.y(), bpp, flags);
 		if (!srf) return false;
+
+		surface_.set(srf);
 
 		int bpb = bpp >> 2;
 

@@ -3,7 +3,7 @@
 
 #include "sound/openal_audio_driver.hpp"
 #include "sound/openal_sound.hpp"
-#include "sound/ogg_sound.hpp"
+#include "sound/vorbis/ogg_sound.hpp"
 #include "sound/wav_sound.hpp"
 
 #endif

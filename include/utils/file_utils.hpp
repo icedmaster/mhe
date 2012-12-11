@@ -12,8 +12,11 @@ std::string get_file_name(const std::string& filepath);
 std::string get_file_name_with_path(const std::string& filepath);
 std::string read_whole_file(std::ifstream& stream);
 
-// path
-std::string path_join(const std::string& part1, const std::string& part2);
+// path utils
+inline std::string path_join(const std::string& path1, const std::string& path2)
+{
+	return path1 + path2;
+}
     
 }}
 

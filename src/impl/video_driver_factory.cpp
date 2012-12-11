@@ -9,8 +9,13 @@ VideoDriverFactory::VideoDriverFactory()
 	#ifdef MHE_OPENGL
 	drivers_.push_back(boost::shared_ptr<AbstractVideoDriverFactory>(new opengl::OpenGLVideoDriverFactory));
 	#endif
-	// select highest video driver
-	current_driver_factory_ = drivers_.back();
+    
+#ifdef MHE_OPENGLES
+    drivers_.push_back(boost::shared_ptr<AbstractVideoDriverFactory>(new opengl::OpenGLESVideoDriverFactory));
+#endif
+    if (!drivers_.empty())
+        // select highest video driver
+        current_driver_factory_ = drivers_.back();
 }
 
 std::vector<std::string> VideoDriverFactory::available_drivers_list() const

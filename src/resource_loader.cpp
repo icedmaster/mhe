@@ -11,9 +11,11 @@ iSound* SoundLoader::load(const std::string& name, const helper_type& /*helper*/
 	bool loaded = false;
 	if (ext == "ogg")
 	{
+#ifdef MHE_HAS_VORBIS
 		data.reset(new ogg_sound);
 		if (data->load(name))
 			loaded = true;
+#endif
 	}
 	else if (ext == "wav")
 	{

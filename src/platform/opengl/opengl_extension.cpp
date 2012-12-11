@@ -8,6 +8,7 @@ namespace mhe {
 namespace opengl {
 void OpenGLExtensions::init_extensions()
 {
+#ifndef MHE_OPENGLES
 	// multitexture
 	glActiveTexture_ = load_extension<PFNGLACTIVETEXTUREARBPROC>("glActiveTexture");
 	glClientActiveTexture_ = load_extension<PFNGLCLIENTACTIVETEXTUREARBPROC>("glClientActiveTexture");
@@ -22,13 +23,19 @@ void OpenGLExtensions::init_extensions()
 		if (it->second)
 			INFO_LOG(it->first);
 	}
+#endif
 }
 
 bool OpenGLExtensions::is_extension_supported(const std::string& ext_name) const
 {
+#ifndef MHE_OPENGLES
 	std::map<std::string, bool>::const_iterator it = loaded_extensions_.find(ext_name);
 	if (it == loaded_extensions_.end()) return false;
 	return it->second;
+#else
+    UNUSED(ext_name);
+  	return true;
+#endif
 }
 
 std::string OpenGLExtensions::get_supported_extensions() const
