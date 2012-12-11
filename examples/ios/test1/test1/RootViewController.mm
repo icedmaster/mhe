@@ -74,7 +74,7 @@
     std::string last = "/";
     std::string path = [[self textureBasePath] fileSystemRepresentation];
     path += last;
-    engine_->context().texture_manager().set_base_path(path);
+    engine_->context().texture_manager().set_path(path);
     
     boost::shared_ptr<TestScene> test_scene(new TestScene(engine_));
     test_scene->init("");
