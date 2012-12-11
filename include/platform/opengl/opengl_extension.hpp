@@ -150,6 +150,13 @@ public:
 #endif
 	}
 
+	void glUniform1i(GLint location, GLint value)
+	{
+#ifdef MHE_OPENGLES
+		::glUniform1i(location, value);
+#endif
+	}
+
 	GLint glGetAttributeLocation(GLuint program, const GLchar* name)
 	{
 #ifdef MHE_OPENGLES
@@ -158,7 +165,7 @@ public:
 	}
 
 	void glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized,
-							   GLsizei stride, const GLvoid**  pointer)
+							   GLsizei stride, const GLvoid* pointer)
 	{
 #ifdef MHE_OPENGLES
 		::glVertexAttribPointer(index, size, type, normalized, stride, pointer);
@@ -178,6 +185,55 @@ public:
         ::glDisableVertexAttribArray(attr);
 #endif
     }
+
+	void glGenBuffers(GLsizei n, GLuint* buffers)
+	{
+#ifdef MHE_OPENGLES
+		::glGenBuffers(n, buffers);
+#endif
+	}
+
+	void glDeleteBuffers(GLsizei n, GLuint* buffers)
+	{
+#ifdef MHE_OPENGLES
+		::glDeleteBuffers(n, buffers);
+#endif
+	}
+
+	void glBindBuffer(GLenum target, GLuint buffer)
+	{
+#ifdef MHE_OPENGLES
+		::glBindBuffer(target, buffer);
+#endif
+	}
+
+	void glBufferData(GLenum target, GLsizeiptr size, const GLvoid* data, GLenum usage)
+	{
+#ifdef MHE_OPENGLES
+		::glBufferData(target, size, data, usage);
+#endif
+	}
+
+	void glGenVertexArrays(GLsizei n, GLuint* array)
+	{
+#ifdef MHE_OPENGLES
+		::glGenVertexArraysOES(n, array);
+#endif
+	}
+
+	void glDeleteVertexArrays(GLsizei n, GLuint* array)
+	{
+#ifdef MHE_OPENGLES
+		::glDeleteVertexArraysOES(n, array);
+#endif
+	}
+
+	void glBindVertexArray(GLuint array)
+	{
+#ifdef MHE_OPENGLES
+		::glBindVertexArrayOES(array);
+#endif
+	}
 private:
 	OpenGLExtensions() {}
 	~OpenGLExtensions() {}

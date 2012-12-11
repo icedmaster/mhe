@@ -25,9 +25,12 @@ public:
 	bool check_status(GLenum param) const;
 
 	bool set_uniform(const std::string& name, const matrixf& value);
+	bool set_uniform(const std::string& name, int value);
 	bool set_attribute(const std::string& name, const v3d& value);
 	bool set_attribute(const std::string& name, const vector4<float>& value);
 	bool set_attribute(const std::string& name, const float* data, cmn::uint size);
+	bool set_attribute(const std::string& name, const float* data, cmn::uint size,
+					   size_t offset, size_t stride = 0);
     bool disable_attribute(const std::string& name);
 private:
 	void remove_program();

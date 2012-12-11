@@ -80,7 +80,6 @@
     test_scene->init("");
     engine_->set_game_scene(test_scene);
     engine_->game_scene()->scene()->add_camera(new mhe::Camera2D(rect.size.width, rect.size.height), true);
-    engine_->context().driver()->set_clear_color(mhe::color_green);
 	// Do any additional setup after loading the view.
     self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(onTimer)];
     self.displayLink.frameInterval = 1.0f / 60.0f;

@@ -3,6 +3,7 @@
 
 #include "video_driver.hpp"
 #include "opengles_shader_program.hpp"
+#include "opengles_buffer.hpp"
 
 namespace mhe {
 namespace opengl {
@@ -44,13 +45,15 @@ private:
 	void save_current_color() {}
 	void restore_color() {}
 	void begin_draw_impl(const float*, const float*, const float*, const float*,
-						 cmn::uint);
+						 cmn::uint) {}
 	void begin_draw_impl(boost::shared_ptr<Texture>,
 						 const float*, const float*, const float*, const float*,
 						 cmn::uint) {}
+	void begin_draw_impl(const RenderBuffer* buffer);
 	void draw_impl(const cmn::uint*, cmn::uint);
-	void end_draw_impl();
+	void end_draw_impl() {}
 	void end_draw_impl(boost::shared_ptr<Texture> /*texture*/) {}
+	void end_draw_impl(const RenderBuffer* buffer);
 
 	void set_color_impl(const colorf&) {}
 
@@ -61,6 +64,16 @@ private:
 	void set_shader_program_impl(const boost::shared_ptr<ShaderProgram>& program);
     
     void end_render_impl();
+
+	bool support_buffered_render() const
+	{
+		return true;
+	}
+
+	virtual RenderBuffer* create_render_buffer() const
+	{
+		return new OpenGLBuffer;
+	}
 private:
 	bool init_default_shader();
 

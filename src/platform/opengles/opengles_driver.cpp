@@ -2,6 +2,7 @@
 
 #include "platform/opengl/mhe_gl.hpp"
 #include "platform/opengl/opengl_extension.hpp"
+#include "platform/opengl/opengl_utils.hpp"
 #include "platform/opengles/shaders/default_shaders.hpp"
 
 namespace mhe {
@@ -86,26 +87,44 @@ void OpenGLESDriver::load_projection_matrix(const matrixf& m)
 	active_shader_program_->set_uniform(projection_matrix_uniform_name, m);
 }
 
-void OpenGLESDriver::begin_draw_impl(const float* v, const float* n, const float* t, const float* c,
-									 cmn::uint /*size*/)
+void OpenGLESDriver::begin_draw_impl(const RenderBuffer* buffer)
 {
-	active_shader_program_->set_attribute(vertex_position_attr_name, v, 3);
-	active_shader_program_->set_attribute(normals_coord_attr_name, n, 3);
-	active_shader_program_->set_attribute(texture_coord_attr_name, t, 2);
-	active_shader_program_->set_attribute(vertex_color_attr_name, c, 4);
+	check_for_errors();
+	// TODO: need to apply correct texture unit
+	active_shader_program_->set_uniform(texture_unit_uniform_name, 0);
+
+    const std::vector<float>& data = buffer->data();
+    size_t v_offset = buffer->offset(vertex_position_attribute_name);
+    if (v_offset != RenderBuffer::invalid_offset)
+        active_shader_program_->set_attribute(vertex_position_attribute_name,
+                                           &data[0], 3, v_offset * sizeof(float));
+    size_t n_offset = buffer->offset(vertex_normal_attribute_name);
+    if (n_offset != RenderBuffer::invalid_offset)
+        active_shader_program_->set_attribute(vertex_normal_attribute_name,
+                                           &data[0], 3, n_offset * sizeof(float));
+    size_t t_offset = buffer->offset(vertex_texcoord_attribute_name);
+    if (t_offset != RenderBuffer::invalid_offset)
+        active_shader_program_->set_attribute(vertex_texcoord_attribute_name,
+                                           &data[0], 2, t_offset * sizeof(float));
+    size_t c_offset = buffer->offset(vertex_color_attribute_name);
+    if (c_offset != RenderBuffer::invalid_offset)
+        active_shader_program_->set_attribute(vertex_color_attribute_name,
+                                           &data[0], 4, c_offset * sizeof(float));
 }
     
 void OpenGLESDriver::draw_impl(const cmn::uint* i, cmn::uint size)
 {
+	check_for_errors();
     glDrawElements(GL_TRIANGLES, size, GL_UNSIGNED_INT, i);
 }
     
-void OpenGLESDriver::end_draw_impl()
+void OpenGLESDriver::end_draw_impl(const RenderBuffer* /*buffer*/)
 {
-    active_shader_program_->disable_attribute(vertex_position_attr_name);
-    active_shader_program_->disable_attribute(normals_coord_attr_name);
-    active_shader_program_->disable_attribute(texture_coord_attr_name);
-    active_shader_program_->disable_attribute(vertex_color_attr_name);
+	check_for_errors();
+    active_shader_program_->disable_attribute(vertex_position_attribute_name);
+    active_shader_program_->disable_attribute(vertex_normal_attribute_name);
+    active_shader_program_->disable_attribute(vertex_texcoord_attribute_name);
+    active_shader_program_->disable_attribute(vertex_color_attribute_name);
 }
     
 void OpenGLESDriver::set_viewport_impl(int x, int y, int w, int h)

@@ -1,5 +1,6 @@
 #include "platform/opengl/opengl_texture.hpp"
 #include "platform/opengl/opengl_driver.hpp"
+#include "platform/opengl/opengl_utils.hpp"
 
 namespace mhe {
 namespace opengl {
@@ -21,10 +22,12 @@ void OpenGLTexture::rebuild_texture(boost::shared_ptr<Image> im,
 	glBindTexture(GL_TEXTURE_2D, id_);
 	//switch (ft_)
 	//glBindOpenGLTexture(GL_OpenGLTexture_2D, id_);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_FALSE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_FALSE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    
+    check_for_errors();
 
 	w_ = im->width();
     h_ = im->height();
@@ -63,19 +66,18 @@ void OpenGLTexture::rebuild_texture(boost::shared_ptr<Image> im,
 		data = &cdata[0];
 	}
 
-	glTexImage2D(GL_TEXTURE_2D, 0, bts, w_, h_,
+	glTexImage2D(GL_TEXTURE_2D, 0, format, w_, h_,
 				 0, format, GL_UNSIGNED_BYTE, data);
 }
 
 void OpenGLTexture::prepare(boost::shared_ptr<Driver> /*driver*/)
 {
-	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, id_);
 }
 
 void OpenGLTexture::clean(boost::shared_ptr<Driver> /*driver*/)
 {
-	glDisable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 boost::shared_ptr<Texture> OpenGLTexture::clone() const

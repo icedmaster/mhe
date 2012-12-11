@@ -9,6 +9,7 @@
 #include "window_system.hpp"
 #include "renderable.hpp"
 #include "shader_program.hpp"
+#include "render_buffer.hpp"
 
 namespace mhe
 {
@@ -247,9 +248,12 @@ private:
 	virtual void begin_draw_impl(boost::shared_ptr<Texture>,
 								 const float*, const float*, const float*, const float*,
 								 cmn::uint) = 0;
+	virtual void begin_draw_impl(const RenderBuffer*) {}
 	virtual void draw_impl(const cmn::uint*, cmn::uint) = 0;
+	virtual void draw_impl(const RenderBuffer*) {}
 	virtual void end_draw_impl() = 0;
 	virtual void end_draw_impl(boost::shared_ptr<Texture> texture) = 0;
+	virtual void end_draw_impl(const RenderBuffer*) {}
 
 	virtual void set_color_impl(const colorf&) {}
 
@@ -261,11 +265,23 @@ private:
     
     virtual void begin_render_impl() {}
     virtual void end_render_impl() {}
+
+	virtual bool support_buffered_render() const
+	{
+		return false;
+	}
+
+	// method for internal buffer using
+	virtual RenderBuffer* create_render_buffer() const
+	{
+		return nullptr;
+	}
 private:
 	std::vector<Renderable> perform_batch() const;
 	void perform_render(const Renderable& renderable);
 	void set_render_flags(const Renderable& renderable);
 	void clear_render_flags(const Renderable& renderable);
+	void perform_buffered_render(const Renderable& Renderable);
 
 	std::list<Renderable*> renderable_elements_;
 	Stats stats_;

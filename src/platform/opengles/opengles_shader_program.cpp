@@ -88,6 +88,17 @@ bool OpenGLESShaderProgram::set_uniform(const std::string& name, const matrixf& 
     return false;
 }
 
+bool OpenGLESShaderProgram::set_uniform(const std::string& name, int value)
+{
+    GLint uniform_position = OpenGLExtensions::instance().glGetUniformLocation(id_, name.c_str());
+    if (uniform_position >= 0)
+    {
+        OpenGLExtensions::instance().glUniform1i(uniform_position, value);
+        return true;
+    }
+    return false;
+}
+
 bool OpenGLESShaderProgram::set_attribute(const std::string& name, const v3d& value)
 {
 	return set_attribute(name, value.get(), 3);
@@ -100,10 +111,16 @@ bool OpenGLESShaderProgram::set_attribute(const std::string& name, const vector4
 
 bool OpenGLESShaderProgram::set_attribute(const std::string& name, const float* data, cmn::uint size)
 {
+	return set_attribute(name, data, size, 0, 0);
+}
+
+bool OpenGLESShaderProgram::set_attribute(const std::string& name, const float* /*data*/, cmn::uint size,
+										  size_t offset, size_t stride)
+{
     GLint attr_location = OpenGLExtensions::instance().glGetAttributeLocation(id_, name.c_str());
     if (attr_location >= 0)
     {
-        OpenGLExtensions::instance().glVertexAttribPointer(attr_location, size, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<const void**>(&data));
+        OpenGLExtensions::instance().glVertexAttribPointer(attr_location, size, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<const void*>(offset));
 		OpenGLExtensions::instance().glEnableVertexAttribArray(attr_location);
         return true;
     }

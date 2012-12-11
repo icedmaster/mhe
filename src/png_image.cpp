@@ -90,7 +90,6 @@ namespace mhe
 			if (color == 6)
 				fi.bpp = bpp * 4;
 
-
 			if (bpp > 8)
 				png_set_swap(png);	// works only with little-endian machines
 
