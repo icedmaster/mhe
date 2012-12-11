@@ -15,8 +15,7 @@ public:
 
 	virtual ~Application2D() {}
 protected:
-	virtual bool mhe_app_init(const ApplicationConfig& config,
-							  const boost::shared_ptr<game::GameScene>& first_scene);
+	virtual int run_impl();
 };
 
 }}

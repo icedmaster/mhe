@@ -1,22 +1,25 @@
 #include "app/application.hpp"
 
 #include "utils/sysutils.hpp"
+#include "app/application_asset_path.hpp"
 
 namespace mhe {
 namespace app {
 
 Application::Application(const std::string& name) :
 	name_(name)
-{}
+{
+	mhe::utils::create_standart_log();
+}
 
 Application::Application(const ArgumentsParser& /*arguments_parser*/)
 {
+	mhe::utils::create_standart_log();
 }
 
-bool Application::init(const ApplicationConfig& config,
-					   const boost::shared_ptr<game::GameScene>& first_scene)
+bool Application::init(const ApplicationConfig& config)
 {
-	if (!mhe_app_init(config, first_scene)) return false;
+	if (!mhe_app_init(config)) return false;
 	init_impl();
 	return true;
 }
@@ -27,18 +30,16 @@ void Application::deinit()
 	mhe_app_deinit();
 }
 
-bool Application::mhe_app_init(const ApplicationConfig& config,
-							   const boost::shared_ptr<game::GameScene>& first_scene)
+bool Application::mhe_app_init(const ApplicationConfig& config)
 {
-	mhe::utils::create_standart_log();
 	mhe::utils::init_randomizer();
 	mhe::impl::start_platform();
 	INFO_LOG("Init application with name:" << name_ << " w:" << config.width <<
 			 " h:" << config.height << " bpp:" << config.bpp);
 	bool result = engine_.init(config.width, config.height, config.bpp, config.fullscreen);
-	if (result)
-		engine_.context().window_system().set_caption(name_);
-	engine_.set_game_scene(first_scene);
+	if (!result) return false;
+	init_assets_path();
+	engine_.context().window_system().set_caption(name_);
 	return result;
 }
 
@@ -52,6 +53,12 @@ int Application::run_impl()
 	engine_.run();
 	deinit();
 	return 0;
+}
+
+void Application::init_assets_path()
+{
+	engine_.context().texture_manager().set_path(utils::path_join(assets_base_path,
+																  texture_path));
 }
 
 }}

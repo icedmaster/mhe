@@ -66,11 +66,17 @@ public:
 	{
 		resources_.clear();
 	}
+
+	void set_path(const std::string& path)
+	{
+		path_ = path;
+	}
 private:
 	boost::shared_ptr<res_type> load_impl(const std::string& name,
 										  const std::string& sname) const
 	{
-		res_type* res = Loader::load(name, helper_);
+		std::string full_path = utils::path_join(path_, name);
+		res_type* res = Loader::load(full_path, helper_);
 		if (res == nullptr)
 		{
 			ERROR_LOG("Can't load: " << name.c_str());
@@ -84,6 +90,7 @@ private:
 
 	mutable resmap resources_;
 	helper_type helper_;
+	std::string path_;
 };
 
 }	// namespace mhe

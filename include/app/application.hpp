@@ -14,14 +14,19 @@ public:
 	Application(const std::string& name);
 	Application(const ArgumentsParser& arg_parser);
 	virtual ~Application() {}
-	bool init(const ApplicationConfig& config,
-			  const boost::shared_ptr<game::GameScene>& first_scene);
-	bool init(const ApplicationConfig& config, game::GameScene* first_scene)
-	{
-		return init(config, boost::shared_ptr<game::GameScene>(first_scene));
+	bool init(const ApplicationConfig& config);
+	void deinit();
+	int run(const boost::shared_ptr<game::GameScene>& first_scene)
+	{		
+		engine_.set_game_scene(first_scene); // TODO: maybe, need to move it into run_impl() ?
+		return run_impl();
 	}
 
-	void deinit();
+	int run(game::GameScene* first_scene)
+	{
+		return run(boost::shared_ptr<game::GameScene>(first_scene));
+	}
+
 	int run()
 	{
 		return run_impl();
@@ -36,20 +41,21 @@ public:
 	{
 		return engine_;
 	}
-protected:
-	// methods with default implementation
-	virtual bool mhe_app_init(const ApplicationConfig& config,
-							  const boost::shared_ptr<game::GameScene>& first_scene);
-	virtual void mhe_app_deinit();
-	virtual int run_impl();
 
 	game::Engine& engine()
 	{
 		return engine_;
 	}
+protected:
+	// methods with default implementation
+	virtual bool mhe_app_init(const ApplicationConfig& config);
+	virtual void mhe_app_deinit();
+	virtual int run_impl();
 private:
 	virtual void init_impl() {}
 	virtual void deinit_impl() {}
+private:
+	void init_assets_path();
 
 	std::string name_;
 	game::Engine engine_;

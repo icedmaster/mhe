@@ -66,13 +66,13 @@ inline void ltrim(std::string& s, const std::string& c = " ")
 inline std::string rtrim_copy(const std::string& s, const std::string& c = " ")
 {
 	size_t pos = s.find_last_not_of(c);
-	return s.substr(pos, s.length() - pos);
+	return s.substr(0, pos);
 }
 
 inline std::string ltrim_copy(const std::string& s, const std::string& c = " ")
 {
 	size_t pos = s.find_first_not_of(c);
-	return s.substr(0, pos);
+	return s.substr(pos, s.length() - pos);
 }
 
 inline void trim(std::string& s, const std::string& c = " ")

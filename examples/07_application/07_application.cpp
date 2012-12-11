@@ -36,6 +36,6 @@ int main(int, char**)
 		config.fullscreen = false;
 	}
 	TestApplication app("07_application");
-	app.init(config, nullptr);
-	return app.run();
+	app.init(config);
+	return app.run(nullptr);
 }
