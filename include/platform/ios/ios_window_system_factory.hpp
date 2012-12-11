@@ -5,6 +5,7 @@
 #include "ios_window_system.hpp"
 #include "ios_event_system.hpp"
 #include "ios_system_device_impl.hpp"
+#include "ios_mouse_device_impl.hpp"
 
 namespace mhe {
 namespace ios {
@@ -29,7 +30,7 @@ public:
 
 	MouseDeviceImpl* create_mouse_device_impl() const
 	{
-		return nullptr;
+		return new iOSMouseDeviceImpl;
 	}
 
 	SystemDeviceImpl* create_system_device_impl() const

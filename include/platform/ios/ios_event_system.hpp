@@ -11,7 +11,6 @@ class iOSEventSystem : public EventSystem
 public:
 	bool init()
 	{
-		// really initialized with SDL_INIT_VIDEO
 		return true;
 	}
 
