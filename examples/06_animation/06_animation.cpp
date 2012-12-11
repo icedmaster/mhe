@@ -93,6 +93,7 @@ int main(int /*argc*/, char** /*argv*/)
 	boost::shared_ptr<TestGameScene> game_scene(new TestGameScene(&engine));
 	game_scene->init("", nullptr);
 	engine.set_game_scene(game_scene);
+	game_scene->scene()->add_camera(new mhe::Camera2D(800, 600), true);
 	engine.run();
 
 	mhe::impl::stop_platform();

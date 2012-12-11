@@ -11,6 +11,7 @@ namespace opengl {
 	bool OpenGLDriver::init_impl()
 	{
 		OpenGLExtensions::instance().init_extensions();
+		glEnable(GL_TEXTURE_2D);
 		return true;
 	}
 
