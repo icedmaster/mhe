@@ -48,9 +48,4 @@ std::string read_whole_file(std::ifstream& stream)
 	return std::string((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
 }
 
-std::string path_join(const std::string& part1, const std::string& part2)
-{
-	return part1 + part2;
-}
-
 }}

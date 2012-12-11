@@ -48,11 +48,6 @@ public:
         return texture_manager_;
     }
 
-	TextureManager& texture_manager()
-	{
-		return texture_manager_;
-	}
-
 	const TextureAtlasManager& texture_atlas_manager() const
 	{
 		return texture_atlas_manager_;

@@ -2,4 +2,4 @@
 !/CMakeLists.txt
 !/cmake_modules/
 !/.gitignore
-
+!*sh

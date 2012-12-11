@@ -38,7 +38,7 @@ public:
 	// TODO:
 	void resize(const vector2<int>&) {}
 
-	Surface* surface() const
+	const Surface* surface() const
 	{
 		return &surface_;
 	}

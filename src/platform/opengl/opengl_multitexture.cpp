@@ -1,5 +1,7 @@
 #include "platform/opengl/opengl_multitexture.hpp"
+
 #include "platform/opengl/opengl_driver.hpp"
+#include "platform/opengl/opengl_extension.hpp"
 
 namespace mhe {
 namespace opengl {
@@ -16,7 +18,7 @@ void OpenGLMultiTexture::prepare(boost::shared_ptr<Driver> driver)
 {
 	for (size_t i = 0; i < textures_.size(); ++i)
 	{
-		dynamic_cast<OpenGLDriver*>(driver.get())->get_extensions().glActiveTexture(GL_TEXTURE0_ARB + i);
+		OpenGLExtensions::instance().glActiveTexture(GL_TEXTURE0_ARB + i);
 		textures_[i]->prepare(driver);
 	}
 }
@@ -25,7 +27,7 @@ void OpenGLMultiTexture::clean(boost::shared_ptr<Driver> driver)
 {
 	for (size_t i = 0; i < textures_.size(); ++i)
 	{
-		dynamic_cast<OpenGLDriver*>(driver.get())->get_extensions().glActiveTexture(GL_TEXTURE0_ARB + i);
+		OpenGLExtensions::instance().glActiveTexture(GL_TEXTURE0_ARB + i);
 		textures_[i]->clean();
 	}
 }

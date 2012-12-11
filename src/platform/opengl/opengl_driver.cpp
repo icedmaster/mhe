@@ -10,7 +10,7 @@ namespace opengl {
 
 	bool OpenGLDriver::init_impl()
 	{
-		extensions_.init_extensions();
+		OpenGLExtensions::instance().init_extensions();
 		return true;
 	}
 
