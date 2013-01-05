@@ -25,7 +25,6 @@ AnimationListBase::AnimationChangeType AnimationListBase::update(cmn::uint tick)
 	{
 		if (!next())
 		{
-			DEBUG_LOG("AnimationList " << index_ << " need to stop");
 			if (!repeat_)
 			{				
 				stop();
