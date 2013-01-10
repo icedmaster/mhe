@@ -14,6 +14,7 @@ namespace game {
 
 class Component;
 typedef boost::shared_ptr<Component> component_ptr;
+typedef boost::weak_ptr<Component> component_weak_ptr;
 
 class Component
 {

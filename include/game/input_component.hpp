@@ -21,12 +21,12 @@ public:
 
 	virtual ~BaseInputComponent() {}
 private:
-	bool update_impl(const Message&)
+	virtual bool update_impl(const Message&)
 	{
 		return true;
 	}
 
-	void do_subscribe(Component* /*parent*/)
+	virtual void do_subscribe(Component* /*parent*/)
 	{}
 };
 

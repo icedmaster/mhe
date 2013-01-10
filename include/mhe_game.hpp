@@ -6,6 +6,7 @@
 #include "game/input_component.hpp"
 #include "game/node_component.hpp"
 #include "game/animation_component.hpp"
+#include "game/observer_component.hpp"
 #include "game/message_transform.hpp"
 
 #endif
