@@ -42,6 +42,7 @@ public:
 	void attach(component_ptr component, int type);
 	void attach(component_ptr component, const std::vector<int>& types);
 	void detach(Component* component);
+	void detach(component_ptr component);
 	void update(const Message& message);
 	void update(cmn::uint tick)
 	{
@@ -84,13 +85,18 @@ protected:
 	}
 
 	Component(const std::string& name, const std::string& add_name) :
-		name_(name), add_name_(add_name), parent_(nullptr),
+        name_(name), add_name_(add_name), parent_(nullptr), root_(nullptr),
 		lifetime_(lifetime_infinite), start_time_(0)
 	{}
 
 	void set_parent(Component* component)
 	{
 		parent_ = component;
+	}
+
+	Component* parent() const
+	{
+		return parent_;
 	}
 
 	void detach_self()

@@ -4,22 +4,11 @@
 namespace mhe {
 namespace game {
 
-void AnimationComponent::update_impl(cmn::uint tick)
-{
-	switch (animation_list_->update(tick))
-	{
-		case AnimationListBase::next_animation:
-			send_animation_message();
-			break;
-
-		default: break;
-	}
-}
-
 // TransformAnimationComponent
 void TransformAnimationComponent::send_animation_message()
 {
-	send_message(TransformMessage(get_animation_list<TransformLinearAnimationList>()->current_value(), this));
+	animation_list()->update_node(nullptr);
+    parent()->update(TransformMessage(animation_list()->current_value(), this));
 }
 
 }}

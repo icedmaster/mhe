@@ -30,6 +30,11 @@ void Component::attach(component_ptr component, int type)
 	subscribe(type, component.get());
 }
 
+void Component::detach(component_ptr component)
+{
+	detach(component.get());
+}
+
 void Component::detach(Component* component)
 {
 	DEBUG_LOG("Component::detach():" << full_name() << " " << component->full_name());

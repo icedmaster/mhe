@@ -62,22 +62,25 @@ private:
 
 	bool next()
 	{
-		if (++current_animation_ >= animations_count_)
+		if (++current_animation_ > animations_count_)
 			return false;
 		return true;
 	}
 
+	/// If node is nullptr - animation list does only update current value
 	void update_node_impl(Node* node)
 	{
 		if (!get_from_value_)
 		{
 			update_current_value(current_, delta_);
-			update_node_for_value(node, current_);
+			if (node != nullptr)
+				update_node_for_value(node, current_);
 			get_from_value_ = false;
 		}
 		else
 		{
-			from_ = get_current_node_value(node);
+			if (node != nullptr)
+				from_ = get_current_node_value(node);
 			init_animation_delta();
 		}
 	}
