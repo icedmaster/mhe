@@ -8,7 +8,8 @@ namespace game {
 void TransformAnimationComponent::send_animation_message()
 {
 	animation_list()->update_node(nullptr);
-    parent()->update(TransformMessage(animation_list()->current_value(), this));
+    parent()->update(
+		TransformMessage(transform_animation_list()->current_value(), this));
 }
 
 }}

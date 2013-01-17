@@ -22,6 +22,11 @@ public:
 	{
 		components_.push_back(component_weak_ptr(component));
 	}
+
+	size_t observed_count() const
+	{
+		return components_.size();
+	}
 private:
 	void do_subscribe(Component* /*parent*/)
 	{}

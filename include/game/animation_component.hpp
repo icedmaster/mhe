@@ -8,16 +8,17 @@
 namespace mhe {
 namespace game {
 
-template <class AnimationListClass>
 class AnimationComponent : public Component
 {	
 public:
-	AnimationListClass* animation_list()
+	virtual ~AnimationComponent() {}
+
+	AnimationListBase* animation_list()
 	{
 		return animation_list_.get();
 	}
 
-	const AnimationListClass* animation_list() const
+	const AnimationListBase* animation_list() const
 	{
 		return animation_list_.get();
 	}
@@ -38,13 +39,17 @@ public:
 	}
 protected:
 	AnimationComponent(const std::string& name, const std::string& add_name,
-		AnimationListClass* animation_list) :
+		AnimationListBase* animation_list) :
 		Component(name, add_name),
 		animation_list_(animation_list),
 		detach_on_completion_(false)
 	{}
 
-	virtual ~AnimationComponent() {}
+	template <class AnimationListClass>
+	AnimationListClass* animation_list_with_class()
+	{
+		return static_cast<AnimationListClass*>(animation_list_.get());
+	}
 private:
 	void do_subscribe(Component* /*parent*/) {}
 	bool update_impl(const Message&)
@@ -71,16 +76,21 @@ private:
 
 	virtual void send_animation_message() = 0;
 
-	boost::shared_ptr<AnimationListClass> animation_list_;
+	boost::shared_ptr<AnimationListBase> animation_list_;
 	bool detach_on_completion_;
 };
 
-class TransformAnimationComponent : public AnimationComponent<TransformLinearAnimationList>
+class TransformAnimationComponent : public AnimationComponent
 {
 public:
 	TransformAnimationComponent(const std::string& name, const std::string& add_name) :
 		AnimationComponent(name, add_name, new TransformLinearAnimationList(0))
 	{}
+
+	TransformLinearAnimationList* transform_animation_list()
+	{
+		return animation_list_with_class<TransformLinearAnimationList>();
+	}
 private:
 	void send_animation_message();
 };

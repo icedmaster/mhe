@@ -76,6 +76,18 @@ public:
 	}	
 
 	component_ptr child_by_add_name(const std::string& add_name) const;
+
+	// IMPORTAINT: I think this function if VERY slow
+	template <class T>
+	T* get_component() const
+	{
+		for (size_t i = 0; i < children_.size(); ++i)
+		{
+			T* component = dynamic_cast<T*>(children_[i].get());
+			if (component != nullptr) return component;
+		}
+		return nullptr;
+	}
 protected:
 	Component(const std::string& fullname) :
 		parent_(nullptr), root_(nullptr),
@@ -113,6 +125,9 @@ protected:
 	virtual	bool update_impl(const Message& message) = 0;
 	virtual void destroy_impl() {}
 private:
+	virtual void on_attach(Component* /*component*/) {}
+	virtual void on_detach(Component* /*component*/) {}
+
 	void divide_full_name(const std::string& fullname)
 	{
 		size_t point_pos = fullname.find(".");
