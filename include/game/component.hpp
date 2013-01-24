@@ -14,6 +14,7 @@ namespace game {
 
 class Component;
 typedef boost::shared_ptr<Component> component_ptr;
+typedef boost::weak_ptr<Component> component_weak_ptr;
 
 class Component
 {
@@ -42,6 +43,7 @@ public:
 	void attach(component_ptr component, int type);
 	void attach(component_ptr component, const std::vector<int>& types);
 	void detach(Component* component);
+	void detach(component_ptr component);
 	void update(const Message& message);
 	void update(cmn::uint tick)
 	{
@@ -74,6 +76,18 @@ public:
 	}	
 
 	component_ptr child_by_add_name(const std::string& add_name) const;
+
+	// IMPORTAINT: I think this function if VERY slow
+	template <class T>
+	T* get_component() const
+	{
+		for (size_t i = 0; i < children_.size(); ++i)
+		{
+			T* component = dynamic_cast<T*>(children_[i].get());
+			if (component != nullptr) return component;
+		}
+		return nullptr;
+	}
 protected:
 	Component(const std::string& fullname) :
 		parent_(nullptr), root_(nullptr),
@@ -84,13 +98,18 @@ protected:
 	}
 
 	Component(const std::string& name, const std::string& add_name) :
-		name_(name), add_name_(add_name), parent_(nullptr),
+        name_(name), add_name_(add_name), parent_(nullptr), root_(nullptr),
 		lifetime_(lifetime_infinite), start_time_(0)
 	{}
 
 	void set_parent(Component* component)
 	{
 		parent_ = component;
+	}
+
+	Component* parent() const
+	{
+		return parent_;
 	}
 
 	void detach_self()
@@ -106,6 +125,9 @@ protected:
 	virtual	bool update_impl(const Message& message) = 0;
 	virtual void destroy_impl() {}
 private:
+	virtual void on_attach(Component* /*component*/) {}
+	virtual void on_detach(Component* /*component*/) {}
+
 	void divide_full_name(const std::string& fullname)
 	{
 		size_t point_pos = fullname.find(".");

@@ -11,6 +11,7 @@ void Component::attach(component_ptr component)
 	component->set_parent(this);
 	component->root_ = (root_ == nullptr) ? this : root_;
 	component->do_subscribe(this);
+	on_attach(component.get());
 }
 
 void Component::attach(component_ptr component, const std::vector<int>& types)
@@ -20,6 +21,7 @@ void Component::attach(component_ptr component, const std::vector<int>& types)
 	component->set_parent(this);
 	for (size_t i = 0; i < types.size(); ++i)
 		subscribe(types[i], component.get());
+	on_attach(component.get());
 }
 
 void Component::attach(component_ptr component, int type)
@@ -28,11 +30,18 @@ void Component::attach(component_ptr component, int type)
 	children_.push_back(component);
 	component->set_parent(this);
 	subscribe(type, component.get());
+	on_attach(component.get());
+}
+
+void Component::detach(component_ptr component)
+{
+	detach(component.get());
 }
 
 void Component::detach(Component* component)
 {
 	DEBUG_LOG("Component::detach():" << full_name() << " " << component->full_name());
+	on_detach(component);
 	// remove component from subscribers
 	for (subsmap::iterator it = subscribers_.begin(); it != subscribers_.end(); ++it)
 	{
