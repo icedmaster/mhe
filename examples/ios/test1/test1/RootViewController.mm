@@ -68,9 +68,8 @@
     
     CGRect rect = self.view.frame;
     engine_->init(rect.size.width, rect.size.height, 32, false);
-    const mhe::ios::iOSSurface* surface = static_cast<const mhe::ios::iOSSurface*>(engine_->context().window_system().surface());
-    [self.view addSubview:surface->view()];
-    [surface->delegate() setEngine:engine_];
+    const mhe::ios::iOSView* view = static_cast<const mhe::ios::iOSView*>(engine_->context().window_system().view());
+    engine_->context().window_system().view()->set_events_handler(new mhe::app::BaseViewEventsHandler(engine_));
     std::string last = "/";
     std::string path = [[self textureBasePath] fileSystemRepresentation];
     path += last;
@@ -84,13 +83,15 @@
     self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(onTimer)];
     self.displayLink.frameInterval = 1.0f / 60.0f;
     [displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+    
+    [self.view addSubview:view->glview()];
 }
 
 -(void) onTimer
 {
     engine_->update();
-    const mhe::ios::iOSSurface* surface = static_cast<const mhe::ios::iOSSurface*>(engine_->context().window_system().surface());
-    [surface->view() display];
+    const mhe::ios::iOSView* view = static_cast<const mhe::ios::iOSView*>(engine_->context().window_system().view());
+    [view->glview() display];
 }
 
 - (void)didReceiveMemoryWarning

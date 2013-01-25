@@ -25,9 +25,9 @@ void iOSWindowSystem::swap_buffers()
     impl_->swap_buffers();
 }
 
-const Surface* iOSWindowSystem::surface() const
+View* iOSWindowSystem::view()
 {
-	return impl_->surface();
+	return impl_->view();
 }
 
 // implementation

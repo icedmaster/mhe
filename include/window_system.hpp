@@ -4,15 +4,11 @@
 #include "config.hpp"
 #include "mhe_math.hpp"
 #include "impl/system_factory.hpp"
+#include "view.hpp"
 #include <boost/shared_ptr.hpp>
 
 namespace mhe
 {
-class Surface
-{
-public:
-	virtual ~Surface() {}
-};
 
 class WindowSystemImpl
 {
@@ -25,7 +21,7 @@ public:
 	virtual void swap_buffers() = 0;
 	virtual void show_cursor(bool) = 0;
 	virtual void resize(const vector2<int>&) = 0;
-	virtual const Surface* surface() const = 0;
+	virtual View* view() = 0;
 };
 
 class WindowSystem
@@ -88,9 +84,14 @@ public:
 		impl_->set_caption(caption);
 	}
 
-	const Surface* surface() const
+	const View* view() const
 	{
-		return impl_->surface();
+		return impl_->view();
+	}
+
+	View* view()
+	{
+		return impl_->view();
 	}
 private:
 	boost::shared_ptr<WindowSystemImpl> impl_;

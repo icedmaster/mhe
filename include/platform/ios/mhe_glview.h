@@ -1,9 +1,16 @@
+#ifndef __MHE_GLVIEW_H__
+#define __MHE_GLVIEW_H__
+
 #import <UIKit/UIKit.h>
 #import <GLKit/GLKit.h>
-#include "game/engine.hpp"
+#include "view.hpp"
 
-@interface mheGLView : NSObject<GLKViewDelegate>
+class ViewEventsHandler;
 
--(void) setEngine:(mhe::game::Engine*)engine;
+@interface mheGLView : GLKView
+
+-(void) setViewEventsHandler:(mhe::ViewEventsHandler*)handler;
 
 @end
+
+#endif

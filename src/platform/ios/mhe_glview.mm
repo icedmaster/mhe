@@ -1,25 +1,27 @@
 #include "platform/ios/mhe_glview.h"
 
 #include "utils/unused.hpp"
+#include "view.hpp"
 
 @interface mheGLView()
 {
-	mhe::game::Engine* engine_;
+	mhe::ViewEventsHandler* _eventsHandler;
 }
 @end
 
 @implementation mheGLView
 
--(void) setEngine:(mhe::game::Engine*)engine
+-(void) setViewEventsHandler:(mhe::ViewEventsHandler*)eventsHandler
 {
-	engine_ = engine;
+	_eventsHandler = eventsHandler;
 }
 
--(void)glkView:(GLKView *)view drawInRect:(CGRect)rect
+-(void) drawRect:(CGRect)rect
 {
-    UNUSED(view); UNUSED(rect);
-    if (engine_ != nullptr)
-        engine_->render();
+    UNUSED(rect);
+    [super drawRect:rect];
+    assert(_eventsHandler != nullptr);
+	_eventsHandler->on_draw();
 }
 
 @end

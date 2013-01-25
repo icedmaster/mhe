@@ -2,6 +2,7 @@
 
 #include "utils/sysutils.hpp"
 #include "app/application_asset_path.hpp"
+#include "app/base_view_events_handler.hpp"
 
 namespace mhe {
 namespace app {
@@ -39,7 +40,8 @@ bool Application::mhe_app_init(const ApplicationConfig& config)
 	bool result = engine_.init(config.width, config.height, config.bpp, config.fullscreen);
 	if (!result) return false;
 	init_assets_path();
-	engine_.context().window_system().set_caption(name_);
+	engine_.context().window_system().set_caption(name_);	
+	engine_.context().window_system().view()->set_events_handler(new BaseViewEventsHandler(&engine_));
 	return result;
 }
 

@@ -22,7 +22,7 @@ public:
 	// TODO:
 	void resize(const vector2<int>&) {}
 
-	const Surface* surface() const;
+	View* view();
 private:
 	boost::scoped_ptr<iOSWindowSystemImpl> impl_;
 };

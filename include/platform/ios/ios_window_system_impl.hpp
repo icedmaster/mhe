@@ -6,39 +6,10 @@
 #import <UIKit/UIKit.h>
 #import <GLKit/GLKit.h>
 #include "window_system.hpp"
-#import "mhe_glview.h"
+#include "ios_view.hpp"
 
 namespace mhe {
 namespace ios {
-
-class iOSSurface : public Surface
-{
-public:
-    ~iOSSurface();
-    
-	mheGLView* delegate() const
-	{		
-		return delegate_;
-	}
-
-	void set(mheGLView* delegate)
-	{
-		delegate_ = delegate;
-	}
-    
-    void set_view(GLKView* view)
-    {
-        view_ = view;
-    }
-    
-    GLKView* view() const
-    {
-        return view_;
-    }
-private:
-	mheGLView* delegate_;
-    GLKView* view_;
-};
 
 class iOSWindowSystemImpl
 {
@@ -48,13 +19,13 @@ public:
     
     void swap_buffers();
 
-	const iOSSurface* surface() const
+	iOSView* view()
 	{
-		return &surface_;
+		return &view_;
 	}
 private:
 	EAGLContext* context_;
-	iOSSurface surface_;
+	iOSView view_;
 };
 
 }}
