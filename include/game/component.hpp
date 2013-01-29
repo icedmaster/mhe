@@ -42,6 +42,12 @@ public:
 	void attach(component_ptr component);
 	void attach(component_ptr component, int type);
 	void attach(component_ptr component, const std::vector<int>& types);
+
+	void attach(Component* component)
+	{
+		attach(component_ptr(component));
+	}
+
 	void detach(Component* component);
 	void detach(component_ptr component);
 	void update(const Message& message);
