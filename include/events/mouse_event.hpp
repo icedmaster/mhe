@@ -29,6 +29,16 @@ public:
 		pos_(pos)
 	{}
 
+	MouseEvent() :
+		Event(mouse_event_type)
+	{}
+
+	void setup_event(int event, int button, const vector2<int>& pos)
+	{
+		Event::setup_event(event, button);
+		pos_ = pos;
+	}
+
 	const vector2<int> pos() const
 	{
 		return pos_;

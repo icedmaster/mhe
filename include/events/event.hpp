@@ -21,6 +21,11 @@ public:
 
 	virtual ~Event() {}
 
+	void setup_event(int arg, int optarg = any_event)
+	{
+		id_ = Event::create_event_id(type(), arg, optarg);
+	}
+
 	void set_device(Device* device)
 	{
 		device_ = device;
@@ -74,6 +79,8 @@ private:
 	Device* device_;
 	int id_;
 };
+
+typedef boost::shared_ptr<Event> event_ptr;
 
 }
 

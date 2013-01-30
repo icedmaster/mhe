@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <boost/shared_ptr.hpp>
+#include "device.hpp"
 
 namespace mhe {
 
@@ -14,7 +15,7 @@ class SystemDeviceImpl
 {
 public:
 	virtual ~SystemDeviceImpl() {}
-	virtual std::vector< boost::shared_ptr<Event> > check(const WindowSystem&) = 0;
+	virtual void check(Device::events_vector& events, const WindowSystem&) = 0;
 };
 
 }

@@ -42,7 +42,7 @@ void EventManager::check(const WindowSystem& ws)
 	backend_->update_event_queue();
 	for (devices_map::iterator it = devices_.begin(); it != devices_.end(); ++it)
 	{
-		const std::vector< boost::shared_ptr<Event> >& events = it->second->check(ws);
+		const Device::events_vector& events = it->second->check(ws);
 		for (size_t i = 0; i < events.size(); ++i)
 		{
 			process_event(events[i]);

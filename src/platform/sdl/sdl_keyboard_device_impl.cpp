@@ -6,21 +6,20 @@
 namespace mhe {
 namespace sdl {
 
-std::vector< boost::shared_ptr<Event> > SDLKeyboardDeviceImpl::check(const WindowSystem& /*ws*/)
+void SDLKeyboardDeviceImpl::check(Device::events_vector& events, const WindowSystem& /*ws*/)
 {
-	std::vector< boost::shared_ptr<Event> > events;
-	std::vector<SDL_Event> sdl_events;
+	SDL_events_vector sdl_events;
 	int cnt = check_for_events(SDL_EVENTMASK(SDL_KEYDOWN) | SDL_EVENTMASK(SDL_KEYUP), sdl_events);
-	if (cnt <= 0) return events;
+	if (cnt <= 0) return;
+	events.resize(cnt);
 	for (int i = 0; i < cnt; ++i)
-		events.push_back(create_event(sdl_events[i]));
-	return events;
+		setup_event(static_cast<KeyboardEvent*>(events[i].get()), sdl_events[i]);
 }
 
-boost::shared_ptr<KeyboardEvent> SDLKeyboardDeviceImpl::create_event(const SDL_Event& sdl_event) const
+void SDLKeyboardDeviceImpl::setup_event(KeyboardEvent* event, const SDL_Event& sdl_event) const
 {
 	int et = (sdl_event.type == SDL_KEYDOWN) ? KeyboardEvent::key_down : KeyboardEvent::key_up;
-	return boost::shared_ptr<KeyboardEvent>(new KeyboardEvent(et, sdl_event.key.keysym.sym));
+	return event->setup_event(et, sdl_event.key.keysym.sym);
 }
 
 }}

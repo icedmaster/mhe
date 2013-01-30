@@ -16,7 +16,11 @@ enum
 
 public:
 	SystemEvent(int system_type) :
-	Event(system_event_type, system_type)
+		Event(system_event_type, system_type)
+	{}
+
+	SystemEvent() :
+		Event(system_event_type)
 	{}
 
 	int system_type() const

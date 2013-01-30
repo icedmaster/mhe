@@ -12,7 +12,7 @@ class MouseDevice : public Device
 public:
 	MouseDevice(const std::string& name);
 private:
-	std::vector< boost::shared_ptr<Event> > check_impl(const WindowSystem&);
+	void check_impl(events_vector& events, const WindowSystem&);
 
 	boost::scoped_ptr<MouseDeviceImpl> impl_;
 };

@@ -7,35 +7,35 @@
 namespace mhe {
 namespace sdl {
 
-std::vector< boost::shared_ptr<Event> > SDLMouseDeviceImpl::check(const WindowSystem& ws)
+void SDLMouseDeviceImpl::check(Device::events_vector& events, const WindowSystem& ws)
 {
-	std::vector< boost::shared_ptr<Event> > events;
-	std::vector<SDL_Event> sdl_events;
+	SDL_events_vector sdl_events;
 	int cnt = check_for_events(SDL_EVENTMASK(SDL_MOUSEMOTION) |
 							   SDL_EVENTMASK(SDL_MOUSEBUTTONDOWN) |
 							   SDL_EVENTMASK(SDL_MOUSEBUTTONUP), sdl_events);
-	if (cnt <= 0) return events;
+	if (cnt <= 0) return;
+	events.resize(cnt);
 	for (int i = 0; i < cnt; ++i)
-		events.push_back(create_event(sdl_events[i], ws));
-	return events;
+		setup_event(static_cast<MouseEvent*>(events[i].get()), sdl_events[i], ws);
 }
 
-boost::shared_ptr<MouseEvent> SDLMouseDeviceImpl::create_event(const SDL_Event& event, const WindowSystem& ws) const
+void SDLMouseDeviceImpl::setup_event(MouseEvent* event, 
+									 const SDL_Event& sdl_event, const WindowSystem& ws) const
 {
 	int arg = Event::any_event, optarg = Event::any_event;
 	vector2<int> pos;
-	if (event.type == SDL_MOUSEMOTION)
+	if (sdl_event.type == SDL_MOUSEMOTION)
 	{
 		arg = MouseEvent::move;
-		pos.set(event.motion.x, ws.height() - event.motion.y);
+		pos.set(sdl_event.motion.x, ws.height() - sdl_event.motion.y);
 	}
 	else
 	{
-		arg = (event.type == SDL_MOUSEBUTTONDOWN) ? MouseEvent::button_pressed : MouseEvent::button_released;
-		pos.set(event.button.x, ws.height() - event.button.y);
-		optarg = event.button.button;
+		arg = (sdl_event.type == SDL_MOUSEBUTTONDOWN) ? MouseEvent::button_pressed : MouseEvent::button_released;
+		pos.set(sdl_event.button.x, ws.height() - sdl_event.button.y);
+		optarg = sdl_event.button.button;
 	}
-	return boost::shared_ptr<MouseEvent>(new MouseEvent(arg, optarg, pos));
+	return event->setup_event(arg, optarg, pos);
 }
 
 }}

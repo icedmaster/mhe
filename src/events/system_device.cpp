@@ -9,12 +9,12 @@ SystemDevice::SystemDevice(const std::string& name) :
 	Device(name),
 	impl_(SystemFactory::instance().create_system_device_impl())
 {
+	init_events_with_type<SystemEvent>();
 }
 
-std::vector< boost::shared_ptr<Event> > SystemDevice::check_impl(const WindowSystem& ws)
+void SystemDevice::check_impl(events_vector& events, const WindowSystem& ws)
 {
-	const std::vector< boost::shared_ptr<Event> >& events = impl_->check(ws);
-	return events;
+	impl_->check(events, ws);
 }
 
 }

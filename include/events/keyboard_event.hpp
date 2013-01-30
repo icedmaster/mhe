@@ -18,6 +18,10 @@ public:
 		Event(keyboard_event_type, state, sym)
 	{}
 
+	KeyboardEvent() :
+		Event(keyboard_event_type)
+	{}
+
 	int state() const
 	{
 		return Event::arg();

@@ -2,12 +2,13 @@
 
 namespace mhe {
 
-std::vector< boost::shared_ptr<Event> > Device::check(const WindowSystem& ws)
+Device::events_vector Device::check(const WindowSystem& ws)
 {
-	const std::vector< boost::shared_ptr<Event> >& events = check_impl(ws);
-	for (size_t i = 0; i < events.size(); ++i)
-		events[i]->set_device(this);
-	return events;
+	events_.clear();
+	check_impl(events_, ws);
+	for (size_t i = 0; i < events_.size(); ++i)
+		events_[i]->set_device(this);
+	return events_;
 }
 
 }
