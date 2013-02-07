@@ -24,6 +24,11 @@ void TextureAtlas::set_indicies(const float* ind, int sz)
 	indicies_.assign(ind, ind + sz);
 }
 
+void TextureAtlas::add_indicies(const float* ind, int sz)
+{
+	indicies_.insert(indicies_.end(), ind, ind + sz);
+}
+
 std::vector<float> TextureAtlas::get(cmn::uint quad) const
 {
 	std::vector<float> a(8);
