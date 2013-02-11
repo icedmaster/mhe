@@ -1,4 +1,4 @@
-#ifndef __TEXTURE_FOT_HPP__
+#ifndef __TEXTURE_FONT_HPP__
 #define __TEXTURE_FONT_HPP__
 
 #include "font.hpp"
@@ -10,9 +10,11 @@ namespace gui {
 class TextureFont : public Font
 {
 public:
+	virtual ~TextureFont() {}
+
 	bool load(const std::string& filename);
 
-	void print(const boost::shared_ptr<Driver>& driver, const utf8_string& text,
+	void print(const boost::shared_ptr<Driver>& driver, const utf32_string& text,
 			   const vector2<float>& position, const colorf& color = color_white);
 
 	std::string name() const
@@ -36,15 +38,15 @@ protected:
 	}
 
 	void load_texture(const std::string& filename);
-	void add_char_for_index(utf8_char c, const rect<float>& rect);	
+	void add_char_for_index(utf32_char c, const rect<float>& rect);	
 private:
 	virtual bool load_font_parameters(std::istream& stream, std::string& texture_filename) = 0;
 	virtual bool load_font_chars(std::istream& stream) = 0;
 
-	cmn::uint get_char(utf8_char c) const;
+	cmn::uint get_char(utf32_char c) const;
 
 	TextureAtlas ta_;
-	std::map<utf8_char, cmn::uint> chars_;
+	std::map<utf32_char, cmn::uint> chars_;
 	std::string name_;
 	cmn::uint height_;
 };

@@ -43,6 +43,13 @@ std::string get_file_name_with_path(const std::string& filepath)
 	return filepath.substr(0, point_pos);
 }
 
+std::string get_file_path(const std::string& fullpath)
+{
+	size_t slash_pos = fullpath.find_last_of('/');
+	if (slash_pos == std::string::npos) return fullpath;
+	return fullpath.substr(0, slash_pos + 1);
+}
+
 std::string read_whole_file(std::ifstream& stream)
 {
 	return std::string((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());

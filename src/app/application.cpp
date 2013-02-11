@@ -59,6 +59,8 @@ void Application::init_assets_path()
 {
 	engine_.context().texture_manager().set_path(utils::path_join(assets_base_path,
 																  texture_path));
+	engine_.font_manager().set_path(utils::path_join(assets_base_path,
+													 font_path));
 }
 
 }}

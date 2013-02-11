@@ -7,6 +7,7 @@
 #include "context.hpp"
 #include "sound_manager.hpp"
 #include "sound/iaudio_driver.hpp"
+#include "gui/font_manager.hpp"
 
 namespace mhe {
 namespace game {
@@ -76,6 +77,11 @@ public:
 	{
 		return initialized_;
 	}
+
+	gui::FontManager& font_manager()
+	{
+		return fm_;
+	}
 private:
 	friend class EventListener;
 	bool stop_p(const Event*)
@@ -89,7 +95,7 @@ private:
 
 	WindowSystem ws_;
 	Context context_;
-	//FontManager fm_;
+	gui::FontManager fm_;
 	SoundManager sm_;
 	EventManager event_manager_;
 	boost::shared_ptr<iAudioDriver> audio_driver_;

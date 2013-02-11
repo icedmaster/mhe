@@ -8,6 +8,7 @@ namespace game {
 class Engine;
 
 // base game scene class
+
 class GameScene
 {
 public:
@@ -59,6 +60,11 @@ public:
 	{
 		return process_impl();
 	}
+
+	void draw()
+	{
+		draw_impl();
+	}
 protected:
 	Engine* get_engine() const
 	{
@@ -70,6 +76,7 @@ private:
 	virtual bool init_impl(const std::string&, void*) {return true;}
 	virtual void deinit_impl() {}
 	virtual bool process_impl() {return true;}
+	virtual void draw_impl() {}
 private:
 	Engine* engine_;
 	boost::shared_ptr<GameScene> prev_;

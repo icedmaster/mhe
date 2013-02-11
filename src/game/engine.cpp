@@ -74,8 +74,9 @@ void Engine::update()
 
 void Engine::render()
 {
-	context_.update();
+	context_.update();	
 	game_scene_->scene()->draw(context_);
+	game_scene_->draw();
 	context_.flush();
 }
 	

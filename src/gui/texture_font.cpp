@@ -23,7 +23,9 @@ bool TextureFont::load(const std::string& filename)
 	}
 	else
 	{
-		load_texture(texture_filename);
+		std::string texture_path = utils::path_join(utils::get_file_path(filename),
+													texture_filename);
+		load_texture(texture_path);
 		loaded = load_font_chars(f);
 		if (!loaded)
 			WARN_LOG("Can't load font chars from file:" << filename);
@@ -32,7 +34,7 @@ bool TextureFont::load(const std::string& filename)
 	return loaded;
 }
 
-void TextureFont::print(const boost::shared_ptr<Driver>& driver, const utf8_string& text,
+void TextureFont::print(const boost::shared_ptr<Driver>& driver, const utf32_string& text,
 						const vector2<float>& position, const colorf& color)
 {
 	std::vector<float> t;	// texture coordinates
@@ -48,7 +50,7 @@ void TextureFont::print(const boost::shared_ptr<Driver>& driver, const utf8_stri
 	float x_offs = 0;
 	for (size_t i = 0; i < len; ++i)
 	{
-		utf8_char sym = text[i];
+		utf32_char sym = text[i];
 		cmn::uint ind = get_char(sym);
 		const v2d& sz = ta_.get_size(ind);
 		const std::vector<float>& tc = ta_.get(ind);
@@ -91,33 +93,34 @@ void TextureFont::load_texture(const std::string& filename)
 	ta_.set_texture(temp_manager.get(filename));
 }
 
-void TextureFont::add_char_for_index(utf8_char c, const rect<float>& rect)
+void TextureFont::add_char_for_index(utf32_char c, const rect<float>& rect)
 {
 	const float texture_width  = ta_.texture()->width();
 	const float texture_height = ta_.texture()->height();
 
 	const float x = rect.ll().x();
-	const float y = rect.ll().y();
+	const float y = texture_height - rect.ll().y();
 	const float height = rect.height();
 	const float width = rect.width();
 
 	float tc[8];
 	tc[0] = x / texture_width;
-	tc[1] = y - height / texture_height;
+	tc[1] = (y - height) / texture_height;
 	tc[2] = tc[0];
 	tc[3] = y / texture_height;
-	tc[4] = x + width / texture_width;
+	tc[4] = (x + width) / texture_width;
 	tc[5] = tc[3];
 	tc[6] = tc[4];
 	tc[7] = tc[1];
 
 	ta_.add_indicies(tc, 8);
-	chars_[c] = chars_.size();
+	size_t index = chars_.size();
+	chars_[c] = index;
 }
 
-cmn::uint TextureFont::get_char(utf8_char c) const
+cmn::uint TextureFont::get_char(utf32_char c) const
 {
-	std::map<utf8_char, cmn::uint>::const_iterator it = chars_.find(c);
+	std::map<utf32_char, cmn::uint>::const_iterator it = chars_.find(c);
 	assert(it != chars_.end());
 	return it->second;
 }
