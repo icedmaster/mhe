@@ -8,12 +8,13 @@ namespace mhe {
 MouseDevice::MouseDevice(const std::string& name) :
 	Device(name),
 	impl_(SystemFactory::instance().create_mouse_device_impl())
-{}
-
-std::vector< boost::shared_ptr<Event> > MouseDevice::check_impl(const WindowSystem& ws)
 {
-	const std::vector< boost::shared_ptr<Event> >& events = impl_->check(ws);
-	return events;
+	init_events_with_type<MouseEvent>();
+}
+
+void MouseDevice::check_impl(events_vector& events, const WindowSystem& ws)
+{
+	impl_->check(events, ws);
 }
 
 }

@@ -10,9 +10,9 @@ namespace sdl {
 class SDLSystemDeviceImpl : public SystemDeviceImpl
 {
 public:
-	std::vector< boost::shared_ptr<Event> > check(const WindowSystem&);
+	void check(Device::events_vector& events, const WindowSystem&);
 private:
-	boost::shared_ptr<SystemEvent> create_event(const SDL_Event& sdl_event) const;
+	void setup_event(SystemEvent* event, const SDL_Event& sdl_event) const;
 };
 
 }}

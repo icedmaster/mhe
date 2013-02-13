@@ -19,7 +19,9 @@ bool MouseInputComponent::handle(const Event* event)
 		mouse_on_ = true;
 		handle_mouse_on();
 	}
-	handle_mouse_impl(me->pos(), me->event_type(), me->button());
+	v2d pos(me->pos().x() - rect_.ll().x(),
+			me->pos().y() - rect_.ll().y());
+	handle_mouse_impl(pos, me->event_type(), me->button());
 	return false;
 }
 

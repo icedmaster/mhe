@@ -5,11 +5,16 @@
 #include <boost/shared_ptr.hpp>
 #include "event.hpp"
 #include "window_system.hpp"
+#include "fixed_size_vector.hpp"
 
 namespace mhe {
 
 class Device
 {
+protected:
+	static const size_t max_events_count = 10;
+public:
+	typedef fixed_size_vector<event_ptr, max_events_count> events_vector;
 public:
 	Device(const std::string& name) :
 		name_(name)
@@ -22,11 +27,20 @@ public:
 		return name_;
 	}
 
-	std::vector< boost::shared_ptr<Event> > check(const WindowSystem& ws);
+	events_vector check(const WindowSystem& ws);
+protected:
+	/// Initializing device events vector with events of concrete type
+	template <class EventType>
+	void init_events_with_type()
+	{		
+		for (size_t i = 0; i < max_events_count; ++i)
+			events_[i] = boost::shared_ptr<EventType>(new EventType);
+	}
 private:
-	virtual std::vector< boost::shared_ptr<Event> > check_impl(const WindowSystem&) = 0;
+	virtual void check_impl(events_vector& events, const WindowSystem&) = 0;
 
 	std::string name_;
+	events_vector events_;
 };
 
 }

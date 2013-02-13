@@ -6,23 +6,22 @@
 namespace mhe {
 namespace sdl {
 
-std::vector< boost::shared_ptr<Event> > SDLSystemDeviceImpl::check(const WindowSystem&)
+void SDLSystemDeviceImpl::check(Device::events_vector& events, const WindowSystem&)
 {
-	std::vector< boost::shared_ptr<Event> > events;
-	std::vector<SDL_Event> sdl_events;
+	SDL_events_vector sdl_events;
 	int cnt = check_for_events(SDL_EVENTMASK(SDL_QUIT), sdl_events);
-	if (cnt <= 0) return events;
+	if (cnt <= 0) return;
+	events.resize(cnt);
 	for (int i = 0; i < cnt; ++i)
-		events.push_back(create_event(sdl_events[i]));
-	return events;
+		setup_event(static_cast<SystemEvent*>(events[i].get()), sdl_events[i]);
 }
 
-boost::shared_ptr<SystemEvent> SDLSystemDeviceImpl::create_event(const SDL_Event& sdl_event) const
+void SDLSystemDeviceImpl::setup_event(SystemEvent* event, const SDL_Event& sdl_event) const
 {
 	int arg = Event::any_event;
 	if (sdl_event.type == SDL_QUIT)
 		arg = SystemEvent::quit;
-	return boost::shared_ptr<SystemEvent>(new SystemEvent(arg));
+	return event->setup_event(arg);
 }
 
 }}
