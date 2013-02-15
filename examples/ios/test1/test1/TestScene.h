@@ -13,12 +13,40 @@
 
 class TestScene : public mhe::game::GameScene
 {
+private:
+    class MouseListener : public mhe::EventListener
+    {
+    public:
+        MouseListener(TestScene* scene) :
+            scene_(scene)
+        {}
+        
+        mhe::EventType type() const {return mhe::mouse_event_type;}
+        int arg() const {return mhe::MouseEvent::button_pressed;}
+        
+        bool handle(const mhe::Event* event)
+        {
+            const mhe::MouseEvent* mouse_event = static_cast<const mhe::MouseEvent*>(event);
+            scene_->mouse_click(mouse_event->pos());
+            return true;
+        }
+    private:
+        TestScene* scene_;
+    };
+    friend class MouseListener;
 public:
     TestScene(mhe::game::Engine* engine):
         mhe::game::GameScene(engine)
     {}
     
     bool init_impl(const std::string&, void*);
+private:
+    void mouse_click(const mhe::vector2<int>& pos)
+    {
+        perform_animation(pos);
+    }
+    
+    void perform_animation(const mhe::vector2<int>& pos);
 };
 
 #endif /* defined(__test1__TestScene__) */

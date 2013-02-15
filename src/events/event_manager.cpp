@@ -45,13 +45,18 @@ void EventManager::check(const WindowSystem& ws)
 		const Device::events_vector& events = it->second->check(ws);
 		for (size_t i = 0; i < events.size(); ++i)
 		{
-			process_event(events[i]);
+			process_event(events[i].get());
 		}
 	}
 	backend_->clear_event_queue();
 }
+    
+void EventManager::add_event(const Event *event)
+{
+    process_event(event);
+}
 
-void EventManager::process_event(const boost::shared_ptr<Event>& event)
+void EventManager::process_event(const Event* event)
 {
 	// find global events
 	int arg = event->arg(), optarg = event->optarg();
@@ -65,12 +70,12 @@ void EventManager::process_event(const boost::shared_ptr<Event>& event)
 	process_event_with_id(event->id(), event);
 }
 
-void EventManager::process_event_with_id(int id, const boost::shared_ptr<Event>& event)
+void EventManager::process_event_with_id(int id, const Event* event)
 {
 	typedef std::pair<listeners_map::iterator, listeners_map::iterator> find_result;
 	find_result res = listeners_.equal_range(id);
 	for (listeners_map::iterator it = res.first; it != res.second; ++it)
-		it->second->handle(event.get());
+		it->second->handle(event);
 }
 
 }

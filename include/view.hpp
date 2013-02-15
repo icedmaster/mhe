@@ -13,7 +13,7 @@ public:
 	virtual ~ViewEventsHandler() {}
 
 	virtual void on_draw() = 0;
-	virtual void on_mouse_click(int button, const v2d& position) = 0;
+	virtual void on_mouse_click(int button, const v2d& position) = 0;   
 };
 
 class View

@@ -9,9 +9,8 @@ namespace ios {
 class iOSSystemDeviceImpl : public SystemDeviceImpl
 {
 public:
-	std::vector< boost::shared_ptr<Event> > check(const WindowSystem&)
+	void check(Device::events_vector& /*events*/, const WindowSystem&)
 	{
-		return std::vector< boost::shared_ptr<Event> >();
 	}
 };
 

@@ -117,9 +117,9 @@ public:
 	iterator insert(const_iterator position, InputIterator first, InputIterator last)
 	{
 		size_t first_index = position - begin();
-		size_t count = 0;
+		size_t inserted_count = 0;
 		for (; first != last; ++first)
-			insert_impl(first_index + count++, *first);
+			insert_impl(first_index + inserted_count++, *first);
 		return begin_ + count;
 	}
 

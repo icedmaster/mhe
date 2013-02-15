@@ -21,9 +21,11 @@ public:
 	void add_listener(const boost::shared_ptr<EventListener>& listener);
 	void add_listener(EventListener* listener);
 	void check(const WindowSystem& window_system);
+    
+    void add_event(const Event* event);
 private:
-	void process_event(const boost::shared_ptr<Event>& event);
-	void process_event_with_id(int id, const boost::shared_ptr<Event>& event);
+  	void process_event(const Event* event);
+	void process_event_with_id(int id, const Event* event);
 
 	typedef std::map< std::string, boost::shared_ptr<Device> > devices_map;
 	typedef std::multimap< int, boost::shared_ptr<EventListener> > listeners_map;

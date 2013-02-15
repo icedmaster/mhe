@@ -53,6 +53,11 @@ public:
 	{
 		return Event::optarg();
 	}
+
+    void invert_y_position(int height = 0)
+	{
+		pos_.set_y(height - pos_.y());
+	}
 private:
 	vector2<int> pos_;
 };

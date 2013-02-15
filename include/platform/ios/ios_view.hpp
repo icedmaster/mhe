@@ -27,6 +27,11 @@ public:
     {
         return glview_;
     }
+
+	EventsProvider* events_provider() const
+	{
+		return [glview_ eventsProvider];
+	}
 private:
 	void update()
 	{

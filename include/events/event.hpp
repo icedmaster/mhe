@@ -1,6 +1,7 @@
 #ifndef __EVENT_HPP__
 #define __EVENT_HPP__
 
+#include <boost/shared_ptr.hpp>
 #include "types.hpp"
 #include "event_type.hpp"
 

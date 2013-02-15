@@ -75,6 +75,8 @@
     path += last;
     engine_->context().texture_manager().set_path(path);
     
+    engine_->event_manager().add_device(new mhe::MouseDevice("mouse"));
+    
     boost::shared_ptr<TestScene> test_scene(new TestScene(engine_));
     test_scene->init("");
     engine_->set_game_scene(test_scene);

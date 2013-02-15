@@ -19,9 +19,7 @@ public:
 	}
     
     void on_mouse_click(int button, const v2d& position)
-    {
-        
-    }
+    {}
 private:
 	game::Engine* engine_;
 };

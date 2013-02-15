@@ -9,10 +9,7 @@ namespace ios {
 class iOSMouseDeviceImpl : public MouseDeviceImpl
 {
 public:
-	std::vector< boost::shared_ptr<Event> > check(const WindowSystem& window_system)
-	{
-		return std::vector< boost::shared_ptr<Event> >();
-	}
+    void check(Device::events_vector& /*events*/, const WindowSystem&);
 };
 
 }}

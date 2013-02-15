@@ -7,6 +7,7 @@
 @interface mheGLView()
 {
 	mhe::ViewEventsHandler* _eventsHandler;
+	mhe::EventsProvider _eventsProvider;
 }
 @end
 
@@ -15,6 +16,11 @@
 -(void) setViewEventsHandler:(mhe::ViewEventsHandler*)eventsHandler
 {
 	_eventsHandler = eventsHandler;
+}
+
+-(mhe::EventsProvider*) eventsProvider
+{
+	return &_eventsProvider;
 }
 
 -(void) drawRect:(CGRect)rect
@@ -30,7 +36,26 @@
     UNUSED(event);
     UITouch* touch = [touches anyObject];
     CGPoint point = [touch locationInView:self];
-    _eventsHandler->on_mouse_click(mhe::Event::any_event, mhe::v2d(point.x, point.y));
+    _eventsProvider.add_mouse_event(mhe::MouseEvent::button_pressed,
+		mhe::Event::any_event, mhe::v2d(point.x, point.y));
+}
+
+-(void) touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    UNUSED(event);
+    UITouch* touch = [touches anyObject];
+    CGPoint point = [touch locationInView:self];
+    _eventsProvider.add_mouse_event(mhe::MouseEvent::move,
+                                    mhe::Event::any_event, mhe::v2d(point.x, point.y));
+}
+
+-(void) touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    UNUSED(event);
+    UITouch* touch = [touches anyObject];
+    CGPoint point = [touch locationInView:self];
+    _eventsProvider.add_mouse_event(mhe::MouseEvent::button_released,
+                                  mhe::Event::any_event, mhe::v2d(point.x, point.y));
 }
 
 @end
