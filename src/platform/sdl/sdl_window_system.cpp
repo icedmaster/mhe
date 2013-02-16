@@ -13,7 +13,7 @@ namespace sdl {
         SDL_Surface* srf = SDL_SetVideoMode(r.x(), r.y(), bpp, flags);
 		if (!srf) return false;
 
-		surface_.set(srf);
+		view_.set(srf);
 
 		int bpb = bpp >> 2;
 
