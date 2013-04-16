@@ -25,7 +25,8 @@ public:
 		elements_[name] = geom;
 	}
 			
-	void set_indicies(const float* ind, int sz);									
+	void set_indicies(const float* ind, int sz);		
+	void add_indicies(const float* ind, int sz); 
 	std::vector<float> get(cmn::uint quad) const;
 	std::vector<float> get(const rect<float>& quad) const;
 	std::vector<float> get(const std::string& name) const;
