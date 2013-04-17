@@ -10,6 +10,7 @@
 #import <QuartzCore/QuartzCore.h>
 #include <mhe.hpp>
 #include <platform/ios/ios_window_system_impl.hpp>
+#include <platform/ios/ios_log.hpp>
 #include "TestScene.h"
 
 @interface RootViewController ()
@@ -65,6 +66,8 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+
+    mhe::utils::ios::create_standart_log();
     
     CGRect rect = self.view.frame;
     engine_->init(rect.size.width, rect.size.height, 32, false);
