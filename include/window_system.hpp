@@ -84,15 +84,15 @@ public:
 		impl_->set_caption(caption);
 	}
 
-	const View* view() const
-	{
-		return impl_->view();
-	}
-
 	View* view()
 	{
 		return impl_->view();
 	}
+
+    const View* view() const
+    {
+        return impl_->view();
+    }
 private:
 	boost::shared_ptr<WindowSystemImpl> impl_;
 	vector2<int> win_dim_;

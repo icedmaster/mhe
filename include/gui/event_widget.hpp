@@ -19,12 +19,12 @@ public:
 
 	virtual ~EventWidget() {}
 
-	void set_geom(const rect<int>& geom)
+	void set_geom(const rect<float>& geom)
 	{
 		geom_ = geom;
 	}
 
-	const rect<int>& geom() const
+	const rect<float>& geom() const
 	{
 		return geom_;
 	}
@@ -32,6 +32,11 @@ public:
 	bool mouse_on() const
 	{
 		return mouse_on_;
+	}
+
+	bool button_pressed() const
+	{
+		return button_pressed_;
 	}
 
 	void add_handler(int event, EventHandler* handler);
@@ -44,7 +49,7 @@ private:
 private:
 	void process_event(int event, const MouseEvent* mouse_event);
 
-	rect<int> geom_;
+	rect<float> geom_;
 	bool mouse_on_;
 	bool button_pressed_;
 	std::map<int, Delegate> handlers_;

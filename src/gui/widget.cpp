@@ -14,6 +14,11 @@ Widget::Widget(const std::string& name) :
 	visible_(true), enabled_(true)
 {}
 
+void Widget::add_widget(Widget* widget)
+{
+	add_widget(widgetptr(widget));
+}
+
 void Widget::add_widget(const widgetptr& widget)
 {
 	children_[widget->name()] = widget;
@@ -29,11 +34,16 @@ widgetptr Widget::get_widget(const std::string& name) const
 
 void Widget::draw(const Context& context)
 {
+	draw_impl(sprite_, context);
+}
+
+void Widget::draw_impl(const boost::shared_ptr<Sprite>& sprite, const Context& context)
+{
 	if (!visible_) return;
-	sprite_->set_size(geom().width(), geom().height());
-	sprite_->identity();
-	sprite_->translate(geom().ll().x(), geom().ll().y(), 0);
-	sprite_->draw(context);
+	sprite->set_size(geom().width(), geom().height());
+	sprite->identity();
+	sprite->translate(geom().ll().x(), geom().ll().y(), 0);
+	sprite->draw(context);
 }
 
 }}

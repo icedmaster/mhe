@@ -13,6 +13,15 @@ private:
 	{
 		get_engine()->font_manager().set_path("../../../assets/fonts/");
 		font_ = get_engine()->font_manager().get("droid-sans.fnt");
+		node_.reset(new mhe::gui::GUINode(get_engine()->event_manager()));
+		mhe::gui::Widget* widget = new mhe::gui::Widget("main");
+		widget->set_sprite(mhe::utils::create_sprite(mhe::color_white, mhe::vector2<float>(200, 200)));
+		widget->set_geom(mhe::rect<float>(100, 100, 200, 200));
+		node_->add_widget(widget);				
+		mhe::gui::Label* label = new mhe::gui::Label("label");
+		label->set_sprite(mhe::utils::create_sprite(mhe::color_red, mhe::vector2<float>(64, 64)));
+		label->set_geom(mhe::rect<float>(100, 100, 64, 64));
+		widget->add_widget(label);
 		return true;
 	}
 
@@ -23,6 +32,7 @@ private:
 	}
 
 	boost::shared_ptr<mhe::gui::Font> font_;
+	boost::shared_ptr<mhe::gui::GUINode> node_;
 };
 
 int main(int, char**)

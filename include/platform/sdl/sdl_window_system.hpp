@@ -7,10 +7,10 @@
 namespace mhe {
 namespace sdl {
 
-class SDLSurface : public Surface
+class SDLView : public View
 {
 public:
-	SDLSurface() :
+	SDLView() :
 		surface_(nullptr)
 	{}
 
@@ -38,12 +38,12 @@ public:
 	// TODO:
 	void resize(const vector2<int>&) {}
 
-	const Surface* surface() const
+	View* view()
 	{
-		return &surface_;
+		return &view_;
 	}
 private:
-	SDLSurface surface_;
+	SDLView view_;
 };
 
 }}

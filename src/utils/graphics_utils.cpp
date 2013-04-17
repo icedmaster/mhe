@@ -17,4 +17,12 @@ Sprite* create_sprite(const std::string& filename, const Context& context)
 	return new mhe::Sprite(al);
 }
 
+Sprite* create_sprite(const colorf& color, const mhe::vector2<float>& size)
+{
+	Sprite* sprite = new Sprite;
+	sprite->set_color(color);
+	sprite->set_size(size.x(), size.y());
+	return sprite;
+}
+
 }}

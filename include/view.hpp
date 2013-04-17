@@ -13,7 +13,6 @@ public:
 	virtual ~ViewEventsHandler() {}
 
 	virtual void on_draw() = 0;
-	virtual void on_mouse_click(int button, const v2d& position) = 0;   
 };
 
 class View
@@ -36,11 +35,6 @@ protected:
 	void on_draw()
 	{
 		events_handler_->on_draw();
-	}
-
-	void on_mouse_click(int button, const v2d& position)
-	{
-		events_handler_->on_mouse_click(button, position);
 	}
 
 	ViewEventsHandler* events_handler()

@@ -35,6 +35,11 @@ public:
 		return name_;
 	}
 
+	void set_sprite(Sprite* sprite)
+	{
+		set_sprite(boost::shared_ptr<Sprite>(sprite));
+	}
+
 	void set_sprite(const boost::shared_ptr<Sprite>& sprite)
 	{
 		sprite_ = sprite;
@@ -96,6 +101,7 @@ public:
 	}
 
 	void add_widget(const widgetptr& widget);
+	void add_widget(Widget* widget);
 	widgetptr get_widget(const std::string& name) const;
 	Widget* parent() const
 	{
@@ -103,6 +109,7 @@ public:
 	}
 protected:
 	void draw(const Context& context);
+	void draw_impl(const boost::shared_ptr<Sprite>& sprite, const Context& content);
 private:
 	// hierarhy
 	Widget* parent_;
