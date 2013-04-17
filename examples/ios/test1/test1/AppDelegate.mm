@@ -8,8 +8,14 @@
 
 #import "AppDelegate.h"
 #import "RootViewController.h"
+#include <platform/ios/ios_application.hpp>
+#include <platform/ios/ios_view.hpp>
+#include "TestScene.h"
 
 @interface AppDelegate()
+{
+    mhe::app::ios::iOSApplication* application_;
+}
 
 @property (nonatomic, retain) RootViewController* rootViewController;
 
@@ -21,6 +27,7 @@
 
 - (void)dealloc
 {
+    delete application_;
     [_window release];
     [rootViewController release];
     [super dealloc];
@@ -28,13 +35,41 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    application_ = new mhe::app::ios::iOSApplication();
     self.window = [[[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]] autorelease];
+    // TODO: application config can be loaded here
+    mhe::app::ApplicationConfig config;
+    config.width = self.window.bounds.size.width;
+    config.height = self.window.bounds.size.height;
+    config.bpp = 32;
+    application_->init(config);
     // Override point for customization after application launch.
     self.rootViewController = [[[RootViewController alloc] init] autorelease];
     self.window.rootViewController = self.rootViewController;
+    mhe::ios::iOSView* view = static_cast<mhe::ios::iOSView*>(application_->engine().context().window_system().view());
+    [self.rootViewController.view addSubview:view->glview()];
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];
+
+    [self userInitialization];
+
+    // Do any additional setup after loading the view.
     return YES;
+}
+
+-(void) userInitialization
+{
+    // write your own code here
+    application_->engine().event_manager().add_device(new mhe::MouseDevice("mouse"));
+
+    boost::shared_ptr<TestScene> test_scene(new TestScene(&(application_->engine())));
+    test_scene->init("");
+    // add 2d camera
+    const mhe::vector2<int>& size = application_->engine().context().window_system().screen_size();
+    test_scene->scene()->add_camera(new mhe::Camera2D(size.x(), size.y()), true);
+    application_->engine().set_game_scene(test_scene);
+    application_->engine().context().texture_manager().set_path(application_->path());
+    application_->engine().font_manager().set_path(application_->path());
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application

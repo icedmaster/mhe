@@ -11,7 +11,7 @@ namespace app {
 class Application
 {
 public:
-	Application(const std::string& name);
+	Application(const std::string& name = "");
 	Application(const ArgumentsParser& arg_parser);
 	virtual ~Application() {}
 	bool init(const ApplicationConfig& config);
@@ -46,17 +46,25 @@ public:
 	{
 		return engine_;
 	}
+
+	std::string path() const
+	{
+		return application_base_path();
+	}
 protected:
 	// methods with default implementation
 	virtual bool mhe_app_init(const ApplicationConfig& config);
 	virtual void mhe_app_deinit();
 	virtual int run_impl();
+	virtual void init_assets_path();
+
+	virtual std::string application_base_path() const
+	{
+		return "";
+	}
 private:
 	virtual void init_impl() {}
 	virtual void deinit_impl() {}
-private:
-	void init_assets_path();
-
 	std::string name_;
 	game::Engine engine_;
 };

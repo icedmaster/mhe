@@ -17,7 +17,7 @@
 		B1F11F8A166E0E85002B8C35 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B1F11F89166E0E85002B8C35 /* CoreGraphics.framework */; };
 		B1F11F90166E0E85002B8C35 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = B1F11F8E166E0E85002B8C35 /* InfoPlist.strings */; };
 		B1F11F92166E0E85002B8C35 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B1F11F91166E0E85002B8C35 /* main.m */; };
-		B1F11F96166E0E85002B8C35 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B1F11F95166E0E85002B8C35 /* AppDelegate.m */; };
+		B1F11F96166E0E85002B8C35 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = B1F11F95166E0E85002B8C35 /* AppDelegate.mm */; };
 		B1F11F98166E0E85002B8C35 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = B1F11F97166E0E85002B8C35 /* Default.png */; };
 		B1F11F9A166E0E85002B8C35 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B1F11F99166E0E85002B8C35 /* Default@2x.png */; };
 		B1F11F9C166E0E85002B8C35 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B1F11F9B166E0E85002B8C35 /* Default-568h@2x.png */; };
@@ -61,7 +61,7 @@
 		B1F11F91166E0E85002B8C35 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		B1F11F93166E0E85002B8C35 /* test1-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "test1-Prefix.pch"; sourceTree = "<group>"; };
 		B1F11F94166E0E85002B8C35 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
-		B1F11F95166E0E85002B8C35 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		B1F11F95166E0E85002B8C35 /* AppDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AppDelegate.mm; sourceTree = "<group>"; };
 		B1F11F97166E0E85002B8C35 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
 		B1F11F99166E0E85002B8C35 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
 		B1F11F9B166E0E85002B8C35 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
@@ -137,7 +137,7 @@
 				B1D8F278166F8CED003FD04C /* test_sprite.png */,
 				B1F11FAF166E0FBC002B8C35 /* mhe.xcodeproj */,
 				B1F11F94166E0E85002B8C35 /* AppDelegate.h */,
-				B1F11F95166E0E85002B8C35 /* AppDelegate.m */,
+				B1F11F95166E0E85002B8C35 /* AppDelegate.mm */,
 				B1F11F8C166E0E85002B8C35 /* Supporting Files */,
 				B1F11FBA166E102E002B8C35 /* RootViewController.h */,
 				B1F11FBB166E102E002B8C35 /* RootViewController.mm */,
@@ -253,7 +253,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B1F11F92166E0E85002B8C35 /* main.m in Sources */,
-				B1F11F96166E0E85002B8C35 /* AppDelegate.m in Sources */,
+				B1F11F96166E0E85002B8C35 /* AppDelegate.mm in Sources */,
 				B1F11FBC166E102E002B8C35 /* RootViewController.mm in Sources */,
 				B1D8F277166F8ADD003FD04C /* TestScene.cpp in Sources */,
 			);

@@ -10,12 +10,16 @@ namespace app {
 Application::Application(const std::string& name) :
 	name_(name)
 {
+#ifndef MHE_STANDART_LOG_DISABLED
 	mhe::utils::create_standart_log();
+#endif
 }
 
 Application::Application(const ArgumentsParser& /*arguments_parser*/)
 {
+#ifndef MHE_STANDART_LOG_DISABLED
 	mhe::utils::create_standart_log();
+#endif
 }
 
 bool Application::init(const ApplicationConfig& config)
@@ -59,9 +63,11 @@ int Application::run_impl()
 
 void Application::init_assets_path()
 {
-	engine_.context().texture_manager().set_path(utils::path_join(assets_base_path,
+	std::string base_path = utils::path_join(application_base_path(), assets_base_path);
+    INFO_LOG("Application::init_assets_path with base path:" << base_path);
+	engine_.context().texture_manager().set_path(utils::path_join(base_path,
 																  texture_path));
-	engine_.font_manager().set_path(utils::path_join(assets_base_path,
+	engine_.font_manager().set_path(utils::path_join(base_path,
 													 font_path));
 }
 
