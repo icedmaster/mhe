@@ -74,6 +74,15 @@ public:
 		texcoord_ = coord;
 	}
 
+	void set_buffers(const std::vector<float>& vertexes, const std::vector<float>& texturecoord,
+					 const std::vector<cmn::uint> indicies)
+	{
+		vertexcoord_ = vertexes;
+		texcoord_ = texturecoord;
+		indicies_ = indicies;
+		update_color_buffer();
+	}
+
 	const std::vector<float>& vertexcoord() const
 	{
 		return vertexcoord_;

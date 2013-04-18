@@ -60,12 +60,13 @@ public:
 		return highlighted_sprite_;
 	}
 
-	void set_caption(const std::wstring& caption)
+	void set_caption(const utf32_string& caption)
 	{
 		caption_ = caption;
+		update_caption();
 	}
 
-	const std::wstring& caption() const
+	const utf32_string& caption() const
 	{
 		return caption_;
 	}
@@ -73,11 +74,23 @@ public:
 	void set_font(const boost::shared_ptr<Font>& font)
 	{
 		font_ = font;
+		update_caption();
 	}
 
 	const boost::shared_ptr<Font>& font() const
 	{
 		return font_;
+	}
+
+	void set_caption_color(const colorf& color)
+	{
+		caption_color_ = color;
+        update_caption();
+	}
+
+	const colorf& caption_color() const
+	{
+		return caption_color_;
 	}
 
 	void set_visible(bool visible)
@@ -119,6 +132,8 @@ private:
 							  parent_->geom().ll().y() + geom().ll().y());
 	}
 
+	void update_caption();
+
 	// hierarhy
 	Widget* parent_;
 	std::vector<widgetptr> children_;	
@@ -128,8 +143,10 @@ private:
 	// basic widget parameters
 	std::string name_;
 	// text parameters
-	std::wstring caption_;
+	utf32_string caption_;
 	boost::shared_ptr<Font> font_;
+	colorf caption_color_;
+	boost::scoped_ptr<Renderable> caption_renderable_;
 	// flags
 	bool visible_;
 	bool enabled_;

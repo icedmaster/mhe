@@ -62,14 +62,15 @@
     // write your own code here
     application_->engine().event_manager().add_device(new mhe::MouseDevice("mouse"));
 
+    application_->engine().context().texture_manager().set_path(application_->path());
+    application_->engine().font_manager().set_path(application_->path());
+
     boost::shared_ptr<TestScene> test_scene(new TestScene(&(application_->engine())));
     test_scene->init("");
     // add 2d camera
     const mhe::vector2<int>& size = application_->engine().context().window_system().screen_size();
     test_scene->scene()->add_camera(new mhe::Camera2D(size.x(), size.y()), true);
     application_->engine().set_game_scene(test_scene);
-    application_->engine().context().texture_manager().set_path(application_->path());
-    application_->engine().font_manager().set_path(application_->path());
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application
