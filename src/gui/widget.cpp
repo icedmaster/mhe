@@ -51,7 +51,7 @@ void Widget::draw_impl(const boost::shared_ptr<Sprite>& sprite, const Context& c
 	if (!visible_) return;
 	sprite->set_size(geom().width(), geom().height());
 	sprite->identity();
-	const vector2<float>& position = relative_position();
+	const vector2<float>& position = absolute_position();
 	sprite->translate(position.x(), position.y(), 0);
 	sprite->draw(context);
 	// draw caption
@@ -74,9 +74,14 @@ void Widget::add_handler(int event, EventHandler* handler)
 	handlers_[event] += handler;
 }
 
-void Widget::process_mouse_move_event(const MouseEvent* event)
+bool Widget::process_mouse_move_event(const MouseEvent* event)
 {
-	if (geom_.in(event->pos()))
+	for (std::vector<widgetptr>::reverse_iterator it = children_.rbegin(); it != children_.rend(); ++it)
+	{
+		widgetptr widget = *it;
+		widget->process_mouse_move_event(event);
+	}
+	if (absolute_geom().in(event->pos()))
 	{
 		if (!mouse_on_)
 			process_event(mouse_move_in_event, event);
@@ -88,27 +93,44 @@ void Widget::process_mouse_move_event(const MouseEvent* event)
 		mouse_on_ = false;
 		process_event(mouse_move_out_event, event);
 	}
+	return false;
 }
 
-void Widget::process_mouse_press_event(const MouseEvent* event)
+bool Widget::process_mouse_press_event(const MouseEvent* event)
 {
-	if (geom_.in(event->pos()))
+	for (std::vector<widgetptr>::reverse_iterator it = children_.rbegin(); it != children_.rend(); ++it)
+	{
+		widgetptr widget = *it;
+		if (widget->process_mouse_press_event(event))
+            return true;
+	}
+	if (absolute_geom().in(event->pos()))
 	{
 		button_pressed_ = true;
 		process_event(mouse_button_press_event, event);
+        return true;
 	}
+	return false;
 }
 
-void Widget::process_mouse_release_event(const MouseEvent* event)
+bool Widget::process_mouse_release_event(const MouseEvent* event)
 {
+	for (std::vector<widgetptr>::reverse_iterator it = children_.rbegin(); it != children_.rend(); ++it)
+	{
+		widgetptr widget = *it;
+		if (widget->process_mouse_release_event(event))
+			return true;
+	}
 	if (button_pressed_)
 	{
 		button_pressed_ = false;
 		process_event(mouse_button_release_event, event);
+		return true;
 	}
+	return false;
 }
 
-void Widget::process_event(int event, const MouseEvent* mouse_event)
+void Widget::process_event(int event, const MouseEvent* /*mouse_event*/)
 {
 	std::map<int, Delegate>::iterator it = handlers_.find(event);
 	if (it == handlers_.end()) return;

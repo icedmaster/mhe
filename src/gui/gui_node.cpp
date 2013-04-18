@@ -48,20 +48,17 @@ void GUINode::draw_impl(const Context& context)
 
 bool GUINode::on_mouse_move(const Event* event)
 {
-	widget_->process_mouse_move_event(static_cast<const MouseEvent*>(event));
-	return true;
+	return widget_->process_mouse_move_event(static_cast<const MouseEvent*>(event));
 }
 
 bool GUINode::on_mouse_button_pressed(const Event* event)
 {
-	widget_->process_mouse_press_event(static_cast<const MouseEvent*>(event));
-	return true;
+	return widget_->process_mouse_press_event(static_cast<const MouseEvent*>(event));
 }
 
 bool GUINode::on_mouse_button_released(const Event* event)
 {
-	widget_->process_mouse_release_event(static_cast<const MouseEvent*>(event));
-	return true;
+	return widget_->process_mouse_release_event(static_cast<const MouseEvent*>(event));
 }
 
 }}

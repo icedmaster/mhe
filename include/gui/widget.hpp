@@ -148,10 +148,10 @@ public:
 		return parent_;
 	}
 protected:
-	void draw(const Context& context);
+	virtual void draw(const Context& context);
 	void draw_impl(const boost::shared_ptr<Sprite>& sprite, const Context& content);
 private:
-	vector2<float> relative_position() const
+	vector2<float> absolute_position() const
 	{
 		if (parent_ == nullptr)
 			return geom().ll();
@@ -159,11 +159,17 @@ private:
 							  parent_->geom().ll().y() + geom().ll().y());
 	}
 
+    rect<float> absolute_geom() const
+    {
+        const vector2<float>& position = absolute_position();
+        return rect<float>(position.x(), position.y(), geom_.width(), geom_.height());
+    }
+
 	void update_caption();
 
-	void process_mouse_move_event(const MouseEvent* event);
-	void process_mouse_press_event(const MouseEvent* event);
-	void process_mouse_release_event(const MouseEvent* event);
+	bool process_mouse_move_event(const MouseEvent* event);
+	bool process_mouse_press_event(const MouseEvent* event);
+	bool process_mouse_release_event(const MouseEvent* event);
 	void process_event(int event, const MouseEvent* mouse_event);
 
 	// hierarhy
