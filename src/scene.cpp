@@ -22,7 +22,7 @@ void Scene::draw(const Context& context)
 			it = nodes_.erase(it);
 			continue;
 		}
-		context.driver()->draw(node);
+		node->draw(context);
 		++it;
 	}
 }

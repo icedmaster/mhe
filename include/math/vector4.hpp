@@ -226,6 +226,12 @@ inline std::ostream& operator<< (std::ostream& s, const vector4<T>& v)
     const colorf color_green = colorf(0, 1.0, 0, 1.0);
     const colorf color_blue  = colorf(0, 0, 1.0, 1.0);
     const colorf color_yellow = colorf(1.0, 1.0, 0.0, 1.0);
+
+    inline void color_to_colorb8(const colorf& color, char* data)
+    {
+        data[0] = color.r() * 255; data[1] = color.g() * 255;
+        data[2] = color.b() * 255; data[3] = color.a() * 255;
+    }
 };
 
 #endif

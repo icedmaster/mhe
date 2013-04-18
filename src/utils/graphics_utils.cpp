@@ -17,11 +17,12 @@ Sprite* create_sprite(const std::string& filename, const Context& context)
 	return new mhe::Sprite(al);
 }
 
-Sprite* create_sprite(const colorf& color, const mhe::vector2<float>& size)
+Sprite* create_sprite(const colorf& color, const mhe::vector2<float>& size, const Context& context)
 {
 	Sprite* sprite = new Sprite;
 	sprite->set_color(color);
 	sprite->set_size(size.x(), size.y());
+    sprite->set_texture(boost::shared_ptr<Texture>(context.texture_manager().get(default_resource_name)));
 	return sprite;
 }
 

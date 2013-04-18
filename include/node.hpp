@@ -37,9 +37,9 @@ public:
 
 	void draw(const Context& context)												
 	{
+		draw_impl(context);
 		for (size_t i = 0; i < childs_.size(); ++i)
 			childs_[i]->draw(context);
-		draw_impl(context);
 	}
 
 	void update(cmn::uint tick)

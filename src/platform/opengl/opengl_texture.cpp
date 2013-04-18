@@ -15,6 +15,22 @@ OpenGLTexture::~OpenGLTexture()
 		glDeleteTextures(1, &id_);
 }
 
+void OpenGLTexture::set_color(const colorf& color)
+{
+	glGenTextures(1, &id_);
+	glBindTexture(GL_TEXTURE_2D, id_);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    GLchar data[16];
+    for (int i = 0; i < 4; ++i)
+        color_to_colorb8(color, data + i * 4);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 2, 2,
+				 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    w_ = h_ = 2;
+}
+
 void OpenGLTexture::rebuild_texture(boost::shared_ptr<Image> im,
 								    boost::shared_ptr<Driver> driver, FilterType/* ft*/)
 {

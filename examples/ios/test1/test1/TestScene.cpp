@@ -11,6 +11,16 @@
 bool TestScene::init_impl(const std::string&, void*)
 {
     get_engine()->event_manager().add_listener(new MouseListener(this));
+    mhe::gui::Widget* widget = new mhe::gui::Widget("main");
+    widget->set_sprite(mhe::utils::create_sprite(mhe::color_white, mhe::vector2<float>(32, 32), get_engine()->context()));
+    widget->set_geom(mhe::rect<float>(100, 100, 200, 100));
+    mhe::gui::Label* label = new mhe::gui::Label("label");
+    label->set_sprite(mhe::utils::create_sprite(mhe::color_green, mhe::vector2<float>(32, 32), get_engine()->context()));
+    label->set_geom(mhe::rect<float>(10, 10, 50, 20));
+    widget->add_widget(label);
+    mhe::gui::GUINode* node = new mhe::gui::GUINode(get_engine()->event_manager());
+    node->set_widget(widget);
+    scene()->add(mhe::nodeptr(node));
     return true;
 }
 

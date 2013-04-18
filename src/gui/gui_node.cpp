@@ -26,6 +26,11 @@ void GUINode::setup_events(EventManager& event_manager)
 														 create_delegate(this, &GUINode::on_mouse_button_released)));
 }
 
+void GUINode::set_widget(Widget* widget)
+{
+    widget_.reset(widget);
+}
+
 void GUINode::add_widget(Widget* widget)
 {
 	widget_->add_widget(widgetptr(widget));

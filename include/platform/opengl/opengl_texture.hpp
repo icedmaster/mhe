@@ -16,6 +16,8 @@ class OpenGLTexture : public Texture
 public:
 	OpenGLTexture();
 	~OpenGLTexture();
+
+	void set_color(const colorf& color);
 			
 	void set_image(boost::shared_ptr<Image> im, boost::shared_ptr<Driver> driver,
 				   FilterType ft = Nearest)
@@ -54,7 +56,7 @@ private:
 	cmn::uint id_;	
 	bool binded_;
 	void rebuild_texture(boost::shared_ptr<Image> im,
-						 boost::shared_ptr<Driver> driver, FilterType ft);	
+						 boost::shared_ptr<Driver> driver, FilterType ft);
 };
 
 }}

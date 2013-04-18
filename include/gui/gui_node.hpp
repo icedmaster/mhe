@@ -18,6 +18,7 @@ public:
 
 	void setup_events(EventManager& event_manager);
 
+    void set_widget(Widget* widget);
 	void add_widget(Widget* widget);
 	widgetptr get_widget(const std::string& name) const;
 private:

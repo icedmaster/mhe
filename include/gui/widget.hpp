@@ -111,9 +111,17 @@ protected:
 	void draw(const Context& context);
 	void draw_impl(const boost::shared_ptr<Sprite>& sprite, const Context& content);
 private:
+	vector2<float> relative_position() const
+	{
+		if (parent_ == nullptr)
+			return geom().ll();
+		return vector2<float>(parent_->geom().ll().x() + geom().ll().x(),
+							  parent_->geom().ll().y() + geom().ll().y());
+	}
+
 	// hierarhy
 	Widget* parent_;
-	std::map<std::string, widgetptr> children_;	
+	std::vector<widgetptr> children_;	
 	// draw
 	boost::shared_ptr<Sprite> sprite_;
 	boost::shared_ptr<Sprite> highlighted_sprite_;

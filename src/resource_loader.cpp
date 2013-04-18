@@ -35,33 +35,44 @@ iSound* SoundLoader::load(const std::string& name, const helper_type& /*helper*/
 
 Texture* TextureLoader::load(const std::string& filename, const helper_type& helper)
 {
-	const std::string& ext = utils::get_file_extension(filename);
-	if (ext.empty()) return nullptr;
-
-	boost::shared_ptr<Image> im;
 	bool loaded = false;
-	if (ext == "bmp")
+	bool use_default_color = false;
+    boost::shared_ptr<Image> im;
+	if (utils::get_file_name(filename) == default_resource_name)
 	{
-		im.reset(new bmp_image);
-		if (im->load(filename))
-			loaded = true;
+		loaded = true;
+		use_default_color = true;
 	}
-	else if (ext == "png")
+	else
 	{
-		im.reset(new png_image);
-		if (im->load(filename))
-			loaded = true;
-	}
-	else if (ext == "siwa")
-	{
-		im.reset(new siwa_image);
-		if (im->load(filename))
-			loaded = true;
+		const std::string& ext = utils::get_file_extension(filename);
+		if (ext.empty()) return nullptr;
+
+		if (ext == "bmp")
+		{
+			im.reset(new bmp_image);
+			if (im->load(filename))
+				loaded = true;
+		}
+		else if (ext == "png")
+		{
+			im.reset(new png_image);
+			if (im->load(filename))
+				loaded = true;
+		}
+		else if (ext == "siwa")
+		{
+			im.reset(new siwa_image);
+			if (im->load(filename))
+				loaded = true;
+		}
 	}
 	if (loaded)
 	{
 		Texture* texture = SystemFactory::instance().create_texture();
-		texture->set_image(im, helper);
+		if (!use_default_color)
+			texture->set_image(im, helper);
+		else texture->set_color(color_white);
 		return texture;
 	}
 	return nullptr;
