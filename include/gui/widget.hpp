@@ -1,8 +1,10 @@
 #ifndef __WIDGET_HPP__
 #define __WIDGET_HPP__
 
-#include "event_widget.hpp"
+#include "gui_event_type.hpp"
+#include "delegate.hpp"
 #include "mhe_math.hpp"
+#include "mhe_event.hpp"
 #include "sprite.hpp"
 #include "font.hpp"
 #include "video_driver.hpp"
@@ -16,13 +18,26 @@ class GUINode;
 class Widget;
 typedef boost::shared_ptr<Widget> widgetptr;
 
-class Widget : public EventWidget
+class Widget
 {
 	friend class GUINode;
+	typedef Delegate1<void, Widget*> Delegate;
+public:
+	typedef DelegateFunc1<void, Widget*> EventHandler;
 public:
 	Widget();
 	Widget(const std::string& name);
 	virtual ~Widget() {}
+
+	void set_geom(const rect<float>& geom)
+	{
+		geom_ = geom;
+	}
+
+	const rect<float>& geom() const
+	{
+		return geom_;
+	}
 
 	// accessors
 	void set_name(const std::string& name)
@@ -113,6 +128,18 @@ public:
 		return enabled_;
 	}
 
+	bool mouse_on() const
+	{
+		return mouse_on_;
+	}
+
+	bool button_pressed() const
+	{
+		return button_pressed_;
+	}
+
+	void add_handler(int event, EventHandler* handler);
+
 	void add_widget(const widgetptr& widget);
 	void add_widget(Widget* widget);
 	widgetptr get_widget(const std::string& name) const;
@@ -134,6 +161,11 @@ private:
 
 	void update_caption();
 
+	void process_mouse_move_event(const MouseEvent* event);
+	void process_mouse_press_event(const MouseEvent* event);
+	void process_mouse_release_event(const MouseEvent* event);
+	void process_event(int event, const MouseEvent* mouse_event);
+
 	// hierarhy
 	Widget* parent_;
 	std::vector<widgetptr> children_;	
@@ -150,6 +182,11 @@ private:
 	// flags
 	bool visible_;
 	bool enabled_;
+	// events
+	rect<float> geom_;
+	bool mouse_on_;
+	bool button_pressed_;
+	std::map<int, Delegate> handlers_;
 };
 
 }}
