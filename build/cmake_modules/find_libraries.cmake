@@ -56,6 +56,19 @@ macro(mhe_find_libraries)
 	  set(MHE_LIBS_FOUND ${MHE_LIBS_FOUND} ${SDL_LIB})
 	endif()
 
+	# find Qt
+	find_library(QT_LIB Qt)
+	if (${QT_LIB} STREQUAL "QT_LIB-NOTFOUND")
+	  message("Qt not found")
+	else()
+	  message("---- qt ----")
+	  message(${QT_LIB})
+	  add_definitions(-DMHE_HAS_QT)
+	  set(QT_USE_QTOPENGL TRUE)
+	  set(MHE_QT_FOUND TRUE)
+	  set(MHE_LIBS_FOUND ${MHE_LIBS_FOUND} ${QT_LIB})
+	endif()
+
 	# find libpng
 	if (NOT DEFINED IOS)
 	  find_library(PNG_LIB png)

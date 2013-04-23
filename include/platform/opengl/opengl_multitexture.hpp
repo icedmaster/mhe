@@ -12,6 +12,9 @@ public:
 	void set_image(boost::shared_ptr<Image> image,
 				   boost::shared_ptr<Driver> driver, FilterType ft = Nearest);
 
+	void set_color(const colorf&)
+	{}
+
 	void prepare(boost::shared_ptr<Driver> driver = 
 				 boost::shared_ptr<Driver>());
 	void clean(boost::shared_ptr<Driver> driver =
