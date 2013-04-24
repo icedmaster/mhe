@@ -12,6 +12,7 @@ option(BUILD_EXAMPLES "Build mhe examples" OFF)
 option(BUILD_LIB_ONLY "Build only libmhe, without examples and demo" ON)
 option(BUILD_WITH_SCRIPTS "Build with script languages support" ON)
 option(BUILD_IOS "Build for iOS" OFF)
+option(BUILD_WITH_C++11 "Build with C++11 support" OFF)
 
 include(add_subproject)
 
@@ -39,6 +40,10 @@ endif()
 
 add_definitions(-Wall)
 add_definitions(-Wextra)
+
+if (BUILD_WITH_C++11)
+   add_definitions(-std=c++11)
+endif()
 
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
    add_definitions(-O2)
