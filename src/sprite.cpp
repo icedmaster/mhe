@@ -19,7 +19,6 @@ void Sprite::draw_impl(const Context& context)
 {
 	if (!is_running_)
 		execute(0);
-	if (!current_al_) return;
 
 	Node::draw_impl(context);
 }
@@ -67,6 +66,7 @@ void Sprite::add_animation_list(AnimationListBase* al)
 void Sprite::execute(cmn::uint index)
 {
 	DEBUG_LOG("Sprite::execute() name=" << name() << " index=" << index);
+	is_running_ = true;
 	almap::iterator it = al_.find(index);
 	if (it == al_.end())
 	{
@@ -74,7 +74,6 @@ void Sprite::execute(cmn::uint index)
 			update_buffers();
 		return;
 	}
-	is_running_ = true;
 	current_al_ = it->second.get();
 	current_al_->update_node(this);
 	update_buffers();
@@ -134,6 +133,7 @@ void Sprite::update_buffers()
 	v[3] = 0.0; v[4] = y_sz; v[5] = 0.0;
 	v[6] = x_sz; v[7] = y_sz; v[8] = 0.0;
 	v[9] = x_sz; v[10] = 0.0; v[11] = 0.0;
+	update_color_buffer();
 }
 
 }

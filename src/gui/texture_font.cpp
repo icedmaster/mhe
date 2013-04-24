@@ -34,8 +34,8 @@ bool TextureFont::load(const std::string& filename)
 	return loaded;
 }
 
-void TextureFont::print(const boost::shared_ptr<Driver>& driver, const utf32_string& text,
-						const vector2<float>& position, const colorf& color)
+Renderable* TextureFont::print(const utf32_string& text,
+							   const vector2<float>& position, const colorf& color)
 {
 	std::vector<float> t;	// texture coordinates
 	std::vector<cmn::uint> ibuf;  // indicies
@@ -76,15 +76,15 @@ void TextureFont::print(const boost::shared_ptr<Driver>& driver, const utf32_str
 		ibuf.insert(ibuf.end(), indicies, indicies + 6);
 	}
 
-	driver->mask_zbuffer();
-	driver->enable_blending(alpha_one_minus_alpha);
-
-	ta_.texture()->prepare();
-	driver->draw(&v[0], 0, &t[0], &c[0], &ibuf[0], ibuf.size());
-	ta_.texture()->clean();
-
-	driver->unmask_zbuffer();
-	driver->disable_blending();
+	Renderable* renderable = new Renderable(true);
+	renderable->set_buffers(v, t, ibuf);
+	renderable->set_color(color);
+	renderable->set_texture(ta_.texture());
+	renderable->set_mask_z_buffer();
+	renderable->set_lighting_disabled();
+    renderable->set_blending_enabled();
+    renderable->set_blend_mode(alpha_one_minus_alpha);
+	return renderable;
 }
 
 void TextureFont::load_texture(const std::string& filename)

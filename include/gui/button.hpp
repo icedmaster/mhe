@@ -17,6 +17,11 @@ public:
 		Widget()
 	{}
 
+    void set_pressed_sprite(Sprite* sprite)
+    {
+        set_pressed_sprite(boost::shared_ptr<Sprite>(sprite));
+    }
+
 	void set_pressed_sprite(const boost::shared_ptr<Sprite>& sprite)
 	{
 		pressed_sprite_ = sprite;

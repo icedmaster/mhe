@@ -56,6 +56,7 @@ public:
 	void set_color(const colorf& color)
 	{
 		color_ = color;
+		update_color_buffer();
 	}
 
 	const colorf& color() const
@@ -71,6 +72,15 @@ public:
 	void set_texcoord(const std::vector<float>& coord)
 	{
 		texcoord_ = coord;
+	}
+
+	void set_buffers(const std::vector<float>& vertexes, const std::vector<float>& texturecoord,
+					 const std::vector<cmn::uint> indicies)
+	{
+		vertexcoord_ = vertexes;
+		texcoord_ = texturecoord;
+		indicies_ = indicies;
+		update_color_buffer();
 	}
 
 	const std::vector<float>& vertexcoord() const
@@ -155,7 +165,7 @@ public:
 
 	bool is_batching_disabled() const
 	{
-		return render_flags_ & batching_disabled;
+		return (render_flags_ & batching_disabled);
 	}
 
 	void set_blend_mode(BlendMode mode)
@@ -219,6 +229,24 @@ protected:
 	void set_indicies(const std::vector<cmn::uint>& coord)
 	{
 		indicies_ = coord;
+	}
+
+	std::vector<float>& rcolorcoord()
+	{
+		return colorcoord_;
+	}
+
+	void update_color_buffer()
+	{
+		int count = vertexcoord_.size() / 3;
+		colorcoord_.resize(count * 4);
+		for (int i = 0; i < count * 4; i += 4)
+		{
+			colorcoord_[i] = color_.r();
+			colorcoord_[i + 1] = color_.g();
+			colorcoord_[i + 2] = color_.b();
+			colorcoord_[i + 3] = color_.a();
+		}
 	}
 private:
 	boost::shared_ptr<Texture> texture_;

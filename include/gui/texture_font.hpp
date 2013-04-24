@@ -14,8 +14,8 @@ public:
 
 	bool load(const std::string& filename);
 
-	void print(const boost::shared_ptr<Driver>& driver, const utf32_string& text,
-			   const vector2<float>& position, const colorf& color = color_white);
+	Renderable* print(const utf32_string& text,
+            const vector2<float>& position, const colorf& color = color_white);
 
 	std::string name() const
 	{

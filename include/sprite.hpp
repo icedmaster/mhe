@@ -43,6 +43,7 @@ public:
 	{
 		x_size_ = xsize;
 		y_size_ = ysize;
+        update_buffers();
 	}
 
 	float width() const;
