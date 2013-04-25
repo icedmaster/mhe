@@ -8,6 +8,14 @@ namespace gui {
 
 class Label : public Widget
 {
+public:
+	Label(const std::string& name) :
+		Widget(name)
+	{}
+
+	Label() :
+		Widget()
+	{}
 };
 
 }}

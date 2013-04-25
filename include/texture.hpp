@@ -24,6 +24,8 @@ class Texture : public utils::noncopyable
 {
 public:
 	virtual ~Texture() {}
+	// create 2x2 (pot) texture with color
+	virtual void set_color(const colorf& color) = 0;
 	virtual void set_image(boost::shared_ptr<Image>, boost::shared_ptr<Driver>,
 						   FilterType ft = Nearest) = 0;
 	virtual void prepare(boost::shared_ptr<Driver> driver =

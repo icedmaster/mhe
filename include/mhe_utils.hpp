@@ -8,5 +8,6 @@
 #include "utils/sysutils.hpp"
 #include "utils/timer.hpp"
 #include "utils/graphics_utils.hpp"
+#include "utils/utf8_utils.hpp"
 
 #endif

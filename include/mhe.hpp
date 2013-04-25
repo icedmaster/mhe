@@ -23,6 +23,8 @@
 
 #include "mhe_application.hpp"
 
+#include "mhe_gui.hpp"
+
 #include "../lib/pugixml/pugixml.hpp"
 
 #endif

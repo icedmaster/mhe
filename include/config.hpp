@@ -41,4 +41,8 @@
 	#define MHE_VORBIS
 #endif
 
+#ifdef MHE_IOS
+#define MHE_STANDART_LOG_DISABLED
+#endif
+
 #endif

@@ -5,3 +5,4 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../04_texture_atlas/build/ ${CMAKE_
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../05_scene/build/ ${CMAKE_CURRENT_SOURCE_DIR}/../05_scene/build/)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../06_animation/build/ ${CMAKE_CURRENT_SOURCE_DIR}/../06_animation/build/)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../07_application/build/ ${CMAKE_CURRENT_SOURCE_DIR}/../07_application/build/)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../08_gui/build/ ${CMAKE_CURRENT_SOURCE_DIR}/../08_gui/build/)

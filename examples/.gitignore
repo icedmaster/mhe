@@ -6,6 +6,7 @@
 /05_scene/build/*
 /06_animation/build/*
 /07_application/build/*
+/08_gui/build/*
 
 !/build/CMakeLists.txt
 !/01_init/build/CMakeLists.txt
@@ -15,6 +16,8 @@
 !/05_scene/build/CMakeLists.txt
 !/06_animation/build/CMakeLists.txt
 !/07_application/build/CMakeLists.txt
+!/08_gui/build/CMakeLists.txt
+
 
 
 

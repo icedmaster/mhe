@@ -28,7 +28,7 @@ private:
         {
             const mhe::MouseEvent* mouse_event = static_cast<const mhe::MouseEvent*>(event);
             scene_->mouse_click(mouse_event->pos());
-            return true;
+            return false;
         }
     private:
         TestScene* scene_;
@@ -40,6 +40,8 @@ public:
     {}
     
     bool init_impl(const std::string&, void*);
+
+    void on_button_pressed(mhe::gui::Widget* widget);
 private:
     void mouse_click(const mhe::vector2<int>& pos)
     {
@@ -47,6 +49,8 @@ private:
     }
     
     void perform_animation(const mhe::vector2<int>& pos);
+
+    mhe::gui::GUINode* gui_node_;
 };
 
 #endif /* defined(__test1__TestScene__) */

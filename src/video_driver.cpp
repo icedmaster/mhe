@@ -45,6 +45,7 @@ std::vector<Renderable> Driver::perform_batch() const
 		 it != renderable_elements_.end(); ++it)
 	{
 		Renderable* renderable = *it;
+        assert(renderable->texture() != nullptr);
 		if ( renderable->is_batching_disabled() || 
 			 (last_texture == nullptr) || !last_texture->is_equal(*(renderable->texture()))
 			)
@@ -62,7 +63,7 @@ std::vector<Renderable> Driver::perform_batch() const
 void Driver::perform_render(const Renderable& renderable)
 {
 	set_render_flags(renderable);
-	renderable.texture()->prepare();
+    renderable.texture()->prepare();
 
 	if (!support_buffered_render())
 	{
