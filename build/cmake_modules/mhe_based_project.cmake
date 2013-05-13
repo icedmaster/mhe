@@ -33,7 +33,7 @@ macro(mhe_based_project NAME)
 
 	set(LIBS ${LIBS} ${MHE_LIB} ${MHE_LIBS_FOUND})
 
-	add_executable(${PROJECT} ${SOURCES})    						  
+	add_executable(${PROJECT} ${SOURCES} ${ADDITIONAL_SOURCES})    						  
         target_link_libraries(${PROJECT} ${LIBS})
         mhe_link_platform_specific(${NAME})
 endmacro()

@@ -12,6 +12,8 @@ option(BUILD_EXAMPLES "Build mhe examples" OFF)
 option(BUILD_LIB_ONLY "Build only libmhe, without examples and demo" ON)
 option(BUILD_WITH_SCRIPTS "Build with script languages support" ON)
 option(BUILD_IOS "Build for iOS" OFF)
+option(BUILD_ANDROID "Build for android" OFF)
+option(BUILD_WITH_C++11 "Build with C++11 support" OFF)
 
 include(add_subproject)
 
@@ -27,8 +29,12 @@ if (BUILD_LIB_ONLY)
     set(MHE_BUILD_EXAMPLES FALSE)
 endif()
 
-if (BUILD_OS)
-  set(IO TRUE)
+if (BUILD_IOS)
+  set(IOS TRUE)
+endif()
+
+if (BUILD_ANDROID)
+  set(ANDROID TRUE)
 endif()
 
 if (IOS)
@@ -37,8 +43,18 @@ if (IOS)
    mhe_ios_build() 
 endif()
 
+if (ANDROID)
+  message("Build for android")
+  include(mhe_android)
+  mhe_android_build()
+endif()
+
 add_definitions(-Wall)
 add_definitions(-Wextra)
+
+if (BUILD_WITH_C++11)
+   add_definitions(-std=c++11)
+endif()
 
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
    add_definitions(-O2)
@@ -73,7 +89,12 @@ set (INC_PATH
   ${INCLUDE_ROOT}/..
 )
 
+# find all headers
+file(GLOB MHE_HEADERS ${INCLUDE_ROOT}/*.hpp)
+
 set(PLATFORM_IMPL_SOURCES ${SOURCE_ROOT}/platform)
+set(PLATFORM_IMPL_HEADERS ${INCLUDE_ROOT}/platform)
+
 set(OPENGL_IMPL_SOURCES ${PLATFORM_IMPL_SOURCES}/opengl)
 set(OPENGLES_IMPL_SOURCES ${PLATFORM_IMPL_SOURCES}/opengles)
 set(LINUX_PLATFORM_SOURCES ${PLATFORM_IMPL_SOURCES}/linux)
@@ -133,7 +154,7 @@ endif()
 
 if (MHE_QT_FOUND)
   set(SRC_PATH ${SRC_PATH} ${QT_PLATFORM_SOURCES})
-  set(LIBS ${LIBS} ${QT_LIB})
+  set(LIBS ${LIBS} ${QT_LIBRARIES})
 endif()
 
 if (MHE_VORBIS_FOUND)
@@ -185,7 +206,7 @@ endif()
 set(MHE_LIB_DIR ${CMAKE_SOURCE_DIR})
 set(DEP_LIBS ${LIBS})
 
-add_library(${PROJECT} ${SOURCE})
+add_library(${PROJECT} ${SOURCE} ${ADDITIONAL_SOURCES})
 target_link_libraries(${PROJECT} ${LIBS})
 
 include(mhe_platform_specific)

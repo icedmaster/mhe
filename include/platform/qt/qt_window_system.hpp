@@ -17,7 +17,10 @@ public:
 	void show_cursor(bool /*show*/) {}
 	void resize(const vector2<int>&) {}
 
-	View* view();
+	View* view()
+	{
+		return view_;
+	}
 
 	void set_view(QtView* view)
 	{

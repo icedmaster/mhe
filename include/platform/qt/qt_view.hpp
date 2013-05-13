@@ -7,7 +7,7 @@
 namespace mhe {
 namespace qt {
 
-public QtView : public QGLWidget, public View
+class QtView : public QGLWidget, public View
 {
 Q_OBJECT
 public:
@@ -18,7 +18,6 @@ public:
 	QtView(ViewEventsHandler* events_handler, QWidget* parent = nullptr) :
 		QGLWidget(parent), View(events_handler)
 	{}
-
 private:
 	void paintGL()
 	{

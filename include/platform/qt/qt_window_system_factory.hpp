@@ -17,7 +17,7 @@ public:
 
 	WindowSystemImpl* create_window_system() const
 	{
-		return new iOSWindowSystem;
+		return new QtWindowSystem;
 	}
 
 	KeyboardDeviceImpl* create_keyboard_device_impl() const

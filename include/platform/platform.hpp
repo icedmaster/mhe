@@ -15,6 +15,10 @@
 #include "platform/sdl/sdl_platform.hpp"
 #endif
 
+#ifdef MHE_QT
+#include "platform/qt/qt_platform.hpp"
+#endif
+
 #ifdef MHE_OPENAL
 #include "sound/openal_audio_driver.hpp"
 #include "sound/openal_sound.hpp"

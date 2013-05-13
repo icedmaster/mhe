@@ -8,13 +8,14 @@ bool QtWindowSystem::init(const vector2<int>& r, int /*bpp*/, bool /*fullscreen*
 	if (view_ == nullptr)
 		view_ = new QtView;
 	view_->setGeometry(0, 0, r.x(), r.y());
+	return true;
 }
 
 void QtWindowSystem::close()
 {
 }
 
-void QtWindowSystem::set_caption(const std::string& caption)
+void QtWindowSystem::set_caption(const std::string& /*caption*/)
 {
 }
 

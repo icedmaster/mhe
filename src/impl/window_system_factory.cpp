@@ -11,7 +11,7 @@ WindowSystemFactory::WindowSystemFactory()
 	#endif
 
 	#ifdef MHE_QT
-	systems_.push_back(boost::shared_ptr<AbstractWindowSystemFactory>(new QtWindowSystemFactory));
+	systems_.push_back(boost::shared_ptr<AbstractWindowSystemFactory>(new qt::QtWindowSystemFactory));
 	#endif
 
 	#ifdef MHE_IOS
