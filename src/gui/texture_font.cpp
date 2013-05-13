@@ -81,7 +81,6 @@ Renderable* TextureFont::print(const utf32_string& text,
 	renderable->set_color(color);
 	renderable->set_texture(ta_.texture());
 	renderable->set_mask_z_buffer();
-	renderable->set_lighting_disabled();
     renderable->set_blending_enabled();
     renderable->set_blend_mode(alpha_one_minus_alpha);
 	return renderable;
