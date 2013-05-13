@@ -3,6 +3,8 @@
 
 #include "impl/abstract_window_system_factory.hpp"
 #include "qt_window_system.hpp"
+#include "qt_event_system.hpp"
+#include "qt_system_device_impl.hpp"
 
 namespace mhe {
 namespace qt {
@@ -32,12 +34,12 @@ public:
 
 	SystemDeviceImpl* create_system_device_impl() const
 	{
-		return nullptr;
+		return new QtSystemDeviceImpl;
 	}
 
 	EventSystem* create_event_system() const
 	{
-		return nullptr;
+		return new QtEventSystem;
 	}
 };
 

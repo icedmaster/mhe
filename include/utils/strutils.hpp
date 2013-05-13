@@ -108,7 +108,8 @@ inline std::string join(const std::vector<std::string>& str, const std::string& 
 	for (size_t i = 0; i < str.size(); ++i)
 	{
 		out += str[i];
-		out += del;
+		if (i < (str.size() - 1))
+			out += del;
 	}
 	return out;
 }

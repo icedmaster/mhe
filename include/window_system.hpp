@@ -10,6 +10,13 @@
 namespace mhe
 {
 
+class MainLoop
+{
+public:
+	virtual ~MainLoop() {}
+	virtual void run(unsigned int update_interval) = 0;
+};
+
 class WindowSystemImpl
 {
 public:
@@ -22,6 +29,10 @@ public:
 	virtual void show_cursor(bool) = 0;
 	virtual void resize(const vector2<int>&) = 0;
 	virtual View* view() = 0;
+	virtual MainLoop* main_loop() const
+	{
+		return nullptr;
+	}
 };
 
 class WindowSystem
@@ -93,6 +104,11 @@ public:
     {
         return impl_->view();
     }
+
+	MainLoop* main_loop() const
+	{
+		return impl_->main_loop();
+	}
 private:
 	boost::shared_ptr<WindowSystemImpl> impl_;
 	vector2<int> win_dim_;

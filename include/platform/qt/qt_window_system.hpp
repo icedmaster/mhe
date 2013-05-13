@@ -1,15 +1,51 @@
 #ifndef __QT_WINDOW_SYSTEM_HPP__
 #define __QT_WINDOW_SYSTEM_HPP__
 
+#include <QApplication>
+#include <QTimer>
 #include "window_system.hpp"
 #include "qt_view.hpp"
 
 namespace mhe {
 namespace qt {
 
+class QtMainLoop : public QObject, public MainLoop
+{
+	Q_OBJECT
+	public:		
+	QtMainLoop(QtView* view) :
+	view_(view)
+	{
+		init_events();
+	}
+
+	void run(unsigned int update_interval)
+	{
+		timer_.start(update_interval);
+		QApplication::instance()->exec();
+	}
+private:
+	void init_events()
+	{
+		QObject::connect(&timer_, SIGNAL(timeout()),
+						 this, SLOT(on_timer()));
+	}
+private slots:
+	void on_timer()
+	{
+		view_->events_handler()->on_update();
+		view_->updateGL();
+	}
+
+private:
+	QTimer timer_;
+	QtView* view_;
+};
+
 class QtWindowSystem : public WindowSystemImpl
 {
 public:
+	QtWindowSystem();
 	bool init(const vector2<int>& r, int bpp, bool fullscreen);
 	void close();
 	void set_caption(const std::string& caption);
@@ -26,8 +62,21 @@ public:
 	{
 		view_ = view;
 	}
+
+	MainLoop* main_loop() const
+	{
+		return get_main_loop();
+	}
 private:
+	MainLoop* get_main_loop() const
+	{
+		if (main_loop_ == nullptr)
+			main_loop_.reset(new QtMainLoop(view_));
+		return main_loop_.get();
+	}
+
 	QtView* view_;
+	mutable boost::scoped_ptr<QtMainLoop> main_loop_;
 };
 
 }}

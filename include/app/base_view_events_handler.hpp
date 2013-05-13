@@ -13,6 +13,11 @@ public:
 		engine_(engine)
 	{}
 
+	void on_update()
+	{
+		engine_->update();
+	}
+
 	void on_draw()
 	{
 		engine_->render();

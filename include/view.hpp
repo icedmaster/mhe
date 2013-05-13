@@ -11,8 +11,8 @@ class ViewEventsHandler
 {
 public:
 	virtual ~ViewEventsHandler() {}
-
 	virtual void on_draw() = 0;
+	virtual void on_update() = 0;
 };
 
 class View
@@ -31,15 +31,16 @@ public:
 		events_handler_.reset(events_handler);
 		update();
 	}
-protected:
-	void on_draw()
-	{
-		events_handler_->on_draw();
-	}
 
 	ViewEventsHandler* events_handler()
 	{
 		return events_handler_.get();
+	}
+protected:
+	void on_draw()
+	{
+		if (events_handler_ != nullptr)
+			events_handler_->on_draw();
 	}
 private:
 	virtual void update() {}

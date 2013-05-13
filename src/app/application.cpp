@@ -56,7 +56,10 @@ void Application::mhe_app_deinit()
 
 int Application::run_impl()
 {
-	engine_.run();
+	MainLoop* main_loop = engine_.context().window_system().main_loop();
+	if (main_loop == nullptr)
+		engine_.run();
+	else main_loop->run(1000 / 60);
 	deinit();
 	return 0;
 }
