@@ -44,6 +44,10 @@ public:
 	void add_camera(Camera* camera, bool set_active = false);
 	void remove_camera(const std::string& name);
 	void set_active_camera(const std::string& name);
+	Camera* active_camera() const
+	{
+		return active_camera_.get();
+	}
 private:
 	void apply_visitors();
 	void apply_scene_modifiers(SceneModifier::UpdateMode mode);

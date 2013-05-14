@@ -16,6 +16,7 @@ public:
 	virtual ~Application2D() {}
 protected:
 	virtual int run_impl();
+	virtual void init_impl();
 };
 
 }}

@@ -16,4 +16,8 @@ int Application2D::run_impl()
 	return Application::run_impl();
 }
 
+void Application2D::init_impl()
+{
+}
+
 }}

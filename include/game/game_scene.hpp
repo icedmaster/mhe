@@ -65,6 +65,11 @@ public:
 	{
 		draw_impl();
 	}
+
+	Engine* engine() const
+	{
+		return engine_;
+	}
 protected:
 	Engine* get_engine() const
 	{

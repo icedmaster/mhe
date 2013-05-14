@@ -34,6 +34,11 @@ public:
 	{
 		return name_;
 	}
+protected:
+	void set_dirty()
+	{
+		updated_ = false;
+	}
 private:
 	bool update_each_frame_;
 	bool updated_;

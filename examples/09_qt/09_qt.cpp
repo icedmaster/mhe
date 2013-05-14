@@ -24,6 +24,12 @@ private:
 		label->set_sprite(mhe::utils::create_sprite(mhe::color_red, mhe::vector2<float>(64, 64), get_engine()->context()));
 		label->set_geom(mhe::rect<float>(10, 10, 50, 20));
 		widget->add_widget(label);
+		// button
+		mhe::gui::Button* button = new mhe::gui::Button("button");
+		button->set_sprite(mhe::utils::create_sprite(mhe::color_green, mhe::vector2<float>(32, 32), get_engine()->context()));
+		button->set_pressed_sprite(mhe::utils::create_sprite(mhe::color_yellow, mhe::vector2<float>(32, 32), get_engine()->context()));
+		button->set_geom(mhe::rect<float>(50, 50, 50, 30));
+		widget->add_widget(button);
 
 		scene()->add(node_);
 		return true;
