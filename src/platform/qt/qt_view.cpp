@@ -2,14 +2,12 @@
 
 #include "events/mouse_event.hpp"
 #include "platform/qt/qt_utils.hpp"
-#include "utils/global_log.hpp"
 
 namespace mhe {
 namespace qt {
 
 void QtView::mousePressEvent(QMouseEvent* event)
 {
-	DEBUG_LOG("mouse event:" << event->x() << " " << event->y());
 	events_provider_.add_mouse_event(MouseEvent::button_pressed,
 									 utils::get_mouse_button(event),
 									 utils::get_mouse_position(event));

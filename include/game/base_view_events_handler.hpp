@@ -4,12 +4,12 @@
 #include "view.hpp"
 
 namespace mhe {
-namespace app {
+namespace game {
 
 class BaseViewEventsHandler : public ViewEventsHandler
 {
 public:
-	BaseViewEventsHandler(game::Engine* engine) :
+	BaseViewEventsHandler(Engine* engine) :
 		engine_(engine)
 	{}
 
@@ -22,8 +22,13 @@ public:
 	{
 		engine_->render();
 	}
+
+	void on_resize(unsigned int new_width, unsigned int new_height)
+	{
+		engine_->resize(new_width, new_height);
+	}
 private:
-	game::Engine* engine_;
+	Engine* engine_;
 };
 
 }}

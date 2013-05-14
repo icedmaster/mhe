@@ -1,5 +1,6 @@
 #include "game/engine.hpp"
 
+#include "game/base_view_events_handler.hpp"
 #include "events/system_device.hpp"
 #include "utils/sysutils.hpp"
 
@@ -17,6 +18,7 @@ bool Engine::init(cmn::uint w, cmn::uint h, cmn::uint bpp, bool fullscreen)
 	INFO_LOG("Engine init:" << w << " " << h << " " << bpp);
 	if (!ws_.init(w, h, bpp, fullscreen))
 		return false;	
+	ws_.view()->set_events_handler(new BaseViewEventsHandler(this));
 	boost::shared_ptr<Driver> driver(SystemFactory::instance().create_driver());
 	context_.set_window_system(&ws_);
 	context_.set_driver(driver);
@@ -46,6 +48,7 @@ void Engine::default_setup()
 	context_.driver()->set_clear_color(mhe::color_black);
 	context_.driver()->enable_depth((mhe::DepthFunc)0);
 	context_.driver()->disable_lighting();
+	context_.driver()->set_viewport(0, 0, context_.window_system().width(), context_.window_system().height());
 }
 	
 void Engine::run()

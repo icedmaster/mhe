@@ -13,6 +13,7 @@ public:
 	virtual ~ViewEventsHandler() {}
 	virtual void on_draw() = 0;
 	virtual void on_update() = 0;
+	virtual void on_resize(unsigned int new_width, unsigned int new_height) = 0;
 };
 
 class View
