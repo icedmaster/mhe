@@ -1,6 +1,7 @@
 #include "events/event_manager.hpp"
 
 #include "impl/system_factory.hpp"
+#include "utils/global_log.hpp"
 
 namespace mhe {
 
@@ -17,6 +18,7 @@ EventManager::~EventManager()
 
 void EventManager::add_device(Device* device)
 {
+	INFO_LOG("EventManager::add_device:" << device->name());
 	devices_[device->name()] = boost::shared_ptr<Device>(device);
 }
 

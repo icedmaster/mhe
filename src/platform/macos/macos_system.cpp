@@ -1,19 +1,12 @@
 #include "platform/macos/macos_system.hpp"
 
-#include <mach/mach.h>
-#include <mach/mach_time.h>
-#include <time.h>
+#include <sys/time.h>
 
 namespace mhe {
 namespace macossys {
 
-namespace {
-uint64_t start_time;
-}
-
 void start_platform()
 {
-	start_time = mach_absolute_time();
 }
 
 void stop_platform()
@@ -22,8 +15,9 @@ void stop_platform()
 
 cmn::uint get_current_tick()
 {
-	uint64_t current_time = mach_absolute_time();
-	return current_time - start_time;
+	struct timeval time;
+	gettimeofday(&time, NULL);
+	return (time.tv_sec * 1000) + (time.tv_usec / 1000);
 }
 
 }}

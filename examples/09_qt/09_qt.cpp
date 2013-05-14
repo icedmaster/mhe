@@ -48,5 +48,6 @@ int main(int /*argc*/, char** argv)
 	boost::shared_ptr<TestScene> scene(new TestScene(&application.engine()));
 	application.engine().set_game_scene(scene);
 	scene->init("", nullptr);
+	application.engine().event_manager().add_device(new mhe::MouseDevice("mouse"));
 	return application.run();
 }

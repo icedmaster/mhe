@@ -25,6 +25,12 @@ private:
 		label->set_caption(mhe::utils::utf8_to_utf32("label"));
 		label->set_caption_color(mhe::color_blue);
 		widget->add_widget(label);
+		// button
+		mhe::gui::Button* button = new mhe::gui::Button("button");
+		button->set_sprite(mhe::utils::create_sprite(mhe::color_green, mhe::vector2<float>(32, 32), get_engine()->context()));
+		button->set_pressed_sprite(mhe::utils::create_sprite(mhe::color_yellow, mhe::vector2<float>(32, 32), get_engine()->context()));
+		button->set_geom(mhe::rect<float>(50, 50, 50, 30));
+		widget->add_widget(button);
 		scene()->add(node_);
 		return true;
 	}
@@ -49,6 +55,8 @@ int main(int, char**)
 	boost::shared_ptr<TestScene> scene(new TestScene(&app.engine()));
 	app.engine().set_game_scene(scene);
 	scene->init("", nullptr);
+
+	app.engine().event_manager().add_device(new mhe::MouseDevice("mouse"));
 	
 	return app.run();
 }
