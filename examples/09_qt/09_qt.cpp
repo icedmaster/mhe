@@ -1,6 +1,8 @@
 #include "mhe.hpp"
 
 #include <iostream>
+#include <QWidget>
+#include <QPushButton>
 
 class TestScene : public mhe::game::GameScene
 {
@@ -16,11 +18,11 @@ private:
 		node_.reset(new mhe::gui::GUINode(get_engine()->event_manager()));
 		mhe::gui::Widget* widget = new mhe::gui::Widget("main");
 		widget->set_sprite(mhe::utils::create_sprite(mhe::color_white, mhe::vector2<float>(200, 200), get_engine()->context()));
-		widget->set_geom(mhe::rect<float>(100, 100, 200, 200));
+		widget->set_geom(mhe::rect<float>(100, 100, 200, 100));
 		node_->set_widget(widget);				
 		mhe::gui::Label* label = new mhe::gui::Label("label");
 		label->set_sprite(mhe::utils::create_sprite(mhe::color_red, mhe::vector2<float>(64, 64), get_engine()->context()));
-		label->set_geom(mhe::rect<float>(100, 100, 64, 64));
+		label->set_geom(mhe::rect<float>(10, 10, 50, 20));
 		widget->add_widget(label);
 
 		scene()->add(node_);
@@ -35,19 +37,42 @@ private:
 	boost::shared_ptr<mhe::gui::GUINode> node_;
 };
 
-int main(int /*argc*/, char** argv)
+int main(int argc, char** argv)
 {
+	// 1) setup Qt application - need to do it before first widget will be created
+	QApplication qapp(argc, argv);
+	// 2) check we using Qt now
 	std::cout << mhe::utils::join(mhe::SystemFactory::instance().window_system_factory().available_systems_list(), ",") << std::endl;
 	std::cout << "Current:" << mhe::SystemFactory::instance().window_system_factory().current_system_name() << std::endl;
-	mhe::app::Application2D application("09_qt");
+	// 3) setup GUI
+	QWidget* widget = new QWidget;
+	widget->setGeometry(0, 0, 800, 600);
+	mhe::qt::QtView* view = new mhe::qt::QtView(widget);
+	view->setGeometry(100, 100, 400, 400);
+	QPushButton* button = new QPushButton(widget);
+	button->setGeometry(10, 500, 50, 20);
+
+	// 4) setup mhe application
+	mhe::app::Application2D app("09_qt");
+	// set view BEFORE app.init() call
+	app.engine().context().window_system().set_view(view);
+	// configure view - size the same as view geometry size
 	mhe::app::ApplicationConfig config;
-	config.width = 800;
-	config.height = 600;
+	config.width = 400;
+	config.height = 400;
 	config.bpp = 32;
-	application.init(config);
-	boost::shared_ptr<TestScene> scene(new TestScene(&application.engine()));
-	application.engine().set_game_scene(scene);
+	app.init(config);
+
+	// set scene
+	boost::shared_ptr<TestScene> scene(new TestScene(&app.engine()));
+	app.engine().set_game_scene(scene);
 	scene->init("", nullptr);
-	application.engine().event_manager().add_device(new mhe::MouseDevice("mouse"));
-	return application.run();
+
+	app.engine().event_manager().add_device(new mhe::MouseDevice("mouse"));
+
+	// show our GUI
+	widget->show();
+
+	// run application
+	return app.run();
 }

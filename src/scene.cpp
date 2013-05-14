@@ -7,7 +7,8 @@ void Scene::draw(const Context& context)
 	for (size_t i = 0; i < subscenes_.size(); ++i)
 		subscenes_[i]->draw(context);
 
-	assert(active_camera_ != nullptr);
+	if (active_camera_ == nullptr) return;
+
 	active_camera_->update(context.driver());
 
 	for (nodelist::iterator it = nodes_.begin(); it != nodes_.end();)

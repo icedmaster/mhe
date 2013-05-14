@@ -19,8 +19,8 @@ bool QtWindowSystem::init(const vector2<int>& r, int /*bpp*/, bool /*fullscreen*
 		}
 		view_ = new QtView;
 		view_->show();
+		view_->setGeometry(0, 0, r.x(), r.y());
 	}
-	view_->setGeometry(0, 0, r.x(), r.y());
 
 	return true;
 }

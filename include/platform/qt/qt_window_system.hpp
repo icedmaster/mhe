@@ -58,9 +58,10 @@ public:
 		return view_;
 	}
 
-	void set_view(QtView* view)
+	void set_view(View* view)
 	{
-		view_ = view;
+		assert(dynamic_cast<QtView*>(view) != nullptr);
+		view_ = static_cast<QtView*>(view);
 	}
 
 	MainLoop* main_loop() const

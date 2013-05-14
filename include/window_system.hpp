@@ -29,6 +29,7 @@ public:
 	virtual void show_cursor(bool) = 0;
 	virtual void resize(const vector2<int>&) = 0;
 	virtual View* view() = 0;
+	virtual void set_view(View* /*view*/) {}
 	virtual MainLoop* main_loop() const
 	{
 		return nullptr;
@@ -104,6 +105,11 @@ public:
     {
         return impl_->view();
     }
+
+	void set_view(View* view)
+	{
+		impl_->set_view(view);
+	}
 
 	MainLoop* main_loop() const
 	{

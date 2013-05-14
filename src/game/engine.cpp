@@ -10,7 +10,10 @@ namespace game {
 Engine::Engine() :
 	audio_driver_(SystemFactory::instance().create_audio_driver()),
 	running_(false), initialized_(false)
-{}
+{
+	// init static context members
+	context_.set_window_system(&ws_);
+}
 	
 bool Engine::init(cmn::uint w, cmn::uint h, cmn::uint bpp, bool fullscreen)
 {
@@ -20,7 +23,6 @@ bool Engine::init(cmn::uint w, cmn::uint h, cmn::uint bpp, bool fullscreen)
 		return false;	
 	ws_.view()->set_events_handler(new BaseViewEventsHandler(this));
 	boost::shared_ptr<Driver> driver(SystemFactory::instance().create_driver());
-	context_.set_window_system(&ws_);
 	context_.set_driver(driver);
 	// init quit event listener
 	event_manager_.add_device(new SystemDevice("sys"));

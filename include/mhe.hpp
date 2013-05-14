@@ -27,4 +27,6 @@
 
 #include "../lib/pugixml/pugixml.hpp"
 
+#include "platform/platform.hpp"
+
 #endif
