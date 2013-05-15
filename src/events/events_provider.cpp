@@ -18,26 +18,24 @@ void EventsProvider::add_mouse_event(int button_state, int button, const vector2
 	mouse_events_.push_back(MouseEvent(button_state, button, position));
 }
 
+void EventsProvider::add_keyboard_event(int type, int button)
+{
+	keyboard_events_.push_back(KeyboardEvent(type, button));
+}
+
 void EventsProvider::remove_system_events(Device::events_vector& events)
 {
-	events.resize(system_events_.size());
-	for (size_t i = 0 ; i < system_events_.size(); ++i)
-	{
-		SystemEvent* event = static_cast<SystemEvent*>(events[i].get());
-		*event = system_events_[i];
-	}
-	system_events_.clear();
+	remove_events(events, system_events_);
 }
 
 void EventsProvider::remove_mouse_events(Device::events_vector& events)
 {
-	events.resize(mouse_events_.size());
-	for (size_t i = 0 ; i < mouse_events_.size(); ++i)
-	{
-		MouseEvent* event = static_cast<MouseEvent*>(events[i].get());
-		*event = mouse_events_[i];
-	}
-	mouse_events_.clear();
+	remove_events(events, mouse_events_);
+}
+
+void EventsProvider::remove_keyboard_events(Device::events_vector& events)
+{
+	remove_events(events, keyboard_events_);
 }
 
 }

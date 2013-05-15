@@ -1,6 +1,7 @@
 #include "platform/qt/qt_view.hpp"
 
 #include "events/mouse_event.hpp"
+#include "events/keyboard_event.hpp"
 #include "platform/qt/qt_utils.hpp"
 
 namespace mhe {
@@ -29,10 +30,12 @@ void QtView::mouseReleaseEvent(QMouseEvent* event)
 
 void QtView::keyPressEvent(QKeyEvent* event)
 {
+	events_provider_.add_keyboard_event(KeyboardEvent::key_down, event->key());
 }
 
 void QtView::keyReleaseEvent(QKeyEvent* event)
 {
+	events_provider_.add_keyboard_event(KeyboardEvent::key_up, event->key());
 }
 
 }}

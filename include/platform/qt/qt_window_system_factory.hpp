@@ -6,6 +6,7 @@
 #include "qt_event_system.hpp"
 #include "qt_system_device_impl.hpp"
 #include "qt_mouse_device_impl.hpp"
+#include "qt_keyboard_device_impl.hpp"
 
 namespace mhe {
 namespace qt {
@@ -25,7 +26,7 @@ public:
 
 	KeyboardDeviceImpl* create_keyboard_device_impl() const
 	{
-		return nullptr;
+		return new QtKeyboardDeviceImpl;
 	}
 
 	MouseDeviceImpl* create_mouse_device_impl() const

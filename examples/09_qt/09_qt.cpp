@@ -10,6 +10,12 @@ public:
 	TestScene(mhe::game::Engine* engine) :
 		mhe::game::GameScene(engine)
 	{}
+
+	bool handle_key(const mhe::Event* event)
+	{
+		const mhe::KeyboardEvent* ke = static_cast<const mhe::KeyboardEvent*>(event);
+		std::cout << "key pressed:" << ke->state() << " " << ke->sym() << std::endl;
+	}
 private:
 	bool init_impl(const std::string&, void*)
 	{
@@ -32,6 +38,10 @@ private:
 		widget->add_widget(button);
 
 		scene()->add(node_);
+
+		engine()->event_manager().add_listener(new mhe::DelegateEventListener(mhe::keyboard_event_type,
+																			  mhe::Event::any_event, mhe::Event::any_event,
+																			  mhe::create_delegate(this, &TestScene::handle_key)));
 		return true;
 	}
 
@@ -75,9 +85,11 @@ int main(int argc, char** argv)
 	scene->init("", nullptr);
 
 	app.engine().event_manager().add_device(new mhe::MouseDevice("mouse"));
+	app.engine().event_manager().add_device(new mhe::KeyboardDevice("keyb"));
 
 	// show our GUI
 	widget->show();
+	view->setFocus();
 
 	// run application
 	return app.run();
