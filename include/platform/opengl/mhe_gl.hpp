@@ -7,12 +7,20 @@
 #include <OpenGLES/ES2/gl.h>
 #include <OpenGLES/ES2/glext.h>
 #elif defined(MHE_MACOS)
-#define GL_GLEXT_LEGACY
+#define GL_GLEXT_PROTOTYPES
 #include <OpenGL/gl.h>
 #include "glext.h"
 #else
     #include <GL/gl.h>
     #include "glext.h"
+#endif
+
+#ifndef MHE_WIN
+	#define MHE_USE_NATIVE_OPENGL
+#endif
+
+#if defined(MHE_OPENGLES) || defined(MHE_OPENGL3)
+#define MHE_OPENGL_HAS_SHADERS
 #endif
 
 #endif

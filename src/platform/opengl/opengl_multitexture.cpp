@@ -23,7 +23,7 @@ void OpenGLMultiTexture::prepare(boost::shared_ptr<Driver> driver)
 	}
 }
 
-void OpenGLMultiTexture::clean(boost::shared_ptr<Driver> driver)
+void OpenGLMultiTexture::clean(boost::shared_ptr<Driver> /*driver*/)
 {
 	for (size_t i = 0; i < textures_.size(); ++i)
 	{
