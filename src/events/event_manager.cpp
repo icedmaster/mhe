@@ -41,7 +41,7 @@ void EventManager::add_listener(EventListener* listener)
 
 void EventManager::check(const WindowSystem& ws)
 {
-	backend_->update_event_queue();
+	backend_->update_event_queue(ws);
 	for (devices_map::iterator it = devices_.begin(); it != devices_.end(); ++it)
 	{
 		const Device::events_vector& events = it->second->check(ws);
@@ -50,7 +50,7 @@ void EventManager::check(const WindowSystem& ws)
 			process_event(events[i].get());
 		}
 	}
-	backend_->clear_event_queue();
+	backend_->clear_event_queue(ws);
 }
     
 void EventManager::add_event(const Event *event)

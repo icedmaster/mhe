@@ -18,7 +18,7 @@ public:
 
 	void deinit() {}	// do nothing
 
-	void clear_event_queue()
+	void clear_event_queue(const WindowSystem& /*window_system*/)
 	{
 		SDL_Event event;
 		while (SDL_PollEvent(&event)) ;

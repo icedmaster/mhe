@@ -27,4 +27,12 @@ void QtView::mouseReleaseEvent(QMouseEvent* event)
 									 utils::get_mouse_position(event));
 }
 
+void QtView::keyPressEvent(QKeyEvent* event)
+{
+}
+
+void QtView::keyReleaseEvent(QKeyEvent* event)
+{
+}
+
 }}

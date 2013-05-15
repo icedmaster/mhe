@@ -9,8 +9,8 @@ public:
 	virtual ~EventSystem() {}
 	virtual bool init() = 0;
 	virtual void deinit() = 0;
-	virtual void clear_event_queue() {}
-	virtual void update_event_queue() {}
+	virtual void clear_event_queue(const WindowSystem& /*window_system*/) {}
+	virtual void update_event_queue(const WindowSystem& /*window_system*/) {}
 };
 
 }
