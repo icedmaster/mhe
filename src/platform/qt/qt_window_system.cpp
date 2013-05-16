@@ -34,6 +34,7 @@ void QtWindowSystem::set_caption(const std::string& /*caption*/)
 }
 
 void QtWindowSystem::swap_buffers()
-{}
+{
+}
 
 }}

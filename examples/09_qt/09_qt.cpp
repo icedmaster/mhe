@@ -15,6 +15,7 @@ public:
 	{
 		const mhe::KeyboardEvent* ke = static_cast<const mhe::KeyboardEvent*>(event);
 		std::cout << "key pressed:" << ke->state() << " " << ke->sym() << std::endl;
+		return true;
 	}
 private:
 	bool init_impl(const std::string&, void*)
@@ -29,6 +30,8 @@ private:
 		mhe::gui::Label* label = new mhe::gui::Label("label");
 		label->set_sprite(mhe::utils::create_sprite(mhe::color_red, mhe::vector2<float>(64, 64), get_engine()->context()));
 		label->set_geom(mhe::rect<float>(10, 10, 50, 20));
+		label->set_font(font_);
+		label->set_caption(mhe::utils::utf8_to_utf32("label"));
 		widget->add_widget(label);
 		// button
 		mhe::gui::Button* button = new mhe::gui::Button("button");
@@ -42,6 +45,9 @@ private:
 		engine()->event_manager().add_listener(new mhe::DelegateEventListener(mhe::keyboard_event_type,
 																			  mhe::Event::any_event, mhe::Event::any_event,
 																			  mhe::create_delegate(this, &TestScene::handle_key)));
+
+		stats_component_.reset(new mhe::game::utils::StatsComponent(scene(), engine()));
+		engine()->component_manager().add(stats_component_);
 		return true;
 	}
 
@@ -51,6 +57,7 @@ private:
 
 	boost::shared_ptr<mhe::gui::Font> font_;
 	boost::shared_ptr<mhe::gui::GUINode> node_;
+	mhe::game::component_ptr stats_component_;
 };
 
 int main(int argc, char** argv)

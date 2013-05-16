@@ -1,6 +1,7 @@
 #include "game/component_manager.hpp"
 
 #include "game/simple_messages.hpp"
+#include "game/engine.hpp"
 #include "utils/global_log.hpp"
 
 namespace mhe {
@@ -18,7 +19,7 @@ component_ptr ComponentManager::get(const std::string& fullname) const
 	return it->second;
 }
 
-void ComponentManager::update(cmn::uint tick)
+void ComponentManager::update(cmn::uint tick, Engine* engine)
 {
 	for (component_map::iterator it = components_.begin(); it != components_.end();)
 	{
@@ -30,7 +31,7 @@ void ComponentManager::update(cmn::uint tick)
 		}
 		else
 		{
-			it->second->update(tick);
+			it->second->update(tick, engine);
 			++it;
 		}
 	}

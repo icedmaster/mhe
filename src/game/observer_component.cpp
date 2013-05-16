@@ -5,7 +5,7 @@
 namespace mhe {
 namespace game {
 
-void ObserverComponent::update_impl(cmn::uint /*tick*/)
+void ObserverComponent::update_impl(cmn::uint /*tick*/, Engine*)
 {
 	for (size_t i = 0; i < components_.size(); ++i)
 	{

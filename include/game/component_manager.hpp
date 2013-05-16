@@ -6,13 +6,15 @@
 namespace mhe {
 namespace game {
 
+class Engine;
+
 class ComponentManager
 {
 public:
 	void add(const component_ptr& component);
 	component_ptr get(const std::string& full_name) const;
 
-	void update(cmn::uint tick);
+	void update(cmn::uint tick, Engine* engine);
 private:
 	bool check_for_component_delete(const component_ptr& component) const;
 	void destroy_component(const component_ptr& component);

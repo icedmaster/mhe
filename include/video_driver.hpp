@@ -31,11 +31,16 @@ public:
 
 		void reset()
 		{
-			tris_ = batches_ = frames_ = 0;
+			tris_ = batches_ = frames_ = elements_count_ = 0;
 		}
 
 		void update(const Renderable& renderable);
 		void update_frames();
+
+		void add_renderable_count(cmn::uint count)
+		{
+			elements_count_ += count;
+		}
 
 		cmn::uint tris() const
 		{
@@ -51,10 +56,16 @@ public:
 		{
 			return frames_;
 		}
+
+		cmn::uint elements_count() const
+		{
+			return elements_count_;
+		}
 	private:
 		cmn::uint tris_;
 		cmn::uint batches_;
 		cmn::uint frames_;
+		cmn::uint elements_count_;
 	};
 public:
 	virtual ~Driver() {}
@@ -144,6 +155,9 @@ public:
 
 	void begin_render();
 	void end_render();
+
+	void begin_frame();
+	void end_frame();
 
 	void draw(const matrixf& m,
 			  const float* v, const float* n, const float* t, const float* c,

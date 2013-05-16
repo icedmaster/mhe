@@ -16,6 +16,8 @@ class Component;
 typedef boost::shared_ptr<Component> component_ptr;
 typedef boost::weak_ptr<Component> component_weak_ptr;
 
+class Engine;
+
 class Component
 {
 public:
@@ -51,12 +53,12 @@ public:
 	void detach(Component* component);
 	void detach(component_ptr component);
 	void update(const Message& message);
-	void update(cmn::uint tick)
+	void update(cmn::uint tick, Engine* engine)
 	{
 		if (lifetime_ && !start_time_) start_time_ = tick;
-		update_impl(tick);
+		update_impl(tick, engine);
 		for (size_t i = 0; i < children_.size(); ++i)
-			children_[i]->update(tick);
+			children_[i]->update(tick, engine);
 	}
 
 	void subscribe(int type, Component* component);
@@ -127,7 +129,7 @@ protected:
 
 	virtual void do_subscribe(Component* component) = 0;
 	void update_children(const Message& message); 
-	virtual void update_impl(cmn::uint)	{}
+	virtual void update_impl(cmn::uint, Engine*)	{}
 	virtual	bool update_impl(const Message& message) = 0;
 	virtual void destroy_impl() {}
 private:

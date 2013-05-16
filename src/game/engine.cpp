@@ -99,7 +99,7 @@ void Engine::resize(cmn::uint w, cmn::uint h)
 void Engine::update_internal()
 {
 	cmn::uint now = utils::get_current_tick();
-	component_manager_.update(now);
+	component_manager_.update(now, this);
 }
 
 void Engine::free_all()

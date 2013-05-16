@@ -36,7 +36,7 @@ private:
 		return true;
 	}
 
-	void update_impl(cmn::uint tick);
+	void update_impl(cmn::uint tick, Engine* engine);
 private:
 	std::vector<component_weak_ptr> components_;
 };

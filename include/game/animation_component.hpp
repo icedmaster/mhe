@@ -57,7 +57,7 @@ private:
 		return true;
 	}
 
-	void update_impl(cmn::uint tick)
+	void update_impl(cmn::uint tick, Engine*)
 	{
 		switch (animation_list_->update(tick))
 		{

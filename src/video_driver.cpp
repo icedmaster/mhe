@@ -19,17 +19,25 @@ void Driver::Stats::update_frames()
 void Driver::begin_render()
 {
 	renderable_elements_.clear();
-	stats_.update_frames();
     begin_render_impl();
 }
 
 void Driver::end_render()
 {	
+	stats_.add_renderable_count(renderable_elements_.size());
 	const std::vector<Renderable>& batched = perform_batch();
 	for (size_t i = 0; i < batched.size(); ++i)
 		perform_render(batched[i]);
     end_render_impl();
 }
+
+void Driver::begin_frame()
+{
+	stats_.update_frames();
+}
+
+void Driver::end_frame()
+{}
 
 void Driver::draw(Renderable* renderable)
 {

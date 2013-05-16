@@ -2,13 +2,29 @@
 
 namespace mhe {
 
+Scene::Scene() :
+	parent_(nullptr)
+{}
+
+void Scene::remove_subscene(const Scene* scene)
+{
+	for (std::vector< boost::shared_ptr<Scene> >::iterator it = subscenes_.begin();
+		 it != subscenes_.end(); ++it)
+	{
+		const boost::shared_ptr<Scene>& s = *it;
+		if (s.get() == scene)
+		{
+			subscenes_.erase(it);
+			return;
+		}
+	}
+}
+
 void Scene::draw(const Context& context)
 {
-	for (size_t i = 0; i < subscenes_.size(); ++i)
-		subscenes_[i]->draw(context);
-
 	if (active_camera_ == nullptr) return;
 
+	context.driver()->begin_render();
 	active_camera_->update(context.driver());
 
 	for (nodelist::iterator it = nodes_.begin(); it != nodes_.end();)
@@ -26,13 +42,14 @@ void Scene::draw(const Context& context)
 		node->draw(context);
 		++it;
 	}
+	context.driver()->end_render();
+
+	for (size_t i = 0; i < subscenes_.size(); ++i)
+		subscenes_[i]->draw(context);
 }
 
 void Scene::update(cmn::uint tick)
-{
-	for (size_t i = 0; i < subscenes_.size(); ++i)
-		subscenes_[i]->update(tick);
-		
+{		
 	for (nodelist::iterator it = nodes_.begin(); it != nodes_.end(); ++it)
 	{
 		if ((*it)->is_frozen()) continue;
@@ -41,6 +58,9 @@ void Scene::update(cmn::uint tick)
 
 	apply_visitors();
 	apply_scene_modifiers(SceneModifier::frame_update);
+
+	for (size_t i = 0; i < subscenes_.size(); ++i)
+		subscenes_[i]->update(tick);
 }
 
 boost::shared_ptr<Node> Scene::get_node(const std::string& name) const

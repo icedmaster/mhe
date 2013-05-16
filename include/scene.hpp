@@ -14,6 +14,7 @@ namespace mhe {
 class Scene
 {
 public:
+	Scene();
 	void add(const nodeptr& node);
 	void remove(const nodeptr& node);
 	void remove(const std::string& name);
@@ -22,7 +23,10 @@ public:
 	void add_subscene(const boost::shared_ptr<Scene>& scene)
 	{
 		subscenes_.push_back(scene);
+		scene->parent_ = this;
 	}
+
+	void remove_subscene(const Scene* scene);
 
 	void update(cmn::uint tick);
 	void draw(const Context& context);
@@ -48,12 +52,18 @@ public:
 	{
 		return active_camera_.get();
 	}
+
+	Scene* parent() const
+	{
+		return parent_;
+	}
 private:
 	void apply_visitors();
 	void apply_scene_modifiers(SceneModifier::UpdateMode mode);
 
 	typedef std::list<nodeptr> nodelist;
 	nodelist nodes_;
+	Scene* parent_;
 	std::vector< boost::shared_ptr<Scene> > subscenes_;
     std::vector< boost::shared_ptr<NodeVisitor> > visitors_;
 	std::vector< boost::shared_ptr<SceneModifier> > modifiers_;
