@@ -14,6 +14,11 @@ namespace mhe
         return deg * deg2rad;
     }
 
+    inline float rad_to_deg(float rad)
+	{
+		return rad * rad2deg;
+	}
+
 	inline bool is_pot(cmn::uint num)
 	{
 		return !(num & (num - 1));

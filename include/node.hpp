@@ -38,15 +38,11 @@ public:
 	void draw(const Context& context)												
 	{
 		draw_impl(context);
-		for (size_t i = 0; i < childs_.size(); ++i)
-			childs_[i]->draw(context);
+		for (size_t i = 0; i < children_.size(); ++i)
+			children_[i]->draw(context);
 	}
 
-	void update(cmn::uint tick)
-	{
-		if (!is_frozen())
-			update_impl(tick);
-	}
+	void update(cmn::uint tick);
 
 	bool is_alive() const
 	{
@@ -82,7 +78,10 @@ public:
 
 	void add_node(boost::shared_ptr<Node> node)
 	{
-		childs_.push_back(node);
+		children_.push_back(node);
+		node->parent_ = this;
+		node->apply_transform(transform());
+		node->update_children_transform();
 	}
 
 	Node* clone() const
@@ -113,10 +112,13 @@ private:
 	{
 		return nullptr;
 	}		
+
+	void update_children_transform();
 	
 	int priority_;						
 	std::string name_;
-	std::vector< boost::shared_ptr<Node> > childs_;	
+	std::vector< boost::shared_ptr<Node> > children_;	
+	Node* parent_;
 	uint32_t flags_;
 };
 

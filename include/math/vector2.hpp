@@ -8,28 +8,22 @@ namespace mhe {
 template <class T>
 class vector2
 {
-private:
-	T x_, y_;
 public:
-	vector2()
+	vector2() :
+		x_(0), y_(0)
 	{
-		// create NULL vector
-		x_ = y_ = 0;
 	}
 
-	vector2(T x, T y)
+	vector2(T x, T y) :
+		x_(x), y_(y)
 	{
-		x_ = x; y_ = y;
 	}
 
 	template <class U>
-	vector2(const vector2<U>& v)
+	vector2(const vector2<U>& v) :
+		x_(v.x()), y_(v.y())
 	{
-		x_ = v.x();
-		y_ = v.y();
 	}
-
-	~vector2() {} // do nothing
 
 	inline void set(T v)
 	{
@@ -78,21 +72,40 @@ public:
 		return *this;
 	}
 
-	vector2<T> operator- (const vector2& v) const
-	{
-		vector2 tmp = *this;
-		tmp -= v;
-		return tmp;
-	}
-
 	template <class Y>
 	vector2<T> operator= (const vector2<Y>& v)
 	{
 		x_ = v.x;
 		y_ = v.y;
 		return *this;
-	}	
+	}
+private:
+	T x_, y_;	
 };
+
+template <class T, class U>
+inline vector2<T> operator- (const vector2<T>& v1, const vector2<U>& v2)
+{
+	return vector2<T>(v1.x() - v2.x(), v1.y() - v2.y());
+}
+
+template <class T, class U>
+inline vector2<T> operator+ (const vector2<T>& v1, const vector2<U>& v2)
+{
+	return vector2<T>(v1.x() + v2.x(), v1.y() + v2.y());
+}
+
+template <class T, class U>
+inline vector2<T> operator* (const vector2<T>& v1, const vector2<U>& v2)
+{
+	return vector2<T>(v1.x() * v2.x(), v1.y() * v2.y());
+}
+
+template <class T, class U>
+inline vector2<T> operator/ (const vector2<T>& v1, const vector2<U>& v2)
+{
+	return vector2<T>(v1.x() / v2.x(), v1.y() / v2.y());
+}
 
 template <class T>
 inline std::ostream& operator<< (std::ostream& s, const vector2<T>& v)

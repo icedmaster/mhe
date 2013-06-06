@@ -34,6 +34,12 @@ public:
 };
 
 template <class T>
+inline T random(T min, T max)
+{
+	return static_cast<T>(static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * (max - min) + min);
+}
+
+template <class T>
 class range
 {
 public:

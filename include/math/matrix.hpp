@@ -264,18 +264,16 @@ public:
 
 	void set_rotate_x(float angle)
 	{
-		angle = deg_to_rad(angle);
 		float s = sin(angle);
 		float c = cos(angle);
 		set(1, 0, 0,  0,
-			0, c, -s, 0,
-			0, s, c,  0,
+			0, c, s, 0,
+			0, -s, c,  0,
 			0, 0, 0,  1);
 	}
 
 	void set_rotate_y(float angle)
 	{
-		angle = deg_to_rad(angle);
 		float s = sin(angle);
 		float c = cos(angle);
 		set(c,  0, s,  0,
@@ -286,20 +284,16 @@ public:
 
 	void set_rotate_z(float angle)
 	{
-		angle = deg_to_rad(angle);
 		float s = sin(angle);
 		float c = cos(angle);
-		set(c, -s, 0,  0,
-			s, c,  0,  0,
+		set(c, s, 0,  0,
+			-s, c,  0,  0,
 			0, 0,  1,  0,
 			0, 0,  0,  1);
 	}
 
 	void set_rotate(float x_angle, float y_angle, float z_angle)
 	{
-		x_angle = deg_to_rad(x_angle);
-		y_angle = deg_to_rad(y_angle);
-		z_angle = deg_to_rad(z_angle);
 		float sx = sin(x_angle), cx = cos(x_angle);
 		float sy = sin(y_angle), cy = cos(y_angle);
 		float sz = sin(z_angle), cz = cos(z_angle);

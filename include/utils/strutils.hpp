@@ -1,45 +1,21 @@
-#ifndef _STRUTILS_HPP_
-#define _STRUTILS_HPP_
-
-#define USE_BOOST_STRINGS
-
-#ifdef USE_BOOST_STRINGS
-	#include <boost/lexical_cast.hpp>
-#endif
+#ifndef __STRUTILS_HPP__
+#define __STRUTILS_HPP__
 
 #include <vector>
+#include "types_cast.hpp"
 
 namespace mhe {
 namespace utils {
 
-inline float to_float(const std::wstring& ws)
-{
-#ifdef USE_BOOST_STRINGS
-	return boost::lexical_cast<float>(ws);
-#endif
-}
-
 inline float to_number(const std::string& s)
 {
-#ifdef USE_BOOST_STRINGS
-	return boost::lexical_cast<float>(s);
-#endif
-}
-
-template <class T>
-inline T to_number(const std::wstring& ws)
-{
-#ifdef USE_BOOST_STRINGS
-	return boost::lexical_cast<T>(ws);
-#endif
+	return types_cast<float>(s);
 }
 
 template <class T>
 inline std::string to_string(T n)
 {
-#ifdef USE_BOOST_STRINGS
-	return boost::lexical_cast<std::string>(n);
-#endif
+	return types_cast<std::string>(n);
 }
 
 inline std::string from_wstr(const std::wstring& ws)

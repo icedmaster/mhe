@@ -5,6 +5,7 @@
 #include <cstring>
 #include <sstream>
 #include <cassert>
+#include <algorithm>
 
 namespace mhe {
 
@@ -188,7 +189,7 @@ private:
 		if ((size_ + 1) > capacity_)
 			reallocate_vector(capacity_ * 2);
 		if (index != size_)
-			::memmove(begin_ + index + 1, begin_ + index, (size_ - index) * sizeof(T));
+			std::copy(begin_ + index, begin_ + size_ - index, begin_ + index + 1);
 		begin_[index] = value;
 		++size_;
 		return begin_ + index;
@@ -198,19 +199,19 @@ private:
 	{
 		size_t prev_capacity = capacity_;
 		T* copy = new T[prev_capacity];
-		::memmove(copy, begin_, size_ * sizeof(T));
+		std::copy(begin_, end(), copy);
 		if (begin_ != elements_)
 			delete [] begin_;
 		capacity_ = new_capacity;
 		begin_ = new T[capacity_];
-		::memmove(begin_, copy, size_ * sizeof(T));
+		std::copy(copy, copy + size_, begin_);
 		delete [] copy;
 	}
 
 	iterator erase_impl(size_t index, size_t erased_count)
 	{
 		if (index != (size_ - erased_count))
-			::memmove(begin_ + index, begin_ + index + erased_count, size_ - index - erased_count);
+			std::copy(begin_ + index + erased_count, begin_ + size_ - index - erased_count, begin_ + index);
 		size_ -= erased_count;
 		return begin_ + index;
 	}

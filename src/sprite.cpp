@@ -12,6 +12,7 @@ Sprite::Sprite(const Sprite& sprite) :
 	pos_(sprite.pos_),
 	current_al_(nullptr)
 {
+	set_texture(sprite.texture());
 	init();
 }
 
