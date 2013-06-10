@@ -8,16 +8,20 @@ namespace mhe
 class Transform
 {
 public:
-	Transform() {}
+	Transform() :
+		scaling_(1, 1, 1),
+		dirty_(false)
+	{}
+
 	Transform(const matrixf& nm) :
 		m(nm),
+		scaling_(1, 1, 1),
 		dirty_(false)
 	{}
 
 	void set_transform(const matrixf& nm)
 	{
 		m = nm;
-		set_dirty();
 	}
 
 	const matrixf& transform() const
@@ -27,8 +31,7 @@ public:
 
 	void apply_transform(const matrixf& nm)
 	{
-		m *= nm;
-		set_dirty();
+		m = nm * m;
 	}
 
 	void translate(float dx, float dy, float dz)
@@ -36,7 +39,6 @@ public:
 		matrixf tm;
 		tm.set_translate(dx, dy, dz);
 		m *= tm;
-		set_dirty();
 	}
 
 	void translate(const v3d& t)
@@ -48,24 +50,21 @@ public:
 	{
 		matrixf rm;
 		rm.set_rotate_x(ang);
-		m *= rm;
-		set_dirty();
+		m = rm * m;
 	}
 
 	void rotate_y(float ang)
 	{
 		matrixf rm;
 		rm.set_rotate_y(ang);
-		m *= rm;
-		set_dirty();
+		m = rm * m;
 	}
 
 	void rotate_z(float ang)
 	{
 		matrixf rm;
 		rm.set_rotate_z(ang);
-		m *= rm;
-		set_dirty();
+		m = rm * m;
 	}
 
 	void rotate(const v3d& v, float angle)
@@ -82,8 +81,7 @@ public:
 	{
 		matrixf sm;
 		sm.set_scale(sx, sy, sz);
-		m = sm * m;
-		set_dirty();
+		m *= sm;
 	}
 
 	void scale(const v3d& s)
@@ -94,8 +92,14 @@ public:
 	void identity()
 	{
 		m.load_identity();
-		set_dirty();
 	}
+
+	void translate_to(const v3d& position);
+	void translate_by(const v3d& position);
+	void rotate_to(float angle_x, float angle_y, float angle_z);
+	void rotate_by(float angle_x, float angle_y, float angle_z);
+	void scale_to(float sx, float sy, float sz);
+	void scale_by(float sx, float sy, float sz);
 protected:
 	bool dirty() const
 	{
@@ -106,6 +110,8 @@ protected:
 	{
 		dirty_ = false;
 	}
+
+	void update_transform();
 private:
 	void set_dirty()
 	{
@@ -113,6 +119,9 @@ private:
 	}
 
 	matrixf m;   
+	v3d position_; 
+	v3d rotation_;
+	v3d scaling_;
 	bool dirty_;
 };
 }

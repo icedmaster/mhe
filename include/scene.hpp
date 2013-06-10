@@ -15,6 +15,12 @@ class Scene
 {
 public:
 	Scene();
+
+	void add(Node* node)
+	{
+		add(nodeptr(node));
+	}
+
 	void add(const nodeptr& node);
 	void remove(const nodeptr& node);
 	void remove(const std::string& name);

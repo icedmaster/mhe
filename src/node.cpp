@@ -6,9 +6,22 @@ namespace mhe {
 
 Node::Node() : 
 	Renderable(),
-	priority_(priority_normal),	parent_(nullptr),
-	flags_(visible | alive)
+	priority_(priority_normal),
+	parent_(nullptr),
+	flags_(visible | alive),
+	dirty_(false)
 {
+}
+
+void Node::add_node(const boost::shared_ptr<Node>& node)
+{
+	children_.push_back(node);
+	node->parent_ = this;
+	if (!dirty() && !dirty_)
+	{
+		node->apply_transform(transform());
+		node->update_children_transform();
+	}
 }
 
 void Node::draw_impl(const Context& context)
@@ -22,7 +35,7 @@ void Node::update(cmn::uint tick)
 		update_impl(tick);
 	if (dirty())
 	{
-		update_children_transform();
+		update_transform();
 		clear_dirty_flag();
 	}
 	for (size_t i = 0; i < children_.size(); ++i)
@@ -35,12 +48,18 @@ void Node::start()
 		start_impl(utils::get_current_tick());
 }	
 
+void Node::update_transform()
+{
+	Transform::update_transform();
+	update_children_transform();
+}
+
 void Node::update_children_transform()
 {
 	for (size_t i = 0; i < children_.size(); ++i)
 	{
+		children_[i]->update_transform();
 		children_[i]->apply_transform(transform());
-		children_[i]->update_children_transform();
 	}
 }
 

@@ -1,4 +1,4 @@
-#ifndef __INODE_HPP__
+#ifndef __INODE_HPP__ 
 #define __INODE_HPP__
 
 #include <boost/shared_ptr.hpp>
@@ -14,7 +14,7 @@ namespace mhe
 // Base renderable class
 class Node : public Renderable
 {	
-	friend class Scene;
+	friend class cene;
 
 	static const size_t default_texcoord_size = 8;
 public:
@@ -76,13 +76,12 @@ public:
 		return name_;
 	}
 
-	void add_node(boost::shared_ptr<Node> node)
+	void add_node(Node* node)
 	{
-		children_.push_back(node);
-		node->parent_ = this;
-		node->apply_transform(transform());
-		node->update_children_transform();
+		add_node(boost::shared_ptr<Node>(node));
 	}
+
+	void add_node(const boost::shared_ptr<Node>& node);
 
 	Node* clone() const
 	{
@@ -112,14 +111,16 @@ private:
 	{
 		return nullptr;
 	}		
-
-	void update_children_transform();
 	
+	void update_transform();
+	void update_children_transform();
+
 	int priority_;						
 	std::string name_;
 	std::vector< boost::shared_ptr<Node> > children_;	
 	Node* parent_;
 	uint32_t flags_;
+	bool dirty_;
 };
 
 typedef boost::shared_ptr<Node> nodeptr;

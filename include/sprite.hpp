@@ -84,7 +84,7 @@ private:
 	bool is_running_;
 	float x_size_, y_size_;
 	bool reset_position_;
-	v3d pos_;   // need while we use reset position
+	v3d pos_;
 	AnimationListBase* current_al_;
 };
 }
