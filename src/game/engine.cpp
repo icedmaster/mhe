@@ -4,6 +4,8 @@
 #include "events/system_device.hpp"
 #include "utils/sysutils.hpp"
 
+#include "utils/profiling.hpp"
+
 namespace mhe  { 
 namespace game {
 
@@ -68,6 +70,7 @@ void Engine::process()
 
 void Engine::update()
 {
+	ADD_PROFILE_ELEMENT("Engine::update");
 	event_manager_.check(ws_);
 	update_internal();
 
@@ -77,6 +80,7 @@ void Engine::update()
 
 void Engine::render()
 {
+	ADD_PROFILE_ELEMENT("Engine::render");
 	context_.update();	
 	game_scene_->scene()->draw(context_);
 	game_scene_->draw();

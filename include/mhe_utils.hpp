@@ -9,5 +9,6 @@
 #include "utils/timer.hpp"
 #include "utils/graphics_utils.hpp"
 #include "utils/utf8_utils.hpp"
+#include "utils/profiling.hpp"
 
 #endif

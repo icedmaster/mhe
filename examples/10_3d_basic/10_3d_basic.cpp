@@ -31,7 +31,8 @@ class TestScene : public mhe::game::GameScene
 {
 public:
 	TestScene(mhe::game::Engine* engine) :
-		mhe::game::GameScene(engine)
+		mhe::game::GameScene(engine),
+		prev_time_(0)
 	{}
 private:
 	bool init_impl(const std::string&, void*)
@@ -53,11 +54,25 @@ private:
 		return true;
 	}
 
+	bool process_impl()
+	{
+		cmn::uint now = mhe::utils::get_current_tick();
+		if (!prev_time_) prev_time_ = now;
+		else if (now >= (prev_time_ + 1000))
+		{
+			prev_time_ = now;
+			std::cout << mhe::utils::Profiler::instance() << std::endl;
+			mhe::utils::Profiler::instance().reset();
+		}
+		return true;
+	}
+
 	void draw_impl()
 	{
 	}
 
 	mhe::game::component_ptr stats_component_;
+	cmn::uint prev_time_;
 };
 
 int main(int /*argc*/, char** /*argv*/)
