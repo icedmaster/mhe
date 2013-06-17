@@ -10,6 +10,8 @@
 #include "renderable.hpp"
 #include "shader_program.hpp"
 #include "render_buffer.hpp"
+#include "engine_config.hpp"
+#include "fixed_size_vector.hpp"
 
 namespace mhe
 {
@@ -298,15 +300,16 @@ public:
 		return stats_;
 	}
 private:
-
+	typedef fixed_size_vector<Renderable*, initial_number_of_renderables> renderable_container;
+	typedef fixed_size_vector<Renderable, initial_number_of_renderables> batched_container;
 private:
-	std::vector<Renderable> perform_batch() const;
+	batched_container perform_batch() const;
 	void perform_render(const Renderable& renderable);
 	void set_render_flags(const Renderable& renderable);
 	void clear_render_flags(const Renderable& renderable);
 	void perform_buffered_render(const Renderable& Renderable);
 
-	std::list<Renderable*> renderable_elements_;
+	renderable_container renderable_elements_;
 	Stats stats_;
 	boost::scoped_ptr<DriverImpl> impl_;
 };

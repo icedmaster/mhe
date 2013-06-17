@@ -96,19 +96,19 @@ float Sprite::height() const
 void Sprite::init()
 {
 	Node::rvertexcoord().resize(12);
-	std::vector<float>& n = Node::rnormalscoord();
+	Renderable::vertex_container& n = Node::rnormalscoord();
 	n.resize(12);
 	n[0] = 0.0; n[1] = 0.0; n[2] = 1.0;
 	n[3] = 0.0; n[4] = 0.0; n[5] = 1.0;
 	n[6] = 0.0; n[7] = 0.0; n[8] = 1.0;
 	n[9] = 0.0; n[10] = 0.0; n[11] = 1.0;
 	
-	std::vector<cmn::uint>& i = Node::rindicies();
+	Renderable::indexes_container& i = Node::rindicies();
 	i.resize(6);
 	i[0] = 0; i[1] = 1; i[2] = 2;
 	i[3] = 2; i[4] = 3; i[5] = 0;
 
-	std::vector<float>& t = Node::rtexcoord();
+	Renderable::texcoord_container& t = Node::rtexcoord();
 	t.resize(8);
 	t[0] = 0.0; t[1] = 0.0; t[2] = 0.0; t[3] = 1.0;
 	t[4] = 1.0; t[5] = 1.0; t[6] = 1.0; t[7] = 0.0;
@@ -122,7 +122,7 @@ void Sprite::init()
 
 void Sprite::update_buffers()
 {
-	std::vector<float>& v = Node::rvertexcoord();
+	Renderable::vertex_container& v = Node::rvertexcoord();
 	float x_sz = x_size_, y_sz = y_size_;
 	if (!x_size_ || !y_size_)
 	{

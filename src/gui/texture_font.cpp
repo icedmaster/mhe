@@ -37,9 +37,9 @@ bool TextureFont::load(const std::string& filename)
 Renderable* TextureFont::print(const utf32_string& text,
 							   const vector2<float>& position, const colorf& color)
 {
-	std::vector<float> t;	// texture coordinates
-	std::vector<cmn::uint> ibuf;  // indicies
-	std::vector<float> v;	// vertexes
+	Renderable::texcoord_container t;	// texture coordinates
+	Renderable::indexes_container ibuf;  // indicies
+	Renderable::vertex_container v;	// vertexes
 	const size_t len = text.length();
 	v.reserve(len * 12);
 	t.reserve(len * 8);

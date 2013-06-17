@@ -34,6 +34,13 @@ public:
 		resize(size);
 	}
 
+	template <class InputIterator>
+	fixed_size_vector(InputIterator first, InputIterator last) :
+		begin_(elements_), capacity_(count)
+	{
+		insert(end(), first, last);
+	}
+
 	~fixed_size_vector()
 	{
 		if (begin_ != elements_)
@@ -139,6 +146,12 @@ public:
 		if (new_size > capacity_)
 			reallocate_vector(new_size);
 		size_ = new_size;
+	}
+
+	void reserve(size_t capacity)
+	{
+		if (capacity > capacity_)
+			reallocate_vector(capacity);
 	}
 
 	// erasing

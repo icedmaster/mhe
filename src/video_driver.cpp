@@ -30,7 +30,7 @@ void Driver::begin_render()
 void Driver::end_render()
 {	
 	stats_.add_renderable_count(renderable_elements_.size());
-	const std::vector<Renderable>& batched = perform_batch();
+	const batched_container& batched = perform_batch();
 	for (size_t i = 0; i < batched.size(); ++i)
 		perform_render(batched[i]);
     impl_->end_render();
@@ -49,12 +49,11 @@ void Driver::draw(Renderable* renderable)
 	renderable_elements_.push_back(renderable);
 }
 
-std::vector<Renderable> Driver::perform_batch() const
+Driver::batched_container Driver::perform_batch() const
 {
 	boost::shared_ptr<Texture> last_texture;
-	std::vector<Renderable> batches;
-	batches.reserve(renderable_elements_.size());
-	for (std::list<Renderable*>::const_iterator it = renderable_elements_.begin();
+	batched_container batches;
+	for (renderable_container::const_iterator it = renderable_elements_.begin();
 		 it != renderable_elements_.end(); ++it)
 	{
 		Renderable* renderable = *it;

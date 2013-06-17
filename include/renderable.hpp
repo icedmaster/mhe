@@ -5,6 +5,8 @@
 #include "types.hpp"
 #include "texture.hpp"
 #include "transform.hpp"
+#include "fixed_size_vector.hpp"
+#include "engine_config.hpp"
 
 namespace mhe {
 
@@ -32,12 +34,15 @@ public:
 		batching_disabled = (1 << 3)
 	};
 public:
+	typedef fixed_size_vector<float, initial_number_of_verteces> vertex_container;
+	typedef fixed_size_vector<unsigned int, initial_number_of_verteces> indexes_container;
+	typedef fixed_size_vector<float, initial_number_of_texcoords> texcoord_container;
+public:
 	Renderable(bool default_initialization = false) :
 		color_(color_white), render_flags_(0), blend_mode_(no_blend)
 	{ 
 		if (default_initialization)
 		{
-			texcoord_.resize(default_texcoord_size);
 			texcoord_[0] = 0.0; texcoord_[1] = 0.0; texcoord_[2] = 0.0; texcoord_[3] = 1.0;
 			texcoord_[4] = 1.0; texcoord_[5] = 1.0; texcoord_[6] = 1.0; texcoord_[7] = 0.0;
 		}
@@ -64,18 +69,18 @@ public:
 		return color_;
 	}
 
-	const std::vector<float>& texcoord() const
+	const texcoord_container& texcoord() const
 	{
 		return texcoord_;
 	}
 
-	void set_texcoord(const std::vector<float>& coord)
+	void set_texcoord(const texcoord_container& coord)
 	{
 		texcoord_ = coord;
 	}
 
-	void set_buffers(const std::vector<float>& vertexes, const std::vector<float>& texturecoord,
-					 const std::vector<cmn::uint> indicies)
+	void set_buffers(const vertex_container& vertexes, const texcoord_container& texturecoord,
+					 const indexes_container& indicies)
 	{
 		vertexcoord_ = vertexes;
 		texcoord_ = texturecoord;
@@ -83,22 +88,22 @@ public:
 		update_color_buffer();
 	}
 
-	const std::vector<float>& vertexcoord() const
+	const vertex_container& vertexcoord() const
 	{
 		return vertexcoord_;
 	}
 
-	const std::vector<float>& normalscoord() const
+	const vertex_container& normalscoord() const
 	{
 		return normalscoord_;
 	}
 
-	const std::vector<float>& colorcoord() const
+	const vertex_container& colorcoord() const
 	{
 		return colorcoord_;
 	}
 
-	const std::vector<cmn::uint> indicies() const
+	const indexes_container& indicies() const
 	{
 		return indicies_;
 	}
@@ -196,42 +201,42 @@ public:
 		blend_mode_ = other.blend_mode_;
 	}
 protected:
-	std::vector<float>& rtexcoord()
+	texcoord_container& rtexcoord()
 	{
 		return texcoord_;
 	}
 
-	std::vector<float>& rvertexcoord()
+	vertex_container& rvertexcoord()
 	{
 		return vertexcoord_;
 	}
 
-	void set_vertexcoord(const std::vector<float>& coord)
+	void set_vertexcoord(const vertex_container& coord)
 	{
 		vertexcoord_ = coord;
 	}
 
-	std::vector<float>& rnormalscoord()
+	vertex_container& rnormalscoord()
 	{
 		return normalscoord_;
 	}
 
-	void set_normalscoord(const std::vector<float>& coord)
+	void set_normalscoord(const vertex_container& coord)
 	{
 		normalscoord_ = coord;
 	}
 
-	std::vector<cmn::uint>& rindicies()
+	indexes_container& rindicies()
 	{
 		return indicies_;
 	}
 
-	void set_indicies(const std::vector<cmn::uint>& coord)
+	void set_indicies(const indexes_container& coord)
 	{
 		indicies_ = coord;
 	}
 
-	std::vector<float>& rcolorcoord()
+	vertex_container& rcolorcoord()
 	{
 		return colorcoord_;
 	}
@@ -249,16 +254,28 @@ protected:
 		}
 	}
 private:
+	texcoord_container texcoord_;
+	vertex_container vertexcoord_;
+	vertex_container colorcoord_;
+	vertex_container normalscoord_;
+	indexes_container indicies_;
 	boost::shared_ptr<Texture> texture_;
-	std::vector<float> texcoord_;
-	std::vector<float> vertexcoord_;
-	std::vector<float> colorcoord_;
-	std::vector<float> normalscoord_;
-	std::vector<cmn::uint> indicies_;
 	colorf color_;
 	uint32_t render_flags_;
 	BlendMode blend_mode_;
 };
+
+inline Renderable::vertex_container vector_to_vertex_container(const std::vector<float>& v)
+{
+	Renderable::vertex_container result(v.begin(), v.end());
+	return result;
+}
+
+inline Renderable::texcoord_container vector_to_texcoord_container(const std::vector<float>& v)
+{
+	Renderable::texcoord_container result(v.begin(), v.end());
+	return result;
+}
 
 }
 

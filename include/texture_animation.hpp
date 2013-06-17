@@ -14,7 +14,7 @@ public:
 		texture_(texture)
 	{}
 
-	void set_texcoord(const std::vector<float>& coord)
+	void set_texcoord(const Renderable::texcoord_container& coord)
 	{
 		texcoord_ = coord;
 	}
@@ -27,7 +27,7 @@ private:
 	}
 
 	boost::shared_ptr<Texture> texture_;
-	std::vector<float> texcoord_;
+	Renderable::texcoord_container texcoord_;
 };
 
 }
