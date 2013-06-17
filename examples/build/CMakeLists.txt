@@ -8,3 +8,4 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../06_animation/build/ ${CMAKE_CURR
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../07_application/build/ ${CMAKE_CURRENT_SOURCE_DIR}/../07_application/build/)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../08_gui/build/ ${CMAKE_CURRENT_SOURCE_DIR}/../08_gui/build/)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../09_qt/build/ ${CMAKE_CURRENT_SOURCE_DIR}/../09_qt/build/)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../10_3d_basic/build/ ${CMAKE_CURRENT_SOURCE_DIR}/../10_3d_basic/build/)

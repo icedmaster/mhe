@@ -23,6 +23,7 @@ void StatsComponent::init(const boost::shared_ptr<Scene>& scene, Engine* engine)
 	scene_->add(nodeptr(node));
 	scene_->add_camera(new Camera2D(engine->context().window_system().width(),
 									engine->context().window_system().height()), true);
+	scene_->active_camera()->enable_each_frame_updating(true);
 	scene->add_subscene(scene_);
 }
 

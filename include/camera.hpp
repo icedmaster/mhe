@@ -13,11 +13,23 @@ class Camera : public Transform
 public:
 	Camera();
 	virtual ~Camera() {}
+	
+	void set_projection(const matrixf& projection)
+	{
+		projection_ = projection;
+	}
+
+	const matrixf& projection() const
+	{
+		return projection_;
+	}
+
 	void update(const boost::shared_ptr<Driver>& driver);
 
 	void enable_each_frame_updating(bool enable)
 	{
 		update_each_frame_ = enable;
+		set_dirty();
 	}
 
 	void set_need_update()
@@ -40,9 +52,10 @@ protected:
 		updated_ = false;
 	}
 private:
+	matrixf projection_;
+	std::string name_;
 	bool update_each_frame_;
 	bool updated_;
-	std::string name_;
 };
 
 }

@@ -17,7 +17,7 @@ public:
 	{
 		matrixf proj;
 		proj.set_ortho(0, width, 0, height, -1, 1);
-		set_transform(proj);
+		set_projection(proj);
 		set_dirty();
 	}
 };
