@@ -16,7 +16,7 @@ Sprite::Sprite(const Sprite& sprite) :
 	init();
 }
 
-void Sprite::draw_impl(const Context& context)
+void Sprite::draw_impl(Context& context)
 {
 	if (!is_running_)
 		execute(0);

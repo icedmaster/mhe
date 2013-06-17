@@ -16,7 +16,7 @@ public:
 		return "opengl";
 	}
 
-	Driver* create_video_driver() const
+	DriverImpl* create_video_driver() const
 	{
 		return new OpenGLDriver;
 	}

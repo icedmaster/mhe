@@ -19,16 +19,13 @@ public:
 
 	void set_color(const colorf& color);
 			
-	void set_image(boost::shared_ptr<Image> im, boost::shared_ptr<Driver> driver,
-				   FilterType ft = Nearest)
+	void set_image(boost::shared_ptr<Image> im, FilterType ft = Nearest)
 	{
-		rebuild_texture(im, driver, ft);
+		rebuild_texture(im, ft);
 	}
 
-	void prepare(boost::shared_ptr<Driver> driver = 
-				 boost::shared_ptr<Driver>());
-	void clean(boost::shared_ptr<Driver> driver =
-			   boost::shared_ptr<Driver>());
+	void prepare(Driver* driver = nullptr);
+	void clean(Driver* driver = nullptr);
 			
 	cmn::uint width() const
 	{
@@ -55,8 +52,7 @@ private:
 	cmn::uint w_, h_;
 	cmn::uint id_;	
 	bool binded_;
-	void rebuild_texture(boost::shared_ptr<Image> im,
-						 boost::shared_ptr<Driver> driver, FilterType ft);
+	void rebuild_texture(boost::shared_ptr<Image> im, FilterType ft);
 };
 
 }}

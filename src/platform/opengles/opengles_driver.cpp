@@ -8,7 +8,7 @@
 namespace mhe {
 namespace opengl {
 
-bool OpenGLESDriver::init_impl()
+bool OpenGLESDriver::init()
 {
 	return init_default_shader();
 }
@@ -23,41 +23,41 @@ bool OpenGLESDriver::init_default_shader()
 		return false;
 	boost::shared_ptr<OpenGLESShaderProgram> program(new OpenGLESShaderProgram);
 	program->set_shaders(vert, frag);
-	set_shader_program_impl(program);
+	set_shader_program(program);
 	return true;
 }
 
-void OpenGLESDriver::clear_depth_impl()
+void OpenGLESDriver::clear_depth()
 {
 	glClear(GL_DEPTH_BUFFER_BIT);
 }
 
-void OpenGLESDriver::clear_color_impl()
+void OpenGLESDriver::clear_color()
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 }
     
-void OpenGLESDriver::mask_zbuffer_impl()
+void OpenGLESDriver::mask_zbuffer()
 {
     glDepthMask(GL_FALSE);
 }
     
-void OpenGLESDriver::unmask_zbuffer_impl()
+void OpenGLESDriver::unmask_zbuffer()
 {
     glDepthMask(GL_TRUE);
 }
 
-void OpenGLESDriver::set_clear_color_impl(const colorf& color)
+void OpenGLESDriver::set_clear_color(const colorf& color)
 {
 	glClearColor(color.r(), color.g(), color.b(), color.a());
 }
     
-void OpenGLESDriver::enable_blending_impl()
+void OpenGLESDriver::enable_blending()
 {
     glEnable(GL_BLEND);
 }
     
-void OpenGLESDriver::disable_blending_impl()
+void OpenGLESDriver::disable_blending()
 {
     glDisable(GL_BLEND);
 }
@@ -74,7 +74,7 @@ void OpenGLESDriver::set_blend_func(BlendMode bf)
     }
 }
 
-void OpenGLESDriver::set_shader_program_impl(const boost::shared_ptr<ShaderProgram>& program)
+void OpenGLESDriver::set_shader_program(const boost::shared_ptr<ShaderProgram>& program)
 {
 	const OpenGLESShaderProgram* shader_program = static_cast<const OpenGLESShaderProgram*>(program.get());
 	OpenGLExtensions::instance().glUseProgram(shader_program->id_);
@@ -87,7 +87,7 @@ void OpenGLESDriver::load_projection_matrix(const matrixf& m)
 	active_shader_program_->set_uniform(projection_matrix_uniform_name, m);
 }
 
-void OpenGLESDriver::begin_draw_impl(const RenderBuffer* buffer)
+void OpenGLESDriver::begin_draw(const RenderBuffer* buffer)
 {
 	check_for_errors();
 	// TODO: need to apply correct texture unit
@@ -112,13 +112,13 @@ void OpenGLESDriver::begin_draw_impl(const RenderBuffer* buffer)
                                            &data[0], 4, c_offset * sizeof(float));
 }
     
-void OpenGLESDriver::draw_impl(const cmn::uint* i, cmn::uint size)
+void OpenGLESDriver::draw(const cmn::uint* i, cmn::uint size)
 {
 	check_for_errors();
     glDrawElements(GL_TRIANGLES, size, GL_UNSIGNED_INT, i);
 }
     
-void OpenGLESDriver::end_draw_impl(const RenderBuffer* /*buffer*/)
+void OpenGLESDriver::end_draw(const RenderBuffer* /*buffer*/)
 {
 	check_for_errors();
     active_shader_program_->disable_attribute(vertex_position_attribute_name);
@@ -127,12 +127,12 @@ void OpenGLESDriver::end_draw_impl(const RenderBuffer* /*buffer*/)
     active_shader_program_->disable_attribute(vertex_color_attribute_name);
 }
     
-void OpenGLESDriver::set_viewport_impl(int x, int y, int w, int h)
+void OpenGLESDriver::set_viewport(int x, int y, int w, int h)
 {
     glViewport(x, y, w, h);
 }
     
-void OpenGLESDriver::end_render_impl()
+void OpenGLESDriver::end_render()
 {
     glFlush();
 }

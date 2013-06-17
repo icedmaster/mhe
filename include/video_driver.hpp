@@ -20,6 +20,78 @@ enum DepthFunc
 
 class Texture;
 
+class DriverImpl
+{
+public:
+	virtual ~DriverImpl() {}
+
+	virtual bool init() = 0;
+	virtual void close() = 0;
+
+	virtual void set_ws(WindowSystem*) {}
+
+	virtual void save_view_matrix() {}
+	virtual void restore_view_matrix() {}
+	virtual void setup_view_matrix(const matrixf&) = 0;
+
+	virtual void load_projection_matrix(const matrixf&) = 0;
+	virtual void load_modelview_matrix(const matrixf&) = 0;
+
+	virtual void enable_lighting() = 0;
+	virtual void disable_lighting() = 0;
+	virtual void enable_blending() = 0;
+	virtual void disable_blending() = 0;
+	virtual void set_blend_func(BlendMode) = 0;
+
+	virtual void enable_depth() = 0;
+	virtual void disable_depth() = 0;
+	virtual void set_depth_func(DepthFunc) = 0;
+
+	virtual void clear_depth() = 0;
+	virtual void clear_color() = 0;
+
+	virtual void mask_zbuffer() {}
+	virtual void unmask_zbuffer() {}
+
+	virtual void set_clear_color(const colorf&) {}
+
+	virtual void save_current_color() {}
+	virtual void restore_color() {}
+	virtual void begin_draw(const float*, const float*, const float*, const float*,
+							cmn::uint) = 0;
+	virtual void begin_draw(boost::shared_ptr<Texture>,
+							const float*, const float*, const float*, const float*,
+							cmn::uint) = 0;
+	virtual void begin_draw(const RenderBuffer*) {}
+	virtual void draw(const cmn::uint*, cmn::uint) = 0;
+	virtual void draw(const RenderBuffer*) {}
+	virtual void end_draw() = 0;
+	virtual void end_draw(boost::shared_ptr<Texture> texture) = 0;
+	virtual void end_draw(const RenderBuffer*) {}
+
+	virtual void set_color(const colorf&) {}
+
+	virtual void get_display_data(std::vector<char>&) {}
+
+	virtual void set_viewport(int x, int y, int w, int h) = 0;
+
+	virtual void set_shader_program(const boost::shared_ptr<ShaderProgram>& program) = 0;
+    
+    virtual void begin_render() {}
+    virtual void end_render() {}
+
+	virtual bool support_buffered_render() const
+	{
+		return false;
+	}
+
+	// method for internal buffer using
+	virtual RenderBuffer* create_render_buffer() const
+	{
+		return nullptr;
+	}
+};
+
 class Driver
 {
 public:
@@ -68,89 +140,90 @@ public:
 		cmn::uint elements_count_;
 	};
 public:
-	virtual ~Driver() {}
+	Driver();
+	~Driver() {}
 
 	void set_window_system(WindowSystem* ws)
 	{
-		set_ws(ws);
+		impl_->set_ws(ws);
 	}
 
 	bool init()
 	{
-		return init_impl();
+		return impl_->init();
 	}
 
 	void close()
 	{
-		close_impl();
+		impl_->close();
 	}
 
 	void enable_lighting()
 	{
-		enable_lighting_impl();
+		impl_->enable_lighting();
 	}
 
 	void disable_lighting()
 	{
-		disable_lighting_impl();
+		impl_->disable_lighting();
 	}
 
 	void enable_blending(BlendMode bf)
 	{
-		enable_blending_impl();
-		set_blend_func(bf);
+		impl_->enable_blending();
+		impl_->set_blend_func(bf);
 	}
 
 	void disable_blending()
 	{
-		disable_blending_impl();
+		impl_->disable_blending();
 	}
 
 	void enable_depth(DepthFunc df)
 	{
-		enable_depth_impl();
-		set_depth_func(df);
+		impl_->enable_depth();
+		impl_->set_depth_func(df);
 	}
 
 	void disable_depth()
 	{
-		disable_depth_impl();
+		impl_->disable_depth();
 	}
 
 	void clear_depth()
 	{
-		clear_depth_impl();
+		impl_->clear_depth();
 	}
 
 	void clear_color()
 	{
-		clear_color_impl();
+		impl_->clear_color();
 	}
 
 	void mask_zbuffer()
 	{
-		mask_zbuffer_impl();
+		impl_->mask_zbuffer();
 	}
 
 	void unmask_zbuffer()
 	{
-		unmask_zbuffer_impl();
+		impl_->unmask_zbuffer();
 	}
 
 	void set_clear_color(const colorf& color)
 	{
-		set_clear_color_impl(color);
+		impl_->set_clear_color(color);
 	}
 
 	// working with matrix
 	void set_modelview_matrix(const matrixf& m)
 	{
-		load_modelview_matrix(m);
+		impl_->load_modelview_matrix(m);
 	}
 
 	void set_projection_matrix(const matrixf& m)
 	{
-		load_projection_matrix(m);
+		impl_->load_projection_matrix(m);
 	}
 
 	void begin_render();
@@ -165,12 +238,12 @@ public:
 			  cmn::uint size
 		)
 	{
-		save_view_matrix();
-		setup_view_matrix(m);
-		begin_draw_impl(v, n, t, c, size);
-		draw_impl(i, size);
-		end_draw_impl();
-		restore_view_matrix();
+		impl_->save_view_matrix();
+		impl_->setup_view_matrix(m);
+		impl_->begin_draw(v, n, t, c, size);
+		impl_->draw(i, size);
+		impl_->end_draw();
+		impl_->restore_view_matrix();
 	}
 
 	void draw(
@@ -179,21 +252,21 @@ public:
 		cmn::uint size
 		)
 	{
-		begin_draw_impl(v, n, t, c, size);
-		draw_impl(i, size);
-		end_draw_impl();
+		impl_->begin_draw(v, n, t, c, size);
+		impl_->draw(i, size);
+		impl_->end_draw();
 	}
 
 	void draw(const matrixf& m, boost::shared_ptr<Texture> texture,
 			  const float* v, const float* n, const float* t, const float* c,
 			  const cmn::uint* i, cmn::uint size)
 	{
-		save_view_matrix();
-		setup_view_matrix(m);
-		begin_draw_impl(texture, v, n, t, c, size);
-		draw_impl(i, size);
-		end_draw_impl(texture);
-		restore_view_matrix();
+		impl_->save_view_matrix();
+		impl_->setup_view_matrix(m);
+		impl_->begin_draw(texture, v, n, t, c, size);
+		impl_->draw(i, size);
+		impl_->end_draw(texture);
+		impl_->restore_view_matrix();
 	}
 
 	void draw(Renderable* renderable);
@@ -202,17 +275,17 @@ public:
 	// for example.
 	void get_display_data(std::vector<char>& pb)
 	{
-		get_display_data_impl(pb);
+		impl_->get_display_data(pb);
 	}
 
 	void set_viewport(int x, int y, int w, int h)
 	{
-		set_viewport_impl(x, y, w, h);
+		impl_->set_viewport(x, y, w, h);
 	}
 
 	void set_shader_program(const boost::shared_ptr<ShaderProgram>& program)
 	{
-		set_shader_program_impl(program);
+		impl_->set_shader_program(program);
 	}
 
 	const Stats& stats() const
@@ -225,71 +298,7 @@ public:
 		return stats_;
 	}
 private:
-	virtual bool init_impl() = 0;
-	virtual void close_impl() = 0;
 
-	virtual void set_ws(WindowSystem*) {}
-
-	virtual void save_view_matrix() {}
-	virtual void restore_view_matrix() {}
-	virtual void setup_view_matrix(const matrixf&) = 0;
-
-	virtual void load_projection_matrix(const matrixf&) = 0;
-	virtual void load_modelview_matrix(const matrixf&) = 0;
-
-	virtual void enable_lighting_impl() = 0;
-	virtual void disable_lighting_impl() = 0;
-	virtual void enable_blending_impl() = 0;
-	virtual void disable_blending_impl() = 0;
-	virtual void set_blend_func(BlendMode) = 0;
-
-	virtual void enable_depth_impl() = 0;
-	virtual void disable_depth_impl() = 0;
-	virtual void set_depth_func(DepthFunc) = 0;
-
-	virtual void clear_depth_impl() = 0;
-	virtual void clear_color_impl() = 0;
-
-	virtual void mask_zbuffer_impl() {}
-	virtual void unmask_zbuffer_impl() {}
-
-	virtual void set_clear_color_impl(const colorf&) {}
-
-	virtual void save_current_color() {}
-	virtual void restore_color() {}
-	virtual void begin_draw_impl(const float*, const float*, const float*, const float*,
-								 cmn::uint) = 0;
-	virtual void begin_draw_impl(boost::shared_ptr<Texture>,
-								 const float*, const float*, const float*, const float*,
-								 cmn::uint) = 0;
-	virtual void begin_draw_impl(const RenderBuffer*) {}
-	virtual void draw_impl(const cmn::uint*, cmn::uint) = 0;
-	virtual void draw_impl(const RenderBuffer*) {}
-	virtual void end_draw_impl() = 0;
-	virtual void end_draw_impl(boost::shared_ptr<Texture> texture) = 0;
-	virtual void end_draw_impl(const RenderBuffer*) {}
-
-	virtual void set_color_impl(const colorf&) {}
-
-	virtual void get_display_data_impl(std::vector<char>&) {}
-
-	virtual void set_viewport_impl(int x, int y, int w, int h) = 0;
-
-	virtual void set_shader_program_impl(const boost::shared_ptr<ShaderProgram>& program) = 0;
-    
-    virtual void begin_render_impl() {}
-    virtual void end_render_impl() {}
-
-	virtual bool support_buffered_render() const
-	{
-		return false;
-	}
-
-	// method for internal buffer using
-	virtual RenderBuffer* create_render_buffer() const
-	{
-		return nullptr;
-	}
 private:
 	std::vector<Renderable> perform_batch() const;
 	void perform_render(const Renderable& renderable);
@@ -299,6 +308,7 @@ private:
 
 	std::list<Renderable*> renderable_elements_;
 	Stats stats_;
+	boost::scoped_ptr<DriverImpl> impl_;
 };
 
 }

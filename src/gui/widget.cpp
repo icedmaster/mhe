@@ -39,14 +39,14 @@ widgetptr Widget::get_widget(const std::string& name) const
 	return widgetptr();
 }
 
-void Widget::draw(const Context& context)
+void Widget::draw(Context& context)
 {
 	draw_impl(sprite_, context);
 	for (size_t i = 0; i < children_.size(); ++i)
 		children_[i]->draw(context);
 }
 
-void Widget::draw_impl(const boost::shared_ptr<Sprite>& sprite, const Context& context)
+void Widget::draw_impl(const boost::shared_ptr<Sprite>& sprite, Context& context)
 {
 	if (!visible_) return;
 	sprite->set_size(geom().width(), geom().height());
@@ -59,7 +59,7 @@ void Widget::draw_impl(const boost::shared_ptr<Sprite>& sprite, const Context& c
 	{
 		caption_renderable_->identity();
 		caption_renderable_->translate(position.x(), position.y(), 0);
-		context.driver()->draw(caption_renderable_.get());
+		context.driver().draw(caption_renderable_.get());
 	}
 }
 

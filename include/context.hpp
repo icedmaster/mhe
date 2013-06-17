@@ -11,14 +11,18 @@ namespace mhe {
 class Context
 {
 public:
-	void set_driver(const boost::shared_ptr<Driver>& driver)
+	Context()
 	{
-		driver_ = driver;
-		texture_manager_.set_helper(driver_);
+		texture_manager_.set_helper(&driver_);
 		texture_atlas_manager_.set_helper(&texture_manager_);
 	}
 
-	boost::shared_ptr<Driver> driver() const
+	const Driver& driver() const
+	{
+		return driver_;
+	}
+
+	Driver& driver()
 	{
 		return driver_;
 	}
@@ -62,7 +66,7 @@ public:
 	void update();
 	void flush();
 private:
-	boost::shared_ptr<Driver> driver_;
+	Driver driver_;
 	WindowSystem* window_system_;
 	TextureManager texture_manager_;
 	TextureAtlasManager texture_atlas_manager_;

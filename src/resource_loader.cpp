@@ -33,7 +33,7 @@ iSound* SoundLoader::load(const std::string& name, const helper_type& /*helper*/
 	return nullptr;
 }
 
-Texture* TextureLoader::load(const std::string& filename, const helper_type& helper)
+Texture* TextureLoader::load(const std::string& filename, const helper_type& /*helper*/)
 {
 	bool loaded = false;
 	bool use_default_color = false;
@@ -71,7 +71,7 @@ Texture* TextureLoader::load(const std::string& filename, const helper_type& hel
 	{
 		Texture* texture = SystemFactory::instance().create_texture();
 		if (!use_default_color)
-			texture->set_image(im, helper);
+			texture->set_image(im);
 		else texture->set_color(color_white);
 		return texture;
 	}

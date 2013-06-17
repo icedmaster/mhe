@@ -6,7 +6,7 @@
 
 namespace mhe {
 
-Driver* SystemFactory::create_driver() const
+DriverImpl* SystemFactory::create_driver() const
 {
 	return video_driver_factory_.create_video_driver();
 }

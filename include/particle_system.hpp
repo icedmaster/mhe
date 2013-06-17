@@ -31,7 +31,7 @@ public:
 
 	//bool is_alive() const;
 private:
-	void draw_impl(const Context& context);
+	void draw_impl(Context& context);
 	void update_impl(cmn::uint tick);
 	void start_impl(cmn::uint tick);
 private:

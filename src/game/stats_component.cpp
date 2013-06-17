@@ -30,15 +30,15 @@ void StatsComponent::init(const boost::shared_ptr<Scene>& scene, Engine* engine)
 void StatsComponent::update_impl(cmn::uint tick, Engine* engine)
 {
 	if (tick - prev_tick_ < 1000) return;
-	unsigned int fps = engine->context().driver()->stats().frames();
+	unsigned int fps = engine->context().driver().stats().frames();
 	std::string s = "fps:" + mhe::utils::types_cast<std::string>(fps) +
-		" tris:" + mhe::utils::types_cast<std::string>(engine->context().driver()->stats().tris() / fps) +
-		" dips:" + mhe::utils::types_cast<std::string>(engine->context().driver()->stats().batches() / fps);
+		" tris:" + mhe::utils::types_cast<std::string>(engine->context().driver().stats().tris() / fps) +
+		" dips:" + mhe::utils::types_cast<std::string>(engine->context().driver().stats().batches() / fps);
 	label_->set_caption(mhe::utils::utf8_to_utf32(s));
 	prev_tick_ = tick;
-	s += (" r:" + mhe::utils::types_cast<std::string>(engine->context().driver()->stats().elements_count() / fps));
+	s += (" r:" + mhe::utils::types_cast<std::string>(engine->context().driver().stats().elements_count() / fps));
 	DEBUG_LOG("stats:" << s);
-	engine->context().driver()->stats().reset();
+	engine->context().driver().stats().reset();
 }
 
 }}}

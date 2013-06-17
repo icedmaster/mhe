@@ -35,7 +35,7 @@ public:
 	void remove_subscene(const Scene* scene);
 
 	void update(cmn::uint tick);
-	void draw(const Context& context);
+	void draw(Context& context);
 
 	void add_visitor(NodeVisitor* visitor)
 	{

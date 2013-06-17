@@ -31,8 +31,7 @@ void OpenGLTexture::set_color(const colorf& color)
     w_ = h_ = 2;
 }
 
-void OpenGLTexture::rebuild_texture(boost::shared_ptr<Image> im,
-								    boost::shared_ptr<Driver> driver, FilterType/* ft*/)
+void OpenGLTexture::rebuild_texture(boost::shared_ptr<Image> im, FilterType/* ft*/)
 {
 	glGenTextures(1, &id_);
 	glBindTexture(GL_TEXTURE_2D, id_);
@@ -47,8 +46,7 @@ void OpenGLTexture::rebuild_texture(boost::shared_ptr<Image> im,
     h_ = im->height();
 
 	bool pot_support = false;
-	if (driver)
-		pot_support = OpenGLExtensions::instance().is_extension_supported("GL_ARB_TEXTURE_non_power_of_two");
+	pot_support = OpenGLExtensions::instance().is_extension_supported("GL_ARB_TEXTURE_non_power_of_two");
 	bool rebuild = false;
 	if (!pot_support)
 	{
@@ -84,12 +82,12 @@ void OpenGLTexture::rebuild_texture(boost::shared_ptr<Image> im,
 				 0, format, GL_UNSIGNED_BYTE, data);
 }
 
-void OpenGLTexture::prepare(boost::shared_ptr<Driver> /*driver*/)
+void OpenGLTexture::prepare(Driver* /*driver*/)
 {
 	glBindTexture(GL_TEXTURE_2D, id_);
 }
 
-void OpenGLTexture::clean(boost::shared_ptr<Driver> /*driver*/)
+void OpenGLTexture::clean(Driver* /*driver*/)
 {
     glBindTexture(GL_TEXTURE_2D, 0);
 }

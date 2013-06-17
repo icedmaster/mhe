@@ -34,9 +34,9 @@ private:
 		if (timer_.elapsed() && frames_)
 		{
 			std::cout << "fps:" << frames_ << " tris:" <<
-				get_engine()->context().driver()->stats().tris() / frames_ <<
-				" dips:" << get_engine()->context().driver()->stats().batches() / frames_ << "\n";
-			get_engine()->context().driver()->stats().reset();
+				get_engine()->context().driver().stats().tris() / frames_ <<
+				" dips:" << get_engine()->context().driver().stats().batches() / frames_ << "\n";
+			get_engine()->context().driver().stats().reset();
 			frames_ = 0;
 			timer_.start();
 		}

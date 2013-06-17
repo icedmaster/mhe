@@ -32,7 +32,7 @@ std::string VideoDriverFactory::current_driver_name() const
 	return current_driver_factory_->name();
 }
 
-Driver* VideoDriverFactory::create_video_driver() const
+DriverImpl* VideoDriverFactory::create_video_driver() const
 {
 	return current_driver_factory_->create_video_driver();
 }

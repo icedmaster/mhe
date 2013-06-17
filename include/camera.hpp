@@ -24,7 +24,7 @@ public:
 		return projection_;
 	}
 
-	void update(const boost::shared_ptr<Driver>& driver);
+	void update(Driver& driver);
 
 	void enable_each_frame_updating(bool enable)
 	{

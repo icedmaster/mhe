@@ -26,12 +26,9 @@ public:
 	virtual ~Texture() {}
 	// create 2x2 (pot) texture with color
 	virtual void set_color(const colorf& color) = 0;
-	virtual void set_image(boost::shared_ptr<Image>, boost::shared_ptr<Driver>,
-						   FilterType ft = Nearest) = 0;
-	virtual void prepare(boost::shared_ptr<Driver> driver =
-						 boost::shared_ptr<Driver>()) = 0;
-	virtual void clean(boost::shared_ptr<Driver> driver = 
-					   boost::shared_ptr<Driver>()) = 0;
+	virtual void set_image(boost::shared_ptr<Image>, FilterType ft = Nearest) = 0;
+	virtual void prepare(Driver* driver = nullptr) = 0;
+	virtual void clean(Driver* driver = nullptr) = 0;
 
 	virtual boost::shared_ptr<Texture> clone() const = 0;
 

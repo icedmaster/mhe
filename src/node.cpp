@@ -24,9 +24,9 @@ void Node::add_node(const boost::shared_ptr<Node>& node)
 	}
 }
 
-void Node::draw_impl(const Context& context)
+void Node::draw_impl(Context& context)
 {
-	context.driver()->draw(this);
+	context.driver().draw(this);
 }
 
 void Node::update(cmn::uint tick)

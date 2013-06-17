@@ -20,11 +20,11 @@ void Scene::remove_subscene(const Scene* scene)
 	}
 }
 
-void Scene::draw(const Context& context)
+void Scene::draw(Context& context)
 {
 	if (active_camera_ == nullptr) return;
 
-	context.driver()->begin_render();
+	context.driver().begin_render();
 	active_camera_->update(context.driver());
 
 	for (nodelist::iterator it = nodes_.begin(); it != nodes_.end();)
@@ -42,7 +42,7 @@ void Scene::draw(const Context& context)
 		node->draw(context);
 		++it;
 	}
-	context.driver()->end_render();
+	context.driver().end_render();
 
 	for (size_t i = 0; i < subscenes_.size(); ++i)
 		subscenes_[i]->draw(context);

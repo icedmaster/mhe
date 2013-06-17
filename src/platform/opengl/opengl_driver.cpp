@@ -8,14 +8,14 @@ namespace opengl {
 	{	
 	}
 
-	bool OpenGLDriver::init_impl()
+	bool OpenGLDriver::init()
 	{
 		OpenGLExtensions::instance().init_extensions();
 		glEnable(GL_TEXTURE_2D);
 		return true;
 	}
 
-	void OpenGLDriver::close_impl()
+	void OpenGLDriver::close()
 	{
 	}
 
@@ -46,22 +46,22 @@ namespace opengl {
 		glLoadMatrixf(m.get());
 	}
 
-	void OpenGLDriver::enable_lighting_impl()
+	void OpenGLDriver::enable_lighting()
 	{
 		GLStateAttr::instance().set(GL_LIGHTING);
 	}
 
-	void OpenGLDriver::disable_lighting_impl()
+	void OpenGLDriver::disable_lighting()
 	{
 		GLStateAttr::instance().clr(GL_LIGHTING);
 	}
 
-	void OpenGLDriver::enable_blending_impl()
+	void OpenGLDriver::enable_blending()
 	{
 		GLStateAttr::instance().set(GL_BLEND);
 	}
 
-	void OpenGLDriver::disable_blending_impl()
+	void OpenGLDriver::disable_blending()
 	{
 		GLStateAttr::instance().clr(GL_BLEND);
 	}
@@ -78,12 +78,12 @@ namespace opengl {
 	    }
 	}
 
-	void OpenGLDriver::enable_depth_impl()
+	void OpenGLDriver::enable_depth()
 	{
         GLStateAttr::instance().set(GL_DEPTH_TEST);
 	}
 
-	void OpenGLDriver::disable_depth_impl()
+	void OpenGLDriver::disable_depth()
 	{
         GLStateAttr::instance().clr(GL_DEPTH_TEST);
 	}
@@ -92,31 +92,31 @@ namespace opengl {
     {
     }
 
-    void OpenGLDriver::clear_depth_impl()
+    void OpenGLDriver::clear_depth()
     {
         glClear(GL_DEPTH_BUFFER_BIT);
     }
 
-    void OpenGLDriver::clear_color_impl()
+    void OpenGLDriver::clear_color()
     {
         glClear(GL_COLOR_BUFFER_BIT);
     }
 
-    void OpenGLDriver::mask_zbuffer_impl()
+    void OpenGLDriver::mask_zbuffer()
     {
 		if (zbuffer_masked_) return;
         glDepthMask(GL_FALSE);
 		zbuffer_masked_ = true;
     }
 
-	void OpenGLDriver::unmask_zbuffer_impl()
+	void OpenGLDriver::unmask_zbuffer()
 	{
 		if (!zbuffer_masked_) return;
 	    glDepthMask(GL_TRUE);
 		zbuffer_masked_ = false;
 	}
 
-	void OpenGLDriver::set_clear_color_impl(const colorf& color)
+	void OpenGLDriver::set_clear_color(const colorf& color)
 	{
 	    glClearColor(color.r(), color.g(), color.b(), color.a());
 	}
@@ -131,7 +131,7 @@ namespace opengl {
 	    glColor4fv(cur_color);
 	}
 
-    void OpenGLDriver::begin_draw_impl(const float* v, const float* n,
+    void OpenGLDriver::begin_draw(const float* v, const float* n,
                                        const float* t, const float* c,
                                        cmn::uint/* size*/)
     {
@@ -157,20 +157,20 @@ namespace opengl {
         }
     }
 
-	void OpenGLDriver::begin_draw_impl(boost::shared_ptr<Texture> texture,
+	void OpenGLDriver::begin_draw(boost::shared_ptr<Texture> texture,
 									   const float* v, const float* n, const float* t, const float* c,
 									   cmn::uint size)
 	{
 		texture->prepare();
-		begin_draw_impl(v, n, t, c, size);
+		begin_draw(v, n, t, c, size);
 	}
 
-    void OpenGLDriver::draw_impl(const cmn::uint* i, cmn::uint size)
+    void OpenGLDriver::draw(const cmn::uint* i, cmn::uint size)
     {
         glDrawElements(GL_TRIANGLES, size, GL_UNSIGNED_INT, i);
     }
 
-    void OpenGLDriver::end_draw_impl()
+    void OpenGLDriver::end_draw()
     {
         if (using_color_)
             glDisableClientState(GL_COLOR_ARRAY);
@@ -183,7 +183,7 @@ namespace opengl {
         glDisableClientState(GL_VERTEX_ARRAY);
     }
 
-	void OpenGLDriver::end_draw_impl(boost::shared_ptr<Texture> texture)
+	void OpenGLDriver::end_draw(boost::shared_ptr<Texture> texture)
 	{
         if (using_color_)
             glDisableClientState(GL_COLOR_ARRAY);
@@ -192,18 +192,18 @@ namespace opengl {
         glDisableClientState(GL_VERTEX_ARRAY);
 	}
 
-    void OpenGLDriver::set_color_impl(const colorf& c)
+    void OpenGLDriver::set_color(const colorf& c)
     {
         glColor4fv(c.get());
     }
 
-    void OpenGLDriver::get_display_data_impl(std::vector<char>& data)
+    void OpenGLDriver::get_display_data(std::vector<char>& data)
     {
 		data.resize(ws_->width() * ws_->height() * 4);
         glReadPixels(0, 0, ws_->width(), ws_->height(), GL_RGBA, GL_UNSIGNED_BYTE, &data[0]);
     }
 
-	void OpenGLDriver::set_viewport_impl(int x, int y, int w, int h)
+	void OpenGLDriver::set_viewport(int x, int y, int w, int h)
 	{
 		glViewport(x, y, w, h);
 		vp.set(x, y, w, h);

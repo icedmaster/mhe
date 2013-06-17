@@ -1,6 +1,7 @@
 #include "video_driver.hpp"
 
 #include "renderable.hpp"
+#include "impl/system_factory.hpp"
 
 namespace mhe {
 
@@ -16,10 +17,14 @@ void Driver::Stats::update_frames()
 	++frames_;
 }
 
+Driver::Driver() :
+	impl_(SystemFactory::instance().create_driver())
+{}
+
 void Driver::begin_render()
 {
 	renderable_elements_.clear();
-    begin_render_impl();
+    impl_->begin_render();
 }
 
 void Driver::end_render()
@@ -28,7 +33,7 @@ void Driver::end_render()
 	const std::vector<Renderable>& batched = perform_batch();
 	for (size_t i = 0; i < batched.size(); ++i)
 		perform_render(batched[i]);
-    end_render_impl();
+    impl_->end_render();
 }
 
 void Driver::begin_frame()
@@ -73,13 +78,13 @@ void Driver::perform_render(const Renderable& renderable)
 	set_render_flags(renderable);
     renderable.texture()->prepare();
 
-	if (!support_buffered_render())
+	if (!impl_->support_buffered_render())
 	{
-		begin_draw_impl(renderable.vertexcoord().data(),
-						renderable.normalscoord().data(), renderable.texcoord().data(),
-						renderable.colorcoord().data(), renderable.indicies().size());
-		draw_impl(renderable.indicies().data(), renderable.indicies().size());
-		end_draw_impl();
+		impl_->begin_draw(renderable.vertexcoord().data(),
+						  renderable.normalscoord().data(), renderable.texcoord().data(),
+						  renderable.colorcoord().data(), renderable.indicies().size());
+		impl_->draw(renderable.indicies().data(), renderable.indicies().size());
+		impl_->end_draw();
 	}
 	else perform_buffered_render(renderable);
 	renderable.texture()->clean();
@@ -89,40 +94,40 @@ void Driver::perform_render(const Renderable& renderable)
 
 void Driver::perform_buffered_render(const Renderable& renderable)
 {
-	boost::scoped_ptr<RenderBuffer> buffer(create_render_buffer());
+	boost::scoped_ptr<RenderBuffer> buffer(impl_->create_render_buffer());
 	buffer->attach_data(vertex_position_attribute_name, renderable.vertexcoord().data(), renderable.vertexcoord().size());
 	buffer->attach_data(vertex_normal_attribute_name, renderable.normalscoord().data(), renderable.normalscoord().size());
 	buffer->attach_data(vertex_texcoord_attribute_name, renderable.texcoord().data(), renderable.texcoord().size());
 	buffer->attach_data(vertex_color_attribute_name, renderable.colorcoord().data(), renderable.colorcoord().size());
 	if (!buffer->init()) return;
 	buffer->enable();
-	begin_draw_impl(buffer.get());
-	draw_impl(renderable.indicies().data(), renderable.indicies().size());
-	end_draw_impl(buffer.get());
+	impl_->begin_draw(buffer.get());
+	impl_->draw(renderable.indicies().data(), renderable.indicies().size());
+	impl_->end_draw(buffer.get());
 	buffer->disable();
 }
 
 void Driver::set_render_flags(const Renderable& renderable)
 {
 	if (renderable.is_z_buffer_masked())
-		mask_zbuffer_impl();
+		impl_->mask_zbuffer();
 	if (!renderable.is_lighting_enabled())
-		disable_lighting_impl();
+		impl_->disable_lighting();
 	if (renderable.is_blending_enabled())
 	{
-		enable_blending_impl();
-		set_blend_func(renderable.blend_mode());
+		impl_->enable_blending();
+		impl_->set_blend_func(renderable.blend_mode());
 	}
 }
 
 void Driver::clear_render_flags(const Renderable& renderable)
 {
 	if (renderable.is_z_buffer_masked())
-		unmask_zbuffer_impl();
+		impl_->unmask_zbuffer();
 	if (!renderable.is_lighting_enabled())
-		enable_lighting_impl();
+		impl_->enable_lighting();
 	if (renderable.is_blending_enabled())
-		disable_blending_impl();
+		impl_->disable_blending();
 }
 
 }

@@ -8,12 +8,12 @@
 namespace mhe {
 namespace opengl {
 
-class OpenGLESDriver : public Driver
+class OpenGLESDriver : public DriverImpl
 {
 public:
 private:
-    bool init_impl();
-	void close_impl() {}
+    bool init();
+	void close() {}
 
 	void set_ws(WindowSystem*) {}
 
@@ -24,46 +24,46 @@ private:
 	void load_projection_matrix(const matrixf&);
 	void load_modelview_matrix(const matrixf&) {}
 
-	void enable_lighting_impl() {}
-	void disable_lighting_impl() {}
-	void enable_blending_impl();
-	void disable_blending_impl();
+	void enable_lighting() {}
+	void disable_lighting() {}
+	void enable_blending();
+	void disable_blending();
 	void set_blend_func(BlendMode);
 
-	void enable_depth_impl() {}
-	void disable_depth_impl() {}
+	void enable_depth() {}
+	void disable_depth() {}
 	void set_depth_func(DepthFunc) {}
 
-	void clear_depth_impl();
-	void clear_color_impl();
+	void clear_depth();
+	void clear_color();
 
-	void mask_zbuffer_impl();
-	void unmask_zbuffer_impl();
+	void mask_zbuffer();
+	void unmask_zbuffer();
 
-	void set_clear_color_impl(const colorf&);
+	void set_clear_color(const colorf&);
 
 	void save_current_color() {}
 	void restore_color() {}
-	void begin_draw_impl(const float*, const float*, const float*, const float*,
+	void begin_draw(const float*, const float*, const float*, const float*,
 						 cmn::uint) {}
-	void begin_draw_impl(boost::shared_ptr<Texture>,
+	void begin_draw(boost::shared_ptr<Texture>,
 						 const float*, const float*, const float*, const float*,
 						 cmn::uint) {}
-	void begin_draw_impl(const RenderBuffer* buffer);
-	void draw_impl(const cmn::uint*, cmn::uint);
-	void end_draw_impl() {}
-	void end_draw_impl(boost::shared_ptr<Texture> /*texture*/) {}
-	void end_draw_impl(const RenderBuffer* buffer);
+	void begin_draw(const RenderBuffer* buffer);
+	void draw(const cmn::uint*, cmn::uint);
+	void end_draw() {}
+	void end_draw(boost::shared_ptr<Texture> /*texture*/) {}
+	void end_draw(const RenderBuffer* buffer);
 
-	void set_color_impl(const colorf&) {}
+	void set_color(const colorf&) {}
 
-	void get_display_data_impl(std::vector<char>&) {}
+	void get_display_data(std::vector<char>&) {}
 
-	void set_viewport_impl(int x, int y, int w, int h);
+	void set_viewport(int x, int y, int w, int h);
 
-	void set_shader_program_impl(const boost::shared_ptr<ShaderProgram>& program);
+	void set_shader_program(const boost::shared_ptr<ShaderProgram>& program);
     
-    void end_render_impl();
+    void end_render();
 
 	bool support_buffered_render() const
 	{

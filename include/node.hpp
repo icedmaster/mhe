@@ -35,7 +35,7 @@ public:
 	Node();
 	virtual ~Node() {}
 
-	void draw(const Context& context)												
+	void draw(Context& context)												
 	{
 		draw_impl(context);
 		for (size_t i = 0; i < children_.size(); ++i)
@@ -98,7 +98,7 @@ public:
 		priority_ = pri;
 	}
 protected:
-	virtual void draw_impl(const Context&);
+	virtual void draw_impl(Context&);
 	virtual void apply_impl(NodeVisitor* visitor)
 	{
 		visitor->visit(this);

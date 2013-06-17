@@ -5,7 +5,7 @@
 class TestNode : public mhe::Node
 {
 private:
-	void draw_impl(const mhe::Context& context)
+	void draw_impl(mhe::Context& context)
 	{
 		glColor4f(1.0, 0.0, 0.0, 1.0);
 		glBegin(GL_LINES);

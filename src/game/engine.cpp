@@ -22,16 +22,14 @@ bool Engine::init(cmn::uint w, cmn::uint h, cmn::uint bpp, bool fullscreen)
 	if (!ws_.init(w, h, bpp, fullscreen))
 		return false;	
 	ws_.view()->set_events_handler(new BaseViewEventsHandler(this));
-	boost::shared_ptr<Driver> driver(SystemFactory::instance().create_driver());
-	context_.set_driver(driver);
 	// init quit event listener
 	event_manager_.add_device(new SystemDevice("sys"));
 	event_manager_.add_listener(new DelegateEventListener(system_event_type, SystemEvent::quit, Event::any_event,
 						      create_delegate(this, &Engine::stop_p)));
 		
 	// graphics driver initialization
-	driver->set_window_system(&ws_);
-	driver->init();
+	context_.driver().set_window_system(&ws_);
+	context_.driver().init();
 
 	default_setup();
 
@@ -47,10 +45,10 @@ bool Engine::init(cmn::uint w, cmn::uint h, cmn::uint bpp, bool fullscreen)
 void Engine::default_setup()
 {
 	ws_.show_cursor(true);
-	context_.driver()->set_clear_color(mhe::color_black);
-	context_.driver()->enable_depth((mhe::DepthFunc)0);
-	context_.driver()->disable_lighting();
-	context_.driver()->set_viewport(0, 0, context_.window_system().width(), context_.window_system().height());
+	context_.driver().set_clear_color(mhe::color_black);
+	context_.driver().enable_depth((mhe::DepthFunc)0);
+	context_.driver().disable_lighting();
+	context_.driver().set_viewport(0, 0, context_.window_system().width(), context_.window_system().height());
 }
 	
 void Engine::run()
@@ -93,7 +91,7 @@ void Engine::stop()
 void Engine::resize(cmn::uint w, cmn::uint h)
 {
 	ws_.resize(w, h);
-	context_.driver()->set_viewport(0, 0, w, h);
+	context_.driver().set_viewport(0, 0, w, h);
 }
 
 void Engine::update_internal()

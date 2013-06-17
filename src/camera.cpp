@@ -9,7 +9,7 @@ Camera::Camera() :
 	updated_(false)
 {}
 
-void Camera::update(const boost::shared_ptr<Driver>& driver)
+void Camera::update(Driver& driver)
 {
 	if (dirty())
 	{
@@ -22,7 +22,7 @@ void Camera::update(const boost::shared_ptr<Driver>& driver)
 	}
 	if (!updated_)
 	{
-		driver->set_projection_matrix(transform() * projection_);
+		driver.set_projection_matrix(transform() * projection_);
 	}
 	if (!update_each_frame_) updated_ = true;
 }

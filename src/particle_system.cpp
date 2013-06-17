@@ -2,7 +2,7 @@
 
 namespace mhe
 {
-void ParticleSystem::draw_impl(const Context& context)
+void ParticleSystem::draw_impl(Context& context)
 {
 	std::vector<float> vbuf;
 	std::vector<float> nbuf;
@@ -48,20 +48,20 @@ void ParticleSystem::draw_impl(const Context& context)
 		}
 	}
 
-	boost::shared_ptr<Driver> driver = context.driver();
+    Driver& driver = context.driver();
 
-	driver->mask_zbuffer();
-	driver->enable_blending(alpha_one_minus_alpha);
+	driver.mask_zbuffer();
+	driver.enable_blending(alpha_one_minus_alpha);
 
 	// setup texture pointer
 	float* tp = (tex != nullptr) ? &tbuf[0] : 0;
 	if (tex != nullptr)
 		tex->prepare();
-	driver->draw(Transform::transform(), &vbuf[0], &nbuf[0], tp, &cbuf[0], &ibuf[0], ibuf.size());
+	driver.draw(Transform::transform(), &vbuf[0], &nbuf[0], tp, &cbuf[0], &ibuf[0], ibuf.size());
 	if (tex != nullptr)
 		tex->clean();
-	driver->disable_blending();
-	driver->unmask_zbuffer();
+	driver.disable_blending();
+	driver.unmask_zbuffer();
 }
 
 void ParticleSystem::update_impl(cmn::uint tick)

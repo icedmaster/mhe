@@ -27,7 +27,7 @@ public:
 		pressed_sprite_ = sprite;
 	}
 private:
-	void draw(const Context& context);
+	void draw(Context& context);
 private:
 	boost::shared_ptr<Sprite> pressed_sprite_;
 };

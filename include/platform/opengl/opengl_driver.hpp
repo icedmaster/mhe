@@ -10,7 +10,7 @@
 namespace mhe {
 namespace opengl {
 
-class OpenGLDriver : public Driver
+class OpenGLDriver : public DriverImpl
 {
 private:
 	float cur_color[4];
@@ -22,8 +22,8 @@ private:
 	// state
 	bool zbuffer_masked_;
 private:
-	bool init_impl();
-	void close_impl();
+	bool init();
+	void close();
 
 	void set_ws(WindowSystem* ws)
 	{
@@ -37,43 +37,43 @@ private:
 	void load_projection_matrix(const matrixf& m);
 	void load_modelview_matrix(const matrixf& m);
 
-	void enable_lighting_impl();
-	void disable_lighting_impl();
-	void enable_blending_impl();
-	void disable_blending_impl();
+	void enable_lighting();
+	void disable_lighting();
+	void enable_blending();
+	void disable_blending();
 	void set_blend_func(BlendMode bf);
 
-	void enable_depth_impl();
-	void disable_depth_impl();
+	void enable_depth();
+	void disable_depth();
 	void set_depth_func(DepthFunc);
 
-	void clear_depth_impl();
-	void clear_color_impl();
+	void clear_depth();
+	void clear_color();
 
-	void mask_zbuffer_impl();
-	void unmask_zbuffer_impl();
+	void mask_zbuffer();
+	void unmask_zbuffer();
 
-	void set_clear_color_impl(const colorf& color);
+	void set_clear_color(const colorf& color);
 
 	void save_current_color();
 	void restore_color();
-	void begin_draw_impl(const float*, const float*, const float*, const float*,
+	void begin_draw(const float*, const float*, const float*, const float*,
 						 cmn::uint);
-	void begin_draw_impl(boost::shared_ptr<Texture>,
+	void begin_draw(boost::shared_ptr<Texture>,
 						 const float*, const float*, const float*, const float*,
 						 cmn::uint);
 
-	void draw_impl(const cmn::uint*, cmn::uint);
-	void end_draw_impl();
-	void end_draw_impl(boost::shared_ptr<Texture> texture);
+	void draw(const cmn::uint*, cmn::uint);
+	void end_draw();
+	void end_draw(boost::shared_ptr<Texture> texture);
 
-	void set_color_impl(const colorf&);
+	void set_color(const colorf&);
 
-	void get_display_data_impl(std::vector<char>& data);
+	void get_display_data(std::vector<char>& data);
 
-	void set_viewport_impl(int x, int y, int w, int h);
+	void set_viewport(int x, int y, int w, int h);
 
-	void set_shader_program_impl(const boost::shared_ptr<ShaderProgram>&)
+	void set_shader_program(const boost::shared_ptr<ShaderProgram>&)
 	{}
 public:
 	OpenGLDriver();

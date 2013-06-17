@@ -41,7 +41,7 @@ widgetptr GUINode::get_widget(const std::string& name) const
 	return widget_->get_widget(name);
 }
 
-void GUINode::draw_impl(const Context& context)
+void GUINode::draw_impl(Context& context)
 {
 	widget_->draw(context);
 }

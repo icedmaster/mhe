@@ -17,7 +17,7 @@ public:
 		return "opengles";
 	}
 
-	Driver* create_video_driver() const
+	DriverImpl* create_video_driver() const
 	{
 		return new OpenGLESDriver;
 	}

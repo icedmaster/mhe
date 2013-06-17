@@ -3,7 +3,7 @@
 namespace mhe {
 namespace gui {
 
-void Button::draw(const Context& context)
+void Button::draw(Context& context)
 {
 	if (button_pressed())
 		draw_impl(pressed_sprite_, context);

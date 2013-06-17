@@ -22,7 +22,7 @@ public:
 		return sf;
 	}
 
-	Driver* create_driver() const;
+	DriverImpl* create_driver() const;
 	WindowSystemImpl* create_window_system() const;
 	Texture* create_texture() const;
 	iAudioDriver* create_audio_driver() const;

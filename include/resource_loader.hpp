@@ -25,7 +25,7 @@ struct SoundLoader
 struct TextureLoader
 {
 	typedef Texture type;
-	typedef boost::shared_ptr<Driver> helper_type;
+	typedef Driver* helper_type;
 	static type* load(const std::string& name, const helper_type& helper);
 };
 

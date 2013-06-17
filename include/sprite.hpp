@@ -64,7 +64,7 @@ public:
 	void execute(cmn::uint index);
 private:
 	// implementations
-	void draw_impl(const Context& context);
+	void draw_impl(Context& context);
 	void update_impl(cmn::uint tick);
 	void set_position(const v3d& pos);
 	matrixf get_matrix() const;

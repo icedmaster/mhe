@@ -22,7 +22,7 @@ public:
 	void add_widget(Widget* widget);
 	widgetptr get_widget(const std::string& name) const;
 private:
-	void draw_impl(const Context& context);
+	void draw_impl(Context& context);
 private:
 	bool on_mouse_move(const Event* event);
 	bool on_mouse_button_pressed(const Event* event);

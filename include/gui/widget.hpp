@@ -148,8 +148,8 @@ public:
 		return parent_;
 	}
 protected:
-	virtual void draw(const Context& context);
-	void draw_impl(const boost::shared_ptr<Sprite>& sprite, const Context& content);
+	virtual void draw(Context& context);
+	void draw_impl(const boost::shared_ptr<Sprite>& sprite, Context& content);
 private:
 	vector2<float> absolute_position() const
 	{
