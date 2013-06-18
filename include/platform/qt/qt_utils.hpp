@@ -21,6 +21,14 @@ inline vector2<float> get_mouse_position(QMouseEvent* event)
 	return vector2<float>(event->x(), event->y());
 }
 
+inline int get_keyboard_key(QKeyEvent* event)
+{
+	int key = event->key();
+	if ( (key >= Qt::Key_A) && (key <= Qt::Key_Z) )
+		key += 32;
+	return key;
+}
+
 }}}
 
 #endif

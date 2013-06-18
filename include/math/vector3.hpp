@@ -42,6 +42,21 @@ public:
 		v_[0] = x; v_[1] = y; v_[2] = z;
 	}
 
+	void set_x(T x)
+	{
+		v_[0] = x;
+	}
+
+	void set_y(T y)
+	{
+		v_[1] = y;
+	}
+
+	void set_z(T z)
+	{
+		v_[2] = z;
+	}
+
 	inline T x() const
 	{
 		return v_[0];

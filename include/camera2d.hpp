@@ -20,6 +20,8 @@ public:
 		set_projection(proj);
 		set_dirty();
 	}
+private:
+	void update_view_matrix() {}
 };
 
 }

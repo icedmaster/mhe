@@ -112,6 +112,16 @@ protected:
 	}
 
 	void update_transform();
+
+	vector3<float> position() const
+	{
+		return position_;
+	}
+
+	void set_position(const vector3<float>& position)
+	{
+		translate_to(position);
+	}
 private:
 	void set_dirty()
 	{
@@ -119,9 +129,9 @@ private:
 	}
 
 	matrixf m;   
-	v3d position_; 
-	v3d rotation_;
-	v3d scaling_;
+	vector3<float> position_; 
+	vector3<float> rotation_;
+	vector3<float> scaling_;
 	bool dirty_;
 };
 }

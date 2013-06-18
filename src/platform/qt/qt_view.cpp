@@ -30,12 +30,12 @@ void QtView::mouseReleaseEvent(QMouseEvent* event)
 
 void QtView::keyPressEvent(QKeyEvent* event)
 {
-	events_provider_.add_keyboard_event(KeyboardEvent::key_down, event->key());
+	events_provider_.add_keyboard_event(KeyboardEvent::key_down, utils::get_keyboard_key(event));
 }
 
 void QtView::keyReleaseEvent(QKeyEvent* event)
 {
-	events_provider_.add_keyboard_event(KeyboardEvent::key_up, event->key());
+	events_provider_.add_keyboard_event(KeyboardEvent::key_up, utils::get_keyboard_key(event));
 }
 
 }}

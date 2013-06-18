@@ -12,7 +12,12 @@ class Camera : public Transform
 {
 public:
 	Camera();
+	Camera(const vector3<float>& position, const vector3<float>& direction,
+		   const vector3<float>& up);
 	virtual ~Camera() {}
+
+	void set(const vector3<float>& position, const vector3<float>& direction,
+			 const vector3<float>& up);
 	
 	void set_projection(const matrixf& projection)
 	{
@@ -51,8 +56,12 @@ protected:
 	{
 		updated_ = false;
 	}
+
+	virtual void update_view_matrix();
+	virtual void update_projection(Driver& driver);
 private:
 	matrixf projection_;
+	matrixf look_;
 	std::string name_;
 	bool update_each_frame_;
 	bool updated_;
