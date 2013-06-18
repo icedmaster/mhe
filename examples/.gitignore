@@ -22,7 +22,7 @@
 !/07_application/build/CMakeLists.txt
 !/08_gui/build/CMakeLists.txt
 !/09_qt/build/CMakeLists.txt
-!/10_3d_basic/CMakeLists.txt
+!/10_3d_basic/build/CMakeLists.txt
 
 
 
