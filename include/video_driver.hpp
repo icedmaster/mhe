@@ -92,6 +92,9 @@ public:
 	{
 		return nullptr;
 	}
+
+	virtual cmn::uint major_version_need() const = 0;
+	virtual cmn::uint minor_version_need() const = 0;
 };
 
 class Driver
@@ -299,6 +302,19 @@ public:
 	{
 		return stats_;
 	}
+
+	cmn::uint major_version_need() const
+	{
+		return impl_->major_version_need();
+	}
+
+	cmn::uint minor_version_need() const
+	{
+		return impl_->minor_version_need();
+	}
+
+	/// Reset implementaion - need to call init()
+	void reset();
 private:
 	typedef fixed_size_vector<Renderable*, initial_number_of_renderables> renderable_container;
 	typedef fixed_size_vector<Renderable, initial_number_of_renderables> batched_container;

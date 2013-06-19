@@ -75,6 +75,16 @@ private:
 
 	void set_shader_program(const boost::shared_ptr<ShaderProgram>&)
 	{}
+
+	cmn::uint major_version_need() const
+	{
+		return 1;
+	}
+
+	cmn::uint minor_version_need() const
+	{
+		return 0;
+	}
 public:
 	OpenGLDriver();
 

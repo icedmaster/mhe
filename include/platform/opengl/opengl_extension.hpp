@@ -221,7 +221,11 @@ public:
 		#ifdef MHE_OPENGLES
 		::glGenVertexArraysOES(n, array);
 		#else
+		#ifndef MHE_MACOS
 		::glGenVertexArrays(n, array);
+		#else
+		::glGenVertexArraysAPPLE(n, array);
+		#endif  // MHE_MACOS
 		#endif  // MHE_OPENGLES
 #endif
 	}
@@ -232,7 +236,11 @@ public:
 		#ifdef MHE_OPENGLES
 		::glDeleteVertexArraysOES(n, array);
 		#else
+		#ifndef MHE_MACOS
 		::glDeleteVertexArrays(n, array);
+		#else
+		::glDeleteVertexArraysAPPLE(n, array);
+		#endif // MHE_MACOS
 		#endif // MHE_OPENGLES
 #endif
 	}
@@ -243,7 +251,11 @@ public:
 		#ifdef MHE_OPENGLES
 		::glBindVertexArrayOES(array);
 		#else
+		#ifndef MHE_MACOS
 		::glBindVertexArray(array);
+		#else
+		::glBindVertexArrayAPPLE(array);
+		#endif // MHE_MACOS
 		#endif // MHE_OPENGLES
 #endif
 	}

@@ -8,6 +8,7 @@
 #include <OpenGLES/ES2/glext.h>
 #elif defined(MHE_MACOS)
 #define GL_GLEXT_PROTOTYPES
+#define MHE_OPENGL3
 #include <OpenGL/gl.h>
 #include "glext.h"
 #else

@@ -19,6 +19,8 @@ public:
 	std::vector<std::string> available_drivers_list() const;
 	std::string current_driver_name() const;
 
+	std::string set_next_driver();
+
 	DriverImpl* create_video_driver() const;
 	Texture* create_texture() const;
 	Texture* create_multitexture() const;

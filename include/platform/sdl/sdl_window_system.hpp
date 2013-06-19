@@ -31,6 +31,10 @@ class SDLWindowSystem : public WindowSystemImpl
 {
 public:
 	bool init(const vector2<int>& r, int bpp, bool fullscreen);
+	bool set_format(const WindowContextFormat& format)
+	{
+		return (format.major_version == 1);
+	}
 	void close();
 	void set_caption(const std::string& caption);
 	void swap_buffers();

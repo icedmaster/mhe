@@ -9,6 +9,10 @@ VideoDriverFactory::VideoDriverFactory()
 	#ifdef MHE_OPENGL
 	drivers_.push_back(boost::shared_ptr<AbstractVideoDriverFactory>(new opengl::OpenGLVideoDriverFactory));
 	#endif
+
+	#ifdef MHE_OPENGL3
+	drivers_.push_back(boost::shared_ptr<AbstractVideoDriverFactory>(new opengl::OpenGL3VideoDriverFactory));
+	#endif
     
 #ifdef MHE_OPENGLES
     drivers_.push_back(boost::shared_ptr<AbstractVideoDriverFactory>(new opengl::OpenGLESVideoDriverFactory));
@@ -25,6 +29,15 @@ std::vector<std::string> VideoDriverFactory::available_drivers_list() const
 	for (size_t i = 0; i < drivers_.size(); ++i)
 		names.push_back(drivers_[i]->name());
 	return names;
+}
+
+std::string VideoDriverFactory::set_next_driver()
+{
+	drvvec::iterator it = std::find(drivers_.begin(), drivers_.end(), current_driver_factory_);
+	if (it == drivers_.begin())
+		return std::string();
+	current_driver_factory_ = *(--it);
+	return current_driver_factory_->name();
 }
 
 std::string VideoDriverFactory::current_driver_name() const

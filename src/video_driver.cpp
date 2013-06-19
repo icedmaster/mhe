@@ -49,6 +49,12 @@ void Driver::draw(Renderable* renderable)
 	renderable_elements_.push_back(renderable);
 }
 
+void Driver::reset()
+{
+	stats_.reset();
+	impl_.reset(SystemFactory::instance().create_driver());
+}
+
 Driver::batched_container Driver::perform_batch() const
 {
 	boost::shared_ptr<Texture> last_texture;

@@ -47,6 +47,7 @@ class QtWindowSystem : public WindowSystemImpl
 public:
 	QtWindowSystem();
 	bool init(const vector2<int>& r, int bpp, bool fullscreen);
+	bool set_format(const WindowContextFormat& format);
 	void close();
 	void set_caption(const std::string& caption);
 	void swap_buffers();

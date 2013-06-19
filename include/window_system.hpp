@@ -17,12 +17,24 @@ public:
 	virtual void run(unsigned int update_interval) = 0;
 };
 
+struct WindowContextFormat
+{
+	cmn::uint major_version;
+	cmn::uint minor_version;
+	cmn::uint build_version;
+
+	WindowContextFormat() :
+		major_version(1), minor_version(0), build_version(0)
+	{}
+};
+
 class WindowSystemImpl
 {
 public:
 	virtual ~WindowSystemImpl() {}
 
 	virtual bool init(const vector2<int>&, int, bool) = 0;
+	virtual bool set_format(const WindowContextFormat& format) = 0;
 	virtual void close() = 0;
 	virtual void set_caption(const std::string&) = 0;
 	virtual void swap_buffers() = 0;
@@ -49,12 +61,15 @@ public:
 	}
 
 	bool init(int w, int h, int bpp, bool fullscreen = false,
+			  const WindowContextFormat& format = WindowContextFormat(),
 			  const std::string& caption = "MHE")
 	{
 		win_dim_.set(w, h);
 		bpp_ = bpp;
 		fullscreen_ = fullscreen;
 		bool res = impl_->init(win_dim_, bpp, fullscreen);
+		if (!res) return false;
+		res = impl_->set_format(format);
 		if (res)
 			impl_->set_caption(caption);
 		return res;

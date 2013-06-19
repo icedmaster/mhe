@@ -7,6 +7,10 @@
 #include "platform/opengl/opengl_platform.hpp"
 #endif
 
+#ifdef MHE_OPENGL3
+#include "platform/opengl3/opengl3_platform.hpp"
+#endif
+
 #ifdef MHE_OPENGLES
 #include "platform/opengles/opengles_platform.hpp"
 #endif
