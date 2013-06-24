@@ -58,10 +58,10 @@ private:
 	void save_current_color();
 	void restore_color();
 	void begin_draw(const float*, const float*, const float*, const float*,
-						 cmn::uint);
+					cmn::uint);
 	void begin_draw(boost::shared_ptr<Texture>,
-						 const float*, const float*, const float*, const float*,
-						 cmn::uint);
+					const float*, const float*, const float*, const float*,
+					cmn::uint);
 
 	void draw(const cmn::uint*, cmn::uint);
 	void end_draw();

@@ -1,12 +1,13 @@
 #ifndef __SCENE_MODIFIER_HPP__
 #define __SCENE_MODIFIER_HPP__
 
-#include <list>
 #include <boost/shared_ptr.hpp>
+#include "configurable_types.hpp"
 
 namespace mhe {
 
 class Node;
+class Scene;
 
 class SceneModifier
 {
@@ -28,7 +29,7 @@ public:
 	}
 
 	virtual ~SceneModifier() {}
-	virtual void apply(std::list< boost::shared_ptr<Node> >& nodes) = 0;
+	virtual void apply(nodelist& nodes) = 0;
 	virtual UpdateMode update_mode() const = 0;
 private:
 	std::string name_;

@@ -11,7 +11,7 @@ public:
 	LayerSceneModifier(const std::string& name = "layer") :
 		SceneModifier(name)
 	{}
-	void apply(std::list< boost::shared_ptr<Node> >& nodes);
+	void apply(nodelist& nodes);
 	SceneModifier::UpdateMode update_mode() const
 	{
 		return node_add;
