@@ -58,8 +58,10 @@ void Node::update_children_transform()
 {
 	for (size_t i = 0; i < children_.size(); ++i)
 	{
-		children_[i]->update_transform();
+		children_[i]->Transform::update_transform();
 		children_[i]->apply_transform(transform());
+		children_[i]->update_children_transform();
+		children_[i]->clear_dirty_flag();
 	}
 }
 
