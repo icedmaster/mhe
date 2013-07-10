@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <ostream>
+#include "vector2.hpp"
 
 namespace mhe
 {
@@ -28,6 +29,13 @@ public:
 		v_[0] = v.v_[0];
 		v_[1] = v.v_[1];
 		v_[2] = v.v_[2];
+	}
+
+	vector3(const vector2<T>& v)
+	{
+		v_[0] = v.x();
+		v_[1] = v.y();
+		v_[2] = 0;
 	}
 
 	~vector3() {} // do nothing

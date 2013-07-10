@@ -4,7 +4,7 @@
 #include "node.hpp"
 #include "scene_modifier.hpp"
 #include "camera.hpp"
-#include <list>
+#include "configurable_types.hpp"
 #include <vector>
 #include <map>
 #include <boost/shared_ptr.hpp>
@@ -67,7 +67,6 @@ private:
 	void apply_visitors();
 	void apply_scene_modifiers(SceneModifier::UpdateMode mode);
 
-	typedef std::list<nodeptr> nodelist;
 	nodelist nodes_;
 	Scene* parent_;
 	std::vector< boost::shared_ptr<Scene> > subscenes_;

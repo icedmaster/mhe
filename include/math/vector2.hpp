@@ -79,6 +79,11 @@ public:
 		y_ = v.y;
 		return *this;
 	}
+
+	static vector2 zero()
+	{
+		return vector2();
+	}
 private:
 	T x_, y_;	
 };
@@ -105,6 +110,18 @@ template <class T, class U>
 inline vector2<T> operator/ (const vector2<T>& v1, const vector2<U>& v2)
 {
 	return vector2<T>(v1.x() / v2.x(), v1.y() / v2.y());
+}
+
+template <class T, class U>
+inline bool operator< (const vector2<T>& v1, const vector2<U>& v2)
+{
+	return ((v1.x() < v2.x()) && (v1.y() < v2.y()));
+}
+
+template <class T, class U>
+inline bool operator> (const vector2<T>& v1, const vector2<U>& v2)
+{
+	return ((v1.x() > v2.x()) && (v1.y() > v2.y()));
 }
 
 template <class T>

@@ -31,7 +31,7 @@ public:
 
 	void apply_transform(const matrixf& nm)
 	{
-		m = nm * m;
+		m *= nm;
 	}
 
 	void translate(float dx, float dy, float dz)
@@ -100,6 +100,11 @@ public:
 	void rotate_by(float angle_x, float angle_y, float angle_z);
 	void scale_to(float sx, float sy, float sz);
 	void scale_by(float sx, float sy, float sz);
+
+	const vector3<float>& position() const
+	{
+		return position_;
+	}
 protected:
 	bool dirty() const
 	{
@@ -112,11 +117,6 @@ protected:
 	}
 
 	void update_transform();
-
-	vector3<float> position() const
-	{
-		return position_;
-	}
 
 	void set_position(const vector3<float>& position)
 	{

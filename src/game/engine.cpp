@@ -3,6 +3,7 @@
 #include "game/base_view_events_handler.hpp"
 #include "events/system_device.hpp"
 #include "utils/sysutils.hpp"
+#include "impl/system_factory.hpp"
 
 #include "utils/profiling.hpp"
 
@@ -21,8 +22,27 @@ bool Engine::init(cmn::uint w, cmn::uint h, cmn::uint bpp, bool fullscreen)
 {
 	if (initialized_) return true;
 	INFO_LOG("Engine init:" << w << " " << h << " " << bpp);
-	if (!ws_.init(w, h, bpp, fullscreen))
-		return false;	
+	while (true)
+	{
+		WindowContextFormat format;
+		format.major_version = context_.driver().major_version_need();
+		format.minor_version = context_.driver().minor_version_need();
+		if (!ws_.init(w, h, bpp, fullscreen, format))
+		{
+			ERROR_LOG("Can't initialize WindowSystem with format:" << format.major_version << " " <<
+					  format.minor_version);
+			const std::string& name = SystemFactory::instance().video_driver_factory().set_next_driver();
+			if (name.empty())
+			{
+				ERROR_LOG("All available drivers has been tried - can't initialize engine");
+				return false;
+			}
+			INFO_LOG("Try next driver with name:" << name);
+			context_.driver().reset();
+			continue;
+		}
+		else break;
+	}
 	ws_.view()->set_events_handler(new BaseViewEventsHandler(this));
 	// init quit event listener
 	event_manager_.add_device(new SystemDevice("sys"));

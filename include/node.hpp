@@ -136,6 +136,12 @@ public:
 	}
 };
 
+class ContainerNode : public Node
+{
+private:
+	void draw_impl(Context&) {}
+};
+
 }
 
 #endif

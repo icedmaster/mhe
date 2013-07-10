@@ -10,7 +10,8 @@ Sprite::Sprite(const Sprite& sprite) :
 	x_size_(sprite.x_size_), y_size_(sprite.y_size_),
 	reset_position_(sprite.reset_position_),
 	pos_(sprite.pos_),
-	current_al_(nullptr)
+	current_al_(nullptr),
+	z_order_(sprite.z_order_)
 {
 	set_texture(sprite.texture());
 	init();
@@ -130,10 +131,10 @@ void Sprite::update_buffers()
 		y_sz = texture()->height();
 	}
 
-	v[0] = 0.0; v[1] = 0.0; v[2] = 0.0;
-	v[3] = 0.0; v[4] = y_sz; v[5] = 0.0;
-	v[6] = x_sz; v[7] = y_sz; v[8] = 0.0;
-	v[9] = x_sz; v[10] = 0.0; v[11] = 0.0;
+	v[0] = 0.0; v[1] = 0.0; v[2] = z_order_;
+	v[3] = 0.0; v[4] = y_sz; v[5] = z_order_;
+	v[6] = x_sz; v[7] = y_sz; v[8] = z_order_;
+	v[9] = x_sz; v[10] = 0.0; v[11] = z_order_;
 	update_color_buffer();
 }
 

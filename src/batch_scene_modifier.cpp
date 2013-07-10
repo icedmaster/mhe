@@ -4,11 +4,11 @@
 
 namespace mhe {
 
-void BatchSceneModifier::apply(std::list< boost::shared_ptr<Node> >& nodes)
+void BatchSceneModifier::apply(nodelist& nodes)
 {
-	std::list< boost::shared_ptr<Node> > batched;
-	std::list< boost::shared_ptr<Node> >::iterator first = batched.begin();
-	for (std::list< boost::shared_ptr<Node> >::iterator it = nodes.begin();
+	nodelist batched;
+	nodelist::iterator first = batched.begin();
+	for (nodelist::iterator it = nodes.begin();
 		 it != nodes.end(); ++it)
 	{
 		const boost::shared_ptr<Node>& node = *it;
@@ -16,7 +16,7 @@ void BatchSceneModifier::apply(std::list< boost::shared_ptr<Node> >& nodes)
 		bool inserted = false;
 		if (!update_first_node)
 		{
-			for (std::list< boost::shared_ptr<Node> >::iterator bit = first; bit != batched.end(); ++bit)
+			for (nodelist::iterator bit = first; bit != batched.end(); ++bit)
 			{
 				const Texture& other_texture = *(node->texture());
 				if ((*bit)->texture()->is_equal(other_texture))

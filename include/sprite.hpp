@@ -13,13 +13,13 @@ class Sprite : public Node
 {
 public:
 	Sprite() : is_alive_(true), is_running_(false), x_size_(0.0), y_size_(0.0),
-			   current_al_(0)
+			   current_al_(0), z_order_(0)
 	{
 		init();
 	}
 
 	Sprite(AnimationListBase* al) : is_alive_(true), is_running_(false), x_size_(0.0), y_size_(0.0),
-									current_al_(0)
+									current_al_(0), z_order_(0)
 	{
 		al_[al->index()] = boost::shared_ptr<AnimationListBase>(al);
 		init();
@@ -62,6 +62,16 @@ public:
 
 	// execute animation from list with index <index>
 	void execute(cmn::uint index);
+
+	void set_z_order(int order)
+	{
+		z_order_ = order;
+	}
+
+	int z_order() const
+	{
+		return z_order_;
+	}
 private:
 	// implementations
 	void draw_impl(Context& context);
@@ -86,6 +96,7 @@ private:
 	bool reset_position_;
 	v3d pos_;
 	AnimationListBase* current_al_;
+	int z_order_;
 };
 }
 
