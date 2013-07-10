@@ -51,6 +51,8 @@ void Node::start()
 void Node::update_transform()
 {
 	Transform::update_transform();
+	if (parent_ != nullptr)
+		apply_transform(parent_->transform());
 	update_children_transform();
 }
 

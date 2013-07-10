@@ -42,6 +42,7 @@ bool QtWindowSystem::set_format(const WindowContextFormat& format)
 	view_->makeCurrent();
 	view_->setFormat(qt_format);
 	view_->show();
+	view_->setMouseTracking(true);
 	int major = view_->format().majorVersion();
 	int minor = view_->format().minorVersion();
 	INFO_LOG("QtWindowSystem::set_format. Use OpenGL version:" << major << "." << minor);
