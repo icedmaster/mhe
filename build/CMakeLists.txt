@@ -49,8 +49,8 @@ if (ANDROID)
   mhe_android_build()
 endif()
 
-add_definitions(-Wall)
-add_definitions(-Wextra)
+include(mhe_compiler_defs)
+mhe_setup_compiler_defs()
 
 if (BUILD_WITH_C++11)
    add_definitions(-std=c++11)
@@ -166,12 +166,14 @@ endif()
 
 set (LIBS ${LIBS} ${PNG_LIB})
 
-if (NOT DEFINED IOS)
-  set(LIBS ${LIBS} ${OPENAL_LIB}
-	${VORBISFILE_LIB} ${VORBIS_LIB} ${OGG_LIB})
-  if (WIN32)
-	set (LIBS ${LIBS} Ws2_32)
-  endif()
+if (MHE_OPENAL_FOUND AND MHE_VORBIS_FOUND)
+	if (NOT DEFINED IOS)
+ 	 	set(LIBS ${LIBS} ${OPENAL_LIB}
+		${VORBISFILE_LIB} ${VORBIS_LIB} ${OGG_LIB})
+  		if (WIN32)
+			set (LIBS ${LIBS} Ws2_32)
+  		endif()
+	endif()
 endif()
 
 # find scripts
@@ -202,7 +204,7 @@ if (WIN32)
 endif()
 if (APPLE AND NOT __IOS__)
     set(LIBS ${LIBS} dl)
-else()
+elseif (NOT WIN32)
     set(LIBS ${LIBS} dl rt)
 endif()
 

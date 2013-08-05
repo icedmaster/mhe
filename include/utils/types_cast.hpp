@@ -5,6 +5,7 @@
 #include <sstream>
 #include <cstring>
 #include <cstdio>
+#include <cstdlib>
 
 namespace mhe {
 namespace utils {

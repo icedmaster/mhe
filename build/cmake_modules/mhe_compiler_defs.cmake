@@ -1,7 +1,9 @@
 macro(mhe_setup_compiler_defs)
 
 	add_definitions(-Wall)
-	add_definitions(-Wextra)
+	if (NOT MSVC)
+		add_definitions(-Wextra)
+	endif()
 	#add_definitions(-std=c++0x)
 
 	if (CMAKE_BUILD_TYPE STREQUAL "Release")
