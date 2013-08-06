@@ -18,4 +18,8 @@ macro(mhe_setup_compiler_defs)
        include_directories("/System/Library/Frameworks/OpenAL.framework/Headers")
 	endif()
 
+	if (MSVC)
+		set(MSVC_HINT_DIR "C:/Program Files (x86)/Microsoft SDKs/Windows/v7.0A/Lib")
+	endif()
+
 endmacro()

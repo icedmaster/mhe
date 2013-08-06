@@ -12,6 +12,9 @@
 #include <OpenGL/gl.h>
 #include "glext.h"
 #else
+	#ifdef MHE_WIN
+		#include <Windows.h>
+	#endif
     #include <GL/gl.h>
     #include "glext.h"
 #endif

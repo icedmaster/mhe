@@ -1,5 +1,5 @@
 macro(mhe_link_platform_specific TARGET)
-if (WIN32)
+if (WIN32 AND NOT MSVC)
    set_target_properties(${TARGET} PROPERTIES LINK_FLAGS "-Wl,--enable-stdcall-fixup")
 endif()
 if (APPLE)

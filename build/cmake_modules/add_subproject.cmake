@@ -3,6 +3,9 @@ macro(mhe_add_subproject NAME)
   project(${TARGET_NAME})
   cmake_minimum_required (VERSION 2.8)
 
+  include(mhe_directories)
+  mhe_setup_directories()
+
   set (TARGET_SOURCE_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/..)
   # main mhe include
   set (TARGET_INCLUDE_ROOT ${INCLUDE_ROOT})
@@ -15,8 +18,8 @@ macro(mhe_add_subproject NAME)
   endforeach ()
 
   # add mhe lib
-  link_directories(${MHE_LIB_DIR})
-  set(MHE_LIB "-lmhe")
+  link_directories(${MHE_LIB_DIR})	
+  find_library(MHE_LIB mhe HINTS ${MHE_LIB_DIR})
 
   set(TARGET_LIBS ${MHE_LIB} ${DEP_LIBS})
 

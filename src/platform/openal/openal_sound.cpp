@@ -1,4 +1,4 @@
-#include "sound/openal_sound.hpp"
+#include "platform/openal/openal_sound.hpp"
 
 namespace mhe
 {

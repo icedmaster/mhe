@@ -1,4 +1,4 @@
-#include "sound/openal_audio_driver.hpp"
+#include "platform/openal/openal_audio_driver.hpp"
 
 namespace mhe
 {
