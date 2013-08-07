@@ -9,7 +9,40 @@
 
 namespace mhe {
 
-template <class T, size_t count>
+namespace detail {
+
+struct default_reallocation_policy
+{
+	static void reallocate(size_t /*prev_size*/, size_t /*new_size*/, const char* /*additional_info*/) {}
+};
+
+struct log_reallocation_policy
+{
+	static void reallocate(size_t prev_size, size_t new_size, const char* additional_info)
+	{
+		std::cout << "reallocate(), " << prev_size << " " << new_size << " info:" << additional_info << std::endl;
+	}
+};
+
+struct assert_reallocation_policy
+{
+	static void reallocate(size_t prev_size, size_t new_size, const char* additional_info)
+	{
+		assert(false);
+	}
+};
+
+}	// detail
+
+#ifdef _MSC_VER
+#define FUNCTION_DESCRIPTION_MACRO						__FUNCSIG__
+#else
+#define FUNCTION_DESCRIPTION_MACRO						__PRETTY_FUNCTION__
+#endif
+
+#define DEFAULT_REALLOCATION_POLICY			detail::log_reallocation_policy
+
+template <class T, size_t count, class reallocation_policy = DEFAULT_REALLOCATION_POLICY>
 class fixed_size_vector
 {
 public:
@@ -210,6 +243,7 @@ private:
 
 	void reallocate_vector(size_t new_capacity)
 	{
+		reallocation_policy::reallocate(capacity_, new_capacity, FUNCTION_DESCRIPTION_MACRO);
 		size_t prev_capacity = capacity_;
 		T* copy = new T[prev_capacity];
 		std::copy(begin_, end(), copy);
