@@ -1,7 +1,7 @@
 #ifndef _OPENAL_SOUND_HPP_
 #define _OPENAL_SOUND_HPP_
 
-#include "isound.hpp"
+#include "sound/isound.hpp"
 #include "mhe_openal.hpp"
 
 namespace mhe

@@ -26,7 +26,7 @@ struct log_reallocation_policy
 
 struct assert_reallocation_policy
 {
-	static void reallocate(size_t prev_size, size_t new_size, const char* additional_info)
+	static void reallocate(size_t /*prev_size*/, size_t /*new_size*/, const char* /*additional_info*/)
 	{
 		assert(false);
 	}
