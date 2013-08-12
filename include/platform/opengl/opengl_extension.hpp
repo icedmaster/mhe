@@ -41,126 +41,162 @@ public:
 #ifdef MHE_OPENGL_HAS_SHADERS
 	GLuint glCreateProgram()
 	{
-#ifdef MHE_USE_NATIVE_OPENGL
+#ifndef MHE_USE_NATIVE_OPENGL
+		return glCreateProgram_();
+#else
 		return ::glCreateProgram();
 #endif
 	}
 
 	void glDeleteProgram(GLuint program)
 	{
-#ifdef MHE_USE_NATIVE_OPENGL
+#ifndef MHE_USE_NATIVE_OPENGL
+		glDeleteProgram_(program);
+#else
 		::glDeleteProgram(program);
 #endif
 	}
 
 	GLuint glCreateShader(GLenum program)
 	{
-#ifdef MHE_USE_NATIVE_OPENGL
+#ifndef MHE_USE_NATIVE_OPENGL
+		return glCreateShader_(program);
+#else
 		return ::glCreateShader(program);
 #endif
 	}
     
     void glDeleteShader(GLuint shader)
     {
-#ifdef MHE_USE_NATIVE_OPENGL
+#ifndef MHE_USE_NATIVE_OPENGL
+		glDeleteShader_(shader);
+#else
         ::glDeleteShader(shader);
 #endif
     }
 
 	void glShaderSource(GLuint shader,  GLsizei count,  const GLchar** string,  const GLint* length)
 	{
-#ifdef MHE_USE_NATIVE_OPENGL
+#ifndef MHE_USE_NATIVE_OPENGL
+		glShaderSource_(shader, count, string, length);
+#else
 		::glShaderSource(shader, count, string, length);
 #endif
 	}
 
 	void glCompileShader(GLuint shader)
 	{
-#ifdef MHE_USE_NATIVE_OPENGL
+#ifndef MHE_USE_NATIVE_OPENGL
+		glCompileShader_(shader);
+#else
 		::glCompileShader(shader);
 #endif
 	}
 
 	void glAttachShader(GLuint program, GLuint shader)
 	{
-#ifdef MHE_USE_NATIVE_OPENGL
+#ifndef MHE_USE_NATIVE_OPENGL
+		glAttachShader_(program, shader);
+#else
 		::glAttachShader(program, shader);
 #endif
 	}
 
 	void glLinkProgram(GLuint program)
 	{
-#ifdef MHE_USE_NATIVE_OPENGL
+#ifndef MHE_USE_NATIVE_OPENGL
+		glLinkProgram_(program);
+#else
 		::glLinkProgram(program);
 #endif
 	}
 
 	void glUseProgram(GLuint program)
 	{
-#ifdef MHE_USE_NATIVE_OPENGL
+#ifndef MHE_USE_NATIVE_OPENGL
+		glUseProgram_(program);
+#else
 		::glUseProgram(program);
 #endif
 	}
 
 	void glValidateProgram(GLuint program)
 	{
-#ifdef MHE_USE_NATIVE_OPENGL
+#ifndef MHE_USE_NATIVE_OPENGL
+		glValidateProgram_(program);
+#else
 		::glValidateProgram(program);
 #endif
 	}
 
 	void glGetShaderiv(GLuint shader, GLenum pname, GLint* params)
 	{
-#ifdef MHE_USE_NATIVE_OPENGL
+#ifndef MHE_USE_NATIVE_OPENGL
+		glGetShaderiv_(shader, pname, params);
+#else
 		::glGetShaderiv(shader, pname, params);
 #endif
 	}
 
 	void glGetShaderInfoLog(GLuint shader, GLsizei maxLength, GLsizei* length, GLchar* infoLog)
 	{
-#ifdef MHE_USE_NATIVE_OPENGL
+#ifndef MHE_USE_NATIVE_OPENGL
+		glGetShaderInfoLog_(shader, maxLength, length, infoLog);
+#else
 		::glGetShaderInfoLog(shader, maxLength, length, infoLog);
 #endif
 	}
 
 	void glGetProgramiv(GLuint program, GLenum pname, GLint* params)
 	{
-#ifdef MHE_USE_NATIVE_OPENGL
+#ifndef MHE_USE_NATIVE_OPENGL
+		glGetProgramiv_(program, pname, params);
+#else
 		::glGetProgramiv(program, pname, params);
 #endif
 	}
 
 	void glGetProgramInfoLog(GLuint program, GLsizei maxLength, GLsizei* length, GLchar* infoLog)
 	{
-#ifdef MHE_USE_NATIVE_OPENGL
+#ifndef MHE_USE_NATIVE_OPENGL
+		glGetProgramInfoLog_(program, maxLength, length, infoLog);
+#else
 		::glGetProgramInfoLog(program, maxLength, length, infoLog);
 #endif
 	}
 
 	GLint glGetUniformLocation(GLuint program, const GLchar* name)
 	{
-#ifdef MHE_USE_NATIVE_OPENGL
+#ifndef MHE_USE_NATIVE_OPENGL
+		return glGetUniformLocation_(program, name);
+#else
 		return ::glGetUniformLocation(program, name);
 #endif
 	}
 
 	void glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value)
 	{
-#ifdef MHE_USE_NATIVE_OPENGL
+#ifndef MHE_USE_NATIVE_OPENGL
+		glUniformMatrix4fv_(location, count, transpose, value);
+#else
 		::glUniformMatrix4fv(location, count, transpose, value);
 #endif
 	}
 
 	void glUniform1i(GLint location, GLint value)
 	{
-#ifdef MHE_USE_NATIVE_OPENGL
+#ifndef MHE_USE_NATIVE_OPENGL
+		glUniform1i_(location, value);
+#else
 		::glUniform1i(location, value);
 #endif
 	}
 
 	GLint glGetAttributeLocation(GLuint program, const GLchar* name)
 	{
-#ifdef MHE_USE_NATIVE_OPENGL
+#ifndef MHE_USE_NATIVE_OPENGL
+		return glGetAttributeLocation_(program, name);
+#else
 		return ::glGetAttribLocation(program, name);
 #endif
 	}
@@ -168,56 +204,72 @@ public:
 	void glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized,
 							   GLsizei stride, const GLvoid* pointer)
 	{
-#ifdef MHE_USE_NATIVE_OPENGL
+#ifndef MHE_USE_NATIVE_OPENGL
+		glVertexAttribPointer_(index, size, type, normalized, stride, pointer);
+#else
 		::glVertexAttribPointer(index, size, type, normalized, stride, pointer);
 #endif
 	}
 
 	void glEnableVertexAttribArray(GLint attr)
 	{
-#ifdef MHE_USE_NATIVE_OPENGL
+#ifndef MHE_USE_NATIVE_OPENGL
+		glEnableVertexAttribArray_(attr);
+#else
 		::glEnableVertexAttribArray(attr);
 #endif
 	}
     
     void glDisableVertexAttribArray(GLint attr)
     {
-#ifdef MHE_USE_NATIVE_OPENGL
+#ifndef MHE_USE_NATIVE_OPENGL
+		glDisableVertexAttribArray_(attr);
+#else
         ::glDisableVertexAttribArray(attr);
 #endif
     }
 
 	void glGenBuffers(GLsizei n, GLuint* buffers)
 	{
-#ifdef MHE_USE_NATIVE_OPENGL
+#ifndef MHE_USE_NATIVE_OPENGL
+		glGenBuffers_(n, buffers);
+#else
 		::glGenBuffers(n, buffers);
 #endif
 	}
 
 	void glDeleteBuffers(GLsizei n, GLuint* buffers)
 	{
-#ifdef MHE_USE_NATIVE_OPENGL
+#ifndef MHE_USE_NATIVE_OPENGL
+		glDeleteBuffers_(n, buffers);
+#else
 		::glDeleteBuffers(n, buffers);
 #endif
 	}
 
 	void glBindBuffer(GLenum target, GLuint buffer)
 	{
-#ifdef MHE_USE_NATIVE_OPENGL
+#ifndef MHE_USE_NATIVE_OPENGL
+		glBindBuffer_(target, buffer);
+#else
 		::glBindBuffer(target, buffer);
 #endif
 	}
 
 	void glBufferData(GLenum target, GLsizeiptr size, const GLvoid* data, GLenum usage)
 	{
-#ifdef MHE_USE_NATIVE_OPENGL
+#ifndef MHE_USE_NATIVE_OPENGL
+		glBufferData_(target, size, data, usage);
+#else
 		::glBufferData(target, size, data, usage);
 #endif
 	}
 
 	void glGenVertexArrays(GLsizei n, GLuint* array)
 	{
-#ifdef MHE_USE_NATIVE_OPENGL
+#ifndef MHE_USE_NATIVE_OPENGL
+		glGenVertexArrays_(n, array);
+#else
 		#ifdef MHE_OPENGLES
 		::glGenVertexArraysOES(n, array);
 		#else
@@ -232,7 +284,9 @@ public:
 
 	void glDeleteVertexArrays(GLsizei n, GLuint* array)
 	{
-#ifdef MHE_USE_NATIVE_OPENGL
+#ifndef MHE_USE_NATIVE_OPENGL
+		glDeleteVertexArrays_(n, array);
+#else
 		#ifdef MHE_OPENGLES
 		::glDeleteVertexArraysOES(n, array);
 		#else
@@ -247,7 +301,9 @@ public:
 
 	void glBindVertexArray(GLuint array)
 	{
-#ifdef MHE_USE_NATIVE_OPENGL
+#ifndef MHE_USE_NATIVE_OPENGL
+		glBindVertexArray_(array);
+#else
 		#ifdef MHE_OPENGLES
 		::glBindVertexArrayOES(array);
 		#else
@@ -285,6 +341,34 @@ private:
 	PFNGLMULTITEXCOORD2FARBPROC glMultiTexCoord2f_;
     PFNGLACTIVETEXTUREARBPROC glActiveTexture_;
 	PFNGLCLIENTACTIVETEXTUREARBPROC glClientActiveTexture_;
+	PFNGLCREATEPROGRAMPROC glCreateProgram_;
+	PFNGLDELETEPROGRAMPROC glDeleteProgram_;
+	PFNGLCREATESHADERPROC glCreateShader_;
+	PFNGLDELETESHADERPROC glDeleteShader_;
+	PFNGLSHADERSOURCEPROC glShaderSource_;
+	PFNGLCOMPILESHADERPROC glCompileShader_;
+	PFNGLATTACHSHADERPROC glAttachShader_;
+	PFNGLLINKPROGRAMPROC glLinkProgram_;
+	PFNGLUSEPROGRAMPROC glUseProgram_;
+	PFNGLVALIDATEPROGRAMPROC glValidateProgram_;
+	PFNGLGETSHADERIVPROC glGetShaderiv_;
+	PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog_;
+	PFNGLGETPROGRAMIVPROC glGetProgramiv_;
+	PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog_;
+	PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation_;
+	PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv_;
+	PFNGLUNIFORM1IPROC glUniform1i_;
+	PFNGLGETATTRIBLOCATIONPROC glGetAttributeLocation_;
+	PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer_;
+	PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray_;
+	PFNGLDISABLEVERTEXATTRIBARRAYPROC glDisableVertexAttribArray_;
+	PFNGLGENBUFFERSPROC glGenBuffers_;
+	PFNGLDELETEBUFFERSPROC glDeleteBuffers_;
+	PFNGLBINDBUFFERPROC glBindBuffer_;
+	PFNGLBUFFERDATAPROC glBufferData_;
+	PFNGLGENVERTEXARRAYSPROC glGenVertexArrays_;
+	PFNGLDELETEVERTEXARRAYSPROC glDeleteVertexArrays_;
+	PFNGLBINDVERTEXARRAYPROC glBindVertexArray_;
 #endif
 	std::map<std::string, bool> loaded_extensions_;
 };

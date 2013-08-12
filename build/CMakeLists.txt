@@ -142,7 +142,7 @@ if (MHE_OPENGL_FOUND)
    # add platform sources
    set(SRC_PATH ${OPENGL_IMPL_SOURCES} ${SRC_PATH})
    # temporary removed
-   #set(SRC_PATH ${OPENGL3_PLATFORM_SOURCES} ${SRC_PATH})
+   set(SRC_PATH ${OPENGL3_PLATFORM_SOURCES} ${SRC_PATH})
    set(LIBS ${LIBS} ${OPENGL_LIB})
 endif()
 
