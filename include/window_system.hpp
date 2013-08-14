@@ -90,6 +90,16 @@ public:
 		return win_dim_.y();
 	}
 
+	bool fullscreen() const
+	{
+		return fullscreen_;
+	}
+
+	int bpp() const
+	{
+		return bpp_;
+	}
+
 	const vector2<int>& screen_size() const
 	{
 		return win_dim_;

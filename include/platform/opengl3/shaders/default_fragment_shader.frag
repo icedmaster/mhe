@@ -1,7 +1,10 @@
-"varying lowp vec4 fragment_color;			\n\
-varying highp vec2 fragment_texcoord;		\n\
+"#version 330 core											\n\
+in vec4 fragment_color;			\n\
+in vec2 fragment_texcoord;		\n\
 											\n\
 uniform sampler2D texture_unit;				\n\
+											\n\
+out vec4 color;								\n\
 											\n\
 void main()									\n\
 {											\n\

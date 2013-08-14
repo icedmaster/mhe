@@ -21,7 +21,7 @@
 #endif
 
 // window system
-#if defined(MHE_HAS_SDL) || defined(MHE_HAS_SDL2)
+#if defined(MHE_HAS_SDL)
 	#define MHE_SDL
 #endif
 

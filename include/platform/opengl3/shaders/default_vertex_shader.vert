@@ -1,10 +1,11 @@
-"uniform mat4 projection_matrix;								\n\
+"#version 330 core											\n\
+uniform mat4 projection_matrix;								\n\
 																\n\
-attribute vec3 position;										\n\
-attribute vec4 color;										    \n\
-attribute vec2 texcoord;										\n\
-varying lowp vec4 fragment_color;								\n\
-varying highp vec2 fragment_texcoord;							\n\
+in vec3 position;										\n\
+in vec4 color;										    \n\
+in vec2 texcoord;										\n\
+out vec4 fragment_color;								\n\
+out vec2 fragment_texcoord;							\n\
 																\n\
 void main()														\n\
 {																\n\

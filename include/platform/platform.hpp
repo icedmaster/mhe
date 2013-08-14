@@ -19,6 +19,10 @@
 #include "platform/sdl/sdl_platform.hpp"
 #endif
 
+#ifdef MHE_SDL2
+#include "platform/sdl2/sdl2_platform.hpp"
+#endif
+
 #ifdef MHE_QT
 #include "platform/qt/qt_platform.hpp"
 #endif

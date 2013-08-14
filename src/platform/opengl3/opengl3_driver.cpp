@@ -10,6 +10,15 @@ namespace opengl {
 
 bool OpenGL3Driver::init()
 {
+	// print information about renderer and context
+	INFO_LOG("OpenGL3Driver::renderer:" << reinterpret_cast<const char*>(glGetString(GL_RENDERER))); 
+	INFO_LOG("OpenGL3Driver::vendor:" << reinterpret_cast<const char*>(glGetString(GL_VENDOR)));
+	INFO_LOG("OpenGL3Driver::version:" << reinterpret_cast<const char*>(glGetString(GL_VERSION)));
+	int major = 0, minor = 0;
+	glGetIntegerv(GL_MAJOR_VERSION, &major);
+	glGetIntegerv(GL_MINOR_VERSION, &minor);
+	INFO_LOG("OpenGL3Driver::context:" << major << "." << minor);
+	OpenGLExtensions::instance().init_extensions();
 	return init_default_shader();
 }
 
@@ -92,24 +101,23 @@ void OpenGL3Driver::begin_draw(const RenderBuffer* buffer)
 	check_for_errors();
 	// TODO: need to apply correct texture unit
 	active_shader_program_->set_uniform(texture_unit_uniform_name, 0);
-
-    const std::vector<float>& data = buffer->data();
+    
     size_t v_offset = buffer->offset(vertex_position_attribute_name);
     if (v_offset != RenderBuffer::invalid_offset)
         active_shader_program_->set_attribute(vertex_position_attribute_name,
-                                           &data[0], 3, v_offset * sizeof(float));
+                                           nullptr, 3, v_offset * sizeof(float));
     size_t n_offset = buffer->offset(vertex_normal_attribute_name);
     if (n_offset != RenderBuffer::invalid_offset)
         active_shader_program_->set_attribute(vertex_normal_attribute_name,
-                                           &data[0], 3, n_offset * sizeof(float));
+                                           nullptr, 3, n_offset * sizeof(float));
     size_t t_offset = buffer->offset(vertex_texcoord_attribute_name);
     if (t_offset != RenderBuffer::invalid_offset)
         active_shader_program_->set_attribute(vertex_texcoord_attribute_name,
-                                           &data[0], 2, t_offset * sizeof(float));
+                                           nullptr, 2, t_offset * sizeof(float));
     size_t c_offset = buffer->offset(vertex_color_attribute_name);
     if (c_offset != RenderBuffer::invalid_offset)
         active_shader_program_->set_attribute(vertex_color_attribute_name,
-                                           &data[0], 4, c_offset * sizeof(float));
+                                           nullptr, 4, c_offset * sizeof(float));
 }
     
 void OpenGL3Driver::draw(const cmn::uint* i, cmn::uint size)

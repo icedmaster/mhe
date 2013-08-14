@@ -1,6 +1,8 @@
 #include "platform/win/win_so.hpp"
 #include "types.hpp"
 
+#include "utils/global_log.hpp"
+
 namespace mhe {
 namespace winsys {
 
@@ -30,18 +32,24 @@ void* get_proc_addr(so_handle handle, const std::string& name)
 #ifdef MHE_OPENGL
 bool init_opengl_so()
 {
-	opengl_lib_handle = open_so(opengl_lib_name);
-	return (opengl_lib_handle != nullptr);
+	//opengl_lib_handle = open_so(opengl_lib_name);
+	//return (opengl_lib_handle != nullptr);
+	return true;
 }
 
 void deinit_opengl_so()
 {
-	close_so(opengl_lib_handle);
+	//close_so(opengl_lib_handle);
 }
 
 void* get_opengl_proc_addr(const std::string& name)
-{
-	return get_proc_addr(opengl_lib_handle, name);
+{	
+	void* result = wglGetProcAddress(name.c_str());	
+	if (result == 0)
+	{
+		WARN_LOG("windows::get_opengl_proc_addr can not load method " << name << " error:" << GetLastError());
+	}
+	return result;
 }
 #endif
 

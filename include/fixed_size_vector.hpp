@@ -40,7 +40,7 @@ struct assert_reallocation_policy
 #define FUNCTION_DESCRIPTION_MACRO						__PRETTY_FUNCTION__
 #endif
 
-#define DEFAULT_REALLOCATION_POLICY			detail::log_reallocation_policy
+#define DEFAULT_REALLOCATION_POLICY			detail::default_reallocation_policy
 
 template <class T, size_t count, class reallocation_policy = DEFAULT_REALLOCATION_POLICY>
 class fixed_size_vector

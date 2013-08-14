@@ -82,7 +82,7 @@ private:
 
 	cmn::uint minor_version_need() const
 	{
-		return 0;
+		return 3;
 	}
 private:
 	bool init_default_shader();

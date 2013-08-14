@@ -106,6 +106,7 @@ set(IOS_PLATFORM_SOURCES ${PLATFORM_IMPL_SOURCES}/ios)
 set(QT_PLATFORM_SOURCES ${PLATFORM_IMPL_SOURCES}/qt)
 set(OPENGL3_PLATFORM_SOURCES ${PLATFORM_IMPL_SOURCES}/opengl3)
 set(OPENAL_PLATFORM_SOURCES ${PLATFORM_IMPL_SOURCES}/openal)
+set(SDL_PLATFORM_SOURCES ${PLATFORM_IMPL_SOURCES}/sdl)
 
 set(VORBIS_SOURCES ${SOURCE_ROOT}/sound/vorbis)
 
@@ -154,7 +155,14 @@ if (MHE_OPENGLES_FOUND)
 endif()
 
 if (MHE_SDL_FOUND)
-   set(SRC_PATH ${SRC_PATH} ${PLATFORM_IMPL_SOURCES}/sdl)
+   if (MHE_SDL2_FOUND)
+       set(SRC_PATH ${SRC_PATH} ${PLATFORM_IMPL_SOURCES}/sdl2)
+	   set(STANDALONE_SOURCES ${STANDALONE_SOURCES} ${SDL_PLATFORM_SOURCES}/sdl_keyboard_device_impl.cpp
+													${SDL_PLATFORM_SOURCES}/sdl_mouse_device_impl.cpp
+													${SDL_PLATFORM_SOURCES}/sdl_system_device_impl.cpp)
+   else()
+	   set(SRC_PATH ${SRC_PATH} ${PLATFORM_IMPL_SOURCES}/sdl)	
+   endif()		
    set(LIBS ${LIBS} ${SDL_LIB})
 endif()
 

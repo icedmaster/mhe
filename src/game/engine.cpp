@@ -41,7 +41,12 @@ bool Engine::init(cmn::uint w, cmn::uint h, cmn::uint bpp, bool fullscreen)
 			context_.driver().reset();
 			continue;
 		}
-		else break;
+		else
+		{
+			INFO_LOG("Initialized WindowSystem with format:" << format.major_version << " " <<
+					  format.minor_version);
+			break;
+		}
 	}
 	ws_.view()->set_events_handler(new BaseViewEventsHandler(this));
 	// init quit event listener

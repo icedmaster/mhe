@@ -195,7 +195,7 @@ public:
 	GLint glGetAttributeLocation(GLuint program, const GLchar* name)
 	{
 #ifndef MHE_USE_NATIVE_OPENGL
-		return glGetAttributeLocation_(program, name);
+		return glGetAttribLocation_(program, name);
 #else
 		return ::glGetAttribLocation(program, name);
 #endif
@@ -358,7 +358,7 @@ private:
 	PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation_;
 	PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv_;
 	PFNGLUNIFORM1IPROC glUniform1i_;
-	PFNGLGETATTRIBLOCATIONPROC glGetAttributeLocation_;
+	PFNGLGETATTRIBLOCATIONPROC glGetAttribLocation_;
 	PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer_;
 	PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray_;
 	PFNGLDISABLEVERTEXATTRIBARRAYPROC glDisableVertexAttribArray_;
