@@ -3,8 +3,8 @@
 
 #include "impl/abstract_window_system_factory.hpp"
 #include "sdl2_window_system.hpp"
-#include "platform/sdl/sdl_keyboard_device_impl.hpp"
-#include "platform/sdl/sdl_mouse_device_impl.hpp"
+#include "sdl2_keyboard_device_impl.hpp"
+#include "sdl2_mouse_device_impl.hpp"
 #include "platform/sdl/sdl_system_device_impl.hpp"
 #include "platform/sdl/sdl_event_system.hpp"
 
@@ -26,12 +26,12 @@ public:
 
 	KeyboardDeviceImpl* create_keyboard_device_impl() const
 	{
-		return new SDLKeyboardDeviceImpl();
+		return new SDL2KeyboardDeviceImpl;
 	}
 
 	MouseDeviceImpl* create_mouse_device_impl() const
 	{
-		return new SDLMouseDeviceImpl();
+		return new SDL2MouseDeviceImpl;
 	}
 
 	SystemDeviceImpl* create_system_device_impl() const

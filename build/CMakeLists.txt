@@ -157,9 +157,7 @@ endif()
 if (MHE_SDL_FOUND)
    if (MHE_SDL2_FOUND)
        set(SRC_PATH ${SRC_PATH} ${PLATFORM_IMPL_SOURCES}/sdl2)
-	   set(STANDALONE_SOURCES ${STANDALONE_SOURCES} ${SDL_PLATFORM_SOURCES}/sdl_keyboard_device_impl.cpp
-													${SDL_PLATFORM_SOURCES}/sdl_mouse_device_impl.cpp
-													${SDL_PLATFORM_SOURCES}/sdl_system_device_impl.cpp)
+	   set(STANDALONE_SOURCES ${STANDALONE_SOURCES} ${SDL_PLATFORM_SOURCES}/sdl_system_device_impl.cpp)
    else()
 	   set(SRC_PATH ${SRC_PATH} ${PLATFORM_IMPL_SOURCES}/sdl)	
    endif()		

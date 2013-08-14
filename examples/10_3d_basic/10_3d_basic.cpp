@@ -160,6 +160,7 @@ int main(int /*argc*/, char** /*argv*/)
 	config.width = 800;
 	config.height = 600;
 	config.bpp = 32;
+	config.fullscreen = false;
 	app.init(config);
 
 	// set scene

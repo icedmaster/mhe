@@ -25,6 +25,20 @@ inline int check_for_events(int mask, SDL_events_vector& events)
 		);
 }
 
+#ifdef MHE_SDL2
+inline int check_for_events(int* masks, int masks_size, SDL_events_vector& events)
+{
+	SDL_PumpEvents();
+	int peeped = 0;
+	for (int i = 0; i < masks_size; ++i)
+	{		
+		peeped += SDL_PeepEvents(&events[peeped], max_number_of_events - peeped, SDL_GETEVENT,
+								 masks[i], masks[i]);
+	}
+	return peeped;
+}
+#endif
+
 }}
 
 #endif
