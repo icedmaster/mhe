@@ -17,7 +17,7 @@ public:
 		set_next_animation();
 	}
 private:
-	bool init_impl(const std::string& /*arg*/, void* /*prm*/)
+	bool init_impl(const mhe::utils::PropertiesList&)
 	{
 		sprite_.reset(new mhe::Sprite);
 		sprite_->set_texture(get_engine()->context().texture_manager().get("../../../assets/test_sprite.png"));
@@ -85,7 +85,7 @@ int main(int /*argc*/, char** /*argv*/)
 	config.assets_path = "../../../assets";
 	app.init(config);
 	boost::shared_ptr<TestGameScene> game_scene(new TestGameScene(&(app.engine())));
-	game_scene->init("", nullptr);
+	game_scene->init();
 	app.engine().set_game_scene(game_scene);
 	game_scene->scene()->add_camera(new mhe::Camera2D(800, 600), true);
 

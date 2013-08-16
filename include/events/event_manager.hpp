@@ -18,6 +18,17 @@ public:
 	void add_device(Device* device);
 	boost::shared_ptr<Device> get_device(const std::string& name) const;
 
+	template <class T>
+	boost::shared_ptr<T> get_device() const
+	{
+		for (devices_map::const_iterator it = devices_.begin(); it != devices_.end(); ++it)
+		{
+			if (dynamic_cast<T*>(it->second.get()) != nullptr)
+				return boost::dynamic_pointer_cast<T>(it->second);
+		}
+		return boost::shared_ptr<T>();
+	}
+
 	void add_listener(const boost::shared_ptr<EventListener>& listener);
 	void add_listener(EventListener* listener);
 	void check(const WindowSystem& window_system);

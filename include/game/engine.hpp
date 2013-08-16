@@ -60,8 +60,7 @@ public:
 		game_scene_ = scene;
 	}
 
-	void free_all();
-	void set_next_scene(const std::string& arg);
+	void free_all();	
 
 	boost::shared_ptr<GameScene> game_scene() const
 	{

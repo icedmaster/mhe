@@ -9,7 +9,7 @@ public:
 		mhe::game::GameScene(engine)
 	{}
 private:
-	bool init_impl(const std::string&, void*)
+	bool init_impl(const mhe::utils::PropertiesList&)
 	{
 		get_engine()->font_manager().set_path("../../../assets/fonts/");
 		font_ = get_engine()->font_manager().get("arial.fnt");
@@ -54,7 +54,7 @@ int main(int, char**)
 	app.init(config);
 	boost::shared_ptr<TestScene> scene(new TestScene(&app.engine()));
 	app.engine().set_game_scene(scene);
-	scene->init("", nullptr);
+	scene->init();
 
 	app.engine().event_manager().add_device(new mhe::MouseDevice("mouse"));
 	

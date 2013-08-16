@@ -2,7 +2,7 @@
 #define __PROPERTIES_LIST_HPP__
 
 #include <string>
-#include <boost/lexical_cast.hpp>
+#include "types_cast.hpp"
 
 namespace mhe {
 namespace utils {
@@ -10,10 +10,15 @@ namespace utils {
 class PropertiesList
 {
 public:
+	static PropertiesList empty()
+	{
+		return PropertiesList();
+	}
+public:
 	template <class T>
 	void add(const std::string& key, const T& value)
 	{
-		values_[key] = boost::lexical_cast<std::string>(value);
+		values_[key] = types_cast<std::string>(value);
 	}
 
 	template <class T>
@@ -21,7 +26,7 @@ public:
 	{
 		std::map<std::string, std::string>::const_iterator it = values_.find(key);
 		if (it == values_.end()) return T();
-		return it->second;
+		return types_cast<T>(it->second);
 	}
 private:
 	std::map<std::string, std::string> values_;
