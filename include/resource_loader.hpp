@@ -10,6 +10,8 @@
 #include "siwa_image.hpp"
 #include "bmp_image.hpp"
 
+#include "sound/isound.hpp"
+
 namespace mhe
 {
 

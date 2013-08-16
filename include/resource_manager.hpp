@@ -11,10 +11,14 @@ namespace mhe {
 template <class Loader>
 class ResourceManager
 {
+protected:
 	typedef typename Loader::type res_type;
 	typedef typename Loader::helper_type helper_type;
+private:
 	typedef std::map< std::string, boost::shared_ptr<res_type> > resmap;
 public:
+	virtual ~ResourceManager() {}
+
 	void set_helper(const helper_type& helper)
 	{
 		helper_ = helper;
@@ -42,14 +46,7 @@ public:
 
 	boost::shared_ptr<res_type> get(const std::string& name) const
 	{
-		const std::string& sname = utils::get_file_name(name);
-		typename resmap::iterator it = resources_.find(sname);
-		if (it != resources_.end())
-		{
-			INFO_LOG("get resource:" << sname);
-			return it->second;
-		}
-		return load_impl(name, sname);
+		return get_impl(name);	
 	}
 
 	void add(const std::string& name, res_type* res)
@@ -70,6 +67,18 @@ public:
 	void set_path(const std::string& path)
 	{
 		path_ = path;
+	}
+protected:
+	virtual boost::shared_ptr<res_type> get_impl(const std::string& name) const
+	{
+		const std::string& sname = utils::get_file_name(name);
+		typename resmap::iterator it = resources_.find(sname);
+		if (it != resources_.end())
+		{
+			INFO_LOG("get resource:" << sname);
+			return it->second;
+		}
+		return load_impl(name, sname);
 	}
 private:
 	boost::shared_ptr<res_type> load_impl(const std::string& name,
