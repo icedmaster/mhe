@@ -48,11 +48,14 @@ macro(mhe_find_libraries)
 
 	# find SDL
 	# try to find SDL2 then SDL
-	find_library(SDL_LIB SDL2 HINTS ${LIB_HINT})
-	if (${SDL_LIB} STREQUAL "SDL_LIB-NOTFOUND")
+	# unix check is temporary
+	find_library(SDL2_LIB SDL2 HINTS ${LIB_HINT})
+	if (${SDL2_LIB} STREQUAL "SDL2_LIB-NOTFOUND")
+	    message("SDL2 not found, try to find SDL")
 		find_library(SDL_LIB SDL HINTS ${LIB_HINT})
 	else()
 		set(MHE_SDL2_FOUND TRUE)
+		set(SDL_LIB ${SDL2_LIB})
 	endif()
 	if (${SDL_LIB} STREQUAL "SDL_LIB-NOTFOUND")
 	  message("SDL not found")

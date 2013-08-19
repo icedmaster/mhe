@@ -15,6 +15,8 @@
 	#define MHE_OPENGL3
 	#ifdef MHE_WIN
 		#include <Windows.h>
+	#else
+		#define GL_GLEXT_PROTOTYPES
 	#endif
     #include <GL/gl.h>
     #include "glext.h"
