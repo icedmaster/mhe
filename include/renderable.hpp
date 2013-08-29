@@ -21,7 +21,12 @@ const std::string vertex_normal_attribute_name = "normals";
 const std::string vertex_color_attribute_name = "color";
 const std::string vertex_texcoord_attribute_name = "texcoord";
 
-class Renderable : public Transform
+template
+<size_t number_of_verteces = initial_number_of_verteces,
+ size_t number_of_indexes = initial_number_of_verteces,
+ size_t number_of_texcoords = initial_number_of_texcoords
+>
+class RenderableBase : public Transform
 {
 	static const cmn::uint default_texcoord_size = 8;
 public:
@@ -34,11 +39,11 @@ public:
 		batching_disabled = (1 << 3)
 	};
 public:
-	typedef fixed_size_vector<float, initial_number_of_verteces> vertex_container;
-	typedef fixed_size_vector<unsigned int, initial_number_of_verteces> indexes_container;
-	typedef fixed_size_vector<float, initial_number_of_texcoords> texcoord_container;
+	typedef fixed_size_vector<float, number_of_verteces> vertex_container;
+	typedef fixed_size_vector<unsigned int, number_of_indexes> indexes_container;
+	typedef fixed_size_vector<float, number_of_texcoords> texcoord_container;
 public:
-	Renderable(bool default_initialization = false) :
+	RenderableBase(bool default_initialization = false) :
 		color_(color_white), render_flags_(0), blend_mode_(no_blend)
 	{ 
 		if (default_initialization)
@@ -173,6 +178,11 @@ public:
 		return (render_flags_ & batching_disabled);
 	}
 
+	uint32_t render_flags() const
+	{
+		return render_flags_;
+	}
+
 	void set_blend_mode(BlendMode mode)
 	{
 		blend_mode_ = mode;
@@ -183,22 +193,23 @@ public:
 		return blend_mode_;
 	}
 
-	void attach(const Renderable& other)
+	template <size_t VC, size_t IC, size_t TC>
+	void attach(const RenderableBase<VC, IC, TC>& other)
 	{
-		texcoord_.insert(texcoord_.end(), other.texcoord_.begin(), other.texcoord_.end());
+		texcoord_.insert(texcoord_.end(), other.texcoord().begin(), other.texcoord().end());
 		size_t v_sz = vertexcoord_.size() / 3;
-		for (size_t i = 0; i < other.vertexcoord_.size(); i += 3)
+		for (size_t i = 0; i < other.vertexcoord().size(); i += 3)
 		{
-			v3d v(other.vertexcoord_[i], other.vertexcoord_[i + 1], other.vertexcoord_[i + 2]);
+			v3d v(other.vertexcoord()[i], other.vertexcoord()[i + 1], other.vertexcoord()[i + 2]);
 			v = v * other.transform();
 			vertexcoord_.insert(vertexcoord_.end(), v.get(), v.get() + 3);
 			colorcoord_.insert(colorcoord_.end(), other.color().get(), other.color().get() + 4);
 		}
-		normalscoord_.insert(normalscoord_.end(), other.normalscoord_.begin(), other.normalscoord_.end());	
-		for (size_t i = 0; i < other.indicies_.size(); ++i)
-			indicies_.push_back(other.indicies_[i] + v_sz); 
-		render_flags_ |= other.render_flags_;
-		blend_mode_ = other.blend_mode_;
+		normalscoord_.insert(normalscoord_.end(), other.normalscoord().begin(), other.normalscoord().end());	
+		for (size_t i = 0; i < other.indicies().size(); ++i)
+			indicies_.push_back(other.indicies()[i] + v_sz); 
+		render_flags_ |= other.render_flags();
+		blend_mode_ = other.blend_mode();
 	}
 protected:
 	texcoord_container& rtexcoord()
@@ -264,6 +275,8 @@ private:
 	uint32_t render_flags_;
 	BlendMode blend_mode_;
 };
+
+typedef RenderableBase<> Renderable;
 
 inline Renderable::vertex_container vector_to_vertex_container(const std::vector<float>& v)
 {

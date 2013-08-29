@@ -115,7 +115,7 @@ private:
 		camera->set(mhe::vector3<float>(0, 0, 10), mhe::vector3<float>(), mhe::y_axis);
 		camera->enable_each_frame_updating(true);
 		scene()->add_camera(camera, true);
-
+		
 		get_engine()->font_manager().set_path("../../../assets/fonts/");
 		stats_component_.reset(new mhe::game::utils::StatsComponent(scene(), engine()));
 		engine()->component_manager().add(stats_component_);

@@ -2,6 +2,8 @@
 #define _MHE_GL_HPP_
 
 #include "config.hpp"
+#include "utils/global_log.hpp"
+#include "compiler.hpp"
 
 #ifdef MHE_IOS
 #include <OpenGLES/ES2/gl.h>
@@ -27,5 +29,12 @@
 #if defined(MHE_OPENGLES) || defined(MHE_OPENGL3)
 #define MHE_OPENGL_HAS_SHADERS
 #endif
+
+#define CHECK_GL_ERRORS()						\
+	{											\
+		GLenum e = glGetError();					\
+		if (e != GL_NO_ERROR)						\
+			WARN_LOG(FUNCTION_DESCRIPTION_MACRO << ":" << e);					\
+	}											
 
 #endif

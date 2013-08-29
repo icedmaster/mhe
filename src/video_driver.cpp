@@ -6,7 +6,7 @@
 namespace mhe {
 
 // helper stats class
-void Driver::Stats::update(const Renderable& renderable)
+void Driver::Stats::update(const BatchedRenderable& renderable)
 {
 	tris_ += renderable.indicies().size() / 3;
 	++batches_;
@@ -18,8 +18,10 @@ void Driver::Stats::update_frames()
 }
 
 Driver::Driver() :
-	impl_(SystemFactory::instance().create_driver())
-{}
+	impl_(SystemFactory::instance().create_driver())	
+{
+	batched_.reserve(initial_number_of_renderables);
+}
 
 void Driver::begin_render()
 {
@@ -29,11 +31,12 @@ void Driver::begin_render()
 
 void Driver::end_render()
 {	
-	stats_.add_renderable_count(renderable_elements_.size());
-	const batched_container& batched = perform_batch();
-	for (size_t i = 0; i < batched.size(); ++i)
-		perform_render(batched[i]);
+	stats_.add_renderable_count(renderable_elements_.size());	
+	perform_batch();
+	for (size_t i = 0; i < batched_.size(); ++i)
+		perform_render(batched_[i]);
     impl_->end_render();
+	batched_.clear();
 }
 
 void Driver::begin_frame()
@@ -55,10 +58,9 @@ void Driver::reset()
 	impl_.reset(SystemFactory::instance().create_driver());
 }
 
-Driver::batched_container Driver::perform_batch() const
+void Driver::perform_batch()
 {
 	boost::shared_ptr<Texture> last_texture;
-	batched_container batches;
 	for (renderable_container::const_iterator it = renderable_elements_.begin();
 		 it != renderable_elements_.end(); ++it)
 	{
@@ -68,17 +70,18 @@ Driver::batched_container Driver::perform_batch() const
 			 (last_texture == nullptr) || !last_texture->is_equal(*(renderable->texture()))
 			)
 		{
-			batches.push_back(Renderable(false));
+			batched_container::iterator it = batched_.next_predefined_element();
+			if (it == batched_.end())
+				batched_.push_back(BatchedRenderable(false));
 			last_texture = renderable->texture();
-			batches.back().set_texture(last_texture);
+			batched_.back().set_texture(last_texture);
 		}
-		Renderable& current_batch = batches.back();			
+		BatchedRenderable& current_batch = batched_.back();			
 		current_batch.attach(*renderable);
-	}
-	return batches;
+	}	
 }
 
-void Driver::perform_render(const Renderable& renderable)
+void Driver::perform_render(const BatchedRenderable& renderable)
 {
 	set_render_flags(renderable);
     renderable.texture()->prepare();
@@ -97,7 +100,7 @@ void Driver::perform_render(const Renderable& renderable)
 	clear_render_flags(renderable);
 }
 
-void Driver::perform_buffered_render(const Renderable& renderable)
+void Driver::perform_buffered_render(const BatchedRenderable& renderable)
 {
 	boost::scoped_ptr<RenderBuffer> buffer(impl_->create_render_buffer());
 	buffer->attach_data(vertex_position_attribute_name, renderable.vertexcoord().data(), renderable.vertexcoord().size());
@@ -112,7 +115,7 @@ void Driver::perform_buffered_render(const Renderable& renderable)
 	buffer->disable();
 }
 
-void Driver::set_render_flags(const Renderable& renderable)
+void Driver::set_render_flags(const BatchedRenderable& renderable)
 {
 	if (renderable.is_z_buffer_masked())
 		impl_->mask_zbuffer();
@@ -125,7 +128,7 @@ void Driver::set_render_flags(const Renderable& renderable)
 	}
 }
 
-void Driver::clear_render_flags(const Renderable& renderable)
+void Driver::clear_render_flags(const BatchedRenderable& renderable)
 {
 	if (renderable.is_z_buffer_masked())
 		impl_->unmask_zbuffer();

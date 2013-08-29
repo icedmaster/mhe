@@ -99,6 +99,11 @@ public:
 
 class Driver
 {
+	typedef fixed_size_vector<Renderable*, initial_number_of_renderables> renderable_container;
+	typedef RenderableBase<initial_number_of_verteces,
+						   initial_number_of_verteces,
+						   100 * initial_number_of_texcoords> BatchedRenderable;
+	typedef fixed_size_vector<BatchedRenderable, 1> batched_container;
 public:
 	class Stats
 	{
@@ -111,7 +116,7 @@ public:
 			tris_ = batches_ = frames_ = elements_count_ = 0;
 		}
 
-		void update(const Renderable& renderable);
+		void update(const BatchedRenderable& renderable);
 		void update_frames();
 
 		void add_renderable_count(cmn::uint count)
@@ -316,16 +321,14 @@ public:
 	/// Reset implementaion - need to call init()
 	void reset();
 private:
-	typedef fixed_size_vector<Renderable*, initial_number_of_renderables> renderable_container;
-	typedef fixed_size_vector<Renderable, initial_number_of_renderables> batched_container;
-private:
-	batched_container perform_batch() const;
-	void perform_render(const Renderable& renderable);
-	void set_render_flags(const Renderable& renderable);
-	void clear_render_flags(const Renderable& renderable);
-	void perform_buffered_render(const Renderable& Renderable);
+	void perform_batch();
+	void perform_render(const BatchedRenderable& renderable);
+	void set_render_flags(const BatchedRenderable& renderable);
+	void clear_render_flags(const BatchedRenderable& renderable);
+	void perform_buffered_render(const BatchedRenderable& Renderable);
 
 	renderable_container renderable_elements_;
+	batched_container batched_;
 	Stats stats_;
 	boost::scoped_ptr<DriverImpl> impl_;
 };
