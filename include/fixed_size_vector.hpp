@@ -57,7 +57,8 @@ public:
 	}
 
 	fixed_size_vector(size_t size) :
-	{
+		begin_(elements_), size_(0), capacity_(count)
+	{		
 		resize(size);
 	}
 
@@ -170,6 +171,7 @@ public:
 
 	void resize(size_t new_size)
 	{
+		size_t sz = size_;
 		if (new_size > capacity_)
 			reallocate_vector(new_size);
 		size_ = new_size;
@@ -204,8 +206,10 @@ public:
 	// optimization, use this methods carefully
 	iterator next_predefined_element()
 	{
-		if (begin_ != elements_) return end();
-		size_t index = size_++;		
+		size_t index = size_;		
+		if (index >= capacity_)
+			return end();
+		++size_;
 		return begin_ + index;
 	}
 

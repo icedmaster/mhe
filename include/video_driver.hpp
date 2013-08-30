@@ -102,7 +102,7 @@ class Driver
 	typedef fixed_size_vector<Renderable*, initial_number_of_renderables> renderable_container;
 	typedef RenderableBase<initial_number_of_verteces,
 						   initial_number_of_verteces,
-						   100 * initial_number_of_texcoords> BatchedRenderable;
+						   initial_number_of_verteces> BatchedRenderable;
 	typedef fixed_size_vector<BatchedRenderable, 1> batched_container;
 public:
 	class Stats

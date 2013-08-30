@@ -18,9 +18,10 @@ void Driver::Stats::update_frames()
 }
 
 Driver::Driver() :
-	impl_(SystemFactory::instance().create_driver())	
+	impl_(SystemFactory::instance().create_driver()),
+	batched_(initial_number_of_renderables)
 {
-	batched_.reserve(initial_number_of_renderables);
+	batched_.resize(0);	
 }
 
 void Driver::begin_render()
@@ -59,7 +60,7 @@ void Driver::reset()
 }
 
 void Driver::perform_batch()
-{
+{	
 	boost::shared_ptr<Texture> last_texture;
 	for (renderable_container::const_iterator it = renderable_elements_.begin();
 		 it != renderable_elements_.end(); ++it)
@@ -74,7 +75,8 @@ void Driver::perform_batch()
 			if (it == batched_.end())
 				batched_.push_back(BatchedRenderable(false));
 			last_texture = renderable->texture();
-			batched_.back().set_texture(last_texture);
+			batched_.back().set_texture(last_texture);	
+			batched_.back().clear();
 		}
 		BatchedRenderable& current_batch = batched_.back();			
 		current_batch.attach(*renderable);

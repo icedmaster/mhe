@@ -53,9 +53,20 @@ public:
 		}
 	}
 
+	RenderableBase(size_t vertexes_number, size_t indexes_number, size_t texcoord_number) :
+		color_(color_white), render_flags_(0), blend_mode_(no_blend)
+	{
+		vertexcoord_.reserve(vertexes_number);
+		normalscoord_.reserve(vertexes_number);
+		colorcoord_.reserve(vertexes_number);
+		indicies_.reserve(indexes_number);
+		texcoord_.reserve(texcoord_number);
+	}
+
 	void set_texture(const boost::shared_ptr<Texture>& texture)
 	{
 		texture_ = texture;
+		on_texture_changed();
 	}
 
 	const boost::shared_ptr<Texture> texture() const
@@ -211,6 +222,18 @@ public:
 		render_flags_ |= other.render_flags();
 		blend_mode_ = other.blend_mode();
 	}
+
+	void clear()
+	{
+		color_ = color_white;
+		render_flags_ = 0;
+		blend_mode_ = no_blend;
+		texcoord_.clear();
+		vertexcoord_.clear();
+		normalscoord_.clear();
+		colorcoord_.clear();
+		indicies_.clear();
+	}
 protected:
 	texcoord_container& rtexcoord()
 	{
@@ -265,6 +288,8 @@ protected:
 		}
 	}
 private:
+	virtual void on_texture_changed() {}
+
 	texcoord_container texcoord_;
 	vertex_container vertexcoord_;
 	vertex_container colorcoord_;
