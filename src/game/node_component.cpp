@@ -7,6 +7,7 @@ void NodeComponent::do_subscribe(Component* parent)
 {
 	parent->subscribe(transform_event, this);
 	parent->subscribe(enable_event, this);
+	parent->subscribe(color_event, this);
 }
 
 bool NodeComponent::update_impl(const Message& message)
@@ -15,6 +16,8 @@ bool NodeComponent::update_impl(const Message& message)
 		process_transform_event(static_cast<const TransformMessage&>(message));
 	else if (message.type() == enable_event)
 		process_enable_event(static_cast<const EnableMessage&>(message));
+	else if (message.type() == color_event)
+		process_color_event(static_cast<const ColorMessage&>(message));
 	return true;
 }
 
@@ -29,6 +32,11 @@ void NodeComponent::process_enable_event(const EnableMessage& message)
 	at_scene_ = message.enabled();
 	if (at_scene_) scene_->add(node_);
 	else scene_->remove(node_);
+}
+
+void NodeComponent::process_color_event(const ColorMessage& message)
+{
+	node_->set_color(message.color());
 }
 
 }}

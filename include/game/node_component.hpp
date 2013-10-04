@@ -5,6 +5,7 @@
 #include "node.hpp"
 #include "scene.hpp"
 #include "message_transform.hpp"
+#include "message_color.hpp"
 
 namespace mhe {
 namespace game {
@@ -31,6 +32,7 @@ private:
 	bool update_impl(const Message& message);
 	void process_transform_event(const TransformMessage& message);
 	void process_enable_event(const EnableMessage& message);
+	void process_color_event(const ColorMessage& message);
 
 	nodeptr node_;
 	boost::shared_ptr<Scene> scene_;
