@@ -136,11 +136,4 @@ void Engine::free_all()
 	sm_.free_all();
 }
 
-void Engine::set_next_scene(const std::string& arg)
-{	
-	game_scene_->deinit();
-	game_scene_ = game_scene_->get_next_scene();
-	if (game_scene_) game_scene_->init(arg);	
-}
-
 }}

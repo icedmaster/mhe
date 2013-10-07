@@ -6,80 +6,22 @@ namespace mhe
 {
 
 Sprite::Sprite(const Sprite& sprite) :
-	al_(sprite.al_), is_alive_(true), is_running_(false),
 	x_size_(sprite.x_size_), y_size_(sprite.y_size_),
-	reset_position_(sprite.reset_position_),
-	pos_(sprite.pos_),
-	current_al_(nullptr),
 	z_order_(sprite.z_order_)
 {
 	set_texture(sprite.texture());
 	init();
 }
 
-void Sprite::draw_impl(Context& context)
-{
-	if (!is_running_)
-		execute(0);
-
-	Node::draw_impl(context);
-}
-
-void Sprite::update_impl(cmn::uint tick)
-{
-	if (!current_al_) return;
-	size_t current_index = current_al_->index();
-	AnimationListBase::AnimationChangeType ct = current_al_->update(tick);
-	if (ct != AnimationListBase::no_change)
-	{
-		if (ct == AnimationListBase::last_animation)
-		{
-			// hack - animation list can be changed in AnimationList delegate
-			if (current_index == current_al_->index())
-			{
-				current_al_ = 0;
-				is_alive_ = false;
-			}
-			return;
-		}
-		// new frame
-		current_al_->update_node(this);  
-		update_buffers();
-	}
-}
-
 Node* Sprite::clone_impl() const
 {
 	Sprite* cloned = new Sprite(*this);
-	cloned->is_alive_ = true;
-	cloned->is_running_ = false;
-	cloned->current_al_ = nullptr;
 	return cloned;
 }
 
-void Sprite::add_animation_list(AnimationListBase* al)
+void Sprite::on_texture_changed()
 {
-	bool empty = al_.empty();
-	al_[al->index()] = boost::shared_ptr<AnimationListBase>(al);
-	if (empty)
-		execute(al->index());
-}
-
-void Sprite::execute(cmn::uint index)
-{
-	DEBUG_LOG("Sprite::execute() name=" << name() << " index=" << index);
-	is_running_ = true;
-	almap::iterator it = al_.find(index);
-	if (it == al_.end())
-	{
-		if (texture() != nullptr)
-			update_buffers();
-		return;
-	}
-	current_al_ = it->second.get();
-	current_al_->update_node(this);
 	update_buffers();
-	current_al_->start(utils::get_current_tick());
 }
 
 float Sprite::width() const
@@ -117,8 +59,6 @@ void Sprite::init()
 	set_mask_z_buffer();
 	set_blending_enabled();
 	set_blend_mode(alpha_one_minus_alpha);
-
-	DEBUG_LOG("Create sprite " << name() << " with animationLists number:" << al_.size());
 }
 
 void Sprite::update_buffers()

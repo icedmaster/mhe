@@ -8,7 +8,7 @@ public:
 	{}
 
 private:
-	bool init_impl(const std::string& /*arg*/, void* /*prm*/)
+	bool init_impl(const mhe::utils::PropertiesList&)
 	{
 		const boost::shared_ptr<mhe::TextureAtlas>& atlas = 
 			get_engine()->context().texture_atlas_manager().get("../../../assets/test_atlas.atlas");
@@ -41,7 +41,7 @@ int main(int /*argc*/, char** /*argv*/)
 	proj.set_ortho(0, 800, 0, 600, -1, 1);
 	engine.context().driver().set_projection_matrix(proj);
 	boost::shared_ptr<TestGameScene> game_scene(new TestGameScene(&engine));
-	game_scene->init("", nullptr);
+	game_scene->init();
 	engine.set_game_scene(game_scene);
 	engine.run();
 

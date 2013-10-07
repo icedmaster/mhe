@@ -33,7 +33,14 @@ namespace mhe
 		x = x | (x >> 8);
 		x = x | (x >> 16);
 		return x + 1;
-	}	
+	}
+
+template <class T>
+inline T lerp(const T& begin, const T& end, float value)
+{
+	return begin + (end - begin) * value;
+}
+
 };
 
 #endif

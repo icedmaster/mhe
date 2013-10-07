@@ -6,6 +6,7 @@
 #include <sstream>
 #include <cassert>
 #include <algorithm>
+#include "compiler.hpp"
 
 namespace mhe {
 
@@ -34,12 +35,6 @@ struct assert_reallocation_policy
 
 }	// detail
 
-#ifdef _MSC_VER
-#define FUNCTION_DESCRIPTION_MACRO						__FUNCSIG__
-#else
-#define FUNCTION_DESCRIPTION_MACRO						__PRETTY_FUNCTION__
-#endif
-
 #define DEFAULT_REALLOCATION_POLICY			detail::default_reallocation_policy
 
 template <class T, size_t count, class reallocation_policy = DEFAULT_REALLOCATION_POLICY>
@@ -62,8 +57,8 @@ public:
 	}
 
 	fixed_size_vector(size_t size) :
-		begin_(elements_), capacity_(count)
-	{
+		begin_(elements_), size_(0), capacity_(count)
+	{		
 		resize(size);
 	}
 
@@ -176,6 +171,7 @@ public:
 
 	void resize(size_t new_size)
 	{
+		size_t sz = size_;
 		if (new_size > capacity_)
 			reallocate_vector(new_size);
 		size_ = new_size;
@@ -205,6 +201,16 @@ public:
 		size_t erased_count = 0;
 		for (; first != last; ++first) ++erased_count;
 		return erase_impl(index, erased_count);
+	}
+
+	// optimization, use this methods carefully
+	iterator next_predefined_element()
+	{
+		size_t index = size_;		
+		if (index >= capacity_)
+			return end();
+		++size_;
+		return begin_ + index;
 	}
 
 	// operators

@@ -13,6 +13,15 @@ Node::Node() :
 {
 }
 
+Node::Node(size_t vertexes_number, size_t indexes_number, size_t texcoord_number) :
+	Renderable(vertexes_number, indexes_number, texcoord_number),
+	priority_(priority_normal),
+	parent_(nullptr),
+	flags_(visible | alive),
+	dirty_(false)
+{}
+
+
 void Node::add_node(const boost::shared_ptr<Node>& node)
 {
 	children_.push_back(node);

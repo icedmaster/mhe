@@ -1,6 +1,7 @@
 #include "platform/opengl3/opengl3_shader_program.hpp"
 
 #include "platform/opengl/opengl_extension.hpp"
+#include "platform/opengl/mhe_gl.hpp"
 #include "utils/global_log.hpp"
 
 namespace mhe {
@@ -78,11 +79,11 @@ void OpenGL3ShaderProgram::remove_program()
 }
 
 bool OpenGL3ShaderProgram::set_uniform(const std::string& name, const matrixf& value)
-{
+{	
     GLint uniform_position = OpenGLExtensions::instance().glGetUniformLocation(id_, name.c_str());
     if (uniform_position >= 0)
     {
-        OpenGLExtensions::instance().glUniformMatrix4fv(uniform_position, 1, GL_FALSE, value.get());
+        OpenGLExtensions::instance().glUniformMatrix4fv(uniform_position, 1, GL_FALSE, value.get());		
         return true;
     }
     return false;

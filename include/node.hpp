@@ -11,11 +11,9 @@
 
 namespace mhe
 {
-// Base renderable class
+
 class Node : public Renderable
 {	
-	friend class cene;
-
 	static const size_t default_texcoord_size = 8;
 public:
 	enum
@@ -33,6 +31,8 @@ public:
 	};
 public:
 	Node();
+	Node(size_t vertexes_number, size_t indexes_number, size_t texcoord_number);
+
 	virtual ~Node() {}
 
 	void draw(Context& context)												

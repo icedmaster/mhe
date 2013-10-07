@@ -2,6 +2,7 @@
 #define _GAME_SCENE_HPP_
 
 #include "scene.hpp"
+#include "utils/properties_list.hpp"
 
 namespace mhe {
 namespace game {
@@ -19,9 +20,9 @@ public:
 
 	virtual ~GameScene() {}
 				
-	bool init(const std::string& arg, void* add_arg = 0)
+	bool init(const mhe::utils::PropertiesList& plist = mhe::utils::PropertiesList::empty())
 	{
-		return init_impl(arg, add_arg);
+		return init_impl(plist);
 	}
 
 	void deinit();
@@ -78,7 +79,7 @@ protected:
 
 	virtual void free_resources();
 private:
-	virtual bool init_impl(const std::string&, void*) {return true;}
+	virtual bool init_impl(const mhe::utils::PropertiesList& /*plist*/) {return true;}
 	virtual void deinit_impl() {}
 	virtual bool process_impl() {return true;}
 	virtual void draw_impl() {}

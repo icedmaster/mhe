@@ -106,7 +106,7 @@ public:
 		return true;
 	}
 private:
-	bool init_impl(const std::string&, void*)
+	bool init_impl(const mhe::utils::PropertiesList&)
 	{
 		mhe::Camera* camera = new mhe::Camera;
 		mhe::matrixf m;
@@ -115,7 +115,7 @@ private:
 		camera->set(mhe::vector3<float>(0, 0, 10), mhe::vector3<float>(), mhe::y_axis);
 		camera->enable_each_frame_updating(true);
 		scene()->add_camera(camera, true);
-
+		
 		get_engine()->font_manager().set_path("../../../assets/fonts/");
 		stats_component_.reset(new mhe::game::utils::StatsComponent(scene(), engine()));
 		engine()->component_manager().add(stats_component_);
@@ -129,6 +129,7 @@ private:
 		engine()->event_manager().add_listener(new mhe::DelegateEventListener(mhe::keyboard_event_type,
 																			  mhe::KeyboardEvent::key_down, mhe::Event::any_event,
 																			  mhe::create_delegate(this, &TestScene::process_key)));
+		mouse_ = engine()->event_manager().get_device<mhe::MouseDevice>();
 		return true;
 	}
 
@@ -142,6 +143,7 @@ private:
 			std::cout << mhe::utils::Profiler::instance() << std::endl;
 			mhe::utils::Profiler::instance().reset();
 		}
+		
 		return true;
 	}
 
@@ -151,6 +153,7 @@ private:
 
 	mhe::game::component_ptr stats_component_;
 	cmn::uint prev_time_;
+	boost::shared_ptr<mhe::MouseDevice> mouse_;
 };
 
 int main(int /*argc*/, char** /*argv*/)
@@ -166,10 +169,11 @@ int main(int /*argc*/, char** /*argv*/)
 	// set scene
 	boost::shared_ptr<TestScene> scene(new TestScene(&app.engine()));
 	app.engine().set_game_scene(scene);
-	scene->init("", nullptr);
 
 	app.engine().event_manager().add_device(new mhe::MouseDevice("mouse"));
 	app.engine().event_manager().add_device(new mhe::KeyboardDevice("keyb"));
+
+	scene->init();
 
 	// run application
 	return app.run();

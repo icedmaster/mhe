@@ -7,7 +7,7 @@ public:
 		mhe::game::GameScene(engine)
 	{}
 private:
-	bool init_impl(const std::string&, void*)
+	bool init_impl(const mhe::utils::PropertiesList&)
 	{
 		engine()->context().texture_manager().set_path("../../../assets/");
 		mhe::Sprite* sprite = mhe::utils::create_sprite("test_sprite.png", engine()->context());
@@ -57,7 +57,7 @@ int main(int, char**)
 	app.init(config);
 	boost::shared_ptr<TestScene> scene(new TestScene(&app.engine()));
 	app.engine().set_game_scene(scene);
-	scene->init("", nullptr);
+	scene->init();
 
 	return app.run();
 }
