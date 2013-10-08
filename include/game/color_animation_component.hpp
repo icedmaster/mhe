@@ -9,10 +9,14 @@ namespace game {
 
 class ColorAnimationComponent : public LinearAnimationComponent<colorf>
 {
+public:
+	ColorAnimationComponent(cmn::uint duration, const std::string& name, const std::string& add_name) :
+		LinearAnimationComponent<colorf>(duration, name, add_name)
+	{}
 private:
 	void send_message(const colorf& value)
 	{
-		send_message(ColorMessage(value, this));
+		Component::send_message(ColorMessage(value, this));
 	}
 };
 

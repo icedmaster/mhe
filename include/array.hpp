@@ -65,7 +65,7 @@ public:
 
 	T at(size_t index) const
 	{
-		assert(index < size_);
+		assert(index < count);
 		return elements_[index];
 	}
 

@@ -1,7 +1,6 @@
 #include "utils/graphics_utils.hpp"
 
 #include "sprite.hpp"
-#include "animation_list.hpp"
 #include "texture_animation.hpp"
 
 namespace mhe {

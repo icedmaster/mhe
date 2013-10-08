@@ -53,7 +53,7 @@ int main(int /*argc*/, char** /*argv*/)
 	proj.set_ortho(0, 800, 0, 600, -1, 1);
 	engine.context().driver().set_projection_matrix(proj);
 	boost::shared_ptr<TestGameScene> game_scene(new TestGameScene(&engine));
-	game_scene->init("", nullptr);
+	game_scene->init();
 	engine.set_game_scene(game_scene);
 	engine.run();
 

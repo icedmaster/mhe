@@ -36,6 +36,11 @@ public:
 		running_ = false;
 	}
 
+	bool running() const
+	{
+		return running_;
+	}
+
 	void update(cmn::uint tick)
 	{
 		if (!running_) return;
@@ -45,7 +50,7 @@ public:
 			stop();
 			return;
 		}
-		update_impl(static_cast<float>(delta) / atime_);
+		update_animation_impl(static_cast<float>(delta) / atime_);
 	}
 
 	float current_value() const
@@ -55,7 +60,7 @@ public:
 		return static_cast<float>(now - start_) / atime_;
 	}
 private:
-	virtual void update_impl(float value) = 0;
+	virtual void update_animation_impl(float value) = 0;
 
 	cmn::uint atime_;    // time of playing current animation
 	cmn::uint start_;

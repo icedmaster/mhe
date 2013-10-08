@@ -11,7 +11,11 @@ template <class T>
 class LinearAnimationComponent : public AnimationComponent
 {
 public:
-	virtual LinearAnimationComponent() {}
+	LinearAnimationComponent(cmn::uint duration, const std::string& name, const std::string& add_name) :
+		AnimationComponent(duration ,name, add_name)
+	{}
+
+	virtual ~LinearAnimationComponent() {}
 
 	void set_range(const T& from, const T& to)
 	{
@@ -23,10 +27,15 @@ public:
 	{
 		return lerp(from_, to_, Animation::current_value());
 	}
-private:
-	void update_impl(float value)
+
+	T value(float v) const
 	{
-		const T& result = current_value();
+		return lerp(from_, to_, v);
+	}
+private:
+	void update_animation_impl(float v)
+	{
+		const T& result = value(v);
 		send_message(result);
 	}
 

@@ -3,7 +3,6 @@
 
 #include <vector>
 #include <map>
-#include "animation_list_base.hpp"
 #include "node.hpp"
 
 namespace mhe

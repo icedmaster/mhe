@@ -171,7 +171,6 @@ public:
 
 	void resize(size_t new_size)
 	{
-		size_t sz = size_;
 		if (new_size > capacity_)
 			reallocate_vector(new_size);
 		size_ = new_size;

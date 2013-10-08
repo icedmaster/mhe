@@ -179,7 +179,7 @@ public:
 		return vv;
 	}
 
-	vector4& operator+ (const vector4& v)
+	vector4 operator+ (const vector4& v) const
 	{
 		vector4 vv = *this;
 		return vv += v;

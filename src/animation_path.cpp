@@ -6,7 +6,7 @@ namespace mhe {
 
 void AnimationPath::add(Animation* animation)
 {
-	animations_.add(animation_ptr(animation));
+	animations_.push_back(animation_ptr(animation));
 	total_duration_ += animation->duration();
 }
 
@@ -22,7 +22,7 @@ AnimationPath::animation_ptr AnimationPath::get_normalized(float value) const
 	float begin = 0.0;
 	for (size_t i = 0; i < animations_.size(); ++i)
 	{
-		total += animation_->duration();
+		total += animations_[i]->duration();
 		float end = static_cast<float>(total) / total_duration_;
 		if ( (value >= begin) && (value < end) )
 			return animations_[i];
@@ -43,10 +43,10 @@ void AnimationPath::stop()
 	started_ = false;
 }
 	
-void update(cmn::uint tick)
+void AnimationPath::update(cmn::uint tick)
 {
 	if (!started_) return;
-	if ( (tick - start_tick_) > animations_[current]->duration() )
+	if ( (tick - start_tick_) > animations_[current_]->duration() )
 	{
 		if (++current_ == animations_.size()) // last
 		{
@@ -59,7 +59,7 @@ void update(cmn::uint tick)
 		}
 		start_tick_ = tick;
 	}
-	animations_[current]->update(tick);
+	animations_[current_]->update(tick);
 }
 
 }

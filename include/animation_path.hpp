@@ -18,7 +18,7 @@ public:
 	AnimationPath() :
 		current_(0),
 		total_duration_(0),
-		start_tick_(0)
+		start_tick_(0),
 		started_(false),
 		loop_(false)
 	{}

@@ -5,27 +5,21 @@ class TestGameScene : public mhe::game::GameScene
 public:
 	TestGameScene(mhe::game::Engine* engine) :
 		mhe::game::GameScene(engine),
-		timer_(1000), frames_(0),
-		current_animation_(0)
+		timer_(1000), frames_(0)
 	{}
-
-	void on_animation_end(mhe::AnimationListBase* /*animation_list*/,
-						  mhe::AnimationListBase::AnimationChangeType change_type)
-	{
-		if (change_type != mhe::AnimationListBase::last_animation) return;
-		DEBUG_LOG("animation end:" << change_type);
-		set_next_animation();
-	}
 private:
 	bool init_impl(const mhe::utils::PropertiesList&)
 	{
-		sprite_.reset(new mhe::Sprite);
-		sprite_->set_texture(get_engine()->context().texture_manager().get("../../../assets/test_sprite.png"));
-		add_linear_color_animation();
-		add_position_animation();
-		scene()->add(sprite_);
+		engine()->context().texture_manager().set_path("../../../assets/");
+		mhe::Sprite* sprite = new mhe::Sprite;
+		sprite->set_texture(engine()->context().texture_manager().get("test_sprite.png"));
+		mhe::game::NodeComponent* node = new mhe::game::NodeComponent("sprite", "node", sprite, scene());
+		color_animation_.reset(new mhe::game::ColorAnimationComponent(1000, "sprite", "animation"));
+		color_animation_->set_range(mhe::color_white, mhe::color_black);
+		node->attach(color_animation_);
+		color_animation_->start();
+		engine()->component_manager().add(node);
 		timer_.start();
-		set_next_animation();
 		return true;
 	}
 
@@ -41,38 +35,14 @@ private:
 			timer_.start();
 		}
 		else ++frames_;
+		if (!color_animation_->running())
+			color_animation_->start();
 		return true;
 	}
 
-	void add_linear_color_animation()
-	{
-		mhe::ColorLinearAnimationList* al = new mhe::ColorLinearAnimationList(0);
-		al->set_range(mhe::color_white, mhe::color_black, 100, 2000);
-		sprite_->add_animation_list(al);
-		al->add_delegate(mhe::create_delegate(this, &TestGameScene::on_animation_end));
-	}
-
-	void add_position_animation()
-	{
-		mhe::TransformLinearAnimationList* al = new mhe::TransformLinearAnimationList(1);
-		al->set_translate_animation(mhe::v3d(300, 300, 0), 100, 2000);
-		sprite_->add_animation_list(al);
-		al->add_delegate(mhe::create_delegate(this, &TestGameScene::on_animation_end));
-	}
-
-	void set_next_animation()
-	{
-		sprite_->set_color(mhe::color_white);
-		sprite_->identity();
-		sprite_->execute(current_animation_++);
-		if (current_animation_ >= 2)
-			current_animation_ = 0;
-	}
-
 	mhe::utils::Timer timer_;
+	boost::shared_ptr<mhe::game::ColorAnimationComponent> color_animation_;
 	cmn::uint frames_;
-	boost::shared_ptr<mhe::Sprite> sprite_;
-	size_t current_animation_;
 };
 
 int main(int /*argc*/, char** /*argv*/)

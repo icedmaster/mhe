@@ -12,6 +12,7 @@ class ComponentManager
 {
 public:
 	void add(const component_ptr& component);
+	void add(Component* component);
 	component_ptr get(const std::string& full_name) const;
 
 	void update(cmn::uint tick, Engine* engine);

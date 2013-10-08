@@ -12,6 +12,11 @@ void ComponentManager::add(const component_ptr& component)
 	components_.insert(std::make_pair(component->full_name(), component));
 }
 
+void ComponentManager::add(Component* component)
+{
+	add(component_ptr(component));
+}
+
 component_ptr ComponentManager::get(const std::string& fullname) const
 {
 	component_map::const_iterator it = components_.find(fullname);
