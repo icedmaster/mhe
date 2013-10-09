@@ -13,12 +13,19 @@ private:
 		engine()->context().texture_manager().set_path("../../../assets/");
 		mhe::Sprite* sprite = new mhe::Sprite;
 		sprite->set_texture(engine()->context().texture_manager().get("test_sprite.png"));
-		mhe::game::NodeComponent* node = new mhe::game::NodeComponent("sprite", "node", sprite, scene());
+		node_.reset(new mhe::game::NodeComponent("sprite", "node", sprite, scene()));
 		color_animation_.reset(new mhe::game::ColorAnimationComponent(1000, "sprite", "animation"));
 		color_animation_->set_range(mhe::color_white, mhe::color_black);
-		node->attach(color_animation_);
+		node_->attach(color_animation_);
+		
+		transform_animation_.reset(new mhe::game::TransformAnimationComponent(1000, "sprite", "transform"));
+		transform_animation_->set_range(mhe::matrixf::identity(), mhe::matrixf::translation_matrix(100, 100, 0));
+		node_->attach(transform_animation_);
+
 		color_animation_->start();
-		engine()->component_manager().add(node);
+		transform_animation_->start();
+
+		engine()->component_manager().add(node_);
 		timer_.start();
 		return true;
 	}
@@ -37,11 +44,15 @@ private:
 		else ++frames_;
 		if (!color_animation_->running())
 			color_animation_->start();
+		if (!transform_animation_->running())
+			transform_animation_->start();
 		return true;
 	}
 
 	mhe::utils::Timer timer_;
+	boost::shared_ptr<mhe::game::NodeComponent> node_;
 	boost::shared_ptr<mhe::game::ColorAnimationComponent> color_animation_;
+	boost::shared_ptr<mhe::game::TransformAnimationComponent> transform_animation_;
 	cmn::uint frames_;
 };
 

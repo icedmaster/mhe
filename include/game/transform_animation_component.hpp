@@ -7,12 +7,16 @@
 namespace mhe {
 namespace game {
 
-class TransformAnimationComponent : public LinearAnimationList<matrixf>
+class TransformAnimationComponent : public LinearAnimationComponent<matrixf>
 {
+public:
+	TransformAnimationComponent(cmn::uint duration, const std::string& name, const std::string& add_name) :
+		LinearAnimationComponent<matrixf>(duration, name, add_name)
+	{}
 private:
 	void send_message(const matrixf& value)
 	{	
-		send_message(TransformMessage(value, this));
+		Component::send_message(TransformMessage(value, this));
 	}
 };
 

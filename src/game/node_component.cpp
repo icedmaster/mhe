@@ -23,7 +23,7 @@ bool NodeComponent::update_impl(const Message& message)
 
 void NodeComponent::process_transform_event(const TransformMessage& message)
 {
-	node_->apply_transform(message.transform());
+	node_->set_transform(message.transform());
 }
 
 void NodeComponent::process_enable_event(const EnableMessage& message)

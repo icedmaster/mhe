@@ -9,6 +9,7 @@
 #include "game/observer_component.hpp"
 #include "game/stats_component.hpp"
 #include "game/color_animation_component.hpp"
+#include "game/transform_animation_component.hpp"
 #include "game/message_transform.hpp"
 
 #endif
