@@ -11,8 +11,8 @@ template <class T>
 class LinearAnimationComponent : public AnimationComponent
 {
 public:
-	LinearAnimationComponent(cmn::uint duration, const std::string& name, const std::string& add_name) :
-		AnimationComponent(duration ,name, add_name)
+	LinearAnimationComponent(cmn::uint duration, const std::string& name) :
+		AnimationComponent(duration ,name)
 	{}
 
 	virtual ~LinearAnimationComponent() {}

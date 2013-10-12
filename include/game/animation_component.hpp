@@ -12,13 +12,13 @@ class AnimationComponent : public Component, public Animation
 public:
 	virtual ~AnimationComponent() {}
 protected:
-	AnimationComponent(const std::string& name, const std::string& add_name) :
-		Component(name, add_name), Animation(),
+	AnimationComponent(const std::string& name) :
+		Component(name), Animation(),
 		detach_on_completion_(false)
 	{}
 
-	AnimationComponent(cmn::uint duration, const std::string& name, const std::string& add_name) :
-		Component(name, add_name), Animation(duration),
+	AnimationComponent(cmn::uint duration, const std::string& name) :
+		Component(name), Animation(duration),
 		detach_on_completion_(false)
 	{}
 private:

@@ -10,10 +10,15 @@ namespace game {
 class ColorAnimationComponent : public LinearAnimationComponent<colorf>
 {
 public:
-	ColorAnimationComponent(cmn::uint duration, const std::string& name, const std::string& add_name) :
-		LinearAnimationComponent<colorf>(duration, name, add_name)
+	ColorAnimationComponent(cmn::uint duration, const std::string& name) :
+		LinearAnimationComponent<colorf>(duration, name)
 	{}
 private:
+	std::string add_name_impl() const
+	{
+		return "color_animation";
+	}
+
 	void send_message(const colorf& value)
 	{
 		Component::send_message(ColorMessage(value, this));

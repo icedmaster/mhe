@@ -13,12 +13,12 @@ private:
 		engine()->context().texture_manager().set_path("../../../assets/");
 		mhe::Sprite* sprite = new mhe::Sprite;
 		sprite->set_texture(engine()->context().texture_manager().get("test_sprite.png"));
-		node_.reset(new mhe::game::NodeComponent("sprite", "node", sprite, scene()));
-		color_animation_.reset(new mhe::game::ColorAnimationComponent(1000, "sprite", "animation"));
+		node_.reset(new mhe::game::NodeComponent("sprite", sprite, scene()));
+		color_animation_.reset(new mhe::game::ColorAnimationComponent(1000, "sprite"));
 		color_animation_->set_range(mhe::color_white, mhe::color_black);
 		node_->attach(color_animation_);
 		
-		transform_animation_.reset(new mhe::game::TransformAnimationComponent(1000, "sprite", "transform"));
+		transform_animation_.reset(new mhe::game::TransformAnimationComponent(1000, "sprite"));
 		transform_animation_->set_range(mhe::matrixf::identity(), mhe::matrixf::translation_matrix(100, 100, 0));
 		node_->attach(transform_animation_);
 
@@ -53,11 +53,11 @@ private:
 
 	void init_second_node()
 	{
-		node2_.reset(new mhe::game::NodeComponent("node2", "node", node_->node()->clone(), scene()));
+		node2_.reset(new mhe::game::NodeComponent("node2", node_->node()->clone(), scene()));
 		node2_->node()->translate_to(mhe::vector3<float>(600, 200, 0));
 		engine()->component_manager().add(node2_);
 
-		transform_animation2_.reset(new mhe::game::TranslateByAnimationComponent(1000, "node2", "translate_by"));
+		transform_animation2_.reset(new mhe::game::TranslateByAnimationComponent(1000, "node2"));
 		transform_animation2_->set_translation(-100, -100, 0);
 		node2_->attach(transform_animation2_);
 		transform_animation2_->start();

@@ -10,8 +10,8 @@ namespace game {
 class MoveAnimationComponent : public AnimationComponent
 {
 public:
-	MoveAnimationComponent(cmn::uint duration, const std::string& name, const std::string& add_name) :
-		AnimationComponent(duration, name, add_name),
+	MoveAnimationComponent(cmn::uint duration, const std::string& name) :
+		AnimationComponent(duration, name),
 		parent_node_(nullptr)
 	{}
 
@@ -31,8 +31,8 @@ private:
 class TranslateByAnimationComponent : public MoveAnimationComponent
 {
 public:
-	TranslateByAnimationComponent(cmn::uint duration, const std::string& name, const std::string& add_name) :
-		MoveAnimationComponent(duration, name, add_name)
+	TranslateByAnimationComponent(cmn::uint duration, const std::string& name) :
+		MoveAnimationComponent(duration, name)
 	{}
 
 	virtual ~TranslateByAnimationComponent() {}
@@ -62,6 +62,11 @@ protected:
 		return initial_position_;
 	}
 private:
+	std::string add_name_impl() const
+	{
+		return "translate_by";
+	}
+
 	void update_animation_impl(float v);
 private:
 	vector3<float> initial_position_;
@@ -71,10 +76,15 @@ private:
 class TranslateToAnimationComponent : public TranslateByAnimationComponent
 {
 public:
-	TranslateToAnimationComponent(cmn::uint duration, const std::string& name, const std::string& add_name) :
-		TranslateByAnimationComponent(duration, name, add_name)
+	TranslateToAnimationComponent(cmn::uint duration, const std::string& name) :
+		TranslateByAnimationComponent(duration, name)
 	{}
 private:
+	std::string add_name_impl() const
+	{
+		return "translate_to";
+	}
+
 	void start_impl()
 	{
 		TranslateByAnimationComponent::start_impl();
@@ -86,8 +96,8 @@ private:
 class RotateByAnimationComponent : public MoveAnimationComponent
 {
 public:
-	RotateByAnimationComponent(cmn::uint duration, const std::string& name, const std::string& add_name) :
-		MoveAnimationComponent(duration, name, add_name)
+	RotateByAnimationComponent(cmn::uint duration, const std::string& name) :
+		MoveAnimationComponent(duration, name)
 	{}
 
 	virtual ~RotateByAnimationComponent() {}
@@ -117,6 +127,11 @@ protected:
 		return initial_rotation_;
 	}
 private:
+	std::string add_name_impl() const
+	{
+		return "rotate_by";
+	}
+
 	void update_animation_impl(float v);
 private:
 	vector3<float> initial_rotation_;
@@ -126,10 +141,15 @@ private:
 class RotateToAnimationComponent : public RotateByAnimationComponent
 {
 public:
-	RotateToAnimationComponent(cmn::uint duration, const std::string& name, const std::string& add_name) :
-		RotateByAnimationComponent(duration, name, add_name)
+	RotateToAnimationComponent(cmn::uint duration, const std::string& name) :
+		RotateByAnimationComponent(duration, name)
 	{}
 private:
+	std::string add_name_impl() const
+	{
+		return "rotate_to";
+	}
+
 	void start_impl()
 	{
 		RotateByAnimationComponent::start_impl();
@@ -141,8 +161,8 @@ private:
 class ScaleByAnimationComponent : public MoveAnimationComponent
 {
 public:
-	ScaleByAnimationComponent(cmn::uint duration, const std::string& name, const std::string& add_name) :
-		MoveAnimationComponent(duration, name, add_name)
+	ScaleByAnimationComponent(cmn::uint duration, const std::string& name) :
+		MoveAnimationComponent(duration, name)
 	{}
 
 	virtual ~ScaleByAnimationComponent() {}
@@ -172,6 +192,11 @@ protected:
 		return initial_scale_;
 	}
 private:
+	std::string add_name_impl() const
+	{
+		return "scale_by";
+	}
+
 	void update_animation_impl(float v);
 private:
 	vector3<float> initial_scale_;
@@ -181,10 +206,15 @@ private:
 class ScaleToAnimationComponent : public ScaleByAnimationComponent
 {
 public:
-	ScaleToAnimationComponent(cmn::uint duration, const std::string& name, const std::string& add_name) :
-		ScaleByAnimationComponent(duration, name, add_name)
+	ScaleToAnimationComponent(cmn::uint duration, const std::string& name) :
+		ScaleByAnimationComponent(duration, name)
 	{}
 private:
+	std::string add_name_impl() const
+	{
+		return "scale_to";
+	}
+
 	void start_impl()
 	{
 		ScaleByAnimationComponent::start_impl();

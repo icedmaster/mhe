@@ -10,10 +10,15 @@ namespace game {
 class TransformAnimationComponent : public LinearAnimationComponent<matrixf>
 {
 public:
-	TransformAnimationComponent(cmn::uint duration, const std::string& name, const std::string& add_name) :
-		LinearAnimationComponent<matrixf>(duration, name, add_name)
+	TransformAnimationComponent(cmn::uint duration, const std::string& name) :
+		LinearAnimationComponent<matrixf>(duration, name)
 	{}
 private:
+	std::string add_name_impl() const
+	{
+		return "transform";
+	}
+
 	void send_message(const matrixf& value)
 	{	
 		Component::send_message(TransformMessage(value, this));

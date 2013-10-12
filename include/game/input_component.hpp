@@ -15,8 +15,8 @@ namespace game {
 class BaseInputComponent : public Component, public EventListener
 {
 public:
-	BaseInputComponent(const std::string& name, const std::string& add_name) :
-		Component(name, add_name), EventListener()
+	BaseInputComponent(const std::string& name) :
+		Component(name), EventListener()
 	{}
 
 	virtual ~BaseInputComponent() {}
@@ -33,8 +33,8 @@ private:
 class KeyboardInputComponent : public BaseInputComponent
 {
 public:
-	KeyboardInputComponent(const std::string& name, const std::string& add_name) :
-		BaseInputComponent(name, add_name)
+	KeyboardInputComponent(const std::string& name) :
+		BaseInputComponent(name)
 	{}
 
 	virtual ~KeyboardInputComponent() {}
@@ -61,14 +61,14 @@ private:
 class MouseInputComponent : public BaseInputComponent
 {
 public:
-	MouseInputComponent(const std::string& name, const std::string& add_name) :
-		BaseInputComponent(name, add_name),
+	MouseInputComponent(const std::string& name) :
+		BaseInputComponent(name),
 		mouse_on_(false)
 	{}
 
-	MouseInputComponent(const std::string& name, const std::string& add_name, 
+	MouseInputComponent(const std::string& name, 
 						const rect<float>& rect) :
-		BaseInputComponent(name, add_name),
+		BaseInputComponent(name),
 		rect_(rect), mouse_on_(false)
 	{}
 

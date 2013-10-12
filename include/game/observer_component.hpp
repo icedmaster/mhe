@@ -13,9 +13,8 @@ namespace game {
 class ObserverComponent : public Component
 {
 public:
-	ObserverComponent(const std::string& name,
-					  const std::string& add_name) :
-		Component(name, add_name)
+	ObserverComponent(const std::string& name) :
+		Component(name)
 	{}
 
 	void add(const component_ptr& component)
@@ -28,6 +27,11 @@ public:
 		return components_.size();
 	}
 private:
+	std::string add_name_impl() const
+	{
+		return "observer";
+	}
+
 	void do_subscribe(Component* /*parent*/)
 	{}
 

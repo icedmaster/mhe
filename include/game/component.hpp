@@ -31,14 +31,14 @@ public:
 		return name_;
 	}
 
-	const std::string& add_name() const
+	std::string add_name() const
 	{
-		return add_name_;
+		return add_name_impl();
 	}
 
 	std::string full_name() const
 	{
-		return name_ + "." + add_name_;
+		return name_ + "." + add_name();
 	}
 
 	void attach(component_ptr component);
@@ -97,16 +97,8 @@ public:
 		return nullptr;
 	}
 protected:
-	Component(const std::string& fullname) :
-		parent_(nullptr), root_(nullptr),
-		lifetime_(lifetime_infinite),
-		start_time_(0)
-	{
-		divide_full_name(fullname);
-	}
-
-	Component(const std::string& name, const std::string& add_name) :
-        name_(name), add_name_(add_name), parent_(nullptr), root_(nullptr),
+	Component(const std::string& name) :
+        name_(name), parent_(nullptr), root_(nullptr),
 		lifetime_(lifetime_infinite), start_time_(0)
 	{}
 
@@ -135,6 +127,7 @@ protected:
 private:
 	virtual void on_attach(Component* /*component*/) {}
 	virtual void on_detach(Component* /*component*/) {}
+	virtual std::string add_name_impl() const = 0;
 
 	void divide_full_name(const std::string& fullname)
 	{

@@ -14,7 +14,7 @@ class StatsComponent : public Component
 {
 public:
 	StatsComponent(const boost::shared_ptr<Scene>& scene, Engine* engine) :
-		Component("globals", "stats"),
+		Component("globals"),
 		label_(nullptr),
 		prev_tick_(0)
 	{
@@ -26,6 +26,11 @@ public:
 		scene_->parent()->remove_subscene(scene_.get());
 	}
 private:
+	std::string add_name_impl() const
+	{
+		return "stats";
+	}
+
 	void do_subscribe(Component* /*component*/) {}
 	bool update_impl(const Message& /*message*/) 
 	{
