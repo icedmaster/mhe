@@ -29,11 +29,13 @@ public:
 	{
 		running_ = true;
 		start_ = utils::get_current_tick();
+		start_impl();
 	}
 
 	void stop()
 	{
 		running_ = false;
+		stop_impl();
 	}
 
 	bool running() const
@@ -60,6 +62,8 @@ public:
 		return static_cast<float>(now - start_) / atime_;
 	}
 private:
+	virtual void start_impl() {}
+	virtual void stop_impl() {}
 	virtual void update_animation_impl(float value) = 0;
 
 	cmn::uint atime_;    // time of playing current animation

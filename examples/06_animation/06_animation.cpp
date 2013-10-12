@@ -26,6 +26,8 @@ private:
 		transform_animation_->start();
 
 		engine()->component_manager().add(node_);
+
+		init_second_node();
 		timer_.start();
 		return true;
 	}
@@ -49,10 +51,24 @@ private:
 		return true;
 	}
 
+	void init_second_node()
+	{
+		node2_.reset(new mhe::game::NodeComponent("node2", "node", node_->node()->clone(), scene()));
+		node2_->node()->translate_to(mhe::vector3<float>(600, 200, 0));
+		engine()->component_manager().add(node2_);
+
+		transform_animation2_.reset(new mhe::game::TranslateByAnimationComponent(1000, "node2", "translate_by"));
+		transform_animation2_->set_translation(-100, -100, 0);
+		node2_->attach(transform_animation2_);
+		transform_animation2_->start();
+	}
+
 	mhe::utils::Timer timer_;
 	boost::shared_ptr<mhe::game::NodeComponent> node_;
 	boost::shared_ptr<mhe::game::ColorAnimationComponent> color_animation_;
 	boost::shared_ptr<mhe::game::TransformAnimationComponent> transform_animation_;
+	boost::shared_ptr<mhe::game::NodeComponent> node2_;
+	boost::shared_ptr<mhe::game::TranslateByAnimationComponent> transform_animation2_;
 	cmn::uint frames_;
 };
 

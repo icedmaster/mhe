@@ -22,7 +22,7 @@ protected:
 		detach_on_completion_(false)
 	{}
 private:
-	void do_subscribe(Component* /*parent*/) {}
+	virtual void do_subscribe(Component* /*parent*/) {}
 	bool update_impl(const Message&)
 	{
 		return true;

@@ -199,11 +199,17 @@ inline vector3<T> cross(const vector3<T>& v1, const vector3<T>& v2)
 }
 
 template <class U, class T>
-vector3<T> operator* (U val, const vector3<T>& v)
+inline vector3<T> operator* (U val, const vector3<T>& v)
 {
 	vector3<T> vv(v);
 	vv *= static_cast<T>(val);
 	return vv;
+}
+
+template <class U, class T>
+vector3<T> operator* (const vector3<T>& v, U val)
+{
+	return val * v;
 }
 
 template <class T>

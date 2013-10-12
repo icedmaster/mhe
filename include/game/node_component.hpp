@@ -27,6 +27,11 @@ public:
 	{
 		scene_->remove(node_);
 	}
+
+	nodeptr node() const
+	{
+		return node_;
+	}
 private:
 	void do_subscribe(Component* parent);
 	bool update_impl(const Message& message);

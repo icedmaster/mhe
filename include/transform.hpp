@@ -97,13 +97,31 @@ public:
 	void translate_to(const v3d& position);
 	void translate_by(const v3d& position);
 	void rotate_to(float angle_x, float angle_y, float angle_z);
+	void rotate_to(const vector3<float>& angles)
+	{
+		rotate_to(angles.x(), angles.y(), angles.z());
+	}
 	void rotate_by(float angle_x, float angle_y, float angle_z);
 	void scale_to(float sx, float sy, float sz);
+	void scale_to(const vector3<float>& s)
+	{
+		scale_to(s.x(), s.y(), s.z());
+	}
 	void scale_by(float sx, float sy, float sz);
 
 	const vector3<float>& position() const
 	{
 		return position_;
+	}
+
+	const vector3<float>& rotation() const
+	{
+		return rotation_;
+	}
+
+	const vector3<float>& scaling() const
+	{
+		return scaling_;
 	}
 protected:
 	bool dirty() const

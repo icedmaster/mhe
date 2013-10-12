@@ -11,7 +11,7 @@ void Component::attach(component_ptr component)
 	component->set_parent(this);
 	component->root_ = (root_ == nullptr) ? this : root_;
 	component->do_subscribe(this);
-	on_attach(component.get());
+	on_attach(component.get());    
 }
 
 void Component::attach(component_ptr component, const std::vector<int>& types)
