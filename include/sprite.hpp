@@ -45,7 +45,7 @@ public:
 		return z_order_;
 	}
 private:
-	void on_texture_changed();
+	void on_material_changed();
 
 	Node* clone_impl() const;
 private:

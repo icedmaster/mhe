@@ -4,9 +4,13 @@
 #include "impl/abstract_video_driver_factory.hpp"
 #include "types.hpp"
 #include "opengles_driver.hpp"
+#include "opengles_shader_program.hpp"
 #include "../opengl/opengl_texture.hpp"
 
 namespace mhe {
+
+class ShaderProgram;
+
 namespace opengl {
 
 class OpenGLESVideoDriverFactory : public AbstractVideoDriverFactory
@@ -28,6 +32,11 @@ public:
 	}
 
 	Texture* create_multitexture() const
+	{
+		return nullptr;
+	}
+
+	ShaderProgram* create_shader_program() const
 	{
 		return nullptr;
 	}

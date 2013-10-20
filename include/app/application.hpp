@@ -56,7 +56,7 @@ protected:
 	virtual bool mhe_app_init(const ApplicationConfig& config);
 	virtual void mhe_app_deinit();
 	virtual int run_impl();
-	virtual void init_assets_path();
+	virtual void init_assets_path(const std::string& config_assets_path);
 
 	virtual std::string application_base_path() const
 	{

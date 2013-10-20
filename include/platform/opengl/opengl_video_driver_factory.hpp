@@ -30,6 +30,11 @@ public:
 	{
 		return new OpenGLMultiTexture;
 	}
+
+	ShaderProgram* create_shader_program() const
+	{
+		return nullptr;
+	}
 };
 
 }}

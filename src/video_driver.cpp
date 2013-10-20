@@ -1,6 +1,7 @@
 #include "video_driver.hpp"
 
 #include "renderable.hpp"
+#include "shader_utils.hpp"
 #include "impl/system_factory.hpp"
 
 namespace mhe {
@@ -61,22 +62,24 @@ void Driver::reset()
 
 void Driver::perform_batch()
 {	
-	boost::shared_ptr<Texture> last_texture;
+	Renderable* last_renderable = nullptr;
 	for (renderable_container::const_iterator it = renderable_elements_.begin();
 		 it != renderable_elements_.end(); ++it)
 	{
 		Renderable* renderable = *it;
-        assert(renderable->texture() != nullptr);
+        assert(renderable->material() != nullptr);
 		if ( renderable->is_batching_disabled() || 
-			 (last_texture == nullptr) || !last_texture->is_equal(*(renderable->texture()))
+			 (last_renderable == nullptr) || !last_renderable->is_material_equals(*renderable)
 			)
 		{
 			batched_container::iterator it = batched_.next_predefined_element();
 			if (it == batched_.end())
-				batched_.push_back(BatchedRenderable(false));
-			last_texture = renderable->texture();
-			batched_.back().set_texture(last_texture);	
-			batched_.back().clear();
+				batched_.push_back(BatchedRenderable());
+			last_renderable = renderable;
+			BatchedRenderable& current = batched_.back();
+			current.clear();
+			for (size_t i = 0; i < last_renderable->materials_number(); ++i)
+				current.add_material(last_renderable->material_at(i));
 		}
 		BatchedRenderable& current_batch = batched_.back();			
 		current_batch.attach(*renderable);
@@ -86,7 +89,6 @@ void Driver::perform_batch()
 void Driver::perform_render(const BatchedRenderable& renderable)
 {
 	set_render_flags(renderable);
-    renderable.texture()->prepare();
 
 	if (!impl_->support_buffered_render())
 	{
@@ -97,7 +99,6 @@ void Driver::perform_render(const BatchedRenderable& renderable)
 		impl_->end_draw();
 	}
 	else perform_buffered_render(renderable);
-	renderable.texture()->clean();
 	stats_.update(renderable);
 	clear_render_flags(renderable);
 }
@@ -107,13 +108,19 @@ void Driver::perform_buffered_render(const BatchedRenderable& renderable)
 	boost::scoped_ptr<RenderBuffer> buffer(impl_->create_render_buffer());
 	buffer->attach_data(vertex_position_attribute_name, renderable.vertexcoord().data(), renderable.vertexcoord().size());
 	buffer->attach_data(vertex_normal_attribute_name, renderable.normalscoord().data(), renderable.normalscoord().size());
-	buffer->attach_data(vertex_texcoord_attribute_name, renderable.texcoord().data(), renderable.texcoord().size());
 	buffer->attach_data(vertex_color_attribute_name, renderable.colorcoord().data(), renderable.colorcoord().size());
+	for (size_t i = 0; i < renderable.materials_number(); ++i)
+	{
+		const std::string& name = utils::name_for_texture_attribute(i);
+		const BatchedRenderable::texcoord_container& tc = renderable.texcoord_at(i);
+		const float* data = tc.data();
+		buffer->attach_data(name, data, tc.size());
+	}
 	if (!buffer->init()) return;
 	buffer->enable();
-	impl_->begin_draw(buffer.get());
+	impl_->begin_draw(buffer.get(), renderable.materials(), renderable.materials_number());
 	impl_->draw(renderable.indicies().data(), renderable.indicies().size());
-	impl_->end_draw(buffer.get());
+	impl_->end_draw(buffer.get(), renderable.materials_number());
 	buffer->disable();
 }
 

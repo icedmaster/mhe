@@ -3,23 +3,20 @@
 
 #include <vector>
 #include "types.hpp"
-#include "texture.hpp"
+#include "material.hpp"
 #include "transform.hpp"
 #include "fixed_size_vector.hpp"
 #include "engine_config.hpp"
 
 namespace mhe {
 
+class Driver;
+
 enum BlendMode
 {
 	no_blend,
 	alpha_one_minus_alpha,
 };
-
-const std::string vertex_position_attribute_name = "position";
-const std::string vertex_normal_attribute_name = "normals";
-const std::string vertex_color_attribute_name = "color";
-const std::string vertex_texcoord_attribute_name = "texcoord";
 
 template
 <size_t number_of_verteces = initial_number_of_verteces,
@@ -28,7 +25,7 @@ template
 >
 class RenderableBase : public Transform
 {
-	static const cmn::uint default_texcoord_size = 8;
+	friend class Driver;	
 public:
 	enum
 	{
@@ -43,14 +40,9 @@ public:
 	typedef fixed_size_vector<unsigned int, number_of_indexes> indexes_container;
 	typedef fixed_size_vector<float, number_of_texcoords> texcoord_container;
 public:
-	RenderableBase(bool default_initialization = false) :
+	RenderableBase() :
 		color_(color_white), render_flags_(0), blend_mode_(no_blend)
 	{ 
-		if (default_initialization)
-		{
-			texcoord_[0] = 0.0; texcoord_[1] = 0.0; texcoord_[2] = 0.0; texcoord_[3] = 1.0;
-			texcoord_[4] = 1.0; texcoord_[5] = 1.0; texcoord_[6] = 1.0; texcoord_[7] = 0.0;
-		}
 	}
 
 	RenderableBase(size_t vertexes_number, size_t indexes_number, size_t texcoord_number) :
@@ -60,18 +52,49 @@ public:
 		normalscoord_.reserve(vertexes_number);
 		colorcoord_.reserve(vertexes_number);
 		indicies_.reserve(indexes_number);
-		texcoord_.reserve(texcoord_number);
+		for (size_t i = 0; i < texcoord_.size(); ++i)
+			texcoord_[i].reserve(texcoord_number);
 	}
 
-	void set_texture(const boost::shared_ptr<Texture>& texture)
+	void set_material(const material_ptr& material)
 	{
-		texture_ = texture;
-		on_texture_changed();
+		materials_.resize(1);
+		texcoord_.resize(1);
+		materials_[0] = material;
+		on_material_changed();
+	}
+
+	void add_material(const material_ptr& material)
+	{
+		materials_.push_back(material);
+		texcoord_.push_back(texcoord_container());
+		if (material->shader() != materials_.front()->shader())
+			set_batching_disabled();
+	}
+
+	material_ptr material() const
+	{
+		return materials_.front();
+	}
+
+	size_t materials_number() const
+	{
+		return materials_.size();
+	}
+
+	material_ptr material_at(size_t index) const
+	{
+		return materials_[index];
+	}
+
+	const material_ptr* materials() const
+	{
+		return materials_.data();
 	}
 
 	const boost::shared_ptr<Texture> texture() const
 	{
-		return texture_;
+		return materials_.front()->texture();
 	}
 
 	void set_color(const colorf& color)
@@ -85,21 +108,27 @@ public:
 		return color_;
 	}
 
-	const texcoord_container& texcoord() const
+	texcoord_container texcoord() const
 	{
-		return texcoord_;
+		return texcoord_[0];
+	}
+
+	texcoord_container texcoord_at(size_t index) const
+	{
+		return texcoord_[index];
 	}
 
 	void set_texcoord(const texcoord_container& coord)
 	{
-		texcoord_ = coord;
+		assert(!texcoord_.empty());
+		texcoord_[0] = coord;
 	}
 
 	void set_buffers(const vertex_container& vertexes, const texcoord_container& texturecoord,
 					 const indexes_container& indicies)
 	{
 		vertexcoord_ = vertexes;
-		texcoord_ = texturecoord;
+		texcoord_[0] = texturecoord;
 		indicies_ = indicies;
 		update_color_buffer();
 	}
@@ -207,7 +236,13 @@ public:
 	template <size_t VC, size_t IC, size_t TC>
 	void attach(const RenderableBase<VC, IC, TC>& other)
 	{
-		texcoord_.insert(texcoord_.end(), other.texcoord().begin(), other.texcoord().end());
+		for (size_t i = 0; i < other.texcoord_.size(); ++i)
+		{
+			const texcoord_container& tc = other.texcoord_at(i);
+			typename texcoord_container::const_iterator b = tc.begin();
+			typename texcoord_container::const_iterator e = tc.end();
+			texcoord_[i].insert(texcoord_[i].end(), b, e);
+		}
 		size_t v_sz = vertexcoord_.size() / 3;
 		for (size_t i = 0; i < other.vertexcoord().size(); i += 3)
 		{
@@ -229,15 +264,34 @@ public:
 		render_flags_ = 0;
 		blend_mode_ = no_blend;
 		texcoord_.clear();
+		materials_.clear();
 		vertexcoord_.clear();
 		normalscoord_.clear();
 		colorcoord_.clear();
 		indicies_.clear();
 	}
+
+	template <size_t VC, size_t IC, size_t TC>	
+	bool is_material_equals(const RenderableBase<VC, IC, TC>& other) const
+	{
+		if (materials_.size() != other.materials_number()) return false;
+		for (size_t i = 0; i < materials_.size(); ++i)
+		{
+			if ( *(materials_[i]) != *(other.material_at(i)) ) return false;
+		}
+		return true;
+	}
 protected:
 	texcoord_container& rtexcoord()
 	{
-		return texcoord_;
+		assert(!texcoord_.empty());
+		return texcoord_[0];
+	}
+
+	texcoord_container& rtexcoord_at(size_t index)
+	{
+		assert(texcoord_.size() > index);
+		return texcoord_[index];
 	}
 
 	vertex_container& rvertexcoord()
@@ -287,15 +341,33 @@ protected:
 			colorcoord_[i + 3] = color_.a();
 		}
 	}
-private:
-	virtual void on_texture_changed() {}
 
-	texcoord_container texcoord_;
+	void update_buffers()
+	{
+		update_color_buffer();
+		for (size_t i = 0; i < texcoord_.size(); ++i)
+		{
+			const std::vector<float>& uv = materials_[i]->uv();
+			float u = uv[0], v = uv[1];
+			float w = uv[4], h = uv[5];
+			float uk = 1.0 / (w - u);
+			float vk = 1.0 / (h - v);
+			for (size_t j = 0; j < texcoord_[i].size(); j += 2)
+			{
+				texcoord_[i][j] *= uk; texcoord_[i][j] += u; 
+				texcoord_[i][j + 1] *= vk; texcoord_[i][j + 1] += v;			
+			}
+		}
+	}
+private:
+	virtual void on_material_changed() {}
+
+	fixed_size_vector<texcoord_container, max_materials_number> texcoord_;
 	vertex_container vertexcoord_;
 	vertex_container colorcoord_;
 	vertex_container normalscoord_;
 	indexes_container indicies_;
-	boost::shared_ptr<Texture> texture_;
+	fixed_size_vector<material_ptr, max_materials_number> materials_;
 	colorf color_;
 	uint32_t render_flags_;
 	BlendMode blend_mode_;

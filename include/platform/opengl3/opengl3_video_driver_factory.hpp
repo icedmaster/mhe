@@ -4,6 +4,7 @@
 #include "impl/abstract_video_driver_factory.hpp"
 #include "types.hpp"
 #include "opengl3_driver.hpp"
+#include "opengl3_shader_program.hpp"
 #include "../opengl/opengl_texture.hpp"
 
 namespace mhe {
@@ -30,6 +31,11 @@ public:
 	Texture* create_multitexture() const
 	{
 		return nullptr;
+	}
+
+	ShaderProgram* create_shader_program() const
+	{
+		return new OpenGL3ShaderProgram;
 	}
 };
 

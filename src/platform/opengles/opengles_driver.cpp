@@ -87,7 +87,7 @@ void OpenGLESDriver::load_projection_matrix(const matrixf& m)
 	active_shader_program_->set_uniform(projection_matrix_uniform_name, m);
 }
 
-void OpenGLESDriver::begin_draw(const RenderBuffer* buffer)
+void OpenGLESDriver::begin_draw(const RenderBuffer* buffer, const material_ptr* /*materials*/, size_t /*materials_number*/)
 {
 	check_for_errors();
 	// TODO: need to apply correct texture unit
@@ -118,7 +118,7 @@ void OpenGLESDriver::draw(const cmn::uint* i, cmn::uint size)
     glDrawElements(GL_TRIANGLES, size, GL_UNSIGNED_INT, i);
 }
     
-void OpenGLESDriver::end_draw(const RenderBuffer* /*buffer*/)
+void OpenGLESDriver::end_draw(const RenderBuffer* /*buffer*/, size_t /*materials_number*/)
 {
 	check_for_errors();
     active_shader_program_->disable_attribute(vertex_position_attribute_name);

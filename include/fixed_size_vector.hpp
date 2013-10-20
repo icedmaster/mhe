@@ -123,7 +123,17 @@ public:
 		return begin_[0];
 	}
 
+	const T& front() const
+	{
+		return begin_[0];
+	}
+
 	T& back()
+	{
+		return begin_[size_ - 1];
+	}
+
+	const T& back() const
 	{
 		return begin_[size_ - 1];
 	}
@@ -156,7 +166,7 @@ public:
 		size_t inserted_count = 0;
 		for (; first != last; ++first)
 			insert_impl(first_index + inserted_count++, *first);
-		return begin_ + count;
+		return begin_ + inserted_count;
 	}
 
 	iterator insert(const_iterator position, const T& value)

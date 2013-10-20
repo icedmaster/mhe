@@ -60,4 +60,9 @@ Texture* VideoDriverFactory::create_multitexture() const
 	return current_driver_factory_->create_multitexture();
 }
 
+ShaderProgram* VideoDriverFactory::create_shader_program() const
+{
+	return current_driver_factory_->create_shader_program();
+}
+
 }

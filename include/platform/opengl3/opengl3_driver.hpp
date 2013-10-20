@@ -4,6 +4,7 @@
 #include "video_driver.hpp"
 #include "opengl3_shader_program.hpp"
 #include "opengl3_buffer.hpp"
+#include "shader_utils.hpp"
 
 namespace mhe {
 namespace opengl {
@@ -49,11 +50,11 @@ private:
 	void begin_draw(boost::shared_ptr<Texture>,
 						 const float*, const float*, const float*, const float*,
 						 cmn::uint) {}
-	void begin_draw(const RenderBuffer* buffer);
+	void begin_draw(const RenderBuffer* buffer, const material_ptr* materials, size_t materials_number);
 	void draw(const cmn::uint*, cmn::uint);
 	void end_draw() {}
 	void end_draw(boost::shared_ptr<Texture> /*texture*/) {}
-	void end_draw(const RenderBuffer* buffer);
+	void end_draw(const RenderBuffer* buffer, size_t materials_number);
 
 	void set_color(const colorf&) {}
 
@@ -87,6 +88,7 @@ private:
 private:
 	bool init_default_shader();
 
+	matrixf active_projection_matrix_;
 	boost::shared_ptr<OpenGL3ShaderProgram> active_shader_program_;
 };
 

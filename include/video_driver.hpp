@@ -64,12 +64,12 @@ public:
 	virtual void begin_draw(boost::shared_ptr<Texture>,
 							const float*, const float*, const float*, const float*,
 							cmn::uint) = 0;
-	virtual void begin_draw(const RenderBuffer*) {}
+	virtual void begin_draw(const RenderBuffer*, const material_ptr* /*materials*/, size_t /*materials_number*/) {}
 	virtual void draw(const cmn::uint*, cmn::uint) = 0;
 	virtual void draw(const RenderBuffer*) {}
 	virtual void end_draw() = 0;
 	virtual void end_draw(boost::shared_ptr<Texture> texture) = 0;
-	virtual void end_draw(const RenderBuffer*) {}
+	virtual void end_draw(const RenderBuffer*, size_t /*materials_number*/) {}
 
 	virtual void set_color(const colorf&) {}
 

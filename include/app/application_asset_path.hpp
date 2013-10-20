@@ -9,6 +9,7 @@ namespace app {
 const std::string assets_base_path = "assets/";
 const std::string texture_path = "textures/";
 const std::string font_path = "fonts/";
+const std::string shader_path = "shaders/";
 
 }}
 

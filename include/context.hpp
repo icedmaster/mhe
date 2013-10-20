@@ -5,6 +5,8 @@
 #include "window_system.hpp"
 #include "texture_manager.hpp"
 #include "texture_atlas_manager.hpp"
+#include "material_manager.hpp"
+#include "shader_manager.hpp"
 
 namespace mhe {
 
@@ -15,6 +17,8 @@ public:
 	{
 		texture_manager_.set_helper(&driver_);
 		texture_atlas_manager_.set_helper(&texture_manager_);
+		material_manager_.set_helper(this);
+		shader_manager_.set_helper(this);
 	}
 
 	const Driver& driver() const
@@ -57,6 +61,26 @@ public:
 		return texture_atlas_manager_;
 	}
 
+	MaterialManager& material_manager()
+	{
+		return material_manager_;
+	}
+
+	const MaterialManager& material_manager() const
+	{
+		return material_manager_;
+	}
+
+	ShaderManager& shader_manager()
+	{
+		return shader_manager_;
+	}
+
+	const ShaderManager& shader_manager() const
+	{
+		return shader_manager_;
+	}
+
 	void reset()
 	{
 		// TODO: implement full reset
@@ -70,6 +94,8 @@ private:
 	WindowSystem* window_system_;
 	TextureManager texture_manager_;
 	TextureAtlasManager texture_atlas_manager_;
+	MaterialManager material_manager_;
+	ShaderManager shader_manager_;
 };
 
 }

@@ -9,7 +9,6 @@ Sprite::Sprite(const Sprite& sprite) :
 	x_size_(sprite.x_size_), y_size_(sprite.y_size_),
 	z_order_(sprite.z_order_)
 {
-	set_texture(sprite.texture());
 	init();
 }
 
@@ -19,7 +18,7 @@ Node* Sprite::clone_impl() const
 	return cloned;
 }
 
-void Sprite::on_texture_changed()
+void Sprite::on_material_changed()
 {
 	update_buffers();
 }
@@ -51,11 +50,6 @@ void Sprite::init()
 	i[0] = 0; i[1] = 1; i[2] = 2;
 	i[3] = 2; i[4] = 3; i[5] = 0;
 
-	Renderable::texcoord_container& t = Node::rtexcoord();
-	t.resize(8);
-	t[0] = 0.0; t[1] = 0.0; t[2] = 0.0; t[3] = 1.0;
-	t[4] = 1.0; t[5] = 1.0; t[6] = 1.0; t[7] = 0.0;
-
 	set_mask_z_buffer();
 	set_blending_enabled();
 	set_blend_mode(alpha_one_minus_alpha);
@@ -63,6 +57,11 @@ void Sprite::init()
 
 void Sprite::update_buffers()
 {
+	Renderable::texcoord_container& t = Node::rtexcoord();
+	t.resize(8);
+	t[0] = 0.0; t[1] = 0.0; t[2] = 0.0; t[3] = 1.0;
+	t[4] = 1.0; t[5] = 1.0; t[6] = 1.0; t[7] = 0.0;
+
 	Renderable::vertex_container& v = Node::rvertexcoord();
 	float x_sz = x_size_, y_sz = y_size_;
 	if (!x_size_ || !y_size_)
@@ -75,7 +74,7 @@ void Sprite::update_buffers()
 	v[3] = 0.0; v[4] = y_sz; v[5] = z_order_;
 	v[6] = x_sz; v[7] = y_sz; v[8] = z_order_;
 	v[9] = x_sz; v[10] = 0.0; v[11] = z_order_;
-	update_color_buffer();
+	Renderable::update_buffers();
 }
 
 }

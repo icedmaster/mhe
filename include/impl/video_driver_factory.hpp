@@ -10,6 +10,7 @@ namespace mhe {
 class Driver;
 class Texture;
 class MultiTexture;
+class ShaderProgram;
 
 class VideoDriverFactory
 {
@@ -24,6 +25,7 @@ public:
 	DriverImpl* create_video_driver() const;
 	Texture* create_texture() const;
 	Texture* create_multitexture() const;
+	ShaderProgram* create_shader_program() const;
 private:
 	typedef std::vector< boost::shared_ptr<AbstractVideoDriverFactory> > drvvec;
 	drvvec drivers_;

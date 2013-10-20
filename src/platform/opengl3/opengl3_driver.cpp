@@ -3,6 +3,7 @@
 #include "platform/opengl/mhe_gl.hpp"
 #include "platform/opengl/opengl_extension.hpp"
 #include "platform/opengl/opengl_utils.hpp"
+#include "platform/opengl/opengl_texture.hpp"
 #include "platform/opengl3/shaders/default_shaders.hpp"
 
 namespace mhe {
@@ -77,7 +78,7 @@ void OpenGL3Driver::set_blend_func(BlendMode bf)
     {
         case alpha_one_minus_alpha:
            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-            break;
+		   break;
                 
         default: break;
     }
@@ -88,20 +89,38 @@ void OpenGL3Driver::set_shader_program(const boost::shared_ptr<ShaderProgram>& p
 	const OpenGL3ShaderProgram* shader_program = static_cast<const OpenGL3ShaderProgram*>(program.get());
 	OpenGLExtensions::instance().glUseProgram(shader_program->id_);
 	active_shader_program_ = boost::static_pointer_cast<OpenGL3ShaderProgram>(program);
+	load_projection_matrix(active_projection_matrix_);
 }
     
 void OpenGL3Driver::load_projection_matrix(const matrixf& m)
 {
 	assert(active_shader_program_ != nullptr);
 	active_shader_program_->set_uniform(projection_matrix_uniform_name, m);
+	active_projection_matrix_ = m;
 }
 
-void OpenGL3Driver::begin_draw(const RenderBuffer* buffer)
+void OpenGL3Driver::begin_draw(const RenderBuffer* buffer, const material_ptr* materials, size_t materials_number)
 {
+	assert(buffer != nullptr);
+	assert(materials_number > 0);
+	assert(materials != nullptr);
+	check_for_errors();
+	// update shader - we presume that all materials for one render call are using the same shader
+	set_shader_program(materials[0]->shader());
 	check_for_errors();
 	// TODO: need to apply correct texture unit
-	active_shader_program_->set_uniform(texture_unit_uniform_name, 0);
-    
+	for (size_t i = 0; i < materials_number; ++i)
+	{
+		OpenGLTexture* texture = static_cast<OpenGLTexture*>(materials[i]->texture().get());
+		OpenGLExtensions::instance().glActiveTexture(GL_TEXTURE0 + i);
+		texture->prepare();
+		active_shader_program_->set_uniform(utils::name_for_texture_unit(i), i); 
+		const std::string& attrib_name = utils::name_for_texture_attribute(i);
+		size_t t_offset = buffer->offset(attrib_name);
+		if (t_offset != RenderBuffer::invalid_offset)
+			active_shader_program_->set_attribute(attrib_name,
+												  nullptr, 2, t_offset * sizeof(float));   
+	}
     size_t v_offset = buffer->offset(vertex_position_attribute_name);
     if (v_offset != RenderBuffer::invalid_offset)
         active_shader_program_->set_attribute(vertex_position_attribute_name,
@@ -110,10 +129,6 @@ void OpenGL3Driver::begin_draw(const RenderBuffer* buffer)
     if (n_offset != RenderBuffer::invalid_offset)
         active_shader_program_->set_attribute(vertex_normal_attribute_name,
                                            nullptr, 3, n_offset * sizeof(float));
-    size_t t_offset = buffer->offset(vertex_texcoord_attribute_name);
-    if (t_offset != RenderBuffer::invalid_offset)
-        active_shader_program_->set_attribute(vertex_texcoord_attribute_name,
-                                           nullptr, 2, t_offset * sizeof(float));
     size_t c_offset = buffer->offset(vertex_color_attribute_name);
     if (c_offset != RenderBuffer::invalid_offset)
         active_shader_program_->set_attribute(vertex_color_attribute_name,
@@ -126,13 +141,14 @@ void OpenGL3Driver::draw(const cmn::uint* i, cmn::uint size)
     glDrawElements(GL_TRIANGLES, size, GL_UNSIGNED_INT, i);
 }
     
-void OpenGL3Driver::end_draw(const RenderBuffer* /*buffer*/)
+void OpenGL3Driver::end_draw(const RenderBuffer* /*buffer*/, size_t materials_number)
 {
 	check_for_errors();
     active_shader_program_->disable_attribute(vertex_position_attribute_name);
     active_shader_program_->disable_attribute(vertex_normal_attribute_name);
-    active_shader_program_->disable_attribute(vertex_texcoord_attribute_name);
     active_shader_program_->disable_attribute(vertex_color_attribute_name);
+	for (size_t i = 0; i < materials_number; ++i)
+		active_shader_program_->disable_attribute(utils::name_for_texture_attribute(i));
 }
     
 void OpenGL3Driver::set_viewport(int x, int y, int w, int h)

@@ -12,7 +12,7 @@ private:
 	{
 		engine()->context().texture_manager().set_path("../../../assets/");
 		mhe::Sprite* sprite = new mhe::Sprite;
-		sprite->set_texture(engine()->context().texture_manager().get("test_sprite.png"));
+		//sprite->set_texture(engine()->context().texture_manager().get("test_sprite.png"));
 		node_.reset(new mhe::game::NodeComponent("sprite", sprite, scene()));
 		color_animation_.reset(new mhe::game::ColorAnimationComponent(1000, "sprite"));
 		color_animation_->set_range(mhe::color_white, mhe::color_black);

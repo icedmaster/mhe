@@ -10,6 +10,7 @@
 /08_gui/build/*
 /09_qt/build/*
 /10_3d_basic/build/*
+/11_material/build/*
 
 !/build/CMakeLists.txt
 !/01_init/build/CMakeLists.txt
@@ -23,6 +24,8 @@
 !/08_gui/build/CMakeLists.txt
 !/09_qt/build/CMakeLists.txt
 !/10_3d_basic/build/CMakeLists.txt
+!/11_material/build/CMakeLists.txt
+
 
 
 

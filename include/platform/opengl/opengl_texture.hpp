@@ -13,6 +13,7 @@ namespace opengl {
 class OpenGLTexture : public Texture
 {
 	friend class OpenGLDriver;
+	friend class OpenGL3Driver;
 public:
 	OpenGLTexture();
 	~OpenGLTexture();

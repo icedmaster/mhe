@@ -42,7 +42,7 @@ bool Application::mhe_app_init(const ApplicationConfig& config)
 			 " h:" << config.height << " bpp:" << config.bpp);
 	bool result = engine_.init(config.width, config.height, config.bpp, config.fullscreen);
 	if (!result) return false;
-	init_assets_path();
+	init_assets_path(config.assets_path);
 	engine_.context().window_system().set_caption(name_);	
 	return result;
 }
@@ -62,14 +62,17 @@ int Application::run_impl()
 	return 0;
 }
 
-void Application::init_assets_path()
-{
-	std::string base_path = utils::path_join(application_base_path(), assets_base_path);
+void Application::init_assets_path(const std::string& config_assets_path)
+{	
+	std::string base_path = utils::path_join(application_base_path(),
+		config_assets_path.empty() ? assets_base_path : config_assets_path);
     INFO_LOG("Application::init_assets_path with base path:" << base_path);
 	engine_.context().texture_manager().set_path(utils::path_join(base_path,
 																  texture_path));
 	engine_.font_manager().set_path(utils::path_join(base_path,
 													 font_path));
+	engine_.context().shader_manager().set_path(utils::path_join(base_path,
+		shader_path));
 }
 
 }}

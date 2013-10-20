@@ -30,7 +30,7 @@ private:
 		emitter->init_with_parameters(prm);
 		boost::shared_ptr<mhe::ParticleSystem> ps(new mhe::ParticleSystem(mhe::v3d(400, 300, 0)));
 		ps->set_emitter(emitter);
-		ps->set_texture(get_engine()->context().texture_manager().get("../../../assets/star.png"));
+		//ps->set_texture(get_engine()->context().texture_manager().get("../../../assets/star.png"));
 		scene()->add(ps);
 		ps->start();
 		return true;

@@ -84,6 +84,7 @@ void OpenGLTexture::rebuild_texture(boost::shared_ptr<Image> im, FilterType/* ft
 
 void OpenGLTexture::prepare(Driver* /*driver*/)
 {
+	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, id_);
 }
 

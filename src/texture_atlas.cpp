@@ -1,5 +1,6 @@
 #include "texture_atlas.hpp"
 
+#include "texture.hpp"
 #include "utils/global_log.hpp"
 
 namespace mhe {

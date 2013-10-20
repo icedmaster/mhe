@@ -1,12 +1,15 @@
-#ifndef _TEXTURE_ATLAS_HPP_
-#define _TEXTURE_ATLAS_HPP_
+#ifndef __TEXTURE_ATLAS_HPP__
+#define __TEXTURE_ATLAS_HPP__
 
 #include <boost/shared_ptr.hpp>
 #include <vector>
 #include <map>
-#include "texture.hpp"
+#include <string>
+#include "mhe_math.hpp"
 
 namespace mhe {
+
+class Texture;
 
 class TextureAtlas
 {

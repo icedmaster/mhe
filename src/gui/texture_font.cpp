@@ -76,10 +76,9 @@ Renderable* TextureFont::print(const utf32_string& text,
 		ibuf.insert(ibuf.end(), indicies, indicies + 6);
 	}
 
-	Renderable* renderable = new Renderable(true);
+	Renderable* renderable = new Renderable();
 	renderable->set_buffers(v, t, ibuf);
 	renderable->set_color(color);
-	renderable->set_texture(ta_.texture());
 	renderable->set_mask_z_buffer();
     renderable->set_blending_enabled();
     renderable->set_blend_mode(alpha_one_minus_alpha);

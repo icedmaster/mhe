@@ -122,7 +122,7 @@ private:
 
 		scene()->add(new TestNode);
 		Cube* cube = new Cube(3);
-		cube->set_texture(engine()->context().texture_manager().get(mhe::default_resource_name));
+		//cube->set_texture(engine()->context().texture_manager().get(mhe::default_resource_name));
 		cube->rotate_by(0, 15, 0);
 		scene()->add(cube);
 
