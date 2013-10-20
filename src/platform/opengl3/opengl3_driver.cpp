@@ -108,18 +108,23 @@ void OpenGL3Driver::begin_draw(const RenderBuffer* buffer, const material_ptr* m
 	// update shader - we presume that all materials for one render call are using the same shader
 	set_shader_program(materials[0]->shader());
 	check_for_errors();
-	// TODO: need to apply correct texture unit
+	size_t total_textures_number = 0;
 	for (size_t i = 0; i < materials_number; ++i)
 	{
-		OpenGLTexture* texture = static_cast<OpenGLTexture*>(materials[i]->texture().get());
-		OpenGLExtensions::instance().glActiveTexture(GL_TEXTURE0 + i);
-		texture->prepare();
-		active_shader_program_->set_uniform(utils::name_for_texture_unit(i), i); 
-		const std::string& attrib_name = utils::name_for_texture_attribute(i);
-		size_t t_offset = buffer->offset(attrib_name);
-		if (t_offset != RenderBuffer::invalid_offset)
-			active_shader_program_->set_attribute(attrib_name,
-												  nullptr, 2, t_offset * sizeof(float));   
+		for (size_t j = 0; j < materials[i]->textures_number(); ++j)
+		{
+			OpenGLTexture* texture = static_cast<OpenGLTexture*>(materials[i]->texture_at(j).get());
+			OpenGLExtensions::instance().glActiveTexture(GL_TEXTURE0 + total_textures_number);
+			texture->prepare();
+			active_shader_program_->set_uniform(utils::name_for_texture_unit(total_textures_number),
+				total_textures_number); 
+			const std::string& attrib_name = utils::name_for_texture_attribute(total_textures_number);
+			size_t t_offset = buffer->offset(attrib_name);
+			if (t_offset != RenderBuffer::invalid_offset)
+				active_shader_program_->set_attribute(attrib_name,
+													  nullptr, 2, t_offset * sizeof(float));   
+			++total_textures_number;
+		}
 	}
     size_t v_offset = buffer->offset(vertex_position_attribute_name);
     if (v_offset != RenderBuffer::invalid_offset)

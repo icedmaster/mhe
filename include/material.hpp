@@ -3,6 +3,8 @@
 
 #include "texture_atlas.hpp"
 #include "shader_program.hpp"
+#include "engine_config.hpp"
+#include "fixed_size_vector.hpp"
 
 namespace mhe {
 
@@ -14,18 +16,19 @@ class Material
 public:
 	Material(const boost::shared_ptr<TextureAtlas>& texture_atlas, const std::string& name,
 			 const boost::shared_ptr<ShaderProgram>& shader) :
-		uv_(texture_atlas->get(name)),
-		texture_atlas_(texture_atlas),
-		texture_(texture_atlas->texture()),
 		shader_(shader)
-	{}
+	{
+		uv_.push_back(texture_atlas->get(name));
+		texture_atlas_.push_back(texture_atlas);
+		texture_.push_back(texture_atlas->texture());
+	}
 
 	Material(const boost::shared_ptr<Texture>& texture,
 			 const boost::shared_ptr<ShaderProgram>& shader) :
-		texture_(texture),
 		shader_(shader)
 	{
-		init_uv();
+		init_uv(0);
+		texture_.push_back(texture);
 	}
 
 	boost::shared_ptr<ShaderProgram> shader() const
@@ -33,20 +36,36 @@ public:
 		return shader_;
 	}
 
-	const std::vector<float>& uv() const
+	std::vector<float> uv() const
 	{
-		return uv_;
+		return uv_[0];
+	}
+
+	std::vector<float> uv_at(size_t index) const
+	{
+		return uv_[index];
 	}
 
 	boost::shared_ptr<Texture> texture() const
 	{
-		return texture_;
+		return texture_[0];
+	}
+
+	boost::shared_ptr<Texture> texture_at(size_t index) const
+	{
+		return texture_[index];
+	}
+
+	size_t textures_number() const
+	{
+		return texture_.size();
 	}
 
 	bool operator== (const Material& other) const
 	{
-		return ( (texture_atlas_->texture() == other.texture_atlas_->texture()) &&
-				 (shader_ == other.shader_) );
+		if (shader_ != other.shader_) return false;
+		if (texture_ != other.texture_) return false;
+		return true;
 	}
 
 	bool operator!= (const Material& other) const
@@ -54,18 +73,20 @@ public:
 		return !(*this == other);
 	}
 private:
-	void init_uv()
+	void init_uv(size_t index)
 	{
-		uv_.resize(8);
-		uv_[0] = 0; uv_[1] = 0;
-		uv_[2] = 0; uv_[3] = 1;
-		uv_[4] = 1; uv_[5] = 1;
-		uv_[6] = 1; uv_[7] = 0;
+		if (uv_.size() <= index)
+			uv_.resize(index + 1);
+		uv_[index].resize(8);
+		uv_[index][0] = 0; uv_[index][1] = 0;
+		uv_[index][2] = 0; uv_[index][3] = 1;
+		uv_[index][4] = 1; uv_[index][5] = 1;
+		uv_[index][6] = 1; uv_[index][7] = 0;
 	}
 
-	std::vector<float> uv_;
-	boost::shared_ptr<TextureAtlas> texture_atlas_;	
-	boost::shared_ptr<Texture> texture_;
+	fixed_size_vector< std::vector<float>, initial_number_of_textures > uv_;
+	fixed_size_vector< boost::shared_ptr<TextureAtlas>, initial_number_of_textures > texture_atlas_;	
+	fixed_size_vector< boost::shared_ptr<Texture>, initial_number_of_textures > texture_;
 	boost::shared_ptr<ShaderProgram> shader_;	
 };
 

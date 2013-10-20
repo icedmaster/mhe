@@ -59,7 +59,7 @@ public:
 	void set_material(const material_ptr& material)
 	{
 		materials_.resize(1);
-		texcoord_.resize(1);
+		texcoord_.resize(material->textures_number());
 		materials_[0] = material;
 		on_material_changed();
 	}
@@ -67,7 +67,8 @@ public:
 	void add_material(const material_ptr& material)
 	{
 		materials_.push_back(material);
-		texcoord_.push_back(texcoord_container());
+		for (size_t i = 0; i < material->textures_number(); ++i)
+			texcoord_.push_back(texcoord_container());
 		if (material->shader() != materials_.front()->shader())
 			set_batching_disabled();
 	}
@@ -80,6 +81,11 @@ public:
 	size_t materials_number() const
 	{
 		return materials_.size();
+	}
+
+	size_t textures_number() const
+	{
+		return texcoord_.size();
 	}
 
 	material_ptr material_at(size_t index) const
@@ -329,6 +335,19 @@ protected:
 		return colorcoord_;
 	}
 
+	material_ptr material_by_texture(size_t texture_index) const
+	{
+		size_t index = 0;
+		for (size_t i = 0; i < materials_.size(); ++i)
+		{
+			size_t next = index + materials_[i]->textures_number();
+			if ( (texture_index >= index) && (texture_index < next) )
+				return materials_[i];
+			index = next;
+		}
+		return material_ptr();
+	}
+
 	void update_color_buffer()
 	{
 		int count = vertexcoord_.size() / 3;
@@ -362,7 +381,7 @@ protected:
 private:
 	virtual void on_material_changed() {}
 
-	fixed_size_vector<texcoord_container, max_materials_number> texcoord_;
+	fixed_size_vector<texcoord_container, max_materials_number * initial_number_of_textures> texcoord_;
 	vertex_container vertexcoord_;
 	vertex_container colorcoord_;
 	vertex_container normalscoord_;

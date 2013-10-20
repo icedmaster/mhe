@@ -109,7 +109,7 @@ void Driver::perform_buffered_render(const BatchedRenderable& renderable)
 	buffer->attach_data(vertex_position_attribute_name, renderable.vertexcoord().data(), renderable.vertexcoord().size());
 	buffer->attach_data(vertex_normal_attribute_name, renderable.normalscoord().data(), renderable.normalscoord().size());
 	buffer->attach_data(vertex_color_attribute_name, renderable.colorcoord().data(), renderable.colorcoord().size());
-	for (size_t i = 0; i < renderable.materials_number(); ++i)
+	for (size_t i = 0; i < renderable.textures_number(); ++i)
 	{
 		const std::string& name = utils::name_for_texture_attribute(i);
 		const BatchedRenderable::texcoord_container& tc = renderable.texcoord_at(i);
