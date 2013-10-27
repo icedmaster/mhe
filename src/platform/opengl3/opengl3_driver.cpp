@@ -104,10 +104,9 @@ void OpenGL3Driver::begin_draw(const RenderBuffer* buffer, const material_ptr* m
 	assert(buffer != nullptr);
 	assert(materials_number > 0);
 	assert(materials != nullptr);
-	check_for_errors();
+	CHECK_FOR_ERRORS();
 	// update shader - we presume that all materials for one render call are using the same shader
 	set_shader_program(materials[0]->shader());
-	check_for_errors();
 	size_t total_textures_number = 0;
 	for (size_t i = 0; i < materials_number; ++i)
 	{
@@ -142,13 +141,13 @@ void OpenGL3Driver::begin_draw(const RenderBuffer* buffer, const material_ptr* m
     
 void OpenGL3Driver::draw(const cmn::uint* i, cmn::uint size)
 {
-	check_for_errors();
+	CHECK_FOR_ERRORS();
     glDrawElements(GL_TRIANGLES, size, GL_UNSIGNED_INT, i);
 }
     
 void OpenGL3Driver::end_draw(const RenderBuffer* /*buffer*/, size_t materials_number)
 {
-	check_for_errors();
+	CHECK_FOR_ERRORS();
     active_shader_program_->disable_attribute(vertex_position_attribute_name);
     active_shader_program_->disable_attribute(vertex_normal_attribute_name);
     active_shader_program_->disable_attribute(vertex_color_attribute_name);

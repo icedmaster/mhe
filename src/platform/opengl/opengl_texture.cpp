@@ -35,6 +35,7 @@ void OpenGLTexture::rebuild_texture(boost::shared_ptr<Image> im, FilterType/* ft
 {
 	glGenTextures(1, &id_);
 	glBindTexture(GL_TEXTURE_2D, id_);
+	DEBUG_LOG("OpenGLTexture::rebuild_texture: created new OpenGL texture with id " << id_);
 	//switch (ft_)
 	//glBindOpenGLTexture(GL_OpenGLTexture_2D, id_);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -84,7 +85,6 @@ void OpenGLTexture::rebuild_texture(boost::shared_ptr<Image> im, FilterType/* ft
 
 void OpenGLTexture::prepare(Driver* /*driver*/)
 {
-	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, id_);
 }
 
