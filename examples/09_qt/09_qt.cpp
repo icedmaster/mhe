@@ -20,7 +20,6 @@ public:
 private:
 	bool init_impl(const mhe::utils::PropertiesList&)
 	{
-		get_engine()->font_manager().set_path("../../../assets/fonts/");
 		font_ = get_engine()->font_manager().get("droid-sans.fnt");
 		node_.reset(new mhe::gui::GUINode(get_engine()->event_manager()));
 		mhe::gui::Widget* widget = new mhe::gui::Widget("main");
@@ -84,6 +83,7 @@ int main(int argc, char** argv)
 	config.width = 400;
 	config.height = 400;
 	config.bpp = 32;
+	config.assets_path = "../../../assets/";
 	app.init(config);
 
 	// set scene

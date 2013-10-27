@@ -12,7 +12,7 @@ class TextureFont : public Font
 public:
 	virtual ~TextureFont() {}
 
-	bool load(const std::string& filename);
+	bool load(const std::string& filename, const Context& context);
 
 	Renderable* print(const utf32_string& text,
             const vector2<float>& position, const colorf& color = color_white);
@@ -37,7 +37,7 @@ protected:
 		height_ = height;
 	}
 
-	void load_texture(const std::string& filename);
+	void load_texture(const std::string& filename, const Context& context);
 	void add_char_for_index(utf32_char c, const rect<float>& rect);	
 private:
 	virtual bool load_font_parameters(std::istream& stream, std::string& texture_filename) = 0;
@@ -45,9 +45,12 @@ private:
 
 	cmn::uint get_char(utf32_char c) const;
 
+	void setup_material(const Context& context);
+
 	TextureAtlas ta_;
 	std::map<utf32_char, cmn::uint> chars_;
 	std::string name_;
+	material_ptr material_;
 	cmn::uint height_;
 };
 

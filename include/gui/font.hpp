@@ -7,6 +7,7 @@
 #include "video_driver.hpp"
 #include "utils/utf8_utils.hpp"
 #include "renderable.hpp"
+#include "context.hpp"
 
 namespace mhe {
 namespace gui {
@@ -15,7 +16,7 @@ class Font
 {
 public:
 	virtual ~Font() {}
-	virtual bool load(const std::string& filename) = 0;
+	virtual bool load(const std::string& filename, const Context& context) = 0;
 	virtual Renderable* print(const utf32_string&,
 							  const vector2<float>&, const colorf& color = color_white) = 0;
 	virtual std::string name() const = 0;

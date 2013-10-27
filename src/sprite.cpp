@@ -57,6 +57,7 @@ void Sprite::init()
 
 void Sprite::update_buffers()
 {
+	if (materials_number() == 0) return; // update will be later 
 	Renderable::texcoord_container& t = Node::rtexcoord();
 	t.resize(8);
 	t[0] = 0.0; t[1] = 0.0; t[2] = 0.0; t[3] = 1.0;

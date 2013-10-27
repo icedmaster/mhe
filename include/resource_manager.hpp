@@ -21,12 +21,12 @@ public:
 
 	void set_helper(const helper_type& helper)
 	{
-		helper_ = helper;
+		helper_ = &helper;
 	}
 
-	bool load(const std::string& name)
+	bool load(const std::string& name, bool absolute_path = false)
 	{
-		return (get(name) != boost::shared_ptr<res_type>());
+		return (get(name, absolute_path) != boost::shared_ptr<res_type>());
 	}
 
 	bool unload(const std::string& name)
@@ -44,9 +44,9 @@ public:
 		return true;
 	}
 
-	boost::shared_ptr<res_type> get(const std::string& name) const
+	boost::shared_ptr<res_type> get(const std::string& name, bool absolute_path = false) const
 	{
-		return get_impl(name);	
+		return get_impl(name, absolute_path);	
 	}
 
 	void add(const std::string& name, res_type* res)
@@ -69,7 +69,7 @@ public:
 		path_ = path;
 	}
 protected:
-	virtual boost::shared_ptr<res_type> get_impl(const std::string& name) const
+	virtual boost::shared_ptr<res_type> get_impl(const std::string& name, bool absolute_path) const
 	{
 		const std::string& sname = utils::get_file_name(name);
 		typename resmap::iterator it = resources_.find(sname);
@@ -78,17 +78,18 @@ protected:
 			INFO_LOG("get resource:" << sname);
 			return it->second;
 		}
-		return load_impl(name, sname);
+		return load_impl(name, sname, absolute_path);
 	}
 private:
 	boost::shared_ptr<res_type> load_impl(const std::string& name,
-										  const std::string& sname) const
+										  const std::string& sname,
+										  bool absolute_path) const
 	{
-		std::string full_path = utils::path_join(path_, name);
-		res_type* res = Loader::load(full_path, helper_);
+		std::string full_path = (!absolute_path) ? utils::path_join(path_, name) : name;
+		res_type* res = Loader::load(full_path, *helper_);
 		if (res == nullptr)
 		{
-			ERROR_LOG("Can't load: " << name.c_str());
+			ERROR_LOG("Can't load: " << full_path);
 			return boost::shared_ptr<res_type>();
 		}
 		INFO_LOG("Resource " << name << " loaded with sname:" << sname);
@@ -98,7 +99,7 @@ private:
 	}
 
 	mutable resmap resources_;
-	helper_type helper_;
+	const helper_type* helper_;
 	std::string path_;
 };
 

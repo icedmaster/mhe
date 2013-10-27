@@ -12,7 +12,9 @@ private:
 	{
 		engine()->context().texture_manager().set_path("../../../assets/");
 		mhe::Sprite* sprite = new mhe::Sprite;
-		//sprite->set_texture(engine()->context().texture_manager().get("test_sprite.png"));
+		sprite->set_material(mhe::material_ptr(new mhe::Material(
+												   engine()->context().texture_manager().get("test_sprite.png"),
+												   engine()->context().shader_manager().get("diffuse_unlit"))));
 		node_.reset(new mhe::game::NodeComponent("sprite", sprite, scene()));
 		color_animation_.reset(new mhe::game::ColorAnimationComponent(1000, "sprite"));
 		color_animation_->set_range(mhe::color_white, mhe::color_black);
@@ -54,6 +56,7 @@ private:
 	void init_second_node()
 	{
 		node2_.reset(new mhe::game::NodeComponent("node2", node_->node()->clone(), scene()));
+		node2_->node()->set_material(node_->node()->material());
 		node2_->node()->translate_to(mhe::vector3<float>(600, 200, 0));
 		engine()->component_manager().add(node2_);
 
@@ -79,7 +82,7 @@ int main(int /*argc*/, char** /*argv*/)
 	config.width = 800;
 	config.height = 600;
 	config.bpp = 32;
-	config.assets_path = "../../../assets";
+	config.assets_path = "../../../assets/";
 	app.init(config);
 	boost::shared_ptr<TestGameScene> game_scene(new TestGameScene(&(app.engine())));
 	game_scene->init();

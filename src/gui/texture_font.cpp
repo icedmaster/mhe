@@ -7,7 +7,7 @@
 namespace mhe {
 namespace gui {
 
-bool TextureFont::load(const std::string& filename)
+bool TextureFont::load(const std::string& filename, const Context& context)
 {
 	std::ifstream f(filename.c_str());
 	if (!f.is_open())
@@ -25,7 +25,8 @@ bool TextureFont::load(const std::string& filename)
 	{
 		std::string texture_path = utils::path_join(utils::get_file_path(filename),
 													texture_filename);
-		load_texture(texture_path);
+		load_texture(texture_path, context);
+		setup_material(context);
 		loaded = load_font_chars(f);
 		if (!loaded)
 			WARN_LOG("Can't load font chars from file:" << filename);
@@ -77,6 +78,7 @@ Renderable* TextureFont::print(const utf32_string& text,
 	}
 
 	Renderable* renderable = new Renderable();
+	renderable->set_material(material_);
 	renderable->set_buffers(v, t, ibuf);
 	renderable->set_color(color);
 	renderable->set_mask_z_buffer();
@@ -85,10 +87,9 @@ Renderable* TextureFont::print(const utf32_string& text,
 	return renderable;
 }
 
-void TextureFont::load_texture(const std::string& filename)
+void TextureFont::load_texture(const std::string& filename, const Context& context)
 {
-	TextureManager temp_manager;
-	ta_.set_texture(temp_manager.get(filename));
+	ta_.set_texture(context.texture_manager().get(filename, true));
 }
 
 void TextureFont::add_char_for_index(utf32_char c, const rect<float>& rect)
@@ -121,6 +122,15 @@ cmn::uint TextureFont::get_char(utf32_char c) const
 	std::map<utf32_char, cmn::uint>::const_iterator it = chars_.find(c);
 	assert(it != chars_.end());
 	return it->second;
+}
+
+void TextureFont::setup_material(const Context& context)
+{
+	material_ = context.material_manager().get(name_);
+	if (material_ != nullptr) return;
+	// create new
+	material_.reset(new Material(ta_.texture(),
+								 context.shader_manager().get("diffuse_unlit")));
 }
 
 }}

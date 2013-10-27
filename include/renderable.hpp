@@ -126,7 +126,6 @@ public:
 
 	void set_texcoord(const texcoord_container& coord)
 	{
-		assert(!texcoord_.empty());
 		texcoord_[0] = coord;
 	}
 

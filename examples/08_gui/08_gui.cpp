@@ -11,7 +11,6 @@ public:
 private:
 	bool init_impl(const mhe::utils::PropertiesList&)
 	{
-		get_engine()->font_manager().set_path("../../../assets/fonts/");
 		font_ = get_engine()->font_manager().get("arial.fnt");
 		node_.reset(new mhe::gui::GUINode(get_engine()->event_manager()));
 		mhe::gui::Widget* widget = new mhe::gui::Widget("main");
@@ -51,6 +50,7 @@ int main(int, char**)
 	config.height = 600;
 	config.bpp = 32;
 	config.fullscreen = false;
+	config.assets_path = "../../../assets/";
 	app.init(config);
 	boost::shared_ptr<TestScene> scene(new TestScene(&app.engine()));
 	app.engine().set_game_scene(scene);
