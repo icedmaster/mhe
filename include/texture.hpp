@@ -38,6 +38,8 @@ public:
 	virtual bool is_equal(const Texture& other) const = 0;
 };
 
+typedef boost::shared_ptr<Texture> texture_ptr;
+
 }
 
 #endif

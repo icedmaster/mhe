@@ -3,7 +3,7 @@
 
 namespace mhe {
 
-MaterialLoader::type* MaterialLoader::load(const std::string& name, const helper_type& helper)
+MaterialLoader::type* MaterialLoader::load(const std::string& name, const helper_type* helper)
 {
 	return nullptr;
 }

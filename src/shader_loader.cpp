@@ -5,7 +5,7 @@
 
 namespace mhe {
 
-ShaderLoader::type* ShaderLoader::load(const std::string& name, const helper_type& helper)
+ShaderLoader::type* ShaderLoader::load(const std::string& name, const helper_type* /*helper*/)
 {
 	const std::string vertex_extension = ".vert";
 	const std::string fragment_extension = ".frag";

@@ -11,7 +11,7 @@ struct FontLoader
 {
 	typedef Font type;
 	typedef Context helper_type;
-	static type* load(const std::string& name, const helper_type& helper);
+	static type* load(const std::string& name, const helper_type* helper);
 };
 
 }}

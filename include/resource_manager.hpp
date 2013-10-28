@@ -14,14 +14,13 @@ class ResourceManager
 protected:
 	typedef typename Loader::type res_type;
 	typedef typename Loader::helper_type helper_type;
-private:
 	typedef std::map< std::string, boost::shared_ptr<res_type> > resmap;
 public:
 	virtual ~ResourceManager() {}
 
-	void set_helper(const helper_type& helper)
+	void set_helper(const helper_type* helper)
 	{
-		helper_ = &helper;
+		helper_ = helper;
 	}
 
 	bool load(const std::string& name, bool absolute_path = false)
@@ -80,13 +79,23 @@ protected:
 		}
 		return load_impl(name, sname, absolute_path);
 	}
+
+	const helper_type* helper() const
+	{
+		return helper_;
+	}
+
+	resmap& resources() const
+	{
+		return resources_;
+	}
 private:
 	boost::shared_ptr<res_type> load_impl(const std::string& name,
 										  const std::string& sname,
 										  bool absolute_path) const
 	{
 		std::string full_path = (!absolute_path) ? utils::path_join(path_, name) : name;
-		res_type* res = Loader::load(full_path, *helper_);
+		res_type* res = Loader::load(full_path, helper_);
 		if (res == nullptr)
 		{
 			ERROR_LOG("Can't load: " << full_path);

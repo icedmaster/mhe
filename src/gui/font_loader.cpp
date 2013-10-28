@@ -6,15 +6,16 @@
 namespace mhe {
 namespace gui {
 
-Font* FontLoader::load(const std::string& name, const FontLoader::helper_type& helper)
+Font* FontLoader::load(const std::string& name, const FontLoader::helper_type* helper)
 {
+	assert(helper != nullptr);
 	const std::string& ext = utils::get_file_extension(name);
 	if (ext.empty()) return nullptr;
 
 	if (ext == "bmfnt")
 	{
 		BMFont* font = new BMFont;
-		if (!font->load(name, helper))
+		if (!font->load(name, *helper))
 		{
 			delete font;
 			return nullptr;
@@ -24,7 +25,7 @@ Font* FontLoader::load(const std::string& name, const FontLoader::helper_type& h
 	else if (ext == "fnt")
 	{
 		UBFGFont* font = new UBFGFont;
-		if (!font->load(name, helper))
+		if (!font->load(name, *helper))
 		{
 			delete font;
 			return nullptr;

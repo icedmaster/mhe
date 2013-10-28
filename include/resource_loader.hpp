@@ -21,14 +21,14 @@ struct SoundLoader
 {
 	typedef iSound type;
 	typedef boost::shared_ptr<iAudioDriver> helper_type;
-	static type* load(const std::string& name, const helper_type& helper);
+	static type* load(const std::string& name, const helper_type* helper);
 };
 
 struct TextureLoader
 {
 	typedef Texture type;
-	typedef Driver* helper_type;
-	static type* load(const std::string& name, const helper_type& helper);
+	typedef Driver helper_type;
+	static type* load(const std::string& name, const helper_type* helper);
 };
 
 }	// namespace

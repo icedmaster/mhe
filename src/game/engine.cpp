@@ -64,8 +64,8 @@ bool Engine::init(cmn::uint w, cmn::uint h, cmn::uint bpp, bool fullscreen)
 	if (audio_driver_ != nullptr)
 		audio_driver_->init();
 
-	sm_.set_helper(audio_driver_);
-	fm_.set_helper(context_);
+	sm_.set_helper(&audio_driver_);
+	fm_.set_helper(&context_);
 	initialized_ = true;
 	return true;
 }

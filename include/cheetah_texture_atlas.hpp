@@ -9,7 +9,7 @@ namespace mhe {
 class CheetahTextureAtlas
 {
 public:
-	CheetahTextureAtlas(TextureManager* texture_manager) :
+	CheetahTextureAtlas(const TextureManager* texture_manager) :
 	texture_manager_(texture_manager)
 	{}
 
@@ -20,7 +20,7 @@ private:
 	void add_texture_atlas_element(TextureAtlas* atlas,
 								   const std::string& element_str) const;
 
-	TextureManager* texture_manager_;
+	const TextureManager* texture_manager_;
 	boost::shared_ptr<Texture> texture_;
 };
 

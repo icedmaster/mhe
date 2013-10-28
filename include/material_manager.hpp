@@ -6,7 +6,11 @@
 
 namespace mhe {
 
-typedef ResourceManager<MaterialLoader> MaterialManager;
+class MaterialManager : public ResourceManager<MaterialLoader>
+{
+public:
+	material_ptr get_material(const std::string& texture_name, const std::string& shader_name) const;
+};
 
 }
 

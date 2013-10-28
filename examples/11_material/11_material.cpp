@@ -17,10 +17,8 @@ public:
 private:
 	bool init_impl(const mhe::utils::PropertiesList&)
 	{		
-		material_.reset(new mhe::Material(engine()->context().texture_manager().get("test_sprite.png"),
-			engine()->context().shader_manager().get("diffuse_unlit")));
 		mhe::Sprite* sprite = new mhe::Sprite;
-		sprite->set_material(material_);
+		sprite->set_material(engine()->context().material_manager().get_material("test_sprite.png", "diffuse_unlit"));
 		scene()->add(sprite);
 		return true;
 	}

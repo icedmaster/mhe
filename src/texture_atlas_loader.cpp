@@ -5,8 +5,9 @@
 namespace mhe {
 
 TextureAtlas* TextureAtlasLoader::load(const std::string& name,
-									   TextureManager* const& helper)
+									   const TextureManager* helper)
 {
+	assert(helper != nullptr);
 	// currently, support only .atlas format, don't check extension
 	return CheetahTextureAtlas(helper).load(name);
 }

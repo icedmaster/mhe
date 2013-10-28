@@ -10,8 +10,8 @@ class Context;
 struct MaterialLoader
 {
 	typedef Material type;
-	typedef Context* helper_type;
-	static type* load(const std::string& name, const helper_type& helper);
+	typedef Context helper_type;
+	static type* load(const std::string& name, const helper_type* helper);
 };
 
 }

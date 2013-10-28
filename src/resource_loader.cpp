@@ -4,7 +4,7 @@
 
 namespace mhe {
 
-iSound* SoundLoader::load(const std::string& name, const helper_type& /*helper*/)
+iSound* SoundLoader::load(const std::string& name, const helper_type* /*helper*/)
 {
 	const std::string& ext = utils::get_file_extension(name);
 	boost::shared_ptr<iSoundData> data;
@@ -33,7 +33,7 @@ iSound* SoundLoader::load(const std::string& name, const helper_type& /*helper*/
 	return nullptr;
 }
 
-Texture* TextureLoader::load(const std::string& filename, const helper_type& /*helper*/)
+Texture* TextureLoader::load(const std::string& filename, const helper_type* /*helper*/)
 {
 	bool loaded = false;
 	bool use_default_color = false;
