@@ -363,17 +363,21 @@ protected:
 	void update_buffers()
 	{
 		update_color_buffer();
-		for (size_t i = 0; i < texcoord_.size(); ++i)
-		{
-			const std::vector<float>& uv = materials_[i]->uv();
-			float u = uv[0], v = uv[1];
-			float w = uv[4], h = uv[5];
-			float uk = 1.0 / (w - u);
-			float vk = 1.0 / (h - v);
-			for (size_t j = 0; j < texcoord_[i].size(); j += 2)
+		size_t texture_index = 0;
+		for (size_t i = 0; i < materials_.size(); ++i)
+		{			
+			for (size_t j = 0; j < materials_[i]->textures_number(); ++j, ++texture_index)
 			{
-				texcoord_[i][j] *= uk; texcoord_[i][j] += u; 
-				texcoord_[i][j + 1] *= vk; texcoord_[i][j + 1] += v;			
+				const std::vector<float>& uv = materials_[i]->uv_at(j);
+				float u = uv[0], v = uv[1];
+				float w = uv[4], h = uv[5];
+				float uk = 1.0 / (w - u);
+				float vk = 1.0 / (h - v);
+				for (size_t k = 0; k < texcoord_[texture_index].size(); k += 2)
+				{
+					texcoord_[i][k] *= uk; texcoord_[i][k] += u; 
+					texcoord_[i][k + 1] *= vk; texcoord_[i][k + 1] += v;			
+				}
 			}
 		}
 	}

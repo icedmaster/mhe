@@ -58,10 +58,13 @@ void Sprite::init()
 void Sprite::update_buffers()
 {
 	if (materials_number() == 0) return; // update will be later 
-	Renderable::texcoord_container& t = Node::rtexcoord();
-	t.resize(8);
-	t[0] = 0.0; t[1] = 0.0; t[2] = 0.0; t[3] = 1.0;
-	t[4] = 1.0; t[5] = 1.0; t[6] = 1.0; t[7] = 0.0;
+	for (size_t i = 0; i < textures_number(); ++i)
+	{
+		Renderable::texcoord_container& t = Node::rtexcoord_at(i);
+		t.resize(8);
+		t[0] = 0.0; t[1] = 0.0; t[2] = 0.0; t[3] = 1.0;
+		t[4] = 1.0; t[5] = 1.0; t[6] = 1.0; t[7] = 0.0;
+	}
 
 	Renderable::vertex_container& v = Node::rvertexcoord();
 	float x_sz = x_size_, y_sz = y_size_;

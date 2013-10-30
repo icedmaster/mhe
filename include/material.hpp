@@ -15,21 +15,10 @@ class Material
 	friend class Driver;
 public:
 	Material(const boost::shared_ptr<TextureAtlas>& texture_atlas, const std::string& name,
-			 const boost::shared_ptr<ShaderProgram>& shader) :
-		shader_(shader)
-	{
-		uv_.push_back(texture_atlas->get(name));
-		texture_atlas_.push_back(texture_atlas);
-		texture_.push_back(texture_atlas->texture());
-	}
+			 const boost::shared_ptr<ShaderProgram>& shader);
 
 	Material(const boost::shared_ptr<Texture>& texture,
-			 const boost::shared_ptr<ShaderProgram>& shader) :
-		shader_(shader)
-	{
-		init_uv(0);
-		texture_.push_back(texture);
-	}
+			 const boost::shared_ptr<ShaderProgram>& shader);
 
 	boost::shared_ptr<ShaderProgram> shader() const
 	{
@@ -61,6 +50,8 @@ public:
 		return texture_.size();
 	}
 
+	void add_texture(const boost::shared_ptr<Texture>& texture);
+
 	bool operator== (const Material& other) const
 	{
 		if (shader_ != other.shader_) return false;
@@ -73,16 +64,7 @@ public:
 		return !(*this == other);
 	}
 private:
-	void init_uv(size_t index)
-	{
-		if (uv_.size() <= index)
-			uv_.resize(index + 1);
-		uv_[index].resize(8);
-		uv_[index][0] = 0; uv_[index][1] = 0;
-		uv_[index][2] = 0; uv_[index][3] = 1;
-		uv_[index][4] = 1; uv_[index][5] = 1;
-		uv_[index][6] = 1; uv_[index][7] = 0;
-	}
+	void init_uv(size_t index);
 
 	fixed_size_vector< std::vector<float>, initial_number_of_textures > uv_;
 	fixed_size_vector< boost::shared_ptr<TextureAtlas>, initial_number_of_textures > texture_atlas_;	
