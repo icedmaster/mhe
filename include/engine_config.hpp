@@ -9,6 +9,7 @@ const size_t initial_number_of_renderables = 1024;
 const size_t initial_number_of_nodes = 1024;
 const size_t max_materials_number = 1;
 const size_t initial_number_of_textures = 2;
+const size_t initial_material_flags = 0xe;
 
 }
 

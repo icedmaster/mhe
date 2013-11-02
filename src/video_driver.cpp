@@ -88,8 +88,6 @@ void Driver::perform_batch()
 
 void Driver::perform_render(const BatchedRenderable& renderable)
 {
-	set_render_flags(renderable);
-
 	if (!impl_->support_buffered_render())
 	{
 		impl_->begin_draw(renderable.vertexcoord().data(),
@@ -100,7 +98,6 @@ void Driver::perform_render(const BatchedRenderable& renderable)
 	}
 	else perform_buffered_render(renderable);
 	stats_.update(renderable);
-	clear_render_flags(renderable);
 }
 
 void Driver::perform_buffered_render(const BatchedRenderable& renderable)
@@ -117,33 +114,39 @@ void Driver::perform_buffered_render(const BatchedRenderable& renderable)
 		buffer->attach_data(name, data, tc.size());
 	}
 	if (!buffer->init()) return;
-	buffer->enable();
-	impl_->begin_draw(buffer.get(), renderable.materials(), renderable.materials_number());
-	impl_->draw(renderable.indicies().data(), renderable.indicies().size());
-	impl_->end_draw(buffer.get(), renderable.materials_number());
-	buffer->disable();
-}
-
-void Driver::set_render_flags(const BatchedRenderable& renderable)
-{
-	if (renderable.is_z_buffer_masked())
-		impl_->mask_zbuffer();
-	if (!renderable.is_lighting_enabled())
-		impl_->disable_lighting();
-	if (renderable.is_blending_enabled())
+	for (size_t i = 0; i < renderable.materials_number(); ++i)
 	{
-		impl_->enable_blending();
-		impl_->set_blend_func(renderable.blend_mode());
+		const material_ptr& material = renderable.material_at(i);
+		set_render_flags(material);
+		buffer->enable();
+		impl_->begin_draw(buffer.get(), material);
+		impl_->draw(renderable.indicies().data(), renderable.indicies().size());
+		impl_->end_draw(buffer.get(), renderable.materials_number());
+		buffer->disable();
+		clear_render_flags(material);
 	}
 }
 
-void Driver::clear_render_flags(const BatchedRenderable& renderable)
+void Driver::set_render_flags(const material_ptr& material)
 {
-	if (renderable.is_z_buffer_masked())
+	if (material->is_z_buffer_masked())
+		impl_->mask_zbuffer();
+	if (!material->is_lighting_enabled())
+		impl_->disable_lighting();
+	if (material->is_blending_enabled())
+	{
+		impl_->enable_blending();
+		impl_->set_blend_func(material->blend_mode());
+	}
+}
+
+void Driver::clear_render_flags(const material_ptr& material)
+{
+	if (material->is_z_buffer_masked())
 		impl_->unmask_zbuffer();
-	if (!renderable.is_lighting_enabled())
+	if (!material->is_lighting_enabled())
 		impl_->enable_lighting();
-	if (renderable.is_blending_enabled())
+	if (material->is_blending_enabled())
 		impl_->disable_blending();
 }
 

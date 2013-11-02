@@ -12,12 +12,6 @@ namespace mhe {
 
 class Driver;
 
-enum BlendMode
-{
-	no_blend,
-	alpha_one_minus_alpha,
-};
-
 template
 <size_t number_of_verteces = initial_number_of_verteces,
  size_t number_of_indexes = initial_number_of_verteces,
@@ -30,9 +24,6 @@ public:
 	enum
 	{
 		default_render = 0, 
-		mask_z_buffer = 1,
-		lighting_disabled = (1 << 1),
-		blending_enabled = (1 << 2),
 		batching_disabled = (1 << 3)
 	};
 public:
@@ -41,12 +32,12 @@ public:
 	typedef fixed_size_vector<float, number_of_texcoords> texcoord_container;
 public:
 	RenderableBase() :
-		color_(color_white), render_flags_(0), blend_mode_(no_blend)
+		color_(color_white), render_flags_(0)
 	{ 
 	}
 
 	RenderableBase(size_t vertexes_number, size_t indexes_number, size_t texcoord_number) :
-		color_(color_white), render_flags_(0), blend_mode_(no_blend)
+		color_(color_white), render_flags_(0)
 	{
 		vertexcoord_.reserve(vertexes_number);
 		normalscoord_.reserve(vertexes_number);
@@ -163,51 +154,6 @@ public:
 		render_flags_ = default_render;
 	}
 
-	void set_mask_z_buffer()
-	{
-		render_flags_ |= mask_z_buffer;
-	}
-
-	void set_unmask_z_buffer()
-	{
-		render_flags_ &= ~mask_z_buffer;
-	}
-
-	bool is_z_buffer_masked() const
-	{
-		return render_flags_ & mask_z_buffer;
-	}
-
-	void set_lightning_enabled()
-	{
-		render_flags_ &= ~lighting_disabled;
-	}
-
-	void set_lighting_disabled()
-	{
-		render_flags_ |= lighting_disabled;
-	}
-
-	bool is_lighting_enabled() const
-	{
-		return !(render_flags_ & lighting_disabled);
-	}
-
-	void set_blending_enabled()
-	{
-		render_flags_ |= blending_enabled;
-	}
-
-	void set_blending_disabled()
-	{
-		render_flags_ &= ~blending_enabled;
-	}
-
-	bool is_blending_enabled() const
-	{
-		return render_flags_ & blending_enabled;
-	}
-
 	void set_batching_disabled()
 	{
 		render_flags_ |= batching_disabled;
@@ -226,16 +172,6 @@ public:
 	uint32_t render_flags() const
 	{
 		return render_flags_;
-	}
-
-	void set_blend_mode(BlendMode mode)
-	{
-		blend_mode_ = mode;
-	}
-
-	BlendMode blend_mode() const
-	{
-		return blend_mode_;
 	}
 
 	template <size_t VC, size_t IC, size_t TC>
@@ -260,14 +196,12 @@ public:
 		for (size_t i = 0; i < other.indicies().size(); ++i)
 			indicies_.push_back(other.indicies()[i] + v_sz); 
 		render_flags_ |= other.render_flags();
-		blend_mode_ = other.blend_mode();
 	}
 
 	void clear()
 	{
 		color_ = color_white;
-		render_flags_ = 0;
-		blend_mode_ = no_blend;
+		render_flags_ = default_render;
 		texcoord_.clear();
 		materials_.clear();
 		vertexcoord_.clear();
@@ -392,7 +326,6 @@ private:
 	fixed_size_vector<material_ptr, max_materials_number> materials_;
 	colorf color_;
 	uint32_t render_flags_;
-	BlendMode blend_mode_;
 };
 
 typedef RenderableBase<> Renderable;

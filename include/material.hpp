@@ -10,9 +10,23 @@ namespace mhe {
 
 class Driver;
 
+enum BlendMode
+{
+	no_blend,
+	alpha_one_minus_alpha,
+};
+
 class Material
 {
 	friend class Driver;
+public:
+	enum
+	{
+		default_render = 0,
+		mask_z_buffer = 1,
+		lighting_disabled = (1 << 1),
+		blending_enabled = (1 << 2)
+	};
 public:
 	Material(const boost::shared_ptr<TextureAtlas>& texture_atlas, const std::string& name,
 			 const boost::shared_ptr<ShaderProgram>& shader);
@@ -63,13 +77,80 @@ public:
 	{
 		return !(*this == other);
 	}
+
+		void clear_render_flags()
+	{
+		render_flags_ = default_render;
+	}
+
+	void set_mask_z_buffer()
+	{
+		render_flags_ |= mask_z_buffer;
+	}
+
+	void set_unmask_z_buffer()
+	{
+		render_flags_ &= ~mask_z_buffer;
+	}
+
+	bool is_z_buffer_masked() const
+	{
+		return render_flags_ & mask_z_buffer;
+	}
+
+	void set_lightning_enabled()
+	{
+		render_flags_ &= ~lighting_disabled;
+	}
+
+	void set_lighting_disabled()
+	{
+		render_flags_ |= lighting_disabled;
+	}
+
+	bool is_lighting_enabled() const
+	{
+		return !(render_flags_ & lighting_disabled);
+	}
+
+	void set_blending_enabled()
+	{
+		render_flags_ |= blending_enabled;
+	}
+
+	void set_blending_disabled()
+	{
+		render_flags_ &= ~blending_enabled;
+	}
+
+	bool is_blending_enabled() const
+	{
+		return render_flags_ & blending_enabled;
+	}
+
+	uint32_t render_flags() const
+	{
+		return render_flags_;
+	}
+
+	void set_blend_mode(BlendMode mode)
+	{
+		blend_mode_ = mode;
+	}
+
+	BlendMode blend_mode() const
+	{
+		return blend_mode_;
+	}
 private:
 	void init_uv(size_t index);
 
 	fixed_size_vector< std::vector<float>, initial_number_of_textures > uv_;
 	fixed_size_vector< boost::shared_ptr<TextureAtlas>, initial_number_of_textures > texture_atlas_;	
 	fixed_size_vector< boost::shared_ptr<Texture>, initial_number_of_textures > texture_;
-	boost::shared_ptr<ShaderProgram> shader_;	
+	boost::shared_ptr<ShaderProgram> shader_;
+	uint32_t render_flags_;
+	BlendMode blend_mode_;	
 };
 
 typedef boost::shared_ptr<Material> material_ptr;

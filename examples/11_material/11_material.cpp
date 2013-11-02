@@ -17,6 +17,16 @@ public:
 			sprite_->set_material(materials_[0]);
 		else if (ke->sym() == mhe::KeyboardDevice::key_2)
 			sprite_->set_material(materials_[1]);
+		else if (ke->sym() == mhe::KeyboardDevice::key_3)
+		{
+			sprite_->set_material(materials_[0]);
+			sprite_->add_material(materials_[1]);
+		}
+		else if (ke->sym() == mhe::KeyboardDevice::key_4)
+		{
+			sprite_->set_material(materials_[1]);
+			sprite_->add_material(materials_[0]);
+		}
 		return true;
 	}
 private:
@@ -32,6 +42,9 @@ private:
 		engine()->event_manager().add_listener(new mhe::DelegateEventListener(mhe::keyboard_event_type,
 																			  mhe::KeyboardEvent::key_down, mhe::Event::any_event,
 																			  mhe::create_delegate(this, &TestScene::process_key)));
+
+		materials_[0]->set_blend_mode(mhe::alpha_one_minus_alpha);
+		materials_[1]->set_blend_mode(mhe::alpha_one_minus_alpha);
 		return true;
 	}
 

@@ -4,7 +4,8 @@ namespace mhe {
 
 Material::Material(const boost::shared_ptr<TextureAtlas>& texture_atlas, const std::string& name,
 				   const boost::shared_ptr<ShaderProgram>& shader) :
-	shader_(shader)
+	shader_(shader),
+	render_flags_(initial_material_flags)
 {
 	uv_.push_back(texture_atlas->get(name));
 	texture_atlas_.push_back(texture_atlas);
@@ -13,7 +14,8 @@ Material::Material(const boost::shared_ptr<TextureAtlas>& texture_atlas, const s
 
 Material::Material(const boost::shared_ptr<Texture>& texture,
 				   const boost::shared_ptr<ShaderProgram>& shader) :
-	shader_(shader)
+	shader_(shader),
+	render_flags_(initial_material_flags)
 {
 	add_texture(texture);
 }

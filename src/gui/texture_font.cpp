@@ -81,9 +81,6 @@ Renderable* TextureFont::print(const utf32_string& text,
 	renderable->set_material(material_);
 	renderable->set_buffers(v, t, ibuf);
 	renderable->set_color(color);
-	renderable->set_mask_z_buffer();
-    renderable->set_blending_enabled();
-    renderable->set_blend_mode(alpha_one_minus_alpha);
 	return renderable;
 }
 
@@ -131,6 +128,9 @@ void TextureFont::setup_material(const Context& context)
 	// create new
 	material_.reset(new Material(ta_.texture(),
 								 context.shader_manager().get("diffuse_unlit")));
+	material_->set_mask_z_buffer();
+    material_->set_blending_enabled();
+    material_->set_blend_mode(alpha_one_minus_alpha);
 }
 
 }}

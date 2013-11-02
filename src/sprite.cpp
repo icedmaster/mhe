@@ -49,10 +49,6 @@ void Sprite::init()
 	i.resize(6);
 	i[0] = 0; i[1] = 1; i[2] = 2;
 	i[3] = 2; i[4] = 3; i[5] = 0;
-
-	set_mask_z_buffer();
-	set_blending_enabled();
-	set_blend_mode(alpha_one_minus_alpha);
 }
 
 void Sprite::update_buffers()

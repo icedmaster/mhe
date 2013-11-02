@@ -64,7 +64,7 @@ public:
 	virtual void begin_draw(boost::shared_ptr<Texture>,
 							const float*, const float*, const float*, const float*,
 							cmn::uint) = 0;
-	virtual void begin_draw(const RenderBuffer*, const material_ptr* /*materials*/, size_t /*materials_number*/) {}
+	virtual void begin_draw(const RenderBuffer*, const material_ptr&) {}
 	virtual void draw(const cmn::uint*, cmn::uint) = 0;
 	virtual void draw(const RenderBuffer*) {}
 	virtual void end_draw() = 0;
@@ -323,8 +323,8 @@ public:
 private:
 	void perform_batch();
 	void perform_render(const BatchedRenderable& renderable);
-	void set_render_flags(const BatchedRenderable& renderable);
-	void clear_render_flags(const BatchedRenderable& renderable);
+	void set_render_flags(const material_ptr& material);
+	void clear_render_flags(const material_ptr& material);
 	void perform_buffered_render(const BatchedRenderable& Renderable);
 
 	renderable_container renderable_elements_;
