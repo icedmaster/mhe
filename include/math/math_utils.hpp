@@ -41,6 +41,21 @@ inline T lerp(const T& begin, const T& end, float value)
 	return begin + (end - begin) * value;
 }
 
+template <class T>
+inline T clamp(const T& min, const T& max, const T& value)
+{
+	if (value > max) return max;
+	if (value < min) return min;
+	return value;
+}
+
+template <class T>
+inline T clamp_up(const T& max, const T& value)
+{
+	if (value > max) return max;
+	return value;
+}
+
 };
 
 #endif
