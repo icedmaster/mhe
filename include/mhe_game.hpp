@@ -12,5 +12,6 @@
 #include "game/transform_animation_component.hpp"
 #include "game/move_animation_components.hpp"
 #include "game/message_transform.hpp"
+#include "game/frame_animation_component.hpp"
 
 #endif

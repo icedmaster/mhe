@@ -11,7 +11,8 @@ public:
 	
 public:
 	Animation() :
-		atime_(0)
+		atime_(0),
+		loop_(false)
 	{}
 
 	Animation(cmn::uint duration) :
@@ -43,14 +44,27 @@ public:
 		return running_;
 	}
 
+	void set_loop(bool loop)
+	{
+		loop_ = loop;
+	}
+
 	void update(cmn::uint tick)
 	{
 		if (!running_) return;
 		cmn::uint delta = tick - start_;
 		if (delta > atime_)
 		{
-			stop();
-			return;
+			if (!loop_)
+			{
+				stop();
+				return;
+			}
+			else
+			{
+				start();
+				delta = 0;
+			}
 		}
 		update_animation_impl(static_cast<float>(delta) / atime_);
 	}
@@ -69,6 +83,7 @@ private:
 	cmn::uint atime_;    // time of playing current animation
 	cmn::uint start_;
 	bool running_;
+	bool loop_;
 };
 
 }
