@@ -9,7 +9,7 @@ namespace mhe {
 // helper stats class
 void Driver::Stats::update(const BatchedRenderable& renderable)
 {
-	tris_ += renderable.indicies().size() / 3;
+	tris_ += renderable.mesh()->indexes.size() / 3;
 	++batches_;
 }
 
@@ -23,6 +23,8 @@ Driver::Driver() :
 	batched_(initial_number_of_renderables)
 {
 	batched_.resize(0);	
+	for (size_t i = 0; i < batched_.capacity(); ++i)
+		batched_[i].set_mesh(mesh_ptr(new Mesh));
 }
 
 void Driver::begin_render()
@@ -74,7 +76,10 @@ void Driver::perform_batch()
 		{
 			batched_container::iterator it = batched_.next_predefined_element();
 			if (it == batched_.end())
+			{
 				batched_.push_back(BatchedRenderable());
+				batched_.back().set_mesh(mesh_ptr(new Mesh));
+			}
 			last_renderable = renderable;
 			BatchedRenderable& current = batched_.back();
 			current.clear();
@@ -82,7 +87,7 @@ void Driver::perform_batch()
 				current.add_material(last_renderable->material_at(i));
 		}
 		BatchedRenderable& current_batch = batched_.back();			
-		current_batch.attach(*renderable);
+		BatchedRenderable::batch(current_batch, *renderable);
 	}	
 }
 
@@ -90,10 +95,10 @@ void Driver::perform_render(const BatchedRenderable& renderable)
 {
 	if (!impl_->support_buffered_render())
 	{
-		impl_->begin_draw(renderable.vertexcoord().data(),
-						  renderable.normalscoord().data(), renderable.texcoord().data(),
-						  renderable.colorcoord().data(), renderable.indicies().size());
-		impl_->draw(renderable.indicies().data(), renderable.indicies().size());
+		impl_->begin_draw(renderable.mesh()->vertexes.data(),
+						  renderable.mesh()->normals.data(), renderable.texcoord().data(),
+						  renderable.colorcoord().data(), renderable.mesh()->indexes.size());
+		impl_->draw(renderable.mesh()->indexes.data(), renderable.mesh()->indexes.size());
 		impl_->end_draw();
 	}
 	else perform_buffered_render(renderable);
@@ -103,8 +108,10 @@ void Driver::perform_render(const BatchedRenderable& renderable)
 void Driver::perform_buffered_render(const BatchedRenderable& renderable)
 {
 	boost::scoped_ptr<RenderBuffer> buffer(impl_->create_render_buffer());
-	buffer->attach_data(vertex_position_attribute_name, renderable.vertexcoord().data(), renderable.vertexcoord().size());
-	buffer->attach_data(vertex_normal_attribute_name, renderable.normalscoord().data(), renderable.normalscoord().size());
+	buffer->attach_data(vertex_position_attribute_name,
+						renderable.mesh()->vertexes.data(), renderable.mesh()->vertexes.size());
+	buffer->attach_data(vertex_normal_attribute_name,
+						renderable.mesh()->normals.data(), renderable.mesh()->normals.size());
 	buffer->attach_data(vertex_color_attribute_name, renderable.colorcoord().data(), renderable.colorcoord().size());
 	for (size_t i = 0; i < renderable.textures_number(); ++i)
 	{
@@ -120,7 +127,7 @@ void Driver::perform_buffered_render(const BatchedRenderable& renderable)
 		set_render_flags(material);
 		buffer->enable();
 		impl_->begin_draw(buffer.get(), material);
-		impl_->draw(renderable.indicies().data(), renderable.indicies().size());
+		impl_->draw(renderable.mesh()->indexes.data(), renderable.mesh()->indexes.size());
 		impl_->end_draw(buffer.get(), renderable.materials_number());
 		buffer->disable();
 		clear_render_flags(material);

@@ -11,13 +11,11 @@ namespace mhe
 class Sprite : public Node
 {
 public:
-	Sprite() : Node(16, 6, 8), x_size_(0.0), y_size_(0.0),
+	Sprite() : Node(), x_size_(0.0), y_size_(0.0),
 			   z_order_(0)
 	{
 		init();
 	}
-
-	Sprite(const Sprite& sprite);
 
 	void set_size(float size)
 	{

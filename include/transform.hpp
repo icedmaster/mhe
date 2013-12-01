@@ -21,7 +21,7 @@ public:
 
 	void set_transform(const matrixf& nm)
 	{
-		m = nm;
+		m = initial_ * nm;
 	}
 
 	const matrixf& transform() const
@@ -32,6 +32,17 @@ public:
 	void apply_transform(const matrixf& nm)
 	{
 		m *= nm;
+	}
+
+	void set_initial(const matrixf& initial)
+	{
+		initial_ = initial;
+		m = initial * m;
+	}
+
+	const matrixf& initial() const
+	{
+		return initial_;
 	}
 
 	void translate(float dx, float dy, float dz)
@@ -91,7 +102,7 @@ public:
 
 	void identity()
 	{
-		m.load_identity();
+		set_transform(matrixf::identity());
 	}
 
 	void translate_to(const v3d& position);
@@ -147,6 +158,7 @@ private:
 	}
 
 	matrixf m;   
+	matrixf initial_;
 	vector3<float> position_; 
 	vector3<float> rotation_;
 	vector3<float> scaling_;

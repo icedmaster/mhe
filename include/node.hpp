@@ -31,7 +31,6 @@ public:
 	};
 public:
 	Node();
-	Node(size_t vertexes_number, size_t indexes_number, size_t texcoord_number);
 
 	virtual ~Node() {}
 

@@ -38,9 +38,10 @@ bool TextureFont::load(const std::string& filename, const Context& context)
 Renderable* TextureFont::print(const utf32_string& text,
 							   const vector2<float>& position, const colorf& color)
 {
-	Renderable::texcoord_container t;	// texture coordinates
-	Renderable::indexes_container ibuf;  // indicies
-	Renderable::vertex_container v;	// vertexes
+	boost::shared_ptr<Mesh> mesh(new Mesh);
+	Mesh::texcoord_vector& t = mesh->uv;	
+	Mesh::indexes_vector& ibuf = mesh->indexes; 
+	Mesh::vertexes_vector& v = mesh->vertexes;
 	const size_t len = text.length();
 	v.reserve(len * 12);
 	t.reserve(len * 8);
@@ -79,7 +80,7 @@ Renderable* TextureFont::print(const utf32_string& text,
 
 	Renderable* renderable = new Renderable();
 	renderable->set_material(material_);
-	renderable->set_buffers(v, t, ibuf);
+	renderable->set_mesh(mesh);
 	renderable->set_color(color);
 	return renderable;
 }

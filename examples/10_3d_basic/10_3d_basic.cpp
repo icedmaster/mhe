@@ -37,7 +37,8 @@ public:
 private:
 	void setup_buffers(float size)
 	{
-		mhe::Renderable::vertex_container& v = rvertexcoord();
+		mhe::mesh_ptr mesh(new mhe::Mesh);
+		mhe::Mesh::vertexes_vector& v = mesh->vertexes;
 		v.resize(24);
 		v[0] = 0; v[1] = 0; v[2] = 0;   // 0
 		v[3] = 0; v[4] = size; v[5] = 0;  // 1
@@ -47,7 +48,7 @@ private:
 		v[15] = 0; v[16] = size; v[17] = -size; // 5
 		v[18] = size; v[19] = size; v[20] = -size; // 6
 		v[21] = size; v[22] = 0; v[23] = -size; // 7
-		mhe::Renderable::indexes_container& i = rindicies();
+		mhe::Mesh::indexes_vector& i = mesh->indexes;
 		i.resize(36);
 		// front
 		i[0] = 0; i[1] = 1; i[2] = 2;
@@ -67,6 +68,8 @@ private:
 		// bottom
 		i[30] = 0; i[31] = 4; i[32] = 7;
 		i[33] = 7; i[34] = 3; i[35] = 0;
+
+		Renderable::set_mesh(mesh);
 	}
 };
 

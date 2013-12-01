@@ -5,19 +5,14 @@
 #include "types.hpp"
 #include "material.hpp"
 #include "transform.hpp"
-#include "fixed_size_vector.hpp"
+#include "mesh.hpp"
 #include "engine_config.hpp"
 
 namespace mhe {
 
 class Driver;
 
-template
-<size_t number_of_verteces = initial_number_of_verteces,
- size_t number_of_indexes = initial_number_of_verteces,
- size_t number_of_texcoords = initial_number_of_texcoords
->
-class RenderableBase : public Transform
+class Renderable : public Transform
 {
 	friend class Driver;	
 public:
@@ -26,43 +21,19 @@ public:
 		default_render = 0, 
 		batching_disabled = (1 << 3)
 	};
+
+	typedef fixed_size_vector<float, initial_number_of_vertexes> vertexes_container;
+	typedef fixed_size_vector<float, initial_number_of_texcoords> texcoord_container;
 public:
-	typedef fixed_size_vector<float, number_of_verteces> vertex_container;
-	typedef fixed_size_vector<unsigned int, number_of_indexes> indexes_container;
-	typedef fixed_size_vector<float, number_of_texcoords> texcoord_container;
+	static void batch(Renderable& to, const Renderable& from);
 public:
-	RenderableBase() :
+	Renderable() :
 		color_(color_white), render_flags_(0)
 	{ 
 	}
 
-	RenderableBase(size_t vertexes_number, size_t indexes_number, size_t texcoord_number) :
-		color_(color_white), render_flags_(0)
-	{
-		vertexcoord_.reserve(vertexes_number);
-		normalscoord_.reserve(vertexes_number);
-		colorcoord_.reserve(vertexes_number);
-		indicies_.reserve(indexes_number);
-		for (size_t i = 0; i < texcoord_.size(); ++i)
-			texcoord_[i].reserve(texcoord_number);
-	}
-
-	void set_material(const material_ptr& material)
-	{
-		materials_.resize(1);
-		texcoord_.resize(material->textures_number());
-		materials_[0] = material;
-		on_material_changed();
-	}
-
-	void add_material(const material_ptr& material)
-	{
-		materials_.push_back(material);
-		for (size_t i = 0; i < material->textures_number(); ++i)
-			texcoord_.push_back(texcoord_container());
-		if (material->shader() != materials_.front()->shader())
-			set_batching_disabled();
-	}
+	void set_material(const material_ptr& material);
+	void add_material(const material_ptr& material);
 
 	material_ptr material() const
 	{
@@ -94,11 +65,14 @@ public:
 		return materials_.front()->texture();
 	}
 
-	void set_color(const colorf& color)
+	void set_mesh(const mesh_ptr& mesh);
+
+	mesh_ptr mesh() const
 	{
-		color_ = color;
-		update_color_buffer();
+		return mesh_;
 	}
+
+	void set_color(const colorf& color);
 
 	const colorf& color() const
 	{
@@ -120,33 +94,9 @@ public:
 		texcoord_[0] = coord;
 	}
 
-	void set_buffers(const vertex_container& vertexes, const texcoord_container& texturecoord,
-					 const indexes_container& indicies)
-	{
-		vertexcoord_ = vertexes;
-		texcoord_[0] = texturecoord;
-		indicies_ = indicies;
-		update_color_buffer();
-	}
-
-	const vertex_container& vertexcoord() const
-	{
-		return vertexcoord_;
-	}
-
-	const vertex_container& normalscoord() const
-	{
-		return normalscoord_;
-	}
-
-	const vertex_container& colorcoord() const
+	vertexes_container colorcoord() const
 	{
 		return colorcoord_;
-	}
-
-	const indexes_container& indicies() const
-	{
-		return indicies_;
 	}
 
 	void clear_render_flags()
@@ -174,52 +124,9 @@ public:
 		return render_flags_;
 	}
 
-	template <size_t VC, size_t IC, size_t TC>
-	void attach(const RenderableBase<VC, IC, TC>& other)
-	{
-		for (size_t i = 0; i < other.texcoord_.size(); ++i)
-		{
-			const texcoord_container& tc = other.texcoord_at(i);
-			typename texcoord_container::const_iterator b = tc.begin();
-			typename texcoord_container::const_iterator e = tc.end();
-			texcoord_[i].insert(texcoord_[i].end(), b, e);
-		}
-		size_t v_sz = vertexcoord_.size() / 3;
-		for (size_t i = 0; i < other.vertexcoord().size(); i += 3)
-		{
-			v3d v(other.vertexcoord()[i], other.vertexcoord()[i + 1], other.vertexcoord()[i + 2]);
-			v = v * other.transform();
-			vertexcoord_.insert(vertexcoord_.end(), v.get(), v.get() + 3);
-			colorcoord_.insert(colorcoord_.end(), other.color().get(), other.color().get() + 4);
-		}
-		normalscoord_.insert(normalscoord_.end(), other.normalscoord().begin(), other.normalscoord().end());	
-		for (size_t i = 0; i < other.indicies().size(); ++i)
-			indicies_.push_back(other.indicies()[i] + v_sz); 
-		render_flags_ |= other.render_flags();
-	}
+	void clear();
 
-	void clear()
-	{
-		color_ = color_white;
-		render_flags_ = default_render;
-		texcoord_.clear();
-		materials_.clear();
-		vertexcoord_.clear();
-		normalscoord_.clear();
-		colorcoord_.clear();
-		indicies_.clear();
-	}
-
-	template <size_t VC, size_t IC, size_t TC>	
-	bool is_material_equals(const RenderableBase<VC, IC, TC>& other) const
-	{
-		if (materials_.size() != other.materials_number()) return false;
-		for (size_t i = 0; i < materials_.size(); ++i)
-		{
-			if ( *(materials_[i]) != *(other.material_at(i)) ) return false;
-		}
-		return true;
-	}
+	bool is_material_equals(const Renderable& other) const;
 protected:
 	texcoord_container& rtexcoord()
 	{
@@ -233,106 +140,26 @@ protected:
 		return texcoord_[index];
 	}
 
-	vertex_container& rvertexcoord()
-	{
-		return vertexcoord_;
-	}
+	material_ptr material_by_texture(size_t texture_index) const;
 
-	void set_vertexcoord(const vertex_container& coord)
-	{
-		vertexcoord_ = coord;
-	}
-
-	vertex_container& rnormalscoord()
-	{
-		return normalscoord_;
-	}
-
-	void set_normalscoord(const vertex_container& coord)
-	{
-		normalscoord_ = coord;
-	}
-
-	indexes_container& rindicies()
-	{
-		return indicies_;
-	}
-
-	void set_indicies(const indexes_container& coord)
-	{
-		indicies_ = coord;
-	}
-
-	vertex_container& rcolorcoord()
-	{
-		return colorcoord_;
-	}
-
-	material_ptr material_by_texture(size_t texture_index) const
-	{
-		size_t index = 0;
-		for (size_t i = 0; i < materials_.size(); ++i)
-		{
-			size_t next = index + materials_[i]->textures_number();
-			if ( (texture_index >= index) && (texture_index < next) )
-				return materials_[i];
-			index = next;
-		}
-		return material_ptr();
-	}
-
-	void update_color_buffer()
-	{
-		int count = vertexcoord_.size() / 3;
-		colorcoord_.resize(count * 4);
-		for (int i = 0; i < count * 4; i += 4)
-		{
-			colorcoord_[i] = color_.r();
-			colorcoord_[i + 1] = color_.g();
-			colorcoord_[i + 2] = color_.b();
-			colorcoord_[i + 3] = color_.a();
-		}
-	}
-
-	void update_buffers()
-	{
-		update_color_buffer();
-		size_t texture_index = 0;
-		for (size_t i = 0; i < materials_.size(); ++i)
-		{			
-			for (size_t j = 0; j < materials_[i]->textures_number(); ++j, ++texture_index)
-			{
-				const std::vector<float>& uv = materials_[i]->uv_at(j);
-				float u = uv[0], v = uv[1];
-				float w = uv[4], h = uv[5];
-				float uk = 1.0 / (w - u);
-				float vk = 1.0 / (h - v);
-				for (size_t k = 0; k < texcoord_[texture_index].size(); k += 2)
-				{
-					texcoord_[i][k] *= uk; texcoord_[i][k] += u; 
-					texcoord_[i][k + 1] *= vk; texcoord_[i][k + 1] += v;			
-				}
-			}
-		}
-	}
+	void update_color_buffer();
+	void update_buffers(bool update_color = true);
 private:
 	virtual void on_material_changed() {}
 
+	void resize_texcoord();
+	
 	fixed_size_vector<texcoord_container, max_materials_number * initial_number_of_textures> texcoord_;
-	vertex_container vertexcoord_;
-	vertex_container colorcoord_;
-	vertex_container normalscoord_;
-	indexes_container indicies_;
+	vertexes_container colorcoord_;
 	fixed_size_vector<material_ptr, max_materials_number> materials_;
+	mesh_ptr mesh_;
 	colorf color_;
 	uint32_t render_flags_;
 };
 
-typedef RenderableBase<> Renderable;
-
-inline Renderable::vertex_container vector_to_vertex_container(const std::vector<float>& v)
+inline Renderable::vertexes_container vector_to_vertex_container(const std::vector<float>& v)
 {
-	Renderable::vertex_container result(v.begin(), v.end());
+	Renderable::vertexes_container result(v.begin(), v.end());
 	return result;
 }
 
