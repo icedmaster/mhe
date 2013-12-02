@@ -38,6 +38,10 @@ private:
 		materials_[1]->add_texture(engine()->context().texture_manager().get("highlight.png"));
 		scene()->add(sprite_);
 		sprite_->set_material(materials_[1]);
+		// by default, sprite class should use only one texture,
+		// because sprite uses texture dimensions as sprite's size,
+		// but for example application we can set fixed size
+		sprite_->set_size(materials_[0]->texture()->width(), materials_[0]->texture()->height());
 
 		engine()->event_manager().add_listener(new mhe::DelegateEventListener(mhe::keyboard_event_type,
 																			  mhe::KeyboardEvent::key_down, mhe::Event::any_event,
