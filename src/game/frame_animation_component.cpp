@@ -44,7 +44,7 @@ void FrameAnimationComponent::update_animation_impl(float value)
 {
 	size_t frame = value / frame_duration_;
 	frame = clamp_up<size_t>(materials_.size() - 1, frame);
-	node_->node()->set_material(materials_[frame]);
+	node_->set_material(materials_[frame]);
 }
 
 }}

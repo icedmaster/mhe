@@ -126,6 +126,11 @@ public:
 
 	void clear();
 
+	void rebuild()
+	{
+		update_buffers();
+	}
+
 	bool is_material_equals(const Renderable& other) const;
 protected:
 	texcoord_container& rtexcoord()

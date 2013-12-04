@@ -11,11 +11,11 @@ private:
 	bool init_impl(const mhe::utils::PropertiesList&)
 	{
 		engine()->context().texture_manager().set_path("../../../assets/");
-		mhe::Sprite* sprite = new mhe::Sprite;
-		sprite->set_material(mhe::material_ptr(new mhe::Material(
-												   engine()->context().texture_manager().get("test_sprite.png"),
-												   engine()->context().shader_manager().get("diffuse_unlit"))));
-		node_.reset(new mhe::game::NodeComponent("sprite", sprite, scene()));
+		node_.reset(new mhe::game::SpriteComponent("sprite"));
+		node_->set_material(mhe::material_ptr(new mhe::Material(
+												  engine()->context().texture_manager().get("test_sprite.png"),
+												  engine()->context().shader_manager().get("diffuse_unlit"))));
+		scene()->add(node_);
 		color_animation_.reset(new mhe::game::ColorAnimationComponent(1000, "sprite"));
 		color_animation_->set_range(mhe::color_white, mhe::color_black);
 		node_->attach(color_animation_);
@@ -55,10 +55,11 @@ private:
 
 	void init_second_node()
 	{
-		node2_.reset(new mhe::game::NodeComponent("node2", node_->node()->clone(), scene()));
-		node2_->node()->set_material(node_->node()->material());
-		node2_->node()->translate_to(mhe::vector3<float>(600, 200, 0));
+		node2_.reset(new mhe::game::SpriteComponent("node2"));
+		node2_->set_material(node_->material());
+		node2_->translate_to(mhe::vector3<float>(600, 200, 0));
 		engine()->component_manager().add(node2_);
+		scene()->add(node2_);
 
 		transform_animation2_.reset(new mhe::game::TranslateByAnimationComponent(1000, "node2"));
 		transform_animation2_->set_translation(-100, -100, 0);

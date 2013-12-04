@@ -12,12 +12,13 @@ public:
 private:
 	bool init_impl(const mhe::utils::PropertiesList&)
 	{		
-		mhe::Sprite* sprite = new mhe::Sprite;
-		sprite->set_material(engine()->context().material_manager().get_material("logo_0.png", "diffuse_unlit"));
-		node_component_.reset(new mhe::game::NodeComponent("sprite", sprite, scene()));
+		node_component_.reset(new mhe::game::SpriteComponent("sprite"));
+		node_component_->set_material(engine()->context().material_manager().get_material("logo_0.png", "diffuse_unlit"));
+
 		frame_animation_component_.reset(new mhe::game::FrameAnimationComponent(
 											 engine(), "diffuse_unlit", "logo_.png", 5,
 											   500, "sprite"));
+		scene()->add(node_component_);
 		engine()->component_manager().add(node_component_);
 		node_component_->attach(frame_animation_component_);
 		frame_animation_component_->set_loop(true);

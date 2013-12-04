@@ -54,7 +54,7 @@ public:
 protected:
 	virtual void start_impl()
 	{
-		initial_position_ = node_component()->node()->position();
+		initial_position_ = node_component()->position();
 	}
 
 	vector3<float> initial_position() const
@@ -119,7 +119,7 @@ public:
 protected:
 	virtual void start_impl()
 	{
-		initial_rotation_ = node_component()->node()->rotation();
+		initial_rotation_ = node_component()->rotation();
 	}
 
 	vector3<float> initial_rotation() const
@@ -184,7 +184,7 @@ public:
 protected:
 	virtual void start_impl()
 	{
-		initial_scale_ = node_component()->node()->scaling();
+		initial_scale_ = node_component()->scaling();
 	}
 
 	vector3<float> initial_scale() const

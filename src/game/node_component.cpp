@@ -23,20 +23,17 @@ bool NodeComponent::update_impl(const Message& message)
 
 void NodeComponent::process_transform_event(const TransformMessage& message)
 {
-	node_->set_transform(message.transform());
+	Node::set_transform(message.transform());
 }
 
 void NodeComponent::process_enable_event(const EnableMessage& message)
 {
-	if (at_scene_ == message.enabled()) return;
-	at_scene_ = message.enabled();
-	if (at_scene_) scene_->add(node_);
-	else scene_->remove(node_);
+	// set frozen flag
 }
 
 void NodeComponent::process_color_event(const ColorMessage& message)
 {
-	node_->set_color(message.color());
+	Node::set_color(message.color());
 }
 
 }}
