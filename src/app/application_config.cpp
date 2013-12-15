@@ -31,6 +31,8 @@ bool load_config(ApplicationConfig& config, const std::string& filename)
 	config.bpp = op.get<int>("bpp");
 	config.fullscreen = op.get<bool>("fullscreen");
 	config.assets_path = op.get<std::string>("assets_path");
+	config.default_shader_name = op.get<std::string>("default_shader");
+	config.default_texture_name = op.get<std::string>("default_texture");
 
 	return true;
 }

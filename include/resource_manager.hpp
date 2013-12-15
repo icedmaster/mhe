@@ -8,6 +8,8 @@
 
 namespace mhe {
 
+static const std::string default_resource_name = "";
+
 template <class Loader>
 class ResourceManager
 {
@@ -48,6 +50,11 @@ public:
 		return get_impl(name, absolute_path);	
 	}
 
+	boost::shared_ptr<res_type> get_default() const
+	{
+		return get_impl(default_resource_name, false);
+	}
+
 	void add(const std::string& name, res_type* res)
 	{
 		add(name, boost::shared_ptr<res_type>(res));
@@ -56,6 +63,16 @@ public:
 	void add(const std::string& name, const boost::shared_ptr<res_type>& res)
 	{
 		resources_[name] = res;
+	}
+
+	void add_default(const boost::shared_ptr<res_type>& res)
+	{
+		resources_[default_resource_name] = res;
+	}
+
+	void add_default(res_type* res)
+	{
+		add_default(boost::shared_ptr<res_type>(res));
 	}
 
 	void free_all()

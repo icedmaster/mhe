@@ -36,43 +36,27 @@ iSound* SoundLoader::load(const std::string& name, const helper_type* /*helper*/
 Texture* TextureLoader::load(const std::string& filename, const helper_type* /*helper*/)
 {
 	bool loaded = false;
-	bool use_default_color = false;
     boost::shared_ptr<Image> im;
-	if (utils::get_file_name(filename) == default_resource_name)
-	{
-		loaded = true;
-		use_default_color = true;
-	}
-	else
-	{
-		const std::string& ext = utils::get_file_extension(filename);
-		if (ext.empty()) return nullptr;
 
-		if (ext == "bmp")
-		{
-			im.reset(new bmp_image);
-			if (im->load(filename))
-				loaded = true;
-		}
-		else if (ext == "png")
-		{
-			im.reset(new png_image);
-			if (im->load(filename))
-				loaded = true;
-		}
-		else if (ext == "siwa")
-		{
-			im.reset(new siwa_image);
-			if (im->load(filename))
-				loaded = true;
-		}
+	const std::string& ext = utils::get_file_extension(filename);
+	if (ext.empty()) return nullptr;
+
+	if (ext == "bmp")
+	{
+		im.reset(new bmp_image);
+		if (im->load(filename))
+			loaded = true;
+	}
+	else if (ext == "png")
+	{
+		im.reset(new png_image);
+		if (im->load(filename))
+			loaded = true;
 	}
 	if (loaded)
 	{
 		Texture* texture = SystemFactory::instance().create_texture();
-		if (!use_default_color)
-			texture->set_image(im);
-		else texture->set_color(color_white);
+		texture->set_image(im);
 		return texture;
 	}
 	return nullptr;

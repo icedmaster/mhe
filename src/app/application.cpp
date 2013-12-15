@@ -43,6 +43,7 @@ bool Application::mhe_app_init(const ApplicationConfig& config)
 	bool result = engine_.init(config.width, config.height, config.bpp, config.fullscreen);
 	if (!result) return false;
 	init_assets_path(config.assets_path);
+	init_default_assets(config);
 	engine_.context().window_system().set_caption(name_);	
 	return result;
 }
@@ -73,6 +74,27 @@ void Application::init_assets_path(const std::string& config_assets_path)
 													 font_path));
 	engine_.context().shader_manager().set_path(utils::path_join(base_path,
 		shader_path));
+}
+
+void Application::init_default_assets(const ApplicationConfig& config)
+{
+	if (!engine_.context().texture_manager().load(config.default_texture_name))
+	{
+		Texture* texture = SystemFactory::instance().create_texture();
+		texture->set_color(color_white);
+		engine_.context().texture_manager().add_default(texture);
+	}
+
+	// shaders should be loaded from file
+	const std::string& shader_name = (config.default_shader_name.empty()) ?
+		default_shader_name : config.default_shader_name;
+	shader_program_ptr shader = engine_.context().shader_manager().get(shader_name);
+	if (shader != nullptr)
+		engine_.context().shader_manager().add_default(shader);
+
+	Material* material = new Material(engine_.context().texture_manager().get_default(),
+									  engine_.context().shader_manager().get_default());
+	engine_.context().material_manager().add_default(material);
 }
 
 }}

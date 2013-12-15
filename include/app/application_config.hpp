@@ -15,7 +15,10 @@ struct ApplicationConfig
 	cmn::uint height;
 	cmn::uint bpp;
 	bool fullscreen;
-	std::string assets_path;	
+	std::string assets_path;
+
+	std::string default_shader_name;
+	std::string default_texture_name;
 };
 
 bool load_config(ApplicationConfig& config, const std::string& filename = default_config_filename);

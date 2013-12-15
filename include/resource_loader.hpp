@@ -15,8 +15,6 @@
 namespace mhe
 {
 
-static const std::string default_resource_name = "default";
-
 struct SoundLoader
 {
 	typedef iSound type;

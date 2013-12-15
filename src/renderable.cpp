@@ -79,6 +79,7 @@ material_ptr Renderable::material_by_texture(size_t texture_index) const
 
 void Renderable::update_color_buffer()
 {
+	if (mesh_ == nullptr) return;
 	int count = mesh_->vertexes.size() / 3;
 	colorcoord_.resize(count * 4);
 	for (int i = 0; i < count * 4; i += 4)
