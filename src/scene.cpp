@@ -85,17 +85,22 @@ void Scene::add(const nodeptr& node)
 	apply_scene_modifiers(SceneModifier::node_add);
 }
 
-void Scene::remove(const nodeptr& node)
+void Scene::remove(Node* node)
 {
 	for (nodelist::iterator it = nodes_.begin(); it != nodes_.end(); ++it)
 	{
-		if (*it == node)
+		if ((*it).get() == node)
 		{
 			nodes_.erase(it);
 			apply_scene_modifiers(SceneModifier::node_remove);
 			return;
 		}
 	}
+}
+
+void Scene::remove(const nodeptr& node)
+{
+	remove(node.get());
 }
 
 void Scene::remove(const std::string& name)

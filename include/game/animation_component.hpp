@@ -11,6 +11,11 @@ class AnimationComponent : public Component, public Animation
 {	
 public:
 	virtual ~AnimationComponent() {}
+
+	void set_detach_on_completion(bool enable)
+	{
+		detach_on_completion_ = enable;
+	}
 protected:
 	AnimationComponent(const std::string& name) :
 		Component(name), Animation(),
@@ -31,6 +36,12 @@ private:
 	void update_impl(cmn::uint tick, Engine*)
 	{
 		Animation::update(tick);
+	}
+
+	virtual void stop_impl()
+	{
+		if (detach_on_completion_)
+			detach_self();
 	}
 
 	bool detach_on_completion_;

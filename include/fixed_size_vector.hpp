@@ -273,7 +273,7 @@ private:
 	iterator erase_impl(size_t index, size_t erased_count)
 	{
 		if (index != (size_ - erased_count))
-			std::copy(begin_ + index + erased_count, begin_ + size_ - index - erased_count, begin_ + index);
+			std::copy(begin_ + index + erased_count, begin_ + size_, begin_ + index);
 		size_ -= erased_count;
 		return begin_ + index;
 	}

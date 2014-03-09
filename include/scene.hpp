@@ -23,6 +23,7 @@ public:
 
 	void add(const nodeptr& node);
 	void remove(const nodeptr& node);
+	void remove(Node* node);
 	void remove(const std::string& name);
 	boost::shared_ptr<Node> get_node(const std::string& name) const;
 
