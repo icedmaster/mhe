@@ -20,7 +20,7 @@ private:
 		color_animation_->set_range(mhe::color_white, mhe::color_black);
 		node_->attach(color_animation_);
 		
-		transform_animation_.reset(new mhe::game::TransformAnimationComponent(1000, "sprite"));
+		transform_animation_.reset(new mhe::game::TransformAnimationComponent(1000, "sprite", true));
 		transform_animation_->set_range(mhe::matrixf::identity(), mhe::matrixf::translation_matrix(100, 100, 0));
 		node_->attach(transform_animation_);
 

@@ -14,7 +14,6 @@ namespace mhe
 
 class Node : public Renderable
 {	
-	static const size_t default_texcoord_size = 8;
 public:
 	enum
 	{
@@ -119,7 +118,6 @@ private:
 	std::vector< boost::shared_ptr<Node> > children_;	
 	Node* parent_;
 	uint32_t flags_;
-	bool dirty_;
 };
 
 typedef boost::shared_ptr<Node> nodeptr;

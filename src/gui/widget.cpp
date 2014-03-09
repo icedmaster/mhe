@@ -50,15 +50,14 @@ void Widget::draw_impl(const boost::shared_ptr<Sprite>& sprite, Context& context
 {
 	if (!visible_) return;
 	sprite->set_size(geom().width(), geom().height());
-	sprite->identity();
 	const vector2<float>& position = absolute_position();
-	sprite->translate(position.x(), position.y(), 0);
+	sprite->translate_to(position.x(), position.y(), 0);
 	sprite->draw(context);
 	// draw caption
 	if (caption_renderable_ != nullptr)
 	{
-		caption_renderable_->identity();
-		caption_renderable_->translate(position.x(), position.y(), 0);
+		caption_renderable_->set_identity();
+		caption_renderable_->translate_to(position.x(), position.y(), 0);
 		context.driver().draw(caption_renderable_.get());
 	}
 }

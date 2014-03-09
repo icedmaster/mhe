@@ -2,49 +2,55 @@
 
 namespace mhe {
 
-void Transform::translate_to(const v3d& position)
+void Transform::translate_to(float x, float y, float z)
 {
-	position_ = position;
-	set_dirty();
+	position_.set(x, y, z);
+	update_transform();
 }
 
 void Transform::translate_by(const v3d& position)
 {
 	position_ += position;
-	set_dirty();
+	update_transform();
 }
 
 void Transform::rotate_to(float angle_x, float angle_y, float angle_z)
 {
-	rotation_.set(angle_x, angle_y, angle_z);
-	set_dirty();
+	rotation_.set_euler(angle_x, angle_y, angle_z);
+	update_transform();
 }
 
 void Transform::rotate_by(float angle_x, float angle_y, float angle_z)
 {
-	rotation_ += v3d(angle_x, angle_y, angle_z);
-	set_dirty();
+	rotation_ *= quatf(angle_x, angle_y, angle_z);
+	update_transform();
 }
 
 void Transform::scale_to(float sx, float sy, float sz)
 {
-	scaling_.set(sx, sy, sz);
-	set_dirty();
+	scale_.set(sx, sy, sz);
+	update_transform();
 }
 
 void Transform::scale_by(float sx, float sy, float sz)
 {
-	scaling_ *= v3d(sx, sy, sz);
-	set_dirty();
+	scale_ *= v3d(sx, sy, sz);
+	update_transform();
 }
 
 void Transform::update_transform()
 {
-	identity();
-	matrixf t = matrixf::scaling_matrix(scaling_);
-	t *= matrixf::rotation_matrix(deg_to_rad(-rotation_.x()), deg_to_rad(-rotation_.y()), deg_to_rad(-rotation_.z()));
+	matrixf t = matrixf::scaling_matrix(scale_);
+	t *= rotation_.to_matrix<mat4x4>();
 	t *= matrixf::translation_matrix(position_);	
-	set_transform(t);
+	m_ = t;
+}
+
+void Transform::get_transformations()
+{
+	position_ = m_.row(3).as_vec3();
+	// TODO: get rotation
+	scale_.set(m_.element(0, 0), m_.element(1, 1), m_.element(2, 2));
 }
 
 }

@@ -27,6 +27,11 @@ private:
 		return "node";
 	}
 
+	mat4x4 transform_impl() const
+	{
+		return Node::transform();
+	}
+
 	void process_transform_event(const TransformMessage& message);
 	void process_enable_event(const EnableMessage& message);
 	void process_color_event(const ColorMessage& message);
@@ -52,11 +57,6 @@ private:
 	void set_transform_impl(const matrixf& m)
 	{
 		NodeComponent::set_transform(m);
-	}
-
-	void set_initial_transform_impl(const matrixf& m)
-	{
-		NodeComponent::set_initial(m);
 	}
 
 	void rebuild_impl()

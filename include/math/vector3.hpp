@@ -187,6 +187,24 @@ public:
 		v_[2] = v_[0] * v.v_[1] - v_[1] * v.v_[0];
 		return *this;
 	}
+
+	static vector3 up()
+	{
+		static vector3 u(0, 1, 0);
+		return u;
+	}
+
+	static vector3 right()
+	{
+		static vector3 r(1, 0, 0);
+		return r;
+	}
+
+	static vector3 forward()
+	{
+		static vector3 f(0, 0, 1);
+		return f;
+	}
 };
 
 template <class T>
@@ -219,6 +237,7 @@ inline std::ostream& operator<< (std::ostream& s, const vector3<T>& v)
 }
 	
 typedef vector3<float> v3d;
+typedef vector3<float> vec3;
 
 const v3d x_axis = v3d(1.0, 0.0, 0.0);
 const v3d y_axis = v3d(0.0, 1.0, 0.0);

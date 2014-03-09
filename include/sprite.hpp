@@ -48,7 +48,6 @@ private:
 	virtual void set_mesh_impl(const mesh_ptr& mesh) = 0;
 	virtual texture_ptr texture_impl() const = 0;
 	virtual void set_transform_impl(const matrixf& m) = 0;
-	virtual void set_initial_transform_impl(const matrixf& m) = 0;
 	virtual void rebuild_impl() = 0;
 	virtual size_t materials_number_impl() const = 0;
 	virtual mesh_ptr mesh_impl() const = 0;
@@ -76,11 +75,6 @@ private:
 	void set_transform_impl(const matrixf& m)
 	{
 		Node::set_transform(m);
-	}
-
-	void set_initial_transform_impl(const matrixf& m)
-	{
-		Node::set_initial(m);
 	}
 
 	void rebuild_impl()

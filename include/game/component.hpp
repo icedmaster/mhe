@@ -8,6 +8,7 @@
 #include <boost/weak_ptr.hpp>
 #include "message.hpp"
 #include "types.hpp"
+#include "math/matrix.hpp"
 
 namespace mhe {
 namespace game {
@@ -96,6 +97,11 @@ public:
 		}
 		return nullptr;
 	}
+
+	mat4x4 transform() const
+	{
+		return transform_impl();
+	}
 protected:
 	Component(const std::string& name) :
         name_(name), parent_(nullptr), root_(nullptr),
@@ -128,6 +134,11 @@ private:
 	virtual void on_attach(Component* /*component*/) {}
 	virtual void on_detach(Component* /*component*/) {}
 	virtual std::string add_name_impl() const = 0;
+
+	virtual mat4x4 transform_impl() const
+	{
+		return mat4x4::identity();
+	}
 
 	void divide_full_name(const std::string& fullname)
 	{

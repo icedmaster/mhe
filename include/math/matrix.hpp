@@ -6,6 +6,8 @@
 #include <cmath>
 #include "math_utils.hpp"
 #include "vector3.hpp"
+#include "vector4.hpp"
+#include "matrix3x3.hpp"
 
 namespace mhe
 {
@@ -80,6 +82,21 @@ public:
 	{
 		return (T*)m_;
 	}
+
+    vector4<T> row(int r) const
+    {
+        return vector4<T>(m_[r][0], m_[r][1], m_[r][2], m_[r][3]);
+    }
+
+    vector4<T> column(int c) const
+    {
+        return vector4<T>(m_[0][c], m_[1][c], m_[2][c], m_[3][c]);
+    }
+
+    T element(int i, int j) const
+    {
+        return m_[i][j];
+    }
 
 	matrix& operator= (const matrix& m)
 	{
@@ -236,7 +253,7 @@ public:
 		// tm.set_translate(-pos);
 		// *this *= tm;
 		//
-		multTranslate(-pos);
+        multTranslate(-pos);
 	}
 
 	void multTranslate(const v3d& v)
@@ -355,6 +372,47 @@ public:
 		T bottom = -top;
 		set_frustum(left, right, bottom, top, z_near, z_far);
 	}
+
+    vector4<T> side_vector() const
+    {
+        return column(0);
+    }
+
+    vector4<T> up_vector() const
+    {
+        return column(1);
+    }
+
+    vector4<T> forward_vector() const
+    {
+        return -column(2);
+    }
+
+    float determinant() const
+    {
+        return
+                m_[0][0] * m_[1][1] * m_[2][2] * m_[3][3] + m_[0][0] * m_[1][2] * m_[2][3] * m_[3][1] + m_[0][0] * m_[1][3] * m_[2][1] * m_[3][2] +
+                m_[0][1] * m_[1][0] * m_[2][3] * m_[3][2] + m_[0][1] * m_[1][2] * m_[2][0] * m_[3][3] + m_[0][1] * m_[1][3] * m_[2][2] * m_[3][0] +
+                m_[0][2] * m_[1][0] * m_[2][1] * m_[3][3] + m_[0][2] * m_[1][1] * m_[2][3] * m_[3][0] + m_[0][2] * m_[1][3] * m_[2][0] * m_[3][1] +
+                m_[0][3] * m_[1][0] * m_[2][2] * m_[3][1] + m_[0][3] * m_[1][1] * m_[2][0] * m_[3][2] + m_[0][3] * m_[1][2] * m_[2][1] * m_[3][0] -
+                m_[0][0] * m_[1][1] * m_[2][2] * m_[3][3] - m_[0][0] * m_[1][2] * m_[2][1] * m_[3][3] - m_[0][0] * m_[1][3] * m_[2][2] * m_[3][1] -
+                m_[0][1] * m_[1][0] * m_[2][2] * m_[3][3] - m_[0][1] * m_[1][2] * m_[2][3] * m_[3][0] - m_[0][1] * m_[1][3] * m_[2][0] * m_[3][2] -
+                m_[0][2] * m_[1][0] * m_[2][3] * m_[3][1] - m_[0][2] * m_[1][1] * m_[2][0] * m_[3][3] - m_[0][2] * m_[1][3] * m_[2][1] * m_[3][0] -
+                m_[0][3] * m_[1][0] * m_[2][1] * m_[3][2] - m_[0][3] * m_[1][1] * m_[2][2] * m_[3][0] - m_[0][2] * m_[1][2] * m_[2][0] * m_[3][1];
+    }
+
+    void inverse()
+    {
+        T b11 = m_[1][1] * m_[2][2] * m_[3][3] + m_[1][2] * m_[2][3] * m_[3][1] + m_[1][3] * m_[2][1] * m_[3][2] -
+                m_[1][1] * m_[2][3] * m_[3][2] - m_[1][2] * m_[2][1] * m_[3][3] - m_[1][3] * m_[2][2] * m_[3][1];
+    }
+
+    matrix3x3<T> as_matrix3x3() const
+    {
+        return matrix3x3<T>(m_[0][0], m_[0][1], m_[0][2],
+                m_[1][0], m_[1][1], m_[1][2],
+                m_[2][0], m_[2][1], m_[2][2]);
+    }
 
 	// create identity matrix
 	static matrix identity()
@@ -484,6 +542,7 @@ inline std::ostream& operator<< (std::ostream& stream, const matrix<T>& m)
 
 typedef matrix<float>  matrixf;
 typedef matrix<double> matrixd;
+typedef matrix<float> mat4x4;
 
 }
 

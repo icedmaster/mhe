@@ -32,17 +32,13 @@ void Camera::update(Driver& driver)
 
 void Camera::update_view_matrix()
 {
-	if (dirty())
-	{
-		updated_ = false;
-		// recalculate new transform
-		vector3<float> pos = position();
-		set_position(-pos);
-		update_transform();
-		set_position(pos);
-		set_transform(look_ * transform());
-		clear_dirty_flag();
-	}
+	updated_ = false;
+	// recalculate new transform
+	vector3<float> pos = position();
+	set_position(-pos);
+	update_transform();
+	set_position(pos);
+	set_transform(look_ * transform());
 }
 
 void Camera::update_projection(Driver& driver)

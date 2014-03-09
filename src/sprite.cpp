@@ -43,9 +43,7 @@ void SpriteBase::update_buffers()
 
 	matrixf initial = matrixf::scaling_matrix(vector3<float>(x_sz, y_sz, 1.0f));
 	initial *= matrixf::translation_matrix(0, 0, z_order_);
-	set_initial_transform_impl(matrixf::identity());
-	set_transform_impl(matrixf::identity());
-	set_initial_transform_impl(initial);
+	set_transform_impl(initial);
 	rebuild_impl();
 }
 
