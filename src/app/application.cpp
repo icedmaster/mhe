@@ -2,6 +2,7 @@
 
 #include "utils/sysutils.hpp"
 #include "app/application_asset_path.hpp"
+#include "memory.hpp"
 
 namespace mhe {
 namespace app {
@@ -32,6 +33,7 @@ void Application::deinit()
 {
 	deinit_impl();
 	mhe_app_deinit();
+	print_memory_info();
 }
 
 bool Application::mhe_app_init(const ApplicationConfig& config)
