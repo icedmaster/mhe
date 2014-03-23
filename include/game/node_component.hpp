@@ -12,6 +12,7 @@ namespace game {
 
 class NodeComponent : public Node, public Component
 {
+	COMPONENT_METHODS(NodeComponent, "node");
 public:
 	NodeComponent(const std::string& name) :
 		Component(name)
@@ -21,11 +22,6 @@ public:
 private:
 	void do_subscribe(Component* parent);
 	bool update_impl(const Message& message);
-
-	std::string add_name_impl() const
-	{
-		return "node";
-	}
 
 	mat4x4 transform_impl() const
 	{
@@ -39,6 +35,7 @@ private:
 
 class SpriteComponent : public SpriteBase, public NodeComponent
 {
+	COMPONENT_METHODS(SpriteComponent, "sprite");
 public:
 	SpriteComponent(const std::string& name) :
 		NodeComponent(name)

@@ -2,6 +2,7 @@
 #define _MHE_HPP_
 
 #include "config.hpp"
+#include "memory.hpp"
 #include "mhe_math.hpp"
 
 #include "camera.hpp"

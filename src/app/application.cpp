@@ -33,7 +33,6 @@ void Application::deinit()
 {
 	deinit_impl();
 	mhe_app_deinit();
-	print_memory_info();
 }
 
 bool Application::mhe_app_init(const ApplicationConfig& config)

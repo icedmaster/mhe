@@ -11,12 +11,12 @@ private:
 	bool init_impl(const mhe::utils::PropertiesList&)
 	{
 		engine()->context().texture_manager().set_path("../../../assets/");
-		node_.reset(new mhe::game::SpriteComponent("sprite"));
+		node_ = engine()->component_manager().create<mhe::game::SpriteComponent>("sprite", false);
 		node_->set_material(mhe::material_ptr(new mhe::Material(
 												  engine()->context().texture_manager().get("test_sprite.png"),
 												  engine()->context().shader_manager().get("diffuse_unlit"))));
 		scene()->add(node_);
-		color_animation_.reset(new mhe::game::ColorAnimationComponent(1000, "sprite"));
+		color_animation_ = engine()->component_manager().create<mhe::game::ColorAnimationComponent>("sprite", 1000);
 		color_animation_->set_range(mhe::color_white, mhe::color_black);
 		node_->attach(color_animation_);
 		
@@ -78,17 +78,22 @@ private:
 
 int main(int /*argc*/, char** /*argv*/)
 {
-	mhe::app::Application2D app("06_animation");
-	mhe::app::ApplicationConfig config;
-	config.width = 800;
-	config.height = 600;
-	config.bpp = 32;
-	config.assets_path = "../../../assets/";
-	app.init(config);
-	boost::shared_ptr<TestGameScene> game_scene(new TestGameScene(&(app.engine())));
-	game_scene->init();
-	app.engine().set_game_scene(game_scene);
-	game_scene->scene()->add_camera(new mhe::Camera2D(800, 600), true);
+	int result = 0;
+	{
+		mhe::app::Application2D app("06_animation");
+		mhe::app::ApplicationConfig config;
+		config.width = 800;
+		config.height = 600;
+		config.bpp = 32;
+		config.assets_path = "../../../assets/";
+		app.init(config);
+		boost::shared_ptr<TestGameScene> game_scene(new TestGameScene(&(app.engine())));
+		game_scene->init();
+		app.engine().set_game_scene(game_scene);
+		game_scene->scene()->add_camera(new mhe::Camera2D(800, 600), true);
 
-	return app.run();
+		result = app.run();
+	}
+	mhe::print_memory_info();
+	return result;
 }

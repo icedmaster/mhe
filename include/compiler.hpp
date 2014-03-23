@@ -11,4 +11,10 @@
 #define FUNCTION_DESCRIPTION_MACRO						__PRETTY_FUNCTION__
 #endif
 
+#ifndef NDEBUG
+#define MHE_DEBUG
+#else
+#define MHE_RELEASE
+#endif
+
 #endif

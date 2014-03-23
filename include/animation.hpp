@@ -21,6 +21,11 @@ public:
 
 	virtual ~Animation() {}
 
+	void set_duration(cmn::uint duration)
+	{
+		atime_ = duration;
+	}
+
 	cmn::uint duration() const
 	{
 		return atime_;

@@ -8,6 +8,7 @@
 #include <boost/weak_ptr.hpp>
 #include "message.hpp"
 #include "types.hpp"
+#include "ref_counter.hpp"
 #include "math/matrix.hpp"
 
 namespace mhe {
@@ -18,6 +19,16 @@ typedef boost::shared_ptr<Component> component_ptr;
 typedef boost::weak_ptr<Component> component_weak_ptr;
 
 class Engine;
+
+#define COMPONENT_METHODS(class_name, n)					 \
+	friend class ComponentManager;                           \
+	public:                                                  \
+	class_name() {}                                          \
+	static std::string type_name()                           \
+	{ return n; }                                         \
+    private:                                                 \
+    std::string add_name_impl() const                        \
+    { return n; }											                                    
 
 class Component
 {
@@ -86,23 +97,42 @@ public:
 
 	component_ptr child_by_add_name(const std::string& add_name) const;
 
-	// IMPORTAINT: I think this function if VERY slow
+	// IMPORTANT: I think this function if VERY slow
 	template <class T>
 	T* get_component() const
 	{
 		for (size_t i = 0; i < children_.size(); ++i)
 		{
-			T* component = dynamic_cast<T*>(children_[i].get());
-			if (component != nullptr) return component;
+			if (children_[i]->add_name() == T::type_name())
+				return children_[i].get();
 		}
 		return nullptr;
+	}
+
+	template <class T>
+	bool remove_component()
+	{
+		T* component = get_component<T>();
+		if (component == nullptr) return;
+		detach(component);
+		return true;
 	}
 
 	mat4x4 transform() const
 	{
 		return transform_impl();
 	}
+
+	static std::string type_name()
+	{
+		return "";
+	}
 protected:
+	Component() :
+        parent_(nullptr), root_(nullptr),
+		lifetime_(lifetime_infinite), start_time_(0)
+	{}
+
 	Component(const std::string& name) :
         name_(name), parent_(nullptr), root_(nullptr),
 		lifetime_(lifetime_infinite), start_time_(0)
@@ -130,6 +160,11 @@ protected:
 	virtual void update_impl(cmn::uint, Engine*)	{}
 	virtual	bool update_impl(const Message& message) = 0;
 	virtual void destroy_impl() {}
+
+	void set_component_name(const std::string& name)
+	{
+		name_ = name;
+	}
 private:
 	virtual void on_attach(Component* /*component*/) {}
 	virtual void on_detach(Component* /*component*/) {}

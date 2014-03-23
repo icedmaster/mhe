@@ -8,7 +8,8 @@ namespace mhe {
 namespace game {
 
 class AnimationComponent : public Component, public Animation
-{	
+{
+	COMPONENT_METHODS(AnimationComponent, "animation");
 public:
 	virtual ~AnimationComponent() {}
 
@@ -27,6 +28,11 @@ protected:
 		detach_on_completion_(false)
 	{}
 private:
+	void init_component(cmn::uint duration)
+	{
+		Animation::set_duration(duration);
+	}
+
 	virtual void do_subscribe(Component* /*parent*/) {}
 	bool update_impl(const Message&)
 	{
