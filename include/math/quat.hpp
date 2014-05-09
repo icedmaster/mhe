@@ -114,7 +114,7 @@ public:
 
 	quat conjugate() const
 	{
-		return quat(-q[0], -q[1], -q[2], q[3]);
+		return quat(-q_[0], -q_[1], -q_[2], q_[3]);
 	}
 
 	float length_sqr() const

@@ -2,7 +2,7 @@
 #define __STRUTILS_HPP__
 
 #include <vector>
-#include "types_cast.hpp"
+#include "core/types_cast.hpp"
 
 namespace mhe {
 namespace utils {

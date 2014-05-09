@@ -1,7 +1,7 @@
 #ifndef _MATH_UTILS_HPP_
 #define _MATH_UTILS_HPP_
 
-#include "types.hpp"
+#include "core/types.hpp"
 
 namespace mhe
 {

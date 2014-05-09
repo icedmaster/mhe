@@ -39,13 +39,20 @@ def fill_file(f, name):
 
 os.chdir('../include/')
 
+main_filename = 'mhe.hpp'
+main_file = open(main_filename, 'w')
+main_file.write(get_header('mhe'))
+
 for d in directories:
     filename = 'mhe_' + d + '.hpp'
     #try:
     f = open(filename, 'w')
     fill_file(f, d)
     f.close()
+    include = '#include "' + filename + '"\n'
+    main_file.write(include)
     #except:
     #    print('Error while opening file ' + filename)
-
-    
+# final file
+main_file.write(get_fileend('mhe'))
+main_file.close()

@@ -7,7 +7,7 @@
 #include <sstream>
 #include <ctime>
 #include <vector>
-#include <boost/shared_ptr.hpp>
+#include "core/ref_ptr.hpp"
 
 namespace mhe {
 namespace utils {
@@ -22,7 +22,7 @@ inline std::string string_date()
 	return std::string(buf);
 }
 
-class Log
+class Log : public ref_counter
 {
 public:
 	enum
@@ -124,10 +124,10 @@ public:
 	MixLog() : Log() {}
 	void add(Log* log)
 	{
-		logs_.push_back(boost::shared_ptr<Log>(log));
+		logs_.push_back(log);
 	}
 
-	void add(boost::shared_ptr<Log> log)
+	void add(const ref_ptr<Log>& log)
 	{
 		logs_.push_back(log);
 	}
@@ -138,7 +138,7 @@ private:
 			logs_[i]->write_impl(str);
 	}
 
-	std::vector< boost::shared_ptr<Log> > logs_;
+	std::vector< ref_ptr<Log> > logs_;
 };
 
 }}	// namespaces

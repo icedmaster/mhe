@@ -3,6 +3,7 @@
 #ifndef __MHE_CORE__
 #define __MHE_CORE__
 
+#include "core/ref_counter.hpp"
 #include "core/memory.hpp"
 #include "core/noncopyable.hpp"
 #include "core/singleton.hpp"
@@ -10,6 +11,7 @@
 #include "core/compiler.hpp"
 #include "core/assert.hpp"
 #include "core/config.hpp"
+#include "core/ref_ptr.hpp"
 #include "core/array.hpp"
 #include "core/fixed_size_vector.hpp"
 #include "core/types_cast.hpp"

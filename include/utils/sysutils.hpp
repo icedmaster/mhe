@@ -14,13 +14,13 @@ namespace mhe
             srand(time(0));
         }
 
-        inline cmn::uint random(cmn::uint limit)
+        inline uint random(uint limit)
         {
             return (rand() % limit);
         }
 
         // with sign
-        inline int srandom(cmn::uint limit, int probability = 50)
+        inline int srandom(uint limit, int probability = 50)
         {
             int n = random(limit);
             // get random sign
@@ -29,7 +29,7 @@ namespace mhe
             return -n;
         }
 
-		inline cmn::uint get_current_tick()
+		inline uint get_current_tick()
 		{
 			return impl::get_current_tick();
 		}			

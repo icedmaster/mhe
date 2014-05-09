@@ -5,13 +5,12 @@
 #include <cstdlib>
 #include <stdint.h>
 
-namespace cmn
+namespace mhe
 {
 typedef unsigned char uchar;
 typedef unsigned short ushort;
 typedef unsigned int uint;
 typedef unsigned long ulong;
-};
 
 template <class T>
 inline T random(T min, T max)
