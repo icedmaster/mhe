@@ -95,30 +95,12 @@ public:
 		const float x_sqr = q_[0] * q_[0];
 		const float y_sqr = q_[1] * q_[1];
 		const float z_sqr = q_[2] * q_[2];
+		const float w_sqr = q_[3] * q_[3];
 
 		xangle = ::atan( 2 * (w() * z() + y() * x()) / (1 - 2 * (z_sqr + y_sqr)) );
 		yangle = ::asin( 2 * (w() * y() - x() * z()) );
 		zangle = ::atan( 2 * (w() * x() + z() * y()) / (1 - 2 * (y_sqr + x_sqr)) );
 	}
-
-	template <class V>
-	V euler() const
-	{
-		float x, y, z;
-		euler(x, y, z);
-		return V(x, y, z);
-	}
-
-    template <class V>
-    void set_rotation(const V& axis, float angle)
-    {
-        const float s = ::sin(angle);
-        const float c = ::cos(angle);
-        q_[0] = axis.x() * s;
-        q_[1] = axis.y() * s;
-        q_[2] = axis.z() * s;
-        q_[3] = c;
-    }
 
 	const T* data() const
 	{
@@ -132,7 +114,7 @@ public:
 
 	quat conjugate() const
 	{
-		return quat(-q_[0], -q_[1], -q_[2], q_[3]);
+		return quat(-q[0], -q[1], -q[2], q[3]);
 	}
 
 	float length_sqr() const
@@ -180,30 +162,6 @@ public:
 	{
 		return !(*this == other);
 	}
-
-    // | 1-2(y^2)-2(z^2)  2xy-2wz           2xz+2wy         |
-    // | 2xy+2wz          1-2(x^2)-2(z^2)   2yz-2wx         |
-    // | 2xz-2wy          2yz+2wx           1-2(x^2)-2(y^2) |
-    template <class M>
-    M to_matrix() const
-    {
-        T x2 = q_[0] * q_[0];
-        T y2 = q_[1] * q_[1];
-        T z2 = q_[2] * q_[2];
-
-        M m;
-        /*
-        m.set(1 - 2 * y2 - 2 * z2, 2 * x() * y() - 2 * w() * z(), 2 * x() * z() + 2 * w() * y(), 0,
-              2 * x() * y() + 2 * w() * x(), 1 - 2 * x2 - 2 * z2, 2 * y() * z() - 2 * w() * x(), 0,
-              2 * x() * z() - 2 * w() * y(), 2 * y() * z() + 2 * w() * x(), 1 - 2 * x2 - 2 * y2, 0,
-              0, 0, 0, 1);
-        */
-        m.set(1 - 2 * y2 - 2 * z2, 2 * x() * y() + 2 * w() * z(), 2 * x() * z() - 2 * w() * y(), 0,
-              2 * x() * y() - 2 * w() * z(), 1 - 2 * x2 - 2 * z2, 2 * y() * z() + 2 * w() * x(), 0,
-              2 * x() * z() + 2 * w() * y(), 2 * y() * z() - 2 * w() * x(), 1 - 2 * x2 - 2 * y2, 0,
-              0, 0, 0, 1);
-        return m;
-    }
 
 	static quat identity()
 	{

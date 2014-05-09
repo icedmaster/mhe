@@ -19,12 +19,12 @@ namespace mhe
 		return rad * rad2deg;
 	}
 
-	inline bool is_pot(cmn::uint num)
+	inline bool is_pot(uint num)
 	{
 		return !(num & (num - 1));
 	}
 
-	inline cmn::uint32_t nearest_pot(cmn::uint32_t x)
+	inline uint32_t nearest_pot(uint32_t x)
 	{
 		x = x - 1;
 		x = x | (x >> 1);	

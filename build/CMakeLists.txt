@@ -73,14 +73,7 @@ set(IOS_LIB_DIR ${CMAKE_SOURCE_DIR}/../lib/ios)
 
 set (SRC_PATH
   ${SOURCE_ROOT}
-  ${SOURCE_ROOT}/gui
-  ${SOURCE_ROOT}/impl
   ${SOURCE_ROOT}/utils
-  ${SOURCE_ROOT}/sound
-  ${SOURCE_ROOT}/game
-  ${SOURCE_ROOT}/events
-  ${SOURCE_ROOT}/app
-  #${SOURCE_ROOT}/script
   ${LIB_DIR}/pugixml
 )
 
@@ -105,10 +98,7 @@ set(MACOS_PLATFORM_SOURCES ${PLATFORM_IMPL_SOURCES}/macos)
 set(IOS_PLATFORM_SOURCES ${PLATFORM_IMPL_SOURCES}/ios)
 set(QT_PLATFORM_SOURCES ${PLATFORM_IMPL_SOURCES}/qt)
 set(OPENGL3_PLATFORM_SOURCES ${PLATFORM_IMPL_SOURCES}/opengl3)
-set(OPENAL_PLATFORM_SOURCES ${PLATFORM_IMPL_SOURCES}/openal)
 set(SDL_PLATFORM_SOURCES ${PLATFORM_IMPL_SOURCES}/sdl)
-
-set(VORBIS_SOURCES ${SOURCE_ROOT}/sound/vorbis)
 
 # platform
 if (WIN32)
@@ -186,21 +176,6 @@ if (MHE_OPENAL_FOUND AND MHE_VORBIS_FOUND)
 	endif()
 endif()
 
-# find scripts
-if (BUILD_WITH_SCRIPTS)
-   find_library(PYTHON_LIB python3)
-   message("---- python ----")
-   if (${PYTHON_LIB} STREQUAL "PYTHON_LIB-NOTFOUND")
-   	  message("Python lib not found. Python scripting not availible")
-   else()
-      message(${PYTHON_LIB})
-	  message("---- boost_python ----")
-	  find_library(BOOST_PYTHON_LIB boost_python3)
-	  message(${BOOST_PYTHON_LIB})
-	  set(LIBS ${LIBS} ${BOOST_PYTHON_LIB} ${PYTHON_LIB})
-   endif()
-endif()
-
 foreach (DIR ${SRC_PATH})
   aux_source_directory (${DIR} CUR_SRC)
   set (SOURCE ${SOURCE} ${CUR_SRC})
@@ -221,7 +196,7 @@ endif()
 set(MHE_LIB_DIR ${CMAKE_SOURCE_DIR})
 set(DEP_LIBS ${LIBS})
 
-add_library(${PROJECT} ${SOURCE} ${ADDITIONAL_SOURCES})
+add_library(${PROJECT} SHARED ${SOURCE} ${ADDITIONAL_SOURCES})
 target_link_libraries(${PROJECT} ${LIBS})
 
 include(mhe_platform_specific)

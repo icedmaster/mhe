@@ -113,7 +113,7 @@ public:
 		return v_;
 	}
 
-    vector3<T> as_vec3() const
+	vector3<T> as_v3d() const
 	{
 		return vector3<T>(v_[0], v_[1], v_[2]);
 	}
@@ -197,11 +197,6 @@ public:
 		return *this;
 	}
 
-    vector4 operator- () const
-    {
-        return vector4(-v_[0], -v_[1], -v_[2], -v_[3]);
-    }
-
 	float length2() const
 	{
 		return v_[0] * v_[0] + v_[1] * v_[1] + v_[2] * v_[2] + v_[3] * v_[3];
@@ -223,7 +218,6 @@ inline std::ostream& operator<< (std::ostream& s, const vector4<T>& v)
 }
 
 	typedef vector4<float> v4d;
-    typedef vector4<float> vec4;
     typedef v4d colorf;
 
     const colorf color_transparent = colorf(0.0, 0.0, 0.0, 0.0);
