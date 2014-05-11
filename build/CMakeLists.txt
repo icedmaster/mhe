@@ -73,6 +73,7 @@ set(IOS_LIB_DIR ${CMAKE_SOURCE_DIR}/../lib/ios)
 
 set (SRC_PATH
   ${SOURCE_ROOT}
+  ${SOURCE_ROOT}/impl
   ${SOURCE_ROOT}/utils
   ${SOURCE_ROOT}/core
   ${LIB_DIR}/pugixml

@@ -16,5 +16,6 @@
 #include "core/fixed_size_vector.hpp"
 #include "core/types_cast.hpp"
 #include "core/delegate.hpp"
+#include "core/unique_ptr.hpp"
 
 #endif // __MHE_CORE__

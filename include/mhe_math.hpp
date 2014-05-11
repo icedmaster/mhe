@@ -7,6 +7,7 @@
 #include "math/vector3.hpp"
 #include "math/vector4.hpp"
 #include "math/math_utils.hpp"
+#include "math/matrix3x3.hpp"
 #include "math/matrix.hpp"
 #include "math/quat.hpp"
 #include "math/rect.hpp"
