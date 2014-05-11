@@ -6,10 +6,6 @@ namespace mhe {
 
 VideoDriverFactory::VideoDriverFactory()
 {
-	#ifdef MHE_OPENGL
-	drivers_.push_back(boost::shared_ptr<AbstractVideoDriverFactory>(new opengl::OpenGLVideoDriverFactory));
-	#endif
-
 	#ifdef MHE_OPENGL3
 	drivers_.push_back(boost::shared_ptr<AbstractVideoDriverFactory>(new opengl::OpenGL3VideoDriverFactory));
 	#endif

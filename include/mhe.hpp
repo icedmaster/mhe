@@ -7,4 +7,5 @@
 #include "mhe_math.hpp"
 #include "mhe_utils.hpp"
 #include "mhe_app.hpp"
+#include "mhe_events.hpp"
 #endif // __MHE_MHE__

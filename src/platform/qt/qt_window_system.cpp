@@ -47,8 +47,8 @@ bool QtWindowSystem::set_format(const WindowContextFormat& format)
 	int minor = view_->format().minorVersion();
 	INFO_LOG("QtWindowSystem::set_format. Use OpenGL version:" << major << "." << minor);
 	INFO_LOG("QtWindowSystem::set_format. Available OpenGL versions:" << QGLFormat::openGLVersionFlags());
-	return ((format.major_version == static_cast<cmn::uint>(major)) &&
-			(format.minor_version == static_cast<cmn::uint>(minor)));
+	return ((format.major_version == static_cast<uint>(major)) &&
+			(format.minor_version == static_cast<uint>(minor)));
 }
 
 void QtWindowSystem::close()

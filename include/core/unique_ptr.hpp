@@ -1,6 +1,8 @@
 #ifndef __UNIQUE_PTR_HPP__
 #define __UNIQUE_PTR_HPP__
 
+#include "assert.hpp"
+
 namespace mhe {
 
 template <class T>
