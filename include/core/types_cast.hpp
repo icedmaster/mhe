@@ -8,7 +8,6 @@
 #include <cstdlib>
 
 namespace mhe {
-namespace utils {
 
 namespace details
 {
@@ -69,6 +68,6 @@ inline float types_cast(const std::string& value)
 	return atof(value.c_str());
 }
 
-}}
+}
 
 #endif

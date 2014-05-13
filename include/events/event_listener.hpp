@@ -1,12 +1,12 @@
 #ifndef __EVENT_LISTENER_HPP__
 #define __EVENT_LISTENER_HPP__
 
-#include <boost/shared_ptr.hpp>
+#include "core/ref_counter.hpp"
 #include "event.hpp"
 
 namespace mhe {
 
-class EventListener
+class EventListener : public ref_counter
 {
 public:
 	virtual ~EventListener() {}

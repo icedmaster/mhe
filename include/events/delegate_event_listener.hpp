@@ -2,7 +2,7 @@
 #define __DELEGATE_EVENT_LISTENER_HPP__
 
 #include <boost/shared_ptr.hpp>
-#include "delegate.hpp"
+#include "core/delegate.hpp"
 #include "event_listener.hpp"
 
 namespace mhe {

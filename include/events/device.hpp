@@ -8,7 +8,7 @@
 
 namespace mhe {
 
-class Device
+class Device : public ref_counter
 {
 protected:
 	static const size_t max_events_count = 10;
@@ -33,7 +33,7 @@ protected:
 	void init_events_with_type()
 	{		
 		for (size_t i = 0; i < max_events_count; ++i)
-			events_[i] = boost::shared_ptr<EventType>(new EventType);
+			events_[i] = ref_ptr<EventType>(new EventType);
 	}
 private:
 	virtual void check_impl(events_vector& events, const WindowSystem&) = 0;

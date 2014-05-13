@@ -23,8 +23,8 @@ public:
 	}
 
 	template <class Y>
-	ref_ptr(const ref_ptr<Y>& p) :
-		ptr_(p.ptr_)
+	ref_ptr(ref_ptr<Y> const& p) :
+		ptr_(p.get())
 	{
 		if (ptr_ != nullptr)
 			ptr_->add_ref();
@@ -80,12 +80,7 @@ public:
 		return ptr_ != nullptr;
 	}
 
-	T* get()
-	{
-		return ptr_;
-	}
-
-	const T* get() const
+	T* get() const
 	{
 		return ptr_;
 	}

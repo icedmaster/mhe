@@ -8,6 +8,7 @@
 #include "utils/log.hpp"
 #include "utils/file_utils.hpp"
 #include "utils/sysutils.hpp"
+#include "utils/options_parser.hpp"
 #include "utils/strutils.hpp"
 
 #endif // __MHE_UTILS__

@@ -19,24 +19,24 @@ EventManager::~EventManager()
 void EventManager::add_device(Device* device)
 {
 	INFO_LOG("EventManager::add_device:" << device->name());
-	devices_[device->name()] = boost::shared_ptr<Device>(device);
+	devices_[device->name()] = ref_ptr<Device>(device);
 }
 
-boost::shared_ptr<Device> EventManager::get_device(const std::string& name) const
+ref_ptr<Device> EventManager::get_device(const std::string& name) const
 {
 	devices_map::const_iterator it = devices_.find(name);
-	if (it == devices_.end()) return boost::shared_ptr<Device>();
+	if (it == devices_.end()) return ref_ptr<Device>();
 	return it->second;
 }
 
-void EventManager::add_listener(const boost::shared_ptr<EventListener>& listener)
+void EventManager::add_listener(const ref_ptr<EventListener>& listener)
 {
 	listeners_.insert(std::make_pair(listener->id(), listener));
 }
 
 void EventManager::add_listener(EventListener* listener)
 {
-	add_listener(boost::shared_ptr<EventListener>(listener));
+	add_listener(ref_ptr<EventListener>(listener));
 }
 
 void EventManager::check(const WindowSystem& ws)

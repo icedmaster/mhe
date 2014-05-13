@@ -8,4 +8,5 @@
 #include "mhe_utils.hpp"
 #include "mhe_app.hpp"
 #include "mhe_events.hpp"
+#include "mhe_render.hpp"
 #endif // __MHE_MHE__

@@ -1,9 +1,8 @@
 #ifndef __MOUSE_DEVICE_HPP__
 #define __MOUSE_DEVICE_HPP__
 
-#include <boost/scoped_ptr.hpp>
 #include "device.hpp"
-#include "array.hpp"
+#include "core/array.hpp"
 #include "mouse_device_impl.hpp"
 
 namespace mhe {
@@ -29,7 +28,7 @@ private:
 
 	array<bool, max_buttons_number> buttons_;
 	vector2<int> position_;	
-	boost::scoped_ptr<MouseDeviceImpl> impl_;
+	unique_ptr<MouseDeviceImpl> impl_;
 };
 
 }

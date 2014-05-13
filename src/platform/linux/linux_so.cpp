@@ -31,18 +31,16 @@ void* get_proc_addr(so_handle handle, const std::string& name)
 #ifdef MHE_OPENGL
 bool init_opengl_so()
 {
-	opengl_lib_handle = open_so(opengl_lib_name);
-	return (opengl_lib_handle != nullptr);
+	return true;
 }
 
 void deinit_opengl_so()
 {
-	close_so(opengl_lib_handle);
 }
 
 void* get_opengl_proc_addr(const std::string& name)
 {
-	return get_proc_addr(opengl_lib_handle, name);
+	return 0;
 }
 #endif
 
