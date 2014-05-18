@@ -23,12 +23,19 @@ public:
 	}
 
 	template <class Y>
-	ref_ptr(ref_ptr<Y> const& p) :
+    ref_ptr(const ref_ptr<Y>& p) :
 		ptr_(p.get())
 	{
 		if (ptr_ != nullptr)
 			ptr_->add_ref();
 	}
+
+    ref_ptr(const ref_ptr& p) :
+        ptr_(p.get())
+    {
+        if (ptr_ != nullptr)
+            ptr_->add_ref();
+    }
 
 	~ref_ptr()
 	{

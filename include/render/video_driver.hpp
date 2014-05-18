@@ -50,6 +50,8 @@ public:
     
 	virtual uint major_version_need() const = 0;
 	virtual uint minor_version_need() const = 0;
+
+	virtual void flush() = 0;
 };
 
 class Driver
@@ -177,6 +179,14 @@ public:
 
 	/// Reset implementaion - need to call init()
 	void reset();
+
+	void begin_render()
+	{}
+
+	void end_render()
+	{
+		impl_->flush();
+	}
 private:
 	Stats stats_;
 	unique_ptr<DriverImpl> impl_;

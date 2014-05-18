@@ -22,7 +22,7 @@ public:
 
 	DriverImpl* create_driver() const;
 	WindowSystemImpl* create_window_system() const;
-	Texture* create_texture() const;
+	//Texture* create_texture() const;
 
 	// input devices
 	KeyboardDeviceImpl* create_keyboard_device_impl() const

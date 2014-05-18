@@ -3,6 +3,7 @@
 
 #include "application_config.hpp"
 #include "core/ref_counter.hpp"
+#include "game/engine.hpp"
 
 namespace mhe {
 namespace app {
@@ -44,6 +45,7 @@ protected:
 private:
 	virtual void init_impl() {}
 	virtual void close_impl() {}
+	game::Engine engine_;
 	std::string name_;
 };
 

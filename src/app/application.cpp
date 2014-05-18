@@ -37,7 +37,7 @@ bool Application::mhe_app_init(const ApplicationConfig& config)
 			 " h:" << config.height << " bpp:" << config.bpp);
 	init_assets_path(config.assets_path);
 	init_default_assets(config);
-	return true;
+	return engine_.init(config.width, config.height, config.bpp, config.fullscreen);
 }
 
 void Application::mhe_app_close()
@@ -47,6 +47,10 @@ void Application::mhe_app_close()
 
 int Application::run_impl()
 {
+	MainLoop* main_loop = engine_.context().window_system.main_loop();
+	if (main_loop == nullptr)
+		engine_.run();
+	else main_loop->run(1000 / 60.0f);
 	close();
 	return 0;
 }

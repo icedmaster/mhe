@@ -19,7 +19,8 @@ public:
 class View
 {
 public:
-	View()	{}
+    View()
+    {}
 
 	View(ViewEventsHandler* events_handler) :
 		events_handler_(events_handler)

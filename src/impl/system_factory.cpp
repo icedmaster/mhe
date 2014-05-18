@@ -8,10 +8,12 @@ DriverImpl* SystemFactory::create_driver() const
 	return video_driver_factory_.create_video_driver();
 }
 
+/*
 Texture* SystemFactory::create_texture() const
 {
 	return video_driver_factory_.create_texture();
 }
+*/
 
 WindowSystemImpl* SystemFactory::create_window_system() const
 {

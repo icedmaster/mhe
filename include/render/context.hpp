@@ -1,10 +1,15 @@
 #ifndef __CONTEXT_HPP__
 #define __CONTEXT_HPP__
 
+#include "window_system.hpp"
+#include "video_driver.hpp"
+
 namespace mhe {
 
-class Context
+struct Context
 {
+	WindowSystem window_system;
+	Driver driver;
 };
 
 }

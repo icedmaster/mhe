@@ -35,7 +35,7 @@
 
 // video driver
 #ifdef MHE_HAS_OPENGL
-	#define MHE_OPENGL
+	#define MHE_OPENGL3
 #endif
 
 #ifdef MHE_HAS_OPENGLES

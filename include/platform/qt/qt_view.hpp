@@ -2,7 +2,7 @@
 #define __QT_VIEW_HPP__
 
 #include <QtOpenGL>
-#include "app/view.hpp"
+#include "render/view.hpp"
 #include "events/events_provider.hpp"
 
 namespace mhe {

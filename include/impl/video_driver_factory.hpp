@@ -2,14 +2,13 @@
 #define __VIDEO_DRIVERS_FACTORY_HPP__
 
 #include <vector>
-#include <boost/shared_ptr.hpp>
+#include "core/ref_ptr.hpp"
 #include "abstract_video_driver_factory.hpp"
 
 namespace mhe {
 
 class Driver;
 class Texture;
-class MultiTexture;
 class ShaderProgram;
 
 class VideoDriverFactory
@@ -23,13 +22,12 @@ public:
 	std::string set_next_driver();
 
 	DriverImpl* create_video_driver() const;
-	Texture* create_texture() const;
-	Texture* create_multitexture() const;
-	ShaderProgram* create_shader_program() const;
+	//Texture* create_texture() const;
+	//ShaderProgram* create_shader_program() const;
 private:
-	typedef std::vector< boost::shared_ptr<AbstractVideoDriverFactory> > drvvec;
+	typedef std::vector< ref_ptr<AbstractVideoDriverFactory> > drvvec;
 	drvvec drivers_;
-	boost::shared_ptr<AbstractVideoDriverFactory> current_driver_factory_;
+	ref_ptr<AbstractVideoDriverFactory> current_driver_factory_;
 };
 
 }

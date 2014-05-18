@@ -37,6 +37,8 @@ private:
 	{
 		return 3;
 	}
+
+	void flush();
 private:
 };
 

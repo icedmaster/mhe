@@ -73,6 +73,7 @@ set(IOS_LIB_DIR ${CMAKE_SOURCE_DIR}/../lib/ios)
 
 set (SRC_PATH
   ${SOURCE_ROOT}
+  ${SOURCE_ROOT}/game
   ${SOURCE_ROOT}/events
   ${SOURCE_ROOT}/app
   ${SOURCE_ROOT}/render

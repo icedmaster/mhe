@@ -2,6 +2,7 @@
 #define __ABSTRACT_VIDEO_DRIVER_FACTORY_HPP__
 
 #include <string>
+#include "core/ref_counter.hpp"
 
 namespace mhe {
 
@@ -9,7 +10,7 @@ class DriverImpl;
 class Texture;
 class ShaderProgram;
 
-class AbstractVideoDriverFactory
+class AbstractVideoDriverFactory : public ref_counter
 {
 public:
 	virtual ~AbstractVideoDriverFactory() {}
@@ -17,9 +18,8 @@ public:
 	virtual std::string name() const = 0;
 
 	virtual DriverImpl* create_video_driver() const = 0;
-	virtual Texture* create_texture() const = 0;
-	virtual Texture* create_multitexture() const = 0;
-	virtual ShaderProgram* create_shader_program() const = 0;
+	//virtual Texture* create_texture() const = 0;
+	//virtual ShaderProgram* create_shader_program() const = 0;
 };
 
 }

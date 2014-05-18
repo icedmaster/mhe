@@ -62,5 +62,10 @@ void OpenGL3Driver::set_viewport(int x, int y, int w, int h)
 {
     glViewport(x, y, w, h);
 }
+
+void OpenGL3Driver::flush()
+{
+	glFlush();
+}
     
 }}

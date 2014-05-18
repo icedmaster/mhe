@@ -9,4 +9,5 @@
 #include "mhe_app.hpp"
 #include "mhe_events.hpp"
 #include "mhe_render.hpp"
+#include "mhe_game.hpp"
 #endif // __MHE_MHE__

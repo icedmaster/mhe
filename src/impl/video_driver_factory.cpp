@@ -7,11 +7,11 @@ namespace mhe {
 VideoDriverFactory::VideoDriverFactory()
 {
 	#ifdef MHE_OPENGL3
-	drivers_.push_back(boost::shared_ptr<AbstractVideoDriverFactory>(new opengl::OpenGL3VideoDriverFactory));
+	drivers_.push_back(ref_ptr<AbstractVideoDriverFactory>(new opengl::OpenGL3VideoDriverFactory));
 	#endif
     
 #ifdef MHE_OPENGLES
-    drivers_.push_back(boost::shared_ptr<AbstractVideoDriverFactory>(new opengl::OpenGLESVideoDriverFactory));
+    drivers_.push_back(ref_ptr<AbstractVideoDriverFactory>(new opengl::OpenGLESVideoDriverFactory));
 #endif
     if (!drivers_.empty())
         // select highest video driver
@@ -46,19 +46,16 @@ DriverImpl* VideoDriverFactory::create_video_driver() const
 	return current_driver_factory_->create_video_driver();
 }
 
+/*
 Texture* VideoDriverFactory::create_texture() const
 {
 	return current_driver_factory_->create_texture();
-}
-
-Texture* VideoDriverFactory::create_multitexture() const
-{
-	return current_driver_factory_->create_multitexture();
 }
 
 ShaderProgram* VideoDriverFactory::create_shader_program() const
 {
 	return current_driver_factory_->create_shader_program();
 }
+*/
 
 }

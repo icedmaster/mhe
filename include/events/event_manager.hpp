@@ -2,7 +2,7 @@
 #define __EVENT_MANAGER_HPP__
 
 #include <map>
-#include "app/window_system.hpp"
+#include "render/window_system.hpp"
 #include "device.hpp"
 #include "event_listener.hpp"
 #include "event_system.hpp"

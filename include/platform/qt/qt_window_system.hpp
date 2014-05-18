@@ -3,7 +3,7 @@
 
 #include <QApplication>
 #include <QTimer>
-#include "app/window_system.hpp"
+#include "render/window_system.hpp"
 #include "qt_view.hpp"
 
 namespace mhe {
@@ -33,7 +33,8 @@ private:
 private slots:
 	void on_timer()
 	{
-		view_->events_handler()->on_update();
+        if (view_->events_handler() != nullptr)
+            view_->events_handler()->on_update();
 		view_->updateGL();
 	}
 
