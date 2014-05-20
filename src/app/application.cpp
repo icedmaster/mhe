@@ -4,6 +4,8 @@
 #include "utils/file_utils.hpp"
 #include "app/application_asset_path.hpp"
 #include "core/memory.hpp"
+#include "events/delegate_event_listener.hpp"
+#include "events/system_event.hpp"
 
 namespace mhe {
 namespace app {
@@ -37,7 +39,12 @@ bool Application::mhe_app_init(const ApplicationConfig& config)
 			 " h:" << config.height << " bpp:" << config.bpp);
 	init_assets_path(config.assets_path);
 	init_default_assets(config);
-	return engine_.init(config.width, config.height, config.bpp, config.fullscreen);
+    if (engine_.init(config.width, config.height, config.bpp, config.fullscreen))
+    {
+        add_delegates();
+        return true;
+    }
+    return false;
 }
 
 void Application::mhe_app_close()
@@ -55,6 +62,11 @@ int Application::run_impl()
 	return 0;
 }
 
+void Application::stop_impl()
+{
+
+}
+
 void Application::init_assets_path(const std::string& config_assets_path)
 {	
 	std::string base_path = utils::path_join(application_base_path(),
@@ -64,6 +76,27 @@ void Application::init_assets_path(const std::string& config_assets_path)
 
 void Application::init_default_assets(const ApplicationConfig& config)
 {
+}
+
+void Application::add_delegates()
+{
+    class ApplicationEventListener : public DelegateEventListener
+    {
+    public:
+        ApplicationEventListener(Application* app) :
+            DelegateEventListener(system_event_type, 0, 0, create_delegate(app, &Application::on_system_event))
+        {}
+    };
+
+    engine_.event_manager().add_listener(new ApplicationEventListener(this));
+}
+
+bool Application::on_system_event(const Event* event)
+{
+    const SystemEvent* se = static_cast<const SystemEvent*>(event);
+    if (se->arg() == SystemEvent::quit)
+        stop();
+    return true;
 }
 
 }}

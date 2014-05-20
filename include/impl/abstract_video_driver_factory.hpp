@@ -7,6 +7,8 @@
 namespace mhe {
 
 class DriverImpl;
+class RenderBufferImpl;
+class LayoutImpl;
 class Texture;
 class ShaderProgram;
 
@@ -18,6 +20,8 @@ public:
 	virtual std::string name() const = 0;
 
 	virtual DriverImpl* create_video_driver() const = 0;
+	virtual RenderBufferImpl* create_render_buffer() const = 0;
+	virtual LayoutImpl* create_layout() const = 0;
 	//virtual Texture* create_texture() const = 0;
 	//virtual ShaderProgram* create_shader_program() const = 0;
 };

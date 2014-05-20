@@ -2,6 +2,7 @@
 #define __UNIQUE_PTR_HPP__
 
 #include "assert.hpp"
+#include "types.hpp"
 
 namespace mhe {
 

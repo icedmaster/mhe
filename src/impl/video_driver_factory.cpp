@@ -46,6 +46,16 @@ DriverImpl* VideoDriverFactory::create_video_driver() const
 	return current_driver_factory_->create_video_driver();
 }
 
+RenderBufferImpl* VideoDriverFactory::create_render_buffer() const
+{
+	return current_driver_factory_->create_render_buffer();
+}
+
+LayoutImpl* VideoDriverFactory::create_layout() const
+{
+	return current_driver_factory_->create_layout();
+}
+
 /*
 Texture* VideoDriverFactory::create_texture() const
 {

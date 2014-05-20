@@ -10,6 +10,8 @@ namespace mhe {
 class Driver;
 class Texture;
 class ShaderProgram;
+class RenderBufferImpl;
+class LayoutImpl;
 
 class VideoDriverFactory
 {
@@ -22,6 +24,8 @@ public:
 	std::string set_next_driver();
 
 	DriverImpl* create_video_driver() const;
+	RenderBufferImpl* create_render_buffer() const;
+	LayoutImpl* create_layout() const;
 	//Texture* create_texture() const;
 	//ShaderProgram* create_shader_program() const;
 private:

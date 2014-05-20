@@ -8,8 +8,9 @@
 
 namespace mhe
 {
-class iAudioDriver;
-class iSound;
+
+class RenderBufferImpl;
+class LayoutImpl;
 
 class SystemFactory
 {
@@ -22,6 +23,10 @@ public:
 
 	DriverImpl* create_driver() const;
 	WindowSystemImpl* create_window_system() const;
+
+	RenderBufferImpl* create_render_buffer() const;
+	LayoutImpl* create_layout() const;
+	
 	//Texture* create_texture() const;
 
 	// input devices

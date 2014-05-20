@@ -14,6 +14,7 @@ class MainLoop : public ref_counter
 public:
 	virtual ~MainLoop() {}
 	virtual void run(unsigned int update_interval) = 0;
+    virtual void stop() = 0;
 };
 
 struct WindowContextFormat

@@ -21,6 +21,11 @@ public:
 		return run_impl();
 	}
 
+    void stop()
+    {
+        stop_impl();
+    }
+
 	const std::string& name() const
 	{
 		return name_;
@@ -35,6 +40,7 @@ protected:
 	virtual bool mhe_app_init(const ApplicationConfig& config);
 	virtual void mhe_app_close();
 	virtual int run_impl();
+    virtual void stop_impl();
 	virtual void init_assets_path(const std::string& config_assets_path);
 	virtual void init_default_assets(const ApplicationConfig& config);
 
@@ -45,6 +51,10 @@ protected:
 private:
 	virtual void init_impl() {}
 	virtual void close_impl() {}
+
+    void add_delegates();
+    bool on_system_event(const Event* event);
+
 	game::Engine engine_;
 	std::string name_;
 };

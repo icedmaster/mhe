@@ -46,6 +46,7 @@ void Engine::run()
 
 void Engine::update()
 {
+    event_manager_.check(context_.window_system);
 }
 
 void Engine::render()

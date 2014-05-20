@@ -24,6 +24,12 @@ class QtMainLoop : public QObject, public MainLoop
 		timer_.start(update_interval);
 		QApplication::instance()->exec();
 	}
+
+    void stop()
+    {
+        QApplication::instance()->exit(0);
+        timer_.stop();
+    }
 private:
 	void init_events()
 	{

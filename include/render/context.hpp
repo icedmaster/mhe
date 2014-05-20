@@ -3,6 +3,7 @@
 
 #include "window_system.hpp"
 #include "video_driver.hpp"
+#include "core/pool.hpp"
 
 namespace mhe {
 
