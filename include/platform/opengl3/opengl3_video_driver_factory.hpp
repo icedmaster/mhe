@@ -27,6 +27,11 @@ public:
 		return new OpenGL3Buffer;
 	}
 
+	IndexBufferImpl* create_index_buffer() const
+	{
+		return new OpenGL3IndexBuffer;
+	}
+
 	LayoutImpl* create_layout() const
 	{
 		return new OpenGL3Layout;

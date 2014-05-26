@@ -10,6 +10,7 @@ namespace mhe
 {
 
 class RenderBufferImpl;
+class IndexBufferImpl;
 class LayoutImpl;
 
 class SystemFactory
@@ -25,6 +26,7 @@ public:
 	WindowSystemImpl* create_window_system() const;
 
 	RenderBufferImpl* create_render_buffer() const;
+	IndexBufferImpl* create_index_buffer() const;
 	LayoutImpl* create_layout() const;
 	
 	//Texture* create_texture() const;

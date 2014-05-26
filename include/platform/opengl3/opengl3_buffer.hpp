@@ -60,6 +60,15 @@ private:
 	VBO vbo_;
 };
 
+class OpenGL3IndexBuffer : public IndexBufferImpl
+{
+public:
+	bool init(const uint32_t* indexes, size_t size);
+	void close() {}
+private:
+	std::vector<uint32_t> indexes_;
+};
+
 class OpenGL3Layout : public LayoutImpl
 {
 public:

@@ -23,6 +23,14 @@ public:
 	virtual void close() = 0;
 };
 
+class IndexBufferImpl
+{
+public:
+	virtual ~IndexBufferImpl() {}
+	virtual bool init(const uint32_t* indexes, size_t size) = 0;
+	virtual void close() = 0;
+};
+
 class LayoutImpl
 {
 public:
@@ -47,6 +55,25 @@ public:
 	}
 private:
 	unique_ptr<RenderBufferImpl> impl_;
+};
+
+class IndexBuffer
+{
+	friend class Driver;
+public:
+	IndexBuffer();
+
+	bool init(const uint32_t* indexes, size_t size)
+	{
+		return impl_->init(indexes, size);
+	}
+
+	void close()
+	{
+		impl_->close();
+	}
+private:
+	unique_ptr<IndexBufferImpl> impl_;
 };
 
 struct LayoutElement
@@ -79,6 +106,8 @@ public:
 private:
 	unique_ptr<LayoutImpl> impl_;
 };
+
+typedef RenderBuffer VertexBuffer;
 
 }
 

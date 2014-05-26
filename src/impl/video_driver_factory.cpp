@@ -51,6 +51,11 @@ RenderBufferImpl* VideoDriverFactory::create_render_buffer() const
 	return current_driver_factory_->create_render_buffer();
 }
 
+IndexBufferImpl* VideoDriverFactory::create_index_buffer() const
+{
+	return current_driver_factory_->create_index_buffer();
+}
+
 LayoutImpl* VideoDriverFactory::create_layout() const
 {
 	return current_driver_factory_->create_layout();

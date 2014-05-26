@@ -68,6 +68,13 @@ void OpenGL3Buffer::close()
 	vao_.close();
 }
 
+bool OpenGL3IndexBuffer::init(const uint32_t* indexes, size_t size)
+{
+	indexes_.resize(size);
+	::memcpy(&indexes_[0], indexes, size * sizeof(uint32_t));
+	return true;
+}
+
 bool OpenGL3Layout::init(const LayoutDesc& desc)
 {
     ASSERT(!desc.layout.empty(), "Getting layout automatically does not supported yet");

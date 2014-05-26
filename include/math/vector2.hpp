@@ -131,6 +131,7 @@ inline std::ostream& operator<< (std::ostream& s, const vector2<T>& v)
 }
 
 typedef vector2<float> v2d;
+typedef vector2<float> vec2;
 }
 
 #endif

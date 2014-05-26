@@ -8,6 +8,10 @@ RenderBuffer::RenderBuffer() :
 	impl_(SystemFactory::instance().create_render_buffer())
 {}
 
+IndexBuffer::IndexBuffer() :
+	impl_(SystemFactory::instance().create_index_buffer())
+{}
+
 Layout::Layout() :
 	impl_(SystemFactory::instance().create_layout())
 {}

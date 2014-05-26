@@ -1,21 +1,35 @@
 #ifndef __POOL_HPP__
 #define __POOL_HPP__
 
-#include "fixed_size_vector.hpp"
-
 namespace mhe {
 
-template <class T, size_t C = 128>
+template <class T, class Handle, size_t C = 128>
 class Pool
 {
 public:
-	T& get()
+    Pool() :
+		last_(0)
 	{
-		return pool_[index_++];
+	}
+
+	Handle create()
+	{
+		return last_++;
+	}
+
+	void close(Handle handle)
+	{
+        ASSERT(handle < C, "Invalid handle:" << handle);
+	}
+
+	T& get(Handle handle)
+	{
+        ASSERT(handle < C, "Invalid handle:" << handle);
+        return pool_[handle];
 	}
 private:
-	fixed_size_vector<T, C> pool_;
-	size_t index_;
+    T pool_[C];
+	Handle last_;
 };
 
 }

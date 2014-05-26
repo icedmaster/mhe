@@ -25,6 +25,7 @@ public:
 
 	DriverImpl* create_video_driver() const;
 	RenderBufferImpl* create_render_buffer() const;
+	IndexBufferImpl* create_index_buffer() const;
 	LayoutImpl* create_layout() const;
 	//Texture* create_texture() const;
 	//ShaderProgram* create_shader_program() const;

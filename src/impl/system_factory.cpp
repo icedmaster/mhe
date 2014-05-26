@@ -13,6 +13,11 @@ RenderBufferImpl* SystemFactory::create_render_buffer() const
 	return video_driver_factory_.create_render_buffer();
 }
 
+IndexBufferImpl* SystemFactory::create_index_buffer() const
+{
+    return video_driver_factory_.create_index_buffer();
+}
+
 LayoutImpl* SystemFactory::create_layout() const
 {
 	return video_driver_factory_.create_layout();
