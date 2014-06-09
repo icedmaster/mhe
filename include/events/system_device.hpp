@@ -1,7 +1,7 @@
 #ifndef __SYSTEM_DEVICE_HPP__
 #define __SYSTEM_DEVICE_HPP__
 
-#include <boost/scoped_ptr.hpp>
+#include "core/unique_ptr.hpp"
 #include "device.hpp"
 #include "system_device_impl.hpp"
 
@@ -14,7 +14,7 @@ public:
 private:
 	void check_impl(events_vector& events, const WindowSystem&);
 
-	boost::scoped_ptr<SystemDeviceImpl> impl_;
+	unique_ptr<SystemDeviceImpl> impl_;
 };
 
 }

@@ -3,6 +3,7 @@
 
 #include <string>
 #include "core/types.hpp"
+#include "core/compiler.hpp"
 
 namespace mhe {
 namespace app {
@@ -21,7 +22,7 @@ struct ApplicationConfig
 	std::string default_texture_name;
 };
 
-bool load_config(ApplicationConfig& config, const std::string& filename = default_config_filename);
+MHE_EXPORT bool load_config(ApplicationConfig& config, const std::string& filename = default_config_filename);
 
 }}
 

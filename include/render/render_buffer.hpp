@@ -3,11 +3,14 @@
 
 #include "core/unique_ptr.hpp"
 #include "core/fixed_size_vector.hpp"
+#include "utils/pool_utils.hpp"
 
 namespace mhe {
 
 class Driver;
+class ShaderProgram;
 struct LayoutDesc;
+struct UniformBufferDesc;
 
 enum BufferUpdateType
 {
@@ -39,9 +42,20 @@ public:
 	virtual void close() = 0;
 };
 
-class RenderBuffer
+class UniformBufferImpl
+{
+public:
+	virtual ~UniformBufferImpl() {}
+	virtual bool init(const UniformBufferDesc& desc) = 0;
+	virtual void close() = 0;
+
+	virtual void update(const UniformBufferDesc& desc) = 0;
+};
+
+class MHE_EXPORT RenderBuffer
 {
 	friend class Driver;
+	POOL_ELEMENT_METHODS(uint16_t);
 public:
 	RenderBuffer();
 	bool init(BufferUpdateType type, const uint8_t* data, size_t size, size_t element_size)
@@ -57,9 +71,10 @@ private:
 	unique_ptr<RenderBufferImpl> impl_;
 };
 
-class IndexBuffer
+class MHE_EXPORT IndexBuffer
 {
 	friend class Driver;
+	POOL_ELEMENT_METHODS(uint16_t);
 public:
 	IndexBuffer();
 
@@ -89,9 +104,10 @@ struct LayoutDesc
 	fixed_size_vector<LayoutElement, 16> layout;
 };
 
-class Layout
+class MHE_EXPORT Layout
 {
 	friend class Driver;
+	POOL_ELEMENT_METHODS(uint16_t);
 public:
 	Layout();
 	bool init(const LayoutDesc& desc)
@@ -105,6 +121,46 @@ public:
 	}
 private:
 	unique_ptr<LayoutImpl> impl_;
+};
+
+struct UniformBufferElement
+{
+	std::string name;
+	size_t size;
+	uint8_t* data;
+};
+
+const size_t max_uniforms_per_block = 16;
+
+struct UniformBufferDesc
+{
+	std::string name;
+	ShaderProgram* program;
+	fixed_size_vector<UniformBufferElement, max_uniforms_per_block> uniforms;
+};
+
+class MHE_EXPORT UniformBuffer
+{
+	friend class Driver;
+	POOL_ELEMENT_METHODS(uint16_t);
+public:
+	UniformBuffer();
+	bool init(const UniformBufferDesc& desc)
+	{
+		return impl_->init(desc);
+	}
+
+	void close()
+	{
+		impl_->close();
+	}
+
+	void update(const UniformBufferDesc& desc)
+	{
+		impl_->update(desc);
+	}
+private:
+	unique_ptr<UniformBufferImpl> impl_;
 };
 
 typedef RenderBuffer VertexBuffer;

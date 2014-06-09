@@ -2,6 +2,7 @@
 
 #include "platform/opengl/opengl_types.hpp"
 #include "platform/opengl/opengl_extension.hpp"
+#include "platform/opengl3/opengl3_shader_program.hpp"
 
 namespace mhe {
 namespace opengl {
@@ -77,7 +78,7 @@ bool OpenGL3IndexBuffer::init(const uint32_t* indexes, size_t size)
 
 bool OpenGL3Layout::init(const LayoutDesc& desc)
 {
-    ASSERT(!desc.layout.empty(), "Getting layout automatically does not supported yet");
+    ASSERT(!desc.layout.empty(), "Getting layout automatically is not supported yet");
 	desc_ = desc;
 	return true;
 }
@@ -100,6 +101,54 @@ void OpenGL3Layout::disable()
 		const LayoutElement& element = desc_.layout[i];
 		OpenGLExtensions::instance().glDisableVertexAttribArray(element.position);
 	}
+}
+
+bool OpenGL3UniformBuffer::init(const UniformBufferDesc& desc)
+{
+	const OpenGL3ShaderProgram* program = static_cast<const OpenGL3ShaderProgram*>(desc.program->impl());
+	id_ = OpenGLExtensions::instance().glGetUniformBlockIndex(program->id(), desc.name.c_str());
+	ASSERT(id_ != GL_INVALID_INDEX, "Can't create uniform buffer");
+	GLint size;
+	OpenGLExtensions::instance().glGetActiveUniformBlockiv(program->id(), id_, GL_UNIFORM_BLOCK_DATA_SIZE, &size);
+	const GLchar* names[max_uniforms_per_block];
+	GLuint indices[max_uniforms_per_block];
+	for (size_t i = 0; i < desc.uniforms.size(); ++i)
+		names[i] = desc.uniforms[i].name.c_str();
+	OpenGLExtensions::instance().glGetUniformIndices(program->id(), desc.uniforms.size(), names, indices);
+	OpenGLExtensions::instance().glGetActiveUniformsiv(program->id(), desc.uniforms.size(), indices, GL_UNIFORM_OFFSET, offsets_);
+
+	data_.resize(size);
+	for (size_t i = 0; i < desc.uniforms.size(); ++i)
+		::memcpy(data_.begin() + offsets_[i], desc.uniforms[i].data, desc.uniforms[i].size);
+
+	if (vbo_.init(GL_UNIFORM_BUFFER, size, &data_[0], GL_DYNAMIC_DRAW))
+	{
+		ASSERT(false, "Can't create VBO for UniformBuffer");
+		return false;
+	}
+	
+	OpenGLExtensions::instance().glBindBufferBase(GL_UNIFORM_BUFFER, id_, vbo_.id());
+
+	return false;
+}
+
+void OpenGL3UniformBuffer::close()
+{
+	vbo_.close();
+}
+
+void OpenGL3UniformBuffer::update(const UniformBufferDesc& desc)
+{
+}
+
+void OpenGL3UniformBuffer::enable()
+{
+	vbo_.enable();
+}
+
+void OpenGL3UniformBuffer::disable()
+{
+	vbo_.disable();
 }
 
 }}

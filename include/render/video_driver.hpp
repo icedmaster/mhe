@@ -54,7 +54,7 @@ public:
 	virtual void flush() = 0;
 };
 
-class Driver
+class MHE_EXPORT Driver
 {
 public:
 	class Stats

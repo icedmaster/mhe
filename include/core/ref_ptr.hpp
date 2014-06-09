@@ -15,7 +15,7 @@ public:
 	{}
 
 	template <class Y>
-	ref_ptr(Y* p) :
+	explicit ref_ptr(Y* p) :
 		ptr_(p)
 	{
 		if (ptr_ != nullptr)
@@ -53,6 +53,12 @@ public:
 
 	template <class Y>
 	ref_ptr& operator= (ref_ptr<Y>& ptr)
+	{
+		set(ptr.ptr_);
+		return *this;
+	}
+
+	ref_ptr& operator= (const ref_ptr& ptr)
 	{
 		set(ptr.ptr_);
 		return *this;
@@ -119,6 +125,7 @@ private:
 	template <class Y>
 	void set(Y* ptr)
 	{
+		if (ptr == ptr_) return;
 		if (ptr_ != nullptr && !ptr_->rem_ref())
 			delete ptr_;
 		ptr_ = ptr;

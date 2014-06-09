@@ -1,13 +1,13 @@
 #ifndef __KEYBOARD_DEVICE_HPP__
 #define __KEYBOARD_DEVICE_HPP__
 
-#include <boost/scoped_ptr.hpp>
+#include "core/unique_ptr.hpp"
 #include "device.hpp"
 #include "keyboard_device_impl.hpp"
 
 namespace mhe {
 
-class KeyboardDevice : public Device
+class MHE_EXPORT KeyboardDevice : public Device
 {
 public:
 enum
@@ -107,7 +107,7 @@ public:
 private:
 	void check_impl(Device::events_vector& events, const WindowSystem&);
 
-	boost::scoped_ptr<KeyboardDeviceImpl> impl_;
+	unique_ptr<KeyboardDeviceImpl> impl_;
 	bool keys_[256];
 };
 

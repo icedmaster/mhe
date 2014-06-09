@@ -3,17 +3,12 @@
 
 #include <vector>
 #include "core/ref_ptr.hpp"
+#include "core/compiler.hpp"
 #include "abstract_video_driver_factory.hpp"
 
 namespace mhe {
 
-class Driver;
-class Texture;
-class ShaderProgram;
-class RenderBufferImpl;
-class LayoutImpl;
-
-class VideoDriverFactory
+class MHE_EXPORT VideoDriverFactory
 {
 public:
 	VideoDriverFactory();
@@ -27,8 +22,9 @@ public:
 	RenderBufferImpl* create_render_buffer() const;
 	IndexBufferImpl* create_index_buffer() const;
 	LayoutImpl* create_layout() const;
-	//Texture* create_texture() const;
-	//ShaderProgram* create_shader_program() const;
+	UniformBufferImpl* create_uniform_buffer() const;
+	ShaderProgramImpl* create_shader_program() const;
+	TextureImpl* create_texture() const;
 private:
 	typedef std::vector< ref_ptr<AbstractVideoDriverFactory> > drvvec;
 	drvvec drivers_;

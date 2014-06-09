@@ -61,16 +61,19 @@ LayoutImpl* VideoDriverFactory::create_layout() const
 	return current_driver_factory_->create_layout();
 }
 
-/*
-Texture* VideoDriverFactory::create_texture() const
+UniformBufferImpl* VideoDriverFactory::create_uniform_buffer() const
 {
-	return current_driver_factory_->create_texture();
+	return current_driver_factory_->create_uniform_buffer();
 }
 
-ShaderProgram* VideoDriverFactory::create_shader_program() const
+ShaderProgramImpl* VideoDriverFactory::create_shader_program() const
 {
 	return current_driver_factory_->create_shader_program();
 }
-*/
+
+TextureImpl* VideoDriverFactory::create_texture() const
+{
+	return current_driver_factory_->create_texture();
+}
 
 }

@@ -5,8 +5,8 @@
 #include "sdl2_window_system.hpp"
 #include "sdl2_keyboard_device_impl.hpp"
 #include "sdl2_mouse_device_impl.hpp"
-#include "platform/sdl/sdl_system_device_impl.hpp"
-#include "platform/sdl/sdl_event_system.hpp"
+#include "sdl2_system_device_impl.hpp"
+#include "sdl2_event_system.hpp"
 
 namespace mhe {
 namespace sdl {

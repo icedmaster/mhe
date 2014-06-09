@@ -1,8 +1,8 @@
 #ifndef _SDL2_WINDOW_SYSTEM_HPP_
 #define _SDL2_WINDOW_SYSTEM_HPP_
 
-#include "window_system.hpp"
-#include "platform/sdl/mhe_sdl.hpp"
+#include "render/window_system.hpp"
+#include "mhe_sdl.hpp"
 
 namespace mhe {
 namespace sdl {

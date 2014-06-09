@@ -1,6 +1,7 @@
 #include "platform/opengl3/opengl3_driver.hpp"
 
 #include "platform/opengl/mhe_gl.hpp"
+#include "platform/opengl/opengl_extension.hpp"
 
 namespace mhe {
 namespace opengl {
@@ -15,7 +16,7 @@ bool OpenGL3Driver::init()
 	glGetIntegerv(GL_MAJOR_VERSION, &major);
 	glGetIntegerv(GL_MINOR_VERSION, &minor);
 	INFO_LOG("OpenGL3Driver::context:" << major << "." << minor);
-	//OpenGLExtensions::instance().init_extensions();
+	OpenGLExtensions::instance().init_extensions();
 	return true;
 }
 

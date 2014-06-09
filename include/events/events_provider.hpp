@@ -9,7 +9,7 @@
 
 namespace mhe {
 
-class EventsProvider
+class MHE_EXPORT EventsProvider
 {
 	static const size_t events_number = 10;
 public:

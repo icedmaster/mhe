@@ -1,6 +1,9 @@
 #ifndef __ARRAY_HPP__
 #define __ARRAY_HPP__
 
+#include <cstdlib>
+#include <cassert>
+
 namespace mhe {
 
 template <class T, size_t count>

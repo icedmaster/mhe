@@ -3,9 +3,14 @@
 #ifndef __MHE_RENDER__
 #define __MHE_RENDER__
 
-#include "render/window_system.hpp"
 #include "render/context.hpp"
+#include "render/layouts.hpp"
+#include "render/mesh.hpp"
+#include "render/render_buffer.hpp"
 #include "render/video_driver.hpp"
 #include "render/view.hpp"
+#include "render/window_system.hpp"
+
+#include "render/utils/simple_meshes.hpp"
 
 #endif // __MHE_RENDER__

@@ -7,7 +7,7 @@ macro(mhe_based_project NAME)
 	set(PROJECT ${NAME})
 	project(${PROJECT})
 
-	set(LIB_DIR ${MHE_DIR}/lib)
+	set(LIB_DIR ${MHE_DIR}/3rdparty)
 
 	set(CMAKE_MODULES_DIR ${MHE_DIR}/build/cmake_modules)
 	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_MODULES_DIR})		
@@ -24,6 +24,8 @@ macro(mhe_based_project NAME)
 
 	include_directories(${MHE_INCLUDE_DIR})
 	include_directories(${MHE_DIR})
+	message("Trying to find mhe library...")
+	message(${MHE_LIB_DIR})
 	find_library(MHE_LIB mhe ${MHE_LIB_DIR})
 
 	foreach (DIR ${SOURCE_ROOT})

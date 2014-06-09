@@ -6,7 +6,7 @@
 #define DELEGATE		JOIN(Delegate, NUMBER_OF_ARGS)
 
 template <class Ret TEMPLATE_ARGS>
-class DELEGATE_FUNC
+class DELEGATE_FUNC : public ref_counter
 {
 public:
 	virtual ~DELEGATE_FUNC() {}
@@ -52,14 +52,14 @@ template <class Ret TEMPLATE_ARGS>
 class DELEGATE
 {
 	typedef DELEGATE_FUNC<Ret TEMPLATE_INST_ARGS> Delegate;
-	typedef std::list< boost::shared_ptr<Delegate> > DelegatesList;
+	typedef std::list< ref_ptr<Delegate> > DelegatesList;
 public:
 	typedef Ret ReturnType;
 public:
 	DELEGATE() {}
 	DELEGATE(Delegate* delegate)
 	{
-        delegates.push_back(boost::shared_ptr<Delegate>(delegate));
+        delegates.push_back(ref_ptr<Delegate>(delegate));
 	}
 
 	DELEGATE& operator= (Delegate* delegate)
@@ -71,7 +71,7 @@ public:
 
 	DELEGATE& operator+= (Delegate* delegate)
 	{
-		delegates.push_back(boost::shared_ptr<Delegate>(delegate));
+		delegates.push_back(ref_ptr<Delegate>(delegate));
 		return *this;
 	}
 

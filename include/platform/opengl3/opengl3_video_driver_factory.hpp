@@ -5,6 +5,8 @@
 #include "core/types.hpp"
 #include "opengl3_driver.hpp"
 #include "opengl3_buffer.hpp"
+#include "opengl3_shader_program.hpp"
+#include "opengl3_texture.hpp"
 
 namespace mhe {
 namespace opengl {
@@ -35,6 +37,21 @@ public:
 	LayoutImpl* create_layout() const
 	{
 		return new OpenGL3Layout;
+	}
+
+	UniformBufferImpl* create_uniform_buffer() const
+	{
+		return new OpenGL3UniformBuffer;
+	}
+
+	ShaderProgramImpl* create_shader_program() const
+	{
+		return new OpenGL3ShaderProgram;
+	}
+
+	TextureImpl* create_texture() const
+	{
+		return new OpenGL3Texture;
 	}
 };
 

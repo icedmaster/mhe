@@ -1,5 +1,6 @@
 #include "platform/opengl/opengl_extension.hpp"
 
+#include <iostream>
 #include <vector>
 #include "utils/global_log.hpp"
 #include "utils/strutils.hpp"
@@ -30,7 +31,11 @@ void OpenGLExtensions::init_extensions()
 	glGetProgramInfoLog_ = load_extension<PFNGLGETPROGRAMINFOLOGPROC>("glGetProgramInfoLog");
 	glGetUniformLocation_ = load_extension<PFNGLGETUNIFORMLOCATIONPROC>("glGetUniformLocation");
 	glUniformMatrix4fv_ = load_extension<PFNGLUNIFORMMATRIX4FVPROC>("glUniformMatrix4fv");
+    glUniformMatrix3fv_ = load_extension<PFNGLUNIFORMMATRIX3FVPROC>("glUniformMatrix3fv");
+    glUniform3fv_ = load_extension<PFNGLUNIFORM3FVPROC>("glUniform3fv");
+    glUniform4fv_ = load_extension<PFNGLUNIFORM4FVPROC>("glUniform4fv");
 	glUniform1i_ = load_extension<PFNGLUNIFORM1IPROC>("glUniform1i");
+    glUniform1f_ = load_extension<PFNGLUNIFORM1FPROC>("glUniform1f");
 	glGetAttribLocation_ = load_extension<PFNGLGETATTRIBLOCATIONPROC>("glGetAttribLocation");
 	glVertexAttribPointer_ = load_extension<PFNGLVERTEXATTRIBPOINTERPROC>("glVertexAttribPointer");
 	glEnableVertexAttribArray_ = load_extension<PFNGLENABLEVERTEXATTRIBARRAYPROC>("glEnableVertexAttribArray");
@@ -42,6 +47,10 @@ void OpenGLExtensions::init_extensions()
 	glGenVertexArrays_ = load_extension<PFNGLGENVERTEXARRAYSPROC>("glGenVertexArrays");
 	glDeleteVertexArrays_ = load_extension<PFNGLDELETEVERTEXARRAYSPROC>("glDeleteVertexArrays");
 	glBindVertexArray_ = load_extension<PFNGLBINDVERTEXARRAYPROC>("glBindVertexArray");
+	glGetActiveUniform_ = load_extension<PFNGLGETACTIVEUNIFORMPROC>("glGetActiveUniform");
+	glGenFramebuffers_ = load_extension<PFNGLGENFRAMEBUFFERSPROC>("glGenFramebuffers");
+	glBindFramebuffer_ = load_extension<PFNGLBINDFRAMEBUFFERPROC>("glBindFramebuffer");
+	glFramebufferTexture_ = load_extension<PFNGLFRAMEBUFFERTEXTUREPROC>("glFramebufferTexture");
 #endif	// MHE_OPENGL_HAS_SHADERS
 
 	get_str_extensions();

@@ -9,7 +9,7 @@
 
 namespace mhe {
 
-class EventManager
+class MHE_EXPORT EventManager
 {
 public:
 	EventManager();

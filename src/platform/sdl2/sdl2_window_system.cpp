@@ -1,6 +1,5 @@
 #include "platform/sdl2/sdl2_window_system.hpp"
 
-#include "utils/unused.hpp"
 #include "utils/global_log.hpp"
 
 namespace mhe {

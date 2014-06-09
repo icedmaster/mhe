@@ -8,7 +8,7 @@
 
 namespace mhe {
 
-class Device : public ref_counter
+class MHE_EXPORT Device : public ref_counter
 {
 protected:
 	static const size_t max_events_count = 10;
@@ -31,7 +31,7 @@ protected:
 	/// Initializing device events vector with events of concrete type
 	template <class EventType>
 	void init_events_with_type()
-	{		
+	{
 		for (size_t i = 0; i < max_events_count; ++i)
 			events_[i] = ref_ptr<EventType>(new EventType);
 	}

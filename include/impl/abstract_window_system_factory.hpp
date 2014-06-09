@@ -2,6 +2,7 @@
 #define __ABSTRACT_WINDOW_SYSTEM_FACTORY_HPP__
 
 #include <string>
+#include "core/ref_counter.hpp"
 
 namespace mhe {
 
@@ -11,7 +12,7 @@ class MouseDeviceImpl;
 class SystemDeviceImpl;
 class EventSystem;
 
-class AbstractWindowSystemFactory
+class AbstractWindowSystemFactory : public ref_counter
 {
 public:
 	virtual ~AbstractWindowSystemFactory() {}

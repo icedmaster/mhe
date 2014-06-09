@@ -124,7 +124,7 @@ public:
 	MixLog() : Log() {}
 	void add(Log* log)
 	{
-		logs_.push_back(log);
+		logs_.push_back(ref_ptr<Log>(log));
 	}
 
 	void add(const ref_ptr<Log>& log)

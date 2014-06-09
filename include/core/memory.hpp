@@ -2,22 +2,23 @@
 #define __MEMORY_HPP__
 
 #include "types.hpp"
+#include "compiler.hpp"
 
 namespace mhe {
 namespace details {
 
-void* allocate(size_t size);
-void free(void* p);
+MHE_EXPORT void* allocate(size_t size);
+MHE_EXPORT void free(void* p);
 
 }
 
-uint64_t allocated_memory_size();
-uint64_t total_allocated_size();
-uint64_t total_freed_size();
-uint64_t allocations_count();
-uint64_t frees_count();
+uint64_t MHE_EXPORT allocated_memory_size();
+uint64_t MHE_EXPORT total_allocated_size();
+uint64_t MHE_EXPORT total_freed_size();
+uint64_t MHE_EXPORT allocations_count();
+uint64_t MHE_EXPORT frees_count();
 
-void print_memory_info();
+MHE_EXPORT void print_memory_info();
 
 }
 

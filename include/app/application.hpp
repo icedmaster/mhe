@@ -8,7 +8,7 @@
 namespace mhe {
 namespace app {
 
-class Application : public ref_counter
+class MHE_EXPORT Application : public ref_counter
 {
 public:
 	Application(const std::string& name = "");
@@ -34,6 +34,11 @@ public:
 	std::string path() const
 	{
 		return application_base_path();
+	}
+
+	game::Engine& engine()
+	{
+		return engine_;
 	}
 protected:
 	// methods with default implementation

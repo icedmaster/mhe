@@ -3,13 +3,14 @@
 #ifndef __MHE_MATH__
 #define __MHE_MATH__
 
+#include "math/math_utils.hpp"
+#include "math/matrix.hpp"
+#include "math/matrix3x3.hpp"
+#include "math/quat.hpp"
+#include "math/rect.hpp"
+#include "math/transform.hpp"
 #include "math/vector2.hpp"
 #include "math/vector3.hpp"
 #include "math/vector4.hpp"
-#include "math/math_utils.hpp"
-#include "math/matrix3x3.hpp"
-#include "math/matrix.hpp"
-#include "math/quat.hpp"
-#include "math/rect.hpp"
 
 #endif // __MHE_MATH__

@@ -5,6 +5,8 @@ macro(mhe_add_subproject NAME)
 
   include(mhe_directories)
   mhe_setup_directories()
+  include(mhe_platform_specific)
+  mhe_search_platform_specific()
 
   set (TARGET_SOURCE_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/..)
   # main mhe include
@@ -19,6 +21,8 @@ macro(mhe_add_subproject NAME)
 
   # add mhe lib
   link_directories(${MHE_LIB_DIR})	
+  message("Trying to find mhe library...")
+  message(${MHE_LIB_DIR})
   find_library(MHE_LIB mhe HINTS ${MHE_LIB_DIR})
 
   set(TARGET_LIBS ${MHE_LIB} ${DEP_LIBS})

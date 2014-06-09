@@ -2,12 +2,13 @@
 #define __LAYOUTS_HPP__
 
 #include "mhe_math.hpp"
+#include "core/compiler.hpp"
 
 namespace mhe {
 
 struct Context;
 
-struct StandartGeometryLayout
+MHE_EXPORT struct StandartGeometryLayout
 {
 	struct Vertex
 	{

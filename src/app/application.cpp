@@ -6,6 +6,7 @@
 #include "core/memory.hpp"
 #include "events/delegate_event_listener.hpp"
 #include "events/system_event.hpp"
+#include "events/system_device.hpp"
 
 namespace mhe {
 namespace app {
@@ -39,12 +40,12 @@ bool Application::mhe_app_init(const ApplicationConfig& config)
 			 " h:" << config.height << " bpp:" << config.bpp);
 	init_assets_path(config.assets_path);
 	init_default_assets(config);
-    if (engine_.init(config.width, config.height, config.bpp, config.fullscreen))
-    {
-        add_delegates();
-        return true;
-    }
-    return false;
+  if (engine_.init(config.width, config.height, config.bpp, config.fullscreen))
+  {
+      add_delegates();
+      return true;
+  }
+  return false;
 }
 
 void Application::mhe_app_close()
@@ -64,7 +65,10 @@ int Application::run_impl()
 
 void Application::stop_impl()
 {
-
+	MainLoop* main_loop = engine_.context().window_system.main_loop();
+	if (main_loop == nullptr)
+		engine_.stop();
+	else main_loop->stop();
 }
 
 void Application::init_assets_path(const std::string& config_assets_path)
@@ -88,6 +92,7 @@ void Application::add_delegates()
         {}
     };
 
+		engine_.event_manager().add_device(new SystemDevice("sys"));
     engine_.event_manager().add_listener(new ApplicationEventListener(this));
 }
 

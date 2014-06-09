@@ -65,7 +65,7 @@ endif()
 set (SOURCE_ROOT ${CMAKE_SOURCE_DIR}/../src)
 set (INCLUDE_ROOT ${CMAKE_SOURCE_DIR}/../include)
 
-set (LIB_DIR ${CMAKE_SOURCE_DIR}/../lib)
+set (LIB_DIR ${CMAKE_SOURCE_DIR}/../3rdparty)
 
 set(IOS_LIB_DIR ${CMAKE_SOURCE_DIR}/../lib/ios)
 
@@ -73,11 +73,13 @@ set(IOS_LIB_DIR ${CMAKE_SOURCE_DIR}/../lib/ios)
 
 set (SRC_PATH
   ${SOURCE_ROOT}
+  ${SOURCE_ROOT}/scene
   ${SOURCE_ROOT}/res
   ${SOURCE_ROOT}/game
   ${SOURCE_ROOT}/events
   ${SOURCE_ROOT}/app
   ${SOURCE_ROOT}/render
+  ${SOURCE_ROOT}/render/utils
   ${SOURCE_ROOT}/impl
   ${SOURCE_ROOT}/utils
   ${SOURCE_ROOT}/core
@@ -105,7 +107,7 @@ set(MACOS_PLATFORM_SOURCES ${PLATFORM_IMPL_SOURCES}/macos)
 set(IOS_PLATFORM_SOURCES ${PLATFORM_IMPL_SOURCES}/ios)
 set(QT_PLATFORM_SOURCES ${PLATFORM_IMPL_SOURCES}/qt)
 set(OPENGL3_PLATFORM_SOURCES ${PLATFORM_IMPL_SOURCES}/opengl3)
-set(SDL_PLATFORM_SOURCES ${PLATFORM_IMPL_SOURCES}/sdl)
+set(SDL2_PLATFORM_SOURCES ${PLATFORM_IMPL_SOURCES}/sdl2)
 
 # platform
 if (WIN32)
@@ -153,10 +155,9 @@ endif()
 
 if (MHE_SDL_FOUND)
    if (MHE_SDL2_FOUND)
-       set(SRC_PATH ${SRC_PATH} ${PLATFORM_IMPL_SOURCES}/sdl2)
-	   set(STANDALONE_SOURCES ${STANDALONE_SOURCES} ${SDL_PLATFORM_SOURCES}/sdl_system_device_impl.cpp)
+       set(SRC_PATH ${SRC_PATH} ${SDL2_PLATFORM_SOURCES})
    else()
-	   set(SRC_PATH ${SRC_PATH} ${PLATFORM_IMPL_SOURCES}/sdl)	
+	   message("SDL2 not found")	
    endif()		
    set(LIBS ${LIBS} ${SDL_LIB})
 endif()
@@ -202,6 +203,10 @@ endif()
 
 set(MHE_LIB_DIR ${CMAKE_SOURCE_DIR})
 set(DEP_LIBS ${LIBS})
+
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/../bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/../bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/../bin)
 
 add_library(${PROJECT} SHARED ${SOURCE} ${ADDITIONAL_SOURCES})
 target_link_libraries(${PROJECT} ${LIBS})

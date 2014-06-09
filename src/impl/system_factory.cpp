@@ -23,12 +23,20 @@ LayoutImpl* SystemFactory::create_layout() const
 	return video_driver_factory_.create_layout();
 }
 
-/*
-Texture* SystemFactory::create_texture() const
+UniformBufferImpl* SystemFactory::create_uniform_buffer() const
+{
+	return video_driver_factory_.create_uniform_buffer();
+}
+
+ShaderProgramImpl* SystemFactory::create_shader_program() const
+{
+	return video_driver_factory_.create_shader_program();
+}
+
+TextureImpl* SystemFactory::create_texture() const
 {
 	return video_driver_factory_.create_texture();
 }
-*/
 
 WindowSystemImpl* SystemFactory::create_window_system() const
 {

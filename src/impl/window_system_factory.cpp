@@ -7,11 +7,11 @@ namespace mhe {
 WindowSystemFactory::WindowSystemFactory()
 {
 	#ifdef MHE_QT
-	systems_.push_back(boost::shared_ptr<AbstractWindowSystemFactory>(new qt::QtWindowSystemFactory));
+	systems_.push_back(ref_ptr<AbstractWindowSystemFactory>(new qt::QtWindowSystemFactory));
 	#endif
 
 	#ifdef MHE_SDL2
-	systems_.push_back(boost::shared_ptr<AbstractWindowSystemFactory>(new sdl::SDL2WindowSystemFactory));
+	systems_.push_back(ref_ptr<AbstractWindowSystemFactory>(new sdl::SDL2WindowSystemFactory));
 	#endif
 
 	current_system_factory_ = systems_.back();

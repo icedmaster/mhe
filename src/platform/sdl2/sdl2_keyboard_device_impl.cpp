@@ -1,7 +1,7 @@
 #include "platform/sdl2/sdl2_keyboard_device_impl.hpp"
 
 #include "events/keyboard_event.hpp"
-#include "platform/sdl/sdl_event_helper.hpp"
+#include "platform/sdl2/sdl2_event_helper.hpp"
 
 namespace mhe {
 namespace sdl {

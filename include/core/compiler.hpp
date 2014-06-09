@@ -1,8 +1,12 @@
 #ifndef __COMPILER_HPP__
 #define __COMPILER_HPP__
 
+#define MHE_EXPORT
+
 #ifdef _MSC_VER
 #define MHE_VS
+#undef MHE_EXPORT
+#define MHE_EXPORT __declspec( dllexport )
 #else
 #define MHE_GCC
 #endif

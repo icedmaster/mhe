@@ -12,8 +12,11 @@ namespace mhe
 class RenderBufferImpl;
 class IndexBufferImpl;
 class LayoutImpl;
+class UniformBufferImpl;
+class ShaderProgramImpl;
+class TextureImpl;
 
-class SystemFactory
+class MHE_EXPORT SystemFactory
 {
 public:
 	static SystemFactory& instance()
@@ -28,8 +31,9 @@ public:
 	RenderBufferImpl* create_render_buffer() const;
 	IndexBufferImpl* create_index_buffer() const;
 	LayoutImpl* create_layout() const;
-	
-	//Texture* create_texture() const;
+	UniformBufferImpl* create_uniform_buffer() const;
+	ShaderProgramImpl* create_shader_program() const;
+	TextureImpl* create_texture() const;
 
 	// input devices
 	KeyboardDeviceImpl* create_keyboard_device_impl() const

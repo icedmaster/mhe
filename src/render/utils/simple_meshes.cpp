@@ -1,6 +1,7 @@
 #include "render/utils/simple_meshes.hpp"
 
 #include "render/layouts.hpp"
+#include "render/context.hpp"
 
 namespace mhe {
 namespace utils {
@@ -31,10 +32,10 @@ bool create_plane(Mesh& mesh, const Context& context)
 
 	VertexBuffer& vbuffer = context.vertex_buffer_pool.get(mesh.vbuffer);
 	if (!vbuffer.init(buffer_update_type_static,
-					  static_cast<const uint8_t*>(&vertexes[0]), 4 * sizeof(Vertex), sizeof(Vertex)))
+					  reinterpret_cast<const uint8_t*>(&vertexes[0]), 4 * sizeof(StandartGeometryLayout::Vertex), sizeof(StandartGeometryLayout::Vertex)))
 		return false;
 	IndexBuffer& ibuffer = context.index_buffer_pool.get(mesh.ibuffer);
-	return ibuffer.init(indexes, sizeof(indexes));
+	return ibuffer.init(indexes, 6);
 }
 
 }}

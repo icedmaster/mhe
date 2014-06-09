@@ -1,13 +1,12 @@
 #ifndef __DELEGATE_EVENT_LISTENER_HPP__
 #define __DELEGATE_EVENT_LISTENER_HPP__
 
-#include <boost/shared_ptr.hpp>
 #include "core/delegate.hpp"
 #include "event_listener.hpp"
 
 namespace mhe {
 
-class DelegateEventListener : public EventListener
+class MHE_EXPORT DelegateEventListener : public EventListener
 {
 public:
 	typedef Delegate1< bool, const Event* > EventHandler;

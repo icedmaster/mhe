@@ -6,3 +6,6 @@ if (APPLE)
    set_target_properties(${TARGET} PROPERTIES LINK_FLAGS "-Wl,-framework,Cocoa")
 endif()
 endmacro()
+
+macro(mhe_search_platform_specific)
+endmacro()

@@ -9,19 +9,26 @@
 
 namespace mhe {
 
-typedef Pool<VertexBuffer, uint16_t, 4096> VertexBufferPool;
-typedef Pool<IndexBuffer, uint16_t, 4096> IndexBufferPool;
-typedef Pool<Layout, uint16_t, 128> LayoutPool;
+typedef Pool<VertexBuffer, 4096, uint16_t> VertexBufferPool;
+typedef Pool<IndexBuffer, 4096, uint16_t> IndexBufferPool;
+typedef Pool<Layout, 128, uint16_t> LayoutPool;
+typedef Pool<ShaderProgram, 128, uint16_t> ShaderPool;
+typedef Pool<Transform, 4096, uint16_t> TransformPool;
 
 struct Context
 {
 	WindowSystem window_system;
 	Driver driver;
-	MeshResourceManager mesh_resource_manager;
+
+	MeshManager mesh_manager;
+    ShaderManager shader_manager;
 
 	VertexBufferPool vertex_buffer_pool;
 	IndexBufferPool index_buffer_pool;
 	LayoutPool layout_pool;
+	ShaderPool shader_pool;
+
+	TransformPool transform_pool;
 };
 
 }

@@ -1,7 +1,7 @@
 #include "platform/sdl2/sdl2_mouse_device_impl.hpp"
 
 #include "events/mouse_event.hpp"
-#include "platform/sdl/sdl_event_helper.hpp"
+#include "platform/sdl2/sdl2_event_helper.hpp"
 #include "platform/sdl2/sdl2_window_system.hpp"
 
 namespace mhe {

@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+   <FileVersion major="1" minor="6" />
+   <Project>
+      <Option title="02_draw" />
+      <Option makefile_is_custom="1" />
+      <Option compiler="gcc" />
+      <Option virtualFolders="CMake Files\;CMake Files\..\;CMake Files\..\examples\;CMake Files\..\examples\01_init\;CMake Files\..\examples\01_init\build\;CMake Files\..\examples\02_draw\;CMake Files\..\examples\02_draw\build\;CMake Files\..\examples\build\;CMake Files\cmake_modules\;" />
+      <Build>
+      <Target title="all">
+         <Option working_dir="/home/master/projects/opengl/mhe/examples/02_draw/build" />
+         <Option type="4" />
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/master/projects/opengl/mhe/examples/02_draw/build/Makefile&quot;  VERBOSE=1 all" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/master/projects/opengl/mhe/examples/02_draw/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/master/projects/opengl/mhe/examples/02_draw/build/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/master/projects/opengl/mhe/examples/02_draw/build/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="02_draw">
+         <Option output="/home/master/projects/opengl/mhe/bin/02_draw" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/master/projects/opengl/mhe/build/../bin" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DMHE_OS_LINUX" />
+            <Add option="-DMHE_HAS_OPENGL" />
+            <Add option="-DMHE_HAS_SDL" />
+            <Add option="-DMHE_HAS_QT" />
+            <Add option="-DQT_OPENGL_LIB" />
+            <Add option="-DQT_GUI_LIB" />
+            <Add option="-DQT_CORE_LIB" />
+            <Add option="-DMHE_HAS_OPENAL" />
+            <Add option="-DMHE_HAS_VORBIS" />
+            <Add directory="/home/master/projects/opengl/mhe/build/../include" />
+            <Add directory="/home/master/projects/opengl/mhe/build/../include/.." />
+            <Add directory="/usr/include/QtCore" />
+            <Add directory="/usr/include/QtGui" />
+            <Add directory="/usr/include/QtOpenGL" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/master/projects/opengl/mhe/examples/02_draw/build/Makefile&quot;  VERBOSE=1 02_draw" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/master/projects/opengl/mhe/examples/02_draw/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/master/projects/opengl/mhe/examples/02_draw/build/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/master/projects/opengl/mhe/examples/02_draw/build/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="02_draw/fast">
+         <Option output="/home/master/projects/opengl/mhe/bin/02_draw" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/master/projects/opengl/mhe/build/../bin" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DMHE_OS_LINUX" />
+            <Add option="-DMHE_HAS_OPENGL" />
+            <Add option="-DMHE_HAS_SDL" />
+            <Add option="-DMHE_HAS_QT" />
+            <Add option="-DQT_OPENGL_LIB" />
+            <Add option="-DQT_GUI_LIB" />
+            <Add option="-DQT_CORE_LIB" />
+            <Add option="-DMHE_HAS_OPENAL" />
+            <Add option="-DMHE_HAS_VORBIS" />
+            <Add directory="/home/master/projects/opengl/mhe/build/../include" />
+            <Add directory="/home/master/projects/opengl/mhe/build/../include/.." />
+            <Add directory="/usr/include/QtCore" />
+            <Add directory="/usr/include/QtGui" />
+            <Add directory="/usr/include/QtOpenGL" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/master/projects/opengl/mhe/examples/02_draw/build/Makefile&quot;  VERBOSE=1 02_draw/fast" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/master/projects/opengl/mhe/examples/02_draw/build/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/master/projects/opengl/mhe/examples/02_draw/build/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/master/projects/opengl/mhe/examples/02_draw/build/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      </Build>
+      <Unit filename="/home/master/projects/opengl/mhe/examples/02_draw/02_draw.cpp">
+      </Unit>
+      <Unit filename="/home/master/projects/opengl/mhe/build/CMakeLists.txt">
+          <Option virtualFolder="CMake Files\" />
+      </Unit>
+      <Unit filename="/home/master/projects/opengl/mhe/build/../examples/01_init/build/CMakeLists.txt">
+          <Option virtualFolder="CMake Files\..\examples\01_init\build\" />
+      </Unit>
+      <Unit filename="/home/master/projects/opengl/mhe/build/../examples/01_init/build/CMakeLists.txt">
+          <Option virtualFolder="CMake Files\..\examples\01_init\build\" />
+      </Unit>
+      <Unit filename="/home/master/projects/opengl/mhe/build/../examples/02_draw/build/CMakeLists.txt">
+          <Option virtualFolder="CMake Files\..\examples\02_draw\build\" />
+      </Unit>
+      <Unit filename="/home/master/projects/opengl/mhe/build/../examples/02_draw/build/CMakeLists.txt">
+          <Option virtualFolder="CMake Files\..\examples\02_draw\build\" />
+      </Unit>
+      <Unit filename="/home/master/projects/opengl/mhe/build/../examples/build/CMakeLists.txt">
+          <Option virtualFolder="CMake Files\..\examples\build\" />
+      </Unit>
+      <Unit filename="/home/master/projects/opengl/mhe/build/cmake_modules/mhe_directories.cmake">
+          <Option virtualFolder="CMake Files\cmake_modules\" />
+      </Unit>
+      <Unit filename="/home/master/projects/opengl/mhe/build/cmake_modules/mhe_platform_specific.cmake">
+          <Option virtualFolder="CMake Files\cmake_modules\" />
+      </Unit>
+      <Unit filename="/home/master/projects/opengl/mhe/build/cmake_modules/mhe_platform_specific.cmake">
+          <Option virtualFolder="CMake Files\cmake_modules\" />
+      </Unit>
+      <Unit filename="/home/master/projects/opengl/mhe/build/cmake_modules/mhe_directories.cmake">
+          <Option virtualFolder="CMake Files\cmake_modules\" />
+      </Unit>
+      <Unit filename="/home/master/projects/opengl/mhe/build/cmake_modules/mhe_platform_specific.cmake">
+          <Option virtualFolder="CMake Files\cmake_modules\" />
+      </Unit>
+      <Unit filename="/home/master/projects/opengl/mhe/build/cmake_modules/mhe_platform_specific.cmake">
+          <Option virtualFolder="CMake Files\cmake_modules\" />
+      </Unit>
+      <Unit filename="/home/master/projects/opengl/mhe/build/cmake_modules/add_subproject.cmake">
+          <Option virtualFolder="CMake Files\cmake_modules\" />
+      </Unit>
+      <Unit filename="/home/master/projects/opengl/mhe/build/cmake_modules/mhe_compiler_defs.cmake">
+          <Option virtualFolder="CMake Files\cmake_modules\" />
+      </Unit>
+      <Unit filename="/home/master/projects/opengl/mhe/build/cmake_modules/find_libraries.cmake">
+          <Option virtualFolder="CMake Files\cmake_modules\" />
+      </Unit>
+      <Unit filename="/home/master/projects/opengl/mhe/build/cmake_modules/mhe_platform_specific.cmake">
+          <Option virtualFolder="CMake Files\cmake_modules\" />
+      </Unit>
+      <Unit filename="/home/master/projects/opengl/mhe/build/cmake_modules/mhe_directories.cmake">
+          <Option virtualFolder="CMake Files\cmake_modules\" />
+      </Unit>
+      <Unit filename="/home/master/projects/opengl/mhe/build/cmake_modules/mhe_platform_specific.cmake">
+          <Option virtualFolder="CMake Files\cmake_modules\" />
+      </Unit>
+      <Unit filename="/home/master/projects/opengl/mhe/build/cmake_modules/mhe_platform_specific.cmake">
+          <Option virtualFolder="CMake Files\cmake_modules\" />
+      </Unit>
+      <Unit filename="/home/master/projects/opengl/mhe/build/cmake_modules/mhe_directories.cmake">
+          <Option virtualFolder="CMake Files\cmake_modules\" />
+      </Unit>
+      <Unit filename="/home/master/projects/opengl/mhe/build/cmake_modules/mhe_platform_specific.cmake">
+          <Option virtualFolder="CMake Files\cmake_modules\" />
+      </Unit>
+      <Unit filename="/home/master/projects/opengl/mhe/build/cmake_modules/mhe_platform_specific.cmake">
+          <Option virtualFolder="CMake Files\cmake_modules\" />
+      </Unit>
+   </Project>
+</CodeBlocks_project_file>

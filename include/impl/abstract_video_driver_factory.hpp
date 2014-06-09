@@ -10,8 +10,9 @@ class DriverImpl;
 class RenderBufferImpl;
 class IndexBufferImpl;
 class LayoutImpl;
-class Texture;
-class ShaderProgram;
+class TextureImpl;
+class ShaderProgramImpl;
+class UniformBufferImpl;
 
 class AbstractVideoDriverFactory : public ref_counter
 {
@@ -24,8 +25,9 @@ public:
 	virtual RenderBufferImpl* create_render_buffer() const = 0;
 	virtual IndexBufferImpl* create_index_buffer() const = 0;
 	virtual LayoutImpl* create_layout() const = 0;
-	//virtual Texture* create_texture() const = 0;
-	//virtual ShaderProgram* create_shader_program() const = 0;
+	virtual UniformBufferImpl* create_uniform_buffer() const = 0;
+	virtual ShaderProgramImpl* create_shader_program() const = 0;
+	virtual TextureImpl* create_texture() const = 0;
 };
 
 }

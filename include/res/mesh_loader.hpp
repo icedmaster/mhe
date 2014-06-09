@@ -11,7 +11,7 @@ struct MeshLoader
 {
 	typedef Mesh type;
 	typedef Context context_type;
-	static bool load(type& res, const std::string& name, const context_type* context);
+	static MHE_EXPORT bool load(type& res, const std::string& name, const context_type* context);
 };
 
 }

@@ -81,6 +81,23 @@ private:
 	LayoutDesc desc_;
 };
 
+class OpenGL3UniformBuffer : public UniformBufferImpl
+{
+public:
+	bool init(const UniformBufferDesc& desc);
+	void close();
+
+	void update(const UniformBufferDesc& desc);
+
+	void enable();
+	void disable();
+private:
+	fixed_size_vector<uint8_t, max_uniforms_per_block * 4 * sizeof(float)> data_;
+	VBO vbo_;
+	GLint offsets_[max_uniforms_per_block];
+	GLuint id_;
+};
+
 }}
 
 #endif

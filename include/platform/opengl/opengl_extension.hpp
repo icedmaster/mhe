@@ -6,8 +6,7 @@
 #include "mhe_gl.hpp"
 #include "platform/platform_so.hpp"
 #include "core/singleton.hpp"
-
-#define UNUSED(a) (void)a
+#include "core/types.hpp"
 
 namespace mhe {
 
@@ -38,7 +37,7 @@ public:
 #endif
 	}
 
-#ifdef MHE_OPENGL_HAS_SHADERS
+
 	GLuint glCreateProgram()
 	{
 #ifndef MHE_USE_NATIVE_OPENGL
@@ -183,6 +182,33 @@ public:
 #endif
 	}
 
+    void glUniformMatrix3fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value)
+    {
+#ifndef MHE_USE_NATIVE_OPENGL
+        glUniformMatrix3fv_(location, count, transpose, value);
+#else
+        ::glUniformMatrix3fv(location, count, transpose, value);
+#endif
+    }
+
+    void glUniform3fv(GLint location, GLsizei count, const GLfloat *value)
+    {
+#ifndef MHE_USE_NATIVE_OPENGL
+        glUniform3fv_(location, count, value);
+#else
+        ::glUniform3fv(location, count, value);
+#endif
+    }
+
+    void glUniform4fv(GLint location, GLsizei count, const GLfloat *value)
+    {
+#ifndef MHE_USE_NATIVE_OPENGL
+        glUniform4fv_(location, count, value);
+#else
+        ::glUniform4fv(location, count, value);
+#endif
+    }
+
 	void glUniform1i(GLint location, GLint value)
 	{
 #ifndef MHE_USE_NATIVE_OPENGL
@@ -191,6 +217,15 @@ public:
 		::glUniform1i(location, value);
 #endif
 	}
+
+    void glUniform1f(GLint location, GLfloat value)
+    {
+#ifndef MHE_USE_NATIVE_OPENGL
+        glUniform1f_(location, value);
+#else
+        ::glUniform1f(location, value);
+#endif
+    }
 
 	GLint glGetAttributeLocation(GLuint program, const GLchar* name)
 	{
@@ -315,7 +350,88 @@ public:
 		#endif // MHE_OPENGLES
 #endif
 	}
-#endif // MHE_OPENGL_HAS_SHADERS
+
+	void glGetActiveUniform(GLuint program, GLuint index, GLsizei bufSize, GLsizei *length,
+		GLint *size, GLenum *type, GLchar *name)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glGetActiveUniform_(program, index, bufSize, length, size, type, name);
+#else
+        ::glGetActiveUniform(program, index, bufSize, length, size, type, name);
+#endif
+	}
+
+	void glGenFramebuffers(GLsizei n, GLuint *ids)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glGenFramebuffers_(n, ids);
+#else
+        ::glGenFramebuffers(n, ids);
+#endif
+	}
+
+	void glBindFramebuffer(GLenum target, GLuint framebuffer)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glBindFramebuffer_(target, framebuffer);
+#else
+        ::glBindFramebuffer(target, framebuffer);
+#endif
+	}
+
+	void glFramebufferTexture(GLenum target, GLenum attachment, GLuint texture, GLint level)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glFramebufferTexture_(target, attachment, texture, level);
+#else
+        ::glFramebufferTexture(target, attachment, texture, level);
+#endif
+	}
+
+	GLuint glGetUniformBlockIndex(GLuint program, const GLchar *uniformBlockName)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		return glGetUniformBlockIndex_(program, uniformBlockName);
+#else
+        return ::glGetUniformBlockIndex(program, uniformBlockName);
+#endif
+	}
+
+	void glGetActiveUniformBlockiv(GLuint program, GLuint uniformBlockIndex, GLenum pname, GLint *params)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glGetActiveUniformBlockiv_(program, uniformBlockIndex, pname, params);
+#else
+        ::glGetActiveUniformBlockiv(program, uniformBlockIndex, pname, params);
+#endif
+	}
+
+	void glGetUniformIndices(GLuint program, GLsizei uniformCount, const GLchar **uniformNames, GLuint *uniformIndices)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glGetUniformIndices_(program, uniformCount, uniformNames, uniformIndices);
+#else
+        ::glGetUniformIndices(program, uniformCount, uniformNames, uniformIndices);
+#endif
+	}
+
+	void glGetActiveUniformsiv(GLuint program, GLsizei uniformCount, const GLuint *uniformIndices, GLenum pname, GLint *params)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glGetActiveUniformsiv_(program, uniformCount, uniformIndices, pname, params);
+#else
+        ::glGetActiveUniformsiv(program, uniformCount, uniformIndices, pname, params);
+#endif
+	}
+
+	void glBindBufferBase(GLenum target, GLuint index, GLuint buffer)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glBindBufferBase_(target, index, buffer);
+#else
+        ::glBindBufferBase(target, index, buffer);
+#endif
+	}
 private:
 	OpenGLExtensions() {}
 	~OpenGLExtensions() {}
@@ -357,7 +473,11 @@ private:
 	PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog_;
 	PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation_;
 	PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv_;
+    PFNGLUNIFORMMATRIX3FVPROC glUniformMatrix3fv_;
+    PFNGLUNIFORM3FVPROC glUniform3fv_;
+    PFNGLUNIFORM4FVPROC glUniform4fv_;
 	PFNGLUNIFORM1IPROC glUniform1i_;
+    PFNGLUNIFORM1FPROC glUniform1f_;
 	PFNGLGETATTRIBLOCATIONPROC glGetAttribLocation_;
 	PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer_;
 	PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray_;
@@ -369,6 +489,15 @@ private:
 	PFNGLGENVERTEXARRAYSPROC glGenVertexArrays_;
 	PFNGLDELETEVERTEXARRAYSPROC glDeleteVertexArrays_;
 	PFNGLBINDVERTEXARRAYPROC glBindVertexArray_;
+	PFNGLGETACTIVEUNIFORMPROC glGetActiveUniform_;
+	PFNGLGENFRAMEBUFFERSPROC glGenFramebuffers_;
+	PFNGLBINDFRAMEBUFFERPROC glBindFramebuffer_;
+	PFNGLFRAMEBUFFERTEXTUREPROC glFramebufferTexture_;
+	PFNGLGETUNIFORMBLOCKINDEXPROC glGetUniformBlockIndex_;
+	PFNGLGETACTIVEUNIFORMBLOCKIVPROC glGetActiveUniformBlockiv_;
+	PFNGLGETUNIFORMINDICESPROC glGetUniformIndices_;
+	PFNGLGETACTIVEUNIFORMSIVPROC glGetActiveUniformsiv_;
+	PFNGLBINDBUFFERBASEPROC glBindBufferBase_;
 #endif
 	std::map<std::string, bool> loaded_extensions_;
 };

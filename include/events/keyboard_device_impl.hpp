@@ -1,8 +1,6 @@
 #ifndef __KEYBOARD_DEVICE_IMPL_HPP__
 #define __KEYBOARD_DEVICE_IMPL_HPP__
 
-#include <vector>
-#include <boost/shared_ptr.hpp>
 #include "device.hpp"
 
 namespace mhe {

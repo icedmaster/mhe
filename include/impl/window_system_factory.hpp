@@ -2,12 +2,13 @@
 #define __WINDOW_SYSTEM_FACTORY_HPP__
 
 #include <vector>
-#include <boost/shared_ptr.hpp>
+#include "core/ref_ptr.hpp"
+#include "core/compiler.hpp"
 #include "abstract_window_system_factory.hpp"
 
 namespace mhe {
 
-class WindowSystemFactory
+class MHE_EXPORT WindowSystemFactory
 {
 public:
 	WindowSystemFactory();
@@ -21,8 +22,8 @@ public:
 	SystemDeviceImpl* create_system_device() const;
 	EventSystem* create_event_system() const;
 private:
-	std::vector< boost::shared_ptr<AbstractWindowSystemFactory> > systems_;
-	boost::shared_ptr<AbstractWindowSystemFactory> current_system_factory_;
+	std::vector< ref_ptr<AbstractWindowSystemFactory> > systems_;
+	ref_ptr<AbstractWindowSystemFactory> current_system_factory_;
 };
 
 }

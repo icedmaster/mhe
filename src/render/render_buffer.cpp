@@ -16,4 +16,8 @@ Layout::Layout() :
 	impl_(SystemFactory::instance().create_layout())
 {}
 
+UniformBuffer::UniformBuffer() :
+	impl_(SystemFactory::instance().create_uniform_buffer())
+{}
+
 }

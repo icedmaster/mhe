@@ -10,4 +10,5 @@
 #include "mhe_events.hpp"
 #include "mhe_render.hpp"
 #include "mhe_game.hpp"
+#include "mhe_res.hpp"
 #endif // __MHE_MHE__

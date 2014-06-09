@@ -7,7 +7,7 @@
 
 namespace mhe {
 
-class MouseDevice : public Device
+class MHE_EXPORT MouseDevice : public Device
 {
 public:
 	static const size_t max_buttons_number = 16; 

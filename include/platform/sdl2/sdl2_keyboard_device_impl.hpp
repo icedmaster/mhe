@@ -2,7 +2,7 @@
 #define __SDL2_KEYBOARD_DEVICE_IMPL_HPP__
 
 #include "events/keyboard_device_impl.hpp"
-#include "platform/sdl/mhe_sdl.hpp"
+#include "mhe_sdl.hpp"
 
 namespace mhe {
 namespace sdl {

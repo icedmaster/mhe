@@ -1,10 +1,10 @@
 #ifndef _OPRIONS_PARSER_HPP_
 #define _OPTIONS_PARSER_HPP_
 
+#include "core/types_cast.hpp"
 #include "strutils.hpp"
 #include <map>
 #include <algorithm>
-#include <boost/lexical_cast.hpp>
 #include <cctype>
 
 namespace mhe {
@@ -15,7 +15,7 @@ inline bool cast_value(T& val, const std::string& valbase)
 {
 	try
 	{
-		val = boost::lexical_cast<T>(valbase);
+		val = types_cast<T>(valbase);
 	}
 	catch (std::exception&)
 	{

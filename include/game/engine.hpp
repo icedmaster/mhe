@@ -3,11 +3,12 @@
 
 #include "render/context.hpp"
 #include "events/event_manager.hpp"
+#include "game_scene.hpp"
 
 namespace mhe {
 namespace game {
 
-class Engine
+class MHE_EXPORT Engine
 {
 public:
 	bool init(uint width, uint height, uint bpp, bool fullscreen);
@@ -23,13 +24,21 @@ public:
     }
 
 	void run();
+	void stop();
 	void update();
 	void render();
+
+	void set_game_scene(GameScene* scene)
+	{
+		game_scene_ = scene;
+	}
 private:
 	void set_default_video_settings();
 
 	Context context_;
     EventManager event_manager_;
+		ref_ptr<GameScene> game_scene_;
+		bool process_;
 };
 
 }}

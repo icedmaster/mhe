@@ -3,19 +3,21 @@
 #ifndef __MHE_CORE__
 #define __MHE_CORE__
 
-#include "core/ref_counter.hpp"
+#include "core/array.hpp"
+#include "core/assert.hpp"
+#include "core/compiler.hpp"
+#include "core/config.hpp"
+#include "core/delegate.hpp"
+#include "core/fixed_size_vector.hpp"
+#include "core/index_manager.hpp"
 #include "core/memory.hpp"
 #include "core/noncopyable.hpp"
+#include "core/pool.hpp"
+#include "core/ref_counter.hpp"
+#include "core/ref_ptr.hpp"
 #include "core/singleton.hpp"
 #include "core/types.hpp"
-#include "core/compiler.hpp"
-#include "core/assert.hpp"
-#include "core/config.hpp"
-#include "core/ref_ptr.hpp"
-#include "core/array.hpp"
-#include "core/fixed_size_vector.hpp"
 #include "core/types_cast.hpp"
-#include "core/delegate.hpp"
 #include "core/unique_ptr.hpp"
 
 #endif // __MHE_CORE__
