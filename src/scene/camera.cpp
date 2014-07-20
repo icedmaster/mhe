@@ -4,8 +4,8 @@
 
 namespace mhe {
 
-Camera::Camera(Context& context, const PerspectiveCameraParameters& parameters,
-			   const vec3& position, const vec3& direction, const vec3& up)
+void Camera::init(Context& context, const PerspectiveCameraParameters& parameters,
+				  const vec3& position, const vec3& direction, const vec3& up)
 {
 	mat4x4 m;
 	m.set_lookAt(position, direction, up);

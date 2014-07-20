@@ -29,8 +29,16 @@ Node& Scene::create_node() const
 	return node_pool_.get(id);
 }
 
-void Scene::update(RenderContext& render_context, const SceneContext& scene_context)
+void Scene::update(RenderContext& render_context, const SceneContext& /*scene_context*/)
 {
+    if (camera_controller_ != nullptr)
+    {
+        camera_controller_->update(render_context);
+        const Camera& camera = camera_controller_->camera();
+        camera.get(render_context.view, render_context.proj, render_context.vp);
+        render_context.viewpos = camera.position();
+    }
+
 	Node* nodes = node_pool_.all_objects();
 	std::sort(nodes, nodes + node_pool_.size(), SortHelper());
 	node_pool_.update();

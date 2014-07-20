@@ -2,6 +2,7 @@
 
 #include "game/base_view_events_handler.hpp"
 #include "utils/global_log.hpp"
+#include "utils/sysutils.hpp"
 
 #include "render/render_context.hpp"
 
@@ -85,6 +86,7 @@ void Engine::update()
 			game_scene_->update(*this);
 
 		RenderContext render_context;
+        render_context.tick = utils::get_current_tick();
 		SceneContext scene_context;
 		scene_.update(render_context, scene_context);
 		update_materials(render_context);

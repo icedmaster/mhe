@@ -8,4 +8,6 @@
 #include "game/engine.hpp"
 #include "game/game_context.hpp"
 
+#include "game/input/fps_camera_controller.hpp"
+
 #endif // __MHE_GAME__

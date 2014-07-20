@@ -1,14 +1,18 @@
 #ifndef __SCENE_HPP__
 #define __SCENE_HPP__
 
+#include "camera_controller.hpp"
 #include "render/node.hpp"
 #include "core/pool.hpp"
 #include "core/fixed_size_vector.hpp"
 #include "core/config.hpp"
+#include "core/ref_ptr.hpp"
 
 namespace mhe {
 
 struct RenderContext;
+
+class CameraController;
 
 typedef Pool<Transform, 4096, uint16_t> TransformPool;
 typedef Pool< Node, 4096, uint16_t, StructTypePolicy<Node, uint16_t> > NodePool;
@@ -40,6 +44,7 @@ private:
 	TransformPool transform_pool_;
 	NodePool node_pool_;
 	size_t nodes_per_material_[max_material_systems_number];
+	ref_ptr<CameraController> camera_controller_;
 };
 
 }

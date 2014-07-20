@@ -4,6 +4,7 @@
 #define __MHE_SCENE__
 
 #include "scene/scene.hpp"
+#include "scene/camera_controller.hpp"
 #include "scene/camera.hpp"
 #include "scene/node.hpp"
 

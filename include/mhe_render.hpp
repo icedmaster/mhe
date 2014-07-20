@@ -6,7 +6,6 @@
 #include "render/render_state.hpp"
 #include "render/mesh.hpp"
 #include "render/transform.hpp"
-#include "render/forward_lighting_material_system.hpp"
 #include "render/render_buffer.hpp"
 #include "render/unlit_material_system.hpp"
 #include "render/render_pass.hpp"

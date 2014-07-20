@@ -20,8 +20,8 @@ struct PerspectiveCameraParameters
 class Camera : public ref_counter
 {
 public:
-	Camera(Context& context, const PerspectiveCameraParameters& parameters,
-		   const vec3& position, const vec3& direction, const vec3& up);
+	void init(Context& context, const PerspectiveCameraParameters& parameters,
+			  const vec3& position, const vec3& direction, const vec3& up);
 
 	Transform& transform()
 	{
@@ -41,6 +41,11 @@ public:
 	mat4x4 viewprojection() const
 	{
         return view() * projection();
+	}
+
+	vec3 position() const
+	{
+		return -transform_.position();
 	}
 
 	void get(mat4x4& v, mat4x4& p, mat4x4& vp) const;
