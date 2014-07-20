@@ -34,8 +34,7 @@ void setup_material_systems(mhe::Context& context)
 
 int main(int /*argc*/, char** /*argv*/)
 {
-    mhe::app::Application* appl = new mhe::app::Application("02_draw");
-    mhe::app::Application& app = *appl;
+    mhe::app::Application app("02_draw");
 	mhe::app::ApplicationConfig config;
 	config.width = 800;
 	config.height = 600;
