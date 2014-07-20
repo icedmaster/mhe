@@ -11,4 +11,5 @@
 #include "mhe_render.hpp"
 #include "mhe_game.hpp"
 #include "mhe_res.hpp"
+#include "mhe_scene.hpp"
 #endif // __MHE_MHE__

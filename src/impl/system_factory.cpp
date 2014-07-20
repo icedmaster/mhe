@@ -38,6 +38,11 @@ TextureImpl* SystemFactory::create_texture() const
 	return video_driver_factory_.create_texture();
 }
 
+RenderStateImpl* SystemFactory::create_render_state() const
+{
+	return video_driver_factory_.create_render_state();
+}
+
 WindowSystemImpl* SystemFactory::create_window_system() const
 {
 	return window_system_factory_.create_window_system();

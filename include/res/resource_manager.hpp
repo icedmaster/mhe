@@ -3,7 +3,7 @@
 
 #include <map>
 #include <string>
-#include "core/ref_ptr.hpp"
+#include "core/hash.hpp"
 #include "utils/file_utils.hpp"
 #include "utils/logutils.hpp"
 
@@ -15,7 +15,7 @@ class ResourceManager
 protected:
 	typedef typename Loader::type res_type;
 	typedef typename Loader::context_type context_type;
-	typedef std::map< std::string, res_type > resmap;
+	typedef std::map< hash_type, res_type > resmap;
 public:
 	virtual ~ResourceManager() {}
 
@@ -49,6 +49,11 @@ public:
 		return get_impl(res, name, absolute_path);	
 	}
 
+	bool get(res_type& res, hash_type hashv) const
+	{
+		return get_impl(res, hashv);
+	}
+
 	void clear()
 	{
 		resources_.clear();
@@ -61,15 +66,30 @@ public:
 protected:
 	virtual bool get_impl(res_type& res, const std::string& name, bool absolute_path) const
 	{
-		const std::string& sname = utils::get_file_name(name);
-		typename resmap::iterator it = resources_.find(sname);
+		return get_impl(res, name, hash(name), absolute_path);
+	}
+
+	virtual bool get_impl(res_type& res, const std::string& name, hash_type hashv, bool absolute_path) const
+	{
+		typename resmap::iterator it = resources_.find(hashv);
 		if (it != resources_.end())
 		{
-			INFO_LOG("get resource:" << sname);
+			INFO_LOG("get resource:" << name);
 			res = it->second;
 			return true;
 		}
-		return load_impl(res, name, sname, absolute_path);
+		return load_impl(res, name, hashv, absolute_path);
+	}
+
+	virtual bool get_impl(res_type& res, hash_type hashv) const
+	{
+		typename resmap::iterator it = resources_.find(hashv);
+		if (it != resources_.end())
+		{
+			res = it->second;
+			return true;
+		}
+		return false;
 	}
 
     const context_type* context() const
@@ -83,8 +103,8 @@ protected:
 	}
 private:
 	bool load_impl(res_type& res, const std::string& name,
-								const std::string& sname,
-								bool absolute_path) const
+				   hash_type hashv,
+				   bool absolute_path) const
 	{
 		std::string full_path = (!absolute_path) ? utils::path_join(path_, name) : name;
         bool result = Loader::load(res, full_path, context_);
@@ -93,8 +113,8 @@ private:
 			ERROR_LOG("Can't load: " << full_path);
 			return false;
 		}
-		INFO_LOG("Resource " << name << " loaded with sname:" << sname);
-		resources_[sname] = res;
+		INFO_LOG("Resource " << name << " loaded with hash:" << hashv);
+		resources_[hashv] = res;
 		return true;
 	}
 

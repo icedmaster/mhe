@@ -3,6 +3,7 @@
 
 #include <string>
 #include <fstream>
+#include <vector>
 #include "core/compiler.hpp"
 
 namespace mhe {
@@ -13,6 +14,7 @@ MHE_EXPORT std::string get_file_name(const std::string& filepath);
 MHE_EXPORT std::string get_file_name_with_path(const std::string& filepath);
 MHE_EXPORT std::string get_file_path(const std::string& fullpath);
 MHE_EXPORT std::string read_whole_file(std::ifstream& stream);
+MHE_EXPORT std::vector<std::string> read_lines(std::ifstream& stream);
 
 // path utils
 inline std::string path_join(const std::string& path1, const std::string& path2)

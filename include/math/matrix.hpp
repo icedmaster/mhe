@@ -90,6 +90,11 @@ public:
         return vector4<T>(m_[r][0], m_[r][1], m_[r][2], m_[r][3]);
     }
 
+    vector3<T> row_vec3(int r) const
+    {
+        return vector3<T>(m_[r][0], m_[r][1], m_[r][2]);
+    }
+
     vector4<T> column(int c) const
     {
         return vector4<T>(m_[0][c], m_[1][c], m_[2][c], m_[3][c]);
@@ -99,6 +104,23 @@ public:
     {
         return m_[i][j];
     }
+
+	void set_element(int i, int j, T v)
+	{
+		m_[i][j] = v;
+	}
+
+	template <class Y>
+	void set_row(int r, const vector3<Y>& v)
+	{
+		m_[r][0] = v.x(); m_[r][1] = v.y(); m_[r][2] = v.z();
+	}
+
+	template <class Y>
+	void set_column(int c, const vector3<Y>& v)
+	{
+		m_[0][c] = v.x(); m_[1][c] = v.y(); m_[2][c] = v.z();
+	}
 
 	matrix& operator= (const matrix& m)
 	{

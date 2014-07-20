@@ -10,8 +10,8 @@ namespace mhe {
 struct Node
 {
 	Mesh mesh;
-	Transform::IdType transform;
-	material_id material;
+	Transform transform;
+	Material material;
 };
 
 }

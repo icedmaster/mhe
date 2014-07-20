@@ -3,6 +3,8 @@
 #include "game/base_view_events_handler.hpp"
 #include "utils/global_log.hpp"
 
+#include "render/render_context.hpp"
+
 namespace mhe {
 namespace game {
 
@@ -37,12 +39,6 @@ bool Engine::init(uint width, uint height, uint bpp, bool fullscreen)
 			}
 	}
 
-	if (!context_.window_system.init(width, height, bpp, fullscreen))
-	{
-		ERROR_LOG("WindowSystem initialization failed");
-		return false;
-	}
-	INFO_LOG("WindowSystem has been initialized: w=" << width << " h=" << height << " bpp=" << bpp);
 	if (!context_.driver.init())
 	{
 		ERROR_LOG("Driver initialization failed");
@@ -51,6 +47,9 @@ bool Engine::init(uint width, uint height, uint bpp, bool fullscreen)
 	INFO_LOG("Driver has been initialized");
 
   context_.window_system.view()->set_events_handler(new BaseViewEventsHandler(this));
+
+	context_.shader_manager.set_context(&context_);
+	context_.mesh_manager.set_context(&context_);
 
 	set_default_video_settings();
 
@@ -84,6 +83,11 @@ void Engine::update()
     event_manager_.check(context_.window_system);
 		if (game_scene_ != nullptr)
 			game_scene_->update(*this);
+
+		RenderContext render_context;
+		SceneContext scene_context;
+		scene_.update(render_context, scene_context);
+		update_materials(render_context);
 }
 
 void Engine::render()
@@ -91,10 +95,28 @@ void Engine::render()
     context_.driver.clear_color();
     context_.driver.clear_depth();
 	context_.driver.begin_render();
-	context_.driver.end_render();
+
+	Node* nodes = nullptr;
+	size_t count;
+	scene_.nodes(nodes, count);
+	context_.driver.render(context_, nodes, count);
 	if (game_scene_ != nullptr)
 		game_scene_->draw(*this);
+	context_.driver.end_render();
     context_.window_system.swap_buffers();
+}
+
+void Engine::update_materials(RenderContext& render_context)
+{
+	const MaterialSystems::Values &systems = context_.material_systems.get_all_materials();
+	for (size_t i = 0; i < systems.size(); ++i)
+	{
+		Node* nodes = nullptr;
+		size_t count;
+		if (!scene_.nodes(nodes, count, systems[i]->id()))
+			continue;
+		systems[i]->update(context_, render_context, nodes, scene_.transform_pool().all_objects(), count);
+	}
 }
 
 }}

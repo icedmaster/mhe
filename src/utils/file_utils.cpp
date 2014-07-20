@@ -55,4 +55,16 @@ std::string read_whole_file(std::ifstream& stream)
 	return std::string((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
 }
 
+std::vector<std::string> read_lines(std::ifstream& stream)
+{
+	std::vector<std::string> result;
+	while (!stream.eof())
+	{
+		std::string line;
+		std::getline(stream, line);
+		result.push_back(line);
+	}
+	return result;
+}
+
 }}

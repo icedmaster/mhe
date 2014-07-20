@@ -51,6 +51,12 @@ void OpenGLExtensions::init_extensions()
 	glGenFramebuffers_ = load_extension<PFNGLGENFRAMEBUFFERSPROC>("glGenFramebuffers");
 	glBindFramebuffer_ = load_extension<PFNGLBINDFRAMEBUFFERPROC>("glBindFramebuffer");
 	glFramebufferTexture_ = load_extension<PFNGLFRAMEBUFFERTEXTUREPROC>("glFramebufferTexture");
+	glGetUniformBlockIndex_ = load_extension<PFNGLGETUNIFORMBLOCKINDEXPROC>("glGetUniformBlockIndex");
+	glGetUniformIndices_ = load_extension<PFNGLGETUNIFORMINDICESPROC>("glGetUniformIndices");
+	glGetActiveUniformBlockiv_ = load_extension<PFNGLGETACTIVEUNIFORMBLOCKIVPROC>("glGetActiveUniformBlockiv");
+	glGetActiveUniformsiv_ = load_extension<PFNGLGETACTIVEUNIFORMSIVPROC>("glGetActiveUniformsiv");
+	glBindBufferBase_ = load_extension<PFNGLBINDBUFFERBASEPROC>("glBindBufferBase");
+	glBufferSubData_ = load_extension<PFNGLBUFFERSUBDATAPROC>("glBufferSubData");
 #endif	// MHE_OPENGL_HAS_SHADERS
 
 	get_str_extensions();

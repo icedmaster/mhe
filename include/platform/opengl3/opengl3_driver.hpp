@@ -6,6 +6,8 @@
 namespace mhe {
 namespace opengl {
 
+class OpenGL3IndexBuffer;
+
 class OpenGL3Driver : public DriverImpl
 {
 public:
@@ -38,8 +40,17 @@ private:
 		return 3;
 	}
 
+	void set_state(const RenderState& state);
+	void set_shader_program(const ShaderProgram& program);
+	void set_vertex_buffer(const RenderBuffer& vbuffer);
+	void set_index_buffer(const IndexBuffer& ibuffer);
+	void set_uniform(const UniformBuffer& uniform);
+	void set_layout(const Layout& layout);
+	void draw(const RenderData& data);
+
 	void flush();
 private:
+	const OpenGL3IndexBuffer* current_index_buffer_;
 };
 
 }}

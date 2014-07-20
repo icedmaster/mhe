@@ -34,6 +34,7 @@ public:
 	UniformBufferImpl* create_uniform_buffer() const;
 	ShaderProgramImpl* create_shader_program() const;
 	TextureImpl* create_texture() const;
+	RenderStateImpl* create_render_state() const;
 
 	// input devices
 	KeyboardDeviceImpl* create_keyboard_device_impl() const

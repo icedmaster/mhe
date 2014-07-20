@@ -432,6 +432,15 @@ public:
         ::glBindBufferBase(target, index, buffer);
 #endif
 	}
+
+	void glBufferSubData(GLenum target, GLintptr offset, GLsizeiptr size, const GLvoid* data)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glBufferSubData_(target, offset, size, data);
+#else
+		::glBufferSubData(target, offset, size, data);
+#endif
+	}
 private:
 	OpenGLExtensions() {}
 	~OpenGLExtensions() {}
@@ -498,6 +507,7 @@ private:
 	PFNGLGETUNIFORMINDICESPROC glGetUniformIndices_;
 	PFNGLGETACTIVEUNIFORMSIVPROC glGetActiveUniformsiv_;
 	PFNGLBINDBUFFERBASEPROC glBindBufferBase_;
+	PFNGLBUFFERSUBDATAPROC glBufferSubData_;
 #endif
 	std::map<std::string, bool> loaded_extensions_;
 };

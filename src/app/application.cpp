@@ -39,7 +39,6 @@ bool Application::mhe_app_init(const ApplicationConfig& config)
 	INFO_LOG("Init application with name:" << name_ << " w:" << config.width <<
 			 " h:" << config.height << " bpp:" << config.bpp);
 	init_assets_path(config.assets_path);
-	init_default_assets(config);
   if (engine_.init(config.width, config.height, config.bpp, config.fullscreen))
   {
       add_delegates();
@@ -75,11 +74,10 @@ void Application::init_assets_path(const std::string& config_assets_path)
 {	
 	std::string base_path = utils::path_join(application_base_path(),
 		config_assets_path.empty() ? assets_base_path : config_assets_path);
-    INFO_LOG("Application::init_assets_path with base path:" << base_path);
-}
+	INFO_LOG("Application::init_assets_path with base path:" << base_path);
 
-void Application::init_default_assets(const ApplicationConfig& config)
-{
+	engine_.context().shader_manager.set_path(utils::path_join(base_path, shader_path));
+	engine_.context().mesh_manager.set_path(utils::path_join(base_path, mesh_path));
 }
 
 void Application::add_delegates()

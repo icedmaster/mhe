@@ -1,9 +1,11 @@
 #ifndef __MATERIAL_HPP__
 #define __MATERIAL_HPP__
 
+#include "core/hash.hpp"
 #include "utils/pool_utils.hpp"
-#include "math/vec4.hpp"
+#include "math/vector4.hpp"
 #include "texture.hpp"
+#include "shader_program.hpp"
 
 namespace mhe {
 
@@ -12,34 +14,26 @@ class Driver;
 const size_t material_textures_number = 8;
 const size_t material_uniforms_number = 4;
 
-template <class MP>
-class Material
+struct Material
 {
-	friend class Driver;
-public:
-	typedef MP Parameters;
-public:
-	Parameters& parameters()
+	typedef uint16_t IdType;
+	Texture::IdType textures[material_textures_number];
+	UniformBuffer::IdType uniforms[material_uniforms_number];
+	ShaderProgram::IdType shader_program;
+	IdType id;
+
+	Material()
 	{
-		return parameters_;
+		::memset(uniforms, UniformBuffer::invalid_id, sizeof(uniforms));
+		::memset(textures, Texture::invalid_id, sizeof(textures));
 	}
-private:
-	Parameters parameters_;
-	Texture::IdType textures_[material_textures_number];
-	UniformBuffer::IdType uniforms_[material_uniforms_number];
-	ShaderProgram::IdType shader_program_;
 };
 
-struct BlinnPhongMaterialParameters
+struct MaterialInstance
 {
-	vec4 diffuse;
-	vec4 specular;
-	float shininess;
+	Material::IdType id;
+	uint8_t material_system;
 };
-
-typedef Material<BlinnPhongMaterialParameters> BlinnPhongMaterial;
-
-typedef uint16_t material_id;
 
 }
 

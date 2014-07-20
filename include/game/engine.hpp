@@ -3,6 +3,7 @@
 
 #include "render/context.hpp"
 #include "events/event_manager.hpp"
+#include "scene/scene.hpp"
 #include "game_scene.hpp"
 
 namespace mhe {
@@ -23,6 +24,11 @@ public:
         return event_manager_;
     }
 
+		Scene& scene()
+		{
+			return scene_;
+		}
+
 	void run();
 	void stop();
 	void update();
@@ -35,8 +41,11 @@ public:
 private:
 	void set_default_video_settings();
 
+	void update_materials(RenderContext& render_context);
+
 	Context context_;
     EventManager event_manager_;
+		Scene scene_;
 		ref_ptr<GameScene> game_scene_;
 		bool process_;
 };

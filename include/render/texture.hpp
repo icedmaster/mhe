@@ -2,6 +2,7 @@
 #define __TEXTURE_HPP__
 
 #include "core/unique_ptr.hpp"
+#include "utils/pool_utils.hpp"
 
 namespace mhe {
 
@@ -19,6 +20,7 @@ public:
 
 class Texture
 {
+	POOL_ELEMENT_METHODS(uint16_t);
 public:
 	Texture();
 

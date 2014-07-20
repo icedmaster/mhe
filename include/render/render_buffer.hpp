@@ -67,6 +67,11 @@ public:
 	{
 		impl_->close();
 	}
+
+	const RenderBufferImpl* impl() const
+	{
+		return impl_.get();
+	}
 private:
 	unique_ptr<RenderBufferImpl> impl_;
 };
@@ -86,6 +91,11 @@ public:
 	void close()
 	{
 		impl_->close();
+	}
+
+	const IndexBufferImpl* impl() const
+	{
+		return impl_.get();
 	}
 private:
 	unique_ptr<IndexBufferImpl> impl_;
@@ -119,13 +129,18 @@ public:
 	{
 		impl_->close();
 	}
+
+	const LayoutImpl* impl() const
+	{
+		return impl_.get();
+	}
 private:
 	unique_ptr<LayoutImpl> impl_;
 };
 
 struct UniformBufferElement
 {
-	std::string name;
+	const char* name;
 	size_t size;
 	uint8_t* data;
 };
@@ -134,10 +149,20 @@ const size_t max_uniforms_per_block = 16;
 
 struct UniformBufferDesc
 {
-	std::string name;
+	const char* name;
 	ShaderProgram* program;
 	fixed_size_vector<UniformBufferElement, max_uniforms_per_block> uniforms;
 };
+
+template <class T>
+inline void create_uniform_buffer_element(UniformBufferDesc& desc, const char* name, const T& data)
+{
+	fixed_size_vector<UniformBufferElement, max_uniforms_per_block>::iterator it = desc.uniforms.next_predefined_element();
+	ASSERT(it != desc.uniforms.end(), "Too many uniform elements");
+	size_t size = sizeof(T);
+	uint8_t* dataptr = (uint8_t*)(&data);
+	it->name = name; it->size = size; it->data = dataptr;
+}
 
 class MHE_EXPORT UniformBuffer
 {
@@ -158,6 +183,11 @@ public:
 	void update(const UniformBufferDesc& desc)
 	{
 		impl_->update(desc);
+	}
+
+	const UniformBufferImpl* impl() const
+	{
+		return impl_.get();
 	}
 private:
 	unique_ptr<UniformBufferImpl> impl_;

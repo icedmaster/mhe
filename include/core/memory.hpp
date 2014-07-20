@@ -27,7 +27,17 @@ inline void* operator new(size_t size)
 	return mhe::details::allocate(size);
 }
 
+inline void* operator new[](size_t count)
+{
+	return mhe::details::allocate(count);
+}
+
 inline void operator delete(void* p)
+{
+	return mhe::details::free(p);
+}
+
+inline void operator delete[] (void* p)
 {
 	return mhe::details::free(p);
 }

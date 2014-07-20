@@ -47,7 +47,6 @@ protected:
 	virtual int run_impl();
     virtual void stop_impl();
 	virtual void init_assets_path(const std::string& config_assets_path);
-	virtual void init_default_assets(const ApplicationConfig& config);
 
 	virtual std::string application_base_path() const
 	{

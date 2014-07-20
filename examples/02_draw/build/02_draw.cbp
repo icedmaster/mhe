@@ -35,9 +35,16 @@
             <Add option="-DMHE_HAS_VORBIS" />
             <Add directory="/home/master/projects/opengl/mhe/build/../include" />
             <Add directory="/home/master/projects/opengl/mhe/build/../include/.." />
+            <Add directory="/usr/include" />
             <Add directory="/usr/include/QtCore" />
             <Add directory="/usr/include/QtGui" />
             <Add directory="/usr/include/QtOpenGL" />
+            <Add directory="/usr/lib/gcc/x86_64-unknown-linux-gnu/4.7.2/../../../../include/c++/4.7.2" />
+            <Add directory="/usr/lib/gcc/x86_64-unknown-linux-gnu/4.7.2/../../../../include/c++/4.7.2/backward" />
+            <Add directory="/usr/lib/gcc/x86_64-unknown-linux-gnu/4.7.2/../../../../include/c++/4.7.2/x86_64-unknown-linux-gnu" />
+            <Add directory="/usr/lib/gcc/x86_64-unknown-linux-gnu/4.7.2/include" />
+            <Add directory="/usr/lib/gcc/x86_64-unknown-linux-gnu/4.7.2/include-fixed" />
+            <Add directory="/usr/local/include" />
          </Compiler>
          <MakeCommands>
             <Build command="/usr/bin/make -f &quot;/home/master/projects/opengl/mhe/examples/02_draw/build/Makefile&quot;  VERBOSE=1 02_draw" />
@@ -64,9 +71,16 @@
             <Add option="-DMHE_HAS_VORBIS" />
             <Add directory="/home/master/projects/opengl/mhe/build/../include" />
             <Add directory="/home/master/projects/opengl/mhe/build/../include/.." />
+            <Add directory="/usr/include" />
             <Add directory="/usr/include/QtCore" />
             <Add directory="/usr/include/QtGui" />
             <Add directory="/usr/include/QtOpenGL" />
+            <Add directory="/usr/lib/gcc/x86_64-unknown-linux-gnu/4.7.2/../../../../include/c++/4.7.2" />
+            <Add directory="/usr/lib/gcc/x86_64-unknown-linux-gnu/4.7.2/../../../../include/c++/4.7.2/backward" />
+            <Add directory="/usr/lib/gcc/x86_64-unknown-linux-gnu/4.7.2/../../../../include/c++/4.7.2/x86_64-unknown-linux-gnu" />
+            <Add directory="/usr/lib/gcc/x86_64-unknown-linux-gnu/4.7.2/include" />
+            <Add directory="/usr/lib/gcc/x86_64-unknown-linux-gnu/4.7.2/include-fixed" />
+            <Add directory="/usr/local/include" />
          </Compiler>
          <MakeCommands>
             <Build command="/usr/bin/make -f &quot;/home/master/projects/opengl/mhe/examples/02_draw/build/Makefile&quot;  VERBOSE=1 02_draw/fast" />

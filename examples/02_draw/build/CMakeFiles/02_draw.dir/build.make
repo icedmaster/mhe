@@ -84,7 +84,7 @@ include /home/master/projects/opengl/mhe/examples/02_draw/build/CMakeFiles/02_dr
 
 /home/master/projects/opengl/mhe/bin/02_draw: /home/master/projects/opengl/mhe/examples/02_draw/build/CMakeFiles/02_draw.dir/home/master/projects/opengl/mhe/examples/02_draw/02_draw.cpp.o
 /home/master/projects/opengl/mhe/bin/02_draw: /home/master/projects/opengl/mhe/examples/02_draw/build/CMakeFiles/02_draw.dir/build.make
-/home/master/projects/opengl/mhe/bin/02_draw: /home/master/projects/opengl/mhe/build/libmhe.so
+/home/master/projects/opengl/mhe/bin/02_draw: /home/master/projects/opengl/mhe/bin/libmhe.so
 /home/master/projects/opengl/mhe/bin/02_draw: /usr/lib64/libGL.so
 /home/master/projects/opengl/mhe/bin/02_draw: /usr/lib64/libSDL.so
 /home/master/projects/opengl/mhe/bin/02_draw: /usr/lib64/libQtOpenGL.so

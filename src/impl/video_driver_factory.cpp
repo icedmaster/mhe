@@ -76,4 +76,9 @@ TextureImpl* VideoDriverFactory::create_texture() const
 	return current_driver_factory_->create_texture();
 }
 
+RenderStateImpl* VideoDriverFactory::create_render_state() const
+{
+	return current_driver_factory_->create_render_state();
+}
+
 }

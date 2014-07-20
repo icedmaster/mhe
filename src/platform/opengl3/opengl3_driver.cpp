@@ -2,6 +2,11 @@
 
 #include "platform/opengl/mhe_gl.hpp"
 #include "platform/opengl/opengl_extension.hpp"
+#include "platform/opengl/opengl_types.hpp"
+
+#include "platform/opengl3/opengl3_shader_program.hpp"
+#include "platform/opengl3/opengl3_render_state.hpp"
+#include "platform/opengl3/opengl3_buffer.hpp"
 
 namespace mhe {
 namespace opengl {
@@ -45,20 +50,6 @@ void OpenGL3Driver::disable_blending()
     glDisable(GL_BLEND);
 }
     
-void OpenGL3Driver::set_blend_func(BlendFunc bf)
-{
-/*
-    switch (bf)
-    {
-        case alpha_one_minus_alpha:
-           glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		   break;
-                
-        default: break;
-    }
-*/
-}
-    
 void OpenGL3Driver::set_viewport(int x, int y, int w, int h)
 {
     glViewport(x, y, w, h);
@@ -67,6 +58,50 @@ void OpenGL3Driver::set_viewport(int x, int y, int w, int h)
 void OpenGL3Driver::flush()
 {
 	glFlush();
+}
+
+void OpenGL3Driver::set_state(const RenderState& /*state*/)
+{
+}
+
+void OpenGL3Driver::set_shader_program(const ShaderProgram& program)
+{
+	const OpenGL3ShaderProgram* active_program = static_cast<const OpenGL3ShaderProgram*>(program.impl());
+	active_program->set();
+	CHECK_GL_ERRORS();
+}
+
+void OpenGL3Driver::set_vertex_buffer(const RenderBuffer& vbuffer)
+{
+	const OpenGL3Buffer* buffer = static_cast<const OpenGL3Buffer*>(vbuffer.impl());
+	buffer->enable();
+	CHECK_GL_ERRORS();
+}
+
+void OpenGL3Driver::set_index_buffer(const IndexBuffer& ibuffer)
+{
+	const OpenGL3IndexBuffer* buffer = static_cast<const OpenGL3IndexBuffer*>(ibuffer.impl());
+	current_index_buffer_ = buffer;
+}
+
+void OpenGL3Driver::set_uniform(const UniformBuffer& uniform)
+{
+	const OpenGL3UniformBuffer* buffer = static_cast<const OpenGL3UniformBuffer*>(uniform.impl());
+	buffer->enable();
+	CHECK_GL_ERRORS();
+}
+
+void OpenGL3Driver::set_layout(const Layout& layout)
+{
+	const OpenGL3Layout* active_layout = static_cast<const OpenGL3Layout*>(layout.impl());
+	active_layout->enable();
+	CHECK_GL_ERRORS();
+}
+
+void OpenGL3Driver::draw(const RenderData& data)
+{
+	glDrawElements(get_primitive_type(data.primitive), current_index_buffer_->size(), GL_UNSIGNED_INT, current_index_buffer_->get());
+	CHECK_GL_ERRORS();
 }
     
 }}

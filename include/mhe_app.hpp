@@ -4,7 +4,7 @@
 #define __MHE_APP__
 
 #include "app/application.hpp"
-#include "app/application_asset_path.hpp"
 #include "app/application_config.hpp"
+#include "app/application_asset_path.hpp"
 
 #endif // __MHE_APP__

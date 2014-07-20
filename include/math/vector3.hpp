@@ -231,6 +231,14 @@ vector3<T> operator* (const vector3<T>& v, U val)
 }
 
 template <class T>
+vector3<T> operator* (const vector3<T>& v1, const vector3<T>& v2)
+{
+    vector3<T> result(v1);
+    result *= v2;
+    return result;
+}
+
+template <class T>
 inline std::ostream& operator<< (std::ostream& s, const vector3<T>& v)
 {
 	return s << '(' << v.x() << ", " << v.y() << ", " << v.z() << ')';

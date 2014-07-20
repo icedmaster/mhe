@@ -25,7 +25,7 @@ MHE_EXPORT struct StandartGeometryLayout
 
 	static uint16_t handle;
 
-	void init(Context& context);
+	static void init(Context& context);
 };
 
 }

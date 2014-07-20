@@ -218,6 +218,7 @@ inline std::ostream& operator<< (std::ostream& s, const vector4<T>& v)
 }
 
 	typedef vector4<float> v4d;
+	typedef vector4<float> vec4;
     typedef v4d colorf;
 
     const colorf color_transparent = colorf(0.0, 0.0, 0.0, 0.0);

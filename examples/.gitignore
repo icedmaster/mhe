@@ -1,6 +1,6 @@
 /build/*
 /01_init/build/*
-/02_node/build/*
+/02_draw/build/*
 /particles/build/*
 /03_sprite/build/*
 /04_texture_atlas/build/*
@@ -15,7 +15,7 @@
 
 !/build/CMakeLists.txt
 !/01_init/build/CMakeLists.txt
-!/02_node/build/CMakeLists.txt
+!/02_draw/build/CMakeLists.txt
 !/particles/build/CMakeLists.txt
 !/03_sprite/build/CMakeLists.txt
 !/04_texture_atlas/build/CMakeLists.txt

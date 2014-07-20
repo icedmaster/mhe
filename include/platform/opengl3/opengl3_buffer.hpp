@@ -12,8 +12,8 @@ class VAO
 public:
 	bool init();
 	void close();
-	void enable();
-	void disable();
+	void enable() const;
+	void disable() const;
 
 	GLuint id() const
 	{
@@ -28,8 +28,8 @@ class VBO
 public:
 	bool init(GLenum target, GLsizeiptr size, const GLvoid* data, GLenum usage);
 	void close();
-	void enable();
-	void disable();
+	void enable() const;
+	void disable() const;
 
 	GLuint id() const
 	{
@@ -55,6 +55,9 @@ public:
 	{
 		return vbo_;
 	}
+
+	void enable() const;
+	void disable() const;
 private:
 	VAO vao_;
 	VBO vbo_;
@@ -65,6 +68,16 @@ class OpenGL3IndexBuffer : public IndexBufferImpl
 public:
 	bool init(const uint32_t* indexes, size_t size);
 	void close() {}
+
+	const uint32_t* get() const
+	{
+		return indexes_.data();
+	}
+
+	size_t size() const
+	{
+		return indexes_.size();
+	}
 private:
 	std::vector<uint32_t> indexes_;
 };
@@ -75,8 +88,8 @@ public:
 	bool init(const LayoutDesc& desc);
 	void close() {}
 
-	void enable();
-	void disable();
+	void enable() const;
+	void disable() const;
 private:
 	LayoutDesc desc_;
 };
@@ -89,8 +102,8 @@ public:
 
 	void update(const UniformBufferDesc& desc);
 
-	void enable();
-	void disable();
+	void enable() const;
+	void disable() const;
 private:
 	fixed_size_vector<uint8_t, max_uniforms_per_block * 4 * sizeof(float)> data_;
 	VBO vbo_;

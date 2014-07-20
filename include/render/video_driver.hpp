@@ -5,7 +5,6 @@
 #include <list>
 #include "mhe_math.hpp"
 #include "core/types.hpp"
-#include "core/fixed_size_vector.hpp"
 #include "core/ref_ptr.hpp"
 #include "core/unique_ptr.hpp"
 
@@ -20,7 +19,17 @@ enum BlendFunc
 {
 };
 
+struct Context;
+struct Node;
+struct RenderData;
+
 class Texture;
+class RenderState;
+class ShaderProgram;
+class RenderBuffer;
+class IndexBuffer;
+class UniformBuffer;
+class Layout;
 
 class DriverImpl
 {
@@ -32,7 +41,6 @@ public:
 
 	virtual void enable_blending() = 0;
 	virtual void disable_blending() = 0;
-	virtual void set_blend_func(BlendFunc) = 0;
 
 	virtual void enable_depth() = 0;
 	virtual void disable_depth() = 0;
@@ -47,6 +55,14 @@ public:
 	virtual void restore_color() {}
 
 	virtual void set_viewport(int x, int y, int w, int h) = 0;
+
+	virtual void set_state(const RenderState& state) = 0;
+	virtual void set_shader_program(const ShaderProgram& program) = 0;
+	virtual void set_vertex_buffer(const RenderBuffer& vbuffer) = 0;
+	virtual void set_index_buffer(const IndexBuffer& ibuffer) = 0;
+	virtual void set_uniform(const UniformBuffer& uniform) = 0;
+	virtual void set_layout(const Layout& layout) = 0;
+	virtual void draw(const RenderData& data) = 0;
     
 	virtual uint major_version_need() const = 0;
 	virtual uint minor_version_need() const = 0;
@@ -115,10 +131,9 @@ public:
 		impl_->close();
 	}
 
-	void enable_blending(BlendFunc bf)
+    void enable_blending(BlendFunc /*bf*/)
 	{
 		impl_->enable_blending();
-		impl_->set_blend_func(bf);
 	}
 
 	void disable_blending()
@@ -187,6 +202,8 @@ public:
 	{
 		impl_->flush();
 	}
+
+	void render(const Context& context, const Node* nodes, size_t count);
 private:
 	Stats stats_;
 	unique_ptr<DriverImpl> impl_;

@@ -13,6 +13,7 @@ class LayoutImpl;
 class TextureImpl;
 class ShaderProgramImpl;
 class UniformBufferImpl;
+class RenderStateImpl;
 
 class AbstractVideoDriverFactory : public ref_counter
 {
@@ -28,6 +29,7 @@ public:
 	virtual UniformBufferImpl* create_uniform_buffer() const = 0;
 	virtual ShaderProgramImpl* create_shader_program() const = 0;
 	virtual TextureImpl* create_texture() const = 0;
+	virtual RenderStateImpl* create_render_state() const = 0;
 };
 
 }

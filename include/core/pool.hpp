@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <cassert>
+#include "core/dynarray.hpp"
 
 typedef unsigned short uint16_t;
 
@@ -91,12 +92,29 @@ public:
 		last_ = id;
 	}
 
-	void debug()
+	bool is_valid(I id) const
 	{
+        return indexes_[id].index != invalid_id;
+	}
+
+	T* all_objects() const
+	{
+		return &objects_[0];
+	}
+
+	I size() const
+	{
+		return size_;
+	}
+
+	void update()
+	{
+		for (I i = 0; i < size_; ++i)
+			indexes_[Policy::get(objects_[i])].index = i;
 	}
 private:
-	mutable T objects_[C];
-	mutable Index indexes_[C];
+	mutable dynarray<T, C> objects_;
+	mutable dynarray<Index, C> indexes_;
 	mutable I first_;
 	mutable I last_;
 	mutable I size_;

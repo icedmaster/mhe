@@ -56,4 +56,9 @@
 #define MHE_STANDART_LOG_DISABLED
 #endif
 
+/**
+* Rendering configuration
+*/
+const size_t max_material_systems_number = 16;
+
 #endif

@@ -3,8 +3,9 @@
 #ifndef __MHE_RES__
 #define __MHE_RES__
 
-#include "res/mesh_loader.hpp"
 #include "res/resource_manager.hpp"
+#include "res/shader_program_loader.hpp"
 #include "res/resource_managers.hpp"
+#include "res/mesh_loader.hpp"
 
 #endif // __MHE_RES__

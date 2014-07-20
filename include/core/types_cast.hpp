@@ -6,6 +6,8 @@
 #include <cstring>
 #include <cstdio>
 #include <cstdlib>
+#include "assert.hpp"
+#include "types.hpp"
 
 namespace mhe {
 
@@ -66,6 +68,13 @@ template <>
 inline float types_cast(const std::string& value)
 {
 	return atof(value.c_str());
+}
+
+template <class U, class V>
+U checked_static_cast(V value)
+{
+	ASSERT(dynamic_cast<U>(value) != nullptr, "Invalid cast");
+	return static_cast<U>(value);
 }
 
 }

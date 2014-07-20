@@ -7,6 +7,7 @@
 #include "opengl3_buffer.hpp"
 #include "opengl3_shader_program.hpp"
 #include "opengl3_texture.hpp"
+#include "opengl3_render_state.hpp"
 
 namespace mhe {
 namespace opengl {
@@ -52,6 +53,11 @@ public:
 	TextureImpl* create_texture() const
 	{
 		return new OpenGL3Texture;
+	}
+
+	RenderStateImpl* create_render_state() const
+	{
+		return new OpenGL3RenderState;
 	}
 };
 

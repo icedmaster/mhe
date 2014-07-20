@@ -59,6 +59,7 @@ inline void trim(std::string& s, const std::string& c = " ")
 
 inline std::string trim_copy(const std::string& s, const std::string& c = " ")
 {
+	if (s.empty()) return s;
 	return rtrim_copy(ltrim_copy(s, c), c);
 }
 

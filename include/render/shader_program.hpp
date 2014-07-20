@@ -21,7 +21,7 @@ class MHE_EXPORT ShaderProgram
 	POOL_ELEMENT_METHODS(uint16_t);
 public:
 	ShaderProgram();
-	bool init(const std::string& vsdata, const std::string& fsdata, const std::string& definitions = std::string());
+	bool init(const std::string& vsdata, const std::string& fsdata);
 	void close()
 	{
 		impl_->close();

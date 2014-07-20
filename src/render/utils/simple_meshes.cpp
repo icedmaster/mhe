@@ -26,9 +26,16 @@ bool create_plane(Mesh& mesh, const Context& context)
 
 	uint32_t indexes[6] = {0, 1, 2, 2, 3, 0};
 
-	mesh.layout = StandartGeometryLayout::handle;
 	mesh.vbuffer = context.vertex_buffer_pool.create();
 	mesh.ibuffer = context.index_buffer_pool.create();
+	mesh.state = context.render_state_pool.create();
+
+	mesh.render_data.elements_number = 2;
+
+	RenderStateDesc desc;
+	RenderState& render_state = context.render_state_pool.get(mesh.state);
+	if (!render_state.init(desc))
+		return false;
 
 	VertexBuffer& vbuffer = context.vertex_buffer_pool.get(mesh.vbuffer);
 	if (!vbuffer.init(buffer_update_type_static,
