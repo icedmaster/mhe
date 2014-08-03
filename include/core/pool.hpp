@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <cassert>
+#include <algorithm>
 #include "core/dynarray.hpp"
 
 typedef unsigned short uint16_t;
@@ -49,6 +50,10 @@ class Pool
 
 	static const I invalid_id = static_cast<I>(-1);
 public:
+	typedef T type;
+	typedef I index_type;
+	static const size_t capacity = C;
+
 	Pool() :
 		first_(0), last_(C - 1), size_(0)
 	{
@@ -100,6 +105,15 @@ public:
 	T* all_objects() const
 	{
 		return &objects_[0];
+	}
+
+	template <class Y>
+	size_t all_indexes(Y* indexes, size_t count) const
+	{
+		size_t result = std::min(count, static_cast<Y>(size_));
+		for (size_t i = 0; i < result; ++i)
+			indexes[i] = indexes_[i].index;
+		return result;
 	}
 
 	I size() const

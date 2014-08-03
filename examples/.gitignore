@@ -1,8 +1,7 @@
 /build/*
 /01_init/build/*
 /02_draw/build/*
-/particles/build/*
-/03_sprite/build/*
+/03_skybox/build/*
 /04_texture_atlas/build/*
 /05_scene/build/*
 /06_animation/build/*
@@ -16,8 +15,7 @@
 !/build/CMakeLists.txt
 !/01_init/build/CMakeLists.txt
 !/02_draw/build/CMakeLists.txt
-!/particles/build/CMakeLists.txt
-!/03_sprite/build/CMakeLists.txt
+!/03_skybox/build/CMakeLists.txt
 !/04_texture_atlas/build/CMakeLists.txt
 !/05_scene/build/CMakeLists.txt
 !/06_animation/build/CMakeLists.txt

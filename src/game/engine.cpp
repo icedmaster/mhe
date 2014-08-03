@@ -51,6 +51,7 @@ bool Engine::init(uint width, uint height, uint bpp, bool fullscreen)
 
 	context_.shader_manager.set_context(&context_);
 	context_.mesh_manager.set_context(&context_);
+	context_.texture_manager.set_context(&context_);
 
 	set_default_video_settings();
 
@@ -61,7 +62,6 @@ void Engine::set_default_video_settings()
 {
 	context_.driver.set_viewport(0, 0, context_.window_system.width(), context_.window_system.height());
 	context_.driver.set_clear_color(color_black);
-	//context_.driver.enable_depth();
 }
 
 void Engine::run()
@@ -87,8 +87,9 @@ void Engine::update()
 
 		RenderContext render_context;
         render_context.tick = utils::get_current_tick();
+				render_context.fdelta = utils::get_last_delta();
 		SceneContext scene_context;
-		scene_.update(render_context, scene_context);
+		scene_.update(render_context, context_, scene_context);
 		update_materials(render_context);
 }
 
@@ -99,8 +100,7 @@ void Engine::render()
 	context_.driver.begin_render();
 
 	Node* nodes = nullptr;
-	size_t count;
-	scene_.nodes(nodes, count);
+	size_t count = scene_.nodes(nodes);
 	context_.driver.render(context_, nodes, count);
 	if (game_scene_ != nullptr)
 		game_scene_->draw(*this);
@@ -110,14 +110,16 @@ void Engine::render()
 
 void Engine::update_materials(RenderContext& render_context)
 {
+	size_t indexes[4096];
+	scene_.transform_pool().all_indexes(indexes, sizeof(indexes));
 	const MaterialSystems::Values &systems = context_.material_systems.get_all_materials();
 	for (size_t i = 0; i < systems.size(); ++i)
 	{
 		Node* nodes = nullptr;
-		size_t count;
-		if (!scene_.nodes(nodes, count, systems[i]->id()))
-			continue;
-		systems[i]->update(context_, render_context, nodes, scene_.transform_pool().all_objects(), count);
+		size_t offset;
+		size_t count = scene_.nodes(nodes, offset, systems[i]->id());
+		if (!count) continue;
+		systems[i]->update(context_, render_context, nodes, scene_.transform_pool().all_objects(), indexes, count);
 	}
 }
 

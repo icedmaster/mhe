@@ -3,12 +3,18 @@
 #include "impl/system_factory.hpp"
 #include "utils/global_log.hpp"
 
+#include "events/keyboard_device.hpp"
+#include "events/keyboard_event.hpp"
+#include "events/mouse_device.hpp"
+#include "events/mouse_event.hpp"
+
 namespace mhe {
 
 EventManager::EventManager() :
 	backend_(SystemFactory::instance().create_event_system())
 {
 	backend_->init();
+	init_default_bindings();
 }
 
 EventManager::~EventManager()
@@ -41,6 +47,8 @@ void EventManager::add_listener(EventListener* listener)
 
 void EventManager::check(const WindowSystem& ws)
 {
+	clear_bindings();
+
 	backend_->update_event_queue(ws);
 	for (devices_map::iterator it = devices_.begin(); it != devices_.end(); ++it)
 	{
@@ -56,6 +64,44 @@ void EventManager::check(const WindowSystem& ws)
 void EventManager::add_event(const Event *event)
 {
     process_event(event);
+}
+
+void EventManager::add_keyboard(KeyboardDevice* device)
+{
+	keyboards_[hash(device->name())] = ref_ptr<KeyboardDevice>(device);
+	add_device(device);
+}
+
+const KeyboardDevice* EventManager::keyboard() const
+{
+	if (keyboards_.empty()) return nullptr;
+	return keyboards_.begin()->second.get();
+}
+
+void EventManager::add_mouse(MouseDevice* device)
+{
+	mice_[hash(device->name())] = ref_ptr<MouseDevice>(device);
+	add_device(device);
+}
+
+const MouseDevice* EventManager::mouse() const
+{
+	if (mice_.empty()) return nullptr;
+	return mice_.begin()->second.get();
+}
+
+void EventManager::add_bind(const char* name, EventType type, int arg, int optarg)
+{
+	EventBind bind;
+	bind.id = Event::create_event_id(type, arg, optarg);
+	bindings_[hash(name)] = bind;
+}
+
+bool EventManager::check_bind(const char* name) const
+{
+	EventBindings::const_iterator it = bindings_.find(hash(name));
+	if (it == bindings_.end()) return false;
+	return it->second.enabled;
 }
 
 void EventManager::process_event(const Event* event)
@@ -79,8 +125,28 @@ void EventManager::process_event_with_id(int id, const Event* event)
 	for (listeners_map::iterator it = res.first; it != res.second; ++it)
 	{
 		if (it->second->handle(event))
-			return;
+			break;
 	}
+
+	for (EventBindings::iterator it = bindings_.begin(); it != bindings_.end(); ++it)
+	{
+		if (it->second.id == id)
+			it->second.enabled = true;
+	}
+}
+
+void EventManager::init_default_bindings()
+{
+	add_bind("left", keyboard_event_type, KeyboardEvent::key_down, KeyboardDevice::key_a);
+	add_bind("right", keyboard_event_type, KeyboardEvent::key_down, KeyboardDevice::key_d);
+	add_bind("up", keyboard_event_type, KeyboardEvent::key_down, KeyboardDevice::key_w);
+	add_bind("down", keyboard_event_type, KeyboardEvent::key_down, KeyboardDevice::key_s);
+}
+
+void EventManager::clear_bindings()
+{
+	for (EventBindings::iterator it = bindings_.begin(); it != bindings_.end(); ++it)
+		it->second.enabled = false;
 }
 
 }

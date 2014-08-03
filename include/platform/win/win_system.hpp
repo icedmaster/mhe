@@ -9,6 +9,8 @@ namespace winsys {
 void start_platform();
 void stop_platform();
 uint get_current_tick();
+float get_current_time();
+float get_last_delta();
 
 }}
 

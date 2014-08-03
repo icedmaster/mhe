@@ -29,7 +29,7 @@ struct BlendDesc
 	bool enabled;
 
 	BlendDesc() :
-		enabled(true)
+		enabled(false)
 	{}
 };
 
@@ -66,6 +66,11 @@ public:
 	void close()
 	{
 		impl_->close();
+	}
+
+	const RenderStateImpl* impl() const
+	{
+		return impl_.get();
 	}
 private:
 	unique_ptr<RenderStateImpl> impl_;

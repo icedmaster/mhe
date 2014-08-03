@@ -2,6 +2,7 @@
 #define __MATERIAL_SYSTEM_HPP__
 
 #include "core/ref_counter.hpp"
+#include "core/hash.hpp"
 
 namespace mhe {
 
@@ -29,7 +30,7 @@ public:
 
 	virtual void setup(Context& context, Node* nodes, ModelContext* model_contexts, size_t count) = 0;
 	virtual void destroy(Context& context, Node* nodes, size_t count) = 0;
-	virtual void update(Context& context, RenderContext& render_context, Node* nodes, Transform* transforms, size_t count) = 0;
+	virtual void update(Context& context, RenderContext& render_context, Node* nodes, Transform* transforms, size_t* transform_indices, size_t count) = 0;
 
 	uint8_t id() const
 	{
@@ -40,9 +41,29 @@ public:
 	{
 		id_ = id;
 	}
+
+	uint8_t priority() const
+	{
+		return priority_;
+	}
+
+	void set_priority(uint8_t priority)
+	{
+		priority_ = priority;
+	}
+
+	hash_type name() const
+	{
+		return name_impl();
+	}
 private:
+	virtual hash_type name_impl() const = 0;
+
 	uint8_t id_;
+	uint8_t priority_;
 };
+
+#define SETUP_MATERIAL(mname) public: static hash_type name() {return hash(mname);} private: hash_type name_impl() const {static hash_type n = hash(mname); return n;}
 
 }
 

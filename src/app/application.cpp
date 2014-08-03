@@ -7,6 +7,8 @@
 #include "events/delegate_event_listener.hpp"
 #include "events/system_event.hpp"
 #include "events/system_device.hpp"
+#include "events/keyboard_device.hpp"
+#include "events/mouse_device.hpp"
 
 namespace mhe {
 namespace app {
@@ -78,6 +80,7 @@ void Application::init_assets_path(const std::string& config_assets_path)
 
 	engine_.context().shader_manager.set_path(utils::path_join(base_path, shader_path));
 	engine_.context().mesh_manager.set_path(utils::path_join(base_path, mesh_path));
+	engine_.context().texture_manager.set_path(utils::path_join(base_path, texture_path));
 }
 
 void Application::add_delegates()
@@ -91,6 +94,8 @@ void Application::add_delegates()
     };
 
 		engine_.event_manager().add_device(new SystemDevice("sys"));
+		engine_.event_manager().add_keyboard(new KeyboardDevice("kbd"));
+		engine_.event_manager().add_mouse(new MouseDevice("mouse"));
     engine_.event_manager().add_listener(new ApplicationEventListener(this));
 }
 

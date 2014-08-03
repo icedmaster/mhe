@@ -11,6 +11,11 @@ struct RenderContext;
 class CameraController : public ref_counter
 {
 public:
+	CameraController() :
+        move_speed_(0.5f),
+        rotation_speed_(0.5f)
+	{}
+
 	virtual ~CameraController() {}
 	
 	void update(const RenderContext& render_context)
@@ -27,10 +32,22 @@ public:
 	{
 		return camera_;
 	}
+protected:
+	float move_speed() const
+	{
+		return move_speed_;
+	}
+
+	float rotation_speed() const
+	{
+		return rotation_speed_;
+	}
 private:
 	virtual void update_impl(const RenderContext& render_context) = 0;
 
 	Camera camera_;
+	float move_speed_;
+	float rotation_speed_;
 };
 
 }

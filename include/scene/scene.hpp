@@ -11,6 +11,7 @@
 namespace mhe {
 
 struct RenderContext;
+struct Context;
 
 class CameraController;
 
@@ -34,16 +35,27 @@ public:
 	}
 
 	Node& create_node() const;
-	void update(RenderContext& render_context, const SceneContext& scene_context);
+	void update(RenderContext& render_context, const Context& context, const SceneContext& scene_context);
 
-	bool nodes(Node*& nodes, size_t& count, size_t material_system) const;
-	bool nodes(Node*& nodes, size_t& count) const;
+	size_t nodes(Node*& nodes, size_t& offset, size_t material_system) const;
+	size_t nodes(Node*& nodes) const;
 
 	void delete_node(uint16_t id);
+
+	void set_camera_controller(CameraController* controller)
+	{
+		camera_controller_ = controller;
+	}
 private:
+	struct MaterialConnector
+	{
+		size_t offset;
+		size_t size;
+	};
+
 	TransformPool transform_pool_;
 	NodePool node_pool_;
-	size_t nodes_per_material_[max_material_systems_number];
+	MaterialConnector nodes_per_material_[max_material_systems_number];
 	ref_ptr<CameraController> camera_controller_;
 };
 

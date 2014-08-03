@@ -14,10 +14,11 @@ class Driver;
 const size_t material_textures_number = 8;
 const size_t material_uniforms_number = 4;
 
+// TODO: change ShaderProgram::IdType -> ShaderInstance
 struct Material
 {
 	typedef uint16_t IdType;
-	Texture::IdType textures[material_textures_number];
+	TextureInstance textures[material_textures_number];
 	UniformBuffer::IdType uniforms[material_uniforms_number];
 	ShaderProgram::IdType shader_program;
 	IdType id;

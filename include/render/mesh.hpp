@@ -9,6 +9,7 @@ namespace mhe {
 enum Primitive
 {
 	triangle = 0,
+	lines = 1
 };
 
 struct RenderData

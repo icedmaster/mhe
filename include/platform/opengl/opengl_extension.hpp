@@ -441,6 +441,15 @@ public:
 		::glBufferSubData(target, offset, size, data);
 #endif
 	}
+
+	void glUniformBlockBinding(GLuint program, GLuint uniformBlockIndex, GLuint uniformBlockBinding)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glUniformBlockBinding_(program, uniformBlockIndex, uniformBlockBinding);
+#else
+		::glUniformBlockBinding(program, uniformBlockIndex, uniformBlockBinding);
+#endif
+	}
 private:
 	OpenGLExtensions() {}
 	~OpenGLExtensions() {}
@@ -508,6 +517,7 @@ private:
 	PFNGLGETACTIVEUNIFORMSIVPROC glGetActiveUniformsiv_;
 	PFNGLBINDBUFFERBASEPROC glBindBufferBase_;
 	PFNGLBUFFERSUBDATAPROC glBufferSubData_;
+	PFNGLUNIFORMBLOCKBINDINGPROC glUniformBlockBinding_;
 #endif
 	std::map<std::string, bool> loaded_extensions_;
 };

@@ -57,6 +57,7 @@ void OpenGLExtensions::init_extensions()
 	glGetActiveUniformsiv_ = load_extension<PFNGLGETACTIVEUNIFORMSIVPROC>("glGetActiveUniformsiv");
 	glBindBufferBase_ = load_extension<PFNGLBINDBUFFERBASEPROC>("glBindBufferBase");
 	glBufferSubData_ = load_extension<PFNGLBUFFERSUBDATAPROC>("glBufferSubData");
+	glUniformBlockBinding_ = load_extension<PFNGLUNIFORMBLOCKBINDINGPROC>("glUniformBlockBinding");
 #endif	// MHE_OPENGL_HAS_SHADERS
 
 	get_str_extensions();

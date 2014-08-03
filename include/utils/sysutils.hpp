@@ -32,7 +32,18 @@ namespace mhe
 		inline uint get_current_tick()
 		{
 			return impl::get_current_tick();
-		}			
+		}
+
+		inline float get_current_time()
+		{
+			return impl::get_current_time();
+		}
+
+		inline float get_last_delta()
+		{
+			return impl::get_last_delta();
+		}
+
     }
 }
 

@@ -5,6 +5,7 @@
 #include "video_driver.hpp"
 #include "render_buffer.hpp"
 #include "render_state.hpp"
+#include "render_target.hpp"
 #include "material_system.hpp"
 #include "material.hpp"
 #include "core/pool.hpp"
@@ -20,58 +21,48 @@ typedef Pool<UniformBuffer, 4096, uint16_t> UniformPool;
 typedef Pool<Layout, 128, uint16_t> LayoutPool;
 typedef Pool<ShaderProgram, 128, uint16_t> ShaderPool;
 typedef Pool<RenderState, 4096, uint16_t> RenderStatePool;
+typedef Pool<Texture, 4096, uint16_t> TexturePool;
+typedef Pool<RenderTarget, max_render_targets_number, RenderTarget::IdType> RenderTargetPool;
 
-template <class K, class V, class I = uint8_t>
-class MapWrapper
+class MaterialSystems
 {
-	typedef ref_ptr<V> value_type;
-	typedef std::map<K, value_type> map_type;
-	typedef fixed_size_vector<V*, sizeof(I) * 256> vector_type;
+private:
+	typedef fixed_size_vector< ref_ptr<MaterialSystem>, max_material_systems_number > vector_type;
 public:
 	typedef vector_type Values;
 
-	MapWrapper() :
-		next_id_(0)
-	{}
-
-	I add(K key, V* value)
+	void add(MaterialSystem* material_system, uint8_t priority = 128)
 	{
-		map_[key] = value_type(value);
-		cache_.push_back(value);
-		value->set_id(next_id_);
-		return next_id_++;
-	}
-
-	template <class T>
-	I add(T* value)
-	{
-		return add(T::name(), value);
-	}
-
-	V* get(K key) const
-	{
-		typename map_type::const_iterator it = map_.find(key);
-		return it == map_.end() ? nullptr : it->second.get();
+		material_system->set_id(systems_.size());
+		material_system->set_priority(priority);
+		systems_.push_back(ref_ptr<MaterialSystem>(material_system));
 	}
 
 	template <class T>
 	T* get() const
 	{
-		V* v = get(T::name());
-		return checked_static_cast<T*>(v);
+		for (size_t i = 0; i < systems_.size(); ++i)
+		{
+			if (systems_[i]->name() == T::name())
+				return checked_static_cast<T*>(systems_[i].get());
+		}
+		return nullptr;
+	}
+
+	MaterialSystem* get(uint8_t id) const
+	{
+		ASSERT(id < systems_.size(), "Invalid material_id " << id);
+		return systems_[id].get();
 	}
 
 	vector_type& get_all_materials()
 	{
-		return cache_;
+		return systems_;
 	}
 private:
-	map_type map_;
-	vector_type cache_;
-	I next_id_;
+	vector_type systems_;
 };
 
-typedef MapWrapper<const char*, MaterialSystem> MaterialSystems;
 typedef Pool< Material, 1024, uint16_t, StructTypePolicy<Material, uint16_t> > MaterialPool;
 
 struct Context
@@ -81,6 +72,7 @@ struct Context
 
 	MeshManager mesh_manager;
 	ShaderManager shader_manager;
+	TextureManager texture_manager;
 
 	VertexBufferPool vertex_buffer_pool;
 	IndexBufferPool index_buffer_pool;
@@ -88,6 +80,8 @@ struct Context
 	LayoutPool layout_pool;
 	ShaderPool shader_pool;
 	RenderStatePool render_state_pool;
+	RenderTargetPool render_target_pool;
+	TexturePool texture_pool;
 
 	MaterialSystems material_systems;
 	MaterialPool materials[max_material_systems_number];

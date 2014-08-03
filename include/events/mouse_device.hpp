@@ -14,9 +14,19 @@ public:
 public:
 	MouseDevice(const std::string& name);	
 
-	vector2<int> position() const
+	const vector2<int>& position() const
 	{
 		return position_;
+	}
+
+	const vector2<int>& delta() const
+	{
+		return delta_;
+	}
+
+	const vector2<float>& wheel_delta() const
+	{
+		return wheel_delta_;
 	}
 
 	bool is_button_pressed(int button) const
@@ -27,7 +37,9 @@ private:
 	void check_impl(events_vector& events, const WindowSystem&);
 
 	array<bool, max_buttons_number> buttons_;
-	vector2<int> position_;	
+	vector2<int> position_;
+	vector2<int> delta_;
+	vector2<float> wheel_delta_;
 	unique_ptr<MouseDeviceImpl> impl_;
 };
 

@@ -43,6 +43,11 @@ RenderStateImpl* SystemFactory::create_render_state() const
 	return video_driver_factory_.create_render_state();
 }
 
+RenderTargetImpl* SystemFactory::create_render_target() const
+{
+	return video_driver_factory_.create_render_target();
+}
+
 WindowSystemImpl* SystemFactory::create_window_system() const
 {
 	return window_system_factory_.create_window_system();

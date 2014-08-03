@@ -7,6 +7,7 @@ namespace mhe {
 namespace opengl {
 
 class OpenGL3IndexBuffer;
+class OpenGL3ShaderProgram;
 
 class OpenGL3Driver : public DriverImpl
 {
@@ -46,11 +47,13 @@ private:
 	void set_index_buffer(const IndexBuffer& ibuffer);
 	void set_uniform(const UniformBuffer& uniform);
 	void set_layout(const Layout& layout);
+	void set_texture(const Texture& texture, size_t unit);
 	void draw(const RenderData& data);
 
 	void flush();
 private:
 	const OpenGL3IndexBuffer* current_index_buffer_;
+	const OpenGL3ShaderProgram* current_shader_program_;
 };
 
 }}

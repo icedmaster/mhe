@@ -7,9 +7,7 @@ namespace mhe {
 void Camera::init(Context& context, const PerspectiveCameraParameters& parameters,
 				  const vec3& position, const vec3& direction, const vec3& up)
 {
-	mat4x4 m;
-	m.set_lookAt(position, direction, up);
-	transform_.set(m);
+	transform_.set_lookAt(position, direction, up);
 
 	float aspect_ratio = static_cast<float>(context.window_system.width()) / static_cast<float>(context.window_system.height());
 	projection_.set_perspective(parameters.fov, aspect_ratio, parameters.znear, parameters.zfar);

@@ -9,6 +9,7 @@ namespace mhe {
 
 class Driver;
 class ShaderProgram;
+class RenderBuffer;
 struct LayoutDesc;
 struct UniformBufferDesc;
 
@@ -30,7 +31,7 @@ class IndexBufferImpl
 {
 public:
 	virtual ~IndexBufferImpl() {}
-	virtual bool init(const uint32_t* indexes, size_t size) = 0;
+	virtual bool init(const RenderBuffer& render_buffer, const uint32_t* indexes, size_t size) = 0;
 	virtual void close() = 0;
 };
 
@@ -83,9 +84,9 @@ class MHE_EXPORT IndexBuffer
 public:
 	IndexBuffer();
 
-	bool init(const uint32_t* indexes, size_t size)
+	bool init(const RenderBuffer& render_buffer, const uint32_t* indexes, size_t size)
 	{
-		return impl_->init(indexes, size);
+		return impl_->init(render_buffer, indexes, size);
 	}
 
 	void close()
@@ -138,6 +139,12 @@ private:
 	unique_ptr<LayoutImpl> impl_;
 };
 
+enum UniformBufferUpdate
+{
+	uniform_buffer_static,
+	uniform_buffer_normal
+};
+
 struct UniformBufferElement
 {
 	const char* name;
@@ -149,6 +156,7 @@ const size_t max_uniforms_per_block = 16;
 
 struct UniformBufferDesc
 {
+	UniformBufferUpdate update_type;
 	const char* name;
 	ShaderProgram* program;
 	fixed_size_vector<UniformBufferElement, max_uniforms_per_block> uniforms;

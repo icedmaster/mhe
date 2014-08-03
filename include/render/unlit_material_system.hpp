@@ -10,18 +10,14 @@ namespace mhe {
 
 class MHE_EXPORT UnlitMaterialSystem : public MaterialSystem
 {
+	SETUP_MATERIAL("unlit");
 public:
 	bool init(Context& context, const MaterialSystemContext& material_system_context);
 	void close() {}
 
-	void update(Context& context, RenderContext& render_context, Node* nodes, Transform* transforms, size_t count);
+	void update(Context& context, RenderContext& render_context, Node* nodes, Transform* transforms, size_t *indexes, size_t count);
 	void setup(Context& context, Node* materials, ModelContext* model_contexts, size_t count);
 	void destroy(Context& context, Node* nodes, size_t count);
-
-	static const char* name()
-	{
-		return "unlit";
-	}
 private:
 	void setup_uniforms(Material& material, Context& context, const ModelContext& model_context);
 

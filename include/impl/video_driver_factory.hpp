@@ -26,6 +26,7 @@ public:
 	ShaderProgramImpl* create_shader_program() const;
 	TextureImpl* create_texture() const;
 	RenderStateImpl* create_render_state() const;
+	RenderTargetImpl* create_render_target() const;
 private:
 	typedef std::vector< ref_ptr<AbstractVideoDriverFactory> > drvvec;
 	drvvec drivers_;

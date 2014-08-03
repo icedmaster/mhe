@@ -201,6 +201,12 @@ public:
 	{
 		return v_[0] * v_[0] + v_[1] * v_[1] + v_[2] * v_[2] + v_[3] * v_[3];
 	}
+
+	static vector4 zero()
+	{
+		static vector4 v;
+		return v;
+	}
 };
 
 template <class U, class T>

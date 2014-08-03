@@ -62,6 +62,7 @@ public:
 	virtual void set_index_buffer(const IndexBuffer& ibuffer) = 0;
 	virtual void set_uniform(const UniformBuffer& uniform) = 0;
 	virtual void set_layout(const Layout& layout) = 0;
+	virtual void set_texture(const Texture& texture, size_t unit) = 0;
 	virtual void draw(const RenderData& data) = 0;
     
 	virtual uint major_version_need() const = 0;

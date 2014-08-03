@@ -15,7 +15,7 @@ void EventsProvider::add_system_event(int event)
 
 void EventsProvider::add_mouse_event(int button_state, int button, const vector2<float>& position)
 {
-	mouse_events_.push_back(MouseEvent(button_state, button, position));
+    mouse_events_.push_back(MouseEvent(button_state, button, position));
 }
 
 void EventsProvider::add_keyboard_event(int type, int button)

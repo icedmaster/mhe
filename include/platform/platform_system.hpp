@@ -90,6 +90,28 @@ inline uint get_current_tick()
 #endif
 }
 
+inline float get_current_time()
+{
+#ifdef MHE_LINUX
+	return linuxsys::get_current_time();
+#endif
+
+#ifdef MHE_WIN
+	return winsys::get_current_time();
+#endif
+}
+
+inline float get_last_delta()
+{
+#ifdef MHE_LINUX
+	return linuxsys::get_last_delta();
+#endif
+
+#ifdef MHE_WIN
+	return winsys::get_last_delta();
+#endif
+}
+
 }}
 
 #endif

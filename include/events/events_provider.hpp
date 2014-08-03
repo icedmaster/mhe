@@ -32,6 +32,8 @@ private:
 		{
 			Type* event = static_cast<Type*>(events[i].get());
 			*event = events_vector[i];
+            // We have to do it to prevent calling of the operator delete later
+            event->add_ref();
 		}
 		events_vector.clear();
 	}

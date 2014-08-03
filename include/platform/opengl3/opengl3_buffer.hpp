@@ -35,6 +35,8 @@ public:
 	{
 		return id_;
 	}
+
+	void update(GLsizeiptr size, const GLvoid* data);
 private:
 	GLuint id_;
 	GLenum target_;
@@ -66,9 +68,9 @@ private:
 class OpenGL3IndexBuffer : public IndexBufferImpl
 {
 public:
-	bool init(const uint32_t* indexes, size_t size);
+	bool init(const RenderBuffer& render_buffer, const uint32_t* indexes, size_t size);
 	void close() {}
-
+	
 	const uint32_t* get() const
 	{
 		return indexes_.data();
@@ -78,8 +80,11 @@ public:
 	{
 		return indexes_.size();
 	}
+
+	void enable() const;
 private:
 	std::vector<uint32_t> indexes_;
+	VBO vbo_;
 };
 
 class OpenGL3Layout : public LayoutImpl
@@ -102,7 +107,7 @@ public:
 
 	void update(const UniformBufferDesc& desc);
 
-	void enable() const;
+	void enable(GLuint program) const;
 	void disable() const;
 private:
 	fixed_size_vector<uint8_t, max_uniforms_per_block * 4 * sizeof(float)> data_;

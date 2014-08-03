@@ -14,14 +14,16 @@ public:
 	Transform()
 	{}
 
-	Transform(const vec3& position, const quatf& rotation, const vec3& scale)
+	Transform(const vec3& position, const quatf& rotation, const vec3& scale) :
+		position_(position), rotation_(rotation), scale_(scale)
 	{
-		update(position, rotation, scale);
+		update();
 	}
 
-	Transform(const mat4x4& transform) :
-		transform_(transform)
-	{}
+	Transform(const mat4x4& transform)
+	{
+		set(transform);
+	}
 
 	operator mat4x4()
 	{
@@ -36,58 +38,67 @@ public:
 	void set(const mat4x4& transform)
 	{
 		transform_ = transform;
+		position_ = transform_.row_vec3(3);
+		scale_.set(1, 1, 1);
 	}
 
 	void translate_to(const vec3& position)
 	{
+		position_ = position;
 		transform_.set_row(3, position);
 	}
 
 	void translate_by(const vec3& delta)
 	{
+		position_ += delta;
         transform_.set_row(3, position() + delta);
 	}
 
 	void rotate_to(const quatf& rotation)
 	{
-		update(scale(), rotation, position());
+		rotation_ = rotation;
+		update();
 	}
 
 	void rotate_by(const quatf& rotation)
 	{
-		transform_ *= rotation.normalized().to_matrix<mat4x4>();
+		rotation_ *= rotation;
+		update();
 	}
 
 	void scale_to(const vec3& scale)
 	{
-		transform_.set_element(0, 0, scale.x());
-		transform_.set_element(1, 1, scale.y());
-		transform_.set_element(2, 2, scale.z());
+		scale_ = scale;
+		update();
 	}
 
     void scale_by(const vec3& scle)
 	{
-        scale_to(scale() * scle);
+		scale_ *= scle;
+		update();
 	}
 
-	vec3 position() const
+	const vec3& position() const
 	{
-        return transform_.row_vec3(3);
+		return position_;
 	}
 
-	vec3 scale() const
+	const vec3& scale() const
 	{
-		return vec3(transform_.element(0, 0), transform_.element(1, 1), transform_.element(2, 2));
+		return scale_;
 	}
 private:
-	void update(const vec3& position, const quatf& rotation, const vec3& scale)
+	void update()
 	{
-		transform_ = mat4x4::scaling_matrix(scale);
-		transform_ *= rotation.normalized().to_matrix<mat4x4>();
-		transform_ *= mat4x4::translation_matrix(position);
+		transform_ = mat4x4::scaling_matrix(scale_);
+		transform_ *= rotation_.normalized().to_matrix<mat4x4>();
+		transform_ *= mat4x4::translation_matrix(position_);
 	}
 
 	mat4x4 transform_;
+	quatf rotation_;
+	vec3 position_;
+	vec3 scale_;
 };
 
 }

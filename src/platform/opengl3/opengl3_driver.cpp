@@ -7,6 +7,7 @@
 #include "platform/opengl3/opengl3_shader_program.hpp"
 #include "platform/opengl3/opengl3_render_state.hpp"
 #include "platform/opengl3/opengl3_buffer.hpp"
+#include "platform/opengl3/opengl3_texture.hpp"
 
 namespace mhe {
 namespace opengl {
@@ -60,14 +61,17 @@ void OpenGL3Driver::flush()
 	glFlush();
 }
 
-void OpenGL3Driver::set_state(const RenderState& /*state*/)
+void OpenGL3Driver::set_state(const RenderState& state)
 {
+	const OpenGL3RenderState* active_state = static_cast<const OpenGL3RenderState*>(state.impl());
+	active_state->enable();
+	CHECK_GL_ERRORS();
 }
 
 void OpenGL3Driver::set_shader_program(const ShaderProgram& program)
 {
-	const OpenGL3ShaderProgram* active_program = static_cast<const OpenGL3ShaderProgram*>(program.impl());
-	active_program->set();
+	current_shader_program_ = static_cast<const OpenGL3ShaderProgram*>(program.impl());
+	current_shader_program_->set();
 	CHECK_GL_ERRORS();
 }
 
@@ -82,12 +86,13 @@ void OpenGL3Driver::set_index_buffer(const IndexBuffer& ibuffer)
 {
 	const OpenGL3IndexBuffer* buffer = static_cast<const OpenGL3IndexBuffer*>(ibuffer.impl());
 	current_index_buffer_ = buffer;
+	buffer->enable();
 }
 
 void OpenGL3Driver::set_uniform(const UniformBuffer& uniform)
 {
 	const OpenGL3UniformBuffer* buffer = static_cast<const OpenGL3UniformBuffer*>(uniform.impl());
-	buffer->enable();
+	buffer->enable(current_shader_program_->id());
 	CHECK_GL_ERRORS();
 }
 
@@ -98,9 +103,16 @@ void OpenGL3Driver::set_layout(const Layout& layout)
 	CHECK_GL_ERRORS();
 }
 
+void OpenGL3Driver::set_texture(const Texture& texture, size_t unit)
+{
+	const OpenGL3Texture* tex = static_cast<const OpenGL3Texture*>(texture.impl());
+	tex->enable(unit);
+	CHECK_GL_ERRORS();
+}
+
 void OpenGL3Driver::draw(const RenderData& data)
 {
-	glDrawElements(get_primitive_type(data.primitive), current_index_buffer_->size(), GL_UNSIGNED_INT, current_index_buffer_->get());
+	glDrawElements(get_primitive_type(data.primitive), current_index_buffer_->size(), GL_UNSIGNED_INT, 0);
 	CHECK_GL_ERRORS();
 }
     

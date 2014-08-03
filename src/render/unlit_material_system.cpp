@@ -39,6 +39,9 @@ void UnlitMaterialSystem::setup(Context& context, Node* nodes, ModelContext* mod
 		nodes[i].material.id = material.id;
 
 		nodes[i].mesh.layout = StandartGeometryLayout::handle;
+
+		if (model_contexts[i].textures[0].empty()) continue;
+		context.texture_manager.get(material.textures[0], model_contexts[i].textures[0]);
 	}
 }
 
@@ -54,7 +57,7 @@ void UnlitMaterialSystem::destroy(Context& context, Node* nodes, size_t count)
 	}
 }
 
-void UnlitMaterialSystem::update(Context& context, RenderContext& render_context, Node* nodes, Transform* transforms, size_t count)
+void UnlitMaterialSystem::update(Context& context, RenderContext& render_context, Node* nodes, Transform* transforms, size_t* indexes, size_t count)
 {
 	// update shader uniform
 	UniformBuffer& uniform = context.uniform_pool.get(transform_uniform_);
@@ -69,7 +72,7 @@ void UnlitMaterialSystem::update(Context& context, RenderContext& render_context
 	{
         Material& material = context.materials[id()].get(nodes[i].material.id);
 		UniformBuffer& uniform = context.uniform_pool.get(material.uniforms[1]);
-        create_uniform_buffer_element(model_uniform_buffer_desc, "model", transforms[i].transform());
+		create_uniform_buffer_element(model_uniform_buffer_desc, "model", transforms[indexes[nodes[i].transform]].transform());
 		uniform.update(model_uniform_buffer_desc);
 		model_uniform_buffer_desc.uniforms.clear();
 	}

@@ -5,7 +5,6 @@
 #include <cstring>	// for memcpy()
 #include <cmath>
 #include <cassert>
-#include <iostream>
 #include "math_utils.hpp"
 #include "vector3.hpp"
 #include "vector4.hpp"
@@ -120,6 +119,12 @@ public:
 	void set_column(int c, const vector3<Y>& v)
 	{
 		m_[0][c] = v.x(); m_[1][c] = v.y(); m_[2][c] = v.z();
+	}
+
+	template <class Y>
+	void set_row(int r, const vector4<Y>& v)
+	{
+		m_[r][0] = v.x(); m_[r][1] = v.y(); m_[r][2] = v.z(); m_[r][3] = v.w();
 	}
 
 	matrix& operator= (const matrix& m)
@@ -397,19 +402,19 @@ public:
 		set_frustum(left, right, bottom, top, z_near, z_far);
 	}
 
-    vector4<T> side_vector() const
+    vector3<T> side_vector() const
     {
-        return column(0);
+			return column(0).as_v3d();
     }
 
-    vector4<T> up_vector() const
+    vector3<T> up_vector() const
     {
-        return column(1);
+			return column(1).as_v3d();
     }
 
-    vector4<T> forward_vector() const
+    vector3<T> forward_vector() const
     {
-        return -column(2);
+			return -column(2).as_v3d();
     }
 
     float determinant() const
@@ -465,7 +470,6 @@ public:
 		res[3][3] = m_[0][0] * m1122 - m_[0][1] * m1022 + m_[0][2] * m1021;
 
 		T det = m_[0][0] * res[0][0] + m_[0][1] * res[1][0] + m_[0][2] * res[2][0] + m_[0][3] * res[3][0];
-		std::cout << det << std::endl;
 		if (det == 0)
 		{
 			assert(0);

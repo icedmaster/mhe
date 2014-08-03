@@ -8,7 +8,7 @@ namespace mhe {
 
 struct Context;
 
-MHE_EXPORT struct StandartGeometryLayout
+struct MHE_EXPORT StandartGeometryLayout
 {
 	struct Vertex
 	{
@@ -21,6 +21,23 @@ MHE_EXPORT struct StandartGeometryLayout
 	static const char* name()
 	{
 		return "standart_geometry";
+	}
+
+	static uint16_t handle;
+
+	static void init(Context& context);
+};
+
+struct MHE_EXPORT SkyboxLayout
+{
+	struct Vertex
+	{
+		vec4 pos;
+	};
+
+	static const char* name()
+	{
+		return "skybox";
 	}
 
 	static uint16_t handle;

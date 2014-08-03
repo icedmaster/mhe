@@ -75,7 +75,9 @@ set (SRC_PATH
   ${SOURCE_ROOT}
   ${SOURCE_ROOT}/scene
   ${SOURCE_ROOT}/res
+  ${SOURCE_ROOT}/res/image_loaders
   ${SOURCE_ROOT}/game
+  ${SOURCE_ROOT}/game/input
   ${SOURCE_ROOT}/events
   ${SOURCE_ROOT}/app
   ${SOURCE_ROOT}/render
@@ -91,6 +93,7 @@ set (STANDALONE_SOURCES "")
 set (INC_PATH
   ${INCLUDE_ROOT}
   ${INCLUDE_ROOT}/..
+  ${LIB_DIR}
 )
 
 # find all headers

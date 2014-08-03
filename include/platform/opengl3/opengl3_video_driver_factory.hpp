@@ -8,6 +8,7 @@
 #include "opengl3_shader_program.hpp"
 #include "opengl3_texture.hpp"
 #include "opengl3_render_state.hpp"
+#include "opengl3_render_target.hpp"
 
 namespace mhe {
 namespace opengl {
@@ -58,6 +59,11 @@ public:
 	RenderStateImpl* create_render_state() const
 	{
 		return new OpenGL3RenderState;
+	}
+
+	RenderTargetImpl* create_render_target() const
+	{
+		return new OpenGL3RenderTarget;
 	}
 };
 

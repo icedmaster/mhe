@@ -13,7 +13,8 @@ enum
 {
 	button_pressed = 1,
 	button_released,
-	move
+	move,
+	wheel
 };
 
 // mouse buttons
@@ -26,17 +27,26 @@ enum
 public:
 	MouseEvent(int event, int button, const vector2<int>& pos) :
 		Event(mouse_event_type, event, button),
-		pos_(pos)
+		pos_(pos),
+        buttons_(button)
 	{}
 
 	MouseEvent() :
 		Event(mouse_event_type)
 	{}
 
-	void setup_event(int event, int button, const vector2<int>& pos)
+	void setup_event(int event, int button, const vector2<int>& pos, int buttons_mask)
 	{
 		Event::setup_event(event, button);
 		pos_ = pos;
+		buttons_ = buttons_mask;
+	}
+
+	void setup_wheel_event(float xdelta, float ydelta, int buttons_mask)
+	{
+		Event::setup_event(wheel);
+		wheel_delta_.set(xdelta, ydelta);
+		buttons_ = buttons_mask;
 	}
 
 	const vector2<int> pos() const
@@ -54,12 +64,34 @@ public:
 		return Event::optarg();
 	}
 
+	bool left_button_pressed() const
+	{
+		return buttons_ & left_button;
+	}
+
+	bool right_button_pressed() const
+	{
+		return buttons_ & right_button;
+	}
+
+	bool any_button_pressed() const
+	{
+		return buttons_ > 0;
+	}
+
     void invert_y_position(int height = 0)
 	{
 		pos_.set_y(height - pos_.y());
 	}
+
+	vector2<float> wheel_delta() const
+	{
+		return wheel_delta_;
+	}
 private:
 	vector2<int> pos_;
+	vector2<float> wheel_delta_;
+	int buttons_;
 };
 
 }

@@ -72,6 +72,13 @@ public:
 		return *this;
 	}
 
+	vector2<T>& operator*= (T v)
+	{
+		x_ *= v;
+		y_ *= v;
+		return *this;
+	}
+
 	template <class Y>
 	vector2<T> operator= (const vector2<Y>& v)
 	{

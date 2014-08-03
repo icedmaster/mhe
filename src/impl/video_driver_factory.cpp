@@ -81,4 +81,9 @@ RenderStateImpl* VideoDriverFactory::create_render_state() const
 	return current_driver_factory_->create_render_state();
 }
 
+RenderTargetImpl* VideoDriverFactory::create_render_target() const
+{
+	return current_driver_factory_->create_render_target();
+}
+
 }

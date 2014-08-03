@@ -11,10 +11,12 @@ struct RenderContext
 	mat4x4 view;
 	mat4x4 proj;
 	mat4x4 vp;
+	mat4x4 inv_vp;
 	vec3 viewpos;
 
 	uint32_t tick;
 	uint32_t delta;
+	float fdelta;
 };
 
 const size_t max_textures_per_model = 8;

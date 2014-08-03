@@ -35,4 +35,20 @@ void StandartGeometryLayout::init(Context& context)
 	context.layout_pool.get(handle).init(desc);
 }
 
+uint16_t SkyboxLayout::handle = 0;
+
+void SkyboxLayout::init(Context& context)
+{
+	handle = context.layout_pool.create();
+	
+	LayoutDesc desc;
+	desc.layout.resize(1);
+	desc.layout[0].offset = 0;
+	desc.layout[0].size = 4;
+	desc.layout[0].stride = sizeof(Vertex);
+	desc.layout[0].position = 0;
+
+	context.layout_pool.get(handle).init(desc);
+}
+
 }
