@@ -11,17 +11,15 @@ namespace opengl {
 class OpenGL3RenderTarget : public RenderTargetImpl
 {
 public:
-	bool init(const RenderTargetDesc& desc);
+	bool init(const RenderTargetDesc& desc, Texture** color_textures, Texture* depth_texture);
 	void close();
 
 	void enable() const;
 	void disable() const;
 private:
-	RenderTargetDesc desc_;
-	Texture rt_[max_simultaneous_render_targets_number];
-	Texture ds_;
 	GLenum target_;
 	GLuint id_;
+	uint8_t targets_number_;
 };
 
 }}

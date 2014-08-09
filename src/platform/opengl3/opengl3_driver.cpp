@@ -8,6 +8,7 @@
 #include "platform/opengl3/opengl3_render_state.hpp"
 #include "platform/opengl3/opengl3_buffer.hpp"
 #include "platform/opengl3/opengl3_texture.hpp"
+#include "platform/opengl3/opengl3_render_target.hpp"
 
 namespace mhe {
 namespace opengl {
@@ -23,6 +24,8 @@ bool OpenGL3Driver::init()
 	glGetIntegerv(GL_MINOR_VERSION, &minor);
 	INFO_LOG("OpenGL3Driver::context:" << major << "." << minor);
 	OpenGLExtensions::instance().init_extensions();
+
+	current_render_target_ = nullptr;
 	return true;
 }
 
@@ -108,6 +111,23 @@ void OpenGL3Driver::set_texture(const Texture& texture, size_t unit)
 	const OpenGL3Texture* tex = static_cast<const OpenGL3Texture*>(texture.impl());
 	tex->enable(unit);
 	CHECK_GL_ERRORS();
+}
+
+void OpenGL3Driver::set_render_target(const RenderTarget& render_target)
+{
+	current_render_target_ = static_cast<const OpenGL3RenderTarget*>(render_target.impl());
+	current_render_target_->enable();
+	CHECK_GL_ERRORS();
+}
+
+void OpenGL3Driver::set_default_render_target()
+{
+	if (current_render_target_ != nullptr)
+	{
+		current_render_target_->disable();
+		CHECK_GL_ERRORS();
+	}
+	current_render_target_ = nullptr;
 }
 
 void OpenGL3Driver::draw(const RenderData& data)

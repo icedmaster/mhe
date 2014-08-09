@@ -24,12 +24,34 @@ struct StencilDesc
 	{}
 };
 
+enum BlendFunc
+{
+	blend_add
+};
+
+enum BlendMode
+{
+	blend_zero,
+	blend_one,
+	blend_src_alpha,
+	blend_src_inv_alpha
+};
+
 struct BlendDesc
 {
 	bool enabled;
+	BlendFunc func;
+	BlendFunc func_alpha;
+	BlendMode srcmode;
+	BlendMode dstmode;
+	BlendMode srcmode_alpha;
+	BlendMode dstmode_alpha;
 
 	BlendDesc() :
-		enabled(false)
+		enabled(false),
+		func(blend_add), func_alpha(blend_add),
+		srcmode(blend_one), dstmode(blend_zero),
+		srcmode_alpha(blend_one), dstmode_alpha(blend_zero)
 	{}
 };
 
@@ -45,6 +67,7 @@ class RenderStateImpl
 public:
 	virtual ~RenderStateImpl() {}
 	virtual bool init(const RenderStateDesc& desc) = 0;
+	virtual void update(const RenderStateDesc& desc) = 0;
 	virtual void close() = 0;
 };
 
@@ -66,6 +89,11 @@ public:
 	void close()
 	{
 		impl_->close();
+	}
+
+	void update(const RenderStateDesc& desc)
+	{
+		impl_->update(desc);
 	}
 
 	const RenderStateImpl* impl() const

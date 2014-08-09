@@ -8,6 +8,7 @@ namespace opengl {
 
 class OpenGL3IndexBuffer;
 class OpenGL3ShaderProgram;
+class OpenGL3RenderTarget;
 
 class OpenGL3Driver : public DriverImpl
 {
@@ -18,11 +19,9 @@ private:
 
 	void enable_blending();
 	void disable_blending();
-	void set_blend_func(BlendFunc);
 
 	void enable_depth() {}
 	void disable_depth() {}
-	void set_depth_func(DepthFunc) {}
 
 	void clear_depth();
 	void clear_color();
@@ -48,12 +47,15 @@ private:
 	void set_uniform(const UniformBuffer& uniform);
 	void set_layout(const Layout& layout);
 	void set_texture(const Texture& texture, size_t unit);
+	void set_render_target(const RenderTarget& render_target);
+	void set_default_render_target();
 	void draw(const RenderData& data);
 
 	void flush();
 private:
 	const OpenGL3IndexBuffer* current_index_buffer_;
 	const OpenGL3ShaderProgram* current_shader_program_;
+	const OpenGL3RenderTarget* current_render_target_;
 };
 
 }}

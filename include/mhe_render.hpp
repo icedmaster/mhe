@@ -4,6 +4,8 @@
 #define __MHE_RENDER__
 
 #include "render/context.hpp"
+#include "render/definitions.hpp"
+#include "render/gbuffer_material_system.hpp"
 #include "render/image.hpp"
 #include "render/layouts.hpp"
 #include "render/material.hpp"
@@ -14,10 +16,12 @@
 #include "render/render_context.hpp"
 #include "render/render_pass.hpp"
 #include "render/render_state.hpp"
+#include "render/render_target.hpp"
 #include "render/shader_program.hpp"
 #include "render/skybox_material_system.hpp"
 #include "render/texture.hpp"
 #include "render/transform.hpp"
+#include "render/uniforms.hpp"
 #include "render/unlit_material_system.hpp"
 #include "render/video_driver.hpp"
 #include "render/view.hpp"

@@ -45,6 +45,24 @@ struct MHE_EXPORT SkyboxLayout
 	static void init(Context& context);
 };
 
+struct MHE_EXPORT FullscreenLayout
+{
+	struct Vertex
+	{
+		vec4 pos;
+		vec2 tex;
+	};
+
+	static const char* name()
+	{
+		return "fullscreen";
+	}
+
+	static uint16_t handle;
+
+	static void init(Context& context);
+};
+
 }
 
 #endif

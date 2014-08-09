@@ -1,4 +1,4 @@
-#ifndef __OPENGL_EXTENSION_HPP__
+﻿#ifndef __OPENGL_EXTENSION_HPP__
 #define __OPENGL_EXTENSION_HPP__
 
 #include <string>
@@ -450,6 +450,42 @@ public:
 		::glUniformBlockBinding(program, uniformBlockIndex, uniformBlockBinding);
 #endif
 	}
+
+	GLenum glCheckFramebufferStatus(GLenum target)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		return glCheckFramebufferStatus_(target);
+#else
+		return ::glCheckFramebufferStatus(target);
+#endif
+	}
+
+	void glDrawBuffers(GLsizei n, const GLenum* bufs)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glDrawBuffers_(n, bufs);
+#else
+		::glDrawBuffers(n, bufs);
+#endif
+	}
+
+	void glBlendFuncSeparate(GLenum srcRGB, GLenum dstRGB, GLenum srcAlpha, GLenum dstAlpha)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glBlendFuncSeparate_(srcRGB, dstRGB, srcAlpha, dstAlpha);
+#else
+		::glBlendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
+#endif
+	}
+
+	void glBlendEquation(GLenum mode)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glBlendEquation_(mode);
+#else
+		::glBlendEquation(mode);
+#endif
+	}
 private:
 	OpenGLExtensions() {}
 	~OpenGLExtensions() {}
@@ -518,6 +554,10 @@ private:
 	PFNGLBINDBUFFERBASEPROC glBindBufferBase_;
 	PFNGLBUFFERSUBDATAPROC glBufferSubData_;
 	PFNGLUNIFORMBLOCKBINDINGPROC glUniformBlockBinding_;
+	PFNGLCHECKFRAMEBUFFERSTATUSPROC glCheckFramebufferStatus_;
+	PFNGLDRAWBUFFERSPROC glDrawBuffers_;
+	PFNGLBLENDFUNCSEPARATEPROC glBlendFuncSeparate_;
+	PFNGLBLENDEQUATIONPROC glBlendEquation_;
 #endif
 	std::map<std::string, bool> loaded_extensions_;
 };

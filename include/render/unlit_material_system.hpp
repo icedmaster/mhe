@@ -21,6 +21,13 @@ public:
 private:
 	void setup_uniforms(Material& material, Context& context, const ModelContext& model_context);
 
+	size_t layout() const;
+
+	size_t shader() const
+	{
+		return shader_.shader_program_handle;
+	}
+
 	Shader shader_;
 	UniformBuffer::IdType transform_uniform_;
 };

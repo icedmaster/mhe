@@ -177,6 +177,12 @@ void OpenGL3UniformBuffer::update(const UniformBufferDesc& desc)
 	vbo_.update(data_.size(), &data_[0]);
 }
 
+void OpenGL3UniformBuffer::update(const uint8_t* data, size_t size)
+{
+	ASSERT(size == data_.size(), "Invalid data for uniform update");
+	vbo_.update(size, data);
+}
+
 void OpenGL3UniformBuffer::enable(GLuint program) const
 {
 	vbo_.enable();

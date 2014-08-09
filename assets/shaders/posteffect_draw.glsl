@@ -1,28 +1,24 @@
 struct VSOutput
 {
-	vec3 tex;
+	vec2 tex;
 };
 
 [vertex]
 
-uniform transform
-{
-	mat4 inv_vp;
-};
-
 layout (location = 0) in vec4 pos;
+layout (location = 1) in vec2 tex;
 
 out VSOutput vsoutput;
 
 void main()
 {
-	vsoutput.tex = (inv_vp * pos).xyz;
+	vsoutput.tex = tex;
 	gl_Position = pos;
 }
 
 [fragment]
 
-uniform samplerCube cubemap;
+uniform sampler2D main_texture;
 
 in VSOutput vsoutput;
 
@@ -30,5 +26,5 @@ out vec4 color;
 
 void main()
 {
-	color = vec4(texture(cubemap, vsoutput.tex).xyz, 1.0f);
+	color = texture(main_texture, vsoutput.tex);
 }

@@ -23,6 +23,25 @@ Driver::Driver() :
 {
 }
 
+void Driver::clear(bool clear_color, bool clear_depth, bool clear_stencil,
+		const colorf& color, float depth, uint stencil)
+{
+	if (clear_color)
+	{
+		impl_->set_clear_color(color);
+		impl_->clear_color();
+	}
+
+	if (clear_depth)
+	{
+		impl_->clear_depth();
+		NOT_IMPLEMENTED(depth);
+	}
+
+	NOT_IMPLEMENTED(clear_stencil);
+	NOT_IMPLEMENTED(stencil);
+}
+
 void Driver::reset()
 {
 	stats_.reset();
@@ -35,9 +54,27 @@ void Driver::render(const Context& context, const Node* nodes, size_t count)
 	for (size_t i = 0; i < count; ++i)
 	{
 		const Node& node = nodes[i];
-        const Material& material =
-                context.materials[node.material.material_system].get(node.material.id);
-		impl_->set_state(context.render_state_pool.get(node.mesh.state));
+		const Material& material =
+			context.materials[node.material.material_system].get(node.material.id);
+		
+		if (context.draw_call_data_pool.is_valid(node.draw_call_data))
+		{
+			const DrawCallData& draw_call_data = context.draw_call_data_pool.get(node.draw_call_data);
+			if (draw_call_data.render_target != default_render_target)
+				impl_->set_render_target(context.render_target_pool.get(draw_call_data.render_target - 1));
+			else
+				impl_->set_default_render_target();
+
+			if (draw_call_data.command != nullptr)
+			{
+				if (!draw_call_data.command->execute())
+					continue;
+			}
+
+			impl_->set_state(context.render_state_pool.get(draw_call_data.state));
+		}
+		else impl_->set_default_render_target();
+
 		impl_->set_shader_program(context.shader_pool.get(material.shader_program));
 		impl_->set_vertex_buffer(context.vertex_buffer_pool.get(node.mesh.vbuffer));
 		impl_->set_index_buffer(context.index_buffer_pool.get(node.mesh.ibuffer));

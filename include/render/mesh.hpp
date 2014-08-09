@@ -2,7 +2,6 @@
 #define __MESH_HPP__
 
 #include "render_buffer.hpp"
-#include "render_state.hpp"
 
 namespace mhe {
 
@@ -28,9 +27,8 @@ struct Mesh
 {
 	VertexBuffer::IdType vbuffer;
 	IndexBuffer::IdType ibuffer;
-	RenderState::IdType state;
-	uint16_t layout;
 	RenderData render_data;
+	uint16_t layout;
 };
 
 }

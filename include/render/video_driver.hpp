@@ -11,14 +11,6 @@
 namespace mhe
 {
 
-enum DepthFunc
-{
-};
-
-enum BlendFunc
-{
-};
-
 struct Context;
 struct Node;
 struct RenderData;
@@ -30,6 +22,7 @@ class RenderBuffer;
 class IndexBuffer;
 class UniformBuffer;
 class Layout;
+class RenderTarget;
 
 class DriverImpl
 {
@@ -44,7 +37,6 @@ public:
 
 	virtual void enable_depth() = 0;
 	virtual void disable_depth() = 0;
-	virtual void set_depth_func(DepthFunc) = 0;
 
 	virtual void clear_depth() = 0;
 	virtual void clear_color() = 0;
@@ -63,6 +55,8 @@ public:
 	virtual void set_uniform(const UniformBuffer& uniform) = 0;
 	virtual void set_layout(const Layout& layout) = 0;
 	virtual void set_texture(const Texture& texture, size_t unit) = 0;
+	virtual void set_render_target(const RenderTarget& render_target) = 0;
+	virtual void set_default_render_target() = 0;
 	virtual void draw(const RenderData& data) = 0;
     
 	virtual uint major_version_need() const = 0;
@@ -132,22 +126,6 @@ public:
 		impl_->close();
 	}
 
-    void enable_blending(BlendFunc /*bf*/)
-	{
-		impl_->enable_blending();
-	}
-
-	void disable_blending()
-	{
-		impl_->disable_blending();
-	}
-
-	void enable_depth(DepthFunc df)
-	{
-		impl_->enable_depth();
-		impl_->set_depth_func(df);
-	}
-
 	void disable_depth()
 	{
 		impl_->disable_depth();
@@ -167,6 +145,9 @@ public:
 	{
 		impl_->set_clear_color(color);
 	}
+
+	void clear(bool clear_color, bool clear_depth, bool clear_stencil,
+		const colorf& color = color_black, float depth = 1.0f, uint stencil = 0);
 
 	void set_viewport(int x, int y, int w, int h)
 	{

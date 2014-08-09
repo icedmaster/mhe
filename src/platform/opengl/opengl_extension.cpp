@@ -1,4 +1,4 @@
-#include "platform/opengl/opengl_extension.hpp"
+﻿#include "platform/opengl/opengl_extension.hpp"
 
 #include <iostream>
 #include <vector>
@@ -58,6 +58,10 @@ void OpenGLExtensions::init_extensions()
 	glBindBufferBase_ = load_extension<PFNGLBINDBUFFERBASEPROC>("glBindBufferBase");
 	glBufferSubData_ = load_extension<PFNGLBUFFERSUBDATAPROC>("glBufferSubData");
 	glUniformBlockBinding_ = load_extension<PFNGLUNIFORMBLOCKBINDINGPROC>("glUniformBlockBinding");
+	glCheckFramebufferStatus_ = load_extension<PFNGLCHECKFRAMEBUFFERSTATUSPROC>("glCheckFramebufferStatus");
+	glDrawBuffers_ = load_extension<PFNGLDRAWBUFFERSPROC>("glDrawBuffers");
+	glBlendFuncSeparate_ = load_extension<PFNGLBLENDFUNCSEPARATEPROC>("glBlendFuncSeparate");
+	glBlendEquation_ = load_extension<PFNGLBLENDEQUATIONPROC>("glBlendEquation");
 #endif	// MHE_OPENGL_HAS_SHADERS
 
 	get_str_extensions();

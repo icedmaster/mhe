@@ -56,8 +56,14 @@ public:
 	{
 		return name_impl();
 	}
+protected:
+	void standart_material_setup(Context& context, Node* nodes, ModelContext* model_contexts, size_t count, size_t textures_number);
+	Transform& transform(const Node& node, Transform* transforms, size_t* indexes) const;
 private:
 	virtual hash_type name_impl() const = 0;
+	virtual void setup_uniforms(Material& /*material*/, Context& /*context*/, const ModelContext& /*model_context*/) {}
+	virtual size_t layout() const = 0;
+	virtual size_t shader() const = 0;
 
 	uint8_t id_;
 	uint8_t priority_;

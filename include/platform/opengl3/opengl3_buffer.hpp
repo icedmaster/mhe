@@ -106,6 +106,7 @@ public:
 	void close();
 
 	void update(const UniformBufferDesc& desc);
+	void update(const uint8_t* data, size_t size);
 
 	void enable(GLuint program) const;
 	void disable() const;

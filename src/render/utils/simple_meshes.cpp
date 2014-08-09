@@ -28,14 +28,9 @@ bool create_plane(Mesh& mesh, const Context& context)
 
 	mesh.vbuffer = context.vertex_buffer_pool.create();
 	mesh.ibuffer = context.index_buffer_pool.create();
-	mesh.state = context.render_state_pool.create();
 
 	mesh.render_data.elements_number = 2;
 
-	RenderStateDesc desc;
-	RenderState& render_state = context.render_state_pool.get(mesh.state);
-	if (!render_state.init(desc))
-		return false;
 
 	VertexBuffer& vbuffer = context.vertex_buffer_pool.get(mesh.vbuffer);
 	if (!vbuffer.init(buffer_update_type_static,
@@ -59,16 +54,9 @@ bool create_axes(Mesh& mesh, const Context& context)
 
 	mesh.vbuffer = context.vertex_buffer_pool.create();
 	mesh.ibuffer = context.index_buffer_pool.create();
-	mesh.state = context.render_state_pool.create();
 
 	mesh.render_data.elements_number = 2;
 	mesh.render_data.primitive = lines;
-
-	RenderStateDesc desc;
-	desc.depth.enabled = false;
-	RenderState& render_state = context.render_state_pool.get(mesh.state);
-	if (!render_state.init(desc))
-		return false;
 
 	VertexBuffer& vbuffer = context.vertex_buffer_pool.get(mesh.vbuffer);
 	if (!vbuffer.init(buffer_update_type_static,
@@ -89,19 +77,37 @@ bool create_skybox_quad(Mesh& mesh, const Context& context)
 
 	mesh.vbuffer = context.vertex_buffer_pool.create();
 	mesh.ibuffer = context.index_buffer_pool.create();
-	mesh.state = context.render_state_pool.create();
 
 	mesh.render_data.elements_number = 1;
-
-	RenderStateDesc desc;
-	desc.depth.enabled = false;
-	RenderState& render_state = context.render_state_pool.get(mesh.state);
-	if (!render_state.init(desc))
-		return false;
 
 	VertexBuffer& vbuffer = context.vertex_buffer_pool.get(mesh.vbuffer);
 	if (!vbuffer.init(buffer_update_type_static,
 					  reinterpret_cast<const uint8_t*>(&vertexes[0]), 3 * sizeof(SkyboxLayout::Vertex), sizeof(SkyboxLayout::Vertex)))
+		return false;
+	IndexBuffer& ibuffer = context.index_buffer_pool.get(mesh.ibuffer);
+	return ibuffer.init(vbuffer, indexes, 3);
+}
+
+bool create_fullscreen_quad(Mesh& mesh, const Context& context)
+{
+	FullscreenLayout::Vertex vertexes[3];
+	vertexes[0].pos.set(-1.0f, -3.0f, 1.0f, 1.0f);
+	vertexes[1].pos.set(-1.0f, 1.0f, 1.0f, 1.0f);
+	vertexes[2].pos.set(3.0f, 1.0f, 1.0f, 1.0f);
+	vertexes[0].tex.set(0.0f, -1.0f);
+	vertexes[1].tex.set(0.0f, 1.0f);
+	vertexes[2].tex.set(2.0f, 1.0f);
+
+	uint32_t indexes[3] = {0, 1, 2};
+
+	mesh.vbuffer = context.vertex_buffer_pool.create();
+	mesh.ibuffer = context.index_buffer_pool.create();
+
+	mesh.render_data.elements_number = 1;
+
+	VertexBuffer& vbuffer = context.vertex_buffer_pool.get(mesh.vbuffer);
+	if (!vbuffer.init(buffer_update_type_static,
+					  reinterpret_cast<const uint8_t*>(&vertexes[0]), 3 * sizeof(FullscreenLayout::Vertex), sizeof(FullscreenLayout::Vertex)))
 		return false;
 	IndexBuffer& ibuffer = context.index_buffer_pool.get(mesh.ibuffer);
 	return ibuffer.init(vbuffer, indexes, 3);

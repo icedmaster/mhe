@@ -89,4 +89,6 @@ private:
 
 #define UNUSED(x) (void)x;
 
+#define NOT_IMPLEMENTED(x) (void)x;
+
 #endif

@@ -4,6 +4,7 @@
 #include "render/render_buffer.hpp"
 #include "render/mesh.hpp"
 #include "render/texture.hpp"
+#include "render/render_state.hpp"
 
 namespace mhe {
 namespace opengl {
@@ -51,17 +52,24 @@ inline GLenum get_texture_address_mode(int mode)
 	return modes[mode];
 }
 
-inline GLenum get_texture_format(int format)
+inline GLenum get_format(int format)
 {
-	ASSERT(format < 2, "Invalid texture format");
-	GLenum formats[2] = {GL_RGBA, GL_BGRA};
+	ASSERT(format < 5, "Invalid format");
+	GLenum formats[5] = {GL_RGBA, GL_BGRA, GL_RGBA32F, GL_DEPTH_STENCIL, GL_DEPTH_COMPONENT24};
 	return formats[format];
 }
 
-inline GLenum get_texture_datatype(int type)
+inline GLenum get_texture_format(int format)
 {
-	ASSERT(type < 1, "Invalid texture datatype");
-	GLenum types[1] = {GL_UNSIGNED_BYTE};
+	ASSERT(format < 5, "Invalid texture format");
+	GLenum formats[5] = {GL_RGBA, GL_BGRA, GL_RGBA, GL_DEPTH_STENCIL, GL_DEPTH_COMPONENT};
+	return formats[format];
+}
+
+inline GLenum get_datatype(int type)
+{
+	ASSERT(type < 2, "Invalid texture datatype");
+	GLenum types[2] = {GL_UNSIGNED_BYTE, GL_FLOAT};
 	return types[type];
 }
 
@@ -70,6 +78,20 @@ inline GLenum get_framebuffer_format(int format)
     ASSERT(format < 3, "Invalid framebuffer format");
 	GLenum formats[3] = {GL_READ_FRAMEBUFFER, GL_DRAW_FRAMEBUFFER, GL_FRAMEBUFFER};
 	return formats[format];
+}
+
+inline GLenum get_blend_operation(BlendFunc func)
+{
+	ASSERT(func < 1, "Invalid blend func");
+	GLenum funcs[1] = {GL_FUNC_ADD};
+	return funcs[func];
+}
+
+inline GLenum get_blend_mode(BlendMode mode)
+{
+	ASSERT(mode < 4, "Invalid blend mode");
+	GLenum modes[4] = {GL_ZERO, GL_ONE, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA};
+	return modes[mode];
 }
 
 inline size_t get_bytes_per_format(GLenum format)

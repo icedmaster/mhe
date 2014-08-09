@@ -5,7 +5,6 @@
 
 #include "scene/camera.hpp"
 #include "scene/camera_controller.hpp"
-#include "scene/node.hpp"
 #include "scene/scene.hpp"
 
 #endif // __MHE_SCENE__

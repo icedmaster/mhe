@@ -19,6 +19,13 @@ public:
 	void destroy(Context& context, Node* nodes, size_t count);
 	void update(Context& context, RenderContext& render_context, Node* nodes, Transform* transforms, size_t* indexes, size_t count);
 private:
+	size_t layout() const;
+
+	size_t shader() const
+	{
+		return shader_.shader_program_handle;
+	}
+
 	Shader shader_;
 	UniformBuffer::IdType transform_uniform_;
 };

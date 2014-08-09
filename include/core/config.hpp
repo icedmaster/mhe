@@ -63,4 +63,6 @@ const size_t max_material_systems_number = 16;
 const size_t max_render_targets_number = 16;
 const size_t max_simultaneous_render_targets_number = 4;
 
+const size_t max_commands_number = 255;
+
 #endif

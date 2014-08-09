@@ -86,7 +86,7 @@ void Engine::update()
 			game_scene_->update(*this);
 
 		RenderContext render_context;
-        render_context.tick = utils::get_current_tick();
+        render_context.tick = utils::get_current_time();
 				render_context.fdelta = utils::get_last_delta();
 		SceneContext scene_context;
 		scene_.update(render_context, context_, scene_context);

@@ -51,4 +51,24 @@ void SkyboxLayout::init(Context& context)
 	context.layout_pool.get(handle).init(desc);
 }
 
+uint16_t FullscreenLayout::handle = 0;
+
+void FullscreenLayout::init(Context& context)
+{
+	handle = context.layout_pool.create();
+	
+	LayoutDesc desc;
+	desc.layout.resize(2);
+	desc.layout[0].offset = 0;
+	desc.layout[0].size = 4;
+	desc.layout[0].stride = sizeof(Vertex);
+	desc.layout[0].position = 0;
+	desc.layout[1].offset = 4 * sizeof(float);
+	desc.layout[1].size = 2;
+	desc.layout[1].stride = sizeof(Vertex);
+	desc.layout[1].position = 1;
+
+	context.layout_pool.get(handle).init(desc);
+}
+
 }

@@ -8,6 +8,7 @@
 #include "render_target.hpp"
 #include "material_system.hpp"
 #include "material.hpp"
+#include "node.hpp"
 #include "core/pool.hpp"
 #include "core/types_cast.hpp"
 #include "core/config.hpp"
@@ -23,6 +24,7 @@ typedef Pool<ShaderProgram, 128, uint16_t> ShaderPool;
 typedef Pool<RenderState, 4096, uint16_t> RenderStatePool;
 typedef Pool<Texture, 4096, uint16_t> TexturePool;
 typedef Pool<RenderTarget, max_render_targets_number, RenderTarget::IdType> RenderTargetPool;
+typedef Pool< DrawCallData, 4096, uint16_t, StructTypePolicy<DrawCallData, uint16_t> > DrawCallDataPool;
 
 class MaterialSystems
 {
@@ -82,6 +84,7 @@ struct Context
 	RenderStatePool render_state_pool;
 	RenderTargetPool render_target_pool;
 	TexturePool texture_pool;
+	DrawCallDataPool draw_call_data_pool;
 
 	MaterialSystems material_systems;
 	MaterialPool materials[max_material_systems_number];

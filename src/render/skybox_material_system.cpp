@@ -28,6 +28,12 @@ void SkyboxMaterialSystem::close()
 
 void SkyboxMaterialSystem::setup(Context& context, Node* nodes, ModelContext* model_contexts, size_t count)
 {
+    DrawCallData& draw_call_data = create_and_get(context.draw_call_data_pool);
+    draw_call_data.state = context.render_state_pool.create();
+    RenderState& state = context.render_state_pool.get(draw_call_data.state);
+    RenderStateDesc desc;
+    desc.depth.enabled = false;
+    state.init(desc);
 	for (size_t i = 0; i < count; ++i)
 	{
 		nodes[i].material.material_system = id();
@@ -37,6 +43,7 @@ void SkyboxMaterialSystem::setup(Context& context, Node* nodes, ModelContext* mo
 		material.uniforms[0] = transform_uniform_;
 		context.texture_manager.get(material.textures[0], model_contexts[i].textures[0]);
 		nodes[i].mesh.layout = SkyboxLayout::handle;
+        nodes[i].draw_call_data = draw_call_data.id;
 	}
 }
 
@@ -56,6 +63,11 @@ void SkyboxMaterialSystem::update(Context& context, RenderContext& render_contex
 	create_uniform_buffer_element(uniform_buffer_desc, "inv_vp", inv_vp);
 	uniform_buffer_desc.name = "transform";
 	uniform.update(uniform_buffer_desc);
+}
+
+size_t SkyboxMaterialSystem::layout() const
+{
+	return SkyboxLayout::handle;
 }
 
 }

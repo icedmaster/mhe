@@ -6,6 +6,7 @@
 #include "math/vector4.hpp"
 #include "texture.hpp"
 #include "shader_program.hpp"
+#include "render_target.hpp"
 
 namespace mhe {
 

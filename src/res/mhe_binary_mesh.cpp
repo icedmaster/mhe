@@ -12,14 +12,8 @@ bool init_mesh(Mesh& mesh, const std::vector<Vertex>& vertexes, const std::vecto
 {
 	mesh.vbuffer = context->vertex_buffer_pool.create();
 	mesh.ibuffer = context->index_buffer_pool.create();
-	mesh.state = context->render_state_pool.create();
 
 	mesh.render_data.elements_number = indexes.size() / 3;
-
-	RenderStateDesc desc;
-	RenderState& render_state = context->render_state_pool.get(mesh.state);
-	if (!render_state.init(desc))
-		return false;
 
 	VertexBuffer& vbuffer = context->vertex_buffer_pool.get(mesh.vbuffer);
 	if (!vbuffer.init(buffer_update_type_static,

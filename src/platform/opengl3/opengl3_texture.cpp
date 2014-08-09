@@ -24,8 +24,8 @@ bool OpenGL3Texture::init(const TextureDesc& desc, const uint8_t* data, size_t s
 	else
 	{
 		glTexImage2D(target_, 0,
-			get_texture_format(desc.format), desc.width, desc.height, 0,
-			get_texture_format(desc.format), get_texture_datatype(desc.datatype), data);
+			get_format(desc.format), desc.width, desc.height, 0,
+			get_texture_format(desc.format), get_datatype(desc.datatype), data);
 	}
 	return true;
 }
@@ -39,8 +39,8 @@ void OpenGL3Texture::init_cubemap(const TextureDesc& desc, const uint8_t* data, 
 		GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, GL_TEXTURE_CUBE_MAP_POSITIVE_Z};
 	for (int i = 0; i < 6; ++i)
 		glTexImage2D(targets[i], 0,
-			get_texture_format(desc.format), desc.width, desc.height, 0,
-			get_texture_format(desc.format), get_texture_datatype(desc.datatype), data + i * stride);
+			get_format(desc.format), desc.width, desc.height, 0,
+			get_texture_format(desc.format), get_datatype(desc.datatype), data + i * stride);
 }
 
 void OpenGL3Texture::close()
