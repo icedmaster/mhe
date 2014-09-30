@@ -34,7 +34,7 @@ void main()
 
 [fragment]
 
-uniform sampler2D diffuse_texture;
+[sampler2D diffuse_texture 0]
 
 in VSOutput vsoutput;
 

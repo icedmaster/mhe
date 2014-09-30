@@ -1,8 +1,8 @@
 macro(mhe_setup_compiler_defs)
 
-	add_definitions(-Wall)
 	if (NOT MSVC)
-		add_definitions(-Wextra)
+	  add_definitions(-Wall)
+	  add_definitions(-Wextra)
 	endif()
 	#add_definitions(-std=c++0x)
 

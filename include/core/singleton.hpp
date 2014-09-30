@@ -4,7 +4,6 @@
 #include "noncopyable.hpp"
 
 namespace mhe {
-namespace utils {
 
 template <class T>
 class Singleton : public noncopyable
@@ -20,6 +19,6 @@ protected:
   	~Singleton() {}
 };
 
-}}
+}
 
 #endif

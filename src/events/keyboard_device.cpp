@@ -9,6 +9,7 @@ KeyboardDevice::KeyboardDevice(const std::string& name) :
 	Device(name),
 	impl_(SystemFactory::instance().create_keyboard_device_impl())
 {
+	::memset(keys_, 0, sizeof(keys_));
 	init_events_with_type<KeyboardEvent>();
 }
 

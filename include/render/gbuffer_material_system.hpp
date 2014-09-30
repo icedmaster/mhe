@@ -9,7 +9,33 @@
 
 namespace mhe {
 
-class MHE_EXPORT GBufferFillMaterialSystem : public MaterialSystem
+class MHE_EXPORT ClearCommand : public RenderCommand
+{
+public:
+	void set_driver(Driver* driver)
+	{
+		driver_ = driver;
+	}
+
+		bool execute();
+private:
+	Driver* driver_;
+};
+
+class AbstractGBufferFillMaterialSystem : public MaterialSystem
+{
+public:
+	virtual RenderTarget::IdType render_target() const = 0;
+};
+
+class AbstractGBufferUseMaterialSystem : public MaterialSystem
+{
+public:
+	virtual void set_render_target(RenderTarget::IdType render_target) = 0;
+	virtual const TextureInstance& lighting_texture() const = 0;
+};
+
+class MHE_EXPORT GBufferFillMaterialSystem : public AbstractGBufferFillMaterialSystem
 {
 	SETUP_MATERIAL("gbuffer_fill");
 public:
@@ -26,42 +52,33 @@ public:
 		return render_target_;
 	}
 private:
-	class MHE_EXPORT ClearCommand : public RenderCommand
-	{
-	public:
-		void set_driver(Driver* driver)
-		{
-			driver_ = driver;
-		}
-
-		bool execute();
-	private:
-		Driver* driver_;
-	};
-
 	void setup_uniforms(Material& material, Context& context, const ModelContext& model_context);
 
-	size_t layout() const;
-
-	size_t shader() const
-	{
-		return shader_.shader_program_handle;
-	}
-
 	ClearCommand clear_command_;
-	Shader shader_;
 	UniformBuffer::IdType transform_uniform_;
 	RenderTargetDesc gbuffer_desc_;
 	RenderTarget::IdType render_target_;
 };
 
-class MHE_EXPORT GBufferDrawMaterialSystem : public MaterialSystem
+class MHE_EXPORT GBufferDrawMaterialSystem : public AbstractGBufferUseMaterialSystem
 {
 	SETUP_MATERIAL("gbuffer_draw");
 public:
+	GBufferDrawMaterialSystem() {}
+
 	GBufferDrawMaterialSystem(RenderTarget::IdType render_target) :
 		render_target_(render_target)
 	{}
+
+	void set_render_target(RenderTarget::IdType render_target)
+	{
+		render_target_ = render_target;
+	}
+
+	const TextureInstance& lighting_texture() const
+	{
+		return light_buffer_texture_;
+	}
 
 	bool init(Context& context, const MaterialSystemContext& material_system_context);
 	void close();
@@ -70,15 +87,15 @@ public:
 	void destroy(Context& context, Node* nodes, size_t count);
 	void update(Context& context, RenderContext& render_context, Node* nodes, Transform* transforms, size_t* transform_indices, size_t count);
 private:
-	size_t layout() const;
+	size_t calculate_passes_number(RenderContext& render_context, size_t* passes) const;
 
-	size_t shader() const
-	{
-		return shader_.shader_program_handle;
-	}
-
+	ClearCommand clear_command_;
 	RenderTarget::IdType render_target_;
-	Shader shader_;
+	RenderTarget::IdType light_buffer_render_target_;
+	TextureInstance light_buffer_texture_;
+	UniformBuffer::IdType light_uniform_[max_lights_number];
+	UniformBuffer::IdType transform_uniform_;
+	size_t lights_per_pass_;
 };
 
 }

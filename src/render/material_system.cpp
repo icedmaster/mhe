@@ -15,7 +15,7 @@ void MaterialSystem::standart_material_setup(Context& context, Node* nodes, Mode
 
 	size_t layout_id = layout();
 	size_t material_system_id = id();
-	size_t shader_id = shader();
+	size_t shader_id = ubershader(context).get_default();
 
 	for (size_t i = 0; i < count; ++i)
 	{
@@ -24,8 +24,8 @@ void MaterialSystem::standart_material_setup(Context& context, Node* nodes, Mode
 		material.shader_program = shader_id;
 		setup_uniforms(material, context, model_contexts[i]);
 
-		nodes[i].material.material_system = material_system_id;
-		nodes[i].material.id = material.id;
+		nodes[i].main_pass.material.material_system = material_system_id;
+		nodes[i].main_pass.material.id = material.id;
 
 		nodes[i].mesh.layout = layout_id;
 
@@ -40,13 +40,29 @@ void MaterialSystem::standart_material_setup(Context& context, Node* nodes, Mode
 		RenderStateDesc desc;
 		render_state.init(desc);
 		draw_call_data.state = render_state.id();
-		nodes[i].draw_call_data = draw_call_data.id;
+		nodes[i].main_pass.draw_call_data = draw_call_data.id;
+
+		context.additional_passes_pool.make_invalid(nodes[i].additional_passes);
 	}
+}
+
+void MaterialSystem::additional_passes_setup(Context& context, Node* nodes, size_t count)
+{
 }
 
 Transform& MaterialSystem::transform(const Node& node, Transform* transforms, size_t* indexes) const
 {
 	return transforms[indexes[node.transform]];
+}
+
+UberShader& MaterialSystem::ubershader(const Context& context) const
+{
+	return context.ubershader_pool.get(shader_.shader_program_handle);
+}
+
+ShaderProgram& MaterialSystem::default_program(const Context& context) const
+{
+	return context.shader_pool.get(ubershader(context).get_default());
 }
 
 }

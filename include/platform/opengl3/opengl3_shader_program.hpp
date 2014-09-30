@@ -37,7 +37,7 @@ public:
 		close();
 	}
 	
-	bool init(const std::string& vsdata, const std::string& fsdata);
+	bool init(const std::string& vsdata, const std::string& fsdata, const ShaderInitializationParams& params);
 	void close();
 
 	GLuint id() const
@@ -49,7 +49,9 @@ public:
 private:
 	bool attach_shaders();
 	bool check_status(GLenum param) const;
+	void init_textures(const ShaderInitializationParams& params);
 
+	GLuint texture_location_[16];	// TODO: need to find a GL constant for this
 	Shader vertex_shader_;
 	Shader fragment_shader_;
 	GLuint id_;

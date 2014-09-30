@@ -79,7 +79,7 @@ public:
 	T& get(I id) const
 	{
 		Index& ind = indexes_[id];
-		assert(ind.index != invalid_id && Policy::get(objects_[ind.index]) == id);
+		ASSERT(ind.index != invalid_id && Policy::get(objects_[ind.index]) == id, "Invalid id " << id);
 		return objects_[ind.index];
 	}
 
@@ -97,9 +97,14 @@ public:
 		last_ = id;
 	}
 
+	void make_invalid(I& id)
+	{
+		id = invalid_id;
+	}
+
 	bool is_valid(I id) const
 	{
-        return indexes_[id].index != invalid_id;
+        return id != invalid_id && indexes_[id].index != invalid_id;
 	}
 
 	T* all_objects() const

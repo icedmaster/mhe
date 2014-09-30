@@ -40,16 +40,6 @@ public:
 	}
 };
 
-void setup_material_systems(mhe::Context& context)
-{
-	mhe::MaterialSystemContext material_system_context;
-	material_system_context.shader_name = "unlit";
-	mhe::UnlitMaterialSystem* material_system = new mhe::UnlitMaterialSystem;
-	bool result = material_system->init(context, material_system_context);
-	ASSERT(result, "Can not initialize unlit material system");
-	context.material_systems.add(material_system);
-}
-
 int main(int argc, char** argv)
 {
 	mhe::app::Application app("02_draw");
@@ -58,10 +48,8 @@ int main(int argc, char** argv)
 	config.height = 600;
 	config.bpp = 32;
 	config.fullscreen = false;
-    config.assets_path = "../assets/";
+	config.assets_path = "e:/projects/mhe/assets/";
 	app.init(config);
-
-	setup_material_systems(app.engine().context());
 
 	mhe::game::GameSceneDesc desc;
 	GameScene* game_scene = new GameScene;

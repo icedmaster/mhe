@@ -10,9 +10,9 @@
 
 namespace mhe {
 
-class OpenGLExtensions : public utils::Singleton<OpenGLExtensions>
+class OpenGLExtensions : public Singleton<OpenGLExtensions>
 {
-	friend class utils::Singleton<OpenGLExtensions>;
+	friend class Singleton<OpenGLExtensions>;
 public:
 	void init_extensions();
 	bool is_extension_supported(const std::string& ext_name) const;

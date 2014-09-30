@@ -17,13 +17,23 @@ struct SortHelper
 		{}
     bool operator() (const Node& n1, const Node& n2) const
     {
-			MaterialSystem* ms1 = context_.material_systems.get(n1.material.material_system);
-			MaterialSystem* ms2 = context_.material_systems.get(n2.material.material_system);
+			MaterialSystem* ms1 = context_.material_systems.get(n1.main_pass.material.material_system);
+			MaterialSystem* ms2 = context_.material_systems.get(n2.main_pass.material.material_system);
 			if (ms1->priority() == ms2->priority())
-        return n1.material.material_system < n2.material.material_system;
+        return n1.main_pass.material.material_system < n2.main_pass.material.material_system;
 			return ms1->priority() < ms2->priority();
     }
 	const Context& context_;
+};
+
+struct LightSortHelper
+{
+	bool operator() (const Light& light1, const Light& light2)
+	{
+		if (!light1.enabled()) return false;
+		if (!light2.enabled()) return true;
+		return light1.type() < light2.type();
+	}
 };
 
 }
@@ -41,7 +51,7 @@ Node& Scene::create_node() const
 	return node;
 }
 
-void Scene::update(RenderContext& render_context, const Context& context, const SceneContext& /*scene_context*/)
+void Scene::update(RenderContext& render_context, Context& context, const SceneContext& /*scene_context*/)
 {
     if (camera_controller_ != nullptr)
     {
@@ -56,20 +66,9 @@ void Scene::update(RenderContext& render_context, const Context& context, const 
 	std::sort(nodes, nodes + node_pool_.size(), SortHelper(context));
 	node_pool_.update();
 
-	uint8_t prev_material_system = max_material_systems_number + 1;
-	size_t size = 0;
-	for (size_t i = 0; i < node_pool_.size(); ++i)
-	{
-		uint8_t current_material_system = nodes[i].material.material_system;
-		++size;
-		if (current_material_system != prev_material_system)
-		{
-			nodes_per_material_[current_material_system].offset = i;
-			nodes_per_material_[current_material_system].size = size;
-			prev_material_system = current_material_system;
-			size = 0;
-		}
-	}
+	refresh_node_material_link(nodes);
+
+	update_light_sources(render_context, context);
 }
 
 size_t Scene::nodes(Node*& nodes, size_t& offset, size_t material_system) const
@@ -92,6 +91,48 @@ void Scene::delete_node(uint16_t id)
 	Node& node = node_pool_.get(id);
 	if (transform_pool_.is_valid(node.transform))
 		transform_pool_.remove(node.transform);
+}
+
+void Scene::refresh_node_material_link(Node* nodes)
+{
+	uint8_t prev_material_system = max_material_systems_number + 1;
+	uint8_t current_material_system = prev_material_system;
+	size_t size = 0, begin = 0;
+	for (size_t i = 0; i < node_pool_.size(); ++i)
+	{
+		uint8_t current_material_system = nodes[i].main_pass.material.material_system;
+		if (prev_material_system > max_material_systems_number)
+			prev_material_system = current_material_system;
+		if (current_material_system != prev_material_system)
+		{
+			nodes_per_material_[prev_material_system].offset = begin;
+			nodes_per_material_[prev_material_system].size = size;
+			prev_material_system = current_material_system;
+			size = 0;
+			begin = i;
+		}
+		++size;
+	}
+	if (current_material_system < max_material_systems_number)
+	{
+		nodes_per_material_[current_material_system].offset = begin;
+		nodes_per_material_[current_material_system].size = size;
+	}
+}
+
+void Scene::update_light_sources(RenderContext& render_context, Context& context)
+{
+	Light* lights = context.light_pool.all_objects();
+	std::sort(lights, lights + context.light_pool.size(), LightSortHelper());
+	context.light_pool.update();
+	render_context.lights = context.light_pool.all_objects();
+	size_t size = 0;
+	for (size_t i = 0; i < context.light_pool.size(); ++i, ++size)
+	{
+		if (!lights[i].enabled())
+			break;
+	}
+	render_context.lights_number = size;
 }
 
 }

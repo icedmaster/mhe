@@ -1,0 +1,14 @@
+<mhe>
+  <materials>
+	<material name="unlit" shader="unlit" />
+	<material name="skybox" shader="skybox" priority="0" />
+	<material name="gbuffer_fill" shader="gbuffer_fill" priority="128" />
+	<material name="gbuffer_draw" shader="gbuffer_draw_blinn_phong" defs="2" priority="129" />
+	<material name="posteffect_simple" shader="gbuffer_draw" priority="130" />
+  </materials>
+  <gbuffer>
+	<fill name="gbuffer_fill" />
+	<use name="gbuffer_draw" />
+	<draw name="posteffect_simple" />
+  </gbuffer>
+</mhe>

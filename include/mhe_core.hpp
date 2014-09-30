@@ -9,6 +9,7 @@
 #include "core/config.hpp"
 #include "core/delegate.hpp"
 #include "core/dynarray.hpp"
+#include "core/factory.hpp"
 #include "core/fixed_size_vector.hpp"
 #include "core/hash.hpp"
 #include "core/index_manager.hpp"

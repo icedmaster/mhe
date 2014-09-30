@@ -36,7 +36,7 @@ public:
 		return id_;
 	}
 
-	void update(GLsizeiptr size, const GLvoid* data);
+	void update(GLsizeiptr size, GLintptr offset, const GLvoid* data);
 private:
 	GLuint id_;
 	GLenum target_;
@@ -106,7 +106,7 @@ public:
 	void close();
 
 	void update(const UniformBufferDesc& desc);
-	void update(const uint8_t* data, size_t size);
+	void update(const uint8_t* data, size_t offset, size_t size);
 
 	void enable(GLuint program) const;
 	void disable() const;

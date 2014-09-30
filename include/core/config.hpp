@@ -56,13 +56,23 @@
 #define MHE_STANDART_LOG_DISABLED
 #endif
 
+#define LOG_SHADER_INFO
+
 /**
 * Rendering configuration
 */
+const size_t max_shader_programs_number = 4096;
+const size_t max_ubershaders_number = 128;
+
 const size_t max_material_systems_number = 16;
 const size_t max_render_targets_number = 16;
 const size_t max_simultaneous_render_targets_number = 4;
+const size_t max_additional_render_passes_number = 16;
 
 const size_t max_commands_number = 255;
+
+const size_t max_lights_number = 16;
+
+const size_t max_additional_render_passes = 16;
 
 #endif

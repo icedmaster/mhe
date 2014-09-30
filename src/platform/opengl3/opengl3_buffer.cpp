@@ -53,10 +53,10 @@ void VBO::disable() const
 	OpenGLExtensions::instance().glBindBuffer(target_, 0);
 }
 
-void VBO::update(GLsizeiptr size, const GLvoid* data)
+void VBO::update(GLsizeiptr size, GLintptr offset, const GLvoid* data)
 {
 	enable();
-	OpenGLExtensions::instance().glBufferSubData(target_, 0, size, data);
+	OpenGLExtensions::instance().glBufferSubData(target_, offset, size, data);
 	CHECK_GL_ERRORS();
 	disable();
 }
@@ -139,16 +139,20 @@ bool OpenGL3UniformBuffer::init(const UniformBufferDesc& desc)
 	ASSERT(id_ != GL_INVALID_INDEX, "Can't create uniform buffer");
 	GLint size;
 	OpenGLExtensions::instance().glGetActiveUniformBlockiv(program->id(), id_, GL_UNIFORM_BLOCK_DATA_SIZE, &size);
-	const GLchar* names[max_uniforms_per_block];
-	GLuint indices[max_uniforms_per_block];
-	for (size_t i = 0; i < desc.uniforms.size(); ++i)
-		names[i] = desc.uniforms[i].name;
-	OpenGLExtensions::instance().glGetUniformIndices(program->id(), desc.uniforms.size(), names, indices);
-	OpenGLExtensions::instance().glGetActiveUniformsiv(program->id(), desc.uniforms.size(), indices, GL_UNIFORM_OFFSET, offsets_);
 
 	data_.resize(size);
-	for (size_t i = 0; i < desc.uniforms.size(); ++i)
-		::memcpy(data_.begin() + offsets_[i], desc.uniforms[i].data, desc.uniforms[i].size);
+	if (!desc.uniforms.empty())
+	{
+		const GLchar* names[max_uniforms_per_block];
+		GLuint indices[max_uniforms_per_block];
+		for (size_t i = 0; i < desc.uniforms.size(); ++i)
+			names[i] = desc.uniforms[i].name;
+		OpenGLExtensions::instance().glGetUniformIndices(program->id(), desc.uniforms.size(), names, indices);
+		OpenGLExtensions::instance().glGetActiveUniformsiv(program->id(), desc.uniforms.size(), indices, GL_UNIFORM_OFFSET, offsets_);
+
+		for (size_t i = 0; i < desc.uniforms.size(); ++i)
+			::memcpy(data_.begin() + offsets_[i], desc.uniforms[i].data, desc.uniforms[i].size);
+	}
 
 	if (!vbo_.init(GL_UNIFORM_BUFFER, size, &data_[0], GL_DYNAMIC_DRAW))
 	{
@@ -174,13 +178,12 @@ void OpenGL3UniformBuffer::update(const UniformBufferDesc& desc)
 #endif
 	for (size_t i = 0; i < desc.uniforms.size(); ++i)
 		::memcpy(data_.begin() + offsets_[i], desc.uniforms[i].data, desc.uniforms[i].size);
-	vbo_.update(data_.size(), &data_[0]);
+	vbo_.update(data_.size(), 0, &data_[0]);
 }
 
-void OpenGL3UniformBuffer::update(const uint8_t* data, size_t size)
+void OpenGL3UniformBuffer::update(const uint8_t* data, size_t offset, size_t size)
 {
-	ASSERT(size == data_.size(), "Invalid data for uniform update");
-	vbo_.update(size, data);
+	vbo_.update(size, offset, data);
 }
 
 void OpenGL3UniformBuffer::enable(GLuint program) const

@@ -5,6 +5,8 @@
 #include "core/ref_counter.hpp"
 #include "game/engine.hpp"
 
+#include "pugixml/pugixml.hpp"
+
 namespace mhe {
 namespace app {
 
@@ -55,6 +57,10 @@ protected:
 private:
 	virtual void init_impl() {}
 	virtual void close_impl() {}
+
+	void init_render(const ApplicationConfig& config);
+	void init_materials(pugi::xml_node materials_node);
+	void init_gbuffer(pugi::xml_node gbuffer_node);
 
     void add_delegates();
     bool on_system_event(const Event* event);

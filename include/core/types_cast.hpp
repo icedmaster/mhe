@@ -65,6 +65,12 @@ inline int types_cast(const std::string& value)
 }
 
 template <>
+inline size_t types_cast(const std::string& value)
+{
+	return atoi(value.c_str());
+}
+
+template <>
 inline float types_cast(const std::string& value)
 {
 	return atof(value.c_str());

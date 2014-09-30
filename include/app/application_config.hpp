@@ -18,6 +18,8 @@ struct ApplicationConfig
 	bool fullscreen;
 	std::string assets_path;
 
+	std::string render_config_filename;
+
 	std::string default_shader_name;
 	std::string default_texture_name;
 };

@@ -16,23 +16,29 @@ bool RenderTarget::init(Context& context, const RenderTargetDesc& desc)
 	for (size_t i = 0; i < desc.color_targets; ++i)
 	{
 		rt[i] = &create_and_get(context.texture_pool);
-		rt_[i] = rt[i]->id();
+		rt_[i].id = rt[i]->id();
 	}
 
 	Texture* ds = nullptr;
 	if (desc.use_depth || desc.use_stencil)
 	{
-		ds_ = context.texture_pool.create();
-		ds = &context.texture_pool.get(ds_);
+		ds_.id = context.texture_pool.create();
+		ds = &context.texture_pool.get(ds_.id);
 	}
 
 	return impl_->init(desc, rt, ds);
 }
 
-size_t RenderTarget::color_textures(const Texture::IdType** ids) const
+size_t RenderTarget::color_textures(const TextureInstance** ids) const
 {
 	*ids = rt_;
 	return desc_.color_targets;
+}
+
+size_t RenderTarget::depth_texture(TextureInstance& id) const
+{
+	id = ds_;
+	return (desc_.use_depth || desc_.use_stencil) ? 1 : 0;
 }
 
 }

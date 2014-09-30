@@ -22,7 +22,7 @@ void main()
 
 [fragment]
 
-uniform samplerCube cubemap;
+[samplerCube cubemap 0]
 
 in VSOutput vsoutput;
 

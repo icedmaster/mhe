@@ -54,46 +54,63 @@ void Driver::render(const Context& context, const Node* nodes, size_t count)
 	for (size_t i = 0; i < count; ++i)
 	{
 		const Node& node = nodes[i];
-		const Material& material =
-			context.materials[node.material.material_system].get(node.material.id);
-		
-		if (context.draw_call_data_pool.is_valid(node.draw_call_data))
-		{
-			const DrawCallData& draw_call_data = context.draw_call_data_pool.get(node.draw_call_data);
-			if (draw_call_data.render_target != default_render_target)
-				impl_->set_render_target(context.render_target_pool.get(draw_call_data.render_target - 1));
-			else
-				impl_->set_default_render_target();
+		uint16_t draw_call_data_id = node.main_pass.draw_call_data;
+		uint8_t material_system_id = node.main_pass.material.material_system;
+		Material::IdType material_id = node.main_pass.material.id;
 
-			if (draw_call_data.command != nullptr)
+		size_t additional_pass_index = 0;
+		AdditionalPasses passes;
+		if (context.additional_passes_pool.is_valid(node.additional_passes))
+			passes = context.additional_passes_pool.get(node.additional_passes);
+		while (true)
+		{
+			if (context.draw_call_data_pool.is_valid(draw_call_data_id))
 			{
-				if (!draw_call_data.command->execute())
-					continue;
+				const DrawCallData& draw_call_data = context.draw_call_data_pool.get(draw_call_data_id);
+				if (draw_call_data.render_target != default_render_target)
+					impl_->set_render_target(context.render_target_pool.get(draw_call_data.render_target - 1));
+				else
+					impl_->set_default_render_target();
+
+				if (draw_call_data.command != nullptr)
+				{
+					if (!draw_call_data.command->execute())
+						break;
+				}
+
+				impl_->set_state(context.render_state_pool.get(draw_call_data.state));
 			}
+			else impl_->set_default_render_target();
 
-			impl_->set_state(context.render_state_pool.get(draw_call_data.state));
-		}
-		else impl_->set_default_render_target();
+			const Material& material =
+				context.materials[material_system_id].get(material_id);
 
-		impl_->set_shader_program(context.shader_pool.get(material.shader_program));
-		impl_->set_vertex_buffer(context.vertex_buffer_pool.get(node.mesh.vbuffer));
-		impl_->set_index_buffer(context.index_buffer_pool.get(node.mesh.ibuffer));
-		impl_->set_layout(context.layout_pool.get(node.mesh.layout));
-		for (size_t i = 0; i < material_textures_number; ++i)
-		{
-			if (material.textures[i].id == Texture::invalid_id)
-				continue;
-			const Texture& texture = context.texture_pool.get(material.textures[i].id);
-			impl_->set_texture(texture, i);
+			impl_->set_shader_program(context.shader_pool.get(material.shader_program));
+			impl_->set_vertex_buffer(context.vertex_buffer_pool.get(node.mesh.vbuffer));
+			impl_->set_index_buffer(context.index_buffer_pool.get(node.mesh.ibuffer));
+			impl_->set_layout(context.layout_pool.get(node.mesh.layout));
+			for (size_t j = 0; j < material_textures_number; ++j)
+			{
+				if (material.textures[j].id == Texture::invalid_id)
+					continue;
+				const Texture& texture = context.texture_pool.get(material.textures[j].id);
+				impl_->set_texture(texture, j);
+			}
+			for (size_t j = 0; j < material_uniforms_number; ++j)
+			{
+				if (material.uniforms[j] == UniformBuffer::invalid_id)
+					continue;
+				const UniformBuffer& uniform = context.uniform_pool.get(material.uniforms[j]);
+				impl_->set_uniform(uniform);
+			}
+			impl_->draw(node.mesh.render_data);
+
+			if (passes.passes.empty() || additional_pass_index >= passes.passes.size())
+				break;
+			material_id = passes.passes[additional_pass_index].material;
+			draw_call_data_id = passes.passes[additional_pass_index].draw_call_data;
+			++additional_pass_index;
 		}
-		for (size_t i = 0; i < material_uniforms_number; ++i)
-		{
-			if (material.uniforms[i] == UniformBuffer::invalid_id)
-				continue;
-			const UniformBuffer& uniform = context.uniform_pool.get(material.uniforms[i]);
-			impl_->set_uniform(uniform);
-		}
-		impl_->draw(node.mesh.render_data);
 	}
 }
 

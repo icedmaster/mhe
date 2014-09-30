@@ -7,6 +7,7 @@
 #include "texture.hpp"
 #include "shader_program.hpp"
 #include "render_target.hpp"
+#include "render_buffer.hpp"
 
 namespace mhe {
 

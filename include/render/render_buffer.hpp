@@ -51,7 +51,7 @@ public:
 	virtual void close() = 0;
 
 	virtual void update(const UniformBufferDesc& desc) = 0;
-	virtual void update(const uint8_t* data, size_t size) = 0;
+	virtual void update(const uint8_t* data, size_t offset, size_t size) = 0;
 };
 
 class MHE_EXPORT RenderBuffer
@@ -196,13 +196,18 @@ public:
 
 	void update(const uint8_t* data, size_t size)
 	{
-		impl_->update(data, size);
+		impl_->update(data, 0, size);
+	}
+
+	void update(const uint8_t* data, size_t offset, size_t size)
+	{
+		impl_->update(data, offset, size);
 	}
 
 	template <class Data>
 	void update(const Data& data)
 	{
-		impl_->update(reinterpret_cast<const uint8_t*>(&data), sizeof(Data));
+		impl_->update(reinterpret_cast<const uint8_t*>(&data), 0, sizeof(Data));
 	}
 
 	const UniformBufferImpl* impl() const

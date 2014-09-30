@@ -31,7 +31,7 @@ void main()
 
 [fragment]
 
-uniform sampler2D texture;
+[sampler2D texture 0]
 
 in VSOutput vsoutput;
 

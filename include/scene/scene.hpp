@@ -35,7 +35,7 @@ public:
 	}
 
 	Node& create_node() const;
-	void update(RenderContext& render_context, const Context& context, const SceneContext& scene_context);
+	void update(RenderContext& render_context, Context& context, const SceneContext& scene_context);
 
 	size_t nodes(Node*& nodes, size_t& offset, size_t material_system) const;
 	size_t nodes(Node*& nodes) const;
@@ -47,6 +47,9 @@ public:
 		camera_controller_ = controller;
 	}
 private:
+	void refresh_node_material_link(Node* nodes);
+	void update_light_sources(RenderContext& render_context, Context& context);
+
 	struct MaterialConnector
 	{
 		size_t offset;

@@ -58,11 +58,12 @@ public:
 		return impl_.get();
 	}
 
-	size_t color_textures(const Texture::IdType** ids) const;
+	size_t color_textures(const TextureInstance** ids) const;
+	size_t depth_texture(TextureInstance& id) const;
 private:
 	RenderTargetDesc desc_;
-	Texture::IdType rt_[max_simultaneous_render_targets_number];
-	Texture::IdType ds_;
+	TextureInstance rt_[max_simultaneous_render_targets_number];
+	TextureInstance ds_;
 	unique_ptr<RenderTargetImpl> impl_;
 };
 

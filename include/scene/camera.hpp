@@ -45,17 +45,21 @@ public:
 
 	vec3 position() const
 	{
-		return transform_.row_vec3(3);
+		return -transform_.row_vec3(3);
 	}
 
 	void translate_by(const vec3& delta)
 	{
-		transform_.set_row(3, position() + delta);
+		//position_ += delta;
+		//update_view();
+		transform_.set_row(3, -(position() + delta));
 	}
 
 	void rotate_by(const quatf& rotation)
 	{
 		transform_ *= rotation.to_matrix<mat4x4>();
+		//rotation_ *= rotation;
+		//update_view();
 	}
 
 	void get(mat4x4& v, mat4x4& p, mat4x4& vp) const;
@@ -64,6 +68,8 @@ private:
 
 	mat4x4 transform_;
 	mat4x4 projection_;
+	quatf rotation_;
+	vec3 position_;
 };
 
 }

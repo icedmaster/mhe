@@ -18,23 +18,43 @@ public:
 
 struct DrawCallData
 {
+	POOL_STRUCT(uint16_t);
 	RenderCommand* command;
 	RenderState::IdType state;
 	RenderTarget::IdType render_target;
-	uint16_t id;
 
 	DrawCallData() :
 		command(nullptr),
-		render_target(default_render_target)
+		render_target(default_render_target),
+		id(invalid_id)
 	{}
+};
+
+struct RenderPassData
+{
+	uint16_t draw_call_data;
+	Material::IdType material;
+};
+
+struct MainPassData
+{
+	uint16_t draw_call_data;
+	MaterialInstance material;
+};
+
+struct AdditionalPasses
+{
+	POOL_STRUCT(uint16_t);
+	typedef fixed_size_vector<RenderPassData, max_additional_render_passes> Passes;
+	Passes passes;
 };
 
 struct Node
 {
 	Mesh mesh;
-	MaterialInstance material;
 	Transform::IdType transform;
-	uint16_t draw_call_data;
+	MainPassData main_pass;
+	uint16_t additional_passes;
 	uint16_t id;
 };
 

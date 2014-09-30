@@ -55,6 +55,8 @@ bool Engine::init(uint width, uint height, uint bpp, bool fullscreen)
 
 	set_default_video_settings();
 
+	setup_generated();
+
 	return true;
 }
 

@@ -82,6 +82,7 @@ private:
 struct TextureInstance
 {
 	Texture::IdType id;
+	TextureInstance() : id(Texture::invalid_id) {}
 };
 
 }

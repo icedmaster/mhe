@@ -5,6 +5,7 @@
 namespace mhe {
 
 Texture::Texture() :
+	id_(invalid_id),
 	impl_(SystemFactory::instance().create_texture())
 {}
 

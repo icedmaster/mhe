@@ -40,6 +40,7 @@ public:
 	}
 private:
 	void set_default_video_settings();
+	void setup_generated();
 
 	void update_materials(RenderContext& render_context);
 

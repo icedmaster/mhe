@@ -9,6 +9,7 @@
 #include "events/system_device.hpp"
 #include "events/keyboard_device.hpp"
 #include "events/mouse_device.hpp"
+#include "render/gbuffer_helper.hpp"
 
 namespace mhe {
 namespace app {
@@ -44,6 +45,7 @@ bool Application::mhe_app_init(const ApplicationConfig& config)
   if (engine_.init(config.width, config.height, config.bpp, config.fullscreen))
   {
       add_delegates();
+			init_render(config);
       return true;
   }
   return false;
@@ -105,6 +107,68 @@ bool Application::on_system_event(const Event* event)
     if (se->arg() == SystemEvent::quit)
         stop();
     return true;
+}
+
+void Application::init_render(const ApplicationConfig& config)
+{
+	std::fstream f(config.render_config_filename, std::ios::in | std::ios::binary);
+	if (!f)
+	{
+		WARN_LOG("Can't open render config with filename " << config.render_config_filename);
+		return;
+	}
+
+	pugi::xml_document document;
+	if (!document.load(f))
+		return;
+
+	pugi::xml_node root = document.root();
+	if (!root) return;
+	pugi::xml_node mhe_node = root.child("mhe");
+	if (!mhe_node) return;
+	pugi::xml_node materials_node = mhe_node.child("materials");
+	if (!materials_node) return;
+
+	init_materials(materials_node);
+	
+	pugi::xml_node gbuffer_node = mhe_node.child("gbuffer");
+	if (gbuffer_node)
+		init_gbuffer(gbuffer_node);
+}
+
+void Application::init_materials(pugi::xml_node materials_node)
+{
+	Context& context = engine_.context();
+	
+	MaterialSystemContext material_context;
+	for (pugi::xml_node n = materials_node.child("material"); n; n = n.next_sibling("material"))
+	{
+		const char* name = n.attribute("name").value();
+		const char* shader_name = n.attribute("shader").value();
+		const char* defs = n.attribute("defs").value();
+		unsigned int priority = n.attribute("priority").as_uint();
+
+		material_context.shader_name = shader_name;
+		material_context.defs[0] = defs;
+		context.material_systems.add(MaterialSystemFactory::instance().create(name, context, material_context), priority);
+	}
+}
+
+void Application::init_gbuffer(pugi::xml_node gbuffer_node)
+{
+	Context& context = engine_.context();
+
+	pugi::xml_node fill_node = gbuffer_node.child("fill");
+	pugi::xml_node use_node = gbuffer_node.child("use");
+	pugi::xml_node draw_node = gbuffer_node.child("draw");
+	const char* fill_name = fill_node.attribute("name").value();
+	const char* use_name = use_node.attribute("name").value();
+	const char* draw_name = draw_node.attribute("name").value();
+	AbstractGBufferFillMaterialSystem* fill_material_system = context.material_systems.get<AbstractGBufferFillMaterialSystem>(fill_name);
+	ASSERT(fill_material_system != nullptr, "Unable to initialize material system with name:" << fill_name);
+	AbstractGBufferUseMaterialSystem* use_material_system = context.material_systems.get<AbstractGBufferUseMaterialSystem>(use_name);
+	MaterialSystem* draw_material_system = context.material_systems.get(draw_name);
+	setup_deferred_pipeline(context, fill_material_system, use_material_system, draw_material_system);
 }
 
 }}

@@ -36,14 +36,17 @@ bool OpenGL3ShaderProgram::Shader::check_status(GLenum param) const
 	return true;
 }
 
-bool OpenGL3ShaderProgram::init(const std::string& vsdata, const std::string& fsdata)
+bool OpenGL3ShaderProgram::init(const std::string& vsdata, const std::string& fsdata, const ShaderInitializationParams& params)
 {
 	if (!vertex_shader_.init(GL_VERTEX_SHADER, vsdata))
 		return false;
 	if (!fragment_shader_.init(GL_FRAGMENT_SHADER, fsdata))
 		return false;
 	
-	return attach_shaders();
+	bool result = attach_shaders();
+	if (result)
+		init_textures(params);
+	return result;
 }
 
 void OpenGL3ShaderProgram::close()
@@ -78,6 +81,36 @@ bool OpenGL3ShaderProgram::check_status(GLenum param) const
 void OpenGL3ShaderProgram::set() const
 {
 	OpenGLExtensions::instance().glUseProgram(id_);
+	for (size_t i = 0; i < 16; ++i)
+	{
+		if (texture_location_[i] == static_cast<GLuint>(-1)) continue;
+		OpenGLExtensions::instance().glUniform1i(texture_location_[i], i);
+	}
+}
+
+void OpenGL3ShaderProgram::init_textures(const ShaderInitializationParams& params)
+{
+	memset(texture_location_, 0xff, sizeof(texture_location_));
+
+	GLint number, length, size;
+	GLenum type;
+	OpenGLExtensions::instance().glGetProgramiv(id_, GL_ACTIVE_UNIFORMS, &number);
+	char data[512];
+	for (int i = 0; i < number; ++i)
+	{
+		OpenGLExtensions::instance().glGetActiveUniform(id_, i, sizeof(data), &length, &size, &type, data);
+		if (type == GL_SAMPLER_2D || type == GL_SAMPLER_CUBE)
+		{
+			for (size_t j = 0; j < params.samplers.size(); ++j)
+			{
+				if (params.samplers[j].name == data)
+				{
+					texture_location_[params.samplers[j].index] = i;
+					break;
+				}
+			}
+		}
+	}
 }
 
 }}

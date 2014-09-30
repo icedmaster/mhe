@@ -4,7 +4,6 @@
 // same as boost/noncopyable
 
 namespace mhe {
-namespace utils {
 
 class noncopyable
 {
@@ -16,6 +15,6 @@ private:
 	noncopyable& operator= (const noncopyable&);
 };
 
-}}
+}
 
 #endif

@@ -205,6 +205,12 @@ public:
 		static vector3 f(0, 0, 1);
 		return f;
 	}
+
+	static vector3 zero()
+	{
+		static vector3 z;
+		return z;
+	}
 };
 
 template <class T>

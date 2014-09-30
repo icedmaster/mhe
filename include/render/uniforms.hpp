@@ -13,6 +13,9 @@ struct TransformSimpleData
 struct TransformData
 {
 	mat4x4 vp;
+	mat4x4 inv_proj;
+	mat4x4 inv_vp;
+	vec4 viewpos;
 };
 
 struct PerModelSimpleData
@@ -24,6 +27,14 @@ struct PerModelData
 {
 	mat4x4 model;
 	mat4x4 normal;
+};
+
+struct LightData
+{
+	vec4 diffuse;
+	vec4 specular;
+	vec4 position;
+	vec4 direction;
 };
 
 }

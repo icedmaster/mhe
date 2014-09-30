@@ -27,15 +27,16 @@ void FPSCameraController::update_impl(const RenderContext& render_context)
 	else if (event_manager_.check_bind("right"))
 		camera().translate_by(-side * time_delta * move_speed());
 	else if (event_manager_.check_bind("up"))
-		camera().translate_by(-fwd * time_delta * move_speed());
-	else if (event_manager_.check_bind("down"))
 		camera().translate_by(fwd * time_delta * move_speed());
+	else if (event_manager_.check_bind("down"))
+		camera().translate_by(-fwd * time_delta * move_speed());
 
 	const MouseDevice* mouse = event_manager_.mouse();
 	if (mouse == nullptr) return;
 
 	// translation from mouse wheel
-	camera().translate_by(-fwd * time_delta * mouse->wheel_delta().y());
+	if (mouse->wheel_delta().y() > 0)
+		camera().translate_by(fwd * time_delta * mouse->wheel_delta().y());
 
 	if (!mouse->is_button_pressed(MouseEvent::right_button)) return;
 	const vector2<int>& delta = mouse->delta();
@@ -43,7 +44,7 @@ void FPSCameraController::update_impl(const RenderContext& render_context)
 	ry.set_rotation(up, deg_to_rad(delta.x()) * rotation_speed() * time_delta);
 	quatf rx;
 	rx.set_rotation(-side, deg_to_rad(delta.y()) * rotation_speed() * time_delta);
-	camera().rotate_by(ry * rx);
+	camera().rotate_by(rx * ry);
 }
 
 }}

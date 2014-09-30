@@ -33,6 +33,7 @@ bool load_config(ApplicationConfig& config, const std::string& filename)
 	config.assets_path = op.get<std::string>("assets_path");
 	config.default_shader_name = op.get<std::string>("default_shader");
 	config.default_texture_name = op.get<std::string>("default_texture");
+	config.render_config_filename = op.get<std::string>("render_config_filename");
 
 	return true;
 }
