@@ -12,4 +12,6 @@
 #include "mhe_game.hpp"
 #include "mhe_res.hpp"
 #include "mhe_scene.hpp"
+#include "mhe_threads.hpp"
+#include "mhe_net.hpp"
 #endif // __MHE_MHE__
