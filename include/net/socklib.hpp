@@ -38,8 +38,8 @@ class socket
 public:
 	struct socket_addr
 	{
-		cmn::uint16_t port;
-		cmn::uint32_t addr;
+		uint16_t port;
+		uint32_t addr;
 	};
 public:
 	socket() :
@@ -88,7 +88,7 @@ public:
 		return open_p();
 	}
 
-	bool open(cmn::uint16_t port, cmn::uint32_t addr = 0)
+	bool open(uint16_t port, uint32_t addr = 0)
 	{
 		if (!open_p())
 			return false;
@@ -100,14 +100,14 @@ public:
 		return open(port, inet_addr(addr.c_str()));
 	}
 
-	bool bind(cmn::uint16_t port, cmn::uint32_t addr = 0)
+	bool bind(uint16_t port, uint32_t addr = 0)
 	{
 		saddr.port = port;
 		saddr.addr = addr;
 		return bind_p();
 	}
 
-	bool bind(cmn::uint16_t port, const std::string& addr)
+	bool bind(uint16_t port, const std::string& addr)
 	{
 		return bind(port, inet_addr(addr.c_str()));
 	}
@@ -122,7 +122,7 @@ public:
 		return connect_p(socket_server_mode, timeout);
 	}
 
-	bool connect(cmn::uint16_t port, cmn::uint32_t addr, int timeout = 0)
+	bool connect(uint16_t port, uint32_t addr, int timeout = 0)
 	{
 		raddr.port = port;
 		raddr.addr = addr;
@@ -171,7 +171,7 @@ protected:
 		return raddr;
 	}
 
-	void set_remoteaddr(cmn::uint16_t port, cmn::uint32_t addr)
+	void set_remoteaddr(uint16_t port, uint32_t addr)
 	{
 		raddr.port = port;
 		raddr.addr = addr;
@@ -266,14 +266,14 @@ public:
 	~udp_socket()
 	{}
 
-	int send(cmn::uint16_t port, uint32_t addr, const char *buf, int size, int flags = 0)
+	int send(uint16_t port, uint32_t addr, const char *buf, int size, int flags = 0)
 	{
 		// do not need to check result - UDP desu
 		connect(port, addr);
 		return write(buf, size, flags);
 	}
 
-	int recv(cmn::uint16_t& port, cmn::uint32_t& addr, char *buf, int size, int flags = 0, int timeout = 0)
+	int recv(uint16_t& port, uint32_t& addr, char *buf, int size, int flags = 0, int timeout = 0)
 	{
 		return recv_p(port, addr, buf, size, flags, timeout);
 	}
@@ -305,7 +305,7 @@ private:
 		return recvfrom(get_socket(), buf, size, flags, (sockaddr*)&inaddr, &len);
 	}
 
-	int recv_p(cmn::uint16_t& port, cmn::uint32_t& addr, char *buf, int size, int flags, int/* timeout*/)
+	int recv_p(uint16_t& port, uint32_t& addr, char *buf, int size, int flags, int/* timeout*/)
 	{
 		sockaddr_in inaddr;
 		memset((char*)&inaddr, 0, c_addr_len);

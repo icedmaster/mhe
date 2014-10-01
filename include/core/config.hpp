@@ -57,6 +57,7 @@
 #endif
 
 #define LOG_SHADER_INFO
+#define RDBG_ENABLED
 
 /**
 * Rendering configuration

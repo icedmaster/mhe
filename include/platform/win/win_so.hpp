@@ -1,7 +1,7 @@
 #ifndef __WIN_SO_HPP__
 #define __WIN_SO_HPP__
 
-#include <windows.h>
+#include "win_wrapper.hpp"
 #include <string>
 #include "core/config.hpp"
 

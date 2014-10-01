@@ -1,5 +1,5 @@
 #include "platform/win/win_system.hpp"
-#include <windows.h>
+#include "platform/win/win_wrapper.hpp"
 #include <mmsystem.h>
 
 namespace mhe {

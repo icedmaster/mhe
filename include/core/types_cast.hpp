@@ -73,7 +73,7 @@ inline size_t types_cast(const std::string& value)
 template <>
 inline float types_cast(const std::string& value)
 {
-	return atof(value.c_str());
+	return static_cast<float>(atof(value.c_str()));
 }
 
 template <class U, class V>

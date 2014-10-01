@@ -16,7 +16,7 @@
 #else
 	#define MHE_OPENGL3
 	#ifdef MHE_WIN
-		#include <Windows.h>
+		#include "platform/win/win_wrapper.hpp"
 	#else
 		#define GL_GLEXT_PROTOTYPES
 	#endif

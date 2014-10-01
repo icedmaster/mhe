@@ -1,6 +1,11 @@
 #ifndef __ENGINE_HPP__
 #define __ENGINE_HPP__
 
+#include "core/config.hpp"
+#ifdef RDBG_ENABLED
+#include "debug/rdbg.hpp"
+#endif
+
 #include "render/context.hpp"
 #include "events/event_manager.hpp"
 #include "scene/scene.hpp"
@@ -12,6 +17,7 @@ namespace game {
 class MHE_EXPORT Engine
 {
 public:
+	Engine();
 	bool init(uint width, uint height, uint bpp, bool fullscreen);
 
 	Context& context()
@@ -24,10 +30,15 @@ public:
         return event_manager_;
     }
 
-		Scene& scene()
-		{
-			return scene_;
-		}
+	Scene& scene()
+	{
+		return scene_;
+	}
+
+	RDBGProcessor& rdbg_processor()
+	{
+		return rdbg_engine_.processor();
+	}
 
 	void run();
 	void stop();
@@ -43,6 +54,10 @@ private:
 	void setup_generated();
 
 	void update_materials(RenderContext& render_context);
+
+#ifdef RDBG_ENABLED
+	RDBGEngine rdbg_engine_;
+#endif
 
 	Context context_;
     EventManager event_manager_;

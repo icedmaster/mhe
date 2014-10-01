@@ -9,6 +9,13 @@
 namespace mhe {
 namespace game {
 
+Engine::Engine()
+#ifdef RDBG_ENABLED
+	:
+	rdbg_engine_(*this)
+#endif
+{}
+
 bool Engine::init(uint width, uint height, uint bpp, bool fullscreen)
 {
 	process_ = false;

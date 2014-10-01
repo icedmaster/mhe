@@ -86,6 +86,7 @@ set (SRC_PATH
   ${SOURCE_ROOT}/utils
   ${SOURCE_ROOT}/core
   ${SOURCE_ROOT}/threads
+  ${SOURCE_ROOT}/debug
   ${LIB_DIR}/pugixml
 )
 

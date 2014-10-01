@@ -1,5 +1,5 @@
-#ifndef _SOCKLIB_CONFIG_HPP_
-#define _SOCKLIB_CONFIG_HPP_
+#ifndef __SOCKLIB_CONFIG_HPP__
+#define __SOCKLIB_CONFIG_HPP__
 
 #include "core/types.hpp"
 #include "core/config.hpp"

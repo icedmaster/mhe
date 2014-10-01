@@ -1,6 +1,6 @@
 #include "threads/thread.hpp"
 
-#include <windows.h>
+#include "platform/win/win_wrapper.hpp"
 
 namespace mhe {
 
