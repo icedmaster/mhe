@@ -6,6 +6,7 @@
 #include <map>
 #include "core/hash.hpp"
 #include "threads/thread.hpp"
+#include "net/socklib.hpp"
 #include "math/vector3.hpp"
 #include "math/vector4.hpp"
 
@@ -140,18 +141,24 @@ public:
 private:
 	std::string make_error(const char* message) const;
 
-	std::string set_data(Data& data, size_t id, const std::string* args, size_t argc);
-	std::string get_data(Data& data, size_t id);
+	std::string set_data(Data& data, size_t id, const std::vector<std::string>& subtypes, const std::string* args, size_t argc);
+	std::string get_data(Data& data, size_t id, const std::vector<std::string>& subtypes);
 
-	bool set(Data& data, size_t id, int value)
+	bool set(const Data& data, size_t id, int value)
 	{
 		return data.set.set_int(engine_, id, value);
 	}
 
-	bool set(Data& data, size_t id, const vec4& value)
+	bool set(const Data& data, size_t id, const vec4& value)
 	{
 		return data.set.set_vec4(engine_, id, value);
 	}
+
+	bool process_default_command(std::string& result, const std::vector<std::string>& args);
+	std::string process_get_all_command(const std::vector<std::string>& args);
+	void process_get_data(std::string& result, const Data& data) const;
+
+	const Data* find_data(const Data& root, const std::vector<std::string>& names) const;
 
 	typedef std::map<hash_type, Data> DataMap;
 	DataMap data_;
@@ -165,9 +172,11 @@ public:
 			processor_(processor)
 	{}
 private:
+	bool start_impl();
 	void process_impl();
 
-	RDBGProcessor processor_;
+	RDBGProcessor& processor_;
+	net::tcp_socket server_socket_;
 };
 
 class RDBGEngine
@@ -182,6 +191,8 @@ public:
 	{
 		return processor_;
 	}
+
+	bool start();
 private:
 	RDBGProcessor processor_;
 	RDBGThread thread_;

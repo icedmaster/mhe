@@ -10,16 +10,22 @@
 
 namespace mhe {
 
+void register_light_type(RDBGProcessor& rdbg_processor)
+{
+#ifdef RDBG_ENABLED
+	if (!rdbg_processor.type_registrated("light"))
+	{
+		RDBGProcessor::Data data("light");
+		data.attach("diffuse", Vector4, set_diffuse_color, get_diffuse_color);
+		rdbg_processor.register_type(data);
+	}
+#endif
+}
+
 void register_light(game::Engine& engine, size_t id, const std::string& name)
 {
 #ifdef RDBG_ENABLED
-	RDBGProcessor& rdbg_processor = engine.rdbg_processor();
-if (!rdbg_processor.type_registrated("light"))
-{
-	RDBGProcessor::Data data("light");
-data.attach("diffuse", Vector4, set_diffuse_color, get_diffuse_color);
-rdbg_processor.register_type(data);
-}
+	register_light_type(engine.rdbg_processor());
 #endif
 }
 

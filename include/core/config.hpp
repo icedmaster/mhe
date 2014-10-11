@@ -59,6 +59,10 @@
 #define LOG_SHADER_INFO
 #define RDBG_ENABLED
 
+#if defined RDBG_ENABLED && !defined MHE_NETWORK
+#define MHE_NETWORK
+#endif
+
 /**
 * Rendering configuration
 */

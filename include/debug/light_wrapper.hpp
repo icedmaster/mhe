@@ -10,6 +10,9 @@ namespace game {
 class Engine;
 }
 
+class RDBGProcessor;
+
+void register_light_type(RDBGProcessor& rdbg_processor);
 void register_light(game::Engine& engine, size_t id, const std::string& name);
 
 bool set_diffuse_color(game::Engine& engine, uint32_t id, const colorf& color);

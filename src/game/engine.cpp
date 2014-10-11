@@ -6,6 +6,10 @@
 
 #include "render/render_context.hpp"
 
+#ifdef RDBG_ENABLED
+#include "debug/default_rdbg_setup.hpp"
+#endif
+
 namespace mhe {
 namespace game {
 
@@ -63,6 +67,18 @@ bool Engine::init(uint width, uint height, uint bpp, bool fullscreen)
 	set_default_video_settings();
 
 	setup_generated();
+
+#ifdef RDBG_ENABLED
+	if (!rdbg_engine_.start())
+	{
+		WARN_LOG("RDBG engine initialization failed");
+	}
+	else
+	{
+		INFO_LOG("RDBG engine started");
+	}
+	default_rdbg_setup(rdbg_engine_.processor());
+#endif
 
 	return true;
 }

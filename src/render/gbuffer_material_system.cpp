@@ -230,7 +230,7 @@ void GBufferDrawMaterialSystem::update(Context& context, RenderContext& render_c
 		{
 			const Light& light = render_context.lights[i];
 			data[l].diffuse = light.shading().diffuse;
-			data[l].diffuse.set_w(light.angle());
+			data[l].diffuse.set_w(light.type() == Light::spot ? light.spot_angle_coeff() : light.angle());
 			data[l].specular = light.shading().specular;
 			data[l].position = vec4(light.position().x(), light.position().y(), light.position().z(), light.attenuation());
 			data[l].direction = vec4(light.direction().x(), light.direction().y(), light.direction().z(), light.angle_attenuation());

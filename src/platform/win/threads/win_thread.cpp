@@ -6,7 +6,7 @@ namespace mhe {
 
 namespace {
 
-DWORD WINAPI start_thread(void* param)
+DWORD WINAPI start_thread_impl(void* param)
 {
 	thread* thr = reinterpret_cast<thread*>(param);
 	thr->process();
@@ -29,10 +29,9 @@ thread::thread() :
 	info_(new Info)
 {}
 
-bool thread::start()
+bool thread::start_thread()
 {
-	finished_ = false;
-	info_->id = CreateThread(NULL, 0, start_thread, this, 0, 0);
+	info_->id = CreateThread(NULL, 0, start_thread_impl, this, 0, 0);
 	return info_->id != FALSE;
 }
 

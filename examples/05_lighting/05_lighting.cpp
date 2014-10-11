@@ -121,15 +121,15 @@ private:
 	void init_directional_lights(mhe::game::Engine& engine)
 	{
 		mhe::Light& light = create_and_get(engine.context().light_pool);
-		light.shading().diffuse = mhe::vec4(0.5f, 0.5f, 0.5f, 1.0f);
-		light.shading().specular = mhe::color_white;
+		light.shading().diffuse = mhe::vec4(0.1f, 0.1f, 0.1f, 1.0f);
+		light.shading().specular = mhe::vec4(0.2f, 0.2f, 0.2f, 1.0f);;
 		light.set_position(mhe::vec3(0, 100, 0));
 		light.set_direction(-mhe::vec3::up());
 		light.set_type(mhe::Light::directional);
 
 		mhe::Light& light2 = create_and_get(engine.context().light_pool);
-		light2.shading().diffuse = mhe::vec4(0.2f, 0.0f, 0.2f, 1.0f);
-		light2.shading().specular = mhe::color_white;
+		light2.shading().diffuse = mhe::vec4(0.1f, 0.0f, 0.1f, 1.0f);
+		light2.shading().specular = mhe::vec4(0.2f, 0.2f, 0.2f, 1.0f);
 		light2.set_position(mhe::vec3(0, 0, 100));
 		light2.set_direction(-mhe::vec3::forward());
 		light2.set_type(mhe::Light::directional);

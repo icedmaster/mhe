@@ -151,6 +151,12 @@ public:
 		}
 	}
 
+	float spot_angle_coeff() const
+	{
+		ASSERT(type_ == spot, "Invalid type");
+		return cos(desc_.spot.angle * 0.5f);
+	}
+
 	float angle_attenuation() const
 	{
 		if (type_ == spot)

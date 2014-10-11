@@ -115,7 +115,7 @@ public:
 	template <class Y>
 	size_t all_indexes(Y* indexes, size_t count) const
 	{
-		size_t result = std::min(count, static_cast<Y>(size_));
+		size_t result = min(count, static_cast<Y>(size_));
 		for (size_t i = 0; i < result; ++i)
 			indexes[i] = indexes_[i].index;
 		return result;

@@ -1,6 +1,12 @@
 #include "platform/win/win_system.hpp"
 #include "platform/win/win_wrapper.hpp"
+
+#include "core/config.hpp"
 #include <mmsystem.h>
+
+#ifdef MHE_NETWORK
+#include "net/socklib.hpp"
+#endif
 
 namespace mhe {
 namespace winsys {
@@ -19,6 +25,10 @@ void start_platform()
 	start = timeGetTime();
 	QueryPerformanceFrequency(&frequency);
 	QueryPerformanceCounter(&hpstart);
+
+#ifdef MHE_NETWORK
+	WIN_NET_START();
+#endif
 }
 
 void stop_platform()

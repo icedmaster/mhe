@@ -198,7 +198,7 @@ set(SOURCE ${SOURCE} ${STANDALONE_SOURCES})
 
 # additional libraries
 if (WIN32)
-	set(LIBS ${LIBS} winmm)
+	set(LIBS ${LIBS} winmm Ws2_32)
 endif()
 if (APPLE AND NOT __IOS__)
     set(LIBS ${LIBS} dl)
