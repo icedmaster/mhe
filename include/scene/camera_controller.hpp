@@ -12,8 +12,8 @@ class CameraController : public ref_counter
 {
 public:
 	CameraController() :
-        move_speed_(0.05f),
-        rotation_speed_(0.01f)
+        move_speed_(2.0f),
+        rotation_speed_(0.5f)
 	{}
 
 	virtual ~CameraController() {}

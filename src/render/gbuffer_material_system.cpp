@@ -218,6 +218,7 @@ void GBufferDrawMaterialSystem::update(Context& context, RenderContext& render_c
 	size_t lights_per_every_pass[max_additional_render_passes_number];
 	::memset(lights_per_every_pass, 0, sizeof(lights_per_every_pass));
 	size_t passes_number = calculate_passes_number(render_context, lights_per_every_pass);
+	if (passes_number == 0) return;
 
 	AdditionalPasses& passes = context.additional_passes_pool.get(nodes[0].additional_passes);
 	passes.passes.resize(passes_number - 1);
@@ -288,7 +289,7 @@ size_t GBufferDrawMaterialSystem::calculate_passes_number(RenderContext& render_
 		size_t passes_per_type = (static_cast<float>(indexes[i]) / lights_per_pass_ + 0.5f);
 		if (!passes_per_type) continue;
 		size_t j = 0;
-		for (; j < (passes_per_type > 1) ? passes_per_type - 1 : 0; ++j)
+		for (size_t end = (passes_per_type > 1) ? passes_per_type - 1 : 0; j < end; ++j)
 			passes[idx++] = lights_per_pass_;
 		passes[idx++] = indexes[i] - lights_per_pass_ * j;
 		number += passes_per_type;
