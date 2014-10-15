@@ -16,6 +16,7 @@ namespace
 DWORD start;
 LARGE_INTEGER frequency;
 LARGE_INTEGER hpstart;
+LARGE_INTEGER prev;
 float last_delta;
 }
 
@@ -25,6 +26,7 @@ void start_platform()
 	start = timeGetTime();
 	QueryPerformanceFrequency(&frequency);
 	QueryPerformanceCounter(&hpstart);
+	QueryPerformanceCounter(&prev);
 
 #ifdef MHE_NETWORK
 	WIN_NET_START();
@@ -49,12 +51,15 @@ float get_current_time()
 {
 	LARGE_INTEGER now;
 	QueryPerformanceCounter(&now);
-	last_delta = (now.QuadPart - hpstart.QuadPart) / frequency.QuadPart;
-	return now.QuadPart / frequency.QuadPart;
+	return (now.QuadPart - hpstart.QuadPart) / static_cast<float>(frequency.QuadPart);
 }
 
 float get_last_delta()
 {
+	LARGE_INTEGER now;
+	QueryPerformanceCounter(&now);
+	last_delta = (now.QuadPart - prev.QuadPart) / static_cast<float>(frequency.QuadPart);
+	prev = now;
 	return last_delta;
 }
 

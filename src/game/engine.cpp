@@ -10,6 +10,8 @@
 #include "debug/default_rdbg_setup.hpp"
 #endif
 
+#include "debug/profiler.hpp"
+
 namespace mhe {
 namespace game {
 
@@ -106,6 +108,8 @@ void Engine::stop()
 
 void Engine::update()
 {
+	MainProfiler::instance().clear();
+	PROFILE("engine.update");
     event_manager_.check(context_.window_system);
 		if (game_scene_ != nullptr)
 			game_scene_->update(*this);
@@ -120,6 +124,7 @@ void Engine::update()
 
 void Engine::render()
 {
+	PROFILE("engine.render");
     context_.driver.clear_color();
     context_.driver.clear_depth();
 	context_.driver.begin_render();

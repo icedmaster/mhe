@@ -46,6 +46,12 @@ inline std::string types_cast(const unsigned long& value)
 	return details::to_string_types_cast(value);
 }
 
+template<>
+inline std::string types_cast(const float& value)
+{
+	return details::to_string_types_cast(value);
+}
+
 template <>
 inline const char* types_cast(const int& value)
 {

@@ -4,6 +4,8 @@
 #include "utils/strutils.hpp"
 #include "utils/global_log.hpp"
 
+#include "debug/profiler.hpp"
+
 namespace mhe {
 
 namespace detail {
@@ -22,6 +24,7 @@ const char* set_command = "s";
 const char* get_command = "g";
 
 const char* get_all_command = "get";
+const char* profiler_result_command = "profiler";
 
 template <class T>
 T convert(const std::string* args, size_t argc)
@@ -108,10 +111,12 @@ bool RDBGProcessor::process_default_command(std::string& result, const std::vect
 	result.clear();
 	if (cmd == get_all_command)
 		result = process_get_all_command(args);
+	else if (cmd == profiler_result_command)
+		result = process_profiler_result_command(args);
 	return !result.empty();
 }
 
-std::string RDBGProcessor::process_get_all_command(const std::vector<std::string>& args)
+std::string RDBGProcessor::process_get_all_command(const std::vector<std::string>& /*args*/)
 {
 	std::string result;
 	for (DataMap::iterator it = data_.begin(); it != data_.end(); ++it)
@@ -121,6 +126,21 @@ std::string RDBGProcessor::process_get_all_command(const std::vector<std::string
 		add_field(result, data.name);
 		add_field(result, "fields");
 		process_get_data(result, data);
+	}
+	return result;
+}
+
+std::string RDBGProcessor::process_profiler_result_command(const std::vector<std::string>& /*args*/)
+{
+	const std::vector<Profiler::Data>& data = MainProfiler::instance().data();
+	std::string result;
+	for (size_t i = 0; i < data.size(); ++i)
+	{
+		result += data[i].name;
+		result += (" time:" + types_cast<std::string>(data[i].interval));
+		result += (" count:" + types_cast<std::string>(data[i].count));
+		result += (" data:" + data[i].data);
+		result += "\n";
 	}
 	return result;
 }

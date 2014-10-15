@@ -63,6 +63,12 @@
 #define MHE_NETWORK
 #endif
 
+#define PROFILER_ENABLED
+
+#ifdef PROFILER_ENABLED
+#define PROFILER_SAVE_LAST_FRAME_DATA
+#endif
+
 /**
 * Rendering configuration
 */

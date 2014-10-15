@@ -5,6 +5,8 @@
 #include "render/node.hpp"
 #include "render/context.hpp"
 
+#include "debug/profiler.hpp"
+
 namespace mhe {
 
 // helper stats class
@@ -53,6 +55,7 @@ void Driver::render(const Context& context, const Node* nodes, size_t count)
 	ASSERT(nodes, "Invalid nodes");
 	for (size_t i = 0; i < count; ++i)
 	{
+		SCOPED_PROFILE("driver.render", "");
 		const Node& node = nodes[i];
 		uint16_t draw_call_data_id = node.main_pass.draw_call_data;
 		uint8_t material_system_id = node.main_pass.material.material_system;
