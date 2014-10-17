@@ -8,6 +8,8 @@
 #include "core/config.hpp"
 #include "core/ref_ptr.hpp"
 
+#include "debug/rdbg.hpp"
+
 namespace mhe {
 
 struct RenderContext;
@@ -60,6 +62,8 @@ private:
 	NodePool node_pool_;
 	MaterialConnector nodes_per_material_[max_material_systems_number];
 	ref_ptr<CameraController> camera_controller_;
+
+	GlobalVar<size_t> global_max_lights_number_;
 };
 
 }

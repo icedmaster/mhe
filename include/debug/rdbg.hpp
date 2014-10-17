@@ -5,6 +5,7 @@
 #include <vector>
 #include <map>
 #include "core/hash.hpp"
+#include "core/singleton.hpp"
 #include "threads/thread.hpp"
 #include "net/socklib.hpp"
 #include "math/vector3.hpp"
@@ -197,6 +198,98 @@ public:
 private:
 	RDBGProcessor processor_;
 	RDBGThread thread_;
+};
+
+template <class T>
+struct TypeHelper { static const int type = None; };
+
+template <>
+struct TypeHelper<int> { static const int type = Int; };
+
+template <>
+struct TypeHelper<size_t> { static const int type = Int; };
+
+class GlobalVars : public Singleton<GlobalVars>
+{
+	friend class Singleton<GlobalVars>;
+public:
+	struct Data
+	{
+		const char* name;
+		int type;
+		std::string value;
+	};
+public:
+	template <class T>
+	void add(const char* name, const T& value)
+	{
+		set(name, value);
+	}
+
+	template <class T>
+	T value(const char* name) const
+	{
+		VarsMap::const_iterator it = vars_.find(hash(name));
+		if (it == vars_.end()) return T();
+		return types_cast<T>(it->second.value);
+	}
+
+	template <class T>
+	void set(const char* name, const T& value)
+	{
+		Data& data = vars_[hash(name)];
+		data.name = name;
+		data.type = TypeHelper<T>::type;
+		data.value = types_cast<std::string>(value);
+	}
+
+	bool has(const char* name) const
+	{
+		return vars_.find(hash(name)) != vars_.end();
+	}
+
+	std::vector<Data> data() const;
+private:
+	GlobalVars() {}
+	~GlobalVars() {}
+
+	typedef std::map<hash_type, Data> VarsMap;
+	VarsMap vars_;
+};
+
+template <class T>
+class GlobalVar
+{
+public:
+	GlobalVar(const char* name, const T& val) :
+		name_(name)
+	{
+		GlobalVars::instance().add(name, val);
+	}
+
+	GlobalVar(const char* name) :
+		name_(name)
+	{
+		if (!GlobalVars::instance().has(name))
+			GlobalVars::instance().add(name, T());
+	}
+
+	T value() const
+	{
+		return GlobalVars::instance().value<T>(name_);
+	}
+
+	operator T()
+	{
+		return value();
+	}
+
+	GlobalVar& operator= (const T& val)
+	{
+		GlobalVars::instance().set(name_, val);
+	}
+private:
+	const char* name_;
 };
 
 }

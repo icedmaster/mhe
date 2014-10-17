@@ -246,4 +246,13 @@ bool RDBGEngine::start()
 	return thread_.start();
 }
 
+std::vector<GlobalVars::Data> GlobalVars::data() const
+{
+	std::vector<Data> result;
+	result.reserve(vars_.size());
+	for (VarsMap::const_iterator it = vars_.begin(); it != vars_.end(); ++it)
+		result.push_back(it->second);
+	return result;
+}
+
 }

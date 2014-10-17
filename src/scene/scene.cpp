@@ -38,7 +38,8 @@ struct LightSortHelper
 
 }
 
-Scene::Scene()
+Scene::Scene() :
+	global_max_lights_number_("max_lights_number", max_lights_number)
 {
 	::memset(nodes_per_material_, 0, sizeof(nodes_per_material_));
 }
@@ -132,7 +133,7 @@ void Scene::update_light_sources(RenderContext& render_context, Context& context
 		if (!lights[i].enabled())
 			break;
 	}
-	render_context.lights_number = size;
+	render_context.lights_number = min(size, global_max_lights_number_);
 }
 
 }
