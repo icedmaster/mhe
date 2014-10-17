@@ -61,7 +61,11 @@ void OpenGL3Driver::set_viewport(int x, int y, int w, int h)
 
 void OpenGL3Driver::flush()
 {
+#ifndef PROFILER_ENABLED
 	glFlush();
+#else
+	glFinish();
+#endif
 }
 
 void OpenGL3Driver::set_state(const RenderState& state)

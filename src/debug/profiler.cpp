@@ -2,7 +2,7 @@
 
 namespace mhe {
 
-ProfilerElement::ProfilerElement(const char* name, Profiler& profiler, int mode, const char* data) :
+ProfilerElement::ProfilerElement(const char* name, int mode, Profiler& profiler, const char* data) :
 	name_(name), profiler_(profiler), mode_(mode), data_(data)
 {
 	timer_.start();

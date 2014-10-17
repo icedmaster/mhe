@@ -96,6 +96,7 @@ void Engine::run()
 	process_ = true;
 	while (process_)
 	{
+		ProfilerElement pe("engine.run");
 		update();
 		render();
 	}
@@ -109,24 +110,24 @@ void Engine::stop()
 void Engine::update()
 {
 	MainProfiler::instance().clear();
-	PROFILE("engine.update");
-    event_manager_.check(context_.window_system);
-		if (game_scene_ != nullptr)
-			game_scene_->update(*this);
+	ProfilerElement pe("engine.update");
+	event_manager_.check(context_.window_system);
+	if (game_scene_ != nullptr)
+		game_scene_->update(*this);
 
-		RenderContext render_context;
-        render_context.tick = utils::get_current_time();
-				render_context.fdelta = utils::get_last_delta();
-		SceneContext scene_context;
-		scene_.update(render_context, context_, scene_context);
-		update_materials(render_context);
+	RenderContext render_context;
+	render_context.tick = utils::get_current_time();
+	render_context.fdelta = utils::get_last_delta();
+	SceneContext scene_context;
+	scene_.update(render_context, context_, scene_context);
+	update_materials(render_context);
 }
 
 void Engine::render()
 {
-	PROFILE("engine.render");
-    context_.driver.clear_color();
-    context_.driver.clear_depth();
+	ProfilerElement pe("engine.render");
+	context_.driver.clear_color();
+	context_.driver.clear_depth();
 	context_.driver.begin_render();
 
 	Node* nodes = nullptr;
@@ -134,8 +135,14 @@ void Engine::render()
 	context_.driver.render(context_, nodes, count);
 	if (game_scene_ != nullptr)
 		game_scene_->draw(*this);
-	context_.driver.end_render();
-    context_.window_system.swap_buffers();
+	{
+		ProfilerElement end_render_pe("driver.end_render");
+		context_.driver.end_render();
+	}
+	{
+		ProfilerElement swap_buffers_pe("window_system.swap_buffers");
+		context_.window_system.swap_buffers();
+	}
 }
 
 void Engine::update_materials(RenderContext& render_context)

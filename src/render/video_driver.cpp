@@ -52,7 +52,7 @@ void Driver::reset()
 
 void Driver::render(const Context& context, const Node* nodes, size_t count)
 {
-	SCOPED_PROFILE("driver.render", "");
+	ProfilerElement pe("driver.render");
 	ASSERT(nodes, "Invalid nodes");
 	for (size_t i = 0; i < count; ++i)
 	{

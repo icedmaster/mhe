@@ -11,46 +11,7 @@
 namespace mhe {
 
 class Profiler;
-
-class ProfilerElement
-{
-public:
-	enum
-	{
-		single,
-		add
-	};
-public:
-	ProfilerElement(const char* name, Profiler& profiler, int mode = add, const char* data = 0);
-	~ProfilerElement();
-
-	const char* name() const
-	{
-		return name_;
-	}
-
-	float result() const
-	{
-		return result_;
-	}
-
-	int mode() const
-	{
-		return mode_;
-	}
-
-	const char* data() const
-	{
-		return data_;
-	}
-private:
-	utils::Timer timer_;
-	float result_;
-	const char* name_;
-	Profiler& profiler_;
-	int mode_;
-	const char* data_;
-};
+class ProfilerElement;
 
 class Profiler
 {
@@ -88,8 +49,47 @@ private:
 	~MainProfiler() {}
 };
 
-#define PROFILE(name) ProfilerElement(name, MainProfiler::instance())
-#define SCOPED_PROFILE(name, data) ProfilerElement(name, MainProfiler::instance(), ProfilerElement::single, data)
+class ProfilerElement
+{
+public:
+	enum
+	{
+		single,
+		add
+	};
+public:
+	ProfilerElement(const char* name, int mode = add, Profiler& profiler = MainProfiler::instance(), const char* data = 0);
+	~ProfilerElement();
+
+	const char* name() const
+	{
+		return name_;
+	}
+
+	float result() const
+	{
+		return result_;
+	}
+
+	int mode() const
+	{
+		return mode_;
+	}
+
+	const char* data() const
+	{
+		return data_;
+	}
+private:
+	utils::Timer timer_;
+	float result_;
+	const char* name_;
+	Profiler& profiler_;
+	int mode_;
+	const char* data_;
+};
+
+#define PROFILE(name) ProfilerElement pe##__LINE__(name)
 
 }
 
