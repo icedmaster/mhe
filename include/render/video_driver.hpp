@@ -7,6 +7,7 @@
 #include "core/types.hpp"
 #include "core/ref_ptr.hpp"
 #include "core/unique_ptr.hpp"
+#include "material.hpp"
 
 namespace mhe
 {
@@ -112,6 +113,18 @@ public:
 		uint frames_;
 		uint elements_count_;
 	};
+
+	struct State
+	{
+		size_t shader_program;
+		size_t vertex_buffer;
+		size_t index_buffer;
+		size_t layout;
+		size_t render_target;
+		size_t state;
+		size_t textures[material_textures_number];
+		size_t uniforms[material_uniforms_number];
+	};
 public:
 	Driver();
 	~Driver() {}
@@ -188,6 +201,7 @@ public:
 	void render(const Context& context, const Node* nodes, size_t count);
 private:
 	Stats stats_;
+	State state_;
 	unique_ptr<DriverImpl> impl_;
 };
 

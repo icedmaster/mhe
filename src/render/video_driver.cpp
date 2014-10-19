@@ -23,6 +23,7 @@ void Driver::Stats::update_frames()
 Driver::Driver() :
 	impl_(SystemFactory::instance().create_driver())
 {
+	::memset(&state_, 0xff, sizeof(state_));
 }
 
 void Driver::clear(bool clear_color, bool clear_depth, bool clear_stencil,
@@ -71,9 +72,21 @@ void Driver::render(const Context& context, const Node* nodes, size_t count)
 			{
 				const DrawCallData& draw_call_data = context.draw_call_data_pool.get(draw_call_data_id);
 				if (draw_call_data.render_target != default_render_target)
-					impl_->set_render_target(context.render_target_pool.get(draw_call_data.render_target - 1));
+				{
+					if (state_.render_target != draw_call_data.render_target)
+					{
+						state_.render_target = draw_call_data.render_target;
+						impl_->set_render_target(context.render_target_pool.get(draw_call_data.render_target - 1));
+					}
+				}
 				else
-					impl_->set_default_render_target();
+				{
+					if (state_.render_target != default_render_target)
+					{
+						state_.render_target = default_render_target;
+						impl_->set_default_render_target();
+					}
+				}
 
 				if (draw_call_data.command != nullptr)
 				{
@@ -81,30 +94,63 @@ void Driver::render(const Context& context, const Node* nodes, size_t count)
 						break;
 				}
 
-				impl_->set_state(context.render_state_pool.get(draw_call_data.state));
+				if (state_.state != draw_call_data.state)
+				{
+					impl_->set_state(context.render_state_pool.get(draw_call_data.state));
+					state_.state = draw_call_data.state;
+				}
 			}
-			else impl_->set_default_render_target();
+			else
+			{
+				if (state_.render_target != default_render_target)
+				{
+					impl_->set_default_render_target();
+					state_.render_target = default_render_target;
+				}
+			}
 
 			const Material& material =
 				context.materials[material_system_id].get(material_id);
 
-			impl_->set_shader_program(context.shader_pool.get(material.shader_program));
-			impl_->set_vertex_buffer(context.vertex_buffer_pool.get(node.mesh.vbuffer));
-			impl_->set_index_buffer(context.index_buffer_pool.get(node.mesh.ibuffer));
-			impl_->set_layout(context.layout_pool.get(node.mesh.layout));
+			if (state_.shader_program != material.shader_program)
+			{
+				impl_->set_shader_program(context.shader_pool.get(material.shader_program));
+				state_.shader_program = material.shader_program;
+			}
+			
+			if (state_.vertex_buffer != node.mesh.vbuffer)
+			{
+				impl_->set_vertex_buffer(context.vertex_buffer_pool.get(node.mesh.vbuffer));
+				state_.vertex_buffer = node.mesh.vbuffer;
+			}
+			
+			if (state_.index_buffer != node.mesh.ibuffer)
+			{
+				impl_->set_index_buffer(context.index_buffer_pool.get(node.mesh.ibuffer));
+				state_.index_buffer = node.mesh.ibuffer;
+			}
+			
+			//if (state_.layout != node.mesh.layout)
+			{
+				impl_->set_layout(context.layout_pool.get(node.mesh.layout));
+				state_.layout = node.mesh.layout;
+			}
+			
 			for (size_t j = 0; j < material_textures_number; ++j)
 			{
-				if (material.textures[j].id == Texture::invalid_id)
+				if (material.textures[j].id == Texture::invalid_id || material.textures[j].id == state_.textures[j])
 					continue;
 				const Texture& texture = context.texture_pool.get(material.textures[j].id);
 				impl_->set_texture(texture, j);
+				state_.textures[j] = material.textures[j].id;
 			}
 			for (size_t j = 0; j < material_uniforms_number; ++j)
 			{
-				if (material.uniforms[j] == UniformBuffer::invalid_id)
+				if (material.uniforms[j] == UniformBuffer::invalid_id || material.uniforms[j] == state_.uniforms[j])
 					continue;
 				const UniformBuffer& uniform = context.uniform_pool.get(material.uniforms[j]);
 				impl_->set_uniform(uniform);
+				state_.uniforms[j] = material.uniforms[j];
 			}
 			impl_->draw(node.mesh.render_data);
 

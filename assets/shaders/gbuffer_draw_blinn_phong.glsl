@@ -1,4 +1,4 @@
-#define MAX_LIGHTS_NUMBER 4
+#define MAX_LIGHTS_NUMBER 8
 
 [defs LIGHT_TYPE 0 2]
 [defs LIGHTS_NUMBER 1 4]
