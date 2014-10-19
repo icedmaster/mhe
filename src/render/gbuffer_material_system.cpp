@@ -286,7 +286,7 @@ size_t GBufferDrawMaterialSystem::calculate_passes_number(RenderContext& render_
 	size_t number = 0;
 	for (size_t i = 0; i < Light::light_types_number; ++i)
 	{
-		size_t passes_per_type = (static_cast<float>(indexes[i]) / lights_per_pass_ + 0.5f);
+		size_t passes_per_type = indexes[i] / lights_per_pass_ + (indexes[i] % lights_per_pass_ == 0 ? 0 : 1);
 		if (!passes_per_type) continue;
 		size_t j = 0;
 		for (size_t end = (passes_per_type > 1) ? passes_per_type - 1 : 0; j < end; ++j)

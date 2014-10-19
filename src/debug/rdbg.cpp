@@ -91,6 +91,9 @@ std::string RDBGProcessor::process_command(const std::string& cmd)
 	if (process_default_command(result, args))
 		return result;
 
+	if (process_var(result, args))
+		return result;
+
 	const std::vector<std::string>& subtypes = utils::split(args[0], ".");
 	const std::string& type_name = subtypes[0];
 	DataMap::iterator it = data_.find(hash(type_name));
@@ -116,6 +119,38 @@ bool RDBGProcessor::process_default_command(std::string& result, const std::vect
 	return !result.empty();
 }
 
+bool RDBGProcessor::process_var(std::string& result, const std::vector<std::string>& args)
+{
+	if (args.size() < 2) return false;
+	const std::string& varname = args[0];
+	const std::string& cmd = args[1];
+
+	if (!GlobalVars::instance().has(varname.c_str()))
+		return false;
+	if (cmd == set_command)
+		return set_var(result, args);
+	else if (cmd == get_command)
+		return get_var(result);
+	else
+	{
+		result = make_error(error_unknown_command);
+		return true;
+	}
+}
+
+bool RDBGProcessor::set_var(std::string& result, const std::vector<std::string>& args)
+{
+	GlobalVars::instance().set(args[0].c_str(), &args[2], args.size() - 2);
+	result = "ok";
+	return true;
+}
+
+bool RDBGProcessor::get_var(std::string& result)
+{
+	result = make_error(error_unknown_command);
+	return true;
+}
+
 std::string RDBGProcessor::process_get_all_command(const std::vector<std::string>& /*args*/)
 {
 	std::string result;
@@ -126,6 +161,13 @@ std::string RDBGProcessor::process_get_all_command(const std::vector<std::string
 		add_field(result, data.name);
 		add_field(result, "fields");
 		process_get_data(result, data);
+	}
+
+	const std::vector<GlobalVars::Data>& global_vars = GlobalVars::instance().data();
+	for (size_t i = 0; i < global_vars.size(); ++i)
+	{
+		add_field(result, "var");
+		add_field(result, global_vars[i].name, global_vars[i].type);
 	}
 	return result;
 }
@@ -253,6 +295,19 @@ std::vector<GlobalVars::Data> GlobalVars::data() const
 	for (VarsMap::const_iterator it = vars_.begin(); it != vars_.end(); ++it)
 		result.push_back(it->second);
 	return result;
+}
+
+void GlobalVars::set(const char* name, const std::string* args, size_t args_number)
+{
+	VarsMap::iterator it = vars_.find(hash(name));
+	if (it == vars_.end()) return;
+	Data& data = it->second;
+	switch (data.type)
+	{
+	case Int: data.value = args[0]; return;
+	case None: return;
+	default: return;
+	}
 }
 
 }

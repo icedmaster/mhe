@@ -156,11 +156,15 @@ private:
 	}
 
 	bool process_default_command(std::string& result, const std::vector<std::string>& args);
+	bool process_var(std::string& result, const std::vector<std::string>& args);
 	std::string process_get_all_command(const std::vector<std::string>& args);
 	std::string process_profiler_result_command(const std::vector<std::string>& args);
 	void process_get_data(std::string& result, const Data& data) const;
 
 	const Data* find_data(const Data& root, const std::vector<std::string>& names) const;
+
+	bool set_var(std::string& result, const std::vector<std::string>& args);
+	bool get_var(std::string& result);
 
 	typedef std::map<hash_type, Data> DataMap;
 	DataMap data_;
@@ -242,6 +246,8 @@ public:
 		data.type = TypeHelper<T>::type;
 		data.value = types_cast<std::string>(value);
 	}
+
+	void set(const char* name, const std::string* args, size_t args_number);
 
 	bool has(const char* name) const
 	{
