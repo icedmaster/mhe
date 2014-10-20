@@ -203,9 +203,10 @@ std::string RDBGProcessor::process_profiler_result_command(const std::vector<std
 std::string RDBGProcessor::process_stats_command(const std::vector<std::string>& /*args*/)
 {
 	std::string result;
-	add_stat_field(result, "fps", engine_.context().driver.stats().frames());
-	add_stat_field(result, "tris", engine_.context().driver.stats().tris());
-	add_stat_field(result, "drawcalls:", engine_.context().driver.stats().batches());
+	Driver::Stats& stats = engine_.context().driver.stats();
+	add_stat_field(result, "fps", stats.frames());
+	add_stat_field(result, "tris", stats.tris() / stats.frames());
+	add_stat_field(result, "drawcalls:", stats.batches() / stats.frames());
 	return result;
 }
 
