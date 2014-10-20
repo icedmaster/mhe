@@ -159,6 +159,7 @@ private:
 	bool process_var(std::string& result, const std::vector<std::string>& args);
 	std::string process_get_all_command(const std::vector<std::string>& args);
 	std::string process_profiler_result_command(const std::vector<std::string>& args);
+	std::string process_stats_command(const std::vector<std::string>& args);
 	void process_get_data(std::string& result, const Data& data) const;
 
 	const Data* find_data(const Data& root, const std::vector<std::string>& names) const;

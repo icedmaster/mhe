@@ -25,6 +25,7 @@ private:
 
 	void clear_depth();
 	void clear_color();
+	void clear_stencil();
 
 	void set_clear_color(const colorf&);
 

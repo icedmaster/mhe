@@ -20,6 +20,26 @@ private:
 	Desc desc_;
 };
 
+class StencilState
+{
+public:
+	void init(const StencilDesc& desc);
+	void enable() const;
+private:
+	struct Desc
+	{
+		GLenum front_op_pass;
+		GLenum front_op_dfail;
+		GLenum front_op_sfail;
+		GLenum front_compare_mode;
+		GLint front_ref;
+		GLint front_mask;
+		bool enabled;
+	};
+
+	Desc desc_; 
+};
+
 class BlendState
 {
 public:
@@ -52,6 +72,7 @@ public:
 	void disable() const;
 private:
 	DepthState depth_state_;
+	StencilState stencil_state_;
 	BlendState blend_state_;
 };
 

@@ -10,9 +10,10 @@
 namespace mhe {
 
 // helper stats class
-void Driver::Stats::update()
+void Driver::Stats::update(size_t tris)
 {
 	++batches_;
+	tris_ += tris;
 }
 
 void Driver::Stats::update_frames()
@@ -41,7 +42,7 @@ void Driver::clear(bool clear_color, bool clear_depth, bool clear_stencil,
 		NOT_IMPLEMENTED(depth);
 	}
 
-	NOT_IMPLEMENTED(clear_stencil);
+	impl_->clear_stencil();
 	NOT_IMPLEMENTED(stencil);
 }
 
@@ -153,6 +154,7 @@ void Driver::render(const Context& context, const Node* nodes, size_t count)
 				state_.uniforms[j] = material.uniforms[j];
 			}
 			impl_->draw(node.mesh.render_data);
+			stats_.update(node.mesh.render_data.elements_number);
 
 			if (passes.passes.empty() || additional_pass_index >= passes.passes.size())
 				break;
@@ -161,6 +163,16 @@ void Driver::render(const Context& context, const Node* nodes, size_t count)
 			++additional_pass_index;
 		}
 	}
+}
+
+void Driver::begin_render()
+{
+}
+
+void Driver::end_render()
+{
+	stats_.update_frames();
+	impl_->flush();
 }
 
 }

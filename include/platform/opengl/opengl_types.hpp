@@ -94,6 +94,20 @@ inline GLenum get_blend_mode(BlendMode mode)
 	return modes[mode];
 }
 
+inline GLenum get_stencil_op(StencilOp op)
+{
+	ASSERT(op < 2, "Invalid stencil op");
+	GLenum ops[2] = {GL_KEEP, GL_REPLACE};
+	return ops[op];
+}
+
+inline GLenum get_compare_mode(CompareMode mode)
+{
+	ASSERT(mode < 3, "Invalid compare mode");
+	GLenum modes[3] = {GL_ALWAYS, GL_EQUAL, GL_NOTEQUAL};
+	return modes[mode];
+}
+
 inline size_t get_bytes_per_format(GLenum format)
 {
 	switch (format)

@@ -6,6 +6,13 @@
 
 namespace mhe {
 
+enum CompareMode
+{
+	compare_mode_always,
+	compare_mode_equal,
+	compare_mode_not_equal
+};
+
 struct DepthDesc
 {
 	bool enabled;
@@ -15,12 +22,28 @@ struct DepthDesc
 	{}
 };
 
+enum StencilOp
+{
+	stencil_op_keep,
+	stencil_op_replace
+};
+
 struct StencilDesc
 {
+	CompareMode front_compare_func;
+	StencilOp front_operation_pass;
+	StencilOp front_operation_dfail;
+	StencilOp front_operation_sfail;
 	bool enabled;
+	uint8_t front_reference;
+	uint8_t front_mask;
 
 	StencilDesc() :
-		enabled(true)
+		front_compare_func(compare_mode_equal),
+		front_operation_pass(stencil_op_keep),
+		front_operation_dfail(stencil_op_keep),
+		front_operation_sfail(stencil_op_keep),
+		enabled(true), front_reference(0), front_mask(0xff)
 	{}
 };
 

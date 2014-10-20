@@ -41,6 +41,7 @@ public:
 
 	virtual void clear_depth() = 0;
 	virtual void clear_color() = 0;
+	virtual void clear_stencil() = 0;
 
 	virtual void set_clear_color(const colorf&) {}
 
@@ -72,46 +73,42 @@ public:
 	class Stats
 	{
 	public:
-		Stats() : tris_(0), batches_(0)
+		Stats() : tris_(0), batches_(0), frames_(0)
 		{}
 
 		void reset()
 		{
-			tris_ = batches_ = frames_ = elements_count_ = 0;
+			last_frames_ = frames_;
+			last_tris_ = tris_;
+			last_batches_ = batches_;
+			tris_ = batches_ = frames_ = 0;
 		}
 
-		void update();
+		void update(size_t tris);
 		void update_frames();
-
-		void add_renderable_count(uint count)
-		{
-			elements_count_ += count;
-		}
 
 		uint tris() const
 		{
-			return tris_;
+			return last_tris_;
 		}
 
 		uint batches() const
 		{
-			return batches_;
+			return last_batches_;
 		}
 
 		uint frames() const
 		{
-			return frames_;
-		}
-
-		uint elements_count() const
-		{
-			return elements_count_;
+			return last_frames_;
 		}
 	private:
 		uint tris_;
 		uint batches_;
 		uint frames_;
-		uint elements_count_;
+
+		uint last_frames_;
+		uint last_tris_;
+		uint last_batches_;
 	};
 
 	struct State
@@ -190,13 +187,8 @@ public:
 	/// Reset implementaion - need to call init()
 	void reset();
 
-	void begin_render()
-	{}
-
-	void end_render()
-	{
-		impl_->flush();
-	}
+	void begin_render();
+	void end_render();
 
 	void render(const Context& context, const Node* nodes, size_t count);
 private:

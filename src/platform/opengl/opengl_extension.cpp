@@ -62,6 +62,8 @@ void OpenGLExtensions::init_extensions()
 	glDrawBuffers_ = load_extension<PFNGLDRAWBUFFERSPROC>("glDrawBuffers");
 	glBlendFuncSeparate_ = load_extension<PFNGLBLENDFUNCSEPARATEPROC>("glBlendFuncSeparate");
 	glBlendEquation_ = load_extension<PFNGLBLENDEQUATIONPROC>("glBlendEquation");
+	glStencilFuncSeparate_ = load_extension<PFNGLSTENCILFUNCSEPARATEPROC>("glStencilFuncSeparate");
+	glStencilOpSeparate_ = load_extension<PFNGLSTENCILOPSEPARATEPROC>("glStencilOpSeparate");
 #endif	// MHE_OPENGL_HAS_SHADERS
 
 	get_str_extensions();

@@ -4,6 +4,8 @@
 #include "utils/strutils.hpp"
 #include "utils/global_log.hpp"
 
+#include "game/engine.hpp"
+
 #include "debug/profiler.hpp"
 
 namespace mhe {
@@ -25,6 +27,7 @@ const char* get_command = "g";
 
 const char* get_all_command = "get";
 const char* profiler_result_command = "profiler";
+const char* stats_command = "stats";
 
 template <class T>
 T convert(const std::string* args, size_t argc)
@@ -79,6 +82,14 @@ inline void add_field(std::string& dst, const std::string& field, int type)
 	dst += types_cast<std::string>(type);
 	dst += " ";
 }
+
+template <class T>
+inline void add_stat_field(std::string& dst, const char* name, const T& value)
+{
+	dst += name;
+	dst += ":" + types_cast<std::string>(value);
+	dst += "\n";
+}
 }
 
 std::string RDBGProcessor::process_command(const std::string& cmd)
@@ -116,6 +127,8 @@ bool RDBGProcessor::process_default_command(std::string& result, const std::vect
 		result = process_get_all_command(args);
 	else if (cmd == profiler_result_command)
 		result = process_profiler_result_command(args);
+	else if (cmd == stats_command)
+		result = process_stats_command(args);
 	return !result.empty();
 }
 
@@ -184,6 +197,15 @@ std::string RDBGProcessor::process_profiler_result_command(const std::vector<std
 		result += (" data:" + data[i].data);
 		result += "\n";
 	}
+	return result;
+}
+
+std::string RDBGProcessor::process_stats_command(const std::vector<std::string>& /*args*/)
+{
+	std::string result;
+	add_stat_field(result, "fps", engine_.context().driver.stats().frames());
+	add_stat_field(result, "tris", engine_.context().driver.stats().tris());
+	add_stat_field(result, "drawcalls:", engine_.context().driver.stats().batches());
 	return result;
 }
 

@@ -2,7 +2,6 @@
 
 #include "game/base_view_events_handler.hpp"
 #include "utils/global_log.hpp"
-#include "utils/sysutils.hpp"
 
 #include "render/render_context.hpp"
 
@@ -82,6 +81,8 @@ bool Engine::init(uint width, uint height, uint bpp, bool fullscreen)
 	default_rdbg_setup(rdbg_engine_.processor());
 #endif
 
+	stats_timer_.start();
+
 	return true;
 }
 
@@ -111,6 +112,13 @@ void Engine::update()
 {
 	MainProfiler::instance().clear();
 	ProfilerElement pe("engine.update");
+
+	if (stats_timer_.elapsed() > 1.0f)
+	{
+		context_.driver.stats().reset();
+		stats_timer_.start();
+	}
+
 	event_manager_.check(context_.window_system);
 	if (game_scene_ != nullptr)
 		game_scene_->update(*this);

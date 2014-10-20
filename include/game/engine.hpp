@@ -11,6 +11,8 @@
 #include "scene/scene.hpp"
 #include "game_scene.hpp"
 
+#include "utils/sysutils.hpp"
+
 namespace mhe {
 namespace game {
 
@@ -60,10 +62,12 @@ private:
 #endif
 
 	Context context_;
-    EventManager event_manager_;
-		Scene scene_;
-		ref_ptr<GameScene> game_scene_;
-		bool process_;
+	EventManager event_manager_;
+	Scene scene_;
+	utils::Timer stats_timer_;
+
+	ref_ptr<GameScene> game_scene_;
+	bool process_;
 };
 
 }}

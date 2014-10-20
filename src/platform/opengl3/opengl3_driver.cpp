@@ -39,6 +39,11 @@ void OpenGL3Driver::clear_color()
 	glClear(GL_COLOR_BUFFER_BIT);
 }
 
+void OpenGL3Driver::clear_stencil()
+{
+	glClear(GL_STENCIL_BUFFER_BIT);
+}
+
 void OpenGL3Driver::set_clear_color(const colorf& color)
 {
 	glClearColor(color.r(), color.g(), color.b(), color.a());

@@ -486,6 +486,24 @@ public:
 		::glBlendEquation(mode);
 #endif
 	}
+
+	void glStencilFuncSeparate(GLenum face, GLenum func, GLenum ref, GLenum mask)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glStencilFuncSeparate_(face, func, ref, mask);
+#else
+		::glStencilFuncSeparate(face, func, ref, mask);
+#endif
+	}
+
+	void glStencilOpSeparate(GLenum face, GLenum sfail, GLenum dpfail, GLenum dppass)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glStencilOpSeparate_(face, sfail, dpfail, dppass);
+#else
+		::glStencilOpSeparate(face, sfail, dpfail, dppass);
+#endif
+	}
 private:
 	OpenGLExtensions() {}
 	~OpenGLExtensions() {}
@@ -558,6 +576,8 @@ private:
 	PFNGLDRAWBUFFERSPROC glDrawBuffers_;
 	PFNGLBLENDFUNCSEPARATEPROC glBlendFuncSeparate_;
 	PFNGLBLENDEQUATIONPROC glBlendEquation_;
+	PFNGLSTENCILFUNCSEPARATEPROC glStencilFuncSeparate_;
+	PFNGLSTENCILOPSEPARATEPROC glStencilOpSeparate_;
 #endif
 	std::map<std::string, bool> loaded_extensions_;
 };
