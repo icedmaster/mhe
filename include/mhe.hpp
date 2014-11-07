@@ -14,4 +14,5 @@
 #include "mhe_scene.hpp"
 #include "mhe_threads.hpp"
 #include "mhe_net.hpp"
+#include "mhe_debug.hpp"
 #endif // __MHE_MHE__

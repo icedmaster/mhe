@@ -3,7 +3,6 @@
 
 #include "mesh.hpp"
 #include "material.hpp"
-#include "transform.hpp"
 #include "render_state.hpp"
 #include "render_target.hpp"
 
@@ -52,10 +51,8 @@ struct AdditionalPasses
 struct Node
 {
 	Mesh mesh;
-	Transform::IdType transform;
 	MainPassData main_pass;
-	uint16_t additional_passes;
-	uint16_t id;
+	AdditionalPasses::IdType additional_passes;
 };
 
 }

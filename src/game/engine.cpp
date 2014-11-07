@@ -126,8 +126,7 @@ void Engine::update()
 	RenderContext render_context;
 	render_context.tick = utils::get_current_time();
 	render_context.fdelta = utils::get_last_delta();
-	SceneContext scene_context;
-	scene_.update(render_context, context_, scene_context);
+	scene_.update(render_context, context_);
 	update_materials(render_context);
 }
 
@@ -138,7 +137,7 @@ void Engine::render()
 	context_.driver.clear_depth();
 	context_.driver.begin_render();
 
-	Node* nodes = nullptr;
+	NodeInstance* nodes = nullptr;
 	size_t count = scene_.nodes(nodes);
 	context_.driver.render(context_, nodes, count);
 	if (game_scene_ != nullptr)
@@ -160,11 +159,11 @@ void Engine::update_materials(RenderContext& render_context)
 	const MaterialSystems::Values &systems = context_.material_systems.get_all_materials();
 	for (size_t i = 0; i < systems.size(); ++i)
 	{
-		Node* nodes = nullptr;
+		NodeInstance* nodes = nullptr;
 		size_t offset;
 		size_t count = scene_.nodes(nodes, offset, systems[i]->id());
 		if (!count) continue;
-		systems[i]->update(context_, render_context, nodes, scene_.transform_pool().all_objects(), indexes, count);
+		systems[i]->update(context_, scene_.scene_context(), render_context, nodes, count);
 	}
 }
 

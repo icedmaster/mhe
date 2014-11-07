@@ -14,9 +14,12 @@ struct Material;
 struct MaterialInstance;
 struct RenderContext;
 struct ModelContext;
-struct Node;
+struct SceneContext;
 struct Mesh;
 struct TextureInstance;
+struct NodeInstance;
+struct TransformInstance;
+
 class Transform;
 
 static const size_t max_material_definitions = 8;
@@ -35,9 +38,9 @@ public:
 	virtual bool init(Context& context, const MaterialSystemContext& material_system_context) = 0;
 	virtual void close() = 0;
 
-	virtual void setup(Context& context, Node* nodes, ModelContext* model_contexts, size_t count) = 0;
-	virtual void destroy(Context& context, Node* nodes, size_t count) = 0;
-	virtual void update(Context& context, RenderContext& render_context, Node* nodes, Transform* transforms, size_t* transform_indices, size_t count) = 0;
+	virtual void setup(Context& context, SceneContext& scene_context, NodeInstance* nodes, ModelContext* model_contexts, size_t count) = 0;
+	virtual void destroy(Context& context, SceneContext& scene_context, NodeInstance* nodes, size_t count) = 0;
+	virtual void update(Context& context, SceneContext& scene_context, RenderContext& render_context, NodeInstance* nodes, size_t count) = 0;
 
 	virtual void set_texture(const TextureInstance& /*texture*/) {}
 	virtual void set_texture(size_t /*unit*/, const TextureInstance& /*texture*/) {}
@@ -67,9 +70,9 @@ public:
 		return name_impl();
 	}
 protected:
-	void standart_material_setup(Context& context, Node* nodes, ModelContext* model_contexts, size_t count, size_t textures_number);
-	void additional_passes_setup(Context& context, Node* nodes, size_t count);
-	Transform& transform(const Node& node, Transform* transforms, size_t* indexes) const;
+	void standart_material_setup(Context& context, SceneContext& scene_context, NodeInstance* nodes, ModelContext* model_contexts, size_t count, size_t textures_number);
+	void additional_passes_setup(Context& context, NodeInstance* nodes, size_t count);
+	Transform& transform(const NodeInstance& node, const SceneContext& scene_context) const;
 
 	void set_layout(size_t layout)
 	{
@@ -95,7 +98,7 @@ protected:
 	ShaderProgram& default_program(const Context& context) const;
 private:
 	virtual hash_type name_impl() const = 0;
-	virtual void setup_uniforms(Material& /*material*/, Context& /*context*/, const ModelContext& /*model_context*/) {}
+	virtual void setup_uniforms(Material& /*material*/, Context& /*context*/, SceneContext& /*scene_context*/, const NodeInstance& /*node*/, const ModelContext& /*model_context*/) {}
 
 	Shader shader_;
 	size_t layout_;

@@ -5,6 +5,7 @@
 
 #include "scene/camera.hpp"
 #include "scene/camera_controller.hpp"
+#include "scene/culling.hpp"
 #include "scene/scene.hpp"
 
 #endif // __MHE_SCENE__

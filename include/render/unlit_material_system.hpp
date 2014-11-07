@@ -12,14 +12,14 @@ class MHE_EXPORT UnlitMaterialSystem : public MaterialSystem
 {
 	SETUP_MATERIAL("unlit");
 public:
-	bool init(Context& context, const MaterialSystemContext& material_system_context);
-	void close() {}
+	bool init(Context& context, const MaterialSystemContext& material_system_context) override;
+	void close() override {}
 
-	void update(Context& context, RenderContext& render_context, Node* nodes, Transform* transforms, size_t *indexes, size_t count);
-	void setup(Context& context, Node* materials, ModelContext* model_contexts, size_t count);
-	void destroy(Context& context, Node* nodes, size_t count);
+	void update(Context& context, SceneContext& scene_context, RenderContext& render_context, NodeInstance* nodes, size_t count) override;
+	void setup(Context& context, SceneContext& scene_context, NodeInstance* materials, ModelContext* model_contexts, size_t count) override;
+	void destroy(Context& context, SceneContext& scene_context, NodeInstance* nodes, size_t count) override;
 private:
-	void setup_uniforms(Material& material, Context& context, const ModelContext& model_context);
+	void setup_uniforms(Material& material, Context& context, SceneContext& scene_context, const NodeInstance& node, const ModelContext& model_context) override;
 
 	UniformBuffer::IdType transform_uniform_;
 };

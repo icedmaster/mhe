@@ -13,7 +13,7 @@ namespace mhe
 {
 
 struct Context;
-struct Node;
+struct NodeInstance;
 struct RenderData;
 
 class Texture;
@@ -190,7 +190,7 @@ public:
 	void begin_render();
 	void end_render();
 
-	void render(const Context& context, const Node* nodes, size_t count);
+	void render(const Context& context, const NodeInstance* nodes, size_t count);
 private:
 	Stats stats_;
 	State state_;

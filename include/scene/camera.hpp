@@ -5,6 +5,7 @@
 #include "math/matrix.hpp"
 #include "math/vector3.hpp"
 #include "math/quat.hpp"
+#include "math/frustum.hpp"
 
 namespace mhe {
 
@@ -50,22 +51,28 @@ public:
 
 	void translate_by(const vec3& delta)
 	{
-		//position_ += delta;
-		//update_view();
-		transform_.set_row(3, -(position() + delta));
+		position_ += delta;
+		update_view();
+		//transform_.set_row(3, -(position() + delta));
 	}
 
 	void rotate_by(const quatf& rotation)
 	{
-		transform_ *= rotation.to_matrix<mat4x4>();
-		//rotation_ *= rotation;
-		//update_view();
+		//transform_ *= rotation.to_matrix<mat4x4>();
+		rotation_ *= rotation;
+		update_view();
 	}
 
 	void get(mat4x4& v, mat4x4& p, mat4x4& vp) const;
+
+	const frustumf& camera_frustum() const
+	{
+		return frustum_;
+	}
 private:
 	void update_view();
 
+	frustumf frustum_;
 	mat4x4 transform_;
 	mat4x4 projection_;
 	quatf rotation_;

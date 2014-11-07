@@ -25,6 +25,7 @@ void Camera::update_view()
 {
 	transform_ = mat4x4::translation_matrix(-position_);
 	transform_ *= rotation_.to_matrix<mat4x4>();
+	frustum_.set(viewprojection());
 }
 
 }

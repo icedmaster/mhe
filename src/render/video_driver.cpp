@@ -2,7 +2,7 @@
 
 #include "impl/system_factory.hpp"
 
-#include "render/node.hpp"
+#include "render/instances.hpp"
 #include "render/context.hpp"
 
 #include "debug/profiler.hpp"
@@ -52,13 +52,13 @@ void Driver::reset()
 	impl_.reset(SystemFactory::instance().create_driver());
 }
 
-void Driver::render(const Context& context, const Node* nodes, size_t count)
+void Driver::render(const Context& context, const NodeInstance* nodes, size_t count)
 {
 	ProfilerElement pe("driver.render");
 	ASSERT(nodes, "Invalid nodes");
 	for (size_t i = 0; i < count; ++i)
 	{
-		const Node& node = nodes[i];
+		const Node& node = nodes[i].node;
 		uint16_t draw_call_data_id = node.main_pass.draw_call_data;
 		uint8_t material_system_id = node.main_pass.material.material_system;
 		Material::IdType material_id = node.main_pass.material.id;

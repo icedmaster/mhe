@@ -5,25 +5,24 @@ class GameScene : public mhe::game::GameScene
 public:
 	bool init(mhe::game::Engine& engine, const mhe::game::GameSceneDesc& /*desc*/)
 	{
-		mhe::Node& skybox = engine.scene().create_node();
-		mhe::utils::create_skybox_quad(skybox.mesh, engine.context());
+		mhe::NodeInstance& skybox = engine.scene().create_node();
+		mhe::utils::create_skybox_quad(skybox.node.mesh, engine.context());
 
 		mhe::SkyboxMaterialSystem* skybox_material_system = engine.context().material_systems.get<mhe::SkyboxMaterialSystem>();
 		mhe::ModelContext skybox_context;
 		skybox_context.textures[0] = "cubemaps/test.cubemap";
-		skybox_material_system->setup(engine.context(), &skybox, &skybox_context, 1);
+		skybox_material_system->setup(engine.context(), engine.scene().scene_context(), &skybox, &skybox_context, 1);
 		
-		mhe::Node& node = engine.scene().create_node();
-		engine.context().mesh_manager.get(node.mesh, "duck.bin");
-		mhe::Transform& transform = engine.scene().transform_pool().get(node.transform);
+		mhe::NodeInstance& node = engine.scene().create_node();
+		engine.context().mesh_manager.get(node.node.mesh, "duck.bin");
+		mhe::Transform& transform = engine.scene().transform_pool().get(node.transform_id).transform;
 		transform.scale_to(mhe::vec3(0.05, 0.05, 0.05));
 
 		mhe::UnlitMaterialSystem* material_system = engine.context().material_systems.get<mhe::UnlitMaterialSystem>();
 
 		mhe::ModelContext model_context[1];
-		model_context[0].model = transform;
 		model_context[0].textures[0] = "test.tga";
-		material_system->setup(engine.context(), &node, model_context, 1);
+		material_system->setup(engine.context(), engine.scene().scene_context(), &node, model_context, 1);
 		return true;
 	}
 

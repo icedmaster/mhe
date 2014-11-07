@@ -2,6 +2,7 @@
 
 #include "render/layouts.hpp"
 #include "render/context.hpp"
+#include "render/instances.hpp"
 
 namespace mhe {
 
@@ -17,12 +18,12 @@ void PosteffectSimpleMaterialSystem::close()
 {
 }
 
-void PosteffectSimpleMaterialSystem::setup(Context& context, Node* nodes, ModelContext* model_contexts, size_t count)
+void PosteffectSimpleMaterialSystem::setup(Context& context, SceneContext& scene_context, NodeInstance* nodes, ModelContext* model_contexts, size_t count)
 {
-	standart_material_setup(context, nodes, model_contexts, count, 0);
+	standart_material_setup(context, scene_context, nodes, model_contexts, count, 0);
 	for (size_t i = 0; i < count; ++i)
 	{
-		Material& material = context.materials[id()].get(nodes[i].main_pass.material.id);
+		Material& material = context.materials[id()].get(nodes[i].node.main_pass.material.id);
 
 		for (size_t i = 0; i < material_textures_number; ++i)
 		{
@@ -31,7 +32,7 @@ void PosteffectSimpleMaterialSystem::setup(Context& context, Node* nodes, ModelC
 			material.textures[i] = textures_[i];
 		}
 
-		DrawCallData& draw_call_data = context.draw_call_data_pool.get(nodes[i].main_pass.draw_call_data);
+		DrawCallData& draw_call_data = context.draw_call_data_pool.get(nodes[i].node.main_pass.draw_call_data);
 		RenderStateDesc desc;
 		desc.blend.enabled = true;
 		desc.blend.srcmode = blend_src_alpha;
@@ -42,11 +43,11 @@ void PosteffectSimpleMaterialSystem::setup(Context& context, Node* nodes, ModelC
 	}
 }
 
-void PosteffectSimpleMaterialSystem::destroy(Context& /*context*/, Node* /*nodes*/, size_t /*count*/)
+void PosteffectSimpleMaterialSystem::destroy(Context& /*context*/, SceneContext& scene_context, NodeInstance* /*nodes*/, size_t /*count*/)
 {
 }
 
-void PosteffectSimpleMaterialSystem::update(Context& /*context*/, RenderContext& /*render_context*/, Node* /*nodes*/, Transform* /*transforms*/, size_t* /*transform_indices*/, size_t /*count*/)
+void PosteffectSimpleMaterialSystem::update(Context& /*context*/, SceneContext& scene_context, RenderContext& /*render_context*/, NodeInstance* /*nodes*/, size_t /*count*/)
 {
 }
 

@@ -29,7 +29,6 @@ const size_t max_textures_per_model = 8;
 
 struct ModelContext
 {
-	mat4x4 model;
 	std::string textures[max_textures_per_model];
 };
 

@@ -27,10 +27,15 @@ public:
 		return context_;
 	}
 
-    EventManager& event_manager()
-    {
-        return event_manager_;
-    }
+	SceneContext& scene_context()
+	{
+		return scene_.scene_context();
+	}
+
+	EventManager& event_manager()
+	{
+		return event_manager_;
+	}
 
 	Scene& scene()
 	{

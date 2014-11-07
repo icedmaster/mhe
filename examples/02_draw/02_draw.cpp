@@ -5,32 +5,28 @@ class GameScene : public mhe::game::GameScene
 public:
 	bool init(mhe::game::Engine& engine, const mhe::game::GameSceneDesc& /*desc*/)
 	{
-		mhe::Node& node = engine.scene().create_node();
-		mhe::utils::create_plane(node.mesh, engine.context());
+		mhe::NodeInstance& node = engine.scene().create_node();
+		mhe::utils::create_plane(node.node.mesh, engine.context());
 
-		mhe::Node& node2 = engine.scene().create_node();
-		mhe::utils::create_plane(node2.mesh, engine.context());
-		mhe::Transform& transform = engine.scene().transform_pool().get(node2.transform);
-		transform.translate_by(mhe::vec3(2, 2, 0));
+		mhe::NodeInstance& node2 = engine.scene().create_node();
+		mhe::utils::create_plane(node2.node.mesh, engine.context());
+		mhe::TransformInstance& transform = engine.scene().transform_pool().get(node2.transform_id);
+		transform.transform.translate_by(mhe::vec3(2, 2, 0));
 
-		mhe::Node& node3 = engine.scene().create_node();
-		engine.context().mesh_manager.get(node3.mesh, "duck.bin");
-		mhe::Transform& transform3 = engine.scene().transform_pool().get(node3.transform);
-		transform3.translate_by(mhe::vec3(-2, -2, 0));
-		transform3.scale_to(mhe::vec3(0.05, 0.05, 0.05));
+		mhe::NodeInstance& node3 = engine.scene().create_node();
+		engine.context().mesh_manager.get(node3.node.mesh, "duck.bin");
+		mhe::TransformInstance& transform3 = engine.scene().transform_pool().get(node3.transform_id);
+		transform3.transform.translate_by(mhe::vec3(-2, -2, 0));
+		transform3.transform.scale_to(mhe::vec3(0.05, 0.05, 0.05));
 
-		mhe::Node& node4 = engine.scene().create_node();
-		mhe::utils::create_axes(node4.mesh, engine.context());
+		mhe::NodeInstance& node4 = engine.scene().create_node();
+		mhe::utils::create_axes(node4.node.mesh, engine.context());
 
 		mhe::UnlitMaterialSystem* material_system = engine.context().material_systems.get<mhe::UnlitMaterialSystem>();
 
 		mhe::ModelContext model_context[4];
-		model_context[0].model = engine.scene().transform_pool().get(node.transform);
 		model_context[0].textures[0] = "test.tga";
-		model_context[1].model = transform;
-		model_context[2].model = transform3;
-		model_context[3].model = engine.scene().transform_pool().get(node4.transform);
-		material_system->setup(engine.context(), &node, model_context, 4);
+		material_system->setup(engine.context(), engine.scene().scene_context(), &node, model_context, 4);
 		return true;
 	}
 

@@ -3,13 +3,11 @@
 
 #include "math/matrix.hpp"
 #include "math/quat.hpp"
-#include "utils/pool_utils.hpp"
 
 namespace mhe {
 
 class Transform
 {
-	POOL_ELEMENT_METHODS(uint16_t);
 public:
 	Transform()
 	{}

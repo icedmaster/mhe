@@ -23,4 +23,9 @@
 #define MHE_RELEASE
 #endif
 
+#ifndef MHE_C++11
+#define override
+#else
+#endif
+
 #endif

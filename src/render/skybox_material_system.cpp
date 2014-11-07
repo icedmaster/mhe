@@ -3,7 +3,7 @@
 #include "render/layouts.hpp"
 #include "render/context.hpp"
 #include "render/render_context.hpp"
-#include "render/node.hpp"
+#include "render/instances.hpp"
 
 namespace mhe {
 
@@ -27,28 +27,28 @@ void SkyboxMaterialSystem::close()
 {
 }
 
-void SkyboxMaterialSystem::setup(Context& context, Node* nodes, ModelContext* model_contexts, size_t count)
+void SkyboxMaterialSystem::setup(Context& context, SceneContext& scene_context, NodeInstance* nodes, ModelContext* model_contexts, size_t count)
 {
 	for (size_t i = 0; i < count; ++i)
 	{
-		nodes[i].main_pass.material.material_system = id();
-		nodes[i].main_pass.material.id = context.materials[id()].create();
-		Material& material = context.materials[id()].get(nodes[i].main_pass.material.id);
+		nodes[i].node.main_pass.material.material_system = id();
+		nodes[i].node.main_pass.material.id = context.materials[id()].create();
+		Material& material = context.materials[id()].get(nodes[i].node.main_pass.material.id);
 		material.shader_program = ubershader(context).get_default();
 		material.uniforms[0] = transform_uniform_;
 		context.texture_manager.get(material.textures[0], model_contexts[i].textures[0]);
-		nodes[i].mesh.layout = SkyboxLayout::handle;
+		nodes[i].node.mesh.layout = SkyboxLayout::handle;
 
-		context.additional_passes_pool.make_invalid(nodes[i].additional_passes);
+		context.additional_passes_pool.make_invalid(nodes[i].node.additional_passes);
 	}
 }
 
-void SkyboxMaterialSystem::destroy(Context& context, Node* nodes, size_t count)
+void SkyboxMaterialSystem::destroy(Context& context, SceneContext& scene_context, NodeInstance* nodes, size_t count)
 {
 }
 
-void SkyboxMaterialSystem::update(Context& context, RenderContext& render_context,
-	Node* /*nodes*/, Transform* /*transforms*/, size_t* /*indexes*/,size_t /*count*/)
+void SkyboxMaterialSystem::update(Context& context, SceneContext& scene_context, RenderContext& render_context,
+	NodeInstance* /*nodes*/, size_t /*count*/)
 {
 	mat4x4 inv_vp = render_context.vp;
 	inv_vp.set_row(3, vec4(0, 0, 0, 1));
