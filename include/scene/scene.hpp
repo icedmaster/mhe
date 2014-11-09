@@ -29,6 +29,8 @@ public:
 	NodeInstance& create_node() const;
 	void update(RenderContext& render_context, Context& context);
 
+	LightInstance& create_light() const;
+
 	size_t nodes(NodeInstance*& nodes, size_t& offset, size_t material_system) const;
 	size_t nodes(NodeInstance*& nodes) const;
 

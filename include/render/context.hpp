@@ -9,7 +9,6 @@
 #include "material_system.hpp"
 #include "material.hpp"
 #include "node.hpp"
-#include "light.hpp"
 #include "core/pool.hpp"
 #include "core/types_cast.hpp"
 #include "core/config.hpp"
@@ -28,7 +27,6 @@ typedef Pool<Texture, 4096, uint16_t> TexturePool;
 typedef Pool<RenderTarget, max_render_targets_number, RenderTarget::IdType> RenderTargetPool;
 typedef Pool< DrawCallData, 4096, uint16_t, StructTypePolicy<DrawCallData, uint16_t> > DrawCallDataPool;
 typedef Pool< AdditionalPasses, max_additional_render_passes_number, uint16_t, StructTypePolicy<AdditionalPasses, uint16_t> > AdditionalPassesPool;
-typedef Pool<Light, max_lights_number, Light::IdType> LightPool;
 
 class MaterialSystems
 {
@@ -112,8 +110,6 @@ struct Context
 
 	MaterialSystems material_systems;
 	MaterialPool materials[max_material_systems_number];
-
-	LightPool light_pool;
 };
 
 }

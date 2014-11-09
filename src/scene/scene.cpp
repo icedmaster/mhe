@@ -30,11 +30,11 @@ struct SortHelper
 
 struct LightSortHelper
 {
-	bool operator() (const Light& light1, const Light& light2)
+	bool operator() (const LightInstance& light1, const LightInstance& light2)
 	{
-		if (!light1.enabled()) return false;
-		if (!light2.enabled()) return true;
-		return light1.type() < light2.type();
+		if (!light1.enabled) return false;
+		if (!light2.enabled) return true;
+		return light1.light.type() < light2.light.type();
 	}
 };
 
@@ -48,10 +48,20 @@ Scene::Scene() :
 
 NodeInstance& Scene::create_node() const
 {
-	uint16_t id = scene_context_.node_pool.create();
+	NodeInstance::IdType id = scene_context_.node_pool.create();
 	NodeInstance& node = scene_context_.node_pool.get(id);
 	node.transform_id = scene_context_.transform_pool.create();
+	node.aabb_id = scene_context_.aabb_pool.create();
 	return node;
+}
+
+LightInstance& Scene::create_light() const
+{
+	LightInstance::IdType id = scene_context_.light_pool.create();
+	LightInstance& light = scene_context_.light_pool.get(id);
+	light.transform_id = scene_context_.transform_pool.create();
+	light.aabb_id = scene_context_.aabb_pool.create();
+	return light;
 }
 
 AABBInstance& Scene::create_aabb() const
@@ -132,14 +142,14 @@ void Scene::refresh_node_material_link(NodeInstance* nodes)
 
 void Scene::update_light_sources(RenderContext& render_context, Context& context)
 {
-	Light* lights = context.light_pool.all_objects();
-	std::sort(lights, lights + context.light_pool.size(), LightSortHelper());
-	context.light_pool.update();
-	render_context.lights = context.light_pool.all_objects();
+	LightInstance* lights = scene_context_.light_pool.all_objects();
+	std::sort(lights, lights + scene_context_.light_pool.size(), LightSortHelper());
+	scene_context_.light_pool.update();
+	render_context.lights = scene_context_.light_pool.all_objects();
 	size_t size = 0;
-	for (size_t i = 0; i < context.light_pool.size(); ++i, ++size)
+	for (size_t i = 0; i < scene_context_.light_pool.size(); ++i, ++size)
 	{
-		if (!lights[i].enabled())
+		if (!lights[i].enabled)
 			break;
 	}
 	render_context.lights_number = min(size, global_max_lights_number_);

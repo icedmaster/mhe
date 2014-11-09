@@ -48,7 +48,6 @@ struct ShadingSettings
 
 class Light
 {
-	POOL_ELEMENT_METHODS(uint16_t);
 public:
 	enum
 	{
@@ -60,13 +59,11 @@ public:
 	static const size_t light_types_number = directional + 1;
 public:
 	Light() :
-		type_(spot),
-		enabled_(true)
+		type_(spot)
 	{}
 
 	Light(int type) :
-		type_(type),
-		enabled_(true)
+		type_(type)
 	{}
 
 	void set_type(int type)
@@ -92,41 +89,6 @@ public:
 	LightDesc& desc()
 	{
 		return desc_;
-	}
-
-	const vec3& position() const
-	{
-		return position_;
-	}
-
-	const vec3& direction() const
-	{
-		return direction_;
-	}
-
-	void set_position(const vec3& position)
-	{
-		position_ = position;
-	}
-
-	void set_direction(const vec3& direction)
-	{
-		direction_  = direction;
-	}
-
-	void enable()
-	{
-		enabled_ = true;
-	}
-
-	void disable()
-	{
-		enabled_ = false;
-	}
-
-	bool enabled() const
-	{
-		return enabled_;
 	}
 
 	float attenuation() const
@@ -166,10 +128,7 @@ public:
 private:
 	ShadingSettings shading_;
 	LightDesc desc_;
-	vec3 position_;
-	vec3 direction_;
 	int type_;
-	bool enabled_;
 };
 
 }

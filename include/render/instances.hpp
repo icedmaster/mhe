@@ -5,6 +5,7 @@
 #include "math/transform.hpp"
 #include "utils/pool_utils.hpp"
 #include "node.hpp"
+#include "light.hpp"
 
 namespace mhe {
 
@@ -34,6 +35,17 @@ struct NodeInstance
 	AABBInstance::IdType aabb_id;
 
 	NodeInstance() : id(invalid_id), transform_id(TransformInstance::invalid_id), aabb_id(AABBInstance::invalid_id) {}
+};
+
+struct LightInstance
+{
+	POOL_STRUCT(uint16_t);
+	Light light;
+	TransformInstance::IdType transform_id;
+	AABBInstance::IdType aabb_id;
+	bool enabled;
+
+	LightInstance() : id(invalid_id), transform_id(TransformInstance::invalid_id), aabb_id(AABBInstance::invalid_id), enabled(true) {}
 };
 
 }

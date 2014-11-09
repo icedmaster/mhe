@@ -12,11 +12,14 @@ typedef Pool< NodeInstance, max_scene_nodes_number, NodeInstance::IdType, Struct
 
 typedef Pool< AABBInstance, max_scene_nodes_number, AABBInstance::IdType, StructTypePolicy<AABBInstance> > AABBPool;
 
+typedef Pool< LightInstance, max_lights_number, LightInstance::IdType, StructTypePolicy<LightInstance> > LightPool;
+
 struct SceneContext
 {
 	TransformPool transform_pool;
 	AABBPool aabb_pool;
 	NodePool node_pool;
+	LightPool light_pool;
 };
 
 }

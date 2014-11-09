@@ -65,11 +65,12 @@ private:
 	{
 		for (size_t i = 0; i < lights_number; ++i)
 		{
-			mhe::Light& light = create_and_get(engine.context().light_pool);
+			mhe::LightInstance& light_instance = create_and_get(engine.scene_context().light_pool);
+			mhe::Light& light = light_instance.light;
 			light.shading().diffuse = mhe::color_green;
 			light.shading().specular = mhe::color_white;
 			float xpos = -static_cast<float>(lights_number * 0.5f) + i;
-			light.set_position(mhe::vec3(xpos, 0, 3));
+			mhe::set_light_position(engine.scene_context(), light_instance.id, mhe::vec3(xpos, 0, 3));
 			light.desc().omni.radius = 3.0f;
 			light.desc().omni.omni_attenuation = 1.5f;
 			light.set_type(mhe::Light::omni);

@@ -72,74 +72,80 @@ private:
 
 	void init_spot_lights(mhe::game::Engine& engine)
 	{
-		mhe::Light& light = create_and_get(engine.context().light_pool);
+		mhe::LightInstance& light_instance = create_and_get(engine.scene_context().light_pool);
+		mhe::Light& light = light_instance.light;
 		light.shading().diffuse = mhe::color_green;
 		light.shading().specular = mhe::color_white;
-		light.set_position(mhe::vec3(0, 20, 0));
-		light.set_direction(-mhe::vec3::up());
+		mhe::set_light_position(engine.scene_context(), light_instance.id, mhe::vec3(0, 20, 0));
+		//light.set_direction(-mhe::vec3::up());
 		light.desc().spot.attenuation = 0.2f;
 		light.desc().spot.angle = mhe::deg_to_rad(30.0f);
 		light.desc().spot.angle_attenuation = 0.5f;
 
-		mhe::Light& light2 = create_and_get(engine.context().light_pool);
+		mhe::LightInstance& light_instance2 = create_and_get(engine.scene_context().light_pool);
+		mhe::Light& light2 = light_instance2.light;
 		light2.shading().diffuse = mhe::color_blue;
 		light2.shading().specular = mhe::color_white;
-		light2.set_position(mhe::vec3(0, 0, 20));
-		light2.set_direction(-mhe::vec3::forward());
+		mhe::set_light_position(engine.scene_context(), light_instance2.id, mhe::vec3(0, 0, 20));
+		//light2.set_direction(-mhe::vec3::forward());
 		light2.desc().spot.attenuation = 0.2f;
 		light2.desc().spot.angle = mhe::deg_to_rad(30.0f);
 		light2.desc().spot.angle_attenuation = 0.5f;
 
-		spot_lights_[0] = light.id();
-		spot_lights_[1] = light2.id();
+		spot_lights_[0] = light_instance.id;
+		spot_lights_[1] = light_instance2.id;
 	}
 
 	void init_omni_lights(mhe::game::Engine& engine)
 	{
-		mhe::Light& light = create_and_get(engine.context().light_pool);
+		mhe::LightInstance& light_instance = create_and_get(engine.scene_context().light_pool);
+		mhe::Light& light = light_instance.light;
 		light.shading().diffuse = mhe::color_red;
 		light.shading().specular = mhe::color_white;
-		light.set_position(mhe::vec3(0, 3, 0));
+		mhe::set_light_position(engine.scene_context(), light_instance.id, mhe::vec3(0, 3, 0));
 		light.desc().omni.radius = 3.0f;
 		light.desc().omni.omni_attenuation = 0.9f;
 		light.set_type(mhe::Light::omni);
 
-		mhe::Light& light2 = create_and_get(engine.context().light_pool);
+		mhe::LightInstance& light_instance2 = create_and_get(engine.scene_context().light_pool);
+		mhe::Light& light2 = light_instance2.light;
 		light2.shading().diffuse = mhe::color_yellow;
 		light2.shading().specular = mhe::color_white;
-		light2.set_position(mhe::vec3(0, 0, 3));
+		mhe::set_light_position(engine.scene_context(), light_instance2.id, mhe::vec3(0, 0, 3));
 		light2.desc().omni.radius = 3.0f;
 		light2.desc().omni.omni_attenuation = 0.9f;
 		light2.set_type(mhe::Light::omni);
 
-		omni_lights_[0] = light.id();
-		omni_lights_[1] = light2.id();
+		omni_lights_[0] = light_instance.id;
+		omni_lights_[1] = light_instance2.id;
 	}
 
 	void init_directional_lights(mhe::game::Engine& engine)
 	{
-		mhe::Light& light = create_and_get(engine.context().light_pool);
+		mhe::LightInstance& light_instance = create_and_get(engine.scene_context().light_pool);
+		mhe::Light& light = light_instance.light;
 		light.shading().diffuse = mhe::vec4(0.1f, 0.1f, 0.1f, 1.0f);
-		light.shading().specular = mhe::vec4(0.2f, 0.2f, 0.2f, 1.0f);;
-		light.set_position(mhe::vec3(0, 100, 0));
-		light.set_direction(-mhe::vec3::up());
+		light.shading().specular = mhe::vec4(0.2f, 0.2f, 0.2f, 1.0f);
+		mhe::set_light_position(engine.scene_context(), light_instance.id, mhe::vec3(0, 100, 0));
+		//light.set_direction(-mhe::vec3::up());
 		light.set_type(mhe::Light::directional);
 
-		mhe::Light& light2 = create_and_get(engine.context().light_pool);
+		mhe::LightInstance& light_instance2 = create_and_get(engine.scene_context().light_pool);
+		mhe::Light& light2 = light_instance2.light;
 		light2.shading().diffuse = mhe::vec4(0.1f, 0.0f, 0.1f, 1.0f);
 		light2.shading().specular = mhe::vec4(0.2f, 0.2f, 0.2f, 1.0f);
-		light2.set_position(mhe::vec3(0, 0, 100));
-		light2.set_direction(-mhe::vec3::forward());
+		mhe::set_light_position(engine.scene_context(), light_instance2.id, mhe::vec3(0, 0, 100));
+		//light2.set_direction(-mhe::vec3::forward());
 		light2.set_type(mhe::Light::directional);
 
-		directional_lights_[0] = light.id();
-		directional_lights_[1] = light2.id();
+		directional_lights_[0] = light_instance.id;
+		directional_lights_[1] = light_instance2.id;
 	}
 
 	void update_lights(mhe::game::Engine& engine)
 	{
-		mhe::Light::IdType for_enable[2];
-		mhe::Light::IdType for_disable[4];
+		mhe::LightInstance::IdType for_enable[2];
+		mhe::LightInstance::IdType for_disable[4];
 
 		switch (light_type_)
 		{
@@ -165,15 +171,15 @@ private:
 		}
 
 		for (int i = 0; i < 2; ++i)
-			engine.context().light_pool.get(for_enable[i]).enable();
+			engine.scene_context().light_pool.get(for_enable[i]).enabled = true;
 
 		for (int i = 0; i < 4; ++i)
-			engine.context().light_pool.get(for_disable[i]).disable();
+			engine.scene_context().light_pool.get(for_disable[i]).enabled = false;
 	}
 
-	mhe::Light::IdType spot_lights_[2];
-	mhe::Light::IdType omni_lights_[2];
-	mhe::Light::IdType directional_lights_[2];
+	mhe::LightInstance::IdType spot_lights_[2];
+	mhe::LightInstance::IdType omni_lights_[2];
+	mhe::LightInstance::IdType directional_lights_[2];
 	const mhe::KeyboardDevice* keyboard_;
 	int light_type_;
 };

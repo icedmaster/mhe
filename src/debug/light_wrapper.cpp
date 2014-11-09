@@ -2,7 +2,7 @@
 
 #include "core/config.hpp"
 #include "game/engine.hpp"
-#include "render/light.hpp"
+#include "render/instances.hpp"
 
 #ifdef RDBG_ENABLED
 #include "debug/rdbg.hpp"
@@ -32,33 +32,33 @@ void register_light(game::Engine& engine, size_t id, const std::string& name)
 
 bool set_diffuse_color(game::Engine& engine, uint32_t id, const colorf& color)
 {
-	if (!engine.context().light_pool.is_valid(id))
+	if (!engine.scene_context().light_pool.is_valid(id))
 		return false;
-	engine.context().light_pool.get(id).shading().diffuse = color;
+	engine.scene_context().light_pool.get(id).light.shading().diffuse = color;
 	return true;
 }
 
 bool get_diffuse_color(game::Engine& engine, uint32_t id, colorf& color)
 {
-	if (!engine.context().light_pool.is_valid(id))
+	if (!engine.scene_context().light_pool.is_valid(id))
 		return false;
-	color = engine.context().light_pool.get(id).shading().diffuse;
+	color = engine.scene_context().light_pool.get(id).light.shading().diffuse;
 	return true;
 }
 
 bool set_specular_color(game::Engine& engine, uint32_t id, const colorf& color)
 {
-	if (!engine.context().light_pool.is_valid(id))
+	if (!engine.scene_context().light_pool.is_valid(id))
 		return false;
-	engine.context().light_pool.get(id).shading().specular = color;
+	engine.scene_context().light_pool.get(id).light.shading().specular = color;
 	return true;
 }
 
 bool get_specular_color(game::Engine& engine, uint32_t id, colorf& color)
 {
-	if (!engine.context().light_pool.is_valid(id))
+	if (!engine.scene_context().light_pool.is_valid(id))
 		return false;
-	color = engine.context().light_pool.get(id).shading().specular;
+	color = engine.scene_context().light_pool.get(id).light.shading().specular;
 	return true;
 }
 

@@ -7,11 +7,11 @@
 
 namespace mhe {
 
-class Light;
+struct LightInstance;
 
 struct RenderContext
 {
-	Light* lights;
+	LightInstance* lights;
 	size_t lights_number;
 
 	mat4x4 view;

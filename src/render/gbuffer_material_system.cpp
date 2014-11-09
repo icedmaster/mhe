@@ -5,6 +5,7 @@
 #include "render/uniforms.hpp"
 #include "render/render_context.hpp"
 #include "render/instances.hpp"
+#include "render/light_instance_methods.hpp"
 
 namespace mhe {
 
@@ -230,12 +231,14 @@ void GBufferDrawMaterialSystem::update(Context& context, SceneContext& scene_con
 		int type = 0;
 		for (size_t l = 0; l < lights_per_every_pass[pass_number]; ++l, ++i)
 		{
-			const Light& light = render_context.lights[i];
+			const Light& light = render_context.lights[i].light;
 			data[l].diffuse = light.shading().diffuse;
 			data[l].diffuse.set_w(light.type() == Light::spot ? light.spot_angle_coeff() : light.angle());
 			data[l].specular = light.shading().specular;
-			data[l].position = vec4(light.position().x(), light.position().y(), light.position().z(), light.attenuation());
-			data[l].direction = vec4(light.direction().x(), light.direction().y(), light.direction().z(), light.angle_attenuation());
+			// TODO: !!
+			const vec3& light_position = get_light_position(scene_context, render_context.lights[i].id);
+			data[l].position = vec4(light_position.x(), light_position.y(), light_position.z(), light.attenuation());
+			//data[l].direction = vec4(light.direction().x(), light.direction().y(), light.direction().z(), light.angle_attenuation());
 			type = light.type();
 		}
 
@@ -279,7 +282,7 @@ size_t GBufferDrawMaterialSystem::calculate_passes_number(RenderContext& render_
 	::memset(indexes, 0, sizeof(indexes));
 	for (size_t i = 0; i < render_context.lights_number; ++i)
 	{
-		const Light& light = render_context.lights[i];
+		const Light& light = render_context.lights[i].light;
 		++indexes[light.type()];
 	}
 
