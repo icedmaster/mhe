@@ -30,6 +30,9 @@ thread::thread() :
 	info_(new Info)
 {}
 
+thread::~thread()
+{}
+
 bool thread::start_thread()
 {
 	info_->id = pthread_create(&info_->thr, 0, start_thread_impl, this);

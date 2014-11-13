@@ -31,13 +31,13 @@ public:
 		return true;
 	}
 
-	bool update(mhe::game::Engine& engine)
+    bool update(mhe::game::Engine& /*engine*/)
 	{
 		return true;
 	}
 };
 
-int main(int argc, char** argv)
+int main(int /*argc*/, char** /*argv*/)
 {
 	mhe::app::Application app("03_skybox");
 	mhe::app::ApplicationConfig config;

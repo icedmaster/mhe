@@ -25,11 +25,11 @@ void PosteffectSimpleMaterialSystem::setup(Context& context, SceneContext& scene
 	{
 		Material& material = context.materials[id()].get(nodes[i].node.main_pass.material.id);
 
-		for (size_t i = 0; i < material_textures_number; ++i)
+        for (size_t j = 0; j < material_textures_number; ++j)
 		{
-			if (textures_[i].id == Texture::invalid_id)
+            if (textures_[j].id == Texture::invalid_id)
 				continue;
-			material.textures[i] = textures_[i];
+            material.textures[j] = textures_[j];
 		}
 
 		DrawCallData& draw_call_data = context.draw_call_data_pool.get(nodes[i].node.main_pass.draw_call_data);
@@ -43,11 +43,11 @@ void PosteffectSimpleMaterialSystem::setup(Context& context, SceneContext& scene
 	}
 }
 
-void PosteffectSimpleMaterialSystem::destroy(Context& /*context*/, SceneContext& scene_context, NodeInstance* /*nodes*/, size_t /*count*/)
+void PosteffectSimpleMaterialSystem::destroy(Context& /*context*/, SceneContext& /*scene_context*/, NodeInstance* /*nodes*/, size_t /*count*/)
 {
 }
 
-void PosteffectSimpleMaterialSystem::update(Context& /*context*/, SceneContext& scene_context, RenderContext& /*render_context*/, NodeInstance* /*nodes*/, size_t /*count*/)
+void PosteffectSimpleMaterialSystem::update(Context& /*context*/, SceneContext& /*scene_context*/, RenderContext& /*render_context*/, NodeInstance* /*nodes*/, size_t /*count*/)
 {
 }
 

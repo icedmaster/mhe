@@ -184,7 +184,7 @@ private:
 	int light_type_;
 };
 
-int main(int argc, char** argv)
+int main(int /*argc*/, char** /*argv*/)
 {
 	mhe::app::Application app("05_lighting");
 	mhe::app::ApplicationConfig config;

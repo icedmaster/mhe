@@ -27,7 +27,7 @@ void SkyboxMaterialSystem::close()
 {
 }
 
-void SkyboxMaterialSystem::setup(Context& context, SceneContext& scene_context, NodeInstance* nodes, ModelContext* model_contexts, size_t count)
+void SkyboxMaterialSystem::setup(Context& context, SceneContext& /*scene_context*/, NodeInstance* nodes, ModelContext* model_contexts, size_t count)
 {
 	for (size_t i = 0; i < count; ++i)
 	{
@@ -51,11 +51,11 @@ void SkyboxMaterialSystem::setup(Context& context, SceneContext& scene_context, 
 	}
 }
 
-void SkyboxMaterialSystem::destroy(Context& context, SceneContext& scene_context, NodeInstance* nodes, size_t count)
+void SkyboxMaterialSystem::destroy(Context& /*context*/, SceneContext& /*scene_context*/, NodeInstance* /*nodes*/, size_t /*count*/)
 {
 }
 
-void SkyboxMaterialSystem::update(Context& context, SceneContext& scene_context, RenderContext& render_context,
+void SkyboxMaterialSystem::update(Context& context, SceneContext& /*scene_context*/, RenderContext& render_context,
 	NodeInstance* /*nodes*/, size_t /*count*/)
 {
 	mat4x4 inv_vp = render_context.vp;

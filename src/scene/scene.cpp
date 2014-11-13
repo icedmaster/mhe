@@ -140,7 +140,7 @@ void Scene::refresh_node_material_link(NodeInstance* nodes)
 	}
 }
 
-void Scene::update_light_sources(RenderContext& render_context, Context& context)
+void Scene::update_light_sources(RenderContext& render_context, Context& /*context*/)
 {
 	LightInstance* lights = scene_context_.light_pool.all_objects();
 	std::sort(lights, lights + scene_context_.light_pool.size(), LightSortHelper());

@@ -63,7 +63,6 @@ void GBufferFillMaterialSystem::close()
 void GBufferFillMaterialSystem::setup(Context& context, SceneContext& scene_context, NodeInstance* nodes, ModelContext* model_contexts, size_t count)
 {
 	standart_material_setup(context, scene_context, nodes, model_contexts, count, 1);
-	Material* materials = context.materials[id()].all_objects();
 	for (size_t i = 0; i < count; ++i)
 	{
 		DrawCallData& draw_call_data = context.draw_call_data_pool.get(nodes[i].node.main_pass.draw_call_data);
@@ -73,11 +72,11 @@ void GBufferFillMaterialSystem::setup(Context& context, SceneContext& scene_cont
 	}
 }
 
-void GBufferFillMaterialSystem::destroy(Context& context, SceneContext& scene_context, NodeInstance* nodes, size_t count)
+void GBufferFillMaterialSystem::destroy(Context& /*context*/, SceneContext& /*scene_context*/, NodeInstance* /*nodes*/, size_t /*count*/)
 {
 }
 
-void GBufferFillMaterialSystem::update(Context& context, SceneContext& scene_context, RenderContext& render_context, NodeInstance* nodes, size_t count)
+void GBufferFillMaterialSystem::update(Context& context, SceneContext& /*scene_context*/, RenderContext& render_context, NodeInstance* /*nodes*/, size_t /*count*/)
 {
 	TransformSimpleData transform_data;
 	transform_data.vp = render_context.vp;
@@ -85,7 +84,7 @@ void GBufferFillMaterialSystem::update(Context& context, SceneContext& scene_con
 	uniform.update(transform_data);
 }
 
-void GBufferFillMaterialSystem::setup_uniforms(Material& material, Context& context, SceneContext& scene_context, const NodeInstance& node, const ModelContext& model_context)
+void GBufferFillMaterialSystem::setup_uniforms(Material& material, Context& context, SceneContext& scene_context, const NodeInstance& node, const ModelContext& /*model_context*/)
 {
 	material.uniforms[0] = transform_uniform_;
 	UniformBuffer::IdType id = context.uniform_pool.create();
@@ -159,7 +158,7 @@ void GBufferDrawMaterialSystem::close()
 {
 }
 
-void GBufferDrawMaterialSystem::setup(Context& context, SceneContext& scene_context, NodeInstance* nodes, ModelContext* /*model_contexts*/, size_t count)
+void GBufferDrawMaterialSystem::setup(Context& context, SceneContext& /*scene_context*/, NodeInstance* nodes, ModelContext* /*model_contexts*/, size_t count)
 {
 	ASSERT(count == 1, "We draw the only one posteffect");
 	Node& node = nodes[0].node;
@@ -200,7 +199,7 @@ void GBufferDrawMaterialSystem::setup(Context& context, SceneContext& scene_cont
 	node.additional_passes = context.additional_passes_pool.create();
 }
 
-void GBufferDrawMaterialSystem::destroy(Context& context, SceneContext& scene_context, NodeInstance* nodes, size_t count)
+void GBufferDrawMaterialSystem::destroy(Context& /*context*/, SceneContext& /*scene_context*/, NodeInstance* /*nodes*/, size_t /*count*/)
 {}
 
 void GBufferDrawMaterialSystem::update(Context& context, SceneContext& scene_context, RenderContext& render_context, NodeInstance* nodes, size_t count)

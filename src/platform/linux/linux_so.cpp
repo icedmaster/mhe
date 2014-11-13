@@ -7,10 +7,6 @@ namespace linuxsys {
 
 #ifdef MHE_OPENGL
 const std::string opengl_lib_name = "libGL.so";
-namespace
-{
-so_handle opengl_lib_handle = nullptr;
-}
 #endif
 
 so_handle open_so(const std::string& name)
@@ -38,7 +34,7 @@ void deinit_opengl_so()
 {
 }
 
-void* get_opengl_proc_addr(const std::string& name)
+void* get_opengl_proc_addr(const std::string& /*name*/)
 {
 	return 0;
 }

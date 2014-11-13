@@ -47,7 +47,7 @@ void MaterialSystem::standart_material_setup(Context& context, SceneContext& sce
 	}
 }
 
-void MaterialSystem::additional_passes_setup(Context& context, NodeInstance* nodes, size_t count)
+void MaterialSystem::additional_passes_setup(Context& /*context*/, NodeInstance* /*nodes*/, size_t /*count*/)
 {
 }
 

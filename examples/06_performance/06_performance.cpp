@@ -7,8 +7,6 @@ class GameScene : public mhe::game::GameScene
 public:
 	bool init(mhe::game::Engine& engine, const mhe::game::GameSceneDesc& /*desc*/)
 	{
-		keyboard_ = engine.event_manager().keyboard();
-
 		mhe::NodeInstance& skybox = engine.scene().create_node();
 		mhe::utils::create_skybox_quad(skybox.node.mesh, engine.context());
 
@@ -49,15 +47,8 @@ public:
 		return true;
 	}
 
-	bool update(mhe::game::Engine& engine)
+    bool update(mhe::game::Engine& /*engine*/)
 	{
-		if (keyboard_->is_key_pressed(mhe::KeyboardDevice::key_0))
-			light_type_ = mhe::Light::spot;
-		else if (keyboard_->is_key_pressed(mhe::KeyboardDevice::key_1))
-			light_type_ = mhe::Light::omni;
-		else if (keyboard_->is_key_pressed(mhe::KeyboardDevice::key_2))
-			light_type_ = mhe::Light::directional;
-		else return true;
 		return true;
 	}
 private:
@@ -76,12 +67,9 @@ private:
 			light.set_type(mhe::Light::omni);
 		}
 	}
-
-	const mhe::KeyboardDevice* keyboard_;
-	int light_type_;
 };
 
-int main(int argc, char** argv)
+int main(int /*argc*/, char** /*argv*/)
 {
 	mhe::app::Application app("06_lighting");
 	mhe::app::ApplicationConfig config;

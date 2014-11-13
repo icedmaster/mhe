@@ -53,7 +53,7 @@ vec4 convert(const std::string* args, size_t argc)
 
 uint32_t construct(const char* data)
 {
-	return (data[0] << 24) & 0xff000000 | (data[1] << 16) & 0xff0000 | (data[2] << 8) & 0xff00 | data[3] & 0xff;
+    return ((data[0] << 24) & 0xff000000) | ((data[1] << 16) & 0xff0000) | ((data[2] << 8) & 0xff00) | (data[3] & 0xff);
 }
 
 void split(uint32_t value, char* buffer)

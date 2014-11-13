@@ -13,7 +13,7 @@ public:
 	{}
 
 	Transform(const vec3& position, const quatf& rotation, const vec3& scale) :
-		position_(position), rotation_(rotation), scale_(scale)
+        rotation_(rotation), position_(position), scale_(scale)
 	{
 		update();
 	}

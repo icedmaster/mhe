@@ -29,7 +29,7 @@ void UnlitMaterialSystem::setup(Context& context, SceneContext& scene_context, N
 	standart_material_setup(context, scene_context, nodes, model_contexts, count, 1);
 }
 
-void UnlitMaterialSystem::destroy(Context& context, SceneContext& scene_context, NodeInstance* nodes, size_t count)
+void UnlitMaterialSystem::destroy(Context& context, SceneContext& /*scene_context*/, NodeInstance* nodes, size_t count)
 {
 	if (!count) return;
 	ASSERT(nodes, "Invalid nodes");
@@ -58,7 +58,7 @@ void UnlitMaterialSystem::update(Context& context, SceneContext& scene_context, 
 	}
 }
 
-void UnlitMaterialSystem::setup_uniforms(Material& material, Context& context, SceneContext& scene_context, const NodeInstance& node, const ModelContext& model_context)
+void UnlitMaterialSystem::setup_uniforms(Material& material, Context& context, SceneContext& scene_context, const NodeInstance& node, const ModelContext& /*model_context*/)
 {
 	material.uniforms[0] = transform_uniform_;
 	UniformBuffer::IdType id = context.uniform_pool.create();

@@ -10,7 +10,7 @@ class thread
 	struct Info;
 public:
 	thread();
-	virtual ~thread() {}
+    virtual ~thread();
 
 	bool start()
 	{
