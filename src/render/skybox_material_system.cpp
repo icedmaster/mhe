@@ -39,6 +39,14 @@ void SkyboxMaterialSystem::setup(Context& context, SceneContext& scene_context, 
 		context.texture_manager.get(material.textures[0], model_contexts[i].textures[0]);
 		nodes[i].node.mesh.layout = SkyboxLayout::handle;
 
+		RenderStateDesc render_state_desc;
+		render_state_desc.stencil.enabled = false;
+		render_state_desc.depth.enabled = false;
+		nodes[i].node.main_pass.draw_call_data = context.draw_call_data_pool.create();
+		DrawCallData& draw_call_data = context.draw_call_data_pool.get(nodes[i].node.main_pass.draw_call_data);
+		draw_call_data.state = context.render_state_pool.create();
+		context.render_state_pool.get(draw_call_data.state).init(render_state_desc);
+
 		context.additional_passes_pool.make_invalid(nodes[i].node.additional_passes);
 	}
 }

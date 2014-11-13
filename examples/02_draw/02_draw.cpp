@@ -44,7 +44,8 @@ int main(int argc, char** argv)
 	config.height = 600;
 	config.bpp = 32;
 	config.fullscreen = false;
-	config.assets_path = "e:/projects/mhe/assets/";
+    config.assets_path = "../assets/";
+	config.render_config_filename = mhe::utils::path_join(config.assets_path, "render.xml");
 	app.init(config);
 
 	mhe::game::GameSceneDesc desc;

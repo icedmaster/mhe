@@ -45,7 +45,7 @@ public:
 
 	Base* create(const char* name) const
 	{
-		std::map<hash_type, ref_ptr<AbstractCreator> >::const_iterator it = creators_.find(hash(name));
+        typename std::map<hash_type, ref_ptr<AbstractCreator> >::const_iterator it = creators_.find(hash(name));
 		if (it == creators_.end()) return nullptr;
 		return it->second->create();
 	}

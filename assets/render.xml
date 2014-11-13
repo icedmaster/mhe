@@ -1,6 +1,6 @@
 <mhe>
   <materials>
-	<material name="unlit" shader="unlit" />
+	<material name="unlit" shader="unlit" priority="128" />
 	<material name="skybox" shader="skybox" priority="0" />
 	<material name="gbuffer_fill" shader="gbuffer_fill" priority="128" />
 	<material name="gbuffer_draw" shader="gbuffer_draw_blinn_phong" defs="4" priority="129" />

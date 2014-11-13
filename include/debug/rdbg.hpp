@@ -6,6 +6,7 @@
 #include <map>
 #include "core/hash.hpp"
 #include "core/singleton.hpp"
+#include "core/types_cast.hpp"
 #include "threads/thread.hpp"
 #include "net/socklib.hpp"
 #include "math/vector3.hpp"

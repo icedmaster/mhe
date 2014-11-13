@@ -65,7 +65,7 @@ void UnlitMaterialSystem::setup_uniforms(Material& material, Context& context, S
 	material.uniforms[1] = id;
 	UniformBuffer& uniform = context.uniform_pool.get(id);
 	UniformBufferDesc uniform_buffer_desc;
-	create_uniform_buffer_element(uniform_buffer_desc, "model", transform(node, scene_context));
+	create_uniform_buffer_element(uniform_buffer_desc, "model", transform(node, scene_context).transform());
 	uniform_buffer_desc.name = "permodel";
 	uniform_buffer_desc.program = &default_program(context);
 	uniform.init(uniform_buffer_desc);

@@ -23,6 +23,7 @@ public:
 		mhe::ModelContext model_context[1];
 		model_context[0].textures[0] = "test.tga";
 		material_system->setup(engine.context(), engine.scene().scene_context(), &node, model_context, 1);
+
 		return true;
 	}
 
@@ -40,7 +41,8 @@ int main(int argc, char** argv)
 	config.height = 768;
 	config.bpp = 32;
 	config.fullscreen = false;
-	config.assets_path = "e:/projects/mhe/assets/";
+    config.assets_path = "../assets/";
+	config.render_config_filename = mhe::utils::path_join(config.assets_path, "render.xml");
 	app.init(config);
 
 	mhe::game::GameSceneDesc desc;

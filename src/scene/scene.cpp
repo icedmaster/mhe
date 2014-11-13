@@ -120,7 +120,7 @@ void Scene::refresh_node_material_link(NodeInstance* nodes)
 	size_t size = 0, begin = 0;
 	for (size_t i = 0; i < scene_context_.node_pool.size(); ++i)
 	{
-		uint8_t current_material_system = nodes[i].node.main_pass.material.material_system;
+		current_material_system = nodes[i].node.main_pass.material.material_system;
 		if (prev_material_system > max_material_systems_number)
 			prev_material_system = current_material_system;
 		if (current_material_system != prev_material_system)
@@ -152,7 +152,7 @@ void Scene::update_light_sources(RenderContext& render_context, Context& context
 		if (!lights[i].enabled)
 			break;
 	}
-	render_context.lights_number = min(size, global_max_lights_number_);
+    render_context.lights_number = min(size, global_max_lights_number_.value());
 }
 
 }

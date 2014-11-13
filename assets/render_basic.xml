@@ -3,7 +3,6 @@
 	<material name="unlit" shader="unlit" />
 	<material name="skybox" shader="skybox" priority="0" />
 	<material name="gbuffer_fill" shader="gbuffer_fill" priority="128" />
-	<material name="gbuffer_draw" shader="posteffect_draw" priority="130" />
 	<material name="posteffect_simple" shader="posteffect_draw" priority="129" />
   </materials>
   <gbuffer>

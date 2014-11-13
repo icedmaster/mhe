@@ -113,10 +113,12 @@ void Driver::render(const Context& context, const NodeInstance* nodes, size_t co
 			const Material& material =
 				context.materials[material_system_id].get(material_id);
 
+			bool shader_program_changed = false;
 			if (state_.shader_program != material.shader_program)
 			{
 				impl_->set_shader_program(context.shader_pool.get(material.shader_program));
 				state_.shader_program = material.shader_program;
+				shader_program_changed = true;
 			}
 			
 			if (state_.vertex_buffer != node.mesh.vbuffer)
@@ -131,7 +133,7 @@ void Driver::render(const Context& context, const NodeInstance* nodes, size_t co
 				state_.index_buffer = node.mesh.ibuffer;
 			}
 			
-			//if (state_.layout != node.mesh.layout)
+			if (state_.layout != node.mesh.layout || shader_program_changed)
 			{
 				impl_->set_layout(context.layout_pool.get(node.mesh.layout));
 				state_.layout = node.mesh.layout;
@@ -147,7 +149,7 @@ void Driver::render(const Context& context, const NodeInstance* nodes, size_t co
 			}
 			for (size_t j = 0; j < material_uniforms_number; ++j)
 			{
-				if (material.uniforms[j] == UniformBuffer::invalid_id || material.uniforms[j] == state_.uniforms[j])
+				if (material.uniforms[j] == UniformBuffer::invalid_id || (material.uniforms[j] == state_.uniforms[j] && !shader_program_changed))
 					continue;
 				const UniformBuffer& uniform = context.uniform_pool.get(material.uniforms[j]);
 				impl_->set_uniform(uniform);

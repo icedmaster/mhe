@@ -23,9 +23,10 @@ struct DrawCallData
 	RenderTarget::IdType render_target;
 
 	DrawCallData() :
+		id(invalid_id),
 		command(nullptr),
-		render_target(default_render_target),
-		id(invalid_id)
+		state(RenderState::invalid_id),
+		render_target(default_render_target)
 	{}
 };
 

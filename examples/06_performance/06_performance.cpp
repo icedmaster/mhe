@@ -3,7 +3,7 @@
 class GameScene : public mhe::game::GameScene
 {
 	static const size_t nodes_number = 100;
-	static const size_t lights_number = 64;
+    static const size_t lights_number = 64;
 public:
 	bool init(mhe::game::Engine& engine, const mhe::game::GameSceneDesc& /*desc*/)
 	{
@@ -65,7 +65,7 @@ private:
 	{
 		for (size_t i = 0; i < lights_number; ++i)
 		{
-			mhe::LightInstance& light_instance = create_and_get(engine.scene_context().light_pool);
+            mhe::LightInstance& light_instance = engine.scene().create_light();
 			mhe::Light& light = light_instance.light;
 			light.shading().diffuse = mhe::color_green;
 			light.shading().specular = mhe::color_white;
@@ -89,7 +89,7 @@ int main(int argc, char** argv)
 	config.height = 768;
 	config.bpp = 32;
 	config.fullscreen = false;
-	config.assets_path = "e:/projects/mhe/assets/";
+    config.assets_path = "../assets/";
 	config.render_config_filename = mhe::utils::path_join(config.assets_path, "render.xml");
 	app.init(config);
 

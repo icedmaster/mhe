@@ -22,6 +22,7 @@
 
 #ifdef MHE_LINUX
     #include <arpa/inet.h>
+    #include <unistd.h>
 
     #define socket_t        int
     #define socket_close    ::close

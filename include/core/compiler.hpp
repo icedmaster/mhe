@@ -23,7 +23,7 @@
 #define MHE_RELEASE
 #endif
 
-#ifndef MHE_C++11
+#ifndef MHE_CPP11
 #define override
 #else
 #endif

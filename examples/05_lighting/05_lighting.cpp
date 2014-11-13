@@ -72,7 +72,7 @@ private:
 
 	void init_spot_lights(mhe::game::Engine& engine)
 	{
-		mhe::LightInstance& light_instance = create_and_get(engine.scene_context().light_pool);
+        mhe::LightInstance& light_instance = engine.scene().create_light();
 		mhe::Light& light = light_instance.light;
 		light.shading().diffuse = mhe::color_green;
 		light.shading().specular = mhe::color_white;
@@ -82,7 +82,7 @@ private:
 		light.desc().spot.angle = mhe::deg_to_rad(30.0f);
 		light.desc().spot.angle_attenuation = 0.5f;
 
-		mhe::LightInstance& light_instance2 = create_and_get(engine.scene_context().light_pool);
+        mhe::LightInstance& light_instance2 = engine.scene().create_light();
 		mhe::Light& light2 = light_instance2.light;
 		light2.shading().diffuse = mhe::color_blue;
 		light2.shading().specular = mhe::color_white;
@@ -98,7 +98,7 @@ private:
 
 	void init_omni_lights(mhe::game::Engine& engine)
 	{
-		mhe::LightInstance& light_instance = create_and_get(engine.scene_context().light_pool);
+        mhe::LightInstance& light_instance = engine.scene().create_light();
 		mhe::Light& light = light_instance.light;
 		light.shading().diffuse = mhe::color_red;
 		light.shading().specular = mhe::color_white;
@@ -107,7 +107,7 @@ private:
 		light.desc().omni.omni_attenuation = 0.9f;
 		light.set_type(mhe::Light::omni);
 
-		mhe::LightInstance& light_instance2 = create_and_get(engine.scene_context().light_pool);
+        mhe::LightInstance& light_instance2 = engine.scene().create_light();
 		mhe::Light& light2 = light_instance2.light;
 		light2.shading().diffuse = mhe::color_yellow;
 		light2.shading().specular = mhe::color_white;
@@ -122,7 +122,7 @@ private:
 
 	void init_directional_lights(mhe::game::Engine& engine)
 	{
-		mhe::LightInstance& light_instance = create_and_get(engine.scene_context().light_pool);
+        mhe::LightInstance& light_instance = engine.scene().create_light();
 		mhe::Light& light = light_instance.light;
 		light.shading().diffuse = mhe::vec4(0.1f, 0.1f, 0.1f, 1.0f);
 		light.shading().specular = mhe::vec4(0.2f, 0.2f, 0.2f, 1.0f);
@@ -130,7 +130,7 @@ private:
 		//light.set_direction(-mhe::vec3::up());
 		light.set_type(mhe::Light::directional);
 
-		mhe::LightInstance& light_instance2 = create_and_get(engine.scene_context().light_pool);
+        mhe::LightInstance& light_instance2 = engine.scene().create_light();
 		mhe::Light& light2 = light_instance2.light;
 		light2.shading().diffuse = mhe::vec4(0.1f, 0.0f, 0.1f, 1.0f);
 		light2.shading().specular = mhe::vec4(0.2f, 0.2f, 0.2f, 1.0f);
@@ -192,7 +192,7 @@ int main(int argc, char** argv)
 	config.height = 768;
 	config.bpp = 32;
 	config.fullscreen = false;
-	config.assets_path = "e:/projects/mhe/assets/";
+    config.assets_path = "../assets/";
 	config.render_config_filename = mhe::utils::path_join(config.assets_path, "render.xml");
 	app.init(config);
 

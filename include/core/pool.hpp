@@ -10,7 +10,7 @@ typedef unsigned short uint16_t;
 
 namespace mhe {
 
-template <class T, class I = T::IdType>
+template <class T, class I = typename T::IdType>
 struct StructTypePolicy
 {
 	static void set(T& obj, I id)

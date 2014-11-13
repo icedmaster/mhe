@@ -43,7 +43,7 @@ struct StencilDesc
 		front_operation_pass(stencil_op_keep),
 		front_operation_dfail(stencil_op_keep),
 		front_operation_sfail(stencil_op_keep),
-		enabled(true), front_reference(0), front_mask(0xff)
+		enabled(false), front_reference(0), front_mask(0xff)
 	{}
 };
 

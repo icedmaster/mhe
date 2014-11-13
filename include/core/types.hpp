@@ -83,6 +83,12 @@ public:
 private:
 	T low_, high_;
 };
+
+template <class T, class U>
+T min(const T& v1, const U& v2)
+{
+	return v1 < v2 ? v1 : v2;
+}
 }
 
 #define nullptr 0

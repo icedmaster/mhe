@@ -111,7 +111,7 @@ bool Application::on_system_event(const Event* event)
 
 void Application::init_render(const ApplicationConfig& config)
 {
-	std::fstream f(config.render_config_filename, std::ios::in | std::ios::binary);
+    std::fstream f(config.render_config_filename.c_str(), std::ios::in | std::ios::binary);
 	if (!f)
 	{
 		WARN_LOG("Can't open render config with filename " << config.render_config_filename);

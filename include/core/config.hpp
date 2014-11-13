@@ -1,6 +1,8 @@
 #ifndef __CONFIG_HPP__
 #define __CONFIG_HPP__
 
+#include <stddef.h> // for size_t
+
 // OS
 #ifdef __linux__
 	#define MHE_LINUX

@@ -69,7 +69,7 @@ void OpenGL3Driver::flush()
 #ifndef PROFILER_ENABLED
 	glFlush();
 #else
-	glFinish();
+    glFinish();
 #endif
 }
 
