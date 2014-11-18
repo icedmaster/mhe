@@ -2,6 +2,8 @@
 #define __OPENGL3_DRIVER_HPP__
 
 #include "render/video_driver.hpp"
+#include "core/array.hpp"
+#include "../opengl/mhe_gl.hpp"
 
 namespace mhe {
 namespace opengl {
@@ -9,6 +11,16 @@ namespace opengl {
 class OpenGL3IndexBuffer;
 class OpenGL3ShaderProgram;
 class OpenGL3RenderTarget;
+
+struct OpenGL3ContextState
+{
+    array<size_t, 16> uniforms;
+    bool depth;
+    bool stencil;
+    bool blend;
+
+    OpenGL3ContextState();
+};
 
 class OpenGL3Driver : public DriverImpl
 {
@@ -45,7 +57,7 @@ private:
 	void set_shader_program(const ShaderProgram& program);
 	void set_vertex_buffer(const RenderBuffer& vbuffer);
 	void set_index_buffer(const IndexBuffer& ibuffer);
-	void set_uniform(const UniformBuffer& uniform);
+    void set_uniform(const UniformBuffer& uniform, size_t unit);
 	void set_layout(const Layout& layout);
 	void set_texture(const Texture& texture, size_t unit);
 	void set_render_target(const RenderTarget& render_target);
@@ -54,6 +66,7 @@ private:
 
 	void flush();
 private:
+    OpenGL3ContextState state_;
 	const OpenGL3IndexBuffer* current_index_buffer_;
 	const OpenGL3ShaderProgram* current_shader_program_;
 	const OpenGL3RenderTarget* current_render_target_;

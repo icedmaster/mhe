@@ -1,4 +1,5 @@
 #include "platform/opengl3/opengl3_render_state.hpp"
+#include "platform/opengl3/opengl3_driver.hpp"
 
 #include "platform/opengl/opengl_types.hpp"
 #include "platform/opengl/opengl_extension.hpp"
@@ -11,11 +12,13 @@ void DepthState::init(const DepthDesc& desc)
 	desc_.enabled = desc.enabled;
 }
 
-void DepthState::enable() const
+void DepthState::enable(OpenGL3ContextState& state) const
 {
+    if (desc_.enabled == state.depth) return;
 	if (desc_.enabled)
 		glEnable(GL_DEPTH_TEST);
 	else glDisable(GL_DEPTH_TEST);
+    state.depth = desc_.enabled;
 }
 
 void StencilState::init(const StencilDesc& desc)
@@ -29,8 +32,9 @@ void StencilState::init(const StencilDesc& desc)
 	desc_.front_mask = desc_.front_mask;
 }
 
-void StencilState::enable() const
+void StencilState::enable(OpenGL3ContextState& state) const
 {
+    if (state.stencil == desc_.enabled) return;
 	if (desc_.enabled)
 	{
 		glEnable(GL_STENCIL_TEST);
@@ -38,6 +42,7 @@ void StencilState::enable() const
 		OpenGLExtensions::instance().glStencilOpSeparate(GL_FRONT, desc_.front_op_sfail, desc_.front_op_dfail, desc_.front_op_pass);
 	}
 	else glDisable(GL_STENCIL_TEST);
+    state.stencil = desc_.enabled;
 }
 
 void BlendState::init(const BlendDesc& desc)
@@ -54,8 +59,9 @@ void BlendState::init(const BlendDesc& desc)
 	}
 }
 
-void BlendState::enable() const
+void BlendState::enable(OpenGL3ContextState& state) const
 {
+    if (state.blend == desc_.enabled) return;
 	if (desc_.enabled)
 	{
 		glEnable(GL_BLEND);
@@ -63,6 +69,7 @@ void BlendState::enable() const
 		OpenGLExtensions::instance().glBlendEquation(desc_.func);
 	}
 	else glDisable(GL_BLEND);
+    state.blend = desc_.enabled;
 }
 
 bool OpenGL3RenderState::init(const RenderStateDesc& desc)
@@ -81,11 +88,11 @@ void OpenGL3RenderState::update(const RenderStateDesc& desc)
 	init(desc);
 }
 
-void OpenGL3RenderState::enable() const
+void OpenGL3RenderState::enable(OpenGL3ContextState& state) const
 {
-	depth_state_.enable();
-	stencil_state_.enable();
-	blend_state_.enable();
+    depth_state_.enable(state);
+    stencil_state_.enable(state);
+    blend_state_.enable(state);
 }
 
 void OpenGL3RenderState::disable() const

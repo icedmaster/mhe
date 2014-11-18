@@ -152,7 +152,7 @@ void Driver::render(const Context& context, const NodeInstance* nodes, size_t co
 				if (material.uniforms[j] == UniformBuffer::invalid_id || (material.uniforms[j] == state_.uniforms[j] && !shader_program_changed))
 					continue;
 				const UniformBuffer& uniform = context.uniform_pool.get(material.uniforms[j]);
-				impl_->set_uniform(uniform);
+                impl_->set_uniform(uniform, j);
 				state_.uniforms[j] = material.uniforms[j];
 			}
 			impl_->draw(node.mesh.render_data);

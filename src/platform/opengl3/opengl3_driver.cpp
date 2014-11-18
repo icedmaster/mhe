@@ -13,6 +13,12 @@
 namespace mhe {
 namespace opengl {
 
+OpenGL3ContextState::OpenGL3ContextState() :
+    depth(false), stencil(false), blend(false)
+{
+    uniforms.fill(UniformBuffer::invalid_id);
+}
+
 bool OpenGL3Driver::init()
 {
 	// print information about renderer and context
@@ -26,6 +32,7 @@ bool OpenGL3Driver::init()
 	OpenGLExtensions::instance().init_extensions();
 
 	current_render_target_ = nullptr;
+
 	return true;
 }
 
@@ -76,7 +83,7 @@ void OpenGL3Driver::flush()
 void OpenGL3Driver::set_state(const RenderState& state)
 {
 	const OpenGL3RenderState* active_state = static_cast<const OpenGL3RenderState*>(state.impl());
-	active_state->enable();
+    active_state->enable(state_);
 	CHECK_GL_ERRORS();
 }
 
@@ -101,10 +108,15 @@ void OpenGL3Driver::set_index_buffer(const IndexBuffer& ibuffer)
 	buffer->enable();
 }
 
-void OpenGL3Driver::set_uniform(const UniformBuffer& uniform)
+void OpenGL3Driver::set_uniform(const UniformBuffer& uniform, size_t unit)
 {
 	const OpenGL3UniformBuffer* buffer = static_cast<const OpenGL3UniformBuffer*>(uniform.impl());
-	buffer->enable(current_shader_program_->id());
+    if (state_.uniforms[unit] != uniform.id())
+    {
+        buffer->bind(unit);
+        state_.uniforms[unit] = uniform.id();
+    }
+    buffer->enable(current_shader_program_->id(), unit);
 	CHECK_GL_ERRORS();
 }
 

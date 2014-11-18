@@ -54,7 +54,7 @@ public:
 	virtual void set_shader_program(const ShaderProgram& program) = 0;
 	virtual void set_vertex_buffer(const RenderBuffer& vbuffer) = 0;
 	virtual void set_index_buffer(const IndexBuffer& ibuffer) = 0;
-	virtual void set_uniform(const UniformBuffer& uniform) = 0;
+    virtual void set_uniform(const UniformBuffer& uniform, size_t unit) = 0;
 	virtual void set_layout(const Layout& layout) = 0;
 	virtual void set_texture(const Texture& texture, size_t unit) = 0;
 	virtual void set_render_target(const RenderTarget& render_target) = 0;

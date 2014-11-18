@@ -186,11 +186,15 @@ void OpenGL3UniformBuffer::update(const uint8_t* data, size_t offset, size_t siz
 	vbo_.update(size, offset, data);
 }
 
-void OpenGL3UniformBuffer::enable(GLuint program) const
+void OpenGL3UniformBuffer::bind(size_t unit) const
 {
-	vbo_.enable();
-	OpenGLExtensions::instance().glUniformBlockBinding(program, id_, id_);
-	OpenGLExtensions::instance().glBindBufferBase(GL_UNIFORM_BUFFER, id_, vbo_.id());
+    vbo_.enable();
+    OpenGLExtensions::instance().glBindBufferBase(GL_UNIFORM_BUFFER, unit, vbo_.id());
+}
+
+void OpenGL3UniformBuffer::enable(GLuint program, size_t unit) const
+{
+    OpenGLExtensions::instance().glUniformBlockBinding(program, id_, unit);
 }
 
 void OpenGL3UniformBuffer::disable() const

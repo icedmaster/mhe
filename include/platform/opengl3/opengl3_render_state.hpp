@@ -7,11 +7,13 @@
 namespace mhe {
 namespace opengl {
 
+struct OpenGL3ContextState;
+
 class DepthState
 {
 public:
 	void init(const DepthDesc& desc);
-	void enable() const;
+    void enable(OpenGL3ContextState& state) const;
 private:
 	struct Desc
 	{
@@ -24,7 +26,7 @@ class StencilState
 {
 public:
 	void init(const StencilDesc& desc);
-	void enable() const;
+    void enable(OpenGL3ContextState& state) const;
 private:
 	struct Desc
 	{
@@ -44,7 +46,7 @@ class BlendState
 {
 public:
 	void init(const BlendDesc& desc);
-	void enable() const;
+    void enable(OpenGL3ContextState& state) const;
 private:
 	struct Desc
 	{
@@ -68,7 +70,7 @@ public:
 
 	void update(const RenderStateDesc& desc);
 
-	void enable() const;
+    void enable(OpenGL3ContextState& state) const;
 	void disable() const;
 private:
 	DepthState depth_state_;
