@@ -114,26 +114,30 @@ void Driver::render(const Context& context, const NodeInstance* nodes, size_t co
 				context.materials[material_system_id].get(material_id);
 
 			bool shader_program_changed = false;
+			bool layout_changed = false;
 			if (state_.shader_program != material.shader_program)
 			{
 				impl_->set_shader_program(context.shader_pool.get(material.shader_program));
 				state_.shader_program = material.shader_program;
 				shader_program_changed = true;
+				layout_changed = true;
 			}
 			
 			if (state_.vertex_buffer != node.mesh.vbuffer)
 			{
 				impl_->set_vertex_buffer(context.vertex_buffer_pool.get(node.mesh.vbuffer));
 				state_.vertex_buffer = node.mesh.vbuffer;
+				layout_changed = true;
 			}
 			
 			if (state_.index_buffer != node.mesh.ibuffer)
 			{
 				impl_->set_index_buffer(context.index_buffer_pool.get(node.mesh.ibuffer));
 				state_.index_buffer = node.mesh.ibuffer;
+				layout_changed = true;
 			}
 			
-			if (state_.layout != node.mesh.layout || shader_program_changed)
+			if (state_.layout != node.mesh.layout || layout_changed)
 			{
 				impl_->set_layout(context.layout_pool.get(node.mesh.layout));
 				state_.layout = node.mesh.layout;

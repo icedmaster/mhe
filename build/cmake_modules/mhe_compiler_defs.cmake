@@ -19,7 +19,7 @@ macro(mhe_setup_compiler_defs)
 	endif()
 
 	if (MSVC)
-		set(MSVC_HINT_DIR "C:/Program Files (x86)/Microsoft SDKs/Windows/v7.0A/Lib")
+		set(MSVC_HINT_DIR "C:/Program Files (x86)/Microsoft SDKs/Windows/v7.0A/Lib" "C:/Program Files (x86)/Microsoft SDKs/Windows/v7.1A/Lib")
 	endif()
 
 endmacro()

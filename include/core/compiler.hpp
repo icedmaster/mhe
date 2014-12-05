@@ -7,6 +7,9 @@
 #define MHE_VS
 #undef MHE_EXPORT
 #define MHE_EXPORT __declspec( dllexport )
+#if _MSC_VER > 1000
+#define MHE_CPP11
+#endif
 #else
 #define MHE_GCC
 #endif

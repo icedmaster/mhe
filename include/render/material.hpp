@@ -19,13 +19,12 @@ const size_t material_uniforms_number = 4;
 // TODO: change ShaderProgram::IdType -> ShaderInstance
 struct Material
 {
-	typedef uint16_t IdType;
+	POOL_STRUCT(uint16_t);
 	TextureInstance textures[material_textures_number];
 	UniformBuffer::IdType uniforms[material_uniforms_number];
 	ShaderProgram::IdType shader_program;
-	IdType id;
 
-	Material()
+	Material() : shader_program(ShaderProgram::invalid_id)
 	{
 		::memset(uniforms, UniformBuffer::invalid_id, sizeof(uniforms));
 		::memset(textures, Texture::invalid_id, sizeof(textures));
@@ -36,6 +35,8 @@ struct MaterialInstance
 {
 	Material::IdType id;
 	uint8_t material_system;
+
+	MaterialInstance() : id(Material::invalid_id) {}
 };
 
 }

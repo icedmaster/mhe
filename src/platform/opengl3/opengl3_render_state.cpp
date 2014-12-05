@@ -61,7 +61,7 @@ void BlendState::init(const BlendDesc& desc)
 
 void BlendState::enable(OpenGL3ContextState& state) const
 {
-    if (state.blend == desc_.enabled) return;
+    //if (state.blend == desc_.enabled) return;
 	if (desc_.enabled)
 	{
 		glEnable(GL_BLEND);

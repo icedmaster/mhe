@@ -29,6 +29,9 @@ thread::thread() :
 	info_(new Info)
 {}
 
+thread::~thread()
+{}
+
 bool thread::start_thread()
 {
 	info_->id = CreateThread(NULL, 0, start_thread_impl, this, 0, 0);

@@ -5,7 +5,7 @@
 
 namespace mhe {
 
-class thread
+class MHE_EXPORT thread
 {
 	struct Info;
 public:

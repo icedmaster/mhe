@@ -77,7 +77,11 @@ int main(int /*argc*/, char** /*argv*/)
 	config.height = 768;
 	config.bpp = 32;
 	config.fullscreen = false;
+#ifndef MHE_VS
     config.assets_path = "../assets/";
+#else
+	config.assets_path = "../../assets/";
+#endif
 	config.render_config_filename = mhe::utils::path_join(config.assets_path, "render.xml");
 	app.init(config);
 

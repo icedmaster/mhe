@@ -32,14 +32,18 @@ struct DrawCallData
 
 struct RenderPassData
 {
-	uint16_t draw_call_data;
+	DrawCallData::IdType draw_call_data;
 	Material::IdType material;
+
+	RenderPassData() : draw_call_data(DrawCallData::invalid_id), material(Material::invalid_id) {}
 };
 
 struct MainPassData
 {
-	uint16_t draw_call_data;
+	DrawCallData::IdType draw_call_data;
 	MaterialInstance material;
+
+	MainPassData() : draw_call_data(DrawCallData::invalid_id) {}
 };
 
 struct AdditionalPasses
@@ -54,6 +58,8 @@ struct Node
 	Mesh mesh;
 	MainPassData main_pass;
 	AdditionalPasses::IdType additional_passes;
+
+	Node() : additional_passes(AdditionalPasses::invalid_id) {}
 };
 
 }
