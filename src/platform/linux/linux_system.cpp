@@ -32,14 +32,14 @@ float get_current_time()
 {
     timespec now;
     clock_gettime(CLOCK_MONOTONIC, &now);
-    float result = (now.tv_sec - start.tv_sec) + (now.tv_nsec - start.tv_nsec) / 1000000000.0f;
-    delta = result - prev;
-    prev = result;
-    return result;
+    return (now.tv_sec - start.tv_sec) + (now.tv_nsec - start.tv_nsec) / 1000000000.0f;
 }
 
 float get_last_delta()
 {
+    float result = get_current_time();
+    delta = result - prev;
+    prev = result;
     return delta;
 }
 

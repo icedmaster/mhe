@@ -23,9 +23,9 @@ void FPSCameraController::update_impl(const RenderContext& render_context)
 	const vec3& fwd = camera().transform().forward_vector();
 	const vec3& up = camera().transform().up_vector();
 	if (event_manager_.check_bind("left"))
-		camera().translate_by(side * time_delta * move_speed());
+        camera().translate_by(-side * time_delta * move_speed());
 	else if (event_manager_.check_bind("right"))
-		camera().translate_by(-side * time_delta * move_speed());
+        camera().translate_by(side * time_delta * move_speed());
 	else if (event_manager_.check_bind("up"))
 		camera().translate_by(fwd * time_delta * move_speed());
 	else if (event_manager_.check_bind("down"))
