@@ -43,6 +43,7 @@ void Driver::clear(bool clear_color, bool clear_depth, bool clear_stencil,
 	}
 
 	impl_->clear_stencil();
+    NOT_IMPLEMENTED(clear_stencil);
 	NOT_IMPLEMENTED(stencil);
 }
 
@@ -153,7 +154,7 @@ void Driver::render(const Context& context, const NodeInstance* nodes, size_t co
 			}
 			for (size_t j = 0; j < material_uniforms_number; ++j)
 			{
-				if (material.uniforms[j] == UniformBuffer::invalid_id || (material.uniforms[j] == state_.uniforms[j] && !shader_program_changed))
+                if (material.uniforms[j] == UniformBuffer::invalid_id || (material.uniforms[j] == state_.uniforms[j] && !shader_program_changed))
 					continue;
 				const UniformBuffer& uniform = context.uniform_pool.get(material.uniforms[j]);
                 impl_->set_uniform(uniform, j);

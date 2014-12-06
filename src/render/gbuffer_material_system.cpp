@@ -11,9 +11,16 @@ namespace mhe {
 
 bool ClearCommand::execute()
 {
+    if (executed_) return true;
 	ASSERT(driver_ != nullptr, "You must to setup the driver first");
 	driver_->clear(true, true, true, vec4(0.0, 0.0, 0.0, 0.0));
+    executed_ = true;
 	return true;
+}
+
+void ClearCommand::reset()
+{
+    executed_ = false;
 }
 
 GBufferFillMaterialSystem::GBufferFillMaterialSystem()
@@ -67,8 +74,7 @@ void GBufferFillMaterialSystem::setup(Context& context, SceneContext& scene_cont
 	{
 		DrawCallData& draw_call_data = context.draw_call_data_pool.get(nodes[i].node.main_pass.draw_call_data);
 		draw_call_data.render_target = render_target_ + 1;
-		if (i == 0)
-			draw_call_data.command = &clear_command_;
+        draw_call_data.command = &clear_command_;
 	}
 }
 
@@ -82,6 +88,8 @@ void GBufferFillMaterialSystem::update(Context& context, SceneContext& /*scene_c
 	transform_data.vp = render_context.vp;
 	UniformBuffer& uniform = context.uniform_pool.get(transform_uniform_);
 	uniform.update(transform_data);
+
+    clear_command_.reset();
 }
 
 void GBufferFillMaterialSystem::setup_uniforms(Material& material, Context& context, SceneContext& scene_context, const NodeInstance& node, const ModelContext& /*model_context*/)
@@ -273,6 +281,8 @@ void GBufferDrawMaterialSystem::update(Context& context, SceneContext& scene_con
 			draw_call_data.state = main_draw_call_data.state;
 		}
 	}
+
+    clear_command_.reset();
 }
 
 size_t GBufferDrawMaterialSystem::calculate_passes_number(RenderContext& render_context, size_t* passes) const

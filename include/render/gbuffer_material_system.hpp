@@ -17,9 +17,11 @@ public:
 		driver_ = driver;
 	}
 
-		bool execute();
+    bool execute();
+    void reset();
 private:
 	Driver* driver_;
+    bool executed_;
 };
 
 class AbstractGBufferFillMaterialSystem : public MaterialSystem
