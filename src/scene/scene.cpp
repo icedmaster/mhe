@@ -6,26 +6,31 @@
 #include "render/context.hpp"
 #include "render/material_system.hpp"
 
-#include "scene/culling.hpp"
-
 namespace mhe {
 
 namespace {
 
 struct SortHelper
 {
-	SortHelper(const Context& context) :
-		context_(context)
+    SortHelper(const Context& context, const SceneContext& scene_context) :
+        context_(context), scene_context_(scene_context)
 		{}
     bool operator() (const NodeInstance& n1, const NodeInstance& n2) const
     {
-			MaterialSystem* ms1 = context_.material_systems.get(n1.node.main_pass.material.material_system);
-			MaterialSystem* ms2 = context_.material_systems.get(n2.node.main_pass.material.material_system);
-			if (ms1->priority() == ms2->priority())
-        return n1.node.main_pass.material.material_system < n2.node.main_pass.material.material_system;
+        const AABBInstance& aabb1 = scene_context_.aabb_pool.get(n1.aabb_id);
+        const AABBInstance& aabb2 = scene_context_.aabb_pool.get(n2.aabb_id);
+        if (aabb1.visible == aabb2.visible)
+        {
+            MaterialSystem* ms1 = context_.material_systems.get(n1.node.main_pass.material.material_system);
+            MaterialSystem* ms2 = context_.material_systems.get(n2.node.main_pass.material.material_system);
+            if (ms1->priority() == ms2->priority())
+                return n1.node.main_pass.material.material_system < n2.node.main_pass.material.material_system;
 			return ms1->priority() < ms2->priority();
+        }
+        else return static_cast<size_t>(aabb1.visible) > static_cast<size_t>(aabb2.visible);
     }
 	const Context& context_;
+    const SceneContext& scene_context_;
 };
 
 struct LightSortHelper
@@ -41,6 +46,8 @@ struct LightSortHelper
 }
 
 Scene::Scene() :
+    visible_aabbs_(0),
+    visible_nodes_(0),
 	global_max_lights_number_("max_lights_number", max_lights_number)
 {
 	::memset(nodes_per_material_, 0, sizeof(nodes_per_material_));
@@ -71,6 +78,8 @@ AABBInstance& Scene::create_aabb() const
 
 void Scene::update(RenderContext& render_context, Context& context)
 {
+    stats_.reset();
+
     if (camera_controller_ != nullptr)
     {
         camera_controller_->update(render_context);
@@ -79,12 +88,23 @@ void Scene::update(RenderContext& render_context, Context& context)
         render_context.viewpos = camera.position();
 		render_context.inv_vp = render_context.vp.inverted();
 
-		frustum_culling(camera.camera_frustum(), scene_context_.aabb_pool.all_objects(), scene_context_.aabb_pool.size());
+        frustum_culling();
     }
 
 	NodeInstance* nodes = scene_context_.node_pool.all_objects();
-	std::sort(nodes, nodes + scene_context_.node_pool.size(), SortHelper(context));
+    size_t nodes_number = scene_context_.node_pool.size();
+    std::sort(nodes, nodes + nodes_number, SortHelper(context, scene_context_));
 	scene_context_.node_pool.update();
+
+    size_t visible_nodes = 0;
+    nodes = scene_context_.node_pool.all_objects();
+    for (size_t i = 0; i < nodes_number; ++i, ++visible_nodes)
+    {
+        AABBInstance& aabb = scene_context_.aabb_pool.get(nodes[i].aabb_id);
+        if (!aabb.visible) break;
+    }
+    visible_nodes_ = visible_nodes;
+    stats_.update_nodes(nodes_number, visible_nodes);
 
 	refresh_node_material_link(nodes);
 
@@ -102,7 +122,7 @@ size_t Scene::nodes(NodeInstance*& nodes, size_t& offset, size_t material_system
 size_t Scene::nodes(NodeInstance*& nodes) const
 {
 	nodes = scene_context_.node_pool.all_objects();
-	return scene_context_.node_pool.size();
+    return visible_nodes_;
 }
 
 void Scene::delete_node(uint16_t id)
@@ -118,7 +138,7 @@ void Scene::refresh_node_material_link(NodeInstance* nodes)
 	uint8_t prev_material_system = max_material_systems_number + 1;
 	uint8_t current_material_system = prev_material_system;
 	size_t size = 0, begin = 0;
-	for (size_t i = 0; i < scene_context_.node_pool.size(); ++i)
+    for (size_t i = 0; i < visible_nodes_; ++i)
 	{
 		current_material_system = nodes[i].node.main_pass.material.material_system;
 		if (prev_material_system > max_material_systems_number)
@@ -153,6 +173,23 @@ void Scene::update_light_sources(RenderContext& render_context, Context& /*conte
 			break;
 	}
     render_context.lights_number = min(size, global_max_lights_number_.value());
+}
+
+void Scene::frustum_culling()
+{
+    AABBInstance* aabbs = scene_context_.aabb_pool.all_objects();
+    const planef* planes = camera_controller_->camera().camera_frustum().planes();
+    const planef abs_planes[6] = {abs(planes[0]), abs(planes[1]), abs(planes[2]),
+                                  abs(planes[3]), abs(planes[4]), abs(planes[5])};
+    size_t visible_aabbs = 0;
+    for (size_t i = 0; i < scene_context_.aabb_pool.size(); ++i)
+    {
+        bool visible = is_inside(aabbs[i].aabb, planes, abs_planes);
+        aabbs[i].visible = visible;
+        visible_aabbs += static_cast<size_t>(visible);
+    }
+    visible_aabbs_ = visible_aabbs;
+    stats_.update_aabbs(scene_context_.aabb_pool.size(), visible_aabbs);
 }
 
 }

@@ -53,12 +53,10 @@ public:
 	{
 		position_ += delta;
 		update_view();
-		//transform_.set_row(3, -(position() + delta));
 	}
 
 	void rotate_by(const quatf& rotation)
 	{
-		//transform_ *= rotation.to_matrix<mat4x4>();
 		rotation_ *= rotation;
 		update_view();
 	}

@@ -26,6 +26,9 @@ public:
 			mhe::Transform& transform = engine.scene().transform_pool().get(node.transform_id).transform;
 			pos += mhe::vec3(2, 0, 0);
 			transform.translate_to(pos);
+            mhe::AABBInstance& aabb = engine.scene_context().aabb_pool.get(node.aabb_id);
+            aabb.aabb.center = pos;
+            aabb.aabb.extents = mhe::vec3(0.5f, 0.5f, 0.5f);
 			model_context[i].textures[0] = "test.tga";
 		}
 
@@ -65,6 +68,9 @@ private:
 			light.desc().omni.radius = 3.0f;
 			light.desc().omni.omni_attenuation = 1.5f;
 			light.set_type(mhe::Light::omni);
+
+            mhe::AABBf& aabb = engine.scene_context().aabb_pool.get(light_instance.aabb_id).aabb;
+            aabb.extents = mhe::vec3(0.5f, 0.5f, 0.5f);
 		}
 	}
 };

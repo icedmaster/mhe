@@ -12,6 +12,8 @@ void Camera::init(Context& context, const PerspectiveCameraParameters& parameter
 
 	float aspect_ratio = static_cast<float>(context.window_system.width()) / static_cast<float>(context.window_system.height());
 	projection_.set_perspective(parameters.fov, aspect_ratio, parameters.znear, parameters.zfar);
+
+    frustum_.set(viewprojection());
 }
 
 void Camera::get(mat4x4& v, mat4x4& p, mat4x4& vp) const

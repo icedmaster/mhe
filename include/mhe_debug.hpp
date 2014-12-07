@@ -3,9 +3,9 @@
 #ifndef __MHE_DEBUG__
 #define __MHE_DEBUG__
 
-#include "debug/default_rdbg_setup.hpp"
-#include "debug/light_wrapper.hpp"
 #include "debug/profiler.hpp"
 #include "debug/rdbg.hpp"
+#include "debug/light_wrapper.hpp"
+#include "debug/default_rdbg_setup.hpp"
 
 #endif // __MHE_DEBUG__

@@ -32,10 +32,28 @@ public:
 	{
 		return nrm_;
 	}
+
+    T d() const
+    {
+        return d_;
+    }
 private:
 	vector3<T> nrm_;
 	T d_;
 };
+
+template <class T>
+plane<T> abs(const plane<T>& p)
+{
+    const vector3<T>& nrm = p.normal();
+    return plane<T>(fabs(nrm.x()), fabs(nrm.y()), fabs(nrm.z()), fabs(p.d()));
+}
+
+template <class T>
+T dot(const plane<T>& p, const vector3<T>& v)
+{
+    return dot(p.normal(), v) + p.d();
+}
 
 typedef plane<float> planef;
 

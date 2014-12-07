@@ -215,6 +215,9 @@ struct TypeHelper<int> { static const int type = Int; };
 template <>
 struct TypeHelper<size_t> { static const int type = Int; };
 
+template <>
+struct TypeHelper<bool> { static const int type = Int; };
+
 class GlobalVars : public Singleton<GlobalVars>
 {
 	friend class Singleton<GlobalVars>;

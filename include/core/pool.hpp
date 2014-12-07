@@ -5,6 +5,7 @@
 #include <cassert>
 #include <algorithm>
 #include "core/dynarray.hpp"
+#include "core/assert.hpp"
 
 typedef unsigned short uint16_t;
 

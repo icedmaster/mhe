@@ -3,6 +3,7 @@
 
 #include "plane.hpp"
 #include "matrix.hpp"
+#include "aabb.hpp"
 
 namespace mhe {
 
@@ -93,6 +94,19 @@ public:
 private:
 	plane<T> planes_[6];
 };
+
+template <class T>
+bool is_inside(const AABB<T>& aabb, const plane<T>* planes, const plane<T>* abs_planes)
+{
+    for (size_t i = 0; i < 6; ++i)
+    {
+        float d = dot(planes[i], aabb.center);
+        float r = dot(abs_planes[i], aabb.extents);
+        if (d + r < 0)
+            return false;
+    }
+    return true;
+}
 
 typedef frustum<float> frustumf;
 

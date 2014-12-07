@@ -4,14 +4,14 @@
 #define __MHE_RES__
 
 #include "res/mesh_loader.hpp"
-#include "res/mhe_binary_mesh.hpp"
-#include "res/resource_manager.hpp"
-#include "res/resource_managers.hpp"
 #include "res/shader_program_loader.hpp"
+#include "res/mhe_binary_mesh.hpp"
+#include "res/resource_managers.hpp"
 #include "res/texture_loader.hpp"
+#include "res/resource_manager.hpp"
 
-#include "res/image_loaders/cubemap_loader.hpp"
-#include "res/image_loaders/image_loaders_helper.hpp"
 #include "res/image_loaders/tga_loader.hpp"
+#include "res/image_loaders/image_loaders_helper.hpp"
+#include "res/image_loaders/cubemap_loader.hpp"
 
 #endif // __MHE_RES__
