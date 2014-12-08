@@ -298,9 +298,23 @@ public:
 	GlobalVar& operator= (const T& val)
 	{
 		GlobalVars::instance().set(name_, val);
+		changed_ = true;
+	}
+
+	bool changed() const
+	{
+		return changed_;
+	}
+
+	bool reset_if_changed()
+	{
+		bool result = changed();
+		if (result) changed_ = false;
+		return result;
 	}
 private:
 	const char* name_;
+	bool changed_;
 };
 
 }

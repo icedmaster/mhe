@@ -48,7 +48,8 @@ struct LightSortHelper
 Scene::Scene() :
     visible_aabbs_(0),
     visible_nodes_(0),
-	global_max_lights_number_("max_lights_number", max_lights_number)
+	global_max_lights_number_("max_lights_number", max_lights_number),
+	use_frustum_culling_("use_frustum_culling", true)
 {
 	::memset(nodes_per_material_, 0, sizeof(nodes_per_material_));
 }
@@ -177,18 +178,33 @@ void Scene::update_light_sources(RenderContext& render_context, Context& /*conte
 
 void Scene::frustum_culling()
 {
-    AABBInstance* aabbs = scene_context_.aabb_pool.all_objects();
-    const planef* planes = camera_controller_->camera().camera_frustum().planes();
-    const planef abs_planes[6] = {abs(planes[0]), abs(planes[1]), abs(planes[2]),
-                                  abs(planes[3]), abs(planes[4]), abs(planes[5])};
-    size_t visible_aabbs = 0;
-    for (size_t i = 0; i < scene_context_.aabb_pool.size(); ++i)
-    {
-        bool visible = is_inside(aabbs[i].aabb, planes, abs_planes);
-        aabbs[i].visible = visible;
-        visible_aabbs += static_cast<size_t>(visible);
-    }
-    visible_aabbs_ = visible_aabbs;
+	size_t visible_aabbs = 0;
+	if (use_frustum_culling_.value())
+	{
+		AABBInstance* aabbs = scene_context_.aabb_pool.all_objects();
+		const planef* planes = camera_controller_->camera().camera_frustum().planes();
+		const planef abs_planes[6] = {abs(planes[0]), abs(planes[1]), abs(planes[2]),
+			                          abs(planes[3]), abs(planes[4]), abs(planes[5])};
+		
+		for (size_t i = 0; i < scene_context_.aabb_pool.size(); ++i)
+		{
+			bool visible = is_inside(aabbs[i].aabb, planes, abs_planes);
+			aabbs[i].visible = visible;
+			visible_aabbs += static_cast<size_t>(visible);
+		}
+		
+	}
+	else
+	{
+		visible_aabbs = scene_context_.aabb_pool.size();
+		if (use_frustum_culling_.reset_if_changed())
+		{
+			AABBInstance* aabbs = scene_context_.aabb_pool.all_objects();
+			for (size_t i = 0; i < visible_aabbs; ++i)
+				aabbs[i].visible = true;
+		}
+	}
+	visible_aabbs_ = visible_aabbs;
     stats_.update_aabbs(scene_context_.aabb_pool.size(), visible_aabbs);
 }
 

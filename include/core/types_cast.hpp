@@ -53,6 +53,12 @@ inline std::string types_cast(const float& value)
 }
 
 template <>
+inline std::string types_cast(const bool& value)
+{
+	return details::to_string_types_cast(static_cast<size_t>(value));
+}
+
+template <>
 inline const char* types_cast(const int& value)
 {
     return types_cast<std::string>(value).c_str();
@@ -74,6 +80,12 @@ template <>
 inline size_t types_cast(const std::string& value)
 {
 	return atoi(value.c_str());
+}
+
+template <>
+inline bool types_cast(const std::string& value)
+{
+	return types_cast<size_t>(value) > 0;
 }
 
 template <>

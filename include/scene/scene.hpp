@@ -125,6 +125,7 @@ private:
     size_t visible_nodes_;
 
 	GlobalVar<size_t> global_max_lights_number_;
+	GlobalVar<bool> use_frustum_culling_;
 };
 
 }
