@@ -5,6 +5,7 @@
 	<material name="gbuffer_fill" shader="gbuffer_fill" priority="128" />
 	<material name="gbuffer_draw" shader="gbuffer_draw_blinn_phong" defs="4" priority="129" />
 	<material name="posteffect_simple" shader="gbuffer_draw" priority="130" />
+  <material name="depth_write" shader="depth_write" priority="127" />
   </materials>
   <gbuffer>
 	<fill name="gbuffer_fill" />

@@ -285,6 +285,18 @@ public:
         multTranslate(-pos);
 	}
 
+	// dir and up vectors should be normalized
+	void set_direction(const vector3<T>& pos, const vector3<T>& dir, const vector3<T>& up)
+	{
+		vector3<T> s = cross(dir, up);
+		vector3<T> u = cross(s, dir);
+		set(s.x(), u.x(), dir.x(), 0,
+			s.y(), u.y(), dir.y(), 0,
+			s.z(), u.z(), dir.z(), 0,
+			0,     0,     0,      1);
+		multTranslate(-pos);
+	}
+
 	void multTranslate(const v3d& v)
 	{
 		for (int i = 0; i < 3; ++i)
@@ -394,7 +406,7 @@ public:
 			
 	void set_perspective(T fov, T aspect_ratio, T z_near, T z_far)
 	{
-		float fov_tan = tan(deg_to_rad(fov * 0.5));
+		float fov_tan = tan(fov * 0.5);
 		T right = fov_tan * aspect_ratio * z_near;
 		T left = -right;
 		T top = fov_tan * z_near;
@@ -414,7 +426,7 @@ public:
 
     vector3<T> forward_vector() const
     {
-			return -column(2).as_v3d();
+			return column(2).as_v3d();
     }
 
     float determinant() const

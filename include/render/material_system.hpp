@@ -19,6 +19,8 @@ struct Mesh;
 struct TextureInstance;
 struct NodeInstance;
 struct TransformInstance;
+struct RenderPass;
+struct MaterialNodes;
 
 class Transform;
 
@@ -45,6 +47,11 @@ public:
 	virtual void set_texture(const TextureInstance& /*texture*/) {}
 	virtual void set_texture(size_t /*unit*/, const TextureInstance& /*texture*/) {}
 
+	virtual bool prepare_render_pass(RenderPass& /*pass*/, Context& /*context*/, SceneContext& /*scene_context*/, RenderContext& /*render_context*/)
+	{
+		return false;
+	}
+
 	uint8_t id() const
 	{
 		return id_;
@@ -70,6 +77,8 @@ public:
 		return name_impl();
 	}
 protected:
+	bool init_default(Context& context, const MaterialSystemContext& material_system_context);
+
 	void standart_material_setup(Context& context, SceneContext& scene_context, NodeInstance* nodes, ModelContext* model_contexts, size_t count, size_t textures_number);
 	void additional_passes_setup(Context& context, NodeInstance* nodes, size_t count);
 	Transform& transform(const NodeInstance& node, const SceneContext& scene_context) const;

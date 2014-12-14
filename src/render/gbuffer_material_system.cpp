@@ -9,20 +9,6 @@
 
 namespace mhe {
 
-bool ClearCommand::execute()
-{
-    if (executed_) return true;
-	ASSERT(driver_ != nullptr, "You must to setup the driver first");
-	driver_->clear(true, true, true, vec4(0.0, 0.0, 0.0, 0.0));
-    executed_ = true;
-	return true;
-}
-
-void ClearCommand::reset()
-{
-    executed_ = false;
-}
-
 GBufferFillMaterialSystem::GBufferFillMaterialSystem()
 {
 	gbuffer_desc_.target = rt_readwrite;
@@ -73,7 +59,7 @@ void GBufferFillMaterialSystem::setup(Context& context, SceneContext& scene_cont
 	for (size_t i = 0; i < count; ++i)
 	{
 		DrawCallData& draw_call_data = context.draw_call_data_pool.get(nodes[i].node.main_pass.draw_call_data);
-		draw_call_data.render_target = render_target_ + 1;
+		draw_call_data.render_target = render_target_;
         draw_call_data.command = &clear_command_;
 	}
 }
@@ -193,7 +179,7 @@ void GBufferDrawMaterialSystem::setup(Context& context, SceneContext& /*scene_co
 
 	node.main_pass.draw_call_data = context.draw_call_data_pool.create();
 	DrawCallData& draw_call_data = context.draw_call_data_pool.get(node.main_pass.draw_call_data);
-	draw_call_data.render_target = light_buffer_render_target_ + 1;
+	draw_call_data.render_target = light_buffer_render_target_;
 	draw_call_data.command = &clear_command_;
 	draw_call_data.state = context.render_state_pool.create();
 	RenderState& render_state = context.render_state_pool.get(draw_call_data.state);
@@ -236,17 +222,29 @@ void GBufferDrawMaterialSystem::update(Context& context, SceneContext& scene_con
 	for (size_t pass_number = 0; pass_number < passes_number; ++pass_number)
 	{
 		int type = 0;
+		size_t use_shadowmap = 0;
+		size_t shadowmap_light_index = 1;
+		TextureInstance shadowmap_texture;
 		for (size_t l = 0; l < lights_per_every_pass[pass_number]; ++l, ++i)
 		{
 			const Light& light = render_context.lights[i].light;
 			data[l].diffuse = light.shading().diffuse;
 			data[l].diffuse.set_w(light.type() == Light::spot ? light.spot_angle_coeff() : light.angle());
 			data[l].specular = light.shading().specular;
-			// TODO: !!
 			const vec3& light_position = get_light_position(scene_context, render_context.lights[i].id);
 			data[l].position = vec4(light_position.x(), light_position.y(), light_position.z(), light.attenuation());
-			//data[l].direction = vec4(light.direction().x(), light.direction().y(), light.direction().z(), light.angle_attenuation());
+			const vec3& light_direction = get_light_direction(scene_context, render_context.lights[i].id);
+			data[l].direction = vec4(light_direction.x(), light_direction.y(), light_direction.z(), light.angle_attenuation());
 			type = light.type();
+			
+			if (light.shadowmap_texture().id != Texture::invalid_id)
+			{
+				use_shadowmap = 1;
+				shadowmap_light_index = l;
+				shadowmap_texture = light.shadowmap_texture();
+				data[l].lightvp = get_light_shadowmap_matrix(scene_context, render_context.lights[i].id);
+				data[l].shadowmap_params = vec4(light.desc().shadowmap_bias, 0.0f, 0.0f, 0.0f);
+			}
 		}
 
 		UniformBuffer& uniform = context.uniform_pool.get(light_uniform_[pass_number]);
@@ -256,10 +254,16 @@ void GBufferDrawMaterialSystem::update(Context& context, SceneContext& scene_con
 		UberShader::Index ubershader_index;
 		ubershader_index.set(shader.info("LIGHT_TYPE"), type);
 		ubershader_index.set(shader.info("LIGHTS_NUMBER"), lights_per_every_pass[pass_number]);
+		ubershader_index.set(shader.info("SHADOWMAP"), use_shadowmap);
+		ubershader_index.set(shader.info("SHADOWMAP_LIGHT"), shadowmap_light_index);
 		ShaderProgram::IdType shader_program_id = ubershader(context).get(ubershader_index);
 
 		if (pass_number == 0)
+		{
 			main_material.shader_program = shader_program_id;
+			if (use_shadowmap)
+				main_material.textures[shadowmap_texture_index] = shadowmap_texture;
+		}
 
 		if (pass_number > 0)
 		{
@@ -270,6 +274,10 @@ void GBufferDrawMaterialSystem::update(Context& context, SceneContext& scene_con
 			material.shader_program = shader_program_id;
 			for (size_t j = 0; j < material_textures_number; ++j)
 				material.textures[j] = main_material.textures[j];
+
+			if (use_shadowmap)
+				material.textures[shadowmap_texture_index] = shadowmap_texture;
+
 			material.uniforms[0] = transform_uniform_;
 			material.uniforms[1] = light_uniform_[pass_number];
 

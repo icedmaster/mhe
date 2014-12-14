@@ -3,6 +3,7 @@
 
 #include "render/shader_program.hpp"
 #include "../opengl/mhe_gl.hpp"
+#include "core/array.hpp"
 
 namespace mhe {
 namespace opengl {
@@ -46,12 +47,15 @@ public:
 	}
 
 	void set() const;
+
+	GLuint uniform_location(size_t unit) const;
 private:
 	bool attach_shaders();
 	bool check_status(GLenum param) const;
-	void init_textures(const ShaderInitializationParams& params);
+	void init(const ShaderInitializationParams& params);
 
-	GLuint texture_location_[16];	// TODO: need to find a GL constant for this
+	array<GLuint, 16> texture_location_;	// TODO: need to find a GL constant for this
+	array<GLuint, 16> shader_bind_indexes_;
 	Shader vertex_shader_;
 	Shader fragment_shader_;
 	GLuint id_;

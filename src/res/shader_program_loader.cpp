@@ -13,6 +13,7 @@ const std::string fragment_shader_tag = "[fragment]";
 const std::string include_tag = "[include";
 const std::string defs_tag = "[defs";
 const std::string sampler_tag = "[sampler";
+const std::string uniform_tag = "[uniform";
 const std::string shader_header = "#version 330 core";
 const std::string shader_extension = ".glsl";
 
@@ -47,7 +48,24 @@ std::string parse_sampler(ShaderInitializationParams& params, const std::string&
 	sampler_data.name = data[1];
 	sampler_data.index = types_cast<size_t>(data[2]);
 	params.samplers.push_back(sampler_data);
-	return "uniform " + data[0] + " " + data[1] + ";";
+	return "uniform " + data[0] + " " + data[1] + ";\n";
+}
+
+std::string parse_uniform(ShaderInitializationParams& params, const std::string& tag)
+{
+	size_t first = tag.find('[');
+	ASSERT(first != std::string::npos, "Invalid shader source:" << tag);
+	size_t last = tag.find(']');
+	ASSERT(last != std::string::npos, "Invalid shader source:" << tag);
+	const std::vector<std::string>& data = utils::split(tag.substr(first + 1, last - first - 1), " ");
+	// 4 == uniform, name, index, update type [uniform global_transform 0 perframe]
+	ASSERT(data.size() == 4 && data[0] == "uniform", "Invalid shader source:" << tag);
+	UniformData uniform_data;
+	uniform_data.name = data[1];
+	uniform_data.index = types_cast<size_t>(data[2]);
+	NOT_IMPLEMENTED(data[3]);
+	params.uniforms.push_back(uniform_data);
+	return "";
 }
 
 std::string load_shader_impl(ShaderInitializationParams& params, const std::vector<std::string>& data, const std::string& tag, const std::string& filename)
@@ -67,20 +85,26 @@ std::string load_shader_impl(ShaderInitializationParams& params, const std::vect
     {
         const std::string& s = utils::trim_copy(data[i]);
 
-				if (s.find(include_tag) != std::string::npos)
-				{
-					actual_data += parse_include(s, filename);
-					continue;
-				}
+		if (s.find(include_tag) != std::string::npos)
+		{
+			actual_data += parse_include(s, filename);
+			continue;
+		}
 
-				if (s.find(defs_tag) != std::string::npos)
-					continue;
+		if (s.find(defs_tag) != std::string::npos)
+			continue;
 
-				if (s.find(sampler_tag) != std::string::npos)
-				{
-					actual_data += parse_sampler(params, s);
-					continue;
-				}
+		if (s.find(sampler_tag) != std::string::npos)
+		{
+			actual_data += parse_sampler(params, s);
+			continue;
+		}
+
+		if (s.find(uniform_tag) != std::string::npos)
+		{
+			actual_data += parse_uniform(params, s);
+			continue;
+		}
 
         if (s == tag)
             state = state_found;
@@ -186,7 +210,9 @@ bool ShaderProgramLoader::load(type& res, const std::string& name, const context
 		const std::string& vsdata = detail::load_shader_impl(params, data, detail::vertex_shader_tag, filename_with_extension);
 		const std::string& fsdata = detail::load_shader_impl(params, data, detail::fragment_shader_tag, filename_with_extension);
 		result = shader_program.init(vsdata, fsdata, params);
-		if (!result) break;
+		ASSERT(result, "Shader compilation failed:\n");
+		if (!result)
+			continue;
 		ubershader.add(i, shader_id);
 	}
 	if (!result) return false;

@@ -7,6 +7,8 @@
 namespace mhe {
 namespace opengl {
 
+class OpenGL3ShaderProgram;
+
 class VAO
 {
 public:
@@ -109,7 +111,7 @@ public:
 	void update(const uint8_t* data, size_t offset, size_t size);
 
     void bind(size_t unit) const;
-    void enable(GLuint program, size_t unit) const;
+    void enable(const OpenGL3ShaderProgram* program, size_t unit) const;
 	void disable() const;
 private:
 	fixed_size_vector<uint8_t, max_uniforms_per_block * 4 * sizeof(float)> data_;

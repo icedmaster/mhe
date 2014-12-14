@@ -9,7 +9,7 @@ namespace mhe {
 class Transform
 {
 public:
-	Transform()
+	Transform() : scale_(1.0f, 1.0f, 1.0f)
 	{}
 
 	Transform(const vec3& position, const quatf& rotation, const vec3& scale) :
@@ -43,7 +43,7 @@ public:
 	void translate_to(const vec3& position)
 	{
 		position_ = position;
-		transform_.set_row(3, position);
+		update();
 	}
 
 	void translate_by(const vec3& delta)
@@ -81,9 +81,20 @@ public:
 		return position_;
 	}
 
+	const quatf& rotation() const
+	{
+		return rotation_;
+	}
+
 	const vec3& scale() const
 	{
 		return scale_;
+	}
+
+	mat4x4 view() const
+	{
+		const vec3& pos = position();
+		return (quatf(0.0f, 1.0f, 0.0f, 0.0) * rotation_).to_matrix<mat4x4>() * mat4x4::translation_matrix(-pos);
 	}
 private:
 	void update()

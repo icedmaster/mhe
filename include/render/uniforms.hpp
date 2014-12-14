@@ -35,6 +35,8 @@ struct LightData
 	vec4 specular;
 	vec4 position;
 	vec4 direction;
+	mat4x4 lightvp;
+	vec4 shadowmap_params;
 };
 
 }

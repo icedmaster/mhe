@@ -31,6 +31,9 @@ bool OpenGL3RenderTarget::init(const RenderTargetDesc& desc, Texture** color_tex
 		CHECK_GL_ERRORS();
 	}
 
+	if (!desc.color_targets)
+		glDrawBuffer(GL_NONE);
+
 	if (depth_texture != nullptr)
 	{
 		texture_desc.format = desc.depth_format;

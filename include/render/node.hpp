@@ -59,7 +59,18 @@ struct Node
 	MainPassData main_pass;
 	AdditionalPasses::IdType additional_passes;
 
-	Node() : additional_passes(AdditionalPasses::invalid_id) {}
+	bool cast_shadow : 1;
+	bool receive_shadow : 1;
+
+	Node() : additional_passes(AdditionalPasses::invalid_id), cast_shadow(false), receive_shadow(false) {}
+};
+
+struct RenderPass
+{
+	Node* nodes;
+	size_t size;
+
+	RenderPass() : nodes(nullptr), size(0) {}
 };
 
 }

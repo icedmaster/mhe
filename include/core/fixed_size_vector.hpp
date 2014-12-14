@@ -222,6 +222,13 @@ public:
 		return begin_ + index;
 	}
 
+	T& add()
+	{
+		iterator it = next_predefined_element();
+		ASSERT(it != end(), "Can not add a new element");
+		return *it;
+	}
+
 	// operators
 	this_type& operator= (const this_type& other)
 	{

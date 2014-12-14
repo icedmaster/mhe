@@ -45,7 +45,7 @@ bool OpenGL3ShaderProgram::init(const std::string& vsdata, const std::string& fs
 	
 	bool result = attach_shaders();
 	if (result)
-		init_textures(params);
+		init(params);
 	return result;
 }
 
@@ -88,9 +88,9 @@ void OpenGL3ShaderProgram::set() const
 	}
 }
 
-void OpenGL3ShaderProgram::init_textures(const ShaderInitializationParams& params)
+void OpenGL3ShaderProgram::init(const ShaderInitializationParams& params)
 {
-	memset(texture_location_, 0xff, sizeof(texture_location_));
+	memset(&texture_location_[0], 0xff, sizeof(texture_location_));
 
 	GLint number, length, size;
 	GLenum type;
@@ -110,7 +110,23 @@ void OpenGL3ShaderProgram::init_textures(const ShaderInitializationParams& param
 				}
 			}
 		}
+		else
+		{
+			for (size_t j = 0; j < params.uniforms.size(); ++j)
+			{
+				if (params.uniforms[j].name == data)
+				{
+					shader_bind_indexes_[params.uniforms[j].index] = i;
+					break;
+				}
+			}
+		}
 	}
+}
+
+GLuint OpenGL3ShaderProgram::uniform_location(size_t unit) const
+{
+	return shader_bind_indexes_[unit];
 }
 
 }}

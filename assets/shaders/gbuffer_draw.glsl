@@ -30,5 +30,8 @@ void main()
 	vec4 albedo = texture(albedo_texture, vsoutput.tex);
 	vec4 light = texture(light_texture, vsoutput.tex);
 
-	color = albedo + light;
+	float shadow = light.w;
+	// TODO: this is a hack - need to fix it with ambient lighting
+	float light_coeff = shadow > 0.999f ? 1.0f : 0.0f; 
+	color = vec4(albedo.rgb * shadow, albedo.a) + vec4(light.rgb * light_coeff, 0.0f);
 }

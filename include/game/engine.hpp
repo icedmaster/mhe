@@ -69,6 +69,7 @@ private:
 	Context context_;
 	EventManager event_manager_;
 	Scene scene_;
+	RenderPass passes_[max_material_systems_number];
 	utils::Timer stats_timer_;
 
 	ref_ptr<GameScene> game_scene_;

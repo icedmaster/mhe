@@ -8,11 +8,24 @@
 namespace mhe {
 
 struct LightInstance;
+struct NodeInstance;
+
+struct MaterialNodes
+{
+	NodeInstance* nodes;
+	size_t size;
+};
 
 struct RenderContext
 {
+	NodeInstance* nodes;
+	size_t nodes_number;
+
 	LightInstance* lights;
 	size_t lights_number;
+
+	MaterialNodes* material_nodes;
+	size_t material_nodes_number;
 
 	mat4x4 view;
 	mat4x4 proj;

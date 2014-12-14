@@ -154,6 +154,7 @@ struct UniformBufferElement
 };
 
 const size_t max_uniforms_per_block = 16;
+const size_t invalid_uniform_unit = static_cast<size_t>(-1);
 
 struct UniformBufferDesc
 {
@@ -161,6 +162,10 @@ struct UniformBufferDesc
 	const char* name;
 	ShaderProgram* program;
 	fixed_size_vector<UniformBufferElement, max_uniforms_per_block> uniforms;
+	size_t unit;	// fixed uniform binding index
+	size_t size;	// fixed uniform size
+
+	UniformBufferDesc() : unit(invalid_uniform_unit), size(0) {}
 };
 
 template <class T>

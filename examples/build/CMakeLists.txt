@@ -4,3 +4,4 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../03_skybox/build/ ${CMAKE_CURRENT
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../04_deferred/build/ ${CMAKE_CURRENT_SOURCE_DIR}/../04_deferred/build/)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../05_lighting/build/ ${CMAKE_CURRENT_SOURCE_DIR}/../05_lighting/build/)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../06_performance/build/ ${CMAKE_CURRENT_SOURCE_DIR}/../06_performance/build/)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../07_shadowmap/build/ ${CMAKE_CURRENT_SOURCE_DIR}/../07_shadowmap/build/)

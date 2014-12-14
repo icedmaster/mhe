@@ -15,9 +15,16 @@ struct SamplerData
 	size_t index;
 };
 
+struct UniformData
+{
+	std::string name;
+	size_t index;
+};
+
 struct ShaderInitializationParams
 {
 	fixed_size_vector<SamplerData, 16> samplers;
+	fixed_size_vector<UniformData, 16> uniforms;
 };
 
 class ShaderProgramImpl

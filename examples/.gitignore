@@ -5,7 +5,7 @@
 /04_deferred/build/*
 /05_lighting/build/*
 /06_performance/build/*
-/07_application/build/*
+/07_shadowmap/build/*
 /08_gui/build/*
 /09_qt/build/*
 /10_3d_basic/build/*
@@ -19,7 +19,7 @@
 !/04_deferred/build/CMakeLists.txt
 !/05_lighting/build/CMakeLists.txt
 !/06_performance/build/CMakeLists.txt
-!/07_application/build/CMakeLists.txt
+!/07_shadowmap/build/CMakeLists.txt
 !/08_gui/build/CMakeLists.txt
 !/09_qt/build/CMakeLists.txt
 !/10_3d_basic/build/CMakeLists.txt

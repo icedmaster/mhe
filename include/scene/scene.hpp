@@ -3,6 +3,7 @@
 
 #include "camera_controller.hpp"
 #include "render/scene_context.hpp"
+#include "render/render_context.hpp"
 #include "core/fixed_size_vector.hpp"
 #include "core/config.hpp"
 #include "core/ref_ptr.hpp"
@@ -11,7 +12,6 @@
 
 namespace mhe {
 
-struct RenderContext;
 struct Context;
 
 class CameraController;
@@ -119,6 +119,8 @@ private:
 
 	SceneContext scene_context_;
 	MaterialConnector nodes_per_material_[max_material_systems_number];
+	// TODO: need to remove MaterialConnector struct
+	MaterialNodes material_nodes_[max_material_systems_number];
     Stats stats_;
 	ref_ptr<CameraController> camera_controller_;
     size_t visible_aabbs_;

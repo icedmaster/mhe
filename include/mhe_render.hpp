@@ -5,7 +5,6 @@
 
 #include "render/unlit_material_system.hpp"
 #include "render/uniforms.hpp"
-#include "render/render_pass.hpp"
 #include "render/gbuffer_helper.hpp"
 #include "render/node.hpp"
 #include "render/light_instance_methods.hpp"

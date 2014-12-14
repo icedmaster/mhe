@@ -150,7 +150,9 @@ void Application::init_materials(pugi::xml_node materials_node)
 
 		material_context.shader_name = shader_name;
 		material_context.defs[0] = defs;
-		context.material_systems.add(MaterialSystemFactory::instance().create(name, context, material_context), priority);
+		MaterialSystem* material_system = MaterialSystemFactory::instance().create(name);
+		context.material_systems.add(material_system, priority);
+		material_system->init(context, material_context);
 	}
 }
 

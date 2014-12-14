@@ -132,10 +132,17 @@ void Engine::update()
 
 void Engine::render()
 {
+	// TODO: need to add priorities to passes, now all additional passes are performed BEFORE the main render pass only
+	for (size_t i = 0; i < max_material_systems_number; ++i)
+	{
+		if (!passes_[i].size) continue;
+		context_.driver.render(context_, passes_[i].nodes, passes_[i].size);
+	}
+
 	ProfilerElement pe("engine.render");
+	context_.driver.begin_render();
 	context_.driver.clear_color();
 	context_.driver.clear_depth();
-	context_.driver.begin_render();
 
 	NodeInstance* nodes = nullptr;
 	size_t count = scene_.nodes(nodes);
@@ -154,11 +161,11 @@ void Engine::render()
 
 void Engine::update_materials(RenderContext& render_context)
 {
-	size_t indexes[4096];
-	scene_.transform_pool().all_indexes(indexes, sizeof(indexes));
 	const MaterialSystems::Values &systems = context_.material_systems.get_all_materials();
 	for (size_t i = 0; i < systems.size(); ++i)
 	{
+		if (systems[i]->prepare_render_pass(passes_[i], context_, scene_.scene_context(), render_context))
+			continue;
 		NodeInstance* nodes = nullptr;
 		size_t offset;
 		size_t count = scene_.nodes(nodes, offset, systems[i]->id());

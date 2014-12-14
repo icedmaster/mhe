@@ -15,6 +15,7 @@ namespace mhe
 struct Context;
 struct NodeInstance;
 struct RenderData;
+struct Node;
 
 class Texture;
 class RenderState;
@@ -190,8 +191,11 @@ public:
 	void begin_render();
 	void end_render();
 
+	void render(const Context& context, const Node* nodes, size_t count);
 	void render(const Context& context, const NodeInstance* nodes, size_t count);
 private:
+	void render_node(const Context& context, const Node& node);
+
 	Stats stats_;
 	State state_;
 	unique_ptr<DriverImpl> impl_;

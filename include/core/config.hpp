@@ -93,4 +93,6 @@ const size_t max_additional_render_passes = 32;
  */
 const size_t max_scene_nodes_number = 4096;
 
+const size_t max_shadowmap_nodes_number = max_scene_nodes_number * 0.8f;	// 80 %
+
 #endif

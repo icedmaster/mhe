@@ -107,7 +107,12 @@ void Scene::update(RenderContext& render_context, Context& context)
     visible_nodes_ = visible_nodes;
     stats_.update_nodes(nodes_number, visible_nodes);
 
+	render_context.nodes = nodes;
+	render_context.nodes_number = visible_nodes;
+
 	refresh_node_material_link(nodes);
+	render_context.material_nodes = material_nodes_;
+	render_context.material_nodes_number = max_material_systems_number;
 
 	update_light_sources(render_context, context);
 }
@@ -148,6 +153,10 @@ void Scene::refresh_node_material_link(NodeInstance* nodes)
 		{
 			nodes_per_material_[prev_material_system].offset = begin;
 			nodes_per_material_[prev_material_system].size = size;
+
+			material_nodes_[current_material_system].nodes = nodes + begin;
+			material_nodes_[current_material_system].size = size;
+
 			prev_material_system = current_material_system;
 			size = 0;
 			begin = i;
@@ -158,6 +167,9 @@ void Scene::refresh_node_material_link(NodeInstance* nodes)
 	{
 		nodes_per_material_[current_material_system].offset = begin;
 		nodes_per_material_[current_material_system].size = size;
+
+		material_nodes_[current_material_system].nodes = nodes + begin;
+		material_nodes_[current_material_system].size = size;
 	}
 }
 

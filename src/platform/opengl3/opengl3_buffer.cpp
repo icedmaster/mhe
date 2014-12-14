@@ -134,14 +134,23 @@ void OpenGL3Layout::disable() const
 
 bool OpenGL3UniformBuffer::init(const UniformBufferDesc& desc)
 {
-	const OpenGL3ShaderProgram* program = static_cast<const OpenGL3ShaderProgram*>(desc.program->impl());
-	id_ = OpenGLExtensions::instance().glGetUniformBlockIndex(program->id(), desc.name);		// uniform block index
-	ASSERT(id_ != GL_INVALID_INDEX, "Can't create uniform buffer");
 	GLint size;
-	OpenGLExtensions::instance().glGetActiveUniformBlockiv(program->id(), id_, GL_UNIFORM_BLOCK_DATA_SIZE, &size);
+	const OpenGL3ShaderProgram* program = 0;
+	if (desc.unit == invalid_uniform_unit)
+	{
+		program = static_cast<const OpenGL3ShaderProgram*>(desc.program->impl());
+		id_ = OpenGLExtensions::instance().glGetUniformBlockIndex(program->id(), desc.name);		// uniform block index
+		ASSERT(id_ != GL_INVALID_INDEX, "Can't create uniform buffer");
+		OpenGLExtensions::instance().glGetActiveUniformBlockiv(program->id(), id_, GL_UNIFORM_BLOCK_DATA_SIZE, &size);
+	}
+	else
+	{
+		id_ = invalid_uniform_unit;
+		size = desc.size;
+	}
 
 	data_.resize(size);
-	if (!desc.uniforms.empty())
+	if (!desc.uniforms.empty() && program)
 	{
 		const GLchar* names[max_uniforms_per_block];
 		GLuint indices[max_uniforms_per_block];
@@ -192,9 +201,12 @@ void OpenGL3UniformBuffer::bind(size_t unit) const
     OpenGLExtensions::instance().glBindBufferBase(GL_UNIFORM_BUFFER, unit, vbo_.id());
 }
 
-void OpenGL3UniformBuffer::enable(GLuint program, size_t unit) const
+void OpenGL3UniformBuffer::enable(const OpenGL3ShaderProgram* program, size_t unit) const
 {
-    OpenGLExtensions::instance().glUniformBlockBinding(program, id_, unit);
+	if (id_ != invalid_uniform_unit)
+		OpenGLExtensions::instance().glUniformBlockBinding(program->id(), id_, unit);
+	else
+		OpenGLExtensions::instance().glUniformBlockBinding(program->id(), program->uniform_location(unit), unit);
 }
 
 void OpenGL3UniformBuffer::disable() const

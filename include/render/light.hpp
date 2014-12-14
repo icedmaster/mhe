@@ -4,6 +4,7 @@
 #include "math/vector3.hpp"
 #include "math/vector4.hpp"
 #include "utils/pool_utils.hpp"
+#include "texture.hpp"
 
 namespace mhe {
 
@@ -14,6 +15,11 @@ struct LightDesc
 		float angle;
 		float attenuation;
 		float angle_attenuation;
+
+		float spot_shadowmap_unused1;
+		float spot_shadowmap_unused2;
+		float spot_shadowmap_projection_znear;
+		float spot_shadowmap_projection_zfar;
 	};
 
 	struct Omni
@@ -21,6 +27,11 @@ struct LightDesc
 		float radius;
 		float omni_attenuation;
 		float omni_unused1;
+
+		float omni_shadowmap_unused1;
+		float omni_shadowmap_unused2;
+		float omni_shadowmap_unused3;
+		float omni_shadowmap_unused4;
 	};
 
 	struct Directional
@@ -28,6 +39,11 @@ struct LightDesc
 		float directional_unused1;
 		float directional_unused2;
 		float directional_unused3;
+
+		float directional_shadowmap_projection_width;
+		float directional_shadowmap_projection_height;
+		float directional_shadowmap_projection_znear;
+		float directional_shadowmap_projection_zfar;
 	};
 
 	union
@@ -37,7 +53,13 @@ struct LightDesc
 		Directional directional;
 	};
 
+	float shadowmap_bias;
 	bool cast_shadows;
+
+	LightDesc() :
+		cast_shadows(false),
+		shadowmap_bias(0.00125f)
+	{}
 };
 
 struct ShadingSettings
@@ -91,6 +113,11 @@ public:
 		return desc_;
 	}
 
+	const LightDesc& desc() const
+	{
+		return desc_;
+	}
+
 	float attenuation() const
 	{
 		switch (type_)
@@ -125,10 +152,22 @@ public:
 			return desc_.spot.angle_attenuation;
 		return 1.0f;
 	}
+
+	TextureInstance shadowmap_texture() const
+	{
+		return shadowmap_texture_;
+	}
+
+	void set_shadowmap_texture(const TextureInstance& texture)
+	{
+		shadowmap_texture_ = texture;
+	}
 private:
 	ShadingSettings shading_;
 	LightDesc desc_;
 	int type_;
+
+	TextureInstance shadowmap_texture_;
 };
 
 }

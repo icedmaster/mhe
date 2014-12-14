@@ -20,7 +20,7 @@ void FPSCameraController::update_impl(const RenderContext& render_context)
 {
 	float time_delta = render_context.fdelta;
 	const vec3& side = camera().transform().side_vector();
-	const vec3& fwd = camera().transform().forward_vector();
+	const vec3& fwd = -camera().transform().forward_vector();
 	const vec3& up = camera().transform().up_vector();
 	if (event_manager_.check_bind("left"))
         camera().translate_by(-side * time_delta * move_speed());

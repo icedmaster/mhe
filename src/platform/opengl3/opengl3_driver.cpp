@@ -116,7 +116,7 @@ void OpenGL3Driver::set_uniform(const UniformBuffer& uniform, size_t unit)
         buffer->bind(unit);
         state_.uniforms[unit] = uniform.id();
     }
-    buffer->enable(current_shader_program_->id(), unit);
+    buffer->enable(current_shader_program_, unit);
 	CHECK_GL_ERRORS();
 }
 

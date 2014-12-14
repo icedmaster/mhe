@@ -12,6 +12,8 @@ struct Light
 	vec4 specular;
 	vec4 position; // w - attenuation
 	vec4 direction; // w - angle attenuation for SPOT
+	mat4 lightvp;
+	vec4 shadowmap_params;	// x - shadowmap bias
 };
 
 vec3 lambert(vec3 diffuse, vec3 material_diffuse, vec3 lightdir, vec3 normal, float attenuation)

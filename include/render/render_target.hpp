@@ -67,7 +67,7 @@ private:
 	unique_ptr<RenderTargetImpl> impl_;
 };
 
-static const RenderTarget::IdType default_render_target = 0;
+static const RenderTarget::IdType default_render_target = RenderTarget::invalid_id - 1;
 
 }
 

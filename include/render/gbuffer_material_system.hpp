@@ -6,23 +6,9 @@
 #include "render_buffer.hpp"
 #include "render_target.hpp"
 #include "node.hpp"
+#include "commands.hpp"
 
 namespace mhe {
-
-class MHE_EXPORT ClearCommand : public RenderCommand
-{
-public:
-	void set_driver(Driver* driver)
-	{
-		driver_ = driver;
-	}
-
-    bool execute();
-    void reset();
-private:
-	Driver* driver_;
-    bool executed_;
-};
 
 class AbstractGBufferFillMaterialSystem : public MaterialSystem
 {
@@ -65,6 +51,8 @@ private:
 class MHE_EXPORT GBufferDrawMaterialSystem : public AbstractGBufferUseMaterialSystem
 {
 	SETUP_MATERIAL("gbuffer_draw");
+
+	static const size_t shadowmap_texture_index = 5;
 public:
 	GBufferDrawMaterialSystem() {}
 

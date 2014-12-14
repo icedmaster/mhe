@@ -7,6 +7,11 @@
 
 namespace mhe {
 
+bool MaterialSystem::init_default(Context& context, const MaterialSystemContext& material_system_context)
+{
+	return context.shader_manager.get(shader_, material_system_context.shader_name);
+}
+
 void MaterialSystem::standart_material_setup(Context& context, SceneContext& scene_context, NodeInstance* nodes, ModelContext* model_contexts, size_t count,
 											size_t textures_number)
 {
