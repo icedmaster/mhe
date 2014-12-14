@@ -77,12 +77,16 @@ public:
 
 	void set_euler(float xangle, float yangle, float zangle)
 	{
-		const float cx = ::cos(xangle * 0.5f);
-		const float sx = ::sin(xangle * 0.5f); 
-		const float cy = ::cos(yangle * 0.5f);
-		const float sy = ::sin(yangle * 0.5f);
-		const float cz = ::cos(zangle * 0.5f);
-		const float sz = ::sin(zangle * 0.5f);
+		float ax = zangle;
+		float ay = yangle;
+		float az = xangle;
+
+		const float cx = ::cos(ax * 0.5f);
+		const float sx = ::sin(ax * 0.5f); 
+		const float cy = ::cos(ay * 0.5f);
+		const float sy = ::sin(ay * 0.5f);
+		const float cz = ::cos(az * 0.5f);
+		const float sz = ::sin(az * 0.5f);
 		T nx = cx * cy * sz - sx * sy * cz;
 		T ny = cx * sy * cz + sx * cy * sz;
 		T nz = sx * cy * cz - cx * sy * sz;
@@ -97,9 +101,9 @@ public:
 		const float z_sqr = q_[2] * q_[2];
 		const float w_sqr = q_[3] * q_[3];
 
-		xangle = ::atan( 2 * (w() * z() + y() * x()) / (1 - 2 * (z_sqr + y_sqr)) );
+		zangle = ::atan( 2 * (w() * z() + y() * x()) / (1 - 2 * (z_sqr + y_sqr)) );
 		yangle = ::asin( 2 * (w() * y() - x() * z()) );
-		zangle = ::atan( 2 * (w() * x() + z() * y()) / (1 - 2 * (y_sqr + x_sqr)) );
+		xangle = ::atan( 2 * (w() * x() + z() * y()) / (1 - 2 * (y_sqr + x_sqr)) );
 	}
 
     template <class V>

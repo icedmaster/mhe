@@ -77,7 +77,7 @@ private:
 		light.shading().diffuse = mhe::color_green;
 		light.shading().specular = mhe::color_white;
 		mhe::set_light_position(engine.scene_context(), light_instance.id, mhe::vec3(0, 20, 0));
-		mhe::set_light_rotation(engine.scene_context(), light_instance.id, mhe::quatf(0.0f, 0.0f, -mhe::pi_2));
+		mhe::set_light_rotation(engine.scene_context(), light_instance.id, mhe::quatf(-mhe::pi_2, 0.0f, 0.0f));
 		light.desc().spot.attenuation = 0.2f;
 		light.desc().spot.angle = mhe::deg_to_rad(30.0f);
 		light.desc().spot.angle_attenuation = 0.5f;
@@ -127,7 +127,7 @@ private:
 		light.shading().diffuse = mhe::vec4(0.1f, 0.1f, 0.1f, 1.0f);
 		light.shading().specular = mhe::vec4(0.2f, 0.2f, 0.2f, 1.0f);
 		mhe::set_light_position(engine.scene_context(), light_instance.id, mhe::vec3(0, 100, 0));
-		mhe::set_light_rotation(engine.scene_context(), light_instance.id, mhe::quatf(0.0f, 0.0f, -mhe::pi_2));
+		mhe::set_light_rotation(engine.scene_context(), light_instance.id, mhe::quatf(-mhe::pi_2, 0.0f, 0.0f));
 		light.set_type(mhe::Light::directional);
 
         mhe::LightInstance& light_instance2 = engine.scene().create_light();

@@ -49,7 +49,7 @@ public:
 	void translate_by(const vec3& delta)
 	{
 		position_ += delta;
-        transform_.set_row(3, position() + delta);
+        update();
 	}
 
 	void rotate_to(const quatf& rotation)

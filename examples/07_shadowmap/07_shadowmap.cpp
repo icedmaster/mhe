@@ -25,7 +25,7 @@ public:
 		mhe::utils::create_plane(plane.node.mesh, engine.context());
 		mhe::Transform& plane_transform = engine.scene().transform_pool().get(plane.transform_id).transform;
 		plane_transform.scale_to(mhe::vec3(50, 50, 50));
-		plane_transform.translate_by(mhe::vec3(0, 0, -15));
+		plane_transform.translate_by(mhe::vec3(0, 0, -30));
 		plane.node.receive_shadow = true;
 
 		mhe::GBufferFillMaterialSystem* material_system = engine.context().material_systems.get<mhe::GBufferFillMaterialSystem>();
@@ -76,7 +76,7 @@ private:
 		light.shading().diffuse = mhe::color_green;
 		light.shading().specular = mhe::color_white;
 		mhe::set_light_position(engine.scene_context(), light_instance.id, mhe::vec3(0, 20, 0));
-		mhe::set_light_rotation(engine.scene_context(), light_instance.id, mhe::quatf(0.0f, 0.0f, -mhe::pi_2));
+		mhe::set_light_rotation(engine.scene_context(), light_instance.id, mhe::quatf(-mhe::pi_2, 0.0f, 0.0f));
 		light.desc().spot.attenuation = 0.2f;
 		light.desc().spot.angle = mhe::deg_to_rad(30.0f);
 		light.desc().spot.angle_attenuation = 0.5f;
@@ -110,7 +110,7 @@ private:
 		light.shading().diffuse = mhe::vec4(0.1f, 0.1f, 0.1f, 1.0f);
 		light.shading().specular = mhe::vec4(0.2f, 0.2f, 0.2f, 1.0f);
 		mhe::set_light_position(engine.scene_context(), light_instance.id, mhe::vec3(0, 100, 0));
-		mhe::set_light_rotation(engine.scene_context(), light_instance.id, mhe::quatf(0.0f, 0.0f, -mhe::pi_2));
+		mhe::set_light_rotation(engine.scene_context(), light_instance.id, mhe::quatf(-mhe::pi_2, 0.0f, 0.0f));
 		light.set_type(mhe::Light::directional);
 		light.desc().directional.directional_shadowmap_projection_znear = 0.1f;
 		light.desc().directional.directional_shadowmap_projection_zfar = 120.0f;
