@@ -25,7 +25,7 @@ public:
 		mhe::utils::create_plane(plane.node.mesh, engine.context());
 		mhe::Transform& plane_transform = engine.scene().transform_pool().get(plane.transform_id).transform;
 		plane_transform.scale_to(mhe::vec3(50, 50, 50));
-		plane_transform.translate_by(mhe::vec3(0, 0, -30));
+		plane_transform.translate_by(mhe::vec3(0, 0, -20));
 		plane.node.receive_shadow = true;
 
 		mhe::GBufferFillMaterialSystem* material_system = engine.context().material_systems.get<mhe::GBufferFillMaterialSystem>();

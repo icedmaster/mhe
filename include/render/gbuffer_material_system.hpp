@@ -8,6 +8,8 @@
 #include "node.hpp"
 #include "commands.hpp"
 
+#include "debug/rdbg.hpp"
+
 namespace mhe {
 
 class AbstractGBufferFillMaterialSystem : public MaterialSystem
@@ -54,10 +56,15 @@ class MHE_EXPORT GBufferDrawMaterialSystem : public AbstractGBufferUseMaterialSy
 
 	static const size_t shadowmap_texture_index = 5;
 public:
-	GBufferDrawMaterialSystem() {}
+	GBufferDrawMaterialSystem() :
+		shadowmap_enabled_("shadowmap_enabled", true),
+		shadowmap_quality_("shadowmap_quality", 1)
+	{}
 
 	GBufferDrawMaterialSystem(RenderTarget::IdType render_target) :
-		render_target_(render_target)
+		render_target_(render_target),
+		shadowmap_enabled_("shadowmap_enabled", true),
+		shadowmap_quality_("shadowmap_quality", 1)
 	{}
 
 	void set_render_target(RenderTarget::IdType render_target)
@@ -86,6 +93,9 @@ private:
 	UniformBuffer::IdType light_uniform_[max_lights_number];
 	UniformBuffer::IdType transform_uniform_;
 	size_t lights_per_pass_;
+
+	GlobalVar<bool> shadowmap_enabled_;
+	GlobalVar<size_t> shadowmap_quality_;
 };
 
 }

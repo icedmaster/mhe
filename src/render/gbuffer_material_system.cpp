@@ -237,7 +237,7 @@ void GBufferDrawMaterialSystem::update(Context& context, SceneContext& scene_con
 			data[l].direction = vec4(light_direction.x(), light_direction.y(), light_direction.z(), light.angle_attenuation());
 			type = light.type();
 			
-			if (light.shadowmap_texture().id != Texture::invalid_id)
+			if (shadowmap_enabled_.value() && light.shadowmap_texture().id != Texture::invalid_id)
 			{
 				use_shadowmap = 1;
 				shadowmap_light_index = l;
@@ -256,6 +256,7 @@ void GBufferDrawMaterialSystem::update(Context& context, SceneContext& scene_con
 		ubershader_index.set(shader.info("LIGHTS_NUMBER"), lights_per_every_pass[pass_number]);
 		ubershader_index.set(shader.info("SHADOWMAP"), use_shadowmap);
 		ubershader_index.set(shader.info("SHADOWMAP_LIGHT"), shadowmap_light_index);
+		ubershader_index.set(shader.info("SHADOWMAP_QUALITY"), shadowmap_quality_.value());
 		ShaderProgram::IdType shader_program_id = ubershader(context).get(ubershader_index);
 
 		if (pass_number == 0)
