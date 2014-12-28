@@ -28,47 +28,54 @@ inline std::wstring to_wstring(const std::string& s)
 {
 	return std::wstring(s.begin(), s.end());
 }
-		
-inline void rtrim(std::string& s, const std::string& c = " ")
+
+template <class Str>
+inline void rtrim(Str& s, const Str& c = " ")
 {
 	s.erase(s.find_last_not_of(c) + 1);
 }
 
-inline void ltrim(std::string& s, const std::string& c = " ")
+template <class Str>
+inline void ltrim(Str& s, const Str& c = " ")
 {
 	s.erase(0, s.find_first_not_of(c));
 }
 
-inline std::string rtrim_copy(const std::string& s, const std::string& c = " ")
+template <class Str>
+inline Str rtrim_copy(const Str& s, const Str& c = " ")
 {
 	size_t pos = s.find_last_not_of(c);
 	return s.substr(0, pos + 1);
 }
 
-inline std::string ltrim_copy(const std::string& s, const std::string& c = " ")
+template <class Str>
+inline Str ltrim_copy(const Str& s, const Str& c = " ")
 {
 	size_t pos = s.find_first_not_of(c);
 	return s.substr(pos, s.length() - pos);
 }
 
-inline void trim(std::string& s, const std::string& c = " ")
+template <class Str>
+inline void trim(Str& s, const Str& c = " ")
 {
 	rtrim(s, c);
 	ltrim(s, c);
 }		
 
-inline std::string trim_copy(const std::string& s, const std::string& c = " ")
+template <class Str>
+inline Str trim_copy(const Str& s, const Str& c = " ")
 {
 	if (s.empty()) return s;
 	return rtrim_copy(ltrim_copy(s, c), c);
 }
 
-inline std::string replace(const std::string& s, char from, char to = 0)
+template <class Str>
+inline Str replace(const Str& s, typename Str::value_type from, typename Str::value_type to = 0)
 {
-	std::string out_str;
+	Str out_str;
 	for (size_t i = 0; i < s.size(); ++i)
 	{
-		char c = s[i];
+		typename Str::value_type c = s[i];
 		if (c == from)
 		{
 			if (!to) continue; 
@@ -79,9 +86,10 @@ inline std::string replace(const std::string& s, char from, char to = 0)
 	return out_str;
 }
 
-inline std::string join(const std::vector<std::string>& str, const std::string& del = std::string())
+template <class Str, class Str2>
+inline Str join(const std::vector<Str>& str, const Str2& del = Str2())
 {
-	std::string out;
+	Str out;
 	for (size_t i = 0; i < str.size(); ++i)
 	{
 		out += str[i];
@@ -91,17 +99,18 @@ inline std::string join(const std::vector<std::string>& str, const std::string& 
 	return out;
 }
 
-inline std::vector<std::string> split(const std::string& str, const std::string& del)
+template <class Str, class Str2>
+inline std::vector<Str> split(const Str& str, const Str2& del)
 {
-	std::vector<std::string> splitted;
+	std::vector<Str> splitted;
 	size_t index = 0;
 	while (index <= str.length())
 	{
 		size_t pos = str.find_first_of(del, index);
-		size_t len = ((pos == std::string::npos) ? str.length() : pos) - index;
+		size_t len = ((pos == Str::npos) ? str.length() : pos) - index;
 		if (len)
 		{
-			const std::string& element = str.substr(index, len);
+			const Str& element = str.substr(index, len);
 			splitted.push_back(element);
 		}
 		index += (len + 1);
