@@ -2,10 +2,10 @@
 #define __PROFILER_HPP__
 
 #include <map>
-#include <string>
 #include <vector>
 #include "core/hash.hpp"
 #include "core/singleton.hpp"
+#include "core/string.hpp"
 #include "utils/sysutils.hpp"
 
 namespace mhe {
@@ -18,8 +18,8 @@ class Profiler
 public:
 	struct Data
 	{
-		std::string name;
-		std::string data;
+		string name;
+		string data;
 		size_t count;
 		float interval;
 

@@ -64,6 +64,9 @@ void OpenGLExtensions::init_extensions()
 	glBlendEquation_ = load_extension<PFNGLBLENDEQUATIONPROC>("glBlendEquation");
 	glStencilFuncSeparate_ = load_extension<PFNGLSTENCILFUNCSEPARATEPROC>("glStencilFuncSeparate");
 	glStencilOpSeparate_ = load_extension<PFNGLSTENCILOPSEPARATEPROC>("glStencilOpSeparate");
+	glMapBuffer_ = load_extension<PFNGLMAPBUFFERPROC>("glMapBuffer");
+	glUnmapBuffer_ = load_extension<PFNGLUNMAPBUFFERPROC>("glUnmapBuffer");
+	glMapBufferRange_ = load_extension<PFNGLMAPBUFFERRANGEPROC>("glMapBufferRange");
 #endif	// MHE_OPENGL_HAS_SHADERS
 
 	get_str_extensions();

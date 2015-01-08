@@ -4,6 +4,8 @@
 #include "platform/opengl/opengl_extension.hpp"
 #include "platform/opengl3/opengl3_shader_program.hpp"
 
+#include "render/render_globals.hpp"
+
 namespace mhe {
 namespace opengl {
 
@@ -35,6 +37,7 @@ bool VBO::init(GLenum target, GLsizeiptr size, const GLvoid* data, GLenum usage)
 	OpenGLExtensions::instance().glBindBuffer(target, id_);
 	OpenGLExtensions::instance().glBufferData(target, size, data, usage);
 	target_ = target;
+	usage_ = usage;
 	return true;
 }
 
@@ -56,7 +59,20 @@ void VBO::disable() const
 void VBO::update(GLsizeiptr size, GLintptr offset, const GLvoid* data)
 {
 	enable();
-	OpenGLExtensions::instance().glBufferSubData(target_, offset, size, data);
+	if (!gl_map_for_buffer_update.value())
+		OpenGLExtensions::instance().glBufferSubData(target_, offset, size, data);
+	else
+	{
+		void* ptr = OpenGLExtensions::instance().glMapBufferRange(target_, offset, size, GL_MAP_INVALIDATE_BUFFER_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_WRITE_BIT);
+		if (ptr == nullptr)
+		{
+			CHECK_GL_ERRORS();
+			return;
+		}
+		::memcpy(ptr, data, size);
+		OpenGLExtensions::instance().glUnmapBuffer(target_);
+	}
+	
 	CHECK_GL_ERRORS();
 	disable();
 }
@@ -134,6 +150,8 @@ void OpenGL3Layout::disable() const
 
 bool OpenGL3UniformBuffer::init(const UniformBufferDesc& desc)
 {
+	current_ = 0;
+
 	GLint size;
 	const OpenGL3ShaderProgram* program = 0;
 	if (desc.unit == invalid_uniform_unit)
@@ -163,10 +181,13 @@ bool OpenGL3UniformBuffer::init(const UniformBufferDesc& desc)
 			::memcpy(data_.begin() + offsets_[i], desc.uniforms[i].data, desc.uniforms[i].size);
 	}
 
-	if (!vbo_.init(GL_UNIFORM_BUFFER, size, &data_[0], GL_DYNAMIC_DRAW))
+	for (int i = 0; i < 2; ++i)
 	{
-		ASSERT(false, "Can't create VBO for UniformBuffer");
-		return false;
+		if (!vbo_[i].init(GL_UNIFORM_BUFFER, size, &data_[0], GL_DYNAMIC_DRAW))
+		{
+			ASSERT(false, "Can't create VBO for UniformBuffer");
+			return false;
+		}
 	}
 
 	return true;
@@ -174,11 +195,14 @@ bool OpenGL3UniformBuffer::init(const UniformBufferDesc& desc)
 
 void OpenGL3UniformBuffer::close()
 {
-	vbo_.close();
+	vbo_[0].close();
+	vbo_[1].close();
 }
 
 void OpenGL3UniformBuffer::update(const UniformBufferDesc& desc)
 {
+	++current_;
+	current_ = current_ % 2;
 #ifdef MHE_DEBUG
 	size_t size = 0;
 	for (size_t i = 0; i < desc.uniforms.size(); ++i)
@@ -187,18 +211,20 @@ void OpenGL3UniformBuffer::update(const UniformBufferDesc& desc)
 #endif
 	for (size_t i = 0; i < desc.uniforms.size(); ++i)
 		::memcpy(data_.begin() + offsets_[i], desc.uniforms[i].data, desc.uniforms[i].size);
-	vbo_.update(data_.size(), 0, &data_[0]);
+	vbo_[current_].update(data_.size(), 0, &data_[0]);
 }
 
 void OpenGL3UniformBuffer::update(const uint8_t* data, size_t offset, size_t size)
 {
-	vbo_.update(size, offset, data);
+	++current_;
+	current_ = current_ % 2;
+	vbo_[current_].update(size, offset, data);
 }
 
 void OpenGL3UniformBuffer::bind(size_t unit) const
 {
-    vbo_.enable();
-    OpenGLExtensions::instance().glBindBufferBase(GL_UNIFORM_BUFFER, unit, vbo_.id());
+    vbo_[current_].enable();
+    OpenGLExtensions::instance().glBindBufferBase(GL_UNIFORM_BUFFER, unit, vbo_[current_].id());
 }
 
 void OpenGL3UniformBuffer::enable(const OpenGL3ShaderProgram* program, size_t unit) const
@@ -211,7 +237,7 @@ void OpenGL3UniformBuffer::enable(const OpenGL3ShaderProgram* program, size_t un
 
 void OpenGL3UniformBuffer::disable() const
 {
-	vbo_.disable();
+	vbo_[current_].disable();
 }
 
 }}

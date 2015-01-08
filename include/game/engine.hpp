@@ -7,6 +7,7 @@
 #endif
 
 #include "render/context.hpp"
+#include "render/render_globals.hpp"
 #include "events/event_manager.hpp"
 #include "scene/scene.hpp"
 #include "game_scene.hpp"
@@ -71,6 +72,8 @@ private:
 	Scene scene_;
 	RenderPass passes_[max_material_systems_number];
 	utils::Timer stats_timer_;
+
+	RenderGlobals render_globals_;
 
 	ref_ptr<GameScene> game_scene_;
 	bool process_;

@@ -504,6 +504,33 @@ public:
 		::glStencilOpSeparate(face, sfail, dpfail, dppass);
 #endif
 	}
+
+	void glMapBuffer(GLenum target, GLenum access)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glMapBuffer_(target, access);
+#else
+		::glMapBuffer(target, access);
+#endif
+	}
+
+	void glUnmapBuffer(GLenum target)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glUnmapBuffer_(target);
+#else
+		::glUnmapBuffer(target);
+#endif
+	}
+
+	void* glMapBufferRange(GLenum target, GLintptr offset, GLsizeiptr length, GLbitfield access)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		return glMapBufferRange_(target, offset, length, access);
+#else
+		return ::glMapBufferRange(target, offset, length, access);
+#endif
+	}
 private:
 	OpenGLExtensions() {}
 	~OpenGLExtensions() {}
@@ -578,6 +605,9 @@ private:
 	PFNGLBLENDEQUATIONPROC glBlendEquation_;
 	PFNGLSTENCILFUNCSEPARATEPROC glStencilFuncSeparate_;
 	PFNGLSTENCILOPSEPARATEPROC glStencilOpSeparate_;
+	PFNGLMAPBUFFERPROC glMapBuffer_;
+	PFNGLUNMAPBUFFERPROC glUnmapBuffer_;
+	PFNGLMAPBUFFERRANGEPROC glMapBufferRange_;
 #endif
 	std::map<std::string, bool> loaded_extensions_;
 };

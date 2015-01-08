@@ -37,7 +37,7 @@ bool Engine::init(uint width, uint height, uint bpp, bool fullscreen)
 				const std::string& name = SystemFactory::instance().video_driver_factory().set_next_driver();
 				if (name.empty())
 				{
-					ERROR_LOG("All available drivers has been tried - can't initialize engine");
+					ERROR_LOG("All available drivers have been tried - can't initialize engine");
 					return false;
 				}
 				INFO_LOG("Try next driver with name:" << name);
@@ -83,6 +83,8 @@ bool Engine::init(uint width, uint height, uint bpp, bool fullscreen)
 
 	stats_timer_.start();
 
+	setup(render_globals_);
+
 	return true;
 }
 
@@ -112,6 +114,13 @@ void Engine::update()
 {
 	MainProfiler::instance().clear();
 	ProfilerElement pe("engine.update");
+
+	if (use_vsync.reset_if_changed())
+	{
+		if (use_vsync.value())
+			context_.window_system.enable_vsync();
+		else context_.window_system.disable_vsync();
+	}
 
 	if (stats_timer_.elapsed() > 1.0f)
 	{

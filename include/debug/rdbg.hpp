@@ -227,6 +227,7 @@ public:
 		const char* name;
 		int type;
 		std::string value;
+		bool changed;
 	};
 public:
 	template <class T>
@@ -250,6 +251,7 @@ public:
 		data.name = name;
 		data.type = TypeHelper<T>::type;
 		data.value = types_cast<std::string>(value);
+		data.changed = true;
 	}
 
 	void set(const char* name, const std::string* args, size_t args_number);
@@ -257,6 +259,15 @@ public:
 	bool has(const char* name) const
 	{
 		return vars_.find(hash(name)) != vars_.end();
+	}
+
+	bool reset_if_changed(const char* name)
+	{
+		VarsMap::iterator it = vars_.find(hash(name));
+		if (it == vars_.end()) return false;
+		bool changed = it->second.changed;
+		it->second.changed = false;
+		return changed;
 	}
 
 	std::vector<Data> data() const;
@@ -272,6 +283,8 @@ template <class T>
 class GlobalVar
 {
 public:
+	GlobalVar() {}
+
 	GlobalVar(const char* name, const T& val) :
 		name_(name)
 	{
@@ -298,23 +311,20 @@ public:
 	GlobalVar& operator= (const T& val)
 	{
 		GlobalVars::instance().set(name_, val);
-		changed_ = true;
 	}
 
-	bool changed() const
+	GlobalVar& operator= (const GlobalVar& other)
 	{
-		return changed_;
+		name_ = other.name_;
+		return *this;
 	}
 
 	bool reset_if_changed()
 	{
-		bool result = changed();
-		if (result) changed_ = false;
-		return result;
+		return GlobalVars::instance().reset_if_changed(name_);
 	}
 private:
 	const char* name_;
-	bool changed_;
 };
 
 }

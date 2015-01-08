@@ -41,6 +41,7 @@ public:
 	virtual void show_cursor(bool) = 0;
 	virtual void resize(const vector2<int>&) = 0;
 	virtual View* view() = 0;
+	virtual void set_vsync_enabled(bool enabled) = 0;
 	virtual void set_view(View* /*view*/) {}
 	virtual MainLoop* main_loop() const
 	{
@@ -139,6 +140,16 @@ public:
 	MainLoop* main_loop() const
 	{
 		return impl_->main_loop();
+	}
+
+	void disable_vsync()
+	{
+		impl_->set_vsync_enabled(false);
+	}
+
+	void enable_vsync()
+	{
+		impl_->set_vsync_enabled(true);
 	}
 private:
 	unique_ptr<WindowSystemImpl> impl_;

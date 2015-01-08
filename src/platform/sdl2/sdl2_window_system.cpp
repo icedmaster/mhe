@@ -70,4 +70,9 @@ namespace sdl {
 		int en = (show) ? SDL_ENABLE : SDL_DISABLE;
 		SDL_ShowCursor(en);
 	}
+
+	void SDL2WindowSystem::set_vsync_enabled(bool enabled)
+	{
+		SDL_GL_SetSwapInterval(enabled ? 1 : 0);
+	}
 }}

@@ -191,10 +191,10 @@ std::string RDBGProcessor::process_profiler_result_command(const std::vector<std
 	std::string result;
 	for (size_t i = 0; i < data.size(); ++i)
 	{
-		result += data[i].name;
+		result += data[i].name.c_str();
 		result += (" time:" + types_cast<std::string>(data[i].interval));
 		result += (" count:" + types_cast<std::string>(data[i].count));
-		result += (" data:" + data[i].data);
+		result += (" data:" + data[i].data).c_str();
 		result += "\n";
 	}
 	return result;
@@ -332,10 +332,11 @@ void GlobalVars::set(const char* name, const std::string* args, size_t args_numb
 	Data& data = it->second;
 	switch (data.type)
 	{
-	case Int: data.value = args[0]; return;
+	case Int: data.value = args[0]; break;
 	case None: return;
 	default: return;
 	}
+	data.changed = true;
 }
 
 }

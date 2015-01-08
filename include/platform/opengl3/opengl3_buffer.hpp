@@ -42,6 +42,7 @@ public:
 private:
 	GLuint id_;
 	GLenum target_;
+	GLenum usage_;
 };
 
 class OpenGL3Buffer : public RenderBufferImpl
@@ -115,9 +116,10 @@ public:
 	void disable() const;
 private:
 	fixed_size_vector<uint8_t, max_uniforms_per_block * 4 * sizeof(float)> data_;
-	VBO vbo_;
+	VBO vbo_[2];
 	GLint offsets_[max_uniforms_per_block];
 	GLuint id_;
+	uint8_t current_;
 };
 
 }}

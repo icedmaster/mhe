@@ -46,6 +46,8 @@ public:
 	{
 		return &view_;
 	}
+
+	void set_vsync_enabled(bool enabled);
 private:
 	SDL2View view_;
 	vector2<int> size_;
