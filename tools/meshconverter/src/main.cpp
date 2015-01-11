@@ -34,7 +34,11 @@ void write_output(const char* filename, uint8_t layout, uint32_t vertex_size, co
 void process_scene(const char* out_filename, const aiScene* assimp_scene)
 {
 	// get only first mesh for now
-	if (!assimp_scene->HasMeshes()) return;
+    if (!assimp_scene->HasMeshes())
+    {
+        ERROR_LOG("This scene has no meshes");
+        return;
+    }
 	aiMesh* mesh = assimp_scene->mMeshes[0];
 	
 	std::vector<mhe::StandartGeometryLayout::Vertex> vertexes;
@@ -81,7 +85,7 @@ int main(int argc, char** argv)
 	
 	Assimp::Importer importer;
 	const aiScene* assimp_scene = importer.ReadFile(in_filename, aiProcess_CalcTangentSpace |
-		aiProcess_Triangulate);
+        aiProcess_Triangulate | aiProcess_GenNormals);
 	if (!assimp_scene)
 	{
 		ERROR_LOG("Error occured during the scene parsing:" << importer.GetErrorString());
