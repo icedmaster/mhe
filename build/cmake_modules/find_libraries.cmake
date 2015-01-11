@@ -173,6 +173,17 @@ macro(mhe_find_libraries)
 	  	set(MHE_LIBS_FOUND ${MHE_LIBS_FOUND} dl rt)
 	endif()
 
+	if (USE_ASSIMP_LIB)
+	  find_library(ASSIMP_LIB assimp HINTS ${LIB_HINT})
+	  if (${ASSIMP_LIB} STREQUAL "ASSIMP_LIB-NOTFOUND")
+		message("Assimp lib is not found")
+	  else()
+		message("---------- assimp ------------")
+		message(${ASSIMP_LIB})
+		set(MHE_LIBS_FOUND ${MHE_LIBS_FOUND} ${ASSIMP_LIB})
+	  endif()
+	endif()
+
   endif() #DONT_FIND_LIBRARIES
 
 endmacro()
