@@ -15,11 +15,11 @@ public:
 	bool init(Context& context, const MaterialSystemContext& material_system_context) override;
 	void close() override {}
 
-	void update(Context& context, SceneContext& scene_context, RenderContext& render_context, NodeInstance* nodes, size_t count) override;
-	void setup(Context& context, SceneContext& scene_context, NodeInstance* materials, ModelContext* model_contexts, size_t count) override;
-	void destroy(Context& context, SceneContext& scene_context, NodeInstance* nodes, size_t count) override;
+    void setup(Context& context, SceneContext& scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count) override;
 private:
-	void setup_uniforms(Material& material, Context& context, SceneContext& scene_context, const NodeInstance& node, const ModelContext& model_context) override;
+    void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
+    void setup_uniforms(Material& material, Context& context, SceneContext& scene_context, const MeshPartInstance& parts, const ModelContext& model_context) override;
+    void update(Context& context, SceneContext& scene_context, RenderContext& render_context, MeshPartInstance* parts, size_t count);
 
 	UniformBuffer::IdType transform_uniform_;
 };

@@ -25,7 +25,9 @@ public:
 
 	void on_resize(unsigned int new_width, unsigned int new_height)
 	{
-        //engine_->resize(new_width, new_height);
+        UNUSED(new_width);
+        UNUSED(new_height);
+        NOT_IMPLEMENTED_ASSERT(0, "Window resizing");
 	}
 private:
 	Engine* engine_;

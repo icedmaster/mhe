@@ -31,12 +31,14 @@ struct Material
 	}
 };
 
+const uint8_t invalid_material_system_id = 255;
+
 struct MaterialInstance
 {
 	Material::IdType id;
 	uint8_t material_system;
 
-	MaterialInstance() : id(Material::invalid_id) {}
+    MaterialInstance() : id(Material::invalid_id), material_system(invalid_material_system_id) {}
 };
 
 }

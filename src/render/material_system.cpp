@@ -4,19 +4,36 @@
 #include "render/instances.hpp"
 #include "render/render_context.hpp"
 #include "render/scene_context.hpp"
+#include "render/uniforms.hpp"
 
 namespace mhe {
+
+void MaterialSystem::setup_draw_call(DrawCall& draw_call, const MeshPartInstance& instance_part, const MeshPart& part, RenderCommand* command) const
+{
+    draw_call.material = instance_part.material;
+    draw_call.draw_call_data = instance_part.draw_call_data;
+    draw_call.render_data = part.render_data;
+    draw_call.command = command;
+
+    ASSERT(draw_call.material.material_system != invalid_material_system_id, "Invalid draw call");
+}
+
+void MaterialSystem::setup_draw_calls(Context& context, SceneContext& scene_context, RenderContext& render_context)
+{
+    if (!enabled_) return;
+    update(context, scene_context, render_context);
+}
 
 bool MaterialSystem::init_default(Context& context, const MaterialSystemContext& material_system_context)
 {
 	return context.shader_manager.get(shader_, material_system_context.shader_name);
 }
 
-void MaterialSystem::standart_material_setup(Context& context, SceneContext& scene_context, NodeInstance* nodes, ModelContext* model_contexts, size_t count,
-											size_t textures_number)
+void MaterialSystem::standart_material_setup(Context& context, SceneContext& scene_context,
+                                             MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count)
 {
 	if (!count) return;
-	ASSERT(nodes, "Invalid materials parameter");
+    ASSERT(parts, "Invalid materials parameter");
 	ASSERT(model_contexts, "Invalid model contexts");
 
 	size_t layout_id = layout();
@@ -28,32 +45,34 @@ void MaterialSystem::standart_material_setup(Context& context, SceneContext& sce
 		Material::IdType material_id = context.materials[id()].create();
 		Material& material = context.materials[id()].get(material_id);
 		material.shader_program = shader_id;
-		setup_uniforms(material, context, scene_context, nodes[i], model_contexts[i]);
+        setup_uniforms(material, context, scene_context, instance_parts[i], model_contexts[i]);
 
-		nodes[i].node.main_pass.material.material_system = material_system_id;
-		nodes[i].node.main_pass.material.id = material.id;
+        instance_parts[i].material.material_system = material_system_id;
+        instance_parts[i].material.id = material.id;
 
-		nodes[i].node.mesh.layout = layout_id;
+        parts[i].render_data.layout = layout_id;
 
-		for (size_t j = 0; j < textures_number; ++j)
-		{
-			if (model_contexts[i].textures[j].empty()) continue;
-			context.texture_manager.get(material.textures[j], model_contexts[i].textures[j]);
-		}
+        setup_textures(context, material, model_contexts[i]);
 
 		DrawCallData& draw_call_data = create_and_get(context.draw_call_data_pool);
 		RenderState& render_state = create_and_get(context.render_state_pool);
 		RenderStateDesc desc;
 		render_state.init(desc);
 		draw_call_data.state = render_state.id();
-		nodes[i].node.main_pass.draw_call_data = draw_call_data.id;
-
-		context.additional_passes_pool.make_invalid(nodes[i].node.additional_passes);
+        instance_parts[i].draw_call_data = draw_call_data.id;
 	}
 }
 
-void MaterialSystem::additional_passes_setup(Context& /*context*/, NodeInstance* /*nodes*/, size_t /*count*/)
+void MaterialSystem::setup_textures(Context& context, Material& material, const ModelContext& model_context)
 {
+    for (size_t i = 0; i < max_color_textures; ++i)
+    {
+        if (model_context.color_textures[i].empty()) continue;
+        context.texture_manager.get(material.textures[albedo_texture_unit + i], model_context.color_textures[i]);
+    }
+
+    if (!model_context.normal_texture.empty())
+        context.texture_manager.get(material.textures[normal_texture_unit], model_context.normal_texture);
 }
 
 Transform& MaterialSystem::transform(const NodeInstance& node, const SceneContext& scene_context) const
@@ -69,6 +88,16 @@ UberShader& MaterialSystem::ubershader(const Context& context) const
 ShaderProgram& MaterialSystem::default_program(const Context& context) const
 {
 	return context.shader_pool.get(ubershader(context).get_default());
+}
+
+void MaterialSystem::empty_setup(Context& /*context*/, SceneContext& /*scene_context*/, MeshPartInstance* /*parts*/, MeshPart* /*parts*/, ModelContext* /*model_contexts*/, size_t /*count*/)
+{
+    ASSERT(0, "This method should not be called");
+}
+
+void MaterialSystem::empty_update(Context& /*context*/, SceneContext& /*scene_context*/, RenderContext& /*render_context*/, MeshPartInstance* /*parts*/, size_t /*count*/)
+{
+    ASSERT(0, "This method should not be called");
 }
 
 }

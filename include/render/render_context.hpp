@@ -2,30 +2,28 @@
 #define __RENDER_CONTEXT_HPP__
 
 #include "core/config.hpp"
+#include "core/fixed_size_vector.hpp"
+#include "core/string.hpp"
 #include "math/vector3.hpp"
 #include "math/matrix.hpp"
+#include "draw_call.hpp"
 
 namespace mhe {
 
 struct LightInstance;
 struct NodeInstance;
 
-struct MaterialNodes
-{
-	NodeInstance* nodes;
-	size_t size;
-};
+typedef fixed_capacity_vector<DrawCall, max_scene_dips_number> DrawCalls;
 
 struct RenderContext
 {
+    DrawCalls draw_calls;
+
 	NodeInstance* nodes;
 	size_t nodes_number;
 
 	LightInstance* lights;
 	size_t lights_number;
-
-	MaterialNodes* material_nodes;
-	size_t material_nodes_number;
 
 	mat4x4 view;
 	mat4x4 proj;
@@ -40,9 +38,15 @@ struct RenderContext
 
 const size_t max_textures_per_model = 8;
 
+const size_t max_color_textures = 2;
+
 struct ModelContext
 {
-	std::string textures[max_textures_per_model];
+    string color_textures[max_color_textures];
+    string normal_texture;
+    UniformBuffer::IdType transform_uniform;
+
+    ModelContext() : transform_uniform(UniformBuffer::invalid_id) {}
 };
 
 }

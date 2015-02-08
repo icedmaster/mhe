@@ -34,9 +34,9 @@ bool create_texture(Texture& texture, int target, const Image& image)
 
 }
 
-bool TextureLoader::load(type& res, const std::string& name, const context_type* context)
+bool TextureLoader::load(type& res, const FilePath& name, const context_type* context)
 {
-	const std::string& ext = utils::get_file_extension(name);
+    const FilePath& ext = utils::get_file_extension(name);
 	bool result = false;
 	Image image;
 	int target = texture_2d;

@@ -11,11 +11,11 @@ namespace mhe {
 
 namespace detail {
 
-bool load_cubemap(Image& image, pugi::xml_node node, const std::string& filename)
+bool load_cubemap(Image& image, pugi::xml_node node, const FilePath& filename)
 {
 	const char* nodes_names[6] = {"negx", "posx", "negy", "posy", "negz", "posz"};
 	Image tmp_image;
-	const std::string& path = utils::get_file_path(filename);
+    const FilePath& path = utils::get_file_path(filename);
 	size_t stride = 0;
 	for (int i = 0; i < 6; ++i)
 	{
@@ -25,7 +25,7 @@ bool load_cubemap(Image& image, pugi::xml_node node, const std::string& filename
 			WARN_LOG("load_cubemap(): node " << nodes_names[i] << " not found");
 			return false;
 		}
-		std::string name = utils::path_join(path, std::string(n.child_value()));
+        FilePath name = utils::path_join(path, FilePath(n.child_value()));
 		if (!load_image_by_extension(tmp_image, name))
 		{
 			WARN_LOG("load_cubemap(): can't load file " << name);
@@ -56,7 +56,7 @@ bool load_cubemap(Image& image, pugi::xml_node node, const std::string& filename
 
 }
 
-bool load_cubemap(Image& image, std::istream& stream, const std::string& filename)
+bool load_cubemap(Image& image, std::istream& stream, const FilePath& filename)
 {
 	pugi::xml_document doc;
 	if (!doc.load(stream))

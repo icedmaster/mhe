@@ -21,8 +21,13 @@ struct NodeInstance;
 struct TransformInstance;
 struct RenderPass;
 struct MaterialNodes;
+struct MeshPart;
+struct DrawCall;
+struct MeshPartInstance;
+struct MeshInstance;
 
 class Transform;
+class RenderCommand;
 
 static const size_t max_material_definitions = 8;
 
@@ -40,17 +45,12 @@ public:
 	virtual bool init(Context& context, const MaterialSystemContext& material_system_context) = 0;
 	virtual void close() = 0;
 
-	virtual void setup(Context& context, SceneContext& scene_context, NodeInstance* nodes, ModelContext* model_contexts, size_t count) = 0;
-	virtual void destroy(Context& context, SceneContext& scene_context, NodeInstance* nodes, size_t count) = 0;
-	virtual void update(Context& context, SceneContext& scene_context, RenderContext& render_context, NodeInstance* nodes, size_t count) = 0;
+    virtual void setup(Context &context, SceneContext &scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count) = 0;
 
 	virtual void set_texture(const TextureInstance& /*texture*/) {}
 	virtual void set_texture(size_t /*unit*/, const TextureInstance& /*texture*/) {}
 
-	virtual bool prepare_render_pass(RenderPass& /*pass*/, Context& /*context*/, SceneContext& /*scene_context*/, RenderContext& /*render_context*/)
-	{
-		return false;
-	}
+    void setup_draw_calls(Context& context, SceneContext& scene_context, RenderContext& render_context);
 
 	uint8_t id() const
 	{
@@ -76,12 +76,30 @@ public:
 	{
 		return name_impl();
 	}
+
+    void enable()
+    {
+        enabled_ = true;
+    }
+
+    void disable()
+    {
+        enabled_ = false;
+    }
+
+    bool enabled() const
+    {
+        return enabled_;
+    }
 protected:
 	bool init_default(Context& context, const MaterialSystemContext& material_system_context);
 
-	void standart_material_setup(Context& context, SceneContext& scene_context, NodeInstance* nodes, ModelContext* model_contexts, size_t count, size_t textures_number);
-	void additional_passes_setup(Context& context, NodeInstance* nodes, size_t count);
+    void standart_material_setup(Context& context, SceneContext& scene_context, MeshPartInstance* instance_parts, MeshPart* part, ModelContext* model_contexts, size_t count);
+    void setup_textures(Context& context, Material& material, const ModelContext& model_context);
 	Transform& transform(const NodeInstance& node, const SceneContext& scene_context) const;
+
+    void empty_setup(Context& context, SceneContext& scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count);
+    void empty_update(Context& context, SceneContext& scene_context, RenderContext& render_context, MeshPartInstance* parts, size_t count);
 
 	void set_layout(size_t layout)
 	{
@@ -105,19 +123,39 @@ protected:
 
 	UberShader& ubershader(const Context& context) const;
 	ShaderProgram& default_program(const Context& context) const;
+
+    void setup_draw_call(DrawCall& draw_call, const MeshPartInstance& instance_part, const MeshPart& part, RenderCommand* command = nullptr) const;
 private:
 	virtual hash_type name_impl() const = 0;
-	virtual void setup_uniforms(Material& /*material*/, Context& /*context*/, SceneContext& /*scene_context*/, const NodeInstance& /*node*/, const ModelContext& /*model_context*/) {}
+    virtual void update(Context& context, SceneContext& scene_context, RenderContext& render_context) = 0;
+    virtual void setup_uniforms(Material& /*material*/, Context& /*context*/, SceneContext& /*scene_context*/, const MeshPartInstance& /*parts*/, const ModelContext& /*model_context*/) {}
 
 	Shader shader_;
 	size_t layout_;
 	uint8_t id_;
 	uint8_t priority_;
+    bool enabled_;
 };
 
 typedef Factory<MaterialSystem> MaterialSystemFactory;
 
 #define SETUP_MATERIAL(mname) public: static hash_type name() {return hash(mname);} private: hash_type name_impl() const {static hash_type n = hash(mname); return n;}
+
+#define MATERIAL_UPDATE_WITH_COMMAND(context, scene_context, render_context, update_method, command)    \
+    for (size_t i = 0; i < render_context.nodes_number; ++i)                \
+    {                                                                       \
+        for (size_t j = 0; j < render_context.nodes[i].mesh.instance_parts.size(); ++j) \
+        {   \
+            MeshPartInstance& part_instance = render_context.nodes[i].mesh.instance_parts[j];   \
+            if (part_instance.material.material_system != id())    \
+                continue;                                                                           \
+            update_method(context, scene_context, render_context, &part_instance, 1); \
+            setup_draw_call(render_context.draw_calls.add(), part_instance, render_context.nodes[i].mesh.mesh.parts[j], command);   \
+        }   \
+    }
+
+#define DEFAULT_MATERIAL_UPDATE(context, scene_context, render_context)     \
+    MATERIAL_UPDATE_WITH_COMMAND(context, scene_context, render_context, update, nullptr)
 
 }
 

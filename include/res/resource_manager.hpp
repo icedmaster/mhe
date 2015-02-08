@@ -4,6 +4,7 @@
 #include <map>
 #include <string>
 #include "core/hash.hpp"
+#include "core/string.hpp"
 #include "utils/file_utils.hpp"
 #include "utils/logutils.hpp"
 
@@ -14,6 +15,7 @@ class ResourceManager
 {
 protected:
 	typedef typename Loader::type res_type;
+    typedef typename Loader::instance_type instance_type;
 	typedef typename Loader::context_type context_type;
 	typedef std::map< hash_type, res_type > resmap;
 public:
@@ -49,17 +51,30 @@ public:
 		return get_impl(res, name, absolute_path);	
 	}
 
+    bool get(res_type& res, const string& name, bool absolute_path = false) const
+    {
+        return get_impl(res, FilePath(name), hash(name), absolute_path);
+    }
+
 	bool get(res_type& res, hash_type hashv) const
 	{
 		return get_impl(res, hashv);
 	}
+
+    bool get_instance(instance_type& instance, const string& name, bool absolute_path = false) const
+    {
+        res_type& res = Loader::get_resource(instance);
+        if (!get(res, name, absolute_path))
+            return false;
+        return Loader::setup_instance(instance);
+    }
 
 	void clear()
 	{
 		resources_.clear();
 	}
 
-	void set_path(const std::string& path)
+    void set_path(const FilePath& path)
 	{
 		path_ = path;
 	}
@@ -69,7 +84,12 @@ protected:
 		return get_impl(res, name, hash(name), absolute_path);
 	}
 
-	virtual bool get_impl(res_type& res, const std::string& name, hash_type hashv, bool absolute_path) const
+    bool get_impl(res_type& res, const std::string& name, hash_type hashv, bool absolute_path) const
+    {
+        return get_impl(res, FilePath(name.c_str()), hashv, absolute_path);
+    }
+
+    virtual bool get_impl(res_type& res, const FilePath& name, hash_type hashv, bool absolute_path) const
 	{
 		typename resmap::iterator it = resources_.find(hashv);
 		if (it != resources_.end())
@@ -102,12 +122,12 @@ protected:
 		return resources_;
 	}
 private:
-	bool load_impl(res_type& res, const std::string& name,
+    bool load_impl(res_type& res, const FilePath& name,
 				   hash_type hashv,
 				   bool absolute_path) const
 	{
-		std::string full_path = (!absolute_path) ? utils::path_join(path_, name) : name;
-        bool result = Loader::load(res, full_path, context_);
+        FilePath full_path = (!absolute_path) ? utils::path_join(path_, name) : FilePath(name);
+        bool result = Loader::load(res, full_path.c_str(), context_);
 		if (!result)
 		{
 			ERROR_LOG("Can't load: " << full_path);
@@ -120,7 +140,7 @@ private:
 
 	mutable resmap resources_;
     const context_type* context_;
-	std::string path_;
+    FilePath path_;
 };
 
 }	// namespace mhe

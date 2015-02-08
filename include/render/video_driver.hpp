@@ -16,6 +16,7 @@ struct Context;
 struct NodeInstance;
 struct RenderData;
 struct Node;
+struct DrawCall;
 
 class Texture;
 class RenderState;
@@ -191,10 +192,9 @@ public:
 	void begin_render();
 	void end_render();
 
-	void render(const Context& context, const Node* nodes, size_t count);
-	void render(const Context& context, const NodeInstance* nodes, size_t count);
+    void render(const Context& context, const DrawCall* draw_calls, size_t count);
 private:
-	void render_node(const Context& context, const Node& node);
+    void perform_draw_call(const Context& context, const DrawCall& draw_call);
 
 	Stats stats_;
 	State state_;

@@ -390,6 +390,16 @@ public:
 		}
 		return npos;
 	}
+
+    size_t find_last_of(T s, size_t pos = npos) const
+    {
+        size_t last = pos == npos ? size_ - 1 : pos;
+        for (int i = last; i >= 0; --i)
+        {
+            if (str_[i] == s) return i;
+        }
+        return npos;
+    }
 private:
 	void assign(const T* str, size_t len)
 	{
@@ -512,8 +522,10 @@ inline std::ostream& operator<< (std::ostream& stream, const basic_string<T, S>&
 }
 
 const size_t default_string_capacity = 64;
+const size_t default_filepath_capacity = 255;
 
 typedef basic_string<char, default_string_capacity> string;
+typedef basic_string<char, default_filepath_capacity> FilePath;
 
 }
 

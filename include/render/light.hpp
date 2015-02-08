@@ -56,9 +56,9 @@ struct LightDesc
 	float shadowmap_bias;
 	bool cast_shadows;
 
-	LightDesc() :
-		cast_shadows(false),
-		shadowmap_bias(0.00125f)
+    LightDesc() :
+        shadowmap_bias(0.00125f),
+        cast_shadows(false)
 	{}
 };
 

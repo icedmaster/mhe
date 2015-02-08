@@ -5,6 +5,7 @@
 #include "render/render_context.hpp"
 #include "render/context.hpp"
 #include "render/material_system.hpp"
+#include "render/renderer.hpp"
 
 namespace mhe {
 
@@ -19,15 +20,7 @@ struct SortHelper
     {
         const AABBInstance& aabb1 = scene_context_.aabb_pool.get(n1.aabb_id);
         const AABBInstance& aabb2 = scene_context_.aabb_pool.get(n2.aabb_id);
-        if (aabb1.visible == aabb2.visible)
-        {
-            MaterialSystem* ms1 = context_.material_systems.get(n1.node.main_pass.material.material_system);
-            MaterialSystem* ms2 = context_.material_systems.get(n2.node.main_pass.material.material_system);
-            if (ms1->priority() == ms2->priority())
-                return n1.node.main_pass.material.material_system < n2.node.main_pass.material.material_system;
-			return ms1->priority() < ms2->priority();
-        }
-        else return static_cast<size_t>(aabb1.visible) > static_cast<size_t>(aabb2.visible);
+        return static_cast<size_t>(aabb1.visible) > static_cast<size_t>(aabb2.visible);
     }
 	const Context& context_;
     const SceneContext& scene_context_;
@@ -45,13 +38,13 @@ struct LightSortHelper
 
 }
 
-Scene::Scene() :
+Scene::Scene(Context& context) :
+    context_(context),
     visible_aabbs_(0),
     visible_nodes_(0),
 	global_max_lights_number_("max_lights_number", max_lights_number),
 	use_frustum_culling_("use_frustum_culling", true)
 {
-	::memset(nodes_per_material_, 0, sizeof(nodes_per_material_));
 }
 
 NodeInstance& Scene::create_node() const
@@ -60,6 +53,8 @@ NodeInstance& Scene::create_node() const
 	NodeInstance& node = scene_context_.node_pool.get(id);
 	node.transform_id = scene_context_.transform_pool.create();
 	node.aabb_id = scene_context_.aabb_pool.create();
+
+    init_node(node, context_);
 	return node;
 }
 
@@ -77,7 +72,7 @@ AABBInstance& Scene::create_aabb() const
 	return create_and_get(scene_context_.aabb_pool);
 }
 
-void Scene::update(RenderContext& render_context, Context& context)
+void Scene::update(RenderContext& render_context)
 {
     stats_.reset();
 
@@ -94,7 +89,7 @@ void Scene::update(RenderContext& render_context, Context& context)
 
 	NodeInstance* nodes = scene_context_.node_pool.all_objects();
     size_t nodes_number = scene_context_.node_pool.size();
-    std::sort(nodes, nodes + nodes_number, SortHelper(context, scene_context_));
+    std::sort(nodes, nodes + nodes_number, SortHelper(context_, scene_context_));
 	scene_context_.node_pool.update();
 
     size_t visible_nodes = 0;
@@ -110,19 +105,14 @@ void Scene::update(RenderContext& render_context, Context& context)
 	render_context.nodes = nodes;
 	render_context.nodes_number = visible_nodes;
 
-	refresh_node_material_link(nodes);
-	render_context.material_nodes = material_nodes_;
-	render_context.material_nodes_number = max_material_systems_number;
-
-	update_light_sources(render_context, context);
+    update_light_sources(render_context);
 }
 
 size_t Scene::nodes(NodeInstance*& nodes, size_t& offset, size_t material_system) const
 {
 	ASSERT(material_system < max_material_systems_number, "Invalid material_system index " << material_system);
-	offset = nodes_per_material_[material_system].offset;
 	nodes = scene_context_.node_pool.all_objects() + offset;
-	return nodes_per_material_[material_system].size;
+    return 0;
 }
 
 size_t Scene::nodes(NodeInstance*& nodes) const
@@ -139,41 +129,7 @@ void Scene::delete_node(uint16_t id)
 		scene_context_.transform_pool.remove(node.transform_id);
 }
 
-void Scene::refresh_node_material_link(NodeInstance* nodes)
-{
-	uint8_t prev_material_system = max_material_systems_number + 1;
-	uint8_t current_material_system = prev_material_system;
-	size_t size = 0, begin = 0;
-    for (size_t i = 0; i < visible_nodes_; ++i)
-	{
-		current_material_system = nodes[i].node.main_pass.material.material_system;
-		if (prev_material_system > max_material_systems_number)
-			prev_material_system = current_material_system;
-		if (current_material_system != prev_material_system)
-		{
-			nodes_per_material_[prev_material_system].offset = begin;
-			nodes_per_material_[prev_material_system].size = size;
-
-			material_nodes_[current_material_system].nodes = nodes + begin;
-			material_nodes_[current_material_system].size = size;
-
-			prev_material_system = current_material_system;
-			size = 0;
-			begin = i;
-		}
-		++size;
-	}
-	if (current_material_system < max_material_systems_number)
-	{
-		nodes_per_material_[current_material_system].offset = begin;
-		nodes_per_material_[current_material_system].size = size;
-
-		material_nodes_[current_material_system].nodes = nodes + begin;
-		material_nodes_[current_material_system].size = size;
-	}
-}
-
-void Scene::update_light_sources(RenderContext& render_context, Context& /*context*/)
+void Scene::update_light_sources(RenderContext& render_context)
 {
 	LightInstance* lights = scene_context_.light_pool.all_objects();
 	std::sort(lights, lights + scene_context_.light_pool.size(), LightSortHelper());

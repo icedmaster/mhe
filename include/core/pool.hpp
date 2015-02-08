@@ -55,15 +55,9 @@ public:
 	typedef I index_type;
 	static const size_t capacity = C;
 
-	Pool() :
-		first_(0), last_(C - 1), size_(0)
+    Pool()
 	{
-		for (size_t i = 0; i < C - 1; ++i)
-		{
-			indexes_[i].id = i;
-			indexes_[i].next = i + 1;
-			indexes_[i].index = invalid_id;
-		}
+        clear();
 	}
 
 	I create() const
@@ -132,6 +126,19 @@ public:
 		for (I i = 0; i < size_; ++i)
 			indexes_[Policy::get(objects_[i])].index = i;
 	}
+
+    void clear()
+    {
+        first_ = 0;
+        last_ = C - 1;
+        size_ = 0;
+        for (size_t i = 0; i < C - 1; ++i)
+        {
+            indexes_[i].id = i;
+            indexes_[i].next = i + 1;
+            indexes_[i].index = invalid_id;
+        }
+    }
 private:
 	mutable dynarray<T, C> objects_;
 	mutable dynarray<Index, C> indexes_;

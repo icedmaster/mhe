@@ -2,11 +2,13 @@
 
 #include "render/layouts.hpp"
 #include "render/context.hpp"
+#include "render/node.hpp"
+#include "render/instances.hpp"
 
 namespace mhe {
 namespace utils {
 
-bool create_plane(Mesh& mesh, const Context& context)
+bool create_plane(MeshInstance& mesh_instance, const Context& context)
 {
 	StandartGeometryLayout::Vertex vertexes[4];
 	vertexes[0].pos.set(-0.5f, -0.5f, 0.0);
@@ -26,21 +28,22 @@ bool create_plane(Mesh& mesh, const Context& context)
 
 	uint32_t indexes[6] = {0, 1, 2, 2, 3, 0};
 
-	mesh.vbuffer = context.vertex_buffer_pool.create();
-	mesh.ibuffer = context.index_buffer_pool.create();
+    Mesh& mesh = mesh_instance.mesh;
 
-	mesh.render_data.elements_number = 2;
+    mesh.parts[0].render_data.vbuffer = context.vertex_buffer_pool.create();
+    mesh.parts[0].render_data.ibuffer = context.index_buffer_pool.create();
 
+    mesh.parts[0].render_data.elements_number = 2;
 
-	VertexBuffer& vbuffer = context.vertex_buffer_pool.get(mesh.vbuffer);
+    VertexBuffer& vbuffer = context.vertex_buffer_pool.get(mesh.parts[0].render_data.vbuffer);
 	if (!vbuffer.init(buffer_update_type_static,
 					  reinterpret_cast<const uint8_t*>(&vertexes[0]), 4 * sizeof(StandartGeometryLayout::Vertex), sizeof(StandartGeometryLayout::Vertex)))
 		return false;
-	IndexBuffer& ibuffer = context.index_buffer_pool.get(mesh.ibuffer);
+    IndexBuffer& ibuffer = context.index_buffer_pool.get(mesh.parts[0].render_data.ibuffer);
 	return ibuffer.init(vbuffer, indexes, 6);
 }
 
-bool create_axes(Mesh& mesh, const Context& context)
+bool create_axes(MeshInstance& mesh_instance, const Context& context)
 {
 	StandartGeometryLayout::Vertex vertexes[6];
 	vertexes[0].pos.set(0.0f, 0.0f, 0.0f); 
@@ -52,21 +55,23 @@ bool create_axes(Mesh& mesh, const Context& context)
 
 	uint32_t indexes[6] = {0, 1, 2, 3, 4, 5};
 
-	mesh.vbuffer = context.vertex_buffer_pool.create();
-	mesh.ibuffer = context.index_buffer_pool.create();
+    Mesh& mesh = mesh_instance.mesh;
 
-	mesh.render_data.elements_number = 2;
-	mesh.render_data.primitive = lines;
+    mesh.parts[0].render_data.vbuffer = context.vertex_buffer_pool.create();
+    mesh.parts[0].render_data.ibuffer = context.index_buffer_pool.create();
 
-	VertexBuffer& vbuffer = context.vertex_buffer_pool.get(mesh.vbuffer);
+    mesh.parts[0].render_data.elements_number = 2;
+    mesh.parts[0].render_data.primitive = lines;
+
+    VertexBuffer& vbuffer = context.vertex_buffer_pool.get(mesh.parts[0].render_data.vbuffer);
 	if (!vbuffer.init(buffer_update_type_static,
 					  reinterpret_cast<const uint8_t*>(&vertexes[0]), 6 * sizeof(StandartGeometryLayout::Vertex), sizeof(StandartGeometryLayout::Vertex)))
 		return false;
-	IndexBuffer& ibuffer = context.index_buffer_pool.get(mesh.ibuffer);
+    IndexBuffer& ibuffer = context.index_buffer_pool.get(mesh.parts[0].render_data.ibuffer);
 	return ibuffer.init(vbuffer, indexes, 6);
 }
 
-bool create_skybox_quad(Mesh& mesh, const Context& context)
+bool create_skybox_quad(MeshInstance& mesh, const Context& context)
 {
 	SkyboxLayout::Vertex vertexes[3];
 	vertexes[0].pos.set(-1.0f, -3.0f, 1.0f, 1.0f);
@@ -75,20 +80,22 @@ bool create_skybox_quad(Mesh& mesh, const Context& context)
 
 	uint32_t indexes[3] = {0, 1, 2};
 
-	mesh.vbuffer = context.vertex_buffer_pool.create();
-	mesh.ibuffer = context.index_buffer_pool.create();
+    MeshPart& part = mesh.mesh.parts[0];
 
-	mesh.render_data.elements_number = 1;
+    part.render_data.vbuffer = context.vertex_buffer_pool.create();
+    part.render_data.ibuffer = context.index_buffer_pool.create();
 
-	VertexBuffer& vbuffer = context.vertex_buffer_pool.get(mesh.vbuffer);
+    part.render_data.elements_number = 1;
+
+    VertexBuffer& vbuffer = context.vertex_buffer_pool.get(part.render_data.vbuffer);
 	if (!vbuffer.init(buffer_update_type_static,
 					  reinterpret_cast<const uint8_t*>(&vertexes[0]), 3 * sizeof(SkyboxLayout::Vertex), sizeof(SkyboxLayout::Vertex)))
 		return false;
-	IndexBuffer& ibuffer = context.index_buffer_pool.get(mesh.ibuffer);
+    IndexBuffer& ibuffer = context.index_buffer_pool.get(part.render_data.ibuffer);
 	return ibuffer.init(vbuffer, indexes, 3);
 }
 
-bool create_fullscreen_quad(Mesh& mesh, const Context& context)
+bool create_fullscreen_quad(MeshInstance& mesh, const Context& context)
 {
 	FullscreenLayout::Vertex vertexes[3];
 	vertexes[0].pos.set(-1.0f, -3.0f, 1.0f, 1.0f);
@@ -100,17 +107,24 @@ bool create_fullscreen_quad(Mesh& mesh, const Context& context)
 
 	uint32_t indexes[3] = {0, 1, 2};
 
-	mesh.vbuffer = context.vertex_buffer_pool.create();
-	mesh.ibuffer = context.index_buffer_pool.create();
+    MeshPart& part = mesh.mesh.parts[0];
 
-	mesh.render_data.elements_number = 1;
+    part.render_data.vbuffer = context.vertex_buffer_pool.create();
+    part.render_data.ibuffer = context.index_buffer_pool.create();
 
-	VertexBuffer& vbuffer = context.vertex_buffer_pool.get(mesh.vbuffer);
+    part.render_data.elements_number = 1;
+
+    VertexBuffer& vbuffer = context.vertex_buffer_pool.get(part.render_data.vbuffer);
 	if (!vbuffer.init(buffer_update_type_static,
 					  reinterpret_cast<const uint8_t*>(&vertexes[0]), 3 * sizeof(FullscreenLayout::Vertex), sizeof(FullscreenLayout::Vertex)))
 		return false;
-	IndexBuffer& ibuffer = context.index_buffer_pool.get(mesh.ibuffer);
+    IndexBuffer& ibuffer = context.index_buffer_pool.get(part.render_data.ibuffer);
 	return ibuffer.init(vbuffer, indexes, 3);
 }
 
+bool create_plane(NodeInstance& node, const Context& context)
+{
+    add_part(node.mesh);
+    return create_plane(node.mesh, context);
+}
 }}

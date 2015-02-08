@@ -7,9 +7,9 @@
 
 namespace mhe {
 
-bool load_image_by_extension(Image& image, const std::string& filename)
+bool load_image_by_extension(Image& image, const FilePath& filename)
 {
-	const std::string& ext = utils::get_file_extension(filename);
+    const FilePath& ext = utils::get_file_extension(filename);
 
 	std::ifstream f(filename.c_str(), std::ios::in | std::ios::binary);
 	if (!f.is_open()) return false;

@@ -7,15 +7,15 @@ namespace utils {
 
 std::string get_file_extension(const std::string& filename)
 {
+    return std::string(get_file_extension(FilePath(filename.c_str())).c_str());
+}
+
+FilePath get_file_extension(const FilePath& filename)
+{
 	size_t point_pos = filename.find_last_of('.');
 	if (point_pos == std::string::npos)
 		return "";
-	std::string ext = filename.substr(point_pos + 1, filename.length() - point_pos - 1);
-	// FIXME: I want to use STL algorithm
-	// std::transform(ext.begin(), ext.end(), ext.begin(), std::tolower)
-	// but have error with GCC compiler
-	for (size_t i = 0; i < ext.length(); ++i)
-		ext[i] = std::tolower(ext[i]);
+    FilePath ext = filename.substr(point_pos + 1, filename.length() - point_pos - 1);
 	return ext;
 }
 
@@ -43,11 +43,16 @@ std::string get_file_name_with_path(const std::string& filepath)
 	return filepath.substr(0, point_pos);
 }
 
-std::string get_file_path(const std::string& fullpath)
+FilePath get_file_path(const FilePath& fullpath)
 {
 	size_t slash_pos = fullpath.find_last_of('/');
-	if (slash_pos == std::string::npos) return fullpath;
+    if (slash_pos == FilePath::npos) return fullpath;
 	return fullpath.substr(0, slash_pos + 1);
+}
+
+std::string get_file_path(const std::string &fullpath)
+{
+    return std::string(get_file_path(FilePath(fullpath.c_str())).c_str());
 }
 
 std::string read_whole_file(std::ifstream& stream)

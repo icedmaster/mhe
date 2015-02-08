@@ -5,6 +5,7 @@
 #include "material_system.hpp"
 #include "shader_program.hpp"
 #include "render_buffer.hpp"
+#include "node.hpp"
 
 namespace mhe {
 
@@ -15,10 +16,12 @@ public:
 	bool init(Context& context, const MaterialSystemContext& material_system_context) override;
 	void close() override;
 
-	void setup(Context& context, SceneContext& scene_context, NodeInstance* nodes, ModelContext* model_contexts, size_t count) override;
-	void destroy(Context& context, SceneContext& scene_context, NodeInstance* nodes, size_t count) override;
-	void update(Context& context, SceneContext& scene_context, RenderContext& render_context, NodeInstance* nodes, size_t count) override;
+    void setup(Context& context, SceneContext& scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count) override;
 private:
+    void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
+    bool init_mesh(Context& context, const MaterialSystemContext& material_system_context);
+
+    MeshInstance skybox_mesh_;
 	UniformBuffer::IdType transform_uniform_;
 };
 

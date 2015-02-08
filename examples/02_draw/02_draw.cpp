@@ -6,27 +6,27 @@ public:
 	bool init(mhe::game::Engine& engine, const mhe::game::GameSceneDesc& /*desc*/)
 	{
 		mhe::NodeInstance& node = engine.scene().create_node();
-		mhe::utils::create_plane(node.node.mesh, engine.context());
+        mhe::utils::create_plane(node, engine.context());
 
 		mhe::NodeInstance& node2 = engine.scene().create_node();
-		mhe::utils::create_plane(node2.node.mesh, engine.context());
+        mhe::utils::create_plane(node2, engine.context());
 		mhe::TransformInstance& transform = engine.scene().transform_pool().get(node2.transform_id);
 		transform.transform.translate_by(mhe::vec3(2, 2, 0));
 
-		mhe::NodeInstance& node3 = engine.scene().create_node();
-		engine.context().mesh_manager.get(node3.node.mesh, "duck.bin");
+        mhe::NodeInstance& node3 = engine.scene().create_node();
+        engine.context().mesh_manager.get_instance(node3.mesh, mhe::string("duck.bin"));
 		mhe::TransformInstance& transform3 = engine.scene().transform_pool().get(node3.transform_id);
 		transform3.transform.translate_by(mhe::vec3(-2, -2, 0));
-		transform3.transform.scale_to(mhe::vec3(0.05, 0.05, 0.05));
+        transform3.transform.scale_to(mhe::vec3(0.05, 0.05, 0.05));
 
-		mhe::NodeInstance& node4 = engine.scene().create_node();
-		mhe::utils::create_axes(node4.node.mesh, engine.context());
+        engine.context().material_systems.disable_all();
 
 		mhe::UnlitMaterialSystem* material_system = engine.context().material_systems.get<mhe::UnlitMaterialSystem>();
+        material_system->enable();
+        mhe::setup_node(node, material_system, engine.context(), engine.scene_context(), mhe::string("test.tga"));
+        mhe::setup_node(node2, material_system, engine.context(), engine.scene_context(), mhe::string("test.tga"));
+        mhe::setup_node(node3, material_system, engine.context(), engine.scene_context(), mhe::string("test.tga"));
 
-		mhe::ModelContext model_context[4];
-		model_context[0].textures[0] = "test.tga";
-		material_system->setup(engine.context(), engine.scene().scene_context(), &node, model_context, 4);
 		return true;
 	}
 

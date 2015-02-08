@@ -254,6 +254,9 @@ std::string RDBGProcessor::set_data(Data& data, size_t id, const std::vector<std
 
 std::string RDBGProcessor::get_data(Data& data, size_t id, const std::vector<std::string>& subtypes)
 {
+    NOT_IMPLEMENTED(data);
+    NOT_IMPLEMENTED(id);
+    NOT_IMPLEMENTED(subtypes);
 	return make_error("");
 }
 
@@ -327,6 +330,7 @@ std::vector<GlobalVars::Data> GlobalVars::data() const
 
 void GlobalVars::set(const char* name, const std::string* args, size_t args_number)
 {
+    NOT_IMPLEMENTED(args_number);
 	VarsMap::iterator it = vars_.find(hash(name));
 	if (it == vars_.end()) return;
 	Data& data = it->second;

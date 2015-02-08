@@ -5,14 +5,17 @@ struct VSOutput
 
 [vertex]
 
+[uniform transform 0 perframe]
 uniform transform
 {
 	mat4 vp;
 };
 
+[uniform transform 1 permodel]
 uniform permodel
 {
 	mat4 model;
+	mat4 normal;
 };
 
 layout (location = 0) in vec3 pos;

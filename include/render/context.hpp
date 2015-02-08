@@ -26,7 +26,6 @@ typedef Pool<RenderState, 4096, uint16_t> RenderStatePool;
 typedef Pool<Texture, 4096, uint16_t> TexturePool;
 typedef Pool<RenderTarget, max_render_targets_number, RenderTarget::IdType> RenderTargetPool;
 typedef Pool< DrawCallData, 4096, uint16_t, StructTypePolicy<DrawCallData, uint16_t> > DrawCallDataPool;
-typedef Pool< AdditionalPasses, max_additional_render_passes_number, uint16_t, StructTypePolicy<AdditionalPasses, uint16_t> > AdditionalPassesPool;
 
 class MaterialSystems
 {
@@ -70,6 +69,12 @@ public:
 	{
 		return systems_;
 	}
+
+    void disable_all()
+    {
+        for (size_t i = 0; i < systems_.size(); ++i)
+            systems_[i]->disable();
+    }
 private:
 	template <class T>
 	T* get_impl(hash_type name) const
@@ -106,7 +111,6 @@ struct Context
 	RenderTargetPool render_target_pool;
 	TexturePool texture_pool;
 	DrawCallDataPool draw_call_data_pool;
-	AdditionalPassesPool additional_passes_pool;
 
 	MaterialSystems material_systems;
 	MaterialPool materials[max_material_systems_number];

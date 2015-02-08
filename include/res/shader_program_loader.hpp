@@ -10,6 +10,7 @@ struct Context;
 struct ShaderProgramLoader
 {
 	typedef Shader type;
+    typedef Shader instance_type;
 	typedef Context context_type;
     static bool MHE_EXPORT load(type& res, const std::string& name, const context_type* context);
 };

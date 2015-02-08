@@ -12,6 +12,7 @@
 #include "core/compiler.hpp"
 #include "core/factory.hpp"
 #include "core/ref_ptr.hpp"
+#include "core/string.hpp"
 #include "core/hash.hpp"
 #include "core/ref_counter.hpp"
 #include "core/delegate.hpp"

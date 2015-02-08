@@ -6,45 +6,24 @@ class GameScene : public mhe::game::GameScene
     static const size_t lights_number = 64;
 public:
 	bool init(mhe::game::Engine& engine, const mhe::game::GameSceneDesc& /*desc*/)
-	{
-		mhe::NodeInstance& skybox = engine.scene().create_node();
-		mhe::utils::create_skybox_quad(skybox.node.mesh, engine.context());
+	{	
+        mhe::GBufferFillMaterialSystem* material_system = engine.context().material_systems.get<mhe::GBufferFillMaterialSystem>();
 
-		mhe::SkyboxMaterialSystem* skybox_material_system = engine.context().material_systems.get<mhe::SkyboxMaterialSystem>();
-		mhe::ModelContext skybox_context;
-		skybox_context.textures[0] = "cubemaps/test.cubemap";
-		skybox_material_system->setup(engine.context(), engine.scene_context(), &skybox, &skybox_context, 1);
-		
-		mhe::ModelContext model_context[nodes_number];
-		mhe::NodeInstance* first = nullptr;
+        const mhe::string sphere_mesh_name = "sphere.bin";
 		mhe::vec3 pos(-100, 0, 0);
 		for (size_t i = 0; i < nodes_number; ++i)
 		{
 			mhe::NodeInstance& node = engine.scene().create_node();
-			if (i == 0) first = &node;
-			engine.context().mesh_manager.get(node.node.mesh, "sphere.bin");
+            engine.context().mesh_manager.get_instance(node.mesh, sphere_mesh_name);
 			mhe::Transform& transform = engine.scene().transform_pool().get(node.transform_id).transform;
 			pos += mhe::vec3(2, 0, 0);
 			transform.translate_to(pos);
             mhe::AABBInstance& aabb = engine.scene_context().aabb_pool.get(node.aabb_id);
             aabb.aabb.center = pos;
             aabb.aabb.extents = mhe::vec3(0.5f, 0.5f, 0.5f);
-			model_context[i].textures[0] = "test.tga";
+
+            mhe::setup_node(node, material_system, engine.context(), engine.scene_context(), mhe::string("test.tga"));
 		}
-
-		mhe::GBufferFillMaterialSystem* material_system = engine.context().material_systems.get<mhe::GBufferFillMaterialSystem>();
-
-		material_system->setup(engine.context(), engine.scene_context(), first, model_context, nodes_number);
-
-		mhe::NodeInstance& quad = engine.scene().create_node();
-		mhe::utils::create_fullscreen_quad(quad.node.mesh, engine.context());
-		mhe::GBufferDrawMaterialSystem* draw_material_system = engine.context().material_systems.get<mhe::GBufferDrawMaterialSystem>();
-		draw_material_system->setup(engine.context(), engine.scene_context(), &quad, model_context, 1);
-
-		mhe::NodeInstance& ambient_quad = engine.scene().create_node();
-		mhe::utils::create_fullscreen_quad(ambient_quad.node.mesh, engine.context());
-		mhe::PosteffectSimpleMaterialSystem* posteffect_material_system = engine.context().material_systems.get<mhe::PosteffectSimpleMaterialSystem>();
-		posteffect_material_system->setup(engine.context(), engine.scene_context(), &ambient_quad, model_context, 1);
 
 		init_lighting(engine);
 		return true;

@@ -163,7 +163,7 @@ bool OpenGL3UniformBuffer::init(const UniformBufferDesc& desc)
 	}
 	else
 	{
-		id_ = invalid_uniform_unit;
+        id_ = invalid_unit;
 		size = desc.size;
 	}
 
@@ -229,7 +229,7 @@ void OpenGL3UniformBuffer::bind(size_t unit) const
 
 void OpenGL3UniformBuffer::enable(const OpenGL3ShaderProgram* program, size_t unit) const
 {
-	if (id_ != invalid_uniform_unit)
+    if (id_ != invalid_unit)
 		OpenGLExtensions::instance().glUniformBlockBinding(program->id(), id_, unit);
 	else
 		OpenGLExtensions::instance().glUniformBlockBinding(program->id(), program->uniform_location(unit), unit);

@@ -16,4 +16,10 @@ bool MeshLoader::load(type& res, const std::string& name, const context_type* co
 	return result;
 }
 
+bool MeshLoader::setup_instance(MeshInstance& instance)
+{
+    instance.instance_parts.resize(instance.mesh.parts.size());
+    return true;
+}
+
 }

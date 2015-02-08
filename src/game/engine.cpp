@@ -4,6 +4,7 @@
 #include "utils/global_log.hpp"
 
 #include "render/render_context.hpp"
+#include "render/renderer.hpp"
 
 #ifdef RDBG_ENABLED
 #include "debug/default_rdbg_setup.hpp"
@@ -17,8 +18,9 @@ namespace game {
 Engine::Engine()
 #ifdef RDBG_ENABLED
 	:
-	rdbg_engine_(*this)
+    rdbg_engine_(*this),
 #endif
+    scene_(context_)
 {}
 
 bool Engine::init(uint width, uint height, uint bpp, bool fullscreen)
@@ -132,30 +134,20 @@ void Engine::update()
 	if (game_scene_ != nullptr)
 		game_scene_->update(*this);
 
-	RenderContext render_context;
-	render_context.tick = utils::get_current_time();
-	render_context.fdelta = utils::get_last_delta();
-	scene_.update(render_context, context_);
-	update_materials(render_context);
+    render_context_.tick = utils::get_current_time();
+    render_context_.fdelta = utils::get_last_delta();
+    scene_.update(render_context_);
+    update_materials(render_context_);
 }
 
 void Engine::render()
 {
-	// TODO: need to add priorities to passes, now all additional passes are performed BEFORE the main render pass only
-	for (size_t i = 0; i < max_material_systems_number; ++i)
-	{
-		if (!passes_[i].size) continue;
-		context_.driver.render(context_, passes_[i].nodes, passes_[i].size);
-	}
-
 	ProfilerElement pe("engine.render");
 	context_.driver.begin_render();
 	context_.driver.clear_color();
 	context_.driver.clear_depth();
 
-	NodeInstance* nodes = nullptr;
-	size_t count = scene_.nodes(nodes);
-	context_.driver.render(context_, nodes, count);
+    context_.driver.render(context_, render_context_.draw_calls.data(), render_context_.draw_calls.size());
 	if (game_scene_ != nullptr)
 		game_scene_->draw(*this);
 	{
@@ -166,21 +158,20 @@ void Engine::render()
 		ProfilerElement swap_buffers_pe("window_system.swap_buffers");
 		context_.window_system.swap_buffers();
 	}
+
+    render_context_.draw_calls.clear();
 }
 
 void Engine::update_materials(RenderContext& render_context)
 {
+    update_nodes(context_, render_context, scene_.scene_context());
+
 	const MaterialSystems::Values &systems = context_.material_systems.get_all_materials();
-	for (size_t i = 0; i < systems.size(); ++i)
-	{
-		if (systems[i]->prepare_render_pass(passes_[i], context_, scene_.scene_context(), render_context))
-			continue;
-		NodeInstance* nodes = nullptr;
-		size_t offset;
-		size_t count = scene_.nodes(nodes, offset, systems[i]->id());
-		if (!count) continue;
-		systems[i]->update(context_, scene_.scene_context(), render_context, nodes, count);
-	}
+
+    for (size_t i = 0; i < systems.size(); ++i)
+        systems[i]->setup_draw_calls(context_, scene_.scene_context(), render_context);
+
+    sort_draw_calls(context_, render_context);
 }
 
 }}

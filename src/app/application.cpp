@@ -151,8 +151,14 @@ void Application::init_materials(pugi::xml_node materials_node)
 		material_context.shader_name = shader_name;
 		material_context.defs[0] = defs;
 		MaterialSystem* material_system = MaterialSystemFactory::instance().create(name);
+        if (material_system == nullptr)
+        {
+            WARN_LOG("MaterialSystem initialization failed:" << name);
+            continue;
+        }
 		context.material_systems.add(material_system, priority);
 		material_system->init(context, material_context);
+        material_system->enable();
 	}
 }
 

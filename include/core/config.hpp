@@ -88,6 +88,8 @@ const size_t max_lights_number = 128;
 
 const size_t max_additional_render_passes = 32;
 
+const size_t max_scene_dips_number = 4096;
+
 /**
  * Scene configuration
  */

@@ -54,7 +54,6 @@ bool DepthWriteMaterialSystem::init_draw_call_data(Context& context)
 
 	render_target.depth_texture(shadowmap_);
 
-	draw_call_data.command = &clear_command_;
 	draw_call_data.render_target = render_target.id();
 	draw_call_data.state = render_state.id();
 
@@ -66,24 +65,17 @@ void DepthWriteMaterialSystem::close()
 {
 }
 
-void DepthWriteMaterialSystem::setup(Context& /*context*/, SceneContext& /*scene_context*/, NodeInstance* /*nodes*/, ModelContext* /*model_contexts*/, size_t /*count*/)
+void DepthWriteMaterialSystem::setup(Context& /*context*/, SceneContext& /*scene_context*/, MeshPartInstance* /*parts*/, MeshPart* /*part*/, ModelContext* /*model_contexts*/, size_t /*count*/)
 {
 	ASSERT(0, "This method should not be called");
 }
 
-void DepthWriteMaterialSystem::destroy(Context& /*context*/, SceneContext& /*scene_context*/, NodeInstance* /*nodes*/, size_t /*count*/)
-{
-	NOT_IMPLEMENTED_ASSERT(0, "DepthWriteMaterialSystem::destroy");
-}
-
-void DepthWriteMaterialSystem::update(Context& /*context*/, SceneContext& /*scene_context*/, RenderContext& /*render_context*/, NodeInstance* /*nodes*/, size_t /*count*/)
-{
-}
-
-bool DepthWriteMaterialSystem::prepare_render_pass(RenderPass& pass, Context& context, SceneContext& scene_context, RenderContext& render_context)
+void DepthWriteMaterialSystem::update(Context& context, SceneContext& scene_context, RenderContext& render_context)
 {
 	clear_command_.reset();
+    context.materials[id()].clear();
 
+    bool have_shadowcasters = false;
 	for (size_t i = 0; i < render_context.lights_number; ++i)
 	{
 		if (!render_context.lights[i].light.desc().cast_shadows)
@@ -94,34 +86,38 @@ bool DepthWriteMaterialSystem::prepare_render_pass(RenderPass& pass, Context& co
 		uniform.update(data);
 
 		render_context.lights[i].light.set_shadowmap_texture(shadowmap_);
+
+        have_shadowcasters = true;
 	}
 
-	nodes_.clear();
+    if (!have_shadowcasters) return;
+
 	for (size_t i = 0; i < render_context.nodes_number; ++i)
 	{
-		if (!render_context.nodes[i].node.cast_shadow && !render_context.nodes[i].node.receive_shadow)
+        if (!render_context.nodes[i].cast_shadow && !render_context.nodes[i].receive_shadow)
 			continue;
-		Node& node = nodes_.add();
-		node.mesh = render_context.nodes[i].node.mesh;
-		node.additional_passes = AdditionalPasses::invalid_id;
-		if (!context.materials[id()].is_valid(node.main_pass.material.id))
-		{
-			Material& material = create_and_get(context.materials[id()]);
-			material.shader_program = default_program(context).id();
-			material.uniforms[0] = uniform_;
-			material.id = material.id;
-			node.main_pass.material.material_system = id();
-			node.main_pass.material.id = material.id;
-		}
-		const MaterialInstance& original_material_instance = render_context.nodes[i].node.main_pass.material;
-		const Material& original_material = context.materials[original_material_instance.material_system].get(original_material_instance.id);
-		Material& material = context.materials[id()].get(node.main_pass.material.id);
-		material.uniforms[1] = original_material.uniforms[1];
-		node.main_pass.draw_call_data = draw_call_data_;
+
+        for (size_t j = 0; j < render_context.nodes[i].mesh.instance_parts.size(); ++j)
+        {
+            const MeshPartInstance& part = render_context.nodes[i].mesh.instance_parts[j];
+            DrawCall& draw_call = render_context.draw_calls.add();
+            draw_call.render_data = render_context.nodes[i].mesh.mesh.parts[j].render_data;
+            Material& material = create_and_get(context.materials[id()]);
+            material.shader_program = default_program(context).id();
+            material.uniforms[0] = uniform_;
+            material.id = material.id;
+            draw_call.material.material_system = id();
+            draw_call.material.id = material.id;
+
+            const MaterialInstance& original_material_instance = part.material;
+            const Material& original_material = context.materials[original_material_instance.material_system].get(original_material_instance.id);
+            material.uniforms[1] = original_material.uniforms[1];
+
+            draw_call.draw_call_data = draw_call_data_;
+
+            draw_call.command = &clear_command_;
+        }
 	}
-	pass.nodes = &nodes_[0];
-	pass.size = nodes_.size();
-	return true;
 }
 
 }

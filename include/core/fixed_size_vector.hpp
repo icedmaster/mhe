@@ -33,6 +33,20 @@ struct assert_reallocation_policy
 	}
 };
 
+template <class T, size_t count>
+struct static_array_traits
+{
+    T elements[count];
+};
+
+template <class T, size_t count>
+struct dynamic_array_traits
+{
+    dynamic_array_traits() : elements(new T[count]) {}
+    ~dynamic_array_traits() { delete [] elements; }
+    T* elements;
+};
+
 }	// detail
 
 #define DEFAULT_REALLOCATION_POLICY			detail::default_reallocation_policy
@@ -289,6 +303,45 @@ private:
 	T* begin_;
 	size_t size_;
 	size_t capacity_;
+};
+
+template <class T, size_t count, class Traits = detail::static_array_traits<T, count> >
+class fixed_capacity_vector
+{
+public:
+    typedef T* iterator;
+    typedef const T* const_iterator;
+public:
+    fixed_capacity_vector() : size_(0) {}
+
+    T& add()
+    {
+        ASSERT(size_ < count - 1, "fixed_capacity_vector is full");
+        return traits_.elements[size_++];
+    }
+
+    const T* data() const
+    {
+        return traits_.elements;
+    }
+
+    T* data()
+    {
+        return traits_.elements;
+    }
+
+    size_t size() const
+    {
+        return size_;
+    }
+
+    void clear()
+    {
+        size_ = 0;
+    }
+private:
+    Traits traits_;
+    size_t size_;
 };
 
 template <class T, size_t count>

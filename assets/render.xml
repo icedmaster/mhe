@@ -1,11 +1,11 @@
 <mhe>
   <materials>
-	<material name="unlit" shader="unlit" priority="128" />
-	<material name="skybox" shader="skybox" priority="0" />
-	<material name="gbuffer_fill" shader="gbuffer_fill" priority="128" />
-	<material name="gbuffer_draw" shader="gbuffer_draw_blinn_phong" defs="4" priority="129" />
-	<material name="posteffect_simple" shader="gbuffer_draw" priority="130" />
-  <material name="depth_write" shader="depth_write" priority="127" />
+	<material name="unlit" shader="unlit" priority="4" />
+	<material name="skybox" shader="skybox" priority="0" defs="cubemaps/test.cubemap" />
+	<material name="gbuffer_fill" shader="gbuffer_fill" priority="4" />
+	<material name="gbuffer_draw" shader="gbuffer_draw_blinn_phong" priority="5" />
+	<material name="posteffect_simple" shader="gbuffer_draw" priority="6" />
+  <material name="depth_write" shader="depth_write" priority="3" />
   </materials>
   <gbuffer>
 	<fill name="gbuffer_fill" />

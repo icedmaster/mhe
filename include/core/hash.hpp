@@ -2,6 +2,7 @@
 #define __HASH_HPP__
 
 #include "types.hpp"
+#include "string.hpp"
 
 namespace mhe {
 
@@ -25,6 +26,12 @@ template <>
 inline hash_type hash(const std::string& value)
 {
 	return hash(value.c_str());
+}
+
+template <size_t N>
+inline hash_type hash(const basic_string<char, N>& value)
+{
+    return hash(value.c_str());
 }
 
 }

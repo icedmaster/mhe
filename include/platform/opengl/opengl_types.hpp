@@ -9,6 +9,8 @@
 namespace mhe {
 namespace opengl {
 
+const GLuint invalid_unit = static_cast<GLuint>(-1);
+
 inline GLenum get_vbo_usage(BufferUpdateType type)
 {
 	switch (type)

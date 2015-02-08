@@ -5,15 +5,18 @@
 
 namespace mhe {
 
-struct Mesh;
+struct MeshInstance;
+struct NodeInstance;
 struct Context;
 
 namespace utils {
 
-bool MHE_EXPORT create_plane(Mesh& mesh, const Context& context);
-bool MHE_EXPORT create_axes(Mesh& mesh, const Context& context);
-bool MHE_EXPORT create_skybox_quad(Mesh& mesh, const Context& context);
-bool MHE_EXPORT create_fullscreen_quad(Mesh& mesh, const Context& context);
+bool MHE_EXPORT create_plane(MeshInstance& mesh, const Context& context);
+bool MHE_EXPORT create_axes(MeshInstance& mesh, const Context& context);
+bool MHE_EXPORT create_skybox_quad(MeshInstance& mesh, const Context& context);
+bool MHE_EXPORT create_fullscreen_quad(MeshInstance& mesh, const Context& context);
+
+bool MHE_EXPORT create_plane(NodeInstance& node, const Context& context);
 
 }}
 

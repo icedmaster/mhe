@@ -11,7 +11,7 @@ void setup_deferred_pipeline(Context& context, AbstractGBufferFillMaterialSystem
 {
 	RenderTarget& render_target = context.render_target_pool.get(fill_material_system->render_target());
 	if (use_material_system != nullptr)
-		use_material_system->set_render_target(fill_material_system->render_target());
+        use_material_system->set_render_target(context, fill_material_system->render_target());
 	const TextureInstance* textures = nullptr;
 	if (draw_material_system != nullptr && render_target.color_textures(&textures))
 	{

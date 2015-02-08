@@ -18,57 +18,33 @@ bool UnlitMaterialSystem::init(Context& context, const MaterialSystemContext& ma
 	transform_uniform_ = context.uniform_pool.create();
 	UniformBuffer& uniform = context.uniform_pool.get(transform_uniform_);
 	UniformBufferDesc uniform_buffer_desc;
-	create_uniform_buffer_element(uniform_buffer_desc, "vp", mat4x4::identity());
-	uniform_buffer_desc.name = "transform";
-	uniform_buffer_desc.program = &default_program(context);
+    uniform_buffer_desc.size = sizeof(TransformSimpleData);
+    uniform_buffer_desc.unit = perframe_data_unit;
 	return uniform.init(uniform_buffer_desc);
 }
 
-void UnlitMaterialSystem::setup(Context& context, SceneContext& scene_context, NodeInstance* nodes, ModelContext* model_contexts, size_t count)
+void UnlitMaterialSystem::setup(Context& context, SceneContext& scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count)
 {
-	standart_material_setup(context, scene_context, nodes, model_contexts, count, 1);
+    standart_material_setup(context, scene_context, instance_parts, parts, model_contexts, count);
 }
 
-void UnlitMaterialSystem::destroy(Context& context, SceneContext& /*scene_context*/, NodeInstance* nodes, size_t count)
+void UnlitMaterialSystem::update(Context& context, SceneContext& scene_context, RenderContext& render_context)
 {
-	if (!count) return;
-	ASSERT(nodes, "Invalid nodes");
-
-	for (size_t i = 0; i < count; ++i)
-	{
-		if (context.materials[id()].is_valid(nodes[i].node.main_pass.material.id))
-			context.materials[id()].remove(nodes[i].node.main_pass.material.id);
-	}
+    DEFAULT_MATERIAL_UPDATE(context, scene_context, render_context);
 }
 
-void UnlitMaterialSystem::update(Context& context, SceneContext& scene_context, RenderContext& render_context, NodeInstance* nodes, size_t count)
+void UnlitMaterialSystem::update(Context& context, SceneContext& /*scene_context*/, RenderContext& render_context, MeshPartInstance* /*parts*/, size_t /*count*/)
 {
 	UniformBuffer& uniform = context.uniform_pool.get(transform_uniform_);
 	TransformSimpleData transform_data;
 	transform_data.vp = render_context.vp;
 	uniform.update(transform_data);
-
-	PerModelSimpleData permodel;
-	for (size_t i = 0; i < count; ++i)
-	{
-		Material& material = context.materials[id()].get(nodes[i].node.main_pass.material.id);
-		UniformBuffer& uniform = context.uniform_pool.get(material.uniforms[1]);
-		permodel.model = transform(nodes[i], scene_context);
-		uniform.update(permodel);
-	}
 }
 
-void UnlitMaterialSystem::setup_uniforms(Material& material, Context& context, SceneContext& scene_context, const NodeInstance& node, const ModelContext& /*model_context*/)
+void UnlitMaterialSystem::setup_uniforms(Material& material, Context& /*context*/, SceneContext& /*scene_context*/, const MeshPartInstance& /*part*/, const ModelContext& model_context)
 {
 	material.uniforms[0] = transform_uniform_;
-	UniformBuffer::IdType id = context.uniform_pool.create();
-	material.uniforms[1] = id;
-	UniformBuffer& uniform = context.uniform_pool.get(id);
-	UniformBufferDesc uniform_buffer_desc;
-	create_uniform_buffer_element(uniform_buffer_desc, "model", transform(node, scene_context).transform());
-	uniform_buffer_desc.name = "permodel";
-	uniform_buffer_desc.program = &default_program(context);
-	uniform.init(uniform_buffer_desc);
+    material.uniforms[1] = model_context.transform_uniform;
 }
 
 }

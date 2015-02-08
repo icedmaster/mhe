@@ -72,7 +72,7 @@ public:
         State prev_state_;
     };
 public:
-	Scene();
+    Scene(Context& context);
 
 	const TransformPool& transform_pool() const
 	{
@@ -80,7 +80,7 @@ public:
 	}
 
 	NodeInstance& create_node() const;
-	void update(RenderContext& render_context, Context& context);
+    void update(RenderContext& render_context);
 
 	LightInstance& create_light() const;
 
@@ -107,7 +107,7 @@ public:
     }
 private:
 	void refresh_node_material_link(NodeInstance* nodes);
-	void update_light_sources(RenderContext& render_context, Context& context);
+    void update_light_sources(RenderContext& render_context);
 
     void frustum_culling();
 
@@ -117,10 +117,8 @@ private:
 		size_t size;
 	};
 
+    Context& context_;
 	SceneContext scene_context_;
-	MaterialConnector nodes_per_material_[max_material_systems_number];
-	// TODO: need to remove MaterialConnector struct
-	MaterialNodes material_nodes_[max_material_systems_number];
     Stats stats_;
 	ref_ptr<CameraController> camera_controller_;
     size_t visible_aabbs_;

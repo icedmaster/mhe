@@ -62,7 +62,6 @@ mat4x4 get_light_shadowmap_matrix(SceneContext& scene_context, LightInstance::Id
 		proj.set_perspective(desc.spot.angle * 2.0f, 1.0f, desc.spot.spot_shadowmap_projection_znear, desc.spot.spot_shadowmap_projection_zfar);
 	
 	Transform& transform = scene_context.transform_pool.get(light_instance.transform_id).transform;
-	const mat4x4& view = transform.view();
 	return transform.view() * proj;
 }
 

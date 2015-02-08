@@ -25,6 +25,8 @@ void register_light_type(RDBGProcessor& rdbg_processor)
 
 void register_light(game::Engine& engine, size_t id, const std::string& name)
 {
+    NOT_IMPLEMENTED(id);
+    NOT_IMPLEMENTED(name);
 #ifdef RDBG_ENABLED
 	register_light_type(engine.rdbg_processor());
 #endif
