@@ -19,7 +19,9 @@ const std::string shader_extension = ".glsl";
 
 const std::string tags[] = {vertex_shader_tag, fragment_shader_tag};
 
-std::string parse_include(const std::string& tag, const std::string& srcname)
+std::string load_shader_impl(ShaderInitializationParams& params, const std::vector<std::string>& data, const std::string& tag, const std::string& filename);
+
+std::string parse_include(ShaderInitializationParams& params, const std::string& tag, const std::string& srcname, const std::string& shadertag)
 {
 	size_t first = tag.find_first_of('"');
 	size_t last = tag.find_last_of('"');
@@ -32,7 +34,7 @@ std::string parse_include(const std::string& tag, const std::string& srcname)
 	if (!f.is_open()) return std::string();
 	const std::vector<std::string>& content = utils::read_lines(f);
 	f.close();
-	return utils::join(content, "\n");
+    return load_shader_impl(params, content, shadertag, srcname);
 }
 
 std::string parse_sampler(ShaderInitializationParams& params, const std::string& tag)
@@ -87,7 +89,7 @@ std::string load_shader_impl(ShaderInitializationParams& params, const std::vect
 
 		if (s.find(include_tag) != std::string::npos)
 		{
-			actual_data += parse_include(s, filename);
+            actual_data += parse_include(params, s, filename, tag);
 			continue;
 		}
 
