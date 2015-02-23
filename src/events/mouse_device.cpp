@@ -34,8 +34,6 @@ void MouseDevice::check_impl(events_vector& events, const WindowSystem& ws)
 				buttons_[me->button()] = false;
 			else if (me->event_type() == MouseEvent::wheel)
 				wheel_delta_ = me->wheel_delta();
-			if (!me->any_button_pressed())
-				buttons_.fill(false);
 		}
 	}
 }

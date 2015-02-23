@@ -40,6 +40,7 @@ void SDL2MouseDeviceImpl::setup_event(MouseEvent* event,
 	{
 		arg = MouseEvent::move;
 		pos.set(sdl_event.motion.x, ws.height() - sdl_event.motion.y);
+		optarg = get_mouse_button(sdl_event.button.button);
 	}
 	else if (sdl_event.type != SDL_MOUSEWHEEL)
 	{
@@ -50,7 +51,7 @@ void SDL2MouseDeviceImpl::setup_event(MouseEvent* event,
 	else
 	{
 		arg = MouseEvent::wheel;
-		return event->setup_wheel_event(sdl_event.wheel.x, sdl_event.wheel.y, sdl_event.button.button);
+		return event->setup_wheel_event(static_cast<float>(sdl_event.wheel.x), static_cast<float>(sdl_event.wheel.y), sdl_event.button.button);
 	}
 	return event->setup_event(arg, optarg, pos, get_mouse_button(sdl_event.button.button));
 }
