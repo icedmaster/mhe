@@ -41,9 +41,9 @@ void FPSCameraController::update_impl(const RenderContext& render_context)
 	if (!mouse->is_button_pressed(MouseEvent::right_button)) return;
 	const vector2<int>& delta = mouse->delta();
 	quatf ry;
-	ry.set_rotation(up, deg_to_rad(delta.x()) * rotation_speed() * time_delta);
+	ry.set_rotation(up, deg_to_rad(static_cast<float>(delta.x())) * rotation_speed() * time_delta);
 	quatf rx;
-	rx.set_rotation(-side, deg_to_rad(delta.y()) * rotation_speed() * time_delta);
+	rx.set_rotation(-side, deg_to_rad(static_cast<float>(delta.y())) * rotation_speed() * time_delta);
 	camera().rotate_by(rx * ry);
 }
 

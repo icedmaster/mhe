@@ -71,7 +71,7 @@ public:
 
 	bool right_button_pressed() const
 	{
-		return buttons_ & right_button;
+		return (buttons_ & right_button) > 0;
 	}
 
 	bool any_button_pressed() const

@@ -29,6 +29,7 @@
 #endif
 
 #define MHE_OPENGL_HAS_SHADERS
+//#define MHE_OPENGL_UBO_DOUBLEBUFFERING
 
 #define CHECK_GL_ERRORS()						\
 	{											\

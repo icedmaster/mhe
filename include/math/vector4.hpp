@@ -238,8 +238,8 @@ inline std::ostream& operator<< (std::ostream& s, const vector4<T>& v)
 
     inline void color_to_colorb8(const colorf& color, char* data)
     {
-        data[0] = color.r() * 255; data[1] = color.g() * 255;
-        data[2] = color.b() * 255; data[3] = color.a() * 255;
+        data[0] = static_cast<char>(color.r() * 255); data[1] = static_cast<char>(color.g() * 255);
+        data[2] = static_cast<char>(color.b() * 255); data[3] = static_cast<char>(color.a() * 255);
     }
 };
 

@@ -15,6 +15,7 @@ int get_mouse_button(Uint8 sdl_button)
 		return MouseEvent::left_button;
 	else if (sdl_button == SDL_BUTTON_RIGHT)
 		return MouseEvent::right_button;
+	return 0;
 }
 
 }

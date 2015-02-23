@@ -104,6 +104,11 @@ private:
 
 class OpenGL3UniformBuffer : public UniformBufferImpl
 {
+#ifdef MHE_OPENGL_UBO_DOUBLEBUFFERING
+	static const size_t max_vbo_index = 2;
+#else
+	static const size_t max_vbo_index = 1;
+#endif
 public:
 	bool init(const UniformBufferDesc& desc);
 	void close();
@@ -116,7 +121,7 @@ public:
 	void disable() const;
 private:
 	fixed_size_vector<uint8_t, max_uniforms_per_block * 4 * sizeof(float)> data_;
-	VBO vbo_[2];
+	VBO vbo_[max_vbo_index];
 	GLint offsets_[max_uniforms_per_block];
 	GLuint id_;
 	uint8_t current_;

@@ -16,7 +16,7 @@ bool init_node(NodeInstance& node, Context& context);
 void update_nodes(Context& context, RenderContext& render_context, SceneContext& scene_context);
 void sort_draw_calls(const Context& context, RenderContext& render_context);
 
-void setup_node(NodeInstance& node, MaterialSystem* material_system, Context& context, SceneContext& scene_context,
+MHE_EXPORT void setup_node(NodeInstance& node, MaterialSystem* material_system, Context& context, SceneContext& scene_context,
                 const string& albedo_texture_name, const string& normalmap_texture_name = string());
 
 }

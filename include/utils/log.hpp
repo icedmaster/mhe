@@ -8,6 +8,11 @@
 #include <ctime>
 #include <vector>
 #include "core/ref_ptr.hpp"
+#include "core/compiler.hpp"
+
+#ifdef MHE_VS
+#pragma warning( disable: 4996 )
+#endif
 
 namespace mhe {
 namespace utils {

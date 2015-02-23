@@ -1,12 +1,17 @@
 #ifndef __FIXED_SIZE_VECTOR_HPP__
 #define __FIXED_SIZE_VECTOR_HPP__
 
+#include "compiler.hpp"
+
+#ifdef MHE_VS
+// TODO: need to check out this warning later
+#pragma warning( disable: 4996 )	// copy may be unsafe
+#endif
+
 #include <iostream>
 #include <cstring>
 #include <sstream>
 #include <cassert>
-#include <algorithm>
-#include "compiler.hpp"
 
 namespace mhe {
 
@@ -46,6 +51,17 @@ struct dynamic_array_traits
     ~dynamic_array_traits() { delete [] elements; }
     T* elements;
 };
+
+template<class InputIterator, class OutputIterator>
+OutputIterator copy(InputIterator first, InputIterator last, OutputIterator result)
+{
+	while (first!=last)
+	{
+		*result = *first;
+		++result; ++first;
+	}
+	return result;
+}
 
 }	// detail
 
@@ -271,7 +287,7 @@ private:
 		if ((size_ + 1) > capacity_)
 			reallocate_vector(capacity_ * 2);
 		if (index != size_)
-			std::copy(begin_ + index, begin_ + size_ - index, begin_ + index + 1);
+			detail::copy(begin_ + index, begin_ + size_ - index, begin_ + index + 1);
 		begin_[index] = value;
 		++size_;
 		return begin_ + index;
@@ -282,19 +298,19 @@ private:
 		reallocation_policy::reallocate(capacity_, new_capacity, FUNCTION_DESCRIPTION_MACRO);
 		size_t prev_capacity = capacity_;
 		T* copy = new T[prev_capacity];
-		std::copy(begin_, end(), copy);
+		detail::copy(begin_, end(), copy);
 		if (begin_ != elements_)
 			delete [] begin_;
 		capacity_ = new_capacity;
 		begin_ = new T[capacity_];
-		std::copy(copy, copy + size_, begin_);
+		detail::copy(copy, copy + size_, begin_);
 		delete [] copy;
 	}
 
 	iterator erase_impl(size_t index, size_t erased_count)
 	{
 		if (index != (size_ - erased_count))
-			std::copy(begin_ + index + erased_count, begin_ + size_, begin_ + index);
+			detail::copy(begin_ + index + erased_count, begin_ + size_, begin_ + index);
 		size_ -= erased_count;
 		return begin_ + index;
 	}

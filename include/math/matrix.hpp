@@ -386,11 +386,11 @@ public:
 		T A = (right + left) / (right - left);
 		T B = (top + bottom) / (top - bottom);
 		T C = -(z_far + z_near) / (z_far - z_near);
-		T D = -2.0 * z_far * z_near / (z_far - z_near);
-		set(2.0 * z_near / (right - left), 0.0, 							0.0, 0.0,
-			0.0, 						   2.0 * z_near / (top - bottom),   0.0, 0.0,
-			A, 							   B, 								C, 	 -1.0,
-			0.0, 						   0.0, 							D, 	 0.0);
+		T D = -2.0f * z_far * z_near / (z_far - z_near);
+		set(2.0f * z_near / (right - left), 0.0f, 							0.0f, 0.0f,
+			0.0f, 						   2.0f * z_near / (top - bottom),   0.0f, 0.0f,
+			A, 							   B, 								C, 	 -1.0f,
+			0.0f, 						   0.0f, 							D, 	 0.0f);
 	}
 			
 	void set_ortho(T left, T right, T bottom, T top, T z_near, T z_far)
@@ -398,15 +398,15 @@ public:
 		T tx = -(right + left) / (right - left);
 		T ty = -(top + bottom) / (top - bottom);
 		T tz = -(z_far + z_near) / (z_far - z_near);
-		set(2 / (right - left), 0, 					0, 					   0,
-			0, 					2 / (top - bottom), 0, 					   0,
-			0, 					0, 					-2 / (z_far - z_near), 0,
-			tx, 				ty, 				tz, 				   1);
+		set(2.0f / (right - left), 0.0f, 					0, 					   0,
+			0, 					2.0f / (top - bottom), 0, 					   0,
+			0, 					0, 					-2.0f / (z_far - z_near), 0,
+			tx, 				ty, 				tz, 				   1.0f);
 	}
 			
 	void set_perspective(T fov, T aspect_ratio, T z_near, T z_far)
 	{
-		float fov_tan = tan(fov * 0.5);
+		float fov_tan = tan(fov * 0.5f);
 		T right = fov_tan * aspect_ratio * z_near;
 		T left = -right;
 		T top = fov_tan * z_near;

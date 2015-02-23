@@ -7,8 +7,8 @@ namespace mhe
 {
     const float pi = 3.14159265359f;
 	const float pi_2 = pi * 0.5f;
-    const float deg2rad = pi / 180.0;
-    const float rad2deg = 180.0 / pi;
+    const float deg2rad = pi / 180.0f;
+    const float rad2deg = 180.0f / pi;
 
     inline float deg_to_rad(float deg)
     {

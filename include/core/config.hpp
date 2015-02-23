@@ -95,6 +95,6 @@ const size_t max_scene_dips_number = 4096;
  */
 const size_t max_scene_nodes_number = 4096;
 
-const size_t max_shadowmap_nodes_number = max_scene_nodes_number * 0.8f;	// 80 %
+const size_t max_shadowmap_nodes_number = static_cast<size_t>(max_scene_nodes_number * 0.8f);	// 80 %
 
 #endif

@@ -181,7 +181,7 @@ bool OpenGL3UniformBuffer::init(const UniformBufferDesc& desc)
 			::memcpy(data_.begin() + offsets_[i], desc.uniforms[i].data, desc.uniforms[i].size);
 	}
 
-	for (int i = 0; i < 2; ++i)
+	for (int i = 0; i < max_vbo_index; ++i)
 	{
 		if (!vbo_[i].init(GL_UNIFORM_BUFFER, size, &data_[0], GL_DYNAMIC_DRAW))
 		{
@@ -202,7 +202,7 @@ void OpenGL3UniformBuffer::close()
 void OpenGL3UniformBuffer::update(const UniformBufferDesc& desc)
 {
 	++current_;
-	current_ = current_ % 2;
+	current_ = current_ % max_vbo_index;
 #ifdef MHE_DEBUG
 	size_t size = 0;
 	for (size_t i = 0; i < desc.uniforms.size(); ++i)
@@ -217,7 +217,7 @@ void OpenGL3UniformBuffer::update(const UniformBufferDesc& desc)
 void OpenGL3UniformBuffer::update(const uint8_t* data, size_t offset, size_t size)
 {
 	++current_;
-	current_ = current_ % 2;
+	current_ = current_ % max_vbo_index;
 	vbo_[current_].update(size, offset, data);
 }
 

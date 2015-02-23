@@ -8,7 +8,7 @@ namespace mhe {
 
 struct RenderContext;
 
-class CameraController : public ref_counter
+class MHE_EXPORT CameraController : public ref_counter
 {
 public:
 	CameraController() :
