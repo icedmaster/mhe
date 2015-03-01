@@ -32,6 +32,11 @@ public:
 	{
 		return camera_;
 	}
+
+	void set_move_speed(float speed)
+	{
+		move_speed_ = speed;
+	}
 protected:
 	float move_speed() const
 	{

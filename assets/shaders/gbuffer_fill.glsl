@@ -2,6 +2,7 @@ struct VSOutput
 {
 	vec3 nrm;
 	vec2 tex;
+	vec3 tng;
 };
 
 [vertex]
@@ -14,6 +15,7 @@ void main()
 {
 	vsoutput.tex = tex;
 	vsoutput.nrm = (normal * vec4(nrm, 0.0f)).xyz;
+	vsoutput.tng = tng;
 
 	gl_Position = vp * model * vec4(pos, 1.0f);
 }

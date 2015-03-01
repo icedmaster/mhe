@@ -531,6 +531,24 @@ public:
 		return ::glMapBufferRange(target, offset, length, access);
 #endif
 	}
+
+	void glDrawRangeElements(GLenum mode, GLuint start, GLuint end, GLsizei count, GLenum type, const GLvoid* indices)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		return glDrawRangeElements_(mode, start, end, count, type, indices);
+#else
+		return ::glDrawRangeElements(mode, start, end, count, type, indices);
+#endif
+	}
+
+	void glDrawElementsBaseVertex(GLenum mode, GLsizei count, GLenum type, GLvoid *indices, GLint basevertex)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		return glDrawElementsBaseVertex_(mode, count, type, indices, basevertex);
+#else
+		::glDrawElementsBaseVertex(mode, count, type, indices, basevertex);
+#endif
+	}
 private:
 	OpenGLExtensions() {}
 	~OpenGLExtensions() {}
@@ -608,6 +626,8 @@ private:
 	PFNGLMAPBUFFERPROC glMapBuffer_;
 	PFNGLUNMAPBUFFERPROC glUnmapBuffer_;
 	PFNGLMAPBUFFERRANGEPROC glMapBufferRange_;
+	PFNGLDRAWRANGEELEMENTSPROC glDrawRangeElements_;
+	PFNGLDRAWELEMENTSBASEVERTEXPROC glDrawElementsBaseVertex_;
 #endif
 	std::map<std::string, bool> loaded_extensions_;
 };

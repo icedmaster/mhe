@@ -19,6 +19,9 @@ MHE_EXPORT std::vector<std::string> read_lines(std::ifstream& stream);
 
 MHE_EXPORT FilePath get_file_extension(const FilePath& filename);
 MHE_EXPORT FilePath get_file_path(const FilePath& fullpath);
+MHE_EXPORT FilePath get_file_name(const FilePath& fullpath);
+MHE_EXPORT FilePath get_file_name_with_extension(const FilePath& fullpath);
+MHE_EXPORT FilePath convert_slashes(const FilePath& fullpath);
 
 // path utils
 inline std::string path_join(const std::string& path1, const std::string& path2)

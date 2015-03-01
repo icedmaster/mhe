@@ -29,23 +29,32 @@ struct DrawCallData
 
 struct RenderData
 {
-	size_t elements_number;
-	uint16_t vbuffer_offset;
-	uint16_t ibuffer_offset;
+	size_t elements_number;	// the number of faces
+	uint32_t vbuffer_offset;
+	uint32_t ibuffer_offset;
+	size_t indexes_number;	// the total size of index buffer is used if indexes_number is zero
 	Primitive primitive;
     Layout::IdType layout;
     VertexBuffer::IdType vbuffer;
     IndexBuffer::IdType ibuffer;
 
 	RenderData() :
-        vbuffer_offset(0), ibuffer_offset(0), primitive(triangle),
+        vbuffer_offset(0), ibuffer_offset(0), indexes_number(0), primitive(triangle),
         layout(Layout::invalid_id), vbuffer(VertexBuffer::invalid_id), ibuffer(IndexBuffer::invalid_id)
 	{}
+};
+
+struct MaterialData
+{
+	FilePath albedo_texture;
+	FilePath normalmap_texture;
+	uint8_t layout;
 };
 
 struct MeshPart
 {
     RenderData render_data;
+	MaterialData material_data;
 };
 
 struct Mesh

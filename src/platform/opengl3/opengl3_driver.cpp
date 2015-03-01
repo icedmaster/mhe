@@ -153,7 +153,9 @@ void OpenGL3Driver::set_default_render_target()
 
 void OpenGL3Driver::draw(const RenderData& data)
 {
-	glDrawElements(get_primitive_type(data.primitive), current_index_buffer_->size(), GL_UNSIGNED_INT, 0);
+	OpenGLExtensions::instance().glDrawElementsBaseVertex(get_primitive_type(data.primitive), 
+		data.indexes_number != 0 ? data.indexes_number : current_index_buffer_->size(), GL_UNSIGNED_INT,
+		(void*)(data.ibuffer_offset * sizeof(uint32_t)), data.vbuffer_offset);
 	CHECK_GL_ERRORS();
 }
     

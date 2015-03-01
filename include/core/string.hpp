@@ -71,6 +71,7 @@ public:
 
 	this_type& operator= (const std::basic_string<T>& str)
 	{
+		if (this == &str) return *this;
 		assign(str.c_str(), str.length());
 		return *this;
 	}
@@ -85,7 +86,6 @@ public:
 	this_type& operator= (const Str& str)
 	{
 		static_assert(sizeof(T) == sizeof(Str::value_type), "Invalid type");
-		if (this == &str) return *this;
 		assign(str.data(), str.length());
 		return *this;
 	}
@@ -184,6 +184,11 @@ public:
 	}
 
 	const T* c_str() const
+	{
+		return str_;
+	}
+
+	T* buffer()
 	{
 		return str_;
 	}
@@ -400,6 +405,18 @@ public:
         }
         return npos;
     }
+
+	// adds trailing 0
+	void make_cstr()
+	{
+		str_[size_] = 0;
+	}
+
+	void resize(size_t size)
+	{
+		size_ = size;
+		make_cstr();
+	}
 private:
 	void assign(const T* str, size_t len)
 	{
