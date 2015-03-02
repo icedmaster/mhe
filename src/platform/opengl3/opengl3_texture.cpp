@@ -17,6 +17,9 @@ bool OpenGL3Texture::init(const TextureDesc& desc, const uint8_t* data, size_t s
 	glTexParameteri(target_, GL_TEXTURE_MAG_FILTER, get_texture_filter(desc.mag_filter));
 	glTexParameteri(target_, GL_TEXTURE_MIN_FILTER, get_texture_filter(desc.min_filter));
 
+	if (desc.anisotropic_level > 1.0f)
+		glTexParameterf(target_, GL_TEXTURE_MAX_ANISOTROPY_EXT, desc.anisotropic_level);
+
 	if (desc.type == texture_cube)
 	{
 		init_cubemap(desc, data, size);
@@ -26,6 +29,11 @@ bool OpenGL3Texture::init(const TextureDesc& desc, const uint8_t* data, size_t s
 		glTexImage2D(target_, 0,
 			get_format(desc.format), desc.width, desc.height, 0,
 			get_texture_format(desc.format), get_datatype(desc.datatype), data);
+		if (desc.mips > 0)
+		{
+			// TODO: need to try glTexStorage2D - we can setup the mipmaps number then
+			OpenGLExtensions::instance().glGenerateMipmap(target_);
+		}
 	}
 	return true;
 }

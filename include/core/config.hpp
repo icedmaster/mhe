@@ -90,6 +90,8 @@ const size_t max_additional_render_passes = 32;
 
 const size_t max_scene_dips_number = 4096;
 
+const size_t default_mips_number = 6;
+
 /**
  * Scene configuration
  */

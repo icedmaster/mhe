@@ -4,6 +4,7 @@
 
 #include "render/context.hpp"
 #include "render/image.hpp"
+#include "render/render_globals.hpp"
 
 #include "res/image_loaders/image_loaders_helper.hpp"
 #include "res/image_loaders/cubemap_loader.hpp"
@@ -20,13 +21,17 @@ int texture_format(int image_format)
 	return formats[image_format];
 }
 
-bool create_texture(Texture& texture, int target, const Image& image)
+bool create_texture(Texture& texture, int target, const Image& image, const Context* context)
 {
 	TextureDesc desc;
 	desc.type = target;
 	desc.width = image.width;
 	desc.height = image.height;
 	desc.format = texture_format(image.mode);
+	desc.mips = image.has_mips ? 0 : default_mips_number;
+	desc.mag_filter = texture_filter_linear_mipmap_linear;
+	desc.min_filter = texture_filter_linear_mipmap_linear;
+	desc.anisotropic_level = texture_anisotropic_level.value();
 	if (target == texture_cube)
 		desc.address_mode_s = desc.address_mode_t = texture_clamp_to_edge;
 	return texture.init(desc, &image.data[0], image.data.size());
@@ -53,7 +58,7 @@ bool TextureLoader::load(type& res, const FilePath& name, const context_type* co
 	if (!result) return false;
 	res.id = context->texture_pool.create();
 	Texture& texture = context->texture_pool.get(res.id);
-	return detail::create_texture(texture, target, image);
+	return detail::create_texture(texture, target, image, context);
 }
 
 }

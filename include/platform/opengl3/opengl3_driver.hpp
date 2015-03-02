@@ -26,7 +26,7 @@ class OpenGL3Driver : public DriverImpl
 {
 public:
 private:
-    bool init();
+    bool init(DriverRenderingCapabilities& caps);
 	void close() {}
 
 	void enable_blending();
@@ -66,6 +66,8 @@ private:
 
 	void flush();
 private:
+	void setup_caps(DriverRenderingCapabilities& caps);
+
     OpenGL3ContextState state_;
 	const OpenGL3IndexBuffer* current_index_buffer_;
 	const OpenGL3ShaderProgram* current_shader_program_;

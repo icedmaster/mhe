@@ -549,6 +549,15 @@ public:
 		::glDrawElementsBaseVertex(mode, count, type, indices, basevertex);
 #endif
 	}
+
+	void glGenerateMipmap(GLenum target)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glGenerateMipmap_(target);
+#else
+		::glGenerateMipmap(target);
+#endif
+	}
 private:
 	OpenGLExtensions() {}
 	~OpenGLExtensions() {}
@@ -628,6 +637,7 @@ private:
 	PFNGLMAPBUFFERRANGEPROC glMapBufferRange_;
 	PFNGLDRAWRANGEELEMENTSPROC glDrawRangeElements_;
 	PFNGLDRAWELEMENTSBASEVERTEXPROC glDrawElementsBaseVertex_;
+	PFNGLGENERATEMIPMAPPROC glGenerateMipmap_;
 #endif
 	std::map<std::string, bool> loaded_extensions_;
 };

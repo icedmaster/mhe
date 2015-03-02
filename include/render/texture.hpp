@@ -17,7 +17,12 @@ enum
 // filter type
 enum
 {
-	texture_filter_linear
+	texture_filter_nearest,
+	texture_filter_linear,
+	texture_filter_nearest_mipmap_nearest,
+	texture_filter_linear_mipmap_nearest,
+	texture_filter_nearest_mipmap_linear,
+	texture_filter_linear_mipmap_linear
 };
 
 // texture address mode
@@ -37,13 +42,15 @@ struct TextureDesc
 	int min_filter;
 	int address_mode_t;
 	int address_mode_s;
+	float anisotropic_level;
 	int format;
 	int datatype;
+	size_t mips;
 
 	TextureDesc() :
-		type(texture_2d), mag_filter(texture_filter_linear), min_filter(texture_filter_linear),
-		address_mode_t(texture_wrap), address_mode_s(texture_wrap),
-		format(format_rgba), datatype(format_ubyte)
+		type(texture_2d), mag_filter(texture_filter_nearest), min_filter(texture_filter_nearest),
+		address_mode_t(texture_wrap), address_mode_s(texture_wrap), anisotropic_level(1.0f),
+		format(format_rgba), datatype(format_ubyte), mips(0)
 	{}
 };
 

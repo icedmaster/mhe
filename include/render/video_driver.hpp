@@ -30,9 +30,14 @@ class RenderTarget;
 class DriverImpl
 {
 public:
+	struct DriverRenderingCapabilities
+	{
+		float max_anisotropic_level;
+	};
+
 	virtual ~DriverImpl() {}
 
-	virtual bool init() = 0;
+	virtual bool init(DriverRenderingCapabilities& caps) = 0;
 	virtual void close() = 0;
 
 	virtual void enable_blending() = 0;
@@ -130,7 +135,7 @@ public:
 
 	bool init()
 	{
-		return impl_->init();
+		return impl_->init(caps_);
 	}
 
 	void close()
@@ -193,11 +198,18 @@ public:
 	void end_render();
 
     void render(const Context& context, const DrawCall* draw_calls, size_t count);
+
+	// capabilities
+	float max_anisotropic_level() const
+	{
+		return caps_.max_anisotropic_level;
+	}
 private:
     void perform_draw_call(const Context& context, const DrawCall& draw_call);
 
 	Stats stats_;
 	State state_;
+	DriverImpl::DriverRenderingCapabilities caps_;
 	unique_ptr<DriverImpl> impl_;
 };
 
