@@ -48,7 +48,7 @@ struct TextureDesc
 	size_t mips;
 
 	TextureDesc() :
-		type(texture_2d), mag_filter(texture_filter_nearest), min_filter(texture_filter_nearest),
+		type(texture_2d), mag_filter(texture_filter_linear), min_filter(texture_filter_linear),
 		address_mode_t(texture_wrap), address_mode_s(texture_wrap), anisotropic_level(1.0f),
 		format(format_rgba), datatype(format_ubyte), mips(0)
 	{}
