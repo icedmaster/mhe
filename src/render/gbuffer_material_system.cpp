@@ -5,6 +5,7 @@
 #include "render/uniforms.hpp"
 #include "render/render_context.hpp"
 #include "render/instances.hpp"
+#include "render/render_globals.hpp"
 #include "render/light_instance_methods.hpp"
 #include "render/utils/simple_meshes.hpp"
 
@@ -69,7 +70,7 @@ void GBufferFillMaterialSystem::update(Context& context, SceneContext& scene_con
     MATERIAL_UPDATE_WITH_COMMAND(context, scene_context, render_context, update, &clear_command_);
 }
 
-void GBufferFillMaterialSystem::update(Context& context, SceneContext& /*scene_context*/, RenderContext& render_context, MeshPartInstance* /*nodes*/, size_t /*count*/)
+void GBufferFillMaterialSystem::update(Context& context, SceneContext& /*scene_context*/, RenderContext& render_context, MeshPartInstance* nodes, size_t count)
 {
 	TransformSimpleData transform_data;
 	transform_data.vp = render_context.vp;
@@ -77,6 +78,17 @@ void GBufferFillMaterialSystem::update(Context& context, SceneContext& /*scene_c
 	uniform.update(transform_data);
 
     clear_command_.reset();
+
+	// It may be done once, at startup
+	UberShader& shader = ubershader(context);
+	UberShader::Index index;
+	for (size_t i = 0; i < count; ++i)
+	{
+		Material& material = context.materials[id()].get(nodes[i].material.id);
+		size_t use_normalmap = !use_normalmaps || material.textures[normal_texture_unit].id == Texture::invalid_id ? 0 : 1;
+		index.set(shader.info("NORMALMAP"), use_normalmap);
+		material.shader_program = shader.get(index);
+	}
 }
 
 void GBufferFillMaterialSystem::setup_uniforms(Material& material, Context& /*context*/, SceneContext& /*scene_context*/, const MeshPartInstance& /*part*/, const ModelContext& model_context)

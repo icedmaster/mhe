@@ -156,6 +156,7 @@
   (let ([context (make-empty-context)])
 	(define-values (in out) (connect))
 	(printf "Connected to server\n")
+	(set! context (request-all context in out))
 	(user-loop context in out)
 	(exit-app in out))
 )
