@@ -40,6 +40,14 @@ public:
 		scale_.set(1, 1, 1);
 	}
 
+	void set(const vec3& position, const quatf& rotation, const vec3& scale = vec3(1, 1, 1))
+	{
+		position_ = position;
+		rotation_ = rotation;
+		scale_ = scale;
+		update();
+	}
+
 	void translate_to(const vec3& position)
 	{
 		position_ = position;

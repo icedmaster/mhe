@@ -49,6 +49,6 @@ int main(int /*argc*/, char** /*argv*/)
 	camera_parameters.znear = 0.1f;
 	camera_parameters.zfar = 100.0f;
 	app.engine().scene().set_camera_controller(new mhe::game::FPSCameraController(app.engine(), camera_parameters,
-		mhe::vec3(0, 1, 10), mhe::vec3(0, 1, 0), mhe::vec3::up()));
+		mhe::vec3(0, 1, 10), mhe::vec3(0, mhe::pi, 0)));
 	return app.run();
 }
