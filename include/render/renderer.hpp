@@ -35,7 +35,7 @@ public:
 	static const uint8_t skybox_material_system_priority = 2;
 	static const uint8_t shadowmap_depth_write_material_system_priority = 3;
 public:
-	Renderer(Context& context) : context_(context) {}
+    Renderer(Context& context);
     virtual ~Renderer() {}
 
 	virtual void update(RenderContext& render_context, SceneContext& scene_context);

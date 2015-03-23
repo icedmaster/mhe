@@ -4,6 +4,7 @@
 #include "utils/file_utils.hpp"
 #include "app/application_asset_path.hpp"
 #include "core/memory.hpp"
+#include "core/string.hpp"
 #include "events/delegate_event_listener.hpp"
 #include "events/system_event.hpp"
 #include "events/system_device.hpp"
@@ -13,6 +14,12 @@
 
 namespace mhe {
 namespace app {
+
+struct RendererParams
+{
+    string skybox;
+    string shadowmap_depth_write;
+};
 
 Application::Application(const std::string& name) :
 	name_(name)
@@ -130,10 +137,16 @@ void Application::init_render(const ApplicationConfig& config)
 	if (!materials_node) return;
 
 	init_materials(materials_node);
+
+    RendererParams renderer_params;
+    pugi::xml_node skybox_node = mhe_node.child("skybox");
+    if (skybox_node) renderer_params.skybox = skybox_node.attribute("name").value();
+    pugi::xml_node shadowmap_depth_write_node = mhe_node.child("shadowmap_depth_write");
+    if (shadowmap_depth_write_node) renderer_params.shadowmap_depth_write = shadowmap_depth_write_node.attribute("name").value();
 	
 	pugi::xml_node gbuffer_node = mhe_node.child("gbuffer");
 	if (gbuffer_node)
-		init_gbuffer(gbuffer_node);
+        init_gbuffer(gbuffer_node, renderer_params);
 }
 
 void Application::init_materials(pugi::xml_node materials_node)
@@ -162,7 +175,7 @@ void Application::init_materials(pugi::xml_node materials_node)
 	}
 }
 
-void Application::init_gbuffer(pugi::xml_node gbuffer_node)
+void Application::init_gbuffer(pugi::xml_node gbuffer_node, const RendererParams& params)
 {
 	Context& context = engine_.context();
 
@@ -176,8 +189,13 @@ void Application::init_gbuffer(pugi::xml_node gbuffer_node)
 	ASSERT(fill_material_system != nullptr, "Unable to initialize material system with name:" << fill_name);
 	AbstractGBufferUseMaterialSystem* use_material_system = context.material_systems.get<AbstractGBufferUseMaterialSystem>(use_name);
 	MaterialSystem* draw_material_system = context.material_systems.get(draw_name);
+
+    MaterialSystem* skybox_material_system = context.material_systems.get(params.skybox);
+    MaterialSystem* depth_write_material_system = context.material_systems.get(params.shadowmap_depth_write);
 	
 	DeferredRenderer* renderer = new DeferredRenderer(context);
+    renderer->set_skybox_material_system(skybox_material_system);
+    renderer->set_shadowmap_depth_write_material_system(depth_write_material_system);
 	renderer->init(fill_material_system, use_material_system, draw_material_system);
 	engine_.set_renderer(renderer);
 }

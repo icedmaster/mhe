@@ -77,6 +77,14 @@ void setup_node(NodeInstance& node, MaterialSystem* material_system, Context& co
     material_system->setup(context, scene_context, &node.mesh.instance_parts[0], &node.mesh.mesh.parts[0], &model_context, 1);
 }
 
+Renderer::Renderer(Context& context) :
+    context_(context),
+    skybox_material_system_(nullptr),
+    shadowmap_depth_write_material_system_(nullptr),
+    transparent_objects_material_system_(nullptr),
+    particles_material_system_(nullptr)
+{}
+
 void Renderer::update(RenderContext& render_context, SceneContext& scene_context)
 {
 	update_nodes(context_, render_context, scene_context);
@@ -91,6 +99,7 @@ void Renderer::render(RenderContext& render_context, SceneContext& scene_context
 		shadowmap_depth_write_material_system_->setup_draw_calls(context_, scene_context, render_context);
 	render_impl(context_, render_context, scene_context);
 	sort_draw_calls(context_, render_context);
+    execute_render(render_context);
 }
 
 void Renderer::execute_render(RenderContext& render_context)
