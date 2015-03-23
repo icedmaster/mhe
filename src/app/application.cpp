@@ -9,7 +9,7 @@
 #include "events/system_device.hpp"
 #include "events/keyboard_device.hpp"
 #include "events/mouse_device.hpp"
-#include "render/gbuffer_helper.hpp"
+#include "render/deferred_renderer.hpp"
 
 namespace mhe {
 namespace app {
@@ -176,7 +176,10 @@ void Application::init_gbuffer(pugi::xml_node gbuffer_node)
 	ASSERT(fill_material_system != nullptr, "Unable to initialize material system with name:" << fill_name);
 	AbstractGBufferUseMaterialSystem* use_material_system = context.material_systems.get<AbstractGBufferUseMaterialSystem>(use_name);
 	MaterialSystem* draw_material_system = context.material_systems.get(draw_name);
-	setup_deferred_pipeline(context, fill_material_system, use_material_system, draw_material_system);
+	
+	DeferredRenderer* renderer = new DeferredRenderer(context);
+	renderer->init(fill_material_system, use_material_system, draw_material_system);
+	engine_.set_renderer(renderer);
 }
 
 }}

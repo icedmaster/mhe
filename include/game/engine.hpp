@@ -8,6 +8,7 @@
 
 #include "render/context.hpp"
 #include "render/render_globals.hpp"
+#include "render/renderer.hpp"
 #include "events/event_manager.hpp"
 #include "scene/scene.hpp"
 #include "game_scene.hpp"
@@ -57,11 +58,14 @@ public:
 	{
 		game_scene_ = scene;
 	}
+
+	void set_renderer(Renderer* renderer)
+	{
+		renderer_ = renderer;
+	}
 private:
 	void set_default_video_settings();
 	void setup_generated();
-
-	void update_materials(RenderContext& render_context);
 
 #ifdef RDBG_ENABLED
 	RDBGEngine rdbg_engine_;
@@ -74,6 +78,7 @@ private:
 	utils::Timer stats_timer_;
 
 	RenderGlobals render_globals_;
+	ref_ptr<Renderer> renderer_;
 
 	ref_ptr<GameScene> game_scene_;
 	bool process_;

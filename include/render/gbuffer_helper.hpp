@@ -6,6 +6,7 @@
 
 namespace mhe {
 
+// OBSOLETE, need to remove it
 void setup_deferred_pipeline(Context& context, AbstractGBufferFillMaterialSystem* fill_material_system,
 							 AbstractGBufferUseMaterialSystem* use_material_system, MaterialSystem* draw_material_system)
 {

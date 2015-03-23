@@ -6,6 +6,7 @@
 #include "render/instances.hpp"
 #include "render/scene_context.hpp"
 #include "render/material_system.hpp"
+#include "debug/profiler.hpp"
 
 namespace mhe {
 
@@ -73,6 +74,56 @@ void setup_node(NodeInstance& node, MaterialSystem* material_system, Context& co
     model_context.normal_texture = normalmap_texture_name;
     model_context.transform_uniform = node.mesh.shared_uniform;
     material_system->setup(context, scene_context, &node.mesh.instance_parts[0], &node.mesh.mesh.parts[0], &model_context, 1);
+}
+
+void Renderer::update(RenderContext& render_context, SceneContext& scene_context)
+{
+	update_nodes(context_, render_context, scene_context);
+	update_impl(context_, render_context, scene_context);
+}
+
+void Renderer::render(RenderContext& render_context, SceneContext& scene_context)
+{
+	if (skybox_material_system_ != nullptr)
+		skybox_material_system_->setup_draw_calls(context_, scene_context, render_context);
+	if (shadowmap_depth_write_material_system_ != nullptr)
+		shadowmap_depth_write_material_system_->setup_draw_calls(context_, scene_context, render_context);
+	render_impl(context_, render_context, scene_context);
+	sort_draw_calls(context_, render_context);
+}
+
+void Renderer::execute_render(RenderContext& render_context)
+{
+	ProfilerElement pe("engine.render");
+	context_.driver.begin_render();
+	context_.driver.clear_color();
+	context_.driver.clear_depth();
+
+    context_.driver.render(context_, render_context.draw_calls.data(), render_context.draw_calls.size());
+}
+
+void Renderer::flush()
+{
+	{
+		ProfilerElement end_render_pe("driver.end_render");
+		context_.driver.end_render();
+	}
+	{
+		ProfilerElement swap_buffers_pe("window_system.swap_buffers");
+		context_.window_system.swap_buffers();
+	}
+}
+
+void Renderer::set_skybox_material_system(MaterialSystem* material_system)
+{
+    skybox_material_system_ = material_system;
+    skybox_material_system_->set_priority(skybox_material_system_priority);
+}
+
+void Renderer::set_shadowmap_depth_write_material_system(MaterialSystem* material_system)
+{
+    shadowmap_depth_write_material_system_ = material_system;
+    shadowmap_depth_write_material_system_->set_priority(shadowmap_depth_write_material_system_priority);
 }
 
 }
