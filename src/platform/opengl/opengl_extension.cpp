@@ -67,6 +67,9 @@ void OpenGLExtensions::init_extensions()
 	glMapBuffer_ = load_extension<PFNGLMAPBUFFERPROC>("glMapBuffer");
 	glUnmapBuffer_ = load_extension<PFNGLUNMAPBUFFERPROC>("glUnmapBuffer");
 	glMapBufferRange_ = load_extension<PFNGLMAPBUFFERRANGEPROC>("glMapBufferRange");
+	glDrawRangeElements_ = load_extension<PFNGLDRAWRANGEELEMENTSPROC>("glDrawRangeElements");
+	glDrawElementsBaseVertex_ = load_extension<PFNGLDRAWELEMENTSBASEVERTEXPROC>("glDrawElementsBaseVertex");
+	glGenerateMipmap_ = load_extension<PFNGLGENERATEMIPMAPPROC>("glGenerateMipmap");
 #endif	// MHE_OPENGL_HAS_SHADERS
 
 	get_str_extensions();

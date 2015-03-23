@@ -8,6 +8,15 @@
 #include <ctime>
 #include <vector>
 #include "core/ref_ptr.hpp"
+#include "core/compiler.hpp"
+
+#ifdef MHE_VS
+#include "platform/win/win_wrapper.hpp"
+#endif
+
+#ifdef MHE_VS
+#pragma warning( disable: 4996 )
+#endif
 
 namespace mhe {
 namespace utils {
@@ -117,6 +126,16 @@ private:
 	std::ofstream of;
 };
 
+#ifdef MHE_VS
+class VSOutputLog : public Log
+{
+private:
+	void write_impl(const std::string& str)
+	{
+		OutputDebugString(str.c_str());
+	}
+};
+#endif
 
 class MixLog : public Log
 {

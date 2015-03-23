@@ -20,6 +20,8 @@ bool OpenGL3RenderTarget::init(const RenderTargetDesc& desc, Texture** color_tex
 	texture_desc.width = desc.width;
 	texture_desc.height = desc.height;
 	texture_desc.address_mode_s = texture_desc.address_mode_t = texture_clamp;
+	texture_desc.anisotropic_level = 1.0f;
+	texture_desc.mips = 0;
 	for (size_t i = 0; i < desc.color_targets; ++i)
 	{
 		texture_desc.format = desc.color_format[i];

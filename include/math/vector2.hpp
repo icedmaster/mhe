@@ -21,7 +21,7 @@ public:
 
 	template <class U>
 	vector2(const vector2<U>& v) :
-		x_(v.x()), y_(v.y())
+		x_(static_cast<T>(v.x())), y_(static_cast<T>(v.y()))
 	{
 	}
 

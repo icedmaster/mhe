@@ -86,6 +86,36 @@ inline Str replace(const Str& s, typename Str::value_type from, typename Str::va
 	return out_str;
 }
 
+template <class Str, class S>
+inline Str replace(const Str& s, const S& from, const S& to)
+{
+	Str out_str;
+	size_t from_len = from.length();
+	for (size_t i = 0, len = s.size(); i < len;)
+	{
+		bool found = true;
+		for (size_t j = 0; j < from_len; ++j)
+		{
+			if (s[i] != from[j])
+			{
+				found = false;
+				break;
+			}
+		}
+		if (found)
+		{
+			out_str += to;
+			i += from_len;
+		}
+		else
+		{
+			out_str += s[i];
+			++i;
+		}
+	}
+	return out_str;
+}
+
 template <class Str, class Str2>
 inline Str join(const std::vector<Str>& str, const Str2& del = Str2())
 {

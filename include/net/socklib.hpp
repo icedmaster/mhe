@@ -311,7 +311,7 @@ private:
 		memset((char*)&inaddr, 0, c_addr_len);
 		addrlen_t len = c_addr_len;
 		int rlen = recvfrom(get_socket(), buf, size, flags, (sockaddr*)&inaddr, &len);
-		port = htonl(inaddr.sin_port);
+		port = static_cast<uint16_t>(htonl(inaddr.sin_port));
 		addr = inaddr.sin_addr.s_addr;
 		return rlen;
 	}
@@ -329,7 +329,7 @@ public:
 
 	~tcp_socket()
 	{
-		if (is_connected() > socket_binded_state)
+		if (static_cast<int>(is_connected()) > socket_binded_state)
 			socket_close(cl_s);
 	}
 private:
@@ -360,7 +360,7 @@ private:
 		addrlen_t len = c_addr_len;
 		cl_s = ::accept(get_socket(), (sockaddr*)&addr, &len);
 		if(cl_s == invalid_socket) return false;
-		set_remoteaddr(htonl(addr.sin_port), addr.sin_addr.s_addr);
+		set_remoteaddr(static_cast<uint16_t>(htonl(addr.sin_port)), addr.sin_addr.s_addr);
 		return true;
 	}
 

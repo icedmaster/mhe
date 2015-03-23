@@ -92,35 +92,16 @@ void OpenGL3ShaderProgram::init(const ShaderInitializationParams& params)
 {
 	memset(&texture_location_[0], 0xff, sizeof(texture_location_));
 
-	GLint number, length, size;
-	GLenum type;
-	OpenGLExtensions::instance().glGetProgramiv(id_, GL_ACTIVE_UNIFORMS, &number);
-	char data[512];
-	for (int i = 0; i < number; ++i)
+	// check samplers locations
+	for (size_t i = 0; i < params.samplers.size(); ++i)
 	{
-		OpenGLExtensions::instance().glGetActiveUniform(id_, i, sizeof(data), &length, &size, &type, data);
-		if (type == GL_SAMPLER_2D || type == GL_SAMPLER_CUBE)
-		{
-			for (size_t j = 0; j < params.samplers.size(); ++j)
-			{
-				if (params.samplers[j].name == data)
-				{
-					texture_location_[params.samplers[j].index] = i;
-					break;
-				}
-			}
-		}
-		else
-		{
-			for (size_t j = 0; j < params.uniforms.size(); ++j)
-			{
-				if (params.uniforms[j].name == data)
-				{
-					shader_bind_indexes_[params.uniforms[j].index] = i;
-					break;
-				}
-			}
-		}
+		texture_location_[params.samplers[i].index] = OpenGLExtensions::instance().glGetUniformLocation(id_, params.samplers[i].name.c_str());
+	}
+
+	// check uniform locations
+	for (size_t i = 0; i < params.uniforms.size(); ++i)
+	{
+		shader_bind_indexes_[params.uniforms[i].index] = OpenGLExtensions::instance().glGetUniformBlockIndex(id_, params.uniforms[i].name.c_str());
 	}
 }
 

@@ -1,4 +1,5 @@
 #include "utils/file_utils.hpp"
+#include "utils/strutils.hpp"
 #include <algorithm>
 #include <cctype>
 
@@ -19,21 +20,26 @@ FilePath get_file_extension(const FilePath& filename)
 	return ext;
 }
 
-std::string get_file_name(const std::string& filepath)
+FilePath get_file_name(const FilePath& filepath)
 {
 	size_t slash_pos = filepath.find_last_of('/');
 	// get filename with extension
-	std::string fne;
+	FilePath fne;
 	if (slash_pos == std::string::npos)
 		fne = filepath;
 	else
 		fne = filepath.substr(slash_pos + 1, filepath.length() - slash_pos - 1);
 	// remove extension
 	size_t point_pos = fne.find_last_of('.');
-	std::string fn = fne;
+	FilePath fn = fne;
 	if (point_pos != std::string::npos)
 		fn.erase(point_pos, fn.length() - point_pos);
 	return fn;
+}
+
+std::string get_file_name(const std::string& fullpath)
+{
+	return std::string(get_file_name(FilePath(fullpath.c_str())).c_str());
 }
 
 std::string get_file_name_with_path(const std::string& filepath)
@@ -70,6 +76,23 @@ std::vector<std::string> read_lines(std::ifstream& stream)
 		result.push_back(line);
 	}
 	return result;
+}
+
+FilePath convert_slashes(const FilePath& fullpath)
+{
+	return utils::replace(fullpath, FilePath("\\"), FilePath("/"));
+}
+
+FilePath get_file_name_with_extension(const FilePath& fullpath)
+{
+	size_t slash_pos = fullpath.find_last_of('/');
+	// get filename with extension
+	FilePath fne;
+	if (slash_pos == FilePath::npos)
+		fne = fullpath;
+	else
+		fne = fullpath.substr(slash_pos + 1, fullpath.length() - slash_pos - 1);
+	return fne;
 }
 
 }}

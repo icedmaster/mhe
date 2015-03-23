@@ -61,7 +61,7 @@ int Application::run_impl()
 	MainLoop* main_loop = engine_.context().window_system.main_loop();
 	if (main_loop == nullptr)
 		engine_.run();
-	else main_loop->run(1000 / 60.0f);
+	else main_loop->run(static_cast<unsigned int>(1000 / 60.0f));
 	close();
 	return 0;
 }

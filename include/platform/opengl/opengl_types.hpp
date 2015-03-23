@@ -42,8 +42,8 @@ inline GLenum get_texture_target(int type)
 
 inline GLenum get_texture_filter(int filter)
 {
-	ASSERT(filter < 1, "Invalid texture filter");
-	GLenum filters[1] = {GL_LINEAR};
+	ASSERT(filter < 6, "Invalid texture filter");
+	GLenum filters[6] = {GL_NEAREST, GL_LINEAR, GL_NEAREST_MIPMAP_NEAREST, GL_LINEAR_MIPMAP_NEAREST, GL_NEAREST_MIPMAP_LINEAR, GL_LINEAR_MIPMAP_LINEAR};
 	return filters[filter];
 }
 

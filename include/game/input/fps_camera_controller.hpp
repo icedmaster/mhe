@@ -15,12 +15,15 @@ class Engine;
 class MHE_EXPORT FPSCameraController : public CameraController
 {
 public:
-		FPSCameraController(Engine& engine, const PerspectiveCameraParameters& parameters,
+	FPSCameraController(Engine& engine, const PerspectiveCameraParameters& parameters,
+						const vec3& position, const vec3& rotation);
+	FPSCameraController(Engine& engine, const PerspectiveCameraParameters& parameters,
 						const vec3& position, const vec3& direction, const vec3& up);
 private:
 	void update_impl(const RenderContext& render_context);
 
 	const EventManager& event_manager_;
+	vec3 angles_;
 };
 
 }}

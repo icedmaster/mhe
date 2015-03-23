@@ -23,8 +23,6 @@ public:
 	void close() override;
 
     void setup(Context& context, SceneContext& scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count) override;
-
-    bool setup_render_pass(Context& /*context*/, SceneContext& /*scene_context*/, RenderContext& /*render_context*/) override;
 private:
     void update(Context& context, SceneContext& scene_context, RenderContext& render_context);
 	bool init_draw_call_data(Context& context);

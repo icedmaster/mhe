@@ -7,6 +7,7 @@
 #include "render/scene_context.hpp"
 #include "render/material_system.hpp"
 #include "debug/profiler.hpp"
+#include "res/resource_manager.hpp"
 
 namespace mhe {
 
@@ -124,6 +125,29 @@ void Renderer::set_shadowmap_depth_write_material_system(MaterialSystem* materia
 {
     shadowmap_depth_write_material_system_ = material_system;
     shadowmap_depth_write_material_system_->set_priority(shadowmap_depth_write_material_system_priority);
+}
+
+bool load_node(NodeInstance& node, const string& name, hash_type material_system_name, Context& context, SceneContext& scene_context)
+{
+	if (!context.mesh_manager.get_instance(node.mesh, name))
+	{
+		ERROR_LOG("load_node() failed: can not get mesh:" << name);
+		return false;
+	}
+	MaterialSystem* material_system = context.material_systems.get(material_system_name);
+	if (material_system == nullptr)
+		return false;
+
+	std::vector<ModelContext> model_contexts(node.mesh.instance_parts.size());
+	for (size_t i = 0; i < node.mesh.instance_parts.size(); ++i)
+	{
+		ModelContext& model_context = model_contexts[i];
+		model_context.color_textures[0] = node.mesh.mesh.parts[i].material_data.albedo_texture;
+		model_context.normal_texture = node.mesh.mesh.parts[i].material_data.normalmap_texture;
+		model_context.transform_uniform = node.mesh.shared_uniform;
+	}
+	material_system->setup(context, scene_context, &node.mesh.instance_parts[0], &node.mesh.mesh.parts[0], &model_contexts[0], node.mesh.instance_parts.size());
+	return true;
 }
 
 }

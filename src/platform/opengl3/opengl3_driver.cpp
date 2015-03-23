@@ -19,7 +19,7 @@ OpenGL3ContextState::OpenGL3ContextState() :
     uniforms.fill(UniformBuffer::invalid_id);
 }
 
-bool OpenGL3Driver::init()
+bool OpenGL3Driver::init(DriverRenderingCapabilities& caps)
 {
 	// print information about renderer and context
 	INFO_LOG("OpenGL3Driver::renderer:" << reinterpret_cast<const char*>(glGetString(GL_RENDERER))); 
@@ -33,7 +33,14 @@ bool OpenGL3Driver::init()
 
 	current_render_target_ = nullptr;
 
+	setup_caps(caps);
+
 	return true;
+}
+
+void OpenGL3Driver::setup_caps(DriverRenderingCapabilities& caps)
+{
+	glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &caps.max_anisotropic_level);
 }
 
 void OpenGL3Driver::clear_depth()
@@ -153,7 +160,9 @@ void OpenGL3Driver::set_default_render_target()
 
 void OpenGL3Driver::draw(const RenderData& data)
 {
-	glDrawElements(get_primitive_type(data.primitive), current_index_buffer_->size(), GL_UNSIGNED_INT, 0);
+	OpenGLExtensions::instance().glDrawElementsBaseVertex(get_primitive_type(data.primitive), 
+		data.indexes_number != 0 ? data.indexes_number : current_index_buffer_->size(), GL_UNSIGNED_INT,
+		(void*)(data.ibuffer_offset * sizeof(uint32_t)), data.vbuffer_offset);
 	CHECK_GL_ERRORS();
 }
     

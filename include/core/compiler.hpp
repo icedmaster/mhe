@@ -39,4 +39,11 @@
 #else
 #endif
 
+// Disable some warnings
+#ifdef MHE_VS
+#pragma warning( disable: 4251 )
+#pragma warning( disable: 4275 )
+#define _SCL_SECURE_NO_WARNINGS
+#endif
+
 #endif

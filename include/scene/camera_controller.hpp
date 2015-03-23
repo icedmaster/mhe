@@ -7,14 +7,12 @@
 namespace mhe {
 
 struct RenderContext;
+class Scene;
 
-class CameraController : public ref_counter
+class MHE_EXPORT CameraController : public ref_counter
 {
 public:
-	CameraController() :
-        move_speed_(7.5f),
-        rotation_speed_(1.5f)
-	{}
+	CameraController(Scene& scene);
 
 	virtual ~CameraController() {}
 	
@@ -25,12 +23,19 @@ public:
 
 	const Camera& camera() const
 	{
-		return camera_;
+		return camera_node_.camera;
 	}
 
 	Camera& camera()
 	{
-		return camera_;
+		return camera_node_.camera;
+	}
+
+	TransformInstance& transform_instance();
+
+	void set_move_speed(float speed)
+	{
+		move_speed_ = speed;
 	}
 protected:
 	float move_speed() const
@@ -42,10 +47,13 @@ protected:
 	{
 		return rotation_speed_;
 	}
+
+	void sync_camera();
 private:
 	virtual void update_impl(const RenderContext& render_context) = 0;
 
-	Camera camera_;
+	Scene& scene_;
+	CameraNode camera_node_;
 	float move_speed_;
 	float rotation_speed_;
 };

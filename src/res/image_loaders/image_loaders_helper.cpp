@@ -13,9 +13,11 @@ bool load_image_by_extension(Image& image, const FilePath& filename)
 
 	std::ifstream f(filename.c_str(), std::ios::in | std::ios::binary);
 	if (!f.is_open()) return false;
+
+	image.has_mips = false;
 	
 	bool result = false;
-	if (ext == "tga")
+	if (ext == "tga" || ext == "png")
 		result = load_tga_image(image, f);
 	f.close();
 	return result;

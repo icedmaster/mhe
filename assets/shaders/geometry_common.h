@@ -6,7 +6,7 @@ uniform transform
     mat4 vp;
 };
 
-[uniform transform 1 permodel]
+[uniform permodel 1 permodel]
 uniform permodel
 {
     mat4 model;

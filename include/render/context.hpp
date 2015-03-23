@@ -54,6 +54,11 @@ public:
 		return get_impl<T>(hash(name));
 	}
 
+	MaterialSystem* get(hash_type name) const
+	{
+		return get_impl<MaterialSystem>(name);
+	}
+
 	MaterialSystem* get(const char* name) const
 	{
 		return get_impl<MaterialSystem>(hash(name));

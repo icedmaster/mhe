@@ -20,6 +20,7 @@ struct Image
 	size_t height;
 	size_t bpp;
 	int mode;
+	bool has_mips;
 };
 
 inline void swap_bgr_rgb(std::vector<uint8_t>& data, uint stride)

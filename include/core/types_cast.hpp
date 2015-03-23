@@ -9,6 +9,11 @@
 #include "assert.hpp"
 #include "types.hpp"
 #include "string.hpp"
+#include "compiler.hpp"
+
+#ifdef MHE_VS
+#pragma warning( disable : 4996 )	// sprintf is unsafe function
+#endif	// MHE_VS
 
 namespace mhe {
 
@@ -120,7 +125,7 @@ inline float types_cast(const std::string& value)
 template<>
 inline bool types_cast(const std::string& value)
 {
-	return static_cast<bool>(types_cast<size_t>(value));
+	return static_cast<bool>(types_cast<size_t>(value) > 0);
 }
 
 // From mhe::string
@@ -145,7 +150,7 @@ inline float types_cast(const mhe::string& value)
 template <>
 inline bool types_cast(const mhe::string& value)
 {
-	return static_cast<bool>(types_cast<size_t>(value));
+	return static_cast<bool>(types_cast<size_t>(value) > 0);
 }
 
 // To mhe::string

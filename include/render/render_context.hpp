@@ -42,8 +42,8 @@ const size_t max_color_textures = 2;
 
 struct ModelContext
 {
-    string color_textures[max_color_textures];
-    string normal_texture;
+    FilePath color_textures[max_color_textures];
+    FilePath normal_texture;
     UniformBuffer::IdType transform_uniform;
 
     ModelContext() : transform_uniform(UniformBuffer::invalid_id) {}
