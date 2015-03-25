@@ -63,6 +63,23 @@ struct MHE_EXPORT FullscreenLayout
 	static void init(Context& context);
 };
 
+struct MHE_EXPORT DebugLayout
+{
+    struct Vertex
+    {
+        vec3 pos;
+    };
+
+    static const char* name()
+    {
+        return "debug";
+    }
+
+    static uint16_t handle;
+
+    static void init(Context& context);
+};
+
 }
 
 #endif

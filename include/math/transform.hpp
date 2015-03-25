@@ -101,8 +101,9 @@ public:
 
 	mat4x4 view() const
 	{
-		const vec3& pos = position();
-		return (quatf(0.0f, 1.0f, 0.0f, 0.0) * rotation_).to_matrix<mat4x4>() * mat4x4::translation_matrix(-pos);
+        mat4x4 res;
+        res.set_lookAt(position_, position_ + transform_.forward_vector(), vec3::up());
+        return res;
 	}
 private:
 	void update()

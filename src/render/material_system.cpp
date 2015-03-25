@@ -50,7 +50,8 @@ void MaterialSystem::standart_material_setup(Context& context, SceneContext& sce
         instance_parts[i].material.material_system = material_system_id;
         instance_parts[i].material.id = material.id;
 
-        parts[i].render_data.layout = layout_id;
+        if (parts[i].render_data.layout == Layout::invalid_id)
+            parts[i].render_data.layout = layout_id;
 
         setup_textures(context, material, model_contexts[i]);
 
