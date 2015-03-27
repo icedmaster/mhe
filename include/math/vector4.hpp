@@ -31,6 +31,14 @@ public:
 		v_[3] = v.v_[3];
 	}
 
+    vector4(const vector3<T>& v, T w)
+    {
+        v_[0] = v.x();
+        v_[1] = v.y();
+        v_[2] = v.z();
+        v_[3] = w;
+    }
+
 	~vector4() {} // do nothing
 
 	inline void set(T v)

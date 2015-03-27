@@ -18,10 +18,10 @@ bool OpenGL3ShaderProgram::Shader::init(GLenum type, const std::string& data)
 	GLint length = static_cast<GLint>(data.length());
 	OpenGLExtensions::instance().glShaderSource(id_, 1, &shader_data, &length);
 	OpenGLExtensions::instance().glCompileShader(id_);
-	return check_status(GL_COMPILE_STATUS);
+    return check_status(type, GL_COMPILE_STATUS);
 }
 
-bool OpenGL3ShaderProgram::Shader::check_status(GLenum param) const
+bool OpenGL3ShaderProgram::Shader::check_status(GLenum type, GLenum param) const
 {
 	GLint status;
 	OpenGLExtensions::instance().glGetShaderiv(id_, param, &status);
@@ -30,7 +30,7 @@ bool OpenGL3ShaderProgram::Shader::check_status(GLenum param) const
 		GLchar buffer[1024];
 		GLint length = 0;
 		OpenGLExtensions::instance().glGetShaderInfoLog(id_, sizeof(buffer), &length, buffer);
-		ERROR_LOG("Shader " << id_ << " check status error:" << buffer);
+        ERROR_LOG("Shader " << id_ << " type:" << type << " check status error:" << buffer);
 		return false;
 	}
 	return true;

@@ -13,6 +13,7 @@ struct Light
 	vec4 position; // w - attenuation
 	vec4 direction; // w - angle attenuation for SPOT
 	mat4 lightvp;
+    mat4 lightw;
 	vec4 shadowmap_params;	// x - shadowmap bias
 };
 

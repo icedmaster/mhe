@@ -27,7 +27,7 @@ public:
 		return id_;
 	}
 private:
-	bool check_status(GLenum param) const;
+    bool check_status(GLenum type, GLenum param) const;
 
 	GLuint id_;
 };

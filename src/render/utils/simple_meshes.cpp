@@ -184,6 +184,7 @@ bool create_sphere(MeshInstance& mesh_instance, const Context& context, int subd
     part.render_data.vbuffer = context.vertex_buffer_pool.create();
     part.render_data.ibuffer = context.index_buffer_pool.create();
     part.render_data.layout = DebugLayout::handle;
+    part.render_data.elements_number = indices.size() / 3;
 
     VertexBuffer& vbuffer = context.vertex_buffer_pool.get(part.render_data.vbuffer);
     if (!vbuffer.init(buffer_update_type_static,
@@ -227,6 +228,7 @@ bool create_conus(MeshInstance& mesh_instance, const Context& context, float rad
     part.render_data.vbuffer = context.vertex_buffer_pool.create();
     part.render_data.ibuffer = context.index_buffer_pool.create();
     part.render_data.layout = DebugLayout::handle;
+    part.render_data.elements_number = indices.size() / 3;
 
     VertexBuffer& vbuffer = context.vertex_buffer_pool.get(part.render_data.vbuffer);
     if (!vbuffer.init(buffer_update_type_static,

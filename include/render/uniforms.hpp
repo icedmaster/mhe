@@ -13,8 +13,8 @@ struct TransformSimpleData
 struct TransformData
 {
 	mat4x4 vp;
+    mat4x4 inv_vp;
 	mat4x4 inv_proj;
-	mat4x4 inv_vp;
 	vec4 viewpos;
 };
 
@@ -36,6 +36,7 @@ struct LightData
 	vec4 position;
 	vec4 direction;
 	mat4x4 lightvp;
+    mat4x4 lightw;
 	vec4 shadowmap_params;
 };
 

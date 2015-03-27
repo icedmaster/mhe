@@ -123,6 +123,20 @@ inline size_t get_bytes_per_format(GLenum format)
 	return 0;
 }
 
+inline GLenum get_cull_mode(CullMode mode)
+{
+    ASSERT(mode < 4, "Invalid mode");
+    GLenum modes[4] = {GL_NONE, GL_FRONT, GL_BACK, GL_FRONT_AND_BACK};
+    return modes[mode];
+}
+
+inline GLenum get_winding_order(WindingOrder order)
+{
+    ASSERT(order < 3, "Invalid order");
+    GLenum orders[2] = {GL_CW, GL_CCW};
+    return orders[order];
+}
+
 }}
 
 #endif

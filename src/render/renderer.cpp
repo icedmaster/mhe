@@ -87,6 +87,23 @@ Renderer::Renderer(Context& context) :
 
 void Renderer::update(RenderContext& render_context, SceneContext& scene_context)
 {
+    TransformData data;
+    data.vp = render_context.vp;
+    data.inv_vp = render_context.inv_vp;
+    data.inv_proj = render_context.proj.inverted();
+    data.viewpos = vec4(render_context.viewpos, 0.0f);
+    if (render_context.percamera_uniform == UniformBuffer::invalid_id)
+    {
+        UniformBuffer& buffer = create_and_get(context_.uniform_pool);
+        render_context.percamera_uniform = buffer.id();
+        UniformBufferDesc desc;
+        desc.unit = perframe_data_unit;
+        desc.size = sizeof(TransformData);
+        buffer.init(desc);
+    }
+    UniformBuffer& buffer = context_.uniform_pool.get(render_context.percamera_uniform);
+    buffer.update(data);
+
 	update_nodes(context_, render_context, scene_context);
 	update_impl(context_, render_context, scene_context);
 }

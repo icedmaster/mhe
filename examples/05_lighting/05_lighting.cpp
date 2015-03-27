@@ -82,7 +82,7 @@ private:
 		light.shading().diffuse = mhe::color_red;
 		light.shading().specular = mhe::color_white;
 		mhe::set_light_position(engine.scene_context(), light_instance.id, mhe::vec3(0, 3, 0));
-		light.desc().omni.radius = 3.0f;
+        light.desc().omni.radius = 1.5f;
 		light.desc().omni.omni_attenuation = 0.9f;
 		light.set_type(mhe::Light::omni);
 
@@ -91,7 +91,7 @@ private:
 		light2.shading().diffuse = mhe::color_yellow;
 		light2.shading().specular = mhe::color_white;
 		mhe::set_light_position(engine.scene_context(), light_instance2.id, mhe::vec3(0, 0, 3));
-		light2.desc().omni.radius = 3.0f;
+        light2.desc().omni.radius = 1.5f;
 		light2.desc().omni.omni_attenuation = 0.9f;
 		light2.set_type(mhe::Light::omni);
 
@@ -189,6 +189,6 @@ int main(int /*argc*/, char** /*argv*/)
 	camera_parameters.znear = 0.1f;
 	camera_parameters.zfar = 100.0f;
 	app.engine().scene().set_camera_controller(new mhe::game::FPSCameraController(app.engine(), camera_parameters,
-		mhe::vec3(0, 1, 10), mhe::vec3(0, 1, 0), mhe::vec3::up()));
+        mhe::vec3(0, 1, 10), mhe::vec3(0, mhe::pi, 0)));
 	return app.run();
 }

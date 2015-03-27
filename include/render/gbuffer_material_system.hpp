@@ -7,10 +7,13 @@
 #include "render_target.hpp"
 #include "node.hpp"
 #include "commands.hpp"
+#include "math/matrix.hpp"
 
 #include "debug/rdbg.hpp"
 
 namespace mhe {
+
+class Light;
 
 class AbstractGBufferFillMaterialSystem : public MaterialSystem
 {
@@ -79,11 +82,16 @@ public:
 
     void setup(Context& context, SceneContext& scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count) override;
 private:
-    bool init_mesh(Context& context);
+    bool init_meshes(Context& context);
+    bool init_fullscreen_quad(Context& context);
+    bool init_sphere(Context& context);
+    bool init_conus(Context& context);
     void update(Context& context, SceneContext& scene_context, RenderContext& render_context);
-	size_t calculate_passes_number(RenderContext& render_context, size_t* passes) const;
+    mat4x4 update_light_transform(const Light& light, const vec3& position, const vec3& direction) const;
 
-    MeshInstance mesh_;
+    MeshInstance quad_mesh_;
+    MeshInstance sphere_mesh_;
+    MeshInstance conus_mesh_;
 	ClearCommand clear_command_;
 	RenderTarget::IdType render_target_;
 	RenderTarget::IdType light_buffer_render_target_;
@@ -91,9 +99,7 @@ private:
     TextureInstance normal_texture_;
     TextureInstance depth_texture_;
 	UniformBuffer::IdType light_uniform_[max_lights_number];
-	UniformBuffer::IdType transform_uniform_;
     DrawCallData::IdType draw_call_data_;
-	size_t lights_per_pass_;
 
 	GlobalVar<bool> shadowmap_enabled_;
 	GlobalVar<size_t> shadowmap_quality_;
