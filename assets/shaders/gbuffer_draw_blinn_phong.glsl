@@ -129,9 +129,5 @@ void main()
 	}
 #endif
 
-#ifndef FULLSCREEN_LAYOUT
-	color = vec4(0.0, 1.0f, 0.0f, 1.0);
-#else
 	color = vec4(result, shadow_value);
-#endif
 }

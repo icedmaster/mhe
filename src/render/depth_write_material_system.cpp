@@ -13,7 +13,6 @@ bool DepthWriteMaterialSystem::init(Context& context, const MaterialSystemContex
 {
 	clear_command_.set_driver(&context.driver);
 
-	StandartGeometryLayout::init(context);
 	set_layout(StandartGeometryLayout::handle);
 
 	if (!init_default(context, material_system_context))

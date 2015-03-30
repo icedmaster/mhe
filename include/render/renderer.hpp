@@ -64,6 +64,8 @@ private:
 	MaterialSystem* particles_material_system_;
 };
 
+bool init_render(Context& context);
+
 }
 
 #endif

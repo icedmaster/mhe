@@ -84,9 +84,11 @@ void RasterizerState::enable(OpenGL3ContextState& state) const
     if (desc_.cull == GL_NONE)
         glDisable(GL_CULL_FACE);
     else
+	{
         glEnable(GL_CULL_FACE);
-    glFrontFace(desc_.winding);
-    glCullFace(desc_.cull);
+		glFrontFace(desc_.winding);
+		glCullFace(desc_.cull);
+	}
 }
 
 bool OpenGL3RenderState::init(const RenderStateDesc& desc)

@@ -118,6 +118,8 @@ bool Application::on_system_event(const Event* event)
 
 void Application::init_render(const ApplicationConfig& config)
 {
+	mhe::init_render(engine_.context());
+
     std::fstream f(config.render_config_filename.c_str(), std::ios::in | std::ios::binary);
 	if (!f)
 	{

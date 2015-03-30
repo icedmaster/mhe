@@ -6,6 +6,7 @@
 #include "render/instances.hpp"
 #include "render/scene_context.hpp"
 #include "render/material_system.hpp"
+#include "render/layouts.hpp"
 #include "debug/profiler.hpp"
 #include "res/resource_manager.hpp"
 
@@ -173,6 +174,13 @@ bool load_node(NodeInstance& node, const string& name, hash_type material_system
 		model_context.transform_uniform = node.mesh.shared_uniform;
 	}
 	material_system->setup(context, scene_context, &node.mesh.instance_parts[0], &node.mesh.mesh.parts[0], &model_contexts[0], node.mesh.instance_parts.size());
+	return true;
+}
+
+bool init_render(Context& context)
+{
+	init_standart_layouts(context);
+
 	return true;
 }
 

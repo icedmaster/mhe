@@ -86,4 +86,14 @@ void DebugLayout::init(Context& context)
     context.layout_pool.get(handle).init(desc);
 }
 
+bool init_standart_layouts(Context& context)
+{
+	StandartGeometryLayout::init(context);
+	SkyboxLayout::init(context);
+	FullscreenLayout::init(context);
+	DebugLayout::init(context);
+
+	return true;
+}
+
 }

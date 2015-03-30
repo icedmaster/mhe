@@ -10,7 +10,6 @@ namespace mhe {
 
 bool PosteffectSimpleMaterialSystem::init(Context& context, const MaterialSystemContext& material_system_context)
 {
-	FullscreenLayout::init(context);
 	set_layout(FullscreenLayout::handle);
 
     if (!context.shader_manager.get(shader(), material_system_context.shader_name))

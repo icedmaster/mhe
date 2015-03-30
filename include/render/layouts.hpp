@@ -80,6 +80,8 @@ struct MHE_EXPORT DebugLayout
     static void init(Context& context);
 };
 
+bool init_standart_layouts(Context& context);
+
 }
 
 #endif

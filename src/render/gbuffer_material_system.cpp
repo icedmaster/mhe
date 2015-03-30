@@ -27,7 +27,6 @@ GBufferFillMaterialSystem::GBufferFillMaterialSystem()
 
 bool GBufferFillMaterialSystem::init(Context& context, const MaterialSystemContext& material_system_context)
 {
-	StandartGeometryLayout::init(context);
 	set_layout(StandartGeometryLayout::handle);
 
 	clear_command_.set_driver(&context.driver);
@@ -87,8 +86,6 @@ void GBufferFillMaterialSystem::setup_uniforms(Material& material, Context& /*co
 
 bool GBufferDrawMaterialSystem::init(Context& context, const MaterialSystemContext& material_system_context)
 {
-	FullscreenLayout::init(context);
-
 	RenderTargetDesc light_buffer_desc;
 	light_buffer_desc.target = rt_readwrite;
 	light_buffer_desc.color_datatype[0] = format_float;
