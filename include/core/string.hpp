@@ -85,7 +85,7 @@ public:
 	template <class Str>
 	this_type& operator= (const Str& str)
 	{
-		static_assert(sizeof(T) == sizeof(Str::value_type), "Invalid type");
+        static_assert(sizeof(T) == sizeof(typename Str::value_type), "Invalid type");
 		assign(str.data(), str.length());
 		return *this;
 	}

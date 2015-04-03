@@ -78,11 +78,37 @@ struct BlendDesc
 	{}
 };
 
+enum WindingOrder
+{
+    winding_cw,
+    winding_ccw
+};
+
+enum CullMode
+{
+    cull_none,
+    cull_front,
+    cull_back,
+    cull_front_and_back
+};
+
+struct RasterizerDesc
+{
+    CullMode cull;
+    WindingOrder order;
+
+    RasterizerDesc() :
+        // TODO: the default cull value should be cull_back
+        cull(cull_none), order(winding_ccw)
+    {}
+};
+
 struct RenderStateDesc
 {
 	DepthDesc depth;
 	StencilDesc stencil;
 	BlendDesc blend;
+    RasterizerDesc rasterizer;
 };
 
 class RenderStateImpl

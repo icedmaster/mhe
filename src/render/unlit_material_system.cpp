@@ -10,7 +10,6 @@ namespace mhe {
 
 bool UnlitMaterialSystem::init(Context& context, const MaterialSystemContext& material_system_context)
 {
-	StandartGeometryLayout::init(context);
 	set_layout(StandartGeometryLayout::handle);
 
 	if (!context.shader_manager.get(shader(), material_system_context.shader_name))

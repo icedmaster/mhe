@@ -7,6 +7,8 @@
 	<material name="posteffect_simple" shader="gbuffer_draw" priority="6" />
   <material name="depth_write" shader="depth_write" priority="3" />
   </materials>
+  <skybox name="skybox" />
+  <shadowmap_depth_write name="depth_write" />
   <gbuffer>
 	<fill name="gbuffer_fill" />
 	<use name="gbuffer_draw" />

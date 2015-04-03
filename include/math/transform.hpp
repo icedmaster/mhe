@@ -40,6 +40,14 @@ public:
 		scale_.set(1, 1, 1);
 	}
 
+	void set(const vec3& position, const quatf& rotation, const vec3& scale = vec3(1, 1, 1))
+	{
+		position_ = position;
+		rotation_ = rotation;
+		scale_ = scale;
+		update();
+	}
+
 	void translate_to(const vec3& position)
 	{
 		position_ = position;
@@ -93,8 +101,9 @@ public:
 
 	mat4x4 view() const
 	{
-		const vec3& pos = position();
-		return (quatf(0.0f, 1.0f, 0.0f, 0.0) * rotation_).to_matrix<mat4x4>() * mat4x4::translation_matrix(-pos);
+        mat4x4 res;
+        res.set_lookAt(position_, position_ + transform_.forward_vector(), vec3::up());
+        return res;
 	}
 private:
 	void update()

@@ -20,9 +20,18 @@ public:
 		plane_transform.translate_by(mhe::vec3(0, 0, -20));
         plane.receive_shadow = true;
 
+		mhe::NodeInstance& floor = engine.scene().create_node();
+        mhe::utils::create_plane(floor, engine.context());
+		mhe::Transform& floor_transform = engine.scene().transform_pool().get(floor.transform_id).transform;
+		floor_transform.scale_to(mhe::vec3(50, 50, 50));
+		floor_transform.rotate_by(mhe::quatf(-mhe::pi_2, 0.0f, 0.0f));
+		floor_transform.translate_by(mhe::vec3(0.0f, -10.0f, 0.0f));
+        floor.receive_shadow = true;
+
 		mhe::GBufferFillMaterialSystem* material_system = engine.context().material_systems.get<mhe::GBufferFillMaterialSystem>();
         mhe::setup_node(node, material_system, engine.context(), engine.scene_context(), mhe::string("test.tga"));
         mhe::setup_node(plane, material_system, engine.context(), engine.scene_context(), mhe::string("test.tga"));
+		mhe::setup_node(floor, material_system, engine.context(), engine.scene_context(), mhe::string("test.tga"));
 
 		init_lighting(engine);
 		return true;
@@ -52,11 +61,11 @@ private:
 	{
         mhe::LightInstance& light_instance = engine.scene().create_light();
 		mhe::Light& light = light_instance.light;
-		light.shading().diffuse = mhe::color_green;
+		light.shading().diffuse = mhe::color_green * 0.5f;
 		light.shading().specular = mhe::color_white;
 		mhe::set_light_position(engine.scene_context(), light_instance.id, mhe::vec3(0, 20, 0));
 		mhe::set_light_rotation(engine.scene_context(), light_instance.id, mhe::quatf(-mhe::pi_2, 0.0f, 0.0f));
-		light.desc().spot.attenuation = 0.2f;
+		light.desc().spot.attenuation = 0.4f;
 		light.desc().spot.angle = mhe::deg_to_rad(30.0f);
 		light.desc().spot.angle_attenuation = 0.5f;
 		light.desc().spot.spot_shadowmap_projection_znear = 0.1f;
@@ -66,11 +75,11 @@ private:
 
         mhe::LightInstance& light_instance2 = engine.scene().create_light();
 		mhe::Light& light2 = light_instance2.light;
-		light2.shading().diffuse = mhe::color_blue;
+		light2.shading().diffuse = mhe::color_blue * 0.7f;
 		light2.shading().specular = mhe::color_white;
 		mhe::set_light_position(engine.scene_context(), light_instance2.id, mhe::vec3(0, 1, 20));
 		mhe::set_light_rotation(engine.scene_context(), light_instance2.id, mhe::quatf(0.0f, mhe::pi, 0.0f));
-		light2.desc().spot.attenuation = 0.2f;
+		light2.desc().spot.attenuation = 0.4f;
 		light2.desc().spot.angle = mhe::deg_to_rad(30.0f);
 		light2.desc().spot.angle_attenuation = 0.5f;
 		light2.desc().spot.spot_shadowmap_projection_znear = 0.1f;
@@ -86,28 +95,28 @@ private:
 	{
         mhe::LightInstance& light_instance = engine.scene().create_light();
 		mhe::Light& light = light_instance.light;
-		light.shading().diffuse = mhe::vec4(0.1f, 0.1f, 0.1f, 1.0f);
+		light.shading().diffuse = mhe::vec4(0.0f, 0.3f, 0.0f, 1.0f);
 		light.shading().specular = mhe::vec4(0.2f, 0.2f, 0.2f, 1.0f);
 		mhe::set_light_position(engine.scene_context(), light_instance.id, mhe::vec3(0, 100, 0));
 		mhe::set_light_rotation(engine.scene_context(), light_instance.id, mhe::quatf(-mhe::pi_2, 0.0f, 0.0f));
 		light.set_type(mhe::Light::directional);
 		light.desc().directional.directional_shadowmap_projection_znear = 0.1f;
 		light.desc().directional.directional_shadowmap_projection_zfar = 120.0f;
-		light.desc().directional.directional_shadowmap_projection_height = 10.0;
-		light.desc().directional.directional_shadowmap_projection_width = 10.0;
-		light.desc().cast_shadows = false;
+		light.desc().directional.directional_shadowmap_projection_height = 100.0;
+		light.desc().directional.directional_shadowmap_projection_width = 100.0;
+		light.desc().cast_shadows = true;
 
         mhe::LightInstance& light_instance2 = engine.scene().create_light();
 		mhe::Light& light2 = light_instance2.light;
-		light2.shading().diffuse = mhe::vec4(0.1f, 0.0f, 0.1f, 1.0f);
+		light2.shading().diffuse = mhe::vec4(0.0f, 0.0f, 0.3f, 1.0f);
 		light2.shading().specular = mhe::vec4(0.2f, 0.2f, 0.2f, 1.0f);
 		mhe::set_light_position(engine.scene_context(), light_instance2.id, mhe::vec3(0, 1, 100));
 		mhe::set_light_rotation(engine.scene_context(), light_instance2.id, mhe::quatf(0.0f, mhe::pi, 0.0f));
 		light2.set_type(mhe::Light::directional);
 		light2.desc().directional.directional_shadowmap_projection_znear = 0.1f;
 		light2.desc().directional.directional_shadowmap_projection_zfar = 120.0f;
-		light2.desc().directional.directional_shadowmap_projection_height = 10.0;
-		light2.desc().directional.directional_shadowmap_projection_width = 10.0;
+		light2.desc().directional.directional_shadowmap_projection_height = 100.0;
+		light2.desc().directional.directional_shadowmap_projection_width = 100.0;
 		light2.desc().cast_shadows = true;
 
 		directional_lights_[0] = light_instance.id;
@@ -173,6 +182,6 @@ int main(int /*argc*/, char** /*argv*/)
 	camera_parameters.znear = 0.1f;
 	camera_parameters.zfar = 100.0f;
 	app.engine().scene().set_camera_controller(new mhe::game::FPSCameraController(app.engine(), camera_parameters,
-		mhe::vec3(0, 1, 10), mhe::vec3(0, 1, 0), mhe::vec3::up()));
+		mhe::vec3(0, 1, 10), mhe::vec3(0, mhe::pi, 0)));
 	return app.run();
 }

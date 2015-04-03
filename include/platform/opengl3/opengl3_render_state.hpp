@@ -62,6 +62,21 @@ private:
 	Desc desc_;
 };
 
+class RasterizerState
+{
+public:
+    void init(const RasterizerDesc& desc);
+    void enable(OpenGL3ContextState& state) const;
+private:
+    struct Desc
+    {
+        GLenum cull;
+        GLenum winding;
+    };
+
+    Desc desc_;
+};
+
 class OpenGL3RenderState : public RenderStateImpl
 {
 public:
@@ -76,6 +91,7 @@ private:
 	DepthState depth_state_;
 	StencilState stencil_state_;
 	BlendState blend_state_;
+    RasterizerState rasterizer_state_;
 };
 
 }}

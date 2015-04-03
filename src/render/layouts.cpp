@@ -35,7 +35,7 @@ void StandartGeometryLayout::init(Context& context)
 	context.layout_pool.get(handle).init(desc);
 }
 
-uint16_t SkyboxLayout::handle = 0;
+uint16_t SkyboxLayout::handle = 1;
 
 void SkyboxLayout::init(Context& context)
 {
@@ -51,7 +51,7 @@ void SkyboxLayout::init(Context& context)
 	context.layout_pool.get(handle).init(desc);
 }
 
-uint16_t FullscreenLayout::handle = 0;
+uint16_t FullscreenLayout::handle = 2;
 
 void FullscreenLayout::init(Context& context)
 {
@@ -69,6 +69,31 @@ void FullscreenLayout::init(Context& context)
 	desc.layout[1].position = 1;
 
 	context.layout_pool.get(handle).init(desc);
+}
+
+uint16_t DebugLayout::handle = 3;
+
+void DebugLayout::init(Context& context)
+{
+    handle = context.layout_pool.create();
+    LayoutDesc desc;
+    desc.layout.resize(1);
+    desc.layout[0].offset = 0;
+    desc.layout[0].size = 3;
+    desc.layout[0].stride = sizeof(Vertex);
+    desc.layout[0].position = 0;
+
+    context.layout_pool.get(handle).init(desc);
+}
+
+bool init_standart_layouts(Context& context)
+{
+	StandartGeometryLayout::init(context);
+	SkyboxLayout::init(context);
+	FullscreenLayout::init(context);
+	DebugLayout::init(context);
+
+	return true;
 }
 
 }

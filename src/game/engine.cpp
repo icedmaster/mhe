@@ -137,41 +137,20 @@ void Engine::update()
     render_context_.tick = utils::get_current_time();
     render_context_.fdelta = utils::get_last_delta();
     scene_.update(render_context_);
-    update_materials(render_context_);
+	renderer_->update(render_context_, scene_.scene_context());
 }
 
 void Engine::render()
 {
 	ProfilerElement pe("engine.render");
-	context_.driver.begin_render();
-	context_.driver.clear_color();
-	context_.driver.clear_depth();
+	renderer_->render(render_context_, scene_.scene_context());
 
-    context_.driver.render(context_, render_context_.draw_calls.data(), render_context_.draw_calls.size());
 	if (game_scene_ != nullptr)
 		game_scene_->draw(*this);
-	{
-		ProfilerElement end_render_pe("driver.end_render");
-		context_.driver.end_render();
-	}
-	{
-		ProfilerElement swap_buffers_pe("window_system.swap_buffers");
-		context_.window_system.swap_buffers();
-	}
 
+	renderer_->flush();
+	
     render_context_.draw_calls.clear();
-}
-
-void Engine::update_materials(RenderContext& render_context)
-{
-    update_nodes(context_, render_context, scene_.scene_context());
-
-	const MaterialSystems::Values &systems = context_.material_systems.get_all_materials();
-
-    for (size_t i = 0; i < systems.size(); ++i)
-        systems[i]->setup_draw_calls(context_, scene_.scene_context(), render_context);
-
-    sort_draw_calls(context_, render_context);
 }
 
 }}

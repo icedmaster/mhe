@@ -72,11 +72,31 @@ void BlendState::enable(OpenGL3ContextState& state) const
     state.blend = desc_.enabled;
 }
 
+void RasterizerState::init(const RasterizerDesc& desc)
+{
+    desc_.cull = get_cull_mode(desc.cull);
+    desc_.winding = get_winding_order(desc.order);
+}
+
+void RasterizerState::enable(OpenGL3ContextState& state) const
+{
+    NOT_IMPLEMENTED(state);
+    if (desc_.cull == GL_NONE)
+        glDisable(GL_CULL_FACE);
+    else
+	{
+        glEnable(GL_CULL_FACE);
+		glFrontFace(desc_.winding);
+		glCullFace(desc_.cull);
+	}
+}
+
 bool OpenGL3RenderState::init(const RenderStateDesc& desc)
 {
 	depth_state_.init(desc.depth);
 	stencil_state_.init(desc.stencil);
 	blend_state_.init(desc.blend);
+    rasterizer_state_.init(desc.rasterizer);
 	return true;
 }
 
@@ -93,6 +113,7 @@ void OpenGL3RenderState::enable(OpenGL3ContextState& state) const
     depth_state_.enable(state);
     stencil_state_.enable(state);
     blend_state_.enable(state);
+    rasterizer_state_.enable(state);
 }
 
 void OpenGL3RenderState::disable() const

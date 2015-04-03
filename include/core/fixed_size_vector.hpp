@@ -101,8 +101,11 @@ public:
 
 	~fixed_size_vector()
 	{
+		destroy_impl();
 		if (begin_ != elements_)
+		{
 			delete [] begin_;
+		}
 	}
 
 	// accessors
@@ -222,6 +225,12 @@ public:
 			reallocate_vector(capacity);
 	}
 
+	void fill(const T& value)
+	{
+		for (size_t i = 0; i < capacity_; ++i)
+			begin_[i] = value;
+	}
+
 	// erasing
 
 	void clear()
@@ -282,6 +291,12 @@ public:
 		return !(*this == other);
 	}
 private:
+	void destroy_impl()
+	{
+		for (size_t i = 0; i < capacity_; ++i)
+			begin_[i].~T();
+	}
+
 	iterator insert_impl(size_t index, const T& value)
 	{
 		if ((size_ + 1) > capacity_)

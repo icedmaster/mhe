@@ -13,9 +13,10 @@ struct AABBInstance
 {
 	POOL_STRUCT(uint16_t);
 	AABBf aabb;
-	bool visible;
+    bool visible : 1;
+    bool enabled : 1;
 
-	AABBInstance() : id(invalid_id) {}
+    AABBInstance() : id(invalid_id), enabled(true) {}
 };
 
 struct TransformInstance
@@ -36,9 +37,10 @@ struct NodeInstance
 	AABBInstance::IdType aabb_id;
     bool cast_shadow : 1;
     bool receive_shadow : 1;
+    bool enabled : 1;
 
     NodeInstance() : id(invalid_id), transform_id(TransformInstance::invalid_id), aabb_id(AABBInstance::invalid_id),
-    cast_shadow(false), receive_shadow(false)
+    cast_shadow(true), receive_shadow(true), enabled(true)
     {}
 };
 

@@ -31,9 +31,13 @@ struct RenderContext
 	mat4x4 inv_vp;
 	vec3 viewpos;
 
+    UniformBuffer::IdType percamera_uniform;
+
 	uint32_t tick;
 	uint32_t delta;
 	float fdelta;
+
+    RenderContext() : percamera_uniform(UniformBuffer::invalid_id) {}
 };
 
 const size_t max_textures_per_model = 8;

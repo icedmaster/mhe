@@ -10,7 +10,6 @@ namespace mhe {
 
 bool PosteffectSimpleMaterialSystem::init(Context& context, const MaterialSystemContext& material_system_context)
 {
-	FullscreenLayout::init(context);
 	set_layout(FullscreenLayout::handle);
 
     if (!context.shader_manager.get(shader(), material_system_context.shader_name))
@@ -77,6 +76,7 @@ void PosteffectSimpleMaterialSystem::update(Context& context, SceneContext& /*sc
             continue;
         material.textures[j] = textures_[j];
     }
+	material.uniforms[0] = render_context.percamera_uniform;
     setup_draw_call(render_context.draw_calls.add(), mesh_.instance_parts[0], mesh_.mesh.parts[0]);
 }
 

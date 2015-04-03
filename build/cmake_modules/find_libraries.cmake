@@ -1,5 +1,7 @@
 #output all libs in MHE_LIBS_FOUND
 
+# switch MHE_NEEDS_QT
+
 macro(mhe_find_libraries)
 
   if (NOT DONT_FIND_LIBS)
@@ -89,21 +91,23 @@ macro(mhe_find_libraries)
 	endif()
 
 	# find Qt
-	set(QT_USE_QTOPENGL TRUE)
-	set(DESIRED_QT_VERSION 4)
-	find_package(Qt)
-	if (QT_FOUND)
-	  message("Find Qt libraries")
-	  add_definitions(-DMHE_HAS_QT)
-	  set(MHE_QT_FOUND TRUE)
-	  include(${QT_USE_FILE})
-	  add_definitions(${QT_DEFINITIONS})
-	  file(GLOB MHE_QT_HEADERS ${PLATFORM_IMPL_HEADERS}/qt/*.hpp)
-	  qt4_wrap_cpp(QT_HEADERS_MOC ${MHE_QT_HEADERS})
-	  set(ADDITIONAL_SOURCES ${ADDITIONAL_SOURCES} ${QT_HEADERS_MOC})
-	  set(MHE_LIBS_FOUND ${MHE_LIBS_FOUND} ${QT_LIBRARIES})
-	else()
-	  message("Qt libs not found")
+	if (MHE_NEEDS_QT)
+	  set(QT_USE_QTOPENGL TRUE)
+	  set(DESIRED_QT_VERSION 4)
+	  find_package(Qt)
+	  if (QT_FOUND)
+		message("Found Qt libraries")
+		add_definitions(-DMHE_HAS_QT)
+		set(MHE_QT_FOUND TRUE)
+		include(${QT_USE_FILE})
+		add_definitions(${QT_DEFINITIONS})
+		file(GLOB MHE_QT_HEADERS ${PLATFORM_IMPL_HEADERS}/qt/*.hpp)
+		qt4_wrap_cpp(QT_HEADERS_MOC ${MHE_QT_HEADERS})
+		set(ADDITIONAL_SOURCES ${ADDITIONAL_SOURCES} ${QT_HEADERS_MOC})
+		set(MHE_LIBS_FOUND ${MHE_LIBS_FOUND} ${QT_LIBRARIES})
+	  else()
+		message("Qt libs not found")
+	  endif()
 	endif()
 
 	# find libpng

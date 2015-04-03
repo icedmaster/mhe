@@ -1,6 +1,7 @@
 #include "impl/video_driver_factory.hpp"
 
 #include "platform/platform.hpp"
+#include "core/algorithm.hpp"
 
 namespace mhe {
 
@@ -29,7 +30,7 @@ std::vector<std::string> VideoDriverFactory::available_drivers_list() const
 
 std::string VideoDriverFactory::set_next_driver()
 {
-	drvvec::iterator it = std::find(drivers_.begin(), drivers_.end(), current_driver_factory_);
+    drvvec::iterator it = mhe::find(drivers_.begin(), drivers_.end(), current_driver_factory_);
 	if (it == drivers_.begin())
 		return std::string();
 	current_driver_factory_ = *(--it);

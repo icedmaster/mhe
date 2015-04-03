@@ -10,7 +10,6 @@ namespace mhe {
 
 bool SkyboxMaterialSystem::init(Context& context, const MaterialSystemContext& material_system_context)
 {
-	SkyboxLayout::init(context);
 	set_layout(SkyboxLayout::handle);
 
 	if (!context.shader_manager.get(shader(), material_system_context.shader_name))

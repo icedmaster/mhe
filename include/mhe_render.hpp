@@ -13,6 +13,7 @@
 #include "render/shader_program.hpp"
 #include "render/texture.hpp"
 #include "render/render_globals.hpp"
+#include "render/deferred_renderer.hpp"
 #include "render/view.hpp"
 #include "render/depth_write_material_system.hpp"
 #include "render/skybox_material_system.hpp"

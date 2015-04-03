@@ -13,8 +13,13 @@ struct Light
 	vec4 position; // w - attenuation
 	vec4 direction; // w - angle attenuation for SPOT
 	mat4 lightvp;
+    mat4 lightw;
 	vec4 shadowmap_params;	// x - shadowmap bias
 };
+
+#define SPOT_LIGHT_ANGLE(light) light.diffuse.w
+#define OMNI_LIGHT_RADIUS(light) light.diffuse.w
+#define LIGHT_ATTENUATION(light) light.position.w
 
 vec3 lambert(vec3 diffuse, vec3 material_diffuse, vec3 lightdir, vec3 normal, float attenuation)
 {
@@ -52,8 +57,8 @@ vec3 lit_blinn(Light light, vec3 pos, vec3 normal, vec3 viewdir)
 	vec3 lightray = light.position.xyz - pos;
 	vec3 lightdir = normalize(lightray);
 	float raylength = length(lightray);
-	float attenuation_coeff = light.position.w;
-	float attenuation = 1.0f / ( attenuation_coeff * attenuation_coeff * raylength );
+	float attenuation_coeff = LIGHT_ATTENUATION(light);
+	float attenuation = 1.0f / (attenuation_coeff * attenuation_coeff * raylength);
 #endif
 
 #if LIGHT_TYPE == SPOT_LIGHT

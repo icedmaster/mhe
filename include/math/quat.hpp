@@ -2,6 +2,7 @@
 #define __QUAT_HPP__
 
 #include <ostream>
+#include <cmath>
 
 namespace mhe {
 
@@ -28,6 +29,12 @@ public:
 	quat(float xangle, float yangle, float zangle)
 	{
 		set_euler(xangle, yangle, zangle);
+	}
+
+	template <class V>
+	quat(const V& axis, float angle)
+	{
+		set_rotation<V>(axis, angle);
 	}
 
 	T x() const
@@ -87,11 +94,13 @@ public:
 		const float sy = ::sin(ay * 0.5f);
 		const float cz = ::cos(az * 0.5f);
 		const float sz = ::sin(az * 0.5f);
-		T nx = cx * cy * sz - sx * sy * cz;
-		T ny = cx * sy * cz + sx * cy * sz;
-		T nz = sx * cy * cz - cx * sy * sz;
-		T nw = cx * cy * cz + sx * sy * sz;
-		set(nx, ny, nz, nw);
+
+		quat<T> qx(sz, 0.0f, 0.0f, cz);
+		quat<T> qy(0.0f, sy, 0.0f, cy);
+		quat<T> qz(0.0f, 0.0f, sx, cx);
+
+		// TODO: optimize it
+		*this = qx * qz * qy;
 	}
 
 	void euler(float& xangle, float& yangle, float& zangle) const
@@ -101,16 +110,16 @@ public:
 		const float z_sqr = q_[2] * q_[2];
 		const float w_sqr = q_[3] * q_[3];
 
-		zangle = ::atan( 2 * (w() * z() + y() * x()) / (1 - 2 * (z_sqr + y_sqr)) );
+		xangle = ::atan2( 2 * (w() * z() + y() * x()), (1 - 2 * (z_sqr + y_sqr)) );
 		yangle = ::asin( 2 * (w() * y() - x() * z()) );
-		xangle = ::atan( 2 * (w() * x() + z() * y()) / (1 - 2 * (y_sqr + x_sqr)) );
+		zangle = ::atan2( 2 * (w() * x() + z() * y()), (1 - 2 * (y_sqr + x_sqr)) );
 	}
 
     template <class V>
     void set_rotation(const V& axis, float angle)
     {
-        const float s = ::sin(angle);
-        const float c = ::cos(angle);
+        const float s = ::sin(angle * 0.5f);
+        const float c = ::cos(angle * 0.5f);
         q_[0] = axis.x() * s;
         q_[1] = axis.y() * s;
         q_[2] = axis.z() * s;
@@ -162,6 +171,19 @@ public:
 		T nz = other.w() * z() + w() * other.z() + (x() * other.y() - y() * other.x());
 		T nw = w() * other.w() - (x() * other.x() + y() * other.y() + z() * other.z());
 		set(nx, ny, nz, nw);
+		return *this;
+	}
+
+	template <class U>
+	quat& operator= (const quat<U>& other)
+	{
+		set(other.x(), other.y(), other.z(), other.w());
+		return *this;
+	}
+
+	quat& operator= (const quat& other)
+	{
+		set(other.x(), other.y(), other.z(), other.w());
 		return *this;
 	}
 

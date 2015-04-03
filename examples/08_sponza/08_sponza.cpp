@@ -69,16 +69,16 @@ private:
 	{
         mhe::LightInstance& light_instance = engine.scene().create_light();
 		mhe::Light& light = light_instance.light;
-		light.shading().diffuse = mhe::vec4(0.1f, 0.1f, 0.1f, 1.0f);
-		light.shading().specular = mhe::vec4(0.1f, 0.1f, 0.1f, 1.0f);
-		mhe::set_light_position(engine.scene_context(), light_instance.id, mhe::vec3(0, 500, 0));
-		mhe::set_light_rotation(engine.scene_context(), light_instance.id, mhe::quatf(-mhe::pi_2, 0.0f, mhe::deg_to_rad(15.0f)));
+		light.shading().diffuse = mhe::vec4(0.5f, 0.5f, 0.5f, 1.0f);
+		light.shading().specular = mhe::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+		mhe::set_light_position(engine.scene_context(), light_instance.id, mhe::vec3(0, 2000, 0));
+		mhe::set_light_rotation(engine.scene_context(), light_instance.id, mhe::quatf(-mhe::pi_2, 0.0f, 0.0f));
 		light.set_type(mhe::Light::directional);
 		light.desc().directional.directional_shadowmap_projection_znear = 0.1f;
-		light.desc().directional.directional_shadowmap_projection_zfar = 120.0f;
-		light.desc().directional.directional_shadowmap_projection_height = 10.0;
-		light.desc().directional.directional_shadowmap_projection_width = 10.0;
-		light.desc().cast_shadows = false;
+		light.desc().directional.directional_shadowmap_projection_zfar = 2100.0f;
+		light.desc().directional.directional_shadowmap_projection_height = 2000.0;
+		light.desc().directional.directional_shadowmap_projection_width = 2000.0;
+		light.desc().cast_shadows = true;
 		light_instance.enabled = true;
 	}
 
@@ -141,7 +141,7 @@ int main(int /*argc*/, char** /*argv*/)
 	camera_parameters.znear = 0.1f;
 	camera_parameters.zfar = 5000.0f;
 	mhe::game::FPSCameraController* camera_controller = new mhe::game::FPSCameraController(app.engine(), camera_parameters,
-		mhe::vec3(0, 1, 10), mhe::vec3(0, 1, 0), mhe::vec3::up());
+		mhe::vec3(0, 10, 10), mhe::vec3(mhe::deg_to_rad(30.0f), mhe::pi_2, 0));
 	camera_controller->set_move_speed(500.0f);
 	app.engine().scene().set_camera_controller(camera_controller);
 	return app.run();

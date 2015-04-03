@@ -10,6 +10,8 @@
 namespace mhe {
 namespace app {
 
+struct RendererParams;
+
 class MHE_EXPORT Application : public ref_counter
 {
 public:
@@ -60,7 +62,7 @@ private:
 
 	void init_render(const ApplicationConfig& config);
 	void init_materials(pugi::xml_node materials_node);
-	void init_gbuffer(pugi::xml_node gbuffer_node);
+    void init_gbuffer(pugi::xml_node gbuffer_node, const RendererParams& params);
 
     void add_delegates();
     bool on_system_event(const Event* event);

@@ -64,6 +64,11 @@ public:
 		return get_impl<MaterialSystem>(hash(name));
 	}
 
+    MaterialSystem* get(const string& name) const
+    {
+        return get(name.c_str());
+    }
+
 	MaterialSystem* get(uint8_t id) const
 	{
 		ASSERT(id < systems_.size(), "Invalid material_id " << id);
