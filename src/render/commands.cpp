@@ -18,4 +18,11 @@ void ClearCommand::reset()
     executed_ = false;
 }
 
+bool ClearCommandSimple::execute()
+{
+	ASSERT(driver_ != nullptr, "You must setup the driver first");
+	driver_->clear(true, true, true, vec4(0.0, 0.0, 0.0, 0.0));
+	return true;
+}
+
 }

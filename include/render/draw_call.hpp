@@ -11,8 +11,9 @@ struct DrawCall
     MaterialInstance material;
     RenderData render_data;
     RenderCommand* command;
+	uint8_t pass;
 
-    DrawCall() : draw_call_data(DrawCallData::invalid_id), command(nullptr) {}
+    DrawCall() : draw_call_data(DrawCallData::invalid_id), command(nullptr), pass(0) {}
 };
 
 }

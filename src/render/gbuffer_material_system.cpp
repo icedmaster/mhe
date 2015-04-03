@@ -34,15 +34,6 @@ bool GBufferFillMaterialSystem::init(Context& context, const MaterialSystemConte
 	if (!context.shader_manager.get(shader(), material_system_context.shader_name))
 		return false;
 
-	transform_uniform_ = context.uniform_pool.create();
-	UniformBuffer& uniform = context.uniform_pool.get(transform_uniform_);
-	UniformBufferDesc uniform_buffer_desc;
-	create_uniform_buffer_element(uniform_buffer_desc, "vp", mat4x4::identity());
-	uniform_buffer_desc.name = "transform";
-	uniform_buffer_desc.program = &default_program(context);
-	if (!uniform.init(uniform_buffer_desc))
-		return false;
-
 	render_target_ = context.render_target_pool.create();
 	RenderTarget& render_target = context.render_target_pool.get(render_target_);
 	if (!gbuffer_desc_.width) gbuffer_desc_.width = context.window_system.width();
@@ -68,14 +59,14 @@ void GBufferFillMaterialSystem::update(Context& context, SceneContext& scene_con
     MATERIAL_UPDATE_WITH_COMMAND(context, scene_context, render_context, update, &clear_command_);
 }
 
-void GBufferFillMaterialSystem::update(Context& context, SceneContext& /*scene_context*/, RenderContext& render_context, MeshPartInstance* /*nodes*/, size_t /*count*/)
+void GBufferFillMaterialSystem::update(Context& context, SceneContext& /*scene_context*/, RenderContext& render_context, MeshPartInstance* nodes, size_t count)
 {
-	TransformSimpleData transform_data;
-	transform_data.vp = render_context.vp;
-	UniformBuffer& uniform = context.uniform_pool.get(transform_uniform_);
-	uniform.update(transform_data);
-
     clear_command_.reset();
+	for (size_t i = 0; i < count; ++i)
+	{
+		Material& material = context.materials[id()].get(nodes[i].material.id);
+		material.uniforms[perframe_data_unit] = render_context.percamera_uniform;
+	}
 }
 
 void GBufferFillMaterialSystem::setup_uniforms(Material& material, Context& /*context*/, SceneContext& /*scene_context*/, const MeshPartInstance& /*part*/, const ModelContext& model_context)

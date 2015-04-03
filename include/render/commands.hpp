@@ -22,6 +22,19 @@ private:
     bool executed_;
 };
 
+class MHE_EXPORT ClearCommandSimple : public RenderCommand
+{
+public:
+	void set_driver(Driver* driver)
+	{
+		driver_ = driver;
+	}
+
+    bool execute();
+private:
+	Driver* driver_;
+};
+
 }
 
 #endif

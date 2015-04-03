@@ -19,8 +19,11 @@ namespace
         DrawCallSortHelper(const Context& context) : context_(context) {}
         bool operator() (const DrawCall& dc1, const DrawCall& dc2) const
         {
-            return context_.material_systems.get(dc1.material.material_system)->priority() <
-                   context_.material_systems.get(dc2.material.material_system)->priority();
+			MaterialSystem* ms1 = context_.material_systems.get(dc1.material.material_system);
+			MaterialSystem* ms2 = context_.material_systems.get(dc2.material.material_system);
+			if (ms1->priority() == ms2->priority())
+				return dc1.pass < dc2.pass;
+            return ms1->priority() < ms2->priority();
         }
 
         const Context& context_;
@@ -88,18 +91,22 @@ Renderer::Renderer(Context& context) :
 
 void Renderer::update(RenderContext& render_context, SceneContext& scene_context)
 {
-    TransformData data;
+    PerCameraData data;
     data.vp = render_context.vp;
     data.inv_vp = render_context.inv_vp;
     data.inv_proj = render_context.proj.inverted();
     data.viewpos = vec4(render_context.viewpos, 0.0f);
+
+	// TODO:
+	data.ambient = vec4(0.1f, 0.1f, 0.1f, 0.0f);
+
     if (render_context.percamera_uniform == UniformBuffer::invalid_id)
     {
         UniformBuffer& buffer = create_and_get(context_.uniform_pool);
         render_context.percamera_uniform = buffer.id();
         UniformBufferDesc desc;
         desc.unit = perframe_data_unit;
-        desc.size = sizeof(TransformData);
+        desc.size = sizeof(PerCameraData);
         buffer.init(desc);
     }
     UniformBuffer& buffer = context_.uniform_pool.get(render_context.percamera_uniform);

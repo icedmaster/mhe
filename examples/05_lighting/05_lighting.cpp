@@ -59,7 +59,7 @@ private:
 		mhe::set_light_rotation(engine.scene_context(), light_instance.id, mhe::quatf(-mhe::pi_2, 0.0f, 0.0f));
 		light.desc().spot.attenuation = 0.2f;
 		light.desc().spot.angle = mhe::deg_to_rad(30.0f);
-		light.desc().spot.angle_attenuation = 0.5f;
+		light.desc().spot.angle_attenuation = 1.5f;
 
         mhe::LightInstance& light_instance2 = engine.scene().create_light();
 		mhe::Light& light2 = light_instance2.light;
@@ -69,7 +69,7 @@ private:
 		mhe::set_light_rotation(engine.scene_context(), light_instance2.id, mhe::quatf(0.0f, mhe::pi, 0.0f));
 		light2.desc().spot.attenuation = 0.2f;
 		light2.desc().spot.angle = mhe::deg_to_rad(30.0f);
-		light2.desc().spot.angle_attenuation = 0.5f;
+		light2.desc().spot.angle_attenuation = 1.5f;
 
 		spot_lights_[0] = light_instance.id;
 		spot_lights_[1] = light_instance2.id;
@@ -83,7 +83,7 @@ private:
 		light.shading().specular = mhe::color_white;
 		mhe::set_light_position(engine.scene_context(), light_instance.id, mhe::vec3(0, 3, 0));
         light.desc().omni.radius = 1.5f;
-		light.desc().omni.omni_attenuation = 0.9f;
+		light.desc().omni.omni_attenuation = 2.0f;
 		light.set_type(mhe::Light::omni);
 
         mhe::LightInstance& light_instance2 = engine.scene().create_light();
@@ -92,7 +92,7 @@ private:
 		light2.shading().specular = mhe::color_white;
 		mhe::set_light_position(engine.scene_context(), light_instance2.id, mhe::vec3(0, 0, 3));
         light2.desc().omni.radius = 1.5f;
-		light2.desc().omni.omni_attenuation = 0.9f;
+		light2.desc().omni.omni_attenuation = 2.0f;
 		light2.set_type(mhe::Light::omni);
 
 		omni_lights_[0] = light_instance.id;

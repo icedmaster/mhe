@@ -75,7 +75,7 @@ out vec4 color;
 #define PCF_TAPS 3
 #endif
 
-#define PCF_DIVIDER (1.0f / (PCF_TAPS * 2 + 1))
+#define PCF_DIVIDER (1.0f / ((PCF_TAPS * 2 + 1) * (PCF_TAPS * 2 + 1)))
 
 float get_shadow_value(sampler2D tex, float pixel_depth, vec2 texcoord, float bias)
 {
@@ -129,5 +129,5 @@ void main()
 	}
 #endif
 
-	color = vec4(result, shadow_value);
+	color = vec4(result * shadow_value, 0.0f);
 }

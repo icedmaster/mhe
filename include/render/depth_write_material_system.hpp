@@ -25,12 +25,16 @@ public:
     void setup(Context& context, SceneContext& scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count) override;
 private:
     void update(Context& context, SceneContext& scene_context, RenderContext& render_context);
-	bool init_draw_call_data(Context& context);
+	bool init_light_data(Context& context);
 
-	ClearCommand clear_command_;
-	UniformBuffer::IdType uniform_;
-	DrawCallData::IdType draw_call_data_;
-	TextureInstance shadowmap_;
+	static const size_t default_number_of_shadowcasters = 8;
+
+	fixed_size_vector<ClearCommand, default_number_of_shadowcasters> clear_commands_;
+	fixed_size_vector<UniformBuffer::IdType, default_number_of_shadowcasters> uniforms_;
+	fixed_size_vector<DrawCallData::IdType, default_number_of_shadowcasters> draw_call_data_;
+	fixed_size_vector<TextureInstance, default_number_of_shadowcasters> shadowmaps_;
+	fixed_size_vector<RenderState::IdType, default_number_of_shadowcasters> render_states_;
+	fixed_size_vector<RenderTarget::IdType, default_number_of_shadowcasters> render_targets_;
 };
 
 }

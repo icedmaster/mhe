@@ -40,7 +40,7 @@ struct NodeInstance
     bool enabled : 1;
 
     NodeInstance() : id(invalid_id), transform_id(TransformInstance::invalid_id), aabb_id(AABBInstance::invalid_id),
-    cast_shadow(false), receive_shadow(false), enabled(true)
+    cast_shadow(true), receive_shadow(true), enabled(true)
     {}
 };
 

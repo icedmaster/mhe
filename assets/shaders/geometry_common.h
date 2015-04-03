@@ -1,10 +1,11 @@
-[uniform transform 0 perframe]
-uniform transform
+[uniform percamera 0 perframe]
+uniform percamera
 {
     mat4 vp;
     mat4 inv_vp;
     mat4 inv_proj;
     vec4 viewpos;
+	vec4 ambient;
 };
 
 [vertex]

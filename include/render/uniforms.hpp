@@ -10,12 +10,13 @@ struct TransformSimpleData
 	mat4x4 vp;
 };
 
-struct TransformData
+struct PerCameraData
 {
 	mat4x4 vp;
     mat4x4 inv_vp;
 	mat4x4 inv_proj;
 	vec4 viewpos;
+	vec4 ambient;
 };
 
 struct PerModelSimpleData
