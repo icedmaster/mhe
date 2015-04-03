@@ -47,10 +47,20 @@ void GBufferFillMaterialSystem::close()
 void GBufferFillMaterialSystem::setup(Context& context, SceneContext& scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count)
 {
     standart_material_setup(context, scene_context, instance_parts, parts, model_contexts, count);
+
+	UberShader& shader = ubershader(context);
+	const UberShader::Info& normalmap_info = shader.info("NORMALMAP");
+
 	for (size_t i = 0; i < count; ++i)
 	{
         DrawCallData& draw_call_data = context.draw_call_data_pool.get(instance_parts[i].draw_call_data);
 		draw_call_data.render_target = render_target_;
+		Material& material = context.materials[id()].get(instance_parts[i].material.id);
+		size_t use_normalmap = material.textures[normal_texture_unit].id != Texture::invalid_id ? 1 : 0;
+
+		UberShader::Index index;
+		index.set(normalmap_info, use_normalmap);
+		material.shader_program = shader.get(index);
 	}
 }
 

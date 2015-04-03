@@ -46,7 +46,7 @@ void main()
 #if NORMALMAP == 0
 	normal = vec4(normalize(vsoutput.nrm), 1.0f);
 #else
-	vec3 normal_tngspace = texture(normalmap_texture, vsoutput.tex).xyz;
+	vec3 normal_tngspace = texture(normalmap_texture, vsoutput.tex).xyz * 2.0f - 1.0f;
 	vec3 normal_wspace = vsoutput.tng * normal_tngspace.x + vsoutput.bitng * normal_tngspace.y + vsoutput.nrm * normal_tngspace.z;
 	normal = vec4(normal_wspace, 1.0f);
 #endif
