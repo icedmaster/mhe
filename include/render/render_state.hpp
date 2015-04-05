@@ -122,7 +122,7 @@ public:
 
 class MHE_EXPORT RenderState
 {
-	POOL_ELEMENT_METHODS(uint16_t);
+    POOL_ELEMENT_METHODS(uint16_t)
 public:
 	RenderState();
 	~RenderState()

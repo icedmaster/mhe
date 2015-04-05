@@ -5,7 +5,7 @@
 	private: Type id_;													\
 public: void set_id(Type id) { id_ = id; }								\
 	Type id() const { return id_; }										\
-	typedef Type IdType;															\
+    typedef Type IdType;												\
 	static const Type invalid_id = static_cast<Type>(-1);
 
 #define POOL_STRUCT(Type)														\

@@ -16,11 +16,11 @@ bool DepthWriteMaterialSystem::init(Context& context, const MaterialSystemContex
 	if (!init_default(context, material_system_context))
 		return false;
 
-	uniforms_.fill(UniformBuffer::invalid_id);
-	draw_call_data_.fill(DrawCallData::invalid_id);
-	shadowmaps_.fill(TextureInstance());
-	render_states_.fill(RenderState::invalid_id);
-	render_targets_.fill(RenderTarget::invalid_id);
+    uniforms_.fill(static_cast<UniformBuffer::IdType>(UniformBuffer::invalid_id));
+    draw_call_data_.fill(static_cast<DrawCallData::IdType>(DrawCallData::invalid_id));
+    shadowmaps_.fill(TextureInstance());
+    render_states_.fill(static_cast<RenderState::IdType>(RenderState::invalid_id));
+    render_targets_.fill(static_cast<RenderTarget::IdType>(RenderTarget::invalid_id));
 
 	return true;
 }
@@ -57,8 +57,8 @@ bool DepthWriteMaterialSystem::init_light_data(Context& context)
 		desc.use_stencil = false;
 		desc.depth_datatype = format_float;
 		desc.depth_format = format_d24f;
-		desc.width = context.window_system.width();
-		desc.height = context.window_system.height();
+        desc.width = context.window_system.width();
+        desc.height = context.window_system.height();
 		if (!render_target.init(context, desc)) return false;
 
 		render_targets_.push_back(render_target.id());

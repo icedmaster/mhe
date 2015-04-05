@@ -57,7 +57,7 @@ public:
 class MHE_EXPORT RenderBuffer
 {
 	friend class Driver;
-	POOL_ELEMENT_METHODS(uint16_t);
+    POOL_ELEMENT_METHODS(uint16_t)
 public:
 	RenderBuffer();
 	bool init(BufferUpdateType type, const uint8_t* data, size_t size, size_t element_size)
@@ -81,7 +81,7 @@ private:
 class MHE_EXPORT IndexBuffer
 {
 	friend class Driver;
-	POOL_ELEMENT_METHODS(uint16_t);
+    POOL_ELEMENT_METHODS(uint16_t)
 public:
 	IndexBuffer();
 
@@ -119,7 +119,7 @@ struct LayoutDesc
 class MHE_EXPORT Layout
 {
 	friend class Driver;
-	POOL_ELEMENT_METHODS(uint16_t);
+    POOL_ELEMENT_METHODS(uint16_t)
 public:
 	Layout();
 	bool init(const LayoutDesc& desc)
@@ -181,7 +181,7 @@ inline void create_uniform_buffer_element(UniformBufferDesc& desc, const char* n
 class MHE_EXPORT UniformBuffer
 {
 	friend class Driver;
-	POOL_ELEMENT_METHODS(uint16_t);
+    POOL_ELEMENT_METHODS(uint16_t)
 public:
 	UniformBuffer();
 	bool init(const UniformBufferDesc& desc)

@@ -98,7 +98,7 @@ private:
 		light.shading().diffuse = mhe::vec4(0.0f, 0.3f, 0.0f, 1.0f);
 		light.shading().specular = mhe::vec4(0.2f, 0.2f, 0.2f, 1.0f);
 		mhe::set_light_position(engine.scene_context(), light_instance.id, mhe::vec3(0, 100, 0));
-		mhe::set_light_rotation(engine.scene_context(), light_instance.id, mhe::quatf(-mhe::pi_2, 0.0f, 0.0f));
+        mhe::set_light_rotation(engine.scene_context(), light_instance.id, mhe::quatf(-mhe::pi_2, 0.0f, 0.0f));
 		light.set_type(mhe::Light::directional);
 		light.desc().directional.directional_shadowmap_projection_znear = 0.1f;
 		light.desc().directional.directional_shadowmap_projection_zfar = 120.0f;

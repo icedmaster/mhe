@@ -42,7 +42,7 @@ public:
 
 class MHE_EXPORT RenderTarget
 {
-	POOL_ELEMENT_METHODS(uint16_t);
+    POOL_ELEMENT_METHODS(uint16_t)
 public:
 	RenderTarget();
 

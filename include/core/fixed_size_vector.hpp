@@ -101,7 +101,6 @@ public:
 
 	~fixed_size_vector()
 	{
-		destroy_impl();
 		if (begin_ != elements_)
 		{
 			delete [] begin_;
@@ -291,12 +290,6 @@ public:
 		return !(*this == other);
 	}
 private:
-	void destroy_impl()
-	{
-		for (size_t i = 0; i < capacity_; ++i)
-			begin_[i].~T();
-	}
-
 	iterator insert_impl(size_t index, const T& value)
 	{
 		if ((size_ + 1) > capacity_)
