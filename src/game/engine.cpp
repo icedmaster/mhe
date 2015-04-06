@@ -59,6 +59,7 @@ bool Engine::init(uint width, uint height, uint bpp, bool fullscreen)
 		ERROR_LOG("Driver initialization failed");
 		return false;
 	}
+	context_.driver.set_window_size(context_.window_system.screen_size());
 	INFO_LOG("Driver has been initialized");
 
   context_.window_system.view()->set_events_handler(new BaseViewEventsHandler(this));

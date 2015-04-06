@@ -16,6 +16,8 @@ bool DepthWriteMaterialSystem::init(Context& context, const MaterialSystemContex
 	if (!init_default(context, material_system_context))
 		return false;
 
+	// It seems we can't pass a static member as a reference
+	// (http://stackoverflow.com/questions/272900/vectorpush-back-odr-uses-the-value-causing-undefined-reference-to-static-clas?lq=1)
     uniforms_.fill(static_cast<UniformBuffer::IdType>(UniformBuffer::invalid_id));
     draw_call_data_.fill(static_cast<DrawCallData::IdType>(DrawCallData::invalid_id));
     shadowmaps_.fill(TextureInstance());
@@ -46,6 +48,7 @@ bool DepthWriteMaterialSystem::init_light_data(Context& context)
 		RenderState& render_state = create_and_get(context.render_state_pool);
 		RenderStateDesc render_state_desc;
 		render_state_desc.depth.enabled = true;
+		render_state_desc.viewport.viewport.set(0, 0, shadowmap_default_width, shadowmap_default_height);
 		if (!render_state.init(render_state_desc)) return false;
 		render_states_.push_back(render_state.id());
 
@@ -57,8 +60,8 @@ bool DepthWriteMaterialSystem::init_light_data(Context& context)
 		desc.use_stencil = false;
 		desc.depth_datatype = format_float;
 		desc.depth_format = format_d24f;
-        desc.width = context.window_system.width();
-        desc.height = context.window_system.height();
+        desc.width = shadowmap_default_width;
+        desc.height = shadowmap_default_height;
 		if (!render_target.init(context, desc)) return false;
 
 		render_targets_.push_back(render_target.id());
@@ -86,7 +89,7 @@ void DepthWriteMaterialSystem::setup(Context& /*context*/, SceneContext& /*scene
 
 void DepthWriteMaterialSystem::update(Context& context, SceneContext& scene_context, RenderContext& render_context)
 {
-	// clear() resets only counter but not really destroys the elements of the vector
+	// clear() resets only counter but doesn't really destroy the elements of the vector
 	clear_commands_.clear();
 	uniforms_.clear();
 	draw_call_data_.clear();

@@ -88,10 +88,13 @@ public:
     void enable(OpenGL3ContextState& state) const;
 	void disable() const;
 private:
+	void set_viewport(OpenGL3ContextState& state, const rect<int>& viewport) const;
+
 	DepthState depth_state_;
 	StencilState stencil_state_;
 	BlendState blend_state_;
     RasterizerState rasterizer_state_;
+	rect<int> viewport_;
 };
 
 }}

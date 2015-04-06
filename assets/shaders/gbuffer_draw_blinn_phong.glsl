@@ -129,5 +129,5 @@ void main()
 	}
 #endif
 
-	color = vec4(result, shadow_value);
+	color = vec4(result * shadow_value, 0.0f);
 }

@@ -97,6 +97,7 @@ bool OpenGL3RenderState::init(const RenderStateDesc& desc)
 	stencil_state_.init(desc.stencil);
 	blend_state_.init(desc.blend);
     rasterizer_state_.init(desc.rasterizer);
+	viewport_ = desc.viewport.viewport;
 	return true;
 }
 
@@ -114,9 +115,21 @@ void OpenGL3RenderState::enable(OpenGL3ContextState& state) const
     stencil_state_.enable(state);
     blend_state_.enable(state);
     rasterizer_state_.enable(state);
+	if (viewport_.is_empty())
+		set_viewport(state, rect<int>(0, 0, state.window_size.x(), state.window_size.y()));
+	else
+		set_viewport(state, viewport_);
 }
 
 void OpenGL3RenderState::disable() const
 {}
+
+void OpenGL3RenderState::set_viewport(OpenGL3ContextState& state, const rect<int>& viewport) const
+{
+	if (state.viewport == viewport)
+		return;
+	glViewport(viewport.ll().x(), viewport.ll().y(), viewport.width(), viewport.height());
+	state.viewport = viewport;
+}
 
 }}
