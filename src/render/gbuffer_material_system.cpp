@@ -233,8 +233,9 @@ void GBufferDrawMaterialSystem::update(Context& context, SceneContext& scene_con
         data.diffuse = light.shading().diffuse;
         data.diffuse.set_w(light.type() == Light::spot ? light.spot_angle_coeff() : light.angle());
         data.specular = light.shading().specular;
+				data.specular.set_w(light.attenuation_b());
         const vec3& light_position = get_light_position(scene_context, render_context.lights[i].id);
-        data.position = vec4(light_position.x(), light_position.y(), light_position.z(), light.attenuation());
+        data.position = vec4(light_position.x(), light_position.y(), light_position.z(), light.attenuation_a());
         const vec3& light_direction = get_light_direction(scene_context, render_context.lights[i].id);
         data.direction = vec4(light_direction.x(), light_direction.y(), light_direction.z(), light.angle_attenuation());
         type = light.type();

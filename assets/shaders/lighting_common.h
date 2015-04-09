@@ -9,8 +9,8 @@
 struct Light
 {
 	vec4 diffuse; // w - angle for SPOT light, radius for OMNI
-	vec4 specular;
-	vec4 position; // w - attenuation
+	vec4 specular; // w - attenuation a
+	vec4 position; // w - attenuation b
 	vec4 direction; // w - angle attenuation for SPOT
 	mat4 lightvp;
     mat4 lightw;
@@ -19,7 +19,8 @@ struct Light
 
 #define SPOT_LIGHT_ANGLE(light) light.diffuse.w
 #define OMNI_LIGHT_RADIUS(light) light.diffuse.w
-#define LIGHT_ATTENUATION(light) light.position.w
+#define LIGHT_ATTENUATION(light) light.specular.w
+#define LIGHT_ATTENUATION_SQ(light) light.position.w
 
 vec3 lambert(vec3 diffuse, vec3 material_diffuse, vec3 lightdir, vec3 normal, float attenuation)
 {
@@ -57,11 +58,10 @@ vec3 lit_blinn(Light light, vec3 pos, vec3 normal, vec3 viewdir)
 	vec3 lightray = light.position.xyz - pos;
 	vec3 lightdir = normalize(lightray);
 	float raylength = length(lightray);
-	float attenuation_coeff = LIGHT_ATTENUATION(light);
-	float attenuation = 1.0f / (attenuation_coeff * attenuation_coeff * raylength);
 #endif
 
 #if LIGHT_TYPE == SPOT_LIGHT
+	float attenuation = 1.0f / (1.0f + LIGHT_ATTENUATION(light) * raylength + LIGHT_ATTENUATION_SQ(light) * raylength * raylength);
 	float angle = light.diffuse.w;
 	float falloff = saturate(dot(lightdir, light_direction));
 	float angle_attenuation = pow(falloff, light.direction.w);
@@ -70,6 +70,7 @@ vec3 lit_blinn(Light light, vec3 pos, vec3 normal, vec3 viewdir)
 
 #if LIGHT_TYPE == POINT_LIGHT
 	float radius = light.diffuse.w;
+	float attenuation = saturate(1.0f - raylength * raylength / (radius * radius));
 	attenuation = raylength <= radius ? attenuation : 0.0f;
 #endif
 

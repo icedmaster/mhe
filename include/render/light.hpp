@@ -13,7 +13,8 @@ struct LightDesc
 	struct Spot
 	{
 		float angle;
-		float attenuation;
+		float attenuation_a;
+		float attenuation_b;
 		float angle_attenuation;
 
 		float spot_shadowmap_unused1;
@@ -26,6 +27,7 @@ struct LightDesc
 	{
 		float radius;
 		float omni_attenuation;
+		float omni_attenuation_unused;
 		float omni_unused1;
 
 		float omni_shadowmap_unused1;
@@ -39,6 +41,7 @@ struct LightDesc
 		float directional_unused1;
 		float directional_unused2;
 		float directional_unused3;
+		float directional_unused4;
 
 		float directional_shadowmap_projection_width;
 		float directional_shadowmap_projection_height;
@@ -118,16 +121,22 @@ public:
 		return desc_;
 	}
 
-	float attenuation() const
+	float attenuation_a() const
 	{
 		switch (type_)
 		{
 		case spot:
-			return desc_.spot.attenuation;
+			return desc_.spot.attenuation_a;
 		case omni:
 			return desc_.omni.omni_attenuation;
-		default: return 1.0f;
+		default: return 0.0f;
 		}
+	}
+
+	float attenuation_b() const
+	{
+		if (type_ == spot) return desc_.spot.attenuation_b;
+		return 1.0f;
 	}
 
 	float angle() const

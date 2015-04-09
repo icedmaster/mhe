@@ -77,6 +77,7 @@ out vec4 color;
 
 #define PCF_DIVIDER (1.0f / ((PCF_TAPS * 2 + 1) * (PCF_TAPS * 2 + 1)))
 
+#pragma optionNV (unroll all)
 float get_shadow_value(sampler2D tex, float pixel_depth, vec2 texcoord, float bias)
 {
 	float shadow_value = 0.0f;
