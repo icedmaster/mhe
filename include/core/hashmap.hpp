@@ -3,6 +3,7 @@
 
 #include "fixed_size_vector.hpp"
 #include "hash.hpp"
+#include "allocator.hpp"
 
 namespace mhe {
 
@@ -131,7 +132,11 @@ public:
 	typedef Iterator<this_type, CurrentTraits, false> iterator;
 	typedef Iterator<this_type, CurrentTraits, true> const_iterator;
 public:
-	hashmap() : buckets_(Buckets), size_(0) {}
+	hashmap(allocator* alloc = default_allocator()) : buckets_(Buckets, alloc), size_(0)
+	{
+		for (size_t i = 0; i < buckets_.size(); ++i)
+			buckets_[i].set_allocator(alloc);
+	}
 
 	const_iterator begin() const
 	{
@@ -299,6 +304,7 @@ private:
 	
 	fixed_size_vector< fixed_size_vector<Node, BucketSize>, Buckets > buckets_;
 	size_t size_; // cached
+	allocator* allocator_;
 };
 
 }

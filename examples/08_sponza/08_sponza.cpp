@@ -39,7 +39,8 @@ private:
 		light.shading().specular = mhe::color_white;
 		mhe::set_light_position(engine.scene_context(), light_instance.id, mhe::vec3(0, 20, 0));
 		mhe::set_light_rotation(engine.scene_context(), light_instance.id, mhe::quatf(-mhe::pi_2, 0.0f, 0.0f));
-		light.desc().spot.attenuation = 0.2f;
+		light.desc().spot.attenuation_a = 0.2f;
+		light.desc().spot.attenuation_b = 0.1f;
 		light.desc().spot.angle = mhe::deg_to_rad(30.0f);
 		light.desc().spot.angle_attenuation = 0.5f;
 		light.desc().spot.spot_shadowmap_projection_znear = 0.1f;
@@ -53,7 +54,8 @@ private:
 		light2.shading().specular = mhe::color_white;
 		mhe::set_light_position(engine.scene_context(), light_instance2.id, mhe::vec3(0, 1, 20));
 		mhe::set_light_rotation(engine.scene_context(), light_instance2.id, mhe::quatf(0.0f, mhe::pi, 0.0f));
-		light2.desc().spot.attenuation = 0.2f;
+		light2.desc().spot.attenuation_a = 0.2f;
+		light2.desc().spot.attenuation_b = 0.2f;
 		light2.desc().spot.angle = mhe::deg_to_rad(30.0f);
 		light2.desc().spot.angle_attenuation = 0.5f;
 		light2.desc().spot.spot_shadowmap_projection_znear = 0.1f;
