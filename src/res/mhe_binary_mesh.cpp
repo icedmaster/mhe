@@ -98,15 +98,21 @@ bool load_mesh_version1(Mesh& mesh, std::istream& stream, const Context* context
     return detail::init_mesh(mesh, vertexes, indexes, context);
 }
 
-void load_texture(TextureExportData& texture_data, std::istream& stream)
+template <class Str>
+void load_string(Str& str, std::istream& stream)
 {
 	uint32_t len;
 	stream.read(reinterpret_cast<char*>(&len), 4);
 	if (len != 0)
 	{
-		stream.read(texture_data.name.buffer(), len);
-		texture_data.name.resize(len);
+		stream.read(str.buffer(), len);
+		str.resize(len);
 	}
+}
+
+void load_texture(TextureExportData& texture_data, std::istream& stream)
+{
+	load_string(texture_data.name, stream);
 	stream.read(reinterpret_cast<char*>(&texture_data.mode), 1);
 }
 
@@ -131,12 +137,20 @@ bool load_mesh_version2(Mesh& mesh, std::istream& stream, const Context* context
 	std::vector<MaterialExportData> material_data(materials_number);
 	for (size_t i = 0; i < materials_number; ++i)
 	{
-		char type;
-		stream.read(&type, 1);
-		ASSERT(type == 'a', "Invalid material data");
+		FilePath material_name;
+		load_string(material_name, stream);
+		string material_system_name;
+		load_string(material_system_name, stream);
+		string lighting_model;
+		load_string(lighting_model, stream);
+		MaterialRenderData material_render_data;
+		stream.read(reinterpret_cast<char*>(&material_render_data), sizeof(MaterialRenderData));
+		NOT_IMPLEMENTED(material_name);
+		NOT_IMPLEMENTED(material_system_name);
+		NOT_IMPLEMENTED(lighting_model);
+		NOT_IMPLEMENTED(material_render_data);
+
 		load_texture(material_data[i].albedo_texture, stream);
-		stream.read(&type, 1);
-		ASSERT(type == 'n', "Invalid material data");
 		load_texture(material_data[i].normalmap_texture, stream);
 	}
 	// parts
