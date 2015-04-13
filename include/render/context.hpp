@@ -124,6 +124,7 @@ struct Context
 
 	MaterialSystems material_systems;
 	MaterialPool materials[max_material_systems_number];
+	MaterialManager material_manager;
 };
 
 }

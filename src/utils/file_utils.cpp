@@ -80,8 +80,7 @@ std::vector<std::string> read_lines(std::ifstream& stream)
 
 FilePath convert_slashes(const FilePath& fullpath)
 {
-	return utils::replace(
-		utils::replace(fullpath, FilePath("\\\\"), FilePath("/")), FilePath("\\"), FilePath("/"));
+	return utils::replace(fullpath, FilePath("\\"), FilePath("/"));
 }
 
 FilePath get_file_name_with_extension(const FilePath& fullpath)

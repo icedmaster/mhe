@@ -44,17 +44,10 @@ struct RenderData
 	{}
 };
 
-struct MaterialData
-{
-	FilePath albedo_texture;
-	FilePath normalmap_texture;
-	uint8_t layout;
-};
-
 struct MeshPart
 {
     RenderData render_data;
-	MaterialData material_data;
+	MaterialId material_id;
 };
 
 struct Mesh

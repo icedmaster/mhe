@@ -63,6 +63,11 @@ public:
 	{
 		renderer_ = renderer;
 	}
+
+	Renderer* renderer()
+	{
+		return renderer_.get();
+	}
 private:
 	void set_default_video_settings();
 	void setup_generated();

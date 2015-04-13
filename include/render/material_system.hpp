@@ -95,7 +95,6 @@ protected:
 	bool init_default(Context& context, const MaterialSystemContext& material_system_context);
 
     void standart_material_setup(Context& context, SceneContext& scene_context, MeshPartInstance* instance_parts, MeshPart* part, ModelContext* model_contexts, size_t count);
-    void setup_textures(Context& context, Material& material, const ModelContext& model_context);
 	Transform& transform(const NodeInstance& node, const SceneContext& scene_context) const;
 
     void empty_setup(Context& context, SceneContext& scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count);
