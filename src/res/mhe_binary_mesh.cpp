@@ -3,6 +3,8 @@
 #include "res/scene_export.hpp"
 #include "render/context.hpp"
 #include "render/layouts.hpp"
+#include "render/material.hpp"
+#include "render/uniforms.hpp"
 
 namespace mhe {
 
@@ -69,9 +71,13 @@ bool init_mesh(Mesh& mesh, uint8_t layout, const std::vector<Vertex>& vertexes, 
 		part.render_data.indexes_number = part_data.faces_number * 3;
 		part.render_data.layout = layout;
 
-		part.material_data.layout = layout;
-		part.material_data.albedo_texture = material_data.albedo_texture.name;
-		part.material_data.normalmap_texture = material_data.normalmap_texture.name;
+		MaterialInitializationData initialization_data;
+		initialization_data.name = material_data.name;
+		initialization_data.lighting_model = material_data.lighting_model;
+		initialization_data.render_data = material_data.data;
+		initialization_data.textures[albedo_texture_unit] = material_data.albedo_texture.name;
+		initialization_data.textures[normal_texture_unit] = material_data.normalmap_texture.name;
+		part.material_id = context->material_manager.get(initialization_data);
 
 		mesh.parts.push_back(part);
 	}

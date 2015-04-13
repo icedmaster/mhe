@@ -4,6 +4,7 @@
 #include "core/string.hpp"
 #include "core/hash.hpp"
 #include "core/ref_counter.hpp"
+#include "math/vector4.hpp"
 
 namespace mhe {
 
@@ -44,6 +45,11 @@ public:
     void set_skybox_material_system(MaterialSystem* material_system);
     void set_shadowmap_depth_write_material_system(MaterialSystem* material_system);
 
+	void set_ambient_color(const colorf& color)
+	{
+		ambient_color_ = color;
+	}
+
 	void flush();
 protected:
 	Context& context()
@@ -62,6 +68,8 @@ private:
 	// To implement
 	MaterialSystem* transparent_objects_material_system_;
 	MaterialSystem* particles_material_system_;
+
+	colorf ambient_color_;
 };
 
 bool init_render(Context& context);

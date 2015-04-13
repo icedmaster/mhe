@@ -45,35 +45,30 @@ void MaterialSystem::standart_material_setup(Context& context, SceneContext& sce
 		Material::IdType material_id = context.materials[id()].create();
 		Material& material = context.materials[id()].get(material_id);
 		material.shader_program = shader_id;
-        setup_uniforms(material, context, scene_context, instance_parts[i], model_contexts[i]);
+		setup_uniforms(material, context, scene_context, instance_parts[i], model_contexts[i]);
 
-        instance_parts[i].material.material_system = material_system_id;
-        instance_parts[i].material.id = material.id;
+		instance_parts[i].material.material_system = material_system_id;
+		instance_parts[i].material.id = material.id;
 
-        if (parts[i].render_data.layout == Layout::invalid_id)
-            parts[i].render_data.layout = layout_id;
+		MaterialData material_data;
+		if (!context.material_manager.get(material_data, parts[i].material_id))
+		{
+			ERROR_LOG("Can't find material with id:" << parts[i].material_id);
+			continue;
+		}
 
-        setup_textures(context, material, model_contexts[i]);
+		::memcpy(material.textures, material_data.textures, sizeof(TextureInstance) * material_textures_number);
+
+		if (parts[i].render_data.layout == Layout::invalid_id)
+			parts[i].render_data.layout = layout_id;
 
 		DrawCallData& draw_call_data = create_and_get(context.draw_call_data_pool);
 		RenderState& render_state = create_and_get(context.render_state_pool);
 		RenderStateDesc desc;
 		render_state.init(desc);
 		draw_call_data.state = render_state.id();
-        instance_parts[i].draw_call_data = draw_call_data.id;
+		instance_parts[i].draw_call_data = draw_call_data.id;
 	}
-}
-
-void MaterialSystem::setup_textures(Context& context, Material& material, const ModelContext& model_context)
-{
-    for (size_t i = 0; i < max_color_textures; ++i)
-    {
-        if (model_context.color_textures[i].empty()) continue;
-        context.texture_manager.get(material.textures[albedo_texture_unit + i], model_context.color_textures[i]);
-    }
-
-    if (!model_context.normal_texture.empty())
-        context.texture_manager.get(material.textures[normal_texture_unit], model_context.normal_texture);
 }
 
 Transform& MaterialSystem::transform(const NodeInstance& node, const SceneContext& scene_context) const

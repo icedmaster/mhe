@@ -67,6 +67,7 @@ bool Engine::init(uint width, uint height, uint bpp, bool fullscreen)
 	context_.shader_manager.set_context(&context_);
 	context_.mesh_manager.set_context(&context_);
 	context_.texture_manager.set_context(&context_);
+	context_.material_manager.set_context(&context_);
 
 	set_default_video_settings();
 

@@ -75,8 +75,6 @@ void setup_node(NodeInstance& node, MaterialSystem* material_system, Context& co
                 const string& albedo_texture_name, const string& normalmap_texture_name)
 {
     ModelContext model_context;
-    model_context.color_textures[0] = albedo_texture_name;
-    model_context.normal_texture = normalmap_texture_name;
     model_context.transform_uniform = node.mesh.shared_uniform;
     material_system->setup(context, scene_context, &node.mesh.instance_parts[0], &node.mesh.mesh.parts[0], &model_context, 1);
 }
@@ -86,7 +84,8 @@ Renderer::Renderer(Context& context) :
     skybox_material_system_(nullptr),
     shadowmap_depth_write_material_system_(nullptr),
     transparent_objects_material_system_(nullptr),
-    particles_material_system_(nullptr)
+    particles_material_system_(nullptr),
+		ambient_color_(0.1f, 0.1f, 0.1f, 0.1f)
 {}
 
 void Renderer::update(RenderContext& render_context, SceneContext& scene_context)
@@ -98,7 +97,7 @@ void Renderer::update(RenderContext& render_context, SceneContext& scene_context
     data.viewpos = vec4(render_context.viewpos, 0.0f);
 
 	// TODO:
-	data.ambient = vec4(0.1f, 0.1f, 0.1f, 0.0f);
+	data.ambient = ambient_color_;
 
     if (render_context.percamera_uniform == UniformBuffer::invalid_id)
     {
@@ -176,8 +175,6 @@ bool load_node(NodeInstance& node, const string& name, hash_type material_system
 	for (size_t i = 0; i < node.mesh.instance_parts.size(); ++i)
 	{
 		ModelContext& model_context = model_contexts[i];
-		model_context.color_textures[0] = node.mesh.mesh.parts[i].material_data.albedo_texture;
-		model_context.normal_texture = node.mesh.mesh.parts[i].material_data.normalmap_texture;
 		model_context.transform_uniform = node.mesh.shared_uniform;
 	}
 	material_system->setup(context, scene_context, &node.mesh.instance_parts[0], &node.mesh.mesh.parts[0], &model_contexts[0], node.mesh.instance_parts.size());

@@ -4,6 +4,7 @@
 #include "core/types.hpp"
 #include "core/string.hpp"
 #include "math/vector3.hpp"
+#include "render/material.hpp" // MaterialRenderData
 
 namespace mhe {
 
@@ -19,15 +20,6 @@ struct TextureExportData
 {
 	FilePath name;
 	uint8_t mode;
-};
-
-struct MaterialRenderData
-{
-	vec3 diffuse;
-	vec3 ambient;
-	vec3 specular;
-	vec3 emissive;
-	float specular_shininess;
 };
 
 struct MaterialExportData

@@ -133,6 +133,8 @@ int main(int /*argc*/, char** /*argv*/)
 	config.render_config_filename = mhe::utils::path_join(config.assets_path, "render.xml");
 	app.init(config);
 
+	app.engine().renderer()->set_ambient_color(mhe::color_white * 0.5f);
+
 	mhe::game::GameSceneDesc desc;
 	GameScene* game_scene = new GameScene;
 	game_scene->init(app.engine(), desc);
