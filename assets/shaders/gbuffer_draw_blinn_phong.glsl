@@ -97,18 +97,21 @@ float get_shadow_value(sampler2D tex, float pixel_depth, vec2 texcoord, float bi
 
 void main()
 {
+	// TODO: add pack and unpack methods
 #ifndef FULLSCREEN_LAYOUT
 	vec2 tex = vsoutput.pos.xy / vsoutput.pos.w * 0.5f + 0.5f;
 #else
 	vec2 tex = vsoutput.tex;
 #endif
-	vec3 normal = texture(normal_texture, tex).xyz;
+	vec4 normal_data = texture(normal_texture, tex);
+	vec3 normal = normal_data.xyz;
+	float shininess = normal_data.w;
 	float depth = texture(depth_texture, tex).x;
 
 	vec3 pos = position_from_depth(tex, depth, inv_vp);
 	vec3 viewdir = normalize(viewpos.xyz - pos);
 
-	vec3 result = lit_blinn(light, pos, normal, viewdir);
+	vec3 result = lit_blinn(light, pos, normal, viewdir, shininess);
 
 	float shadow_value = 1.0f;
 #if SHADOWMAP == 1

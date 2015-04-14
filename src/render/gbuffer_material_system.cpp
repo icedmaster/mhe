@@ -61,6 +61,29 @@ void GBufferFillMaterialSystem::setup(Context& context, SceneContext& scene_cont
 		UberShader::Index index;
 		index.set(normalmap_info, use_normalmap);
 		material.shader_program = shader.get(index);
+
+		UniformBufferDesc uniform_buffer_desc;
+		uniform_buffer_desc.unit = material_data_unit;
+		uniform_buffer_desc.update_type = uniform_buffer_static;
+		uniform_buffer_desc.size = sizeof(PhongMaterialData);
+		UniformBuffer& uniform = create_and_get(context.uniform_pool);
+		if (!uniform.init(uniform_buffer_desc))
+		{
+			WARN_LOG("Can't initialize material uniform");
+		}
+		else
+		{
+			material.uniforms[material_data_unit] = uniform.id();
+			MaterialData material_data;
+			if (!context.material_manager.get(material_data, parts[i].material_id))
+			{
+				WARN_LOG("Can't find a material with id:" << parts[i].material_id);
+			}
+			PhongMaterialData shader_material_data;
+			shader_material_data.diffuse = vec4(material_data.render_data.diffuse, 1.0f);
+			shader_material_data.specular = vec4(material_data.render_data.specular, material_data.render_data.specular_shininess);
+			uniform.update(shader_material_data);
+		}
 	}
 }
 
