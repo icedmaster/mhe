@@ -41,7 +41,7 @@ vec3 blinn(vec3 specular, vec3 material_specular, vec3 lightdir, vec3 normal, ve
 	return specular * material_specular * pow(vdotr, shininess) * enable * attenuation;
 }
 
-vec3 lit_blinn(Light light, vec3 pos, vec3 normal, vec3 viewdir)
+vec3 lit_blinn(Light light, vec3 pos, vec3 normal, vec3 viewdir, float shininess)
 {
 #if LIGHT_TYPE != POINT_LIGHT
 	#ifdef LIGHT_DIRECTION_FROM_SOURCE
@@ -75,5 +75,5 @@ vec3 lit_blinn(Light light, vec3 pos, vec3 normal, vec3 viewdir)
 #endif
 
 	return lambert(light.diffuse.rgb, vec3(1.0f), lightdir, normal, attenuation) + 
-		blinn(light.specular.rgb, vec3(1.0f), lightdir, normal, viewdir, 50.0f, attenuation);
+		blinn(light.specular.rgb, vec3(1.0f), lightdir, normal, viewdir, shininess, attenuation);
 }

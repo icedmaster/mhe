@@ -74,9 +74,16 @@ void sort_draw_calls(const Context& context, RenderContext& render_context)
 void setup_node(NodeInstance& node, MaterialSystem* material_system, Context& context, SceneContext& scene_context,
                 const string& albedo_texture_name, const string& normalmap_texture_name)
 {
-    ModelContext model_context;
-    model_context.transform_uniform = node.mesh.shared_uniform;
-    material_system->setup(context, scene_context, &node.mesh.instance_parts[0], &node.mesh.mesh.parts[0], &model_context, 1);
+	MaterialInitializationData initialization_data;
+	initialization_data.name = "mat_" + albedo_texture_name + normalmap_texture_name;
+	initialization_data.textures[albedo_texture_unit] = albedo_texture_name;
+	initialization_data.textures[normal_texture_unit] = normalmap_texture_name;
+	initialization_data.render_data.specular_shininess = 50.0f;
+
+	node.mesh.mesh.parts[0].material_id = context.material_manager.get(initialization_data);
+	ModelContext model_context;
+	model_context.transform_uniform = node.mesh.shared_uniform;
+	material_system->setup(context, scene_context, &node.mesh.instance_parts[0], &node.mesh.mesh.parts[0], &model_context, 1);
 }
 
 Renderer::Renderer(Context& context) :

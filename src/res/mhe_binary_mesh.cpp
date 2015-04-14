@@ -143,19 +143,10 @@ bool load_mesh_version2(Mesh& mesh, std::istream& stream, const Context* context
 	std::vector<MaterialExportData> material_data(materials_number);
 	for (size_t i = 0; i < materials_number; ++i)
 	{
-		FilePath material_name;
-		load_string(material_name, stream);
-		string material_system_name;
-		load_string(material_system_name, stream);
-		string lighting_model;
-		load_string(lighting_model, stream);
-		MaterialRenderData material_render_data;
-		stream.read(reinterpret_cast<char*>(&material_render_data), sizeof(MaterialRenderData));
-		NOT_IMPLEMENTED(material_name);
-		NOT_IMPLEMENTED(material_system_name);
-		NOT_IMPLEMENTED(lighting_model);
-		NOT_IMPLEMENTED(material_render_data);
-
+		load_string(material_data[i].name, stream);
+		load_string(material_data[i].material_system, stream);
+		load_string(material_data[i].lighting_model, stream);
+		stream.read(reinterpret_cast<char*>(&material_data[i].data), sizeof(MaterialRenderData));
 		load_texture(material_data[i].albedo_texture, stream);
 		load_texture(material_data[i].normalmap_texture, stream);
 	}
