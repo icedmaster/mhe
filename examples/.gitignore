@@ -7,7 +7,7 @@
 /06_performance/build/*
 /07_shadowmap/build/*
 /08_sponza/build/*
-/09_qt/build/*
+/09_reflections/build/*
 /10_3d_basic/build/*
 /11_material/build/*
 /13_logo/build/*
@@ -21,7 +21,7 @@
 !/06_performance/build/CMakeLists.txt
 !/07_shadowmap/build/CMakeLists.txt
 !/08_sponza/build/CMakeLists.txt
-!/09_qt/build/CMakeLists.txt
+!/09_reflections/build/CMakeLists.txt
 !/10_3d_basic/build/CMakeLists.txt
 !/11_material/build/CMakeLists.txt
 !/13_logo/build/CMakeLists.txt

@@ -96,6 +96,7 @@ private:
 	RenderTarget::IdType render_target_;
 	RenderTarget::IdType light_buffer_render_target_;
 	TextureInstance light_buffer_texture_;
+	TextureInstance albedo_texture_;
     TextureInstance normal_texture_;
     TextureInstance depth_texture_;
 	UniformBuffer::IdType light_uniform_[max_lights_number];

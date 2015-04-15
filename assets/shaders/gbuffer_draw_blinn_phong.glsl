@@ -1,6 +1,7 @@
 [defs LIGHT_TYPE 0 2]
 [defs SHADOWMAP 0 1]
 [defs SHADOWMAP_QUALITY 0 2]
+[defs CUBEMAP 0 1]
 
 #define LIGHT_DIRECTION_FROM_SOURCE
 
@@ -55,10 +56,15 @@ void main()
 
 [fragment]
 
-[sampler2D normal_texture 0]
-[sampler2D depth_texture 1]
+[sampler2D albedo_texture 0]
+[sampler2D normal_texture 1]
+[sampler2D depth_texture 2]
 #if SHADOWMAP == 1
 [sampler2D shadowmap_texture 5]
+#endif
+
+#if CUBEMAP == 1
+[samplerCube env_cubemap 6]
 #endif
 
 in VSOutput vsoutput;
@@ -111,7 +117,15 @@ void main()
 	vec3 pos = position_from_depth(tex, depth, inv_vp);
 	vec3 viewdir = normalize(viewpos.xyz - pos);
 
-	vec3 result = lit_blinn(light, pos, normal, viewdir, shininess);
+	#if CUBEMAP == 1
+	float glossiness = texture(albedo_texture, tex).w;
+	vec3 cubemap_refl = texture(env_cubemap, reflect(-viewdir, normal)).rgb * glossiness * 2.0f; // Looks better with mul by 2.0f
+	#else
+	vec3 cubemap_refl = vec3(0.0f, 0.0f, 0.0f);
+	#endif
+
+
+	vec3 result = lit_blinn(light, pos, normal, viewdir, shininess, cubemap_refl);
 
 	float shadow_value = 1.0f;
 #if SHADOWMAP == 1

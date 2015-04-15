@@ -75,6 +75,7 @@ bool init_mesh(Mesh& mesh, uint8_t layout, const std::vector<Vertex>& vertexes, 
 		initialization_data.name = material_data.name;
 		initialization_data.lighting_model = material_data.lighting_model;
 		initialization_data.render_data = material_data.data;
+		initialization_data.render_data.glossiness = default_glossiness;
 		initialization_data.textures[albedo_texture_unit] = material_data.albedo_texture.name;
 		initialization_data.textures[normal_texture_unit] = material_data.normalmap_texture.name;
 		part.material_id = context->material_manager.get(initialization_data);
