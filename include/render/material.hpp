@@ -50,7 +50,11 @@ struct MaterialRenderData
 	vec3 specular;
 	vec3 emissive;
 	float specular_shininess;
+	float glossiness;
 };
+
+const float default_shininess = 50.0f;
+const float default_glossiness = 0.5f;
 
 struct MaterialData
 {

@@ -45,8 +45,7 @@ bool SkyboxMaterialSystem::init_mesh(Context& context, const MaterialSystemConte
         return false;
     }
 
-    TextureInstance skybox_texture;
-    if (!context.texture_manager.get(skybox_texture, texture_name))
+    if (!context.texture_manager.get(skybox_texture_, texture_name))
     {
         ERROR_LOG("Can't get skybox texture with name:" << texture_name);
         return false;
@@ -57,6 +56,7 @@ bool SkyboxMaterialSystem::init_mesh(Context& context, const MaterialSystemConte
     Material& material = context.materials[id()].get(skybox_mesh_.instance_parts[0].material.id);
     material.shader_program = ubershader(context).get_default();
     material.uniforms[0] = transform_uniform_;
+		material.textures[0] = skybox_texture_;
     skybox_mesh_.mesh.parts[0].render_data.layout = SkyboxLayout::handle;
 
     RenderStateDesc render_state_desc;
@@ -91,6 +91,8 @@ void SkyboxMaterialSystem::update(Context& context, SceneContext& /*scene_contex
 	uniform.update(uniform_buffer_desc);
 
     setup_draw_call(render_context.draw_calls.add(), skybox_mesh_.instance_parts[0], skybox_mesh_.mesh.parts[0]);
+
+	render_context.space_grid.set_global_cubemap(skybox_texture_);
 }
 
 }

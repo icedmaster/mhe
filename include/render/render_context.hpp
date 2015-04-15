@@ -15,6 +15,23 @@ struct NodeInstance;
 
 typedef fixed_capacity_vector<DrawCall, max_scene_dips_number> DrawCalls;
 
+// It's just a temporary implementation
+class SpaceGrid
+{
+public:
+	void set_global_cubemap(const TextureInstance& cubemap)
+	{
+		global_cubemap_ = cubemap;
+	}
+
+	const TextureInstance& global_cubemap() const
+	{
+		return global_cubemap_;
+	}
+private:
+	TextureInstance global_cubemap_;
+};
+
 struct RenderContext
 {
     DrawCalls draw_calls;
@@ -36,6 +53,8 @@ struct RenderContext
 	uint32_t tick;
 	uint32_t delta;
 	float fdelta;
+
+	SpaceGrid space_grid;
 
     RenderContext() : percamera_uniform(UniformBuffer::invalid_id) {}
 };

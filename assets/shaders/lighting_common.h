@@ -22,13 +22,13 @@ struct Light
 #define LIGHT_ATTENUATION(light) light.specular.w
 #define LIGHT_ATTENUATION_SQ(light) light.position.w
 
-vec3 lambert(vec3 diffuse, vec3 material_diffuse, vec3 lightdir, vec3 normal, float attenuation)
+vec3 lambert(vec3 diffuse, vec3 material_diffuse, vec3 lightdir, vec3 normal)
 {
 	float ndotl = dot(lightdir, normal);
-	return diffuse * material_diffuse * saturate(ndotl) * attenuation;
+	return diffuse * material_diffuse * saturate(ndotl);
 }
 
-vec3 blinn(vec3 specular, vec3 material_specular, vec3 lightdir, vec3 normal, vec3 viewdir, float shininess, float attenuation)
+vec3 blinn(vec3 specular, vec3 material_specular, vec3 lightdir, vec3 normal, vec3 viewdir, float shininess, vec3 env_color)
 {
 	float ndotl = dot(lightdir, normal);
 	float enable = ndotl > 0.0f ? 1.0f : 0.0f;
@@ -38,10 +38,10 @@ vec3 blinn(vec3 specular, vec3 material_specular, vec3 lightdir, vec3 normal, ve
 	vec3 reflected = -lightdir + 2.0f * ndotl * normal;
 	float vdotr = saturate(dot(viewdir, reflected));
 
-	return specular * material_specular * pow(vdotr, shininess) * enable * attenuation;
+	return (specular + env_color) * material_specular * pow(vdotr, shininess) * enable;
 }
 
-vec3 lit_blinn(Light light, vec3 pos, vec3 normal, vec3 viewdir, float shininess)
+vec3 lit_blinn(Light light, vec3 pos, vec3 normal, vec3 viewdir, float shininess, vec3 env_color)
 {
 #if LIGHT_TYPE != POINT_LIGHT
 	#ifdef LIGHT_DIRECTION_FROM_SOURCE
@@ -74,6 +74,6 @@ vec3 lit_blinn(Light light, vec3 pos, vec3 normal, vec3 viewdir, float shininess
 	attenuation = raylength <= radius ? attenuation : 0.0f;
 #endif
 
-	return lambert(light.diffuse.rgb, vec3(1.0f), lightdir, normal, attenuation) + 
-		blinn(light.specular.rgb, vec3(1.0f), lightdir, normal, viewdir, shininess, attenuation);
+	return lambert(light.diffuse.rgb, vec3(1.0f), lightdir, normal) * attenuation + 
+		blinn(light.specular.rgb, vec3(1.0f), lightdir, normal, viewdir, shininess, env_color) * attenuation;
 }

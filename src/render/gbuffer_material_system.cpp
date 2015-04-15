@@ -82,6 +82,7 @@ void GBufferFillMaterialSystem::setup(Context& context, SceneContext& scene_cont
 			PhongMaterialData shader_material_data;
 			shader_material_data.diffuse = vec4(material_data.render_data.diffuse, 1.0f);
 			shader_material_data.specular = vec4(material_data.render_data.specular, material_data.render_data.specular_shininess);
+			shader_material_data.params = vec4(material_data.render_data.glossiness, 0.0f, 0.0f, 0.0f);
 			uniform.update(shader_material_data);
 		}
 	}
@@ -224,6 +225,7 @@ void GBufferDrawMaterialSystem::set_render_target(Context& context, RenderTarget
     const TextureInstance* textures = nullptr;
     size_t number = render_target.color_textures(&textures);
     ASSERT(number != 0, "Invalid render target");
+		albedo_texture_ = textures[0];
     normal_texture_ = textures[1];
     TextureInstance depth_texture;
     number = render_target.depth_texture(depth_texture);
@@ -244,6 +246,11 @@ void GBufferDrawMaterialSystem::update(Context& context, SceneContext& scene_con
 {
     context.materials[id()].clear();
     clear_command_.reset();
+
+		size_t use_cubemap = 0;
+		const TextureInstance& cubemap_texture = render_context.space_grid.global_cubemap();
+		if (cubemap_texture.id != Texture::invalid_id)
+			use_cubemap = 1;
 
     for (size_t i = 0; i < render_context.lights_number; ++i)
     {
@@ -282,6 +289,7 @@ void GBufferDrawMaterialSystem::update(Context& context, SceneContext& scene_con
         ubershader_index.set(shader.info("LIGHT_TYPE"), type);
         ubershader_index.set(shader.info("SHADOWMAP"), use_shadowmap);
         ubershader_index.set(shader.info("SHADOWMAP_QUALITY"), shadowmap_quality_.value());
+				ubershader_index.set(shader.info("CUBEMAP"), use_cubemap);
         ShaderProgram::IdType shader_program_id = ubershader(context).get(ubershader_index);
 
         // Here we go - it's time to kick off something to draw
@@ -296,9 +304,11 @@ void GBufferDrawMaterialSystem::update(Context& context, SceneContext& scene_con
 
         Material& material = create_and_get(context.materials[id()]);
         material.shader_program = shader_program_id;
-        material.textures[0] = normal_texture_;
-        material.textures[1] = depth_texture_;
+				material.textures[0] = albedo_texture_;
+        material.textures[1] = normal_texture_;
+        material.textures[2] = depth_texture_;
         material.textures[shadowmap_texture_unit] = shadowmap_texture;
+				material.textures[env_cubemap_texture_unit] = cubemap_texture;
         material.uniforms[0] = render_context.percamera_uniform;
         material.uniforms[1] = uniform.id();
         draw_call.material.material_system = id();
