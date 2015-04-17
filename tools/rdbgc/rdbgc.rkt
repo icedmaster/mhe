@@ -83,6 +83,10 @@
 	  (printf "Arguments are invalid\n"))
 )
 
+(define (var-set-command var varvalue context in out)
+  (if (valid-args? (var-desc-type var) varvalue)
+	  (send-command context in out (make-command SET_VAR_COMMAND (var-desc-name var) varvalue) print-answer-handler)
+
 ;; var_name s value
 ;; var_name g value
 (define (process-var var args context in out)
