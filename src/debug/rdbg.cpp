@@ -24,6 +24,8 @@ const char* message_ok = "ok";
 
 const char* set_command = "s";
 const char* get_command = "g";
+const char* set_var_command = "sv";
+const char* get_var_command = "gv";
 
 const char* get_all_command = "get";
 const char* profiler_result_command = "profiler";
@@ -135,14 +137,14 @@ bool RDBGProcessor::process_default_command(std::string& result, const std::vect
 bool RDBGProcessor::process_var(std::string& result, const std::vector<std::string>& args)
 {
 	if (args.size() < 2) return false;
-	const std::string& varname = args[0];
-	const std::string& cmd = args[1];
+	const std::string& cmd = args[0];
+	const std::string& varname = args[1];
 
 	if (!GlobalVars::instance().has(varname.c_str()))
 		return false;
-	if (cmd == set_command)
+	if (cmd == set_var_command)
 		return set_var(result, args);
-	else if (cmd == get_command)
+	else if (cmd == get_var_command)
 		return get_var(result);
 	else
 	{
@@ -153,7 +155,7 @@ bool RDBGProcessor::process_var(std::string& result, const std::vector<std::stri
 
 bool RDBGProcessor::set_var(std::string& result, const std::vector<std::string>& args)
 {
-	GlobalVars::instance().set(args[0].c_str(), &args[2], args.size() - 2);
+	GlobalVars::instance().set(args[1].c_str(), &args[2], args.size() - 2);
 	result = "ok";
 	return true;
 }
@@ -167,15 +169,6 @@ bool RDBGProcessor::get_var(std::string& result)
 std::string RDBGProcessor::process_get_all_command(const std::vector<std::string>& /*args*/)
 {
 	std::string result;
-	for (DataMap::iterator it = data_.begin(); it != data_.end(); ++it)
-	{
-		Data& data = it->second;
-		add_field(result, "type");
-		add_field(result, data.name);
-		add_field(result, "fields");
-		process_get_data(result, data);
-	}
-
 	const std::vector<GlobalVars::Data>& global_vars = GlobalVars::instance().data();
 	for (size_t i = 0; i < global_vars.size(); ++i)
 	{
