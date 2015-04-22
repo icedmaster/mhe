@@ -137,6 +137,20 @@ inline GLenum get_winding_order(WindingOrder order)
     return orders[order];
 }
 
+inline GLenum get_side(int side)
+{
+	ASSERT(side < 6, "Invalid side");
+	GLenum sides[6] = {GL_TEXTURE_CUBE_MAP_POSITIVE_X, GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
+		GL_TEXTURE_CUBE_MAP_POSITIVE_Y, GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
+		GL_TEXTURE_CUBE_MAP_POSITIVE_Z, GL_TEXTURE_CUBE_MAP_NEGATIVE_Z};
+	return sides[side];
+}
+
+inline GLenum get_side_offset(int side)
+{
+	return get_side(side) - GL_TEXTURE_CUBE_MAP_POSITIVE_X;
+}
+
 }}
 
 #endif

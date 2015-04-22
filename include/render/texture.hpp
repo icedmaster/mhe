@@ -33,6 +33,16 @@ enum
 	texture_clamp_to_edge
 };
 
+enum
+{
+	texture_posx,
+	texture_negx,
+	texture_posy,
+	texture_negy,
+	texture_posz,
+	texture_negz
+};
+
 struct TextureDesc
 {
 	int type;

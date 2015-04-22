@@ -40,6 +40,10 @@ public:
 		mhe::setup_node(floor, material_system, engine.context(), engine.scene_context(), mhe::string("test.tga"));
 
 		init_lighting(engine);
+
+		mhe::MaterialSystemContext cubemap_creation_context;
+		cubemap_creation_context.shader_name = "render_simple";
+		cubemap_creation_material_system_.init(engine.context(), cubemap_creation_context);
 		return true;
 	}
 
@@ -158,6 +162,7 @@ private:
 			engine.scene_context().light_pool.get(for_disable[i]).enabled = false;
 	}
 
+	mhe::CubemapCreationMaterialSystem cubemap_creation_material_system_;
 	mhe::LightInstance::IdType spot_lights_[2];
 	mhe::LightInstance::IdType directional_lights_[2];
 	const mhe::KeyboardDevice* keyboard_;

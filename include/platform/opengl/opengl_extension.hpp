@@ -558,6 +558,15 @@ public:
 		::glGenerateMipmap(target);
 #endif
 	}
+
+	void glFramebufferTexture2D(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glFramebufferTexture2D_(target, attachment, textarget, texture, level);
+#else
+		::glFramebufferTexture2D(target, attachment, textarget, texture, level);
+#endif
+	}
 private:
 	OpenGLExtensions() {}
 	~OpenGLExtensions() {}
@@ -638,6 +647,7 @@ private:
 	PFNGLDRAWRANGEELEMENTSPROC glDrawRangeElements_;
 	PFNGLDRAWELEMENTSBASEVERTEXPROC glDrawElementsBaseVertex_;
 	PFNGLGENERATEMIPMAPPROC glGenerateMipmap_;
+	PFNGLFRAMEBUFFERTEXTURE2DPROC glFramebufferTexture2D_;
 #endif
 	std::map<std::string, bool> loaded_extensions_;
 };
