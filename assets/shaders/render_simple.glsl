@@ -1,11 +1,11 @@
 struct VSOutput
 {
-	vec3 nrm;
 	vec2 tex;
 };
 
 [vertex]
 
+#define USE_CUSTOM_PERCAMERA_UNIFORM
 [include "geometry_common.h"]
 
 out VSOutput vsoutput;

@@ -206,6 +206,8 @@ public:
 		impl_->set_window_size(size);
 	}
 
+	void reset_state();
+
 	// capabilities
 	float max_anisotropic_level() const
 	{

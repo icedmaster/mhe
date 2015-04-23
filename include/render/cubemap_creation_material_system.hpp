@@ -5,17 +5,13 @@
 #include "material_system.hpp"
 #include "texture.hpp"
 #include "node.hpp"
+#include "commands.hpp"
 
 namespace mhe {
 
 class MHE_EXPORT CubemapCreationMaterialSystem : public MaterialSystem
 {
 	SETUP_MATERIAL("cubemap_creation");
-
-	struct PerSideData
-	{
-		mat4x4 side_vp;
-	};
 public:
 	bool init(Context& context, const MaterialSystemContext& material_system_context) override;
 	void close() override;
@@ -36,6 +32,7 @@ private:
 	UniformBuffer::IdType uniforms_[6];
 	TextureInstance texture_;
 	DrawCallData::IdType draw_call_data_id_;
+	ClearCommand command_;
 };
 
 }

@@ -12,6 +12,7 @@ public:
 		mhe::Transform& transform = engine.scene().transform_pool().get(node.transform_id).transform;
 		transform.scale_to(mhe::vec3(2, 2, 2));
         node.cast_shadow = true;
+				node.cast_reflection = false;
 		
 		mhe::NodeInstance& plane = engine.scene().create_node();
         mhe::utils::create_plane(plane, engine.context());
@@ -43,7 +44,9 @@ public:
 
 		mhe::MaterialSystemContext cubemap_creation_context;
 		cubemap_creation_context.shader_name = "render_simple";
-		cubemap_creation_material_system_.init(engine.context(), cubemap_creation_context);
+		cubemap_creation_material_system_ = new mhe::CubemapCreationMaterialSystem;
+		cubemap_creation_material_system_->init(engine.context(), cubemap_creation_context);
+		engine.context().material_systems.add(cubemap_creation_material_system_);
 		return true;
 	}
 
@@ -56,6 +59,12 @@ public:
 		else return true;
 		update_lights(engine);
 		return true;
+	}
+
+	void before_draw(mhe::game::Engine& engine) override
+	{
+		cubemap_creation_material_system_->render_cubemap(engine.context(), engine.scene_context(), engine.render_context(), mhe::vec3( 0.0f, 10.0f, 5.0f ), 50.0f);
+		engine.render_context().space_grid.set_global_cubemap(cubemap_creation_material_system_->texture());
 	}
 private:
 	void init_lighting(mhe::game::Engine& engine)
@@ -162,7 +171,7 @@ private:
 			engine.scene_context().light_pool.get(for_disable[i]).enabled = false;
 	}
 
-	mhe::CubemapCreationMaterialSystem cubemap_creation_material_system_;
+	mhe::CubemapCreationMaterialSystem* cubemap_creation_material_system_;
 	mhe::LightInstance::IdType spot_lights_[2];
 	mhe::LightInstance::IdType directional_lights_[2];
 	const mhe::KeyboardDevice* keyboard_;

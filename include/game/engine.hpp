@@ -68,6 +68,11 @@ public:
 	{
 		return renderer_.get();
 	}
+
+	RenderContext& render_context()
+	{
+		return render_context_;
+	}
 private:
 	void set_default_video_settings();
 	void setup_generated();

@@ -6,6 +6,7 @@
 namespace mhe {
 
 class Driver;
+class RenderTarget;
 
 class MHE_EXPORT ClearCommand : public RenderCommand
 {
@@ -33,6 +34,25 @@ public:
     bool execute();
 private:
 	Driver* driver_;
+};
+
+class MHE_EXPORT SetRenderTargetTextureSideCommand : public RenderCommand
+{
+public:
+	void setup(Driver* driver, RenderTarget* render_target, int side)
+	{
+		driver_ = driver;
+		render_target_ = render_target;
+		side_ = side;
+		executed_ = false;
+	}
+
+	bool execute();
+private:
+	Driver* driver_;
+	RenderTarget* render_target_;
+	int side_;
+	bool executed_;
 };
 
 }

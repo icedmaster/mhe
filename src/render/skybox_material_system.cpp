@@ -91,8 +91,6 @@ void SkyboxMaterialSystem::update(Context& context, SceneContext& /*scene_contex
 	uniform.update(uniform_buffer_desc);
 
     setup_draw_call(render_context.draw_calls.add(), skybox_mesh_.instance_parts[0], skybox_mesh_.mesh.parts[0]);
-
-	render_context.space_grid.set_global_cubemap(skybox_texture_);
 }
 
 }

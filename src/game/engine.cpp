@@ -144,6 +144,8 @@ void Engine::update()
 
 void Engine::render()
 {
+	if (game_scene_ != nullptr)
+		game_scene_->before_draw(*this);
 	ProfilerElement pe("engine.render");
 	renderer_->render(render_context_, scene_.scene_context());
 

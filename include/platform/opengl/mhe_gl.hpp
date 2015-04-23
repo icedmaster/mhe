@@ -30,6 +30,7 @@
 
 #define MHE_OPENGL_HAS_SHADERS
 //#define MHE_OPENGL_UBO_DOUBLEBUFFERING
+//#define MHE_OPENGL_USE_SRGB
 
 #define CHECK_GL_ERRORS()						\
 	{											\

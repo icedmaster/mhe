@@ -35,6 +35,10 @@ bool OpenGL3Driver::init(DriverRenderingCapabilities& caps)
 
 	setup_caps(caps);
 
+#ifdef MHE_OPENGL_USE_SRGB
+	glEnable(GL_FRAMEBUFFER_SRGB);
+#endif
+
 	return true;
 }
 

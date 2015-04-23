@@ -25,7 +25,7 @@ void Driver::Stats::update_frames()
 Driver::Driver() :
 	impl_(SystemFactory::instance().create_driver())
 {
-	::memset(&state_, 0xff, sizeof(state_));
+	reset_state();
 }
 
 void Driver::clear(bool clear_color, bool clear_depth, bool clear_stencil,
@@ -168,6 +168,11 @@ void Driver::end_render()
 {
 	stats_.update_frames();
 	impl_->flush();
+}
+
+void Driver::reset_state()
+{
+	::memset(&state_, 0xff, sizeof(state_));
 }
 
 }

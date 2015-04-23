@@ -382,6 +382,11 @@ public:
     {
         size_ = 0;
     }
+
+		bool empty() const
+		{
+			return size_ == 0;
+		}
 private:
     Traits traits_;
     size_t size_;
