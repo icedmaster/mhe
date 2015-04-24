@@ -45,6 +45,7 @@
 #pragma warning( disable: 4275 )
 #define _SCL_SECURE_NO_WARNINGS
 #define _HAS_ITERATOR_DEBUGGING 1
+#define NOMINMAX
 #endif
 
 #endif

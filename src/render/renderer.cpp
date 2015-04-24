@@ -181,6 +181,10 @@ bool load_node(NodeInstance& node, const string& name, hash_type material_system
 		ERROR_LOG("load_node() failed: can not get mesh:" << name);
 		return false;
 	}
+
+	AABBInstance& aabb_instance = scene_context.aabb_pool.get(node.aabb_id);
+	aabb_instance.aabb = node.mesh.mesh.aabb;
+
 	MaterialSystem* material_system = context.material_systems.get(material_system_name);
 	if (material_system == nullptr)
 		return false;

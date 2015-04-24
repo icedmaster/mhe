@@ -6,6 +6,7 @@
 #include "core/string.hpp"
 #include "math/vector3.hpp"
 #include "math/matrix.hpp"
+#include "math/aabb.hpp"
 #include "draw_call.hpp"
 
 namespace mhe {
@@ -54,6 +55,7 @@ struct RenderContext
 	uint32_t delta;
 	float fdelta;
 
+	AABBf aabb;
 	SpaceGrid space_grid;
 
     RenderContext() : percamera_uniform(UniformBuffer::invalid_id) {}

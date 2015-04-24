@@ -30,9 +30,12 @@ bool init_mesh(Mesh& mesh, const std::vector<Vertex>& vertexes, const std::vecto
 }
 
 template <class Vertex>
-bool init_mesh(Mesh& mesh, uint8_t layout, const std::vector<Vertex>& vertexes, const std::vector<uint32_t>& indexes, 
+bool init_mesh(Mesh& mesh, uint8_t layout, const MeshExportData& mesh_export_data, 
+	const std::vector<Vertex>& vertexes, const std::vector<uint32_t>& indexes, 
 	const std::vector<MaterialExportData>& materials_data, const std::vector<MeshPartExportData>& parts_data, const Context* context)
 {
+	mesh.aabb = mesh_export_data.aabb;
+
 	mesh.vbuffer = context->vertex_buffer_pool.create();
 	mesh.ibuffer = context->index_buffer_pool.create();
 
@@ -127,6 +130,8 @@ bool load_mesh_version2(Mesh& mesh, std::istream& stream, const Context* context
 {
 	uint8_t layout;
 	stream.read(reinterpret_cast<char*>(&layout), 1);
+	MeshExportData mesh_export_data;
+	stream.read(reinterpret_cast<char*>(&mesh_export_data), sizeof(MeshExportData));
 	uint32_t size, vertex_size;
 	stream.read(reinterpret_cast<char*>(&vertex_size), sizeof(uint32_t));
 	ASSERT(vertex_size == sizeof(StandartGeometryLayout::Vertex), "Invalid vertex size");
@@ -157,7 +162,7 @@ bool load_mesh_version2(Mesh& mesh, std::istream& stream, const Context* context
 	std::vector<MeshPartExportData> parts_data(parts_number);
 	stream.read(reinterpret_cast<char*>(&parts_data[0]), parts_number * sizeof(MeshPartExportData));
 
-	return detail::init_mesh(mesh, layout, vertexes, indexes, material_data, parts_data, context);
+	return detail::init_mesh(mesh, layout, mesh_export_data, vertexes, indexes, material_data, parts_data, context);
 }
 
 }

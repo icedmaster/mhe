@@ -14,6 +14,9 @@ const char mhe_version = 0x2;
 
 const size_t initial_vertex_buffer_size = 100000;
 
+const mhe::vec3 default_aabb_min = mhe::vec3(9999999.0, 9999999.0f, 9999999.0f);
+const mhe::vec3 default_aabb_max = mhe::vec3(-9999999.0f, -9999999.0f, -9999999.0f);
+
 struct ExportParams
 {
 	mhe::FilePath texture_path;
@@ -49,6 +52,11 @@ void write_vertex_data(std::ofstream& stream, uint32_t vertex_size, const char* 
 	stream.write(vertex_data, vertex_size * vertexes_number);
 	stream.write((const char*)&indexes_number, 4);
 	stream.write(index_data, indexes_number * 4); // index is u32
+}
+
+void write_mesh_data(std::ofstream& stream, const mhe::MeshExportData& data)
+{
+	stream.write((const char*)&data, sizeof(mhe::MeshExportData));
 }
 
 template <class Str>
@@ -100,6 +108,7 @@ void process_scene(const char* out_filename, const aiScene* assimp_scene, const 
         return;
     }
 	
+	mhe::MeshExportData mesh_export_data;
 	std::vector<mhe::StandartGeometryLayout::Vertex> vertexes;
 	std::vector<uint32_t> indexes;
 	std::vector<mhe::MeshPartExportData> parts(assimp_scene->mNumMeshes);
@@ -107,6 +116,8 @@ void process_scene(const char* out_filename, const aiScene* assimp_scene, const 
 
 	vertexes.reserve(initial_vertex_buffer_size);
 	indexes.reserve(initial_vertex_buffer_size);
+
+	mhe::vec3 mesh_aabb_min = default_aabb_min, mesh_aabb_max = default_aabb_max;
 
 	for (unsigned int m = 0; m < assimp_scene->mNumMeshes; ++m)
 	{
@@ -118,6 +129,8 @@ void process_scene(const char* out_filename, const aiScene* assimp_scene, const 
 		part_data.vbuffer_offset = vertexes.size();
 		part_data.faces_number = mesh->mNumFaces;
 		part_data.material_index = mesh->mMaterialIndex;
+
+		mhe::vec3 submesh_aabb_min = default_aabb_min, submesh_aabb_max = default_aabb_max;
 
 		parts[m] = part_data;
 
@@ -143,8 +156,16 @@ void process_scene(const char* out_filename, const aiScene* assimp_scene, const 
 			vertex.tng.set(tng.x, tng.y, tng.z);
 
 			vertexes.push_back(vertex);
+
+			mesh_aabb_max = mhe::max(mesh_aabb_max, vertex.pos);
+			mesh_aabb_min = mhe::min(mesh_aabb_min, vertex.pos);
+			submesh_aabb_max = mhe::max(submesh_aabb_max, vertex.pos);
+			submesh_aabb_min = mhe::min(submesh_aabb_min, vertex.pos);
 		}
+		part_data.aabb = mhe::AABBf::from_min_max(submesh_aabb_min, submesh_aabb_max);
 	}
+
+	mesh_export_data.aabb = mhe::AABBf::from_min_max(mesh_aabb_min, mesh_aabb_max);
 
 	for (unsigned int i = 0; i < assimp_scene->mNumMaterials; ++i)
 	{
@@ -200,7 +221,10 @@ void process_scene(const char* out_filename, const aiScene* assimp_scene, const 
 		return;
 	}
 
+	DEBUG_LOG("The result AABB is:" << mesh_export_data.aabb);
+
 	write_header(f, 0);
+	write_mesh_data(f, mesh_export_data);
 	write_vertex_data(f, sizeof(mhe::StandartGeometryLayout::Vertex),
 		(const char*)&vertexes[0], vertexes.size(),
 		(const char*)&indexes[0], indexes.size());

@@ -1,6 +1,7 @@
 #ifndef __MESH_HPP__
 #define __MESH_HPP__
 
+#include "math/aabb.hpp"
 #include "render_buffer.hpp"
 #include "render_state.hpp"
 #include "material.hpp"
@@ -55,6 +56,7 @@ struct Mesh
     std::vector<MeshPart> parts;
     VertexBuffer::IdType vbuffer;
     IndexBuffer::IdType ibuffer;
+		AABBf aabb;
 
     Mesh() : vbuffer(VertexBuffer::invalid_id), ibuffer(IndexBuffer::invalid_id)
     {}

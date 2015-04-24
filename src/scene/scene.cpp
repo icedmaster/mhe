@@ -102,6 +102,8 @@ void Scene::update(RenderContext& render_context)
     visible_nodes_ = visible_nodes;
     stats_.update_nodes(nodes_number, visible_nodes);
 
+	update_scene_aabb(render_context);
+
 	render_context.nodes = nodes;
 	render_context.nodes_number = visible_nodes;
 
@@ -174,6 +176,23 @@ void Scene::frustum_culling()
 	}
 	visible_aabbs_ = visible_aabbs;
     stats_.update_aabbs(scene_context_.aabb_pool.size(), visible_aabbs);
+}
+
+void Scene::update_scene_aabb(RenderContext& render_context) const
+{
+	vec3 aabb_min(9999999.0f, 9999999.0f, 9999999.0f);
+	vec3 aabb_max(-9999999.0f, -9999999.0f, -9999999.0f);
+
+	// Check aabbs for lights as well. Probably it'd be a good idea to create the additional AABB pool for lights only
+	AABBInstance* aabbs = scene_context_.aabb_pool.all_objects();
+	for (size_t i = 0; i < visible_aabbs_; ++i)
+	{
+		vec3 cur_min, cur_max;
+		aabbs[i].aabb.min_max(cur_min, cur_max);
+		aabb_min = min(cur_min, aabb_min);
+		aabb_max = max(cur_max, aabb_max);
+	}
+	render_context.aabb = AABBf::from_min_max(aabb_min, aabb_max);
 }
 
 }
