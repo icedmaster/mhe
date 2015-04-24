@@ -93,14 +93,13 @@ void CubemapCreationMaterialSystem::render_cubemap(Context& context, SceneContex
 {
 	// TODO: remove euler angles from the constants - use quaternion values instead
 	// FIXME: it looks like we have to render the +X/-X/+Z/-Z sides of the cubemap upside-down
-	const quatf rotations[6] = {quatf(pi, pi_2, 0.0f), quatf(pi, -pi_2, 0.0f),
-		quatf(-pi_2, 0.0f, 0.0f), quatf(pi_2, 0.0f, 0.0f), quatf(pi, pi, 0.0f), quatf(pi, 0.0f, 0.0f) };
-	vec3 dirs[6] = {vec3(1.0f, 0.0f, 0.0f), vec3(-1.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f), vec3(0.0f, -1.0f, 0.0f),
-	vec3(0.0f, 0.0f, 1.0f), vec3(0.0f, 0.0f, -1.0f)};
+	const quatf rotations[6] = {quatf(0.0f, -pi_2, 0.0f) * quatf(pi, 0.0f, 0.0f), quatf(0.0f, pi_2, 0.0f) * quatf(pi, 0.0f, 0.0f),
+		quatf(-pi_2, 0.0f, 0.0f) * quatf(0.0f, pi, 0.0f), quatf(pi_2, 0.0f, 0.0f) * quatf(0.0f, pi, 0.0f),
+		quatf(0.0f, pi, 0.0f) * quatf(pi, 0.0f, 0.0f), quatf(0.0f, 0.0f, 0.0f) * quatf(pi, 0.0f, 0.0f) };
 	mat4x4 view;
 	view.set_lookAt(position, position + vec3(0.0f, 0.0f, 1.0f), vec3::up());
 	mat4x4 proj;
-	proj.set_perspective(pi_2, 1.0f, 0.1f, size * 2.0f);
+	proj.set_perspective(pi_2, 1.0f, 0.1f, size);
 	for (int i = 0; i < 6; ++i)
 	{
 		UniformBuffer& uniform_buffer = context.uniform_pool.get(uniforms_[i]);

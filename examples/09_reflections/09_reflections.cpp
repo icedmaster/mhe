@@ -29,6 +29,15 @@ public:
 		floor_transform.translate_by(mhe::vec3(0.0f, -10.0f, 0.0f));
         floor.receive_shadow = true;
 
+		mhe::NodeInstance& rotating_sphere = engine.scene().create_node();
+		engine.context().mesh_manager.get_instance(rotating_sphere.mesh, mhe::string("sphere.bin"));
+		rotated_sphere_transform_ = &engine.scene().transform_pool().get(rotating_sphere.transform_id);
+		mhe::Transform& rotating_sphere_transform = rotated_sphere_transform_->transform;
+		rotating_sphere_transform.scale_to(mhe::vec3(0.7f, 0.7f, 0.7f));
+		rotating_sphere_transform.translate_by(mhe::vec3(0.0f, 5.0f, 15.0f));
+		rotating_sphere.receive_shadow = true;
+		rotating_sphere.cast_shadow = true;
+
 		mhe::MaterialInitializationData glossy_material;
 		glossy_material.name = "glossy";
 		glossy_material.textures[mhe::albedo_texture_unit] = "metal.tga";
@@ -39,6 +48,7 @@ public:
         mhe::setup_node(node, material_system, engine.context(), engine.scene_context(), glossy_material);
         mhe::setup_node(plane, material_system, engine.context(), engine.scene_context(), glossy_material);
 		mhe::setup_node(floor, material_system, engine.context(), engine.scene_context(), mhe::string("test.tga"));
+		mhe::setup_node(rotating_sphere, material_system, engine.context(), engine.scene_context(), mhe::string("test.tga"));
 
 		init_lighting(engine);
 
@@ -63,7 +73,7 @@ public:
 
 	void before_draw(mhe::game::Engine& engine) override
 	{
-		cubemap_creation_material_system_->render_cubemap(engine.context(), engine.scene_context(), engine.render_context(), mhe::vec3( 0.0f, 10.0f, 5.0f ), 50.0f);
+		cubemap_creation_material_system_->render_cubemap(engine.context(), engine.scene_context(), engine.render_context(), mhe::vec3( 0.0f, 0.0f, 2.0f ), 50.0f);
 		engine.render_context().space_grid.set_global_cubemap(cubemap_creation_material_system_->texture());
 	}
 private:
@@ -176,6 +186,7 @@ private:
 	mhe::LightInstance::IdType directional_lights_[2];
 	const mhe::KeyboardDevice* keyboard_;
 	int light_type_;
+	mhe::TransformInstance* rotated_sphere_transform_;
 };
 
 int main(int /*argc*/, char** /*argv*/)
