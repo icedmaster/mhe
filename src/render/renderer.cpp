@@ -106,23 +106,23 @@ Renderer::Renderer(Context& context) :
 void Renderer::update(RenderContext& render_context, SceneContext& scene_context)
 {
     PerCameraData data;
-    data.vp = render_context.vp;
-    data.inv_vp = render_context.inv_vp;
-    data.inv_proj = render_context.proj.inverted();
-    data.viewpos = vec4(render_context.viewpos, 0.0f);
+    data.vp = render_context.main_camera.vp;
+    data.inv_vp = render_context.main_camera.inv_vp;
+    data.inv_proj = render_context.main_camera.proj.inverted();
+    data.viewpos = vec4(render_context.main_camera.viewpos, 0.0f);
 
 	data.ambient = ambient_color_;
 
-    if (render_context.percamera_uniform == UniformBuffer::invalid_id)
+    if (render_context.main_camera.percamera_uniform == UniformBuffer::invalid_id)
     {
         UniformBuffer& buffer = create_and_get(context_.uniform_pool);
-        render_context.percamera_uniform = buffer.id();
+        render_context.main_camera.percamera_uniform = buffer.id();
         UniformBufferDesc desc;
         desc.unit = perframe_data_unit;
         desc.size = sizeof(PerCameraData);
         buffer.init(desc);
     }
-    UniformBuffer& buffer = context_.uniform_pool.get(render_context.percamera_uniform);
+    UniformBuffer& buffer = context_.uniform_pool.get(render_context.main_camera.percamera_uniform);
     buffer.update(data);
 
 	update_nodes(context_, render_context, scene_context);

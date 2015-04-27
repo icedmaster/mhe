@@ -80,7 +80,7 @@ void SkyboxMaterialSystem::setup(Context& context, SceneContext& scene_context, 
 
 void SkyboxMaterialSystem::update(Context& context, SceneContext& /*scene_context*/, RenderContext& render_context)
 {
-	mat4x4 inv_vp = render_context.vp;
+	mat4x4 inv_vp = render_context.main_camera.vp;
 	inv_vp.set_row(3, vec4(0, 0, 0, 1));
 	inv_vp.inverse();
 

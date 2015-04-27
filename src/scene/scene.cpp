@@ -80,9 +80,9 @@ void Scene::update(RenderContext& render_context)
     {
         camera_controller_->update(render_context);
         const Camera& camera = camera_controller_->camera();
-        camera.get(render_context.view, render_context.proj, render_context.vp);
-        render_context.viewpos = camera.position();
-		render_context.inv_vp = render_context.vp.inverted();
+        camera.get(render_context.main_camera.view, render_context.main_camera.proj, render_context.main_camera.vp);
+        render_context.main_camera.viewpos = camera.position();
+		render_context.main_camera.inv_vp = render_context.main_camera.vp.inverted();
 
         frustum_culling();
     }

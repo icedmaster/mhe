@@ -99,7 +99,7 @@ void GBufferFillMaterialSystem::update(Context& context, SceneContext& /*scene_c
 	for (size_t i = 0; i < count; ++i)
 	{
 		Material& material = context.materials[id()].get(nodes[i].material.id);
-		material.uniforms[perframe_data_unit] = render_context.percamera_uniform;
+		material.uniforms[perframe_data_unit] = render_context.main_camera.percamera_uniform;
 	}
 }
 
@@ -309,7 +309,7 @@ void GBufferDrawMaterialSystem::update(Context& context, SceneContext& scene_con
         material.textures[2] = depth_texture_;
         material.textures[shadowmap_texture_unit] = shadowmap_texture;
 				material.textures[env_cubemap_texture_unit] = cubemap_texture;
-        material.uniforms[0] = render_context.percamera_uniform;
+        material.uniforms[0] = render_context.main_camera.percamera_uniform;
         material.uniforms[1] = uniform.id();
         draw_call.material.material_system = id();
         draw_call.material.id = material.id;

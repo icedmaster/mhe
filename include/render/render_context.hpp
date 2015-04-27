@@ -33,6 +33,26 @@ private:
 	TextureInstance global_cubemap_;
 };
 
+struct CameraData
+{
+	mat4x4 view;
+	mat4x4 proj;
+	mat4x4 vp;
+	mat4x4 inv_vp;
+	mat4x4 inv_v;
+	vec3 viewpos;
+	frustumf camera_frustum;
+	float znear;
+	float zfar;
+	float near_height;
+	float near_width;
+	float far_height;
+	float far_width;
+    UniformBuffer::IdType percamera_uniform;
+
+	CameraData() : percamera_uniform(UniformBuffer::invalid_id) {}
+};
+
 struct RenderContext
 {
     DrawCalls draw_calls;
@@ -43,13 +63,7 @@ struct RenderContext
 	LightInstance* lights;
 	size_t lights_number;
 
-	mat4x4 view;
-	mat4x4 proj;
-	mat4x4 vp;
-	mat4x4 inv_vp;
-	vec3 viewpos;
-
-    UniformBuffer::IdType percamera_uniform;
+	CameraData main_camera;
 
 	uint32_t tick;
 	uint32_t delta;
@@ -57,8 +71,6 @@ struct RenderContext
 
 	AABBf aabb;
 	SpaceGrid space_grid;
-
-    RenderContext() : percamera_uniform(UniformBuffer::invalid_id) {}
 };
 
 const size_t max_textures_per_model = 8;

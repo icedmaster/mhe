@@ -231,6 +231,12 @@ vector4<T> operator* (U val, const vector4<T>& v)
 }
 
 template <class T>
+vector4<T> mul(const vector4<T>& v1, const vector4<T>& v2)
+{
+	return vector4<T>(v1.x() * v2.x(), v1.y() * v2.y(), v1.z() * v2.z(), v1.w() * v2.w());
+}
+
+template <class T>
 inline std::ostream& operator<< (std::ostream& s, const vector4<T>& v)
 {
 	return s << '(' << v.x() << ", " << v.y() << ", " << v.z() << ", " << v.w() << ')';
