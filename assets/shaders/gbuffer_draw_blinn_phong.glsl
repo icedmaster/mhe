@@ -81,18 +81,22 @@ out vec4 color;
 #define PCF_TAPS 3
 #endif
 
-#define PCF_DIVIDER (1.0f / ((PCF_TAPS * 2 + 1) * (PCF_TAPS * 2 + 1)))
+#define PCF_SIZE (PCF_TAPS * 2 + 1)
+
+[include "pcf_kernels.h"]
+
+#define PCF_DIVIDER (1.0f / (PCF_SIZE * PCF_SIZE))
 
 #pragma optionNV (unroll all)
 float get_shadow_value(sampler2D tex, float pixel_depth, vec2 texcoord, float bias)
 {
 	float shadow_value = 0.0f;
-	for (int x = -PCF_TAPS; x <= PCF_TAPS; ++x)
+	for (int y = -PCF_TAPS; y <= PCF_TAPS; ++y)
 	{
-		for (int y= -PCF_TAPS; y <= PCF_TAPS; ++y)
+		for (int x = -PCF_TAPS; x <= PCF_TAPS; ++x)
 		{
 			float shadowmap_depth = textureOffset(tex, texcoord, ivec2(x, y)).x;
-			shadow_value += pixel_depth < shadowmap_depth + bias ? 1.0f : 0.0f;
+			shadow_value += pixel_depth < shadowmap_depth + bias ? 1.0f * pcf_weights[(y + PCF_TAPS) * PCF_SIZE + x + PCF_TAPS] : 0.0f;
 		}
 	}
 		

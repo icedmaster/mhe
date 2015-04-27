@@ -20,6 +20,7 @@ Engine::Engine()
 	:
     rdbg_engine_(*this),
 #endif
+		debug_views_(*this),
     scene_(context_)
 {}
 
@@ -85,6 +86,8 @@ bool Engine::init(uint width, uint height, uint bpp, bool fullscreen)
 	default_rdbg_setup(rdbg_engine_.processor());
 #endif
 
+	debug_views_.init(event_manager_);
+
 	stats_timer_.start();
 
 	setup(render_globals_);
@@ -133,6 +136,9 @@ void Engine::update()
 	}
 
 	event_manager_.check(context_.window_system);
+
+	debug_views_.update();
+
 	if (game_scene_ != nullptr)
 		game_scene_->update(*this);
 

@@ -40,6 +40,13 @@ size_t RenderTarget::color_textures(const TextureInstance** ids) const
 	return desc_.color_targets;
 }
 
+size_t RenderTarget::color_textures(TextureInstance* ids) const
+{
+	for (size_t i = 0; i < desc_.color_targets; ++i)
+		ids[i] = rt_[i];
+	return desc_.color_targets;
+}
+
 size_t RenderTarget::depth_texture(TextureInstance& id) const
 {
 	id = ds_;

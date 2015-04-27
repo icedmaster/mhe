@@ -5,6 +5,7 @@
 #ifdef RDBG_ENABLED
 #include "debug/rdbg.hpp"
 #endif
+#include "debug/debug_views.hpp"
 
 #include "render/context.hpp"
 #include "render/render_globals.hpp"
@@ -80,6 +81,7 @@ private:
 #ifdef RDBG_ENABLED
 	RDBGEngine rdbg_engine_;
 #endif
+	DebugViews debug_views_;
 
 	Context context_;
     RenderContext render_context_;

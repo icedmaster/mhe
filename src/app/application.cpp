@@ -19,6 +19,7 @@ struct RendererParams
 {
     string skybox;
     string shadowmap_depth_write;
+		string fullscreen_debug;
 };
 
 Application::Application(const char* name) :
@@ -153,6 +154,8 @@ void Application::init_render(const ApplicationConfig& config)
     if (skybox_node) renderer_params.skybox = skybox_node.attribute("name").value();
     pugi::xml_node shadowmap_depth_write_node = mhe_node.child("shadowmap_depth_write");
     if (shadowmap_depth_write_node) renderer_params.shadowmap_depth_write = shadowmap_depth_write_node.attribute("name").value();
+		pugi::xml_node fullscreen_debug_node = mhe_node.child("fullscreen_debug");
+		if (fullscreen_debug_node) renderer_params.fullscreen_debug = fullscreen_debug_node.attribute("name").value();
 	
 	pugi::xml_node gbuffer_node = mhe_node.child("gbuffer");
 	if (gbuffer_node)
@@ -170,6 +173,13 @@ void Application::init_materials(pugi::xml_node materials_node)
 		const char* shader_name = n.attribute("shader").value();
 		const char* defs = n.attribute("defs").value();
 		unsigned int priority = n.attribute("priority").as_uint();
+
+		material_context.options.clear();
+		if (pugi::xml_node options_node = n.child("options"))
+		{
+			for (pugi::xml_node o = options_node.first_child(); o; o = o.next_sibling())
+				material_context.options.add(o.name(), o.child_value());
+		}
 
 		material_context.shader_name = shader_name;
 		material_context.defs[0] = defs;
@@ -202,10 +212,12 @@ void Application::init_gbuffer(pugi::xml_node gbuffer_node, const RendererParams
 
     MaterialSystem* skybox_material_system = context.material_systems.get(params.skybox);
     MaterialSystem* depth_write_material_system = context.material_systems.get(params.shadowmap_depth_write);
+		MaterialSystem* fullscreen_debug_material_system = context.material_systems.get(params.fullscreen_debug);
 	
 	DeferredRenderer* renderer = new DeferredRenderer(context);
     renderer->set_skybox_material_system(skybox_material_system);
     renderer->set_shadowmap_depth_write_material_system(depth_write_material_system);
+		renderer->set_fullscreen_debug_material_system(fullscreen_debug_material_system);
 	renderer->init(fill_material_system, use_material_system, draw_material_system);
 	engine_->set_renderer(renderer);
 }

@@ -4,6 +4,7 @@
 #include "core/ref_counter.hpp"
 #include "core/hash.hpp"
 #include "core/factory.hpp"
+#include "core/keyvalue.hpp"
 
 #include "shader_program.hpp"
 
@@ -35,6 +36,7 @@ struct MaterialSystemContext
 {
 	std::string shader_name;
 	std::string defs[max_material_definitions];
+	KeyValue<string, string> options;
 };
 
 class MaterialSystem : public ref_counter

@@ -99,7 +99,8 @@ Renderer::Renderer(Context& context) :
     shadowmap_depth_write_material_system_(nullptr),
     transparent_objects_material_system_(nullptr),
     particles_material_system_(nullptr),
-		ambient_color_(0.1f, 0.1f, 0.1f, 0.1f)
+		ambient_color_(0.1f, 0.1f, 0.1f, 0.1f),
+		debug_mode_(renderer_debug_mode_none)
 {}
 
 void Renderer::update(RenderContext& render_context, SceneContext& scene_context)
@@ -110,7 +111,6 @@ void Renderer::update(RenderContext& render_context, SceneContext& scene_context
     data.inv_proj = render_context.proj.inverted();
     data.viewpos = vec4(render_context.viewpos, 0.0f);
 
-	// TODO:
 	data.ambient = ambient_color_;
 
     if (render_context.percamera_uniform == UniformBuffer::invalid_id)
@@ -136,6 +136,10 @@ void Renderer::render(RenderContext& render_context, SceneContext& scene_context
 	if (shadowmap_depth_write_material_system_ != nullptr)
 		shadowmap_depth_write_material_system_->setup_draw_calls(context_, scene_context, render_context);
 	render_impl(context_, render_context, scene_context);
+
+	if (fullscreen_debug_material_system_ != nullptr)
+		fullscreen_debug_material_system_->setup_draw_calls(context_, scene_context, render_context);
+
 	sort_draw_calls(context_, render_context);
     execute_render(render_context);
 }
@@ -172,6 +176,12 @@ void Renderer::set_shadowmap_depth_write_material_system(MaterialSystem* materia
 {
     shadowmap_depth_write_material_system_ = material_system;
     shadowmap_depth_write_material_system_->set_priority(shadowmap_depth_write_material_system_priority);
+}
+
+void Renderer::set_fullscreen_debug_material_system(MaterialSystem* material_system)
+{
+	fullscreen_debug_material_system_ = material_system;
+	fullscreen_debug_material_system_->set_priority(debug_material_system_priority);
 }
 
 bool load_node(NodeInstance& node, const string& name, hash_type material_system_name, Context& context, SceneContext& scene_context)

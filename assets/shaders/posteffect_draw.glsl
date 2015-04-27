@@ -1,3 +1,5 @@
+[defs RENDER_DEPTH 0 1]
+
 struct VSOutput
 {
 	vec2 tex;
@@ -26,5 +28,10 @@ out vec4 color;
 
 void main()
 {
+#if RENDER_DEPTH == 0
 	color = texture(main_texture, vsoutput.tex);
+#else
+	float d = texture(main_texture, vsoutput.tex).r;
+	color = vec4(d, d, d, 1.0f);
+#endif
 }

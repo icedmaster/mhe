@@ -64,6 +64,7 @@ public:
 	}
 
 	size_t color_textures(const TextureInstance** ids) const;
+	size_t color_textures(TextureInstance* ids) const;
 	size_t depth_texture(TextureInstance& id) const;
 	size_t color_texture(TextureInstance& id, size_t index) const;
 

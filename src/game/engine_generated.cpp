@@ -16,6 +16,7 @@ void Engine::setup_generated()
 	MaterialSystemFactory::instance().add<GBufferFillMaterialSystem>();
 	MaterialSystemFactory::instance().add<GBufferDrawMaterialSystem>();
 	MaterialSystemFactory::instance().add<PosteffectSimpleMaterialSystem>();
+	MaterialSystemFactory::instance().add<PosteffectDebugMaterialSystem>();
 	MaterialSystemFactory::instance().add<DepthWriteMaterialSystem>();
 }
 

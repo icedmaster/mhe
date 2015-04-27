@@ -38,6 +38,14 @@ class Renderer : public ref_counter
 public:
 	static const uint8_t skybox_material_system_priority = 2;
 	static const uint8_t shadowmap_depth_write_material_system_priority = 3;
+	static const uint8_t debug_material_system_priority = 10;
+
+	enum DebugMode
+	{
+		renderer_debug_mode_none,
+		renderer_debug_mode_main,
+		renderer_debug_mode_shadows
+	};
 public:
     Renderer(Context& context);
     virtual ~Renderer() {}
@@ -47,10 +55,22 @@ public:
 
     void set_skybox_material_system(MaterialSystem* material_system);
     void set_shadowmap_depth_write_material_system(MaterialSystem* material_system);
+		void set_fullscreen_debug_material_system(MaterialSystem* material_system);
 
 	void set_ambient_color(const colorf& color)
 	{
 		ambient_color_ = color;
+	}
+
+	void set_debug_mode(DebugMode mode)
+	{
+		debug_mode_ = mode;
+		debug_mode_changed(mode);
+	}
+
+	DebugMode debug_mode() const
+	{
+		return debug_mode_;
 	}
 
 	void flush();
@@ -64,6 +84,7 @@ protected:
 private:
     virtual void update_impl(Context& /*context*/, RenderContext& /*render_context*/, SceneContext& /*scene_context*/) {}
 	virtual void render_impl(Context& context, RenderContext& render_context, SceneContext& scene_context) = 0;
+	virtual void debug_mode_changed(DebugMode /*mode*/) {}
 
 	Context& context_;
 	MaterialSystem* skybox_material_system_;
@@ -72,7 +93,10 @@ private:
 	MaterialSystem* transparent_objects_material_system_;
 	MaterialSystem* particles_material_system_;
 
+	MaterialSystem* fullscreen_debug_material_system_;
+
 	colorf ambient_color_;
+	DebugMode debug_mode_;
 };
 
 bool init_render(Context& context);
