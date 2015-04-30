@@ -32,6 +32,9 @@ void main()
 	color = texture(main_texture, vsoutput.tex);
 #else
 	float d = texture(main_texture, vsoutput.tex).r;
+
+	const float range_start = 0.0f;
+	d = (d - range_start) / (1.0f - range_start);
 	color = vec4(d, d, d, 1.0f);
 #endif
 }

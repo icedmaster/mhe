@@ -80,26 +80,26 @@ enum
 	// different keys
 	key_return = 13,
 	key_space = 32,
-	key_up = 273,
-	key_down = 274,
-	key_right = 275,
-	key_left = 276,
+	key_up = 128 + 0x52,
+	key_down = 128 + 0x51,
+	key_right = 128 + 0x50,
+	key_left = 128 + 0x4f,
 	// f1 - f15
-	key_f1 = 282,
-	key_f2 = 283,
-	key_f3 = 284,
-	key_f4 = 285,
-	key_f5 = 286,
-	key_f6 = 287,
-	key_f7 = 288,
-	key_f8 = 289,
-	key_f9 = 290,
-	key_f10 = 291,
-	key_f11 = 292,
-	key_f12 = 293,
-	key_f13 = 294,
-	key_f14 = 295,
-	key_f15 = 296,
+	key_f1 = 128 + 0x3a,
+	key_f2 = 128 + 0x3b,
+	key_f3 = 128 + 0x3c,
+	key_f4 = 128 + 0x3d,
+	key_f5 = 128 + 0x3e,
+	key_f6 = 128 + 0x3f,
+	key_f7 = 128 + 0x40,
+	key_f8 = 128 + 0x41,
+	key_f9 = 128 + 0x42,
+	key_f10 = 128 + 0x43,
+	key_f11 = 128 + 0x44,
+	key_f12 = 128 + 0x45,
+	key_f13 = 128 + 0x46,
+	key_f14 = 128 + 0x47,
+	key_f15 = 128 + 0x48,
 };
 public:
 	KeyboardDevice(const std::string& name);
@@ -108,7 +108,7 @@ private:
 	void check_impl(Device::events_vector& events, const WindowSystem&);
 
 	unique_ptr<KeyboardDeviceImpl> impl_;
-	bool keys_[256];
+	bool keys_[300];
 };
 
 }

@@ -47,6 +47,7 @@ void DeferredRenderer::render_impl(Context& context, RenderContext& render_conte
 
 void DeferredRenderer::debug_mode_changed(DebugMode mode)
 {
+	Renderer::debug_mode_changed(mode);
 	PosteffectDebugMaterialSystem* debug_material_system = context().material_systems.get<PosteffectDebugMaterialSystem>();
 	ASSERT(debug_material_system != nullptr, "Invalid DebugMaterialSystem");
 	if (mode == Renderer::renderer_debug_mode_none)

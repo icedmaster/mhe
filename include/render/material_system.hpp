@@ -7,6 +7,7 @@
 #include "core/keyvalue.hpp"
 
 #include "shader_program.hpp"
+#include "render_target.hpp"
 
 namespace mhe {
 
@@ -51,6 +52,11 @@ public:
 
 	virtual void set_texture(const TextureInstance& /*texture*/) {}
 	virtual void set_texture(size_t /*unit*/, const TextureInstance& /*texture*/) {}
+
+	virtual RenderTarget::IdType render_target_id() const
+	{
+		return default_render_target;
+	}
 
     void setup_draw_calls(Context& context, SceneContext& scene_context, RenderContext& render_context);
 

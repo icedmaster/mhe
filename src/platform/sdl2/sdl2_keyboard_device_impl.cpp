@@ -20,7 +20,8 @@ void SDL2KeyboardDeviceImpl::check(Device::events_vector& events, const WindowSy
 void SDL2KeyboardDeviceImpl::setup_event(KeyboardEvent* event, const SDL_Event& sdl_event) const
 {
 	int et = (sdl_event.type == SDL_KEYDOWN) ? KeyboardEvent::key_down : KeyboardEvent::key_up;
-	return event->setup_event(et, sdl_event.key.keysym.sym);
+	int sym = (sdl_event.key.keysym.sym & (1 << 30)) ? (sdl_event.key.keysym.sym & ~(1 << 30)) + 128 : sdl_event.key.keysym.sym;
+	return event->setup_event(et, sym);
 }
 
 }}

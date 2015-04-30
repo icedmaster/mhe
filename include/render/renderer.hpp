@@ -81,10 +81,11 @@ protected:
 	}
 
 	virtual void execute_render(RenderContext& render_context);
+protected:
+	virtual void debug_mode_changed(DebugMode mode);
 private:
     virtual void update_impl(Context& /*context*/, RenderContext& /*render_context*/, SceneContext& /*scene_context*/) {}
 	virtual void render_impl(Context& context, RenderContext& render_context, SceneContext& scene_context) = 0;
-	virtual void debug_mode_changed(DebugMode /*mode*/) {}
 
 	Context& context_;
 	MaterialSystem* skybox_material_system_;

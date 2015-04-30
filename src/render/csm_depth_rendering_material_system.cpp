@@ -42,6 +42,8 @@ bool CSMDepthRenderingMaterialSystem::init(Context& context, const MaterialSyste
 	desc.height = shadowmap_default_height;
 	if (!render_target.init(context, desc)) return false;
 
+	render_target_id_ = render_target.id();
+
 	render_target.depth_texture(shadowmap_);
 
 	DrawCallData& draw_call_data = create_and_get(context.draw_call_data_pool);

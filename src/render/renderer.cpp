@@ -7,6 +7,7 @@
 #include "render/scene_context.hpp"
 #include "render/material_system.hpp"
 #include "render/layouts.hpp"
+#include "render/posteffect_material_system.hpp"
 #include "debug/profiler.hpp"
 #include "res/resource_manager.hpp"
 
@@ -182,6 +183,16 @@ void Renderer::set_fullscreen_debug_material_system(MaterialSystem* material_sys
 {
 	fullscreen_debug_material_system_ = material_system;
 	fullscreen_debug_material_system_->set_priority(debug_material_system_priority);
+}
+
+void Renderer::debug_mode_changed(DebugMode mode)
+{
+	if (mode == renderer_debug_mode_shadows && fullscreen_debug_material_system_ != nullptr)
+	{
+		RenderTarget& render_target = context_.render_target_pool.get(shadowmap_depth_write_material_system_->render_target_id());
+		static_cast<PosteffectDebugMaterialSystem*>(fullscreen_debug_material_system_)->set_render_target(render_target);
+		fullscreen_debug_material_system_->enable();
+	}
 }
 
 bool load_node(NodeInstance& node, const string& name, hash_type material_system_name, Context& context, SceneContext& scene_context)
