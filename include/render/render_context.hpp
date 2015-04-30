@@ -35,6 +35,7 @@ private:
 
 struct CameraData
 {
+	mat4x4 world;
 	mat4x4 view;
 	mat4x4 proj;
 	mat4x4 vp;
@@ -48,6 +49,8 @@ struct CameraData
 	float near_width;
 	float far_height;
 	float far_width;
+	float angle;
+	float aspect_ratio;
     UniformBuffer::IdType percamera_uniform;
 
 	CameraData() : percamera_uniform(UniformBuffer::invalid_id) {}

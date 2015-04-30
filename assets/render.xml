@@ -15,9 +15,10 @@
       </options>
     </material>
   <material name="depth_write" shader="depth_write" priority="3" />
+  <material name="csm_depth_write" shader="depth_write" priority="3" />
   </materials>
   <skybox name="skybox" />
-  <shadowmap_depth_write name="depth_write" />
+  <shadowmap_depth_write name="csm_depth_write" />
   <fullscreen_debug name="posteffect_debug" />
   <gbuffer>
 	<fill name="gbuffer_fill" />

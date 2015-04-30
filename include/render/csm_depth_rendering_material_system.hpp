@@ -3,8 +3,11 @@
 
 #include "material_system.hpp"
 #include "commands.hpp"
+#include "math/matrix.hpp"
 
 namespace mhe {
+
+struct CameraData;
 
 class CSMDepthRenderingMaterialSystem : public MaterialSystem
 {
@@ -15,9 +18,13 @@ public:
 
     void setup(Context& context, SceneContext& scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count) override;
 private:
-    void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
+	void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
+	void calculate_projection(mat4x4& proj, const vec4* lightspace_aabb, const mat4x4& light_view, const CameraData& camera_data, float znear, float zfar) const;
 
 	ClearCommand clear_command_;
+	DrawCallData::IdType draw_call_data_id_;
+	UniformBuffer::IdType transform_uniform_id_;
+	TextureInstance shadowmap_;
 };
 
 }

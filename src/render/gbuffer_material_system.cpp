@@ -274,7 +274,7 @@ void GBufferDrawMaterialSystem::update(Context& context, SceneContext& scene_con
         {
             use_shadowmap = 1;
             shadowmap_texture = light.shadowmap_texture();
-            data.lightvp = get_light_shadowmap_matrix(scene_context, render_context.lights[i].id);
+            data.lightvp = light.vp();
             data.shadowmap_params = vec4(light.desc().shadowmap_bias, 0.0f, 0.0f, 0.0f);
         }
 

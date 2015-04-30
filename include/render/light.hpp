@@ -171,12 +171,24 @@ public:
 	{
 		shadowmap_texture_ = texture;
 	}
+
+	void set_vp(const mat4x4& vp)
+	{
+		light_vp_ = vp;
+	}
+
+	const mat4x4& vp() const
+	{
+		return light_vp_;
+	}
 private:
 	ShadingSettings shading_;
 	LightDesc desc_;
 	int type_;
 
 	TextureInstance shadowmap_texture_;
+
+	mat4x4 light_vp_;
 };
 
 }

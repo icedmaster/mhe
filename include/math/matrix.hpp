@@ -495,9 +495,9 @@ public:
 
 	matrix<T> inverted() const
 	{
-		matrix<T> copy(*this);
-		copy.inverse();
-		return copy;
+		matrix<T> cp(*this);
+		cp.inverse();
+		return cp;
 	}
 
 	void transpose()
@@ -672,17 +672,16 @@ inline vector4<T> operator* (const vector4<T>& v, const matrix<T>& m)
 template <class T>
 inline std::ostream& operator<< (std::ostream& stream, const matrix<T>& m)
 {
-	stream << "{";
+	stream << "{\n";
 	for (int i = 0; i < 4; ++i)
 	{
 		stream << "{";
 		for (int j = 0; j < 4; ++j)
 		{
 			stream << m.get()[i * 4 + j];
-			if (j != 3) stream << ",";
+			if (j != 3) stream << "\t";
+			else stream << "}\n";
 		}
-		stream << "}";
-		if (i != 3)	stream << ",";
 	}
 	stream << "}";
 	return stream;
