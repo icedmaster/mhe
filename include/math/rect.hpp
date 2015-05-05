@@ -83,6 +83,11 @@ public:
 		return *this;
 	}
 
+	bool operator== (const rect& r) const
+	{
+		return p1 == r.p1 && p2 == r.p2;
+	}
+
 	const vector2<T>& ll() const
 	{
 		return p1;

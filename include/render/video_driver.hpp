@@ -40,6 +40,8 @@ public:
 	virtual bool init(DriverRenderingCapabilities& caps) = 0;
 	virtual void close() = 0;
 
+	virtual void set_window_size(const vector2<int>& size) = 0;
+
 	virtual void enable_blending() = 0;
 	virtual void disable_blending() = 0;
 
@@ -198,6 +200,13 @@ public:
 	void end_render();
 
     void render(const Context& context, const DrawCall* draw_calls, size_t count);
+
+	void set_window_size(const vector2<int>& size)
+	{
+		impl_->set_window_size(size);
+	}
+
+	void reset_state();
 
 	// capabilities
 	float max_anisotropic_level() const

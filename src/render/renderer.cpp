@@ -7,6 +7,7 @@
 #include "render/scene_context.hpp"
 #include "render/material_system.hpp"
 #include "render/layouts.hpp"
+#include "render/posteffect_material_system.hpp"
 #include "debug/profiler.hpp"
 #include "res/resource_manager.hpp"
 
@@ -74,11 +75,23 @@ void sort_draw_calls(const Context& context, RenderContext& render_context)
 void setup_node(NodeInstance& node, MaterialSystem* material_system, Context& context, SceneContext& scene_context,
                 const string& albedo_texture_name, const string& normalmap_texture_name)
 {
-    ModelContext model_context;
-    model_context.color_textures[0] = albedo_texture_name;
-    model_context.normal_texture = normalmap_texture_name;
-    model_context.transform_uniform = node.mesh.shared_uniform;
-    material_system->setup(context, scene_context, &node.mesh.instance_parts[0], &node.mesh.mesh.parts[0], &model_context, 1);
+	MaterialInitializationData initialization_data;
+	initialization_data.name = "mat_" + albedo_texture_name + normalmap_texture_name;
+	initialization_data.textures[albedo_texture_unit] = albedo_texture_name;
+	initialization_data.textures[normal_texture_unit] = normalmap_texture_name;
+	initialization_data.render_data.specular_shininess = default_shininess;
+	initialization_data.render_data.glossiness = default_glossiness;
+
+	setup_node(node, material_system, context, scene_context, initialization_data);
+}
+
+void setup_node(NodeInstance& node, MaterialSystem* material_system, Context& context, SceneContext& scene_context,
+	const MaterialInitializationData& material_initialization_data)
+{
+	node.mesh.mesh.parts[0].material_id = context.material_manager.get(material_initialization_data);
+	ModelContext model_context;
+	model_context.transform_uniform = node.mesh.shared_uniform;
+	material_system->setup(context, scene_context, &node.mesh.instance_parts[0], &node.mesh.mesh.parts[0], &model_context, 1);
 }
 
 Renderer::Renderer(Context& context) :
@@ -86,30 +99,31 @@ Renderer::Renderer(Context& context) :
     skybox_material_system_(nullptr),
     shadowmap_depth_write_material_system_(nullptr),
     transparent_objects_material_system_(nullptr),
-    particles_material_system_(nullptr)
+    particles_material_system_(nullptr),
+		ambient_color_(0.1f, 0.1f, 0.1f, 0.1f),
+		debug_mode_(renderer_debug_mode_none)
 {}
 
 void Renderer::update(RenderContext& render_context, SceneContext& scene_context)
 {
     PerCameraData data;
-    data.vp = render_context.vp;
-    data.inv_vp = render_context.inv_vp;
-    data.inv_proj = render_context.proj.inverted();
-    data.viewpos = vec4(render_context.viewpos, 0.0f);
+    data.vp = render_context.main_camera.vp;
+    data.inv_vp = render_context.main_camera.inv_vp;
+    data.inv_proj = render_context.main_camera.proj.inverted();
+    data.viewpos = vec4(render_context.main_camera.viewpos, 0.0f);
 
-	// TODO:
-	data.ambient = vec4(0.1f, 0.1f, 0.1f, 0.0f);
+	data.ambient = ambient_color_;
 
-    if (render_context.percamera_uniform == UniformBuffer::invalid_id)
+    if (render_context.main_camera.percamera_uniform == UniformBuffer::invalid_id)
     {
         UniformBuffer& buffer = create_and_get(context_.uniform_pool);
-        render_context.percamera_uniform = buffer.id();
+        render_context.main_camera.percamera_uniform = buffer.id();
         UniformBufferDesc desc;
         desc.unit = perframe_data_unit;
         desc.size = sizeof(PerCameraData);
         buffer.init(desc);
     }
-    UniformBuffer& buffer = context_.uniform_pool.get(render_context.percamera_uniform);
+    UniformBuffer& buffer = context_.uniform_pool.get(render_context.main_camera.percamera_uniform);
     buffer.update(data);
 
 	update_nodes(context_, render_context, scene_context);
@@ -123,6 +137,10 @@ void Renderer::render(RenderContext& render_context, SceneContext& scene_context
 	if (shadowmap_depth_write_material_system_ != nullptr)
 		shadowmap_depth_write_material_system_->setup_draw_calls(context_, scene_context, render_context);
 	render_impl(context_, render_context, scene_context);
+
+	if (fullscreen_debug_material_system_ != nullptr)
+		fullscreen_debug_material_system_->setup_draw_calls(context_, scene_context, render_context);
+
 	sort_draw_calls(context_, render_context);
     execute_render(render_context);
 }
@@ -161,6 +179,22 @@ void Renderer::set_shadowmap_depth_write_material_system(MaterialSystem* materia
     shadowmap_depth_write_material_system_->set_priority(shadowmap_depth_write_material_system_priority);
 }
 
+void Renderer::set_fullscreen_debug_material_system(MaterialSystem* material_system)
+{
+	fullscreen_debug_material_system_ = material_system;
+	fullscreen_debug_material_system_->set_priority(debug_material_system_priority);
+}
+
+void Renderer::debug_mode_changed(DebugMode mode)
+{
+	if (mode == renderer_debug_mode_shadows && fullscreen_debug_material_system_ != nullptr)
+	{
+		RenderTarget& render_target = context_.render_target_pool.get(shadowmap_depth_write_material_system_->render_target_id());
+		static_cast<PosteffectDebugMaterialSystem*>(fullscreen_debug_material_system_)->set_render_target(render_target);
+		fullscreen_debug_material_system_->enable();
+	}
+}
+
 bool load_node(NodeInstance& node, const string& name, hash_type material_system_name, Context& context, SceneContext& scene_context)
 {
 	if (!context.mesh_manager.get_instance(node.mesh, name))
@@ -168,6 +202,10 @@ bool load_node(NodeInstance& node, const string& name, hash_type material_system
 		ERROR_LOG("load_node() failed: can not get mesh:" << name);
 		return false;
 	}
+
+	AABBInstance& aabb_instance = scene_context.aabb_pool.get(node.aabb_id);
+	aabb_instance.aabb = node.mesh.mesh.aabb;
+
 	MaterialSystem* material_system = context.material_systems.get(material_system_name);
 	if (material_system == nullptr)
 		return false;
@@ -176,8 +214,6 @@ bool load_node(NodeInstance& node, const string& name, hash_type material_system
 	for (size_t i = 0; i < node.mesh.instance_parts.size(); ++i)
 	{
 		ModelContext& model_context = model_contexts[i];
-		model_context.color_textures[0] = node.mesh.mesh.parts[i].material_data.albedo_texture;
-		model_context.normal_texture = node.mesh.mesh.parts[i].material_data.normalmap_texture;
 		model_context.transform_uniform = node.mesh.shared_uniform;
 	}
 	material_system->setup(context, scene_context, &node.mesh.instance_parts[0], &node.mesh.mesh.parts[0], &model_contexts[0], node.mesh.instance_parts.size());

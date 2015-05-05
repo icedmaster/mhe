@@ -3,6 +3,7 @@
 
 #include <cstdlib>
 #include <cassert>
+#include "allocator.hpp"
 
 namespace mhe {
 
@@ -16,25 +17,28 @@ public:
 	typedef T* iterator;
 	typedef const T* const_iterator;
 public:
-	dynarray() :
-		elements_(new T[count])
+	dynarray(allocator* alloc = default_allocator()) :
+		elements_(new (alloc) T[count]),
+		allocator_(alloc)
 	{}
 
-	dynarray(const this_type& other) :
-		elements_(new T[count])
+	dynarray(const this_type& other, allocator* alloc = default_allocator()) :
+		elements_(new (alloc) T[count]),
+		allocator_(alloc)
 	{
 		swap(other);
 	}
 
-	dynarray(const T& value) :
-		elements_(new T[count])
+	dynarray(const T& value, allocator* alloc = default_allocator()) :
+		elements_(new (alloc) T[count]),
+		allocator_(alloc)
 	{
 		fill(value);
 	}
 
 	~dynarray()
 	{
-		delete [] elements_;
+		delete[](allocator_, elements_);
 	}
 
 	// accessors
@@ -113,6 +117,7 @@ public:
 	}
 private:
 	T* elements_;
+	allocator* allocator_;
 };
 
 }

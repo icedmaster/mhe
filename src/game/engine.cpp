@@ -20,6 +20,7 @@ Engine::Engine()
 	:
     rdbg_engine_(*this),
 #endif
+		debug_views_(*this),
     scene_(context_)
 {}
 
@@ -59,6 +60,7 @@ bool Engine::init(uint width, uint height, uint bpp, bool fullscreen)
 		ERROR_LOG("Driver initialization failed");
 		return false;
 	}
+	context_.driver.set_window_size(context_.window_system.screen_size());
 	INFO_LOG("Driver has been initialized");
 
   context_.window_system.view()->set_events_handler(new BaseViewEventsHandler(this));
@@ -66,6 +68,7 @@ bool Engine::init(uint width, uint height, uint bpp, bool fullscreen)
 	context_.shader_manager.set_context(&context_);
 	context_.mesh_manager.set_context(&context_);
 	context_.texture_manager.set_context(&context_);
+	context_.material_manager.set_context(&context_);
 
 	set_default_video_settings();
 
@@ -82,6 +85,8 @@ bool Engine::init(uint width, uint height, uint bpp, bool fullscreen)
 	}
 	default_rdbg_setup(rdbg_engine_.processor());
 #endif
+
+	debug_views_.init(event_manager_);
 
 	stats_timer_.start();
 
@@ -131,6 +136,9 @@ void Engine::update()
 	}
 
 	event_manager_.check(context_.window_system);
+
+	debug_views_.update();
+
 	if (game_scene_ != nullptr)
 		game_scene_->update(*this);
 
@@ -142,6 +150,8 @@ void Engine::update()
 
 void Engine::render()
 {
+	if (game_scene_ != nullptr)
+		game_scene_->before_draw(*this);
 	ProfilerElement pe("engine.render");
 	renderer_->render(render_context_, scene_.scene_context());
 

@@ -39,7 +39,8 @@ private:
 		light.shading().specular = mhe::color_white;
 		mhe::set_light_position(engine.scene_context(), light_instance.id, mhe::vec3(0, 20, 0));
 		mhe::set_light_rotation(engine.scene_context(), light_instance.id, mhe::quatf(-mhe::pi_2, 0.0f, 0.0f));
-		light.desc().spot.attenuation = 0.2f;
+		light.desc().spot.attenuation_a = 0.2f;
+		light.desc().spot.attenuation_b = 0.1f;
 		light.desc().spot.angle = mhe::deg_to_rad(30.0f);
 		light.desc().spot.angle_attenuation = 0.5f;
 		light.desc().spot.spot_shadowmap_projection_znear = 0.1f;
@@ -53,7 +54,8 @@ private:
 		light2.shading().specular = mhe::color_white;
 		mhe::set_light_position(engine.scene_context(), light_instance2.id, mhe::vec3(0, 1, 20));
 		mhe::set_light_rotation(engine.scene_context(), light_instance2.id, mhe::quatf(0.0f, mhe::pi, 0.0f));
-		light2.desc().spot.attenuation = 0.2f;
+		light2.desc().spot.attenuation_a = 0.2f;
+		light2.desc().spot.attenuation_b = 0.2f;
 		light2.desc().spot.angle = mhe::deg_to_rad(30.0f);
 		light2.desc().spot.angle_attenuation = 0.5f;
 		light2.desc().spot.spot_shadowmap_projection_znear = 0.1f;
@@ -74,10 +76,10 @@ private:
 		mhe::set_light_position(engine.scene_context(), light_instance.id, mhe::vec3(0, 2000, 0));
 		mhe::set_light_rotation(engine.scene_context(), light_instance.id, mhe::quatf(-mhe::pi_2, 0.0f, 0.0f));
 		light.set_type(mhe::Light::directional);
-		light.desc().directional.directional_shadowmap_projection_znear = 0.1f;
-		light.desc().directional.directional_shadowmap_projection_zfar = 2100.0f;
-		light.desc().directional.directional_shadowmap_projection_height = 2000.0;
-		light.desc().directional.directional_shadowmap_projection_width = 2000.0;
+		light.desc().directional.directional_shadowmap_projection_znear = 10.0f;
+		light.desc().directional.directional_shadowmap_projection_zfar = 2200.0f;
+		light.desc().directional.directional_shadowmap_projection_height = 2500.0;
+		light.desc().directional.directional_shadowmap_projection_width = 2500.0;
 		light.desc().cast_shadows = true;
 		light_instance.enabled = true;
 	}
@@ -131,6 +133,8 @@ int main(int /*argc*/, char** /*argv*/)
 	config.render_config_filename = mhe::utils::path_join(config.assets_path, "render.xml");
 	app.init(config);
 
+	app.engine().renderer()->set_ambient_color(mhe::color_white * 0.5f);
+
 	mhe::game::GameSceneDesc desc;
 	GameScene* game_scene = new GameScene;
 	game_scene->init(app.engine(), desc);
@@ -138,8 +142,8 @@ int main(int /*argc*/, char** /*argv*/)
 
 	mhe::PerspectiveCameraParameters camera_parameters;
 	camera_parameters.fov = 60.0f;
-	camera_parameters.znear = 0.1f;
-	camera_parameters.zfar = 5000.0f;
+	camera_parameters.znear = 1.0f;
+	camera_parameters.zfar = 3000.0f;
 	mhe::game::FPSCameraController* camera_controller = new mhe::game::FPSCameraController(app.engine(), camera_parameters,
 		mhe::vec3(0, 10, 10), mhe::vec3(mhe::deg_to_rad(30.0f), mhe::pi_2, 0));
 	camera_controller->set_move_speed(500.0f);

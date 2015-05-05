@@ -4,6 +4,7 @@
 #include <cmath>
 #include <ostream>
 #include "vector2.hpp"
+#include "core/compiler.hpp"
 
 namespace mhe
 {
@@ -248,6 +249,18 @@ template <class T>
 T dot(const vector3<T>& v1, const vector3<T>& v2)
 {
     return v1.x() * v2.x() + v1.y() * v2.y() + v1.z() * v2.z();
+}
+
+template <class T>
+vector3<T> min(const vector3<T>& v1, const vector3<T>& v2)
+{
+	return vector3<T>(std::min(v1.x(), v2.x()), std::min(v1.y(), v2.y()), std::min(v1.z(), v2.z()));
+}
+
+template <class T>
+vector3<T> max(const vector3<T>& v1, const vector3<T>& v2)
+{
+	return vector3<T>(std::max(v1.x(), v2.x()), std::max(v1.y(), v2.y()), std::max(v1.z(), v2.z()));
 }
 
 template <class T>

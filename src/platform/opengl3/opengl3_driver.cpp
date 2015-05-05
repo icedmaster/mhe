@@ -35,6 +35,10 @@ bool OpenGL3Driver::init(DriverRenderingCapabilities& caps)
 
 	setup_caps(caps);
 
+#ifdef MHE_OPENGL_USE_SRGB
+	glEnable(GL_FRAMEBUFFER_SRGB);
+#endif
+
 	return true;
 }
 
@@ -76,6 +80,7 @@ void OpenGL3Driver::disable_blending()
 void OpenGL3Driver::set_viewport(int x, int y, int w, int h)
 {
     glViewport(x, y, w, h);
+	state_.viewport.set(x, y, w, h);
 }
 
 void OpenGL3Driver::flush()

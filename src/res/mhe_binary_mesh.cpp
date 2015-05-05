@@ -3,6 +3,8 @@
 #include "res/scene_export.hpp"
 #include "render/context.hpp"
 #include "render/layouts.hpp"
+#include "render/material.hpp"
+#include "render/uniforms.hpp"
 
 namespace mhe {
 
@@ -28,9 +30,12 @@ bool init_mesh(Mesh& mesh, const std::vector<Vertex>& vertexes, const std::vecto
 }
 
 template <class Vertex>
-bool init_mesh(Mesh& mesh, uint8_t layout, const std::vector<Vertex>& vertexes, const std::vector<uint32_t>& indexes, 
+bool init_mesh(Mesh& mesh, uint8_t layout, const MeshExportData& mesh_export_data, 
+	const std::vector<Vertex>& vertexes, const std::vector<uint32_t>& indexes, 
 	const std::vector<MaterialExportData>& materials_data, const std::vector<MeshPartExportData>& parts_data, const Context* context)
 {
+	mesh.aabb = mesh_export_data.aabb;
+
 	mesh.vbuffer = context->vertex_buffer_pool.create();
 	mesh.ibuffer = context->index_buffer_pool.create();
 
@@ -69,9 +74,14 @@ bool init_mesh(Mesh& mesh, uint8_t layout, const std::vector<Vertex>& vertexes, 
 		part.render_data.indexes_number = part_data.faces_number * 3;
 		part.render_data.layout = layout;
 
-		part.material_data.layout = layout;
-		part.material_data.albedo_texture = material_data.albedo_texture.name;
-		part.material_data.normalmap_texture = material_data.normalmap_texture.name;
+		MaterialInitializationData initialization_data;
+		initialization_data.name = material_data.name;
+		initialization_data.lighting_model = material_data.lighting_model;
+		initialization_data.render_data = material_data.data;
+		initialization_data.render_data.glossiness = default_glossiness;
+		initialization_data.textures[albedo_texture_unit] = material_data.albedo_texture.name;
+		initialization_data.textures[normal_texture_unit] = material_data.normalmap_texture.name;
+		part.material_id = context->material_manager.get(initialization_data);
 
 		mesh.parts.push_back(part);
 	}
@@ -98,15 +108,21 @@ bool load_mesh_version1(Mesh& mesh, std::istream& stream, const Context* context
     return detail::init_mesh(mesh, vertexes, indexes, context);
 }
 
-void load_texture(TextureExportData& texture_data, std::istream& stream)
+template <class Str>
+void load_string(Str& str, std::istream& stream)
 {
 	uint32_t len;
 	stream.read(reinterpret_cast<char*>(&len), 4);
 	if (len != 0)
 	{
-		stream.read(texture_data.name.buffer(), len);
-		texture_data.name.resize(len);
+		stream.read(str.buffer(), len);
+		str.resize(len);
 	}
+}
+
+void load_texture(TextureExportData& texture_data, std::istream& stream)
+{
+	load_string(texture_data.name, stream);
 	stream.read(reinterpret_cast<char*>(&texture_data.mode), 1);
 }
 
@@ -114,6 +130,8 @@ bool load_mesh_version2(Mesh& mesh, std::istream& stream, const Context* context
 {
 	uint8_t layout;
 	stream.read(reinterpret_cast<char*>(&layout), 1);
+	MeshExportData mesh_export_data;
+	stream.read(reinterpret_cast<char*>(&mesh_export_data), sizeof(MeshExportData));
 	uint32_t size, vertex_size;
 	stream.read(reinterpret_cast<char*>(&vertex_size), sizeof(uint32_t));
 	ASSERT(vertex_size == sizeof(StandartGeometryLayout::Vertex), "Invalid vertex size");
@@ -131,12 +149,11 @@ bool load_mesh_version2(Mesh& mesh, std::istream& stream, const Context* context
 	std::vector<MaterialExportData> material_data(materials_number);
 	for (size_t i = 0; i < materials_number; ++i)
 	{
-		char type;
-		stream.read(&type, 1);
-		ASSERT(type == 'a', "Invalid material data");
+		load_string(material_data[i].name, stream);
+		load_string(material_data[i].material_system, stream);
+		load_string(material_data[i].lighting_model, stream);
+		stream.read(reinterpret_cast<char*>(&material_data[i].data), sizeof(MaterialRenderData));
 		load_texture(material_data[i].albedo_texture, stream);
-		stream.read(&type, 1);
-		ASSERT(type == 'n', "Invalid material data");
 		load_texture(material_data[i].normalmap_texture, stream);
 	}
 	// parts
@@ -145,7 +162,7 @@ bool load_mesh_version2(Mesh& mesh, std::istream& stream, const Context* context
 	std::vector<MeshPartExportData> parts_data(parts_number);
 	stream.read(reinterpret_cast<char*>(&parts_data[0]), parts_number * sizeof(MeshPartExportData));
 
-	return detail::init_mesh(mesh, layout, vertexes, indexes, material_data, parts_data, context);
+	return detail::init_mesh(mesh, layout, mesh_export_data, vertexes, indexes, material_data, parts_data, context);
 }
 
 }

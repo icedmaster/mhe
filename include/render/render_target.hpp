@@ -20,9 +20,11 @@ enum
 
 struct RenderTargetDesc
 {
+	// TODO: make different widths and heights for each render target
 	size_t width;
 	size_t height;
 	int target;
+	int texture_type;
 	int color_format[max_simultaneous_render_targets_number];
 	int depth_format;
 	int color_datatype[max_simultaneous_render_targets_number];
@@ -30,6 +32,8 @@ struct RenderTargetDesc
 	uint8_t color_targets;
 	bool use_depth;
 	bool use_stencil;
+
+	RenderTargetDesc() : texture_type(texture_2d) {}
 };
 
 class RenderTargetImpl
@@ -38,6 +42,7 @@ public:
 	virtual ~RenderTargetImpl() {}
 	virtual bool init(const RenderTargetDesc& desc, Texture** color_textures, Texture* depth_texture) = 0;
 	virtual void close() = 0;
+	virtual void set_texture_side(int side) = 0;
 };
 
 class MHE_EXPORT RenderTarget
@@ -59,7 +64,12 @@ public:
 	}
 
 	size_t color_textures(const TextureInstance** ids) const;
+	size_t color_textures(TextureInstance* ids) const;
 	size_t depth_texture(TextureInstance& id) const;
+	size_t color_texture(TextureInstance& id, size_t index) const;
+
+	// For cubemaps only!
+	void set_texture_side(int side);
 private:
 	RenderTargetDesc desc_;
 	TextureInstance rt_[max_simultaneous_render_targets_number];

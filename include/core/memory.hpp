@@ -20,6 +20,16 @@ uint64_t MHE_EXPORT frees_count();
 
 MHE_EXPORT void print_memory_info();
 
+inline void* allocate(size_t size)
+{
+	return mhe::details::allocate(size);
+}
+
+inline void free(void* p)
+{
+	mhe::details::free(p);
+}
+
 }
 
 inline void* operator new(size_t size)

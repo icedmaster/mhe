@@ -2,6 +2,7 @@
 #define __FIXED_SIZE_VECTOR_HPP__
 
 #include "compiler.hpp"
+#include "allocator.hpp"
 
 #ifdef MHE_VS
 // TODO: need to check out this warning later
@@ -76,24 +77,24 @@ public:
 	typedef T* iterator;
 	typedef const T* const_iterator;
 public:
-	fixed_size_vector() :
+	fixed_size_vector(allocator* alloc = default_allocator()) :
 		begin_(elements_), size_(0), capacity_(count)
 	{}
 
-	fixed_size_vector(const this_type& v) :
+	fixed_size_vector(const this_type& v, allocator* alloc = default_allocator()) :
 		begin_(elements_), size_(0), capacity_(count)
 	{
 		insert(end(), v.begin(), v.end());
 	}
 
-	fixed_size_vector(size_t size) :
+	fixed_size_vector(size_t size, allocator* alloc = default_allocator()) :
 		begin_(elements_), size_(0), capacity_(count)
 	{		
 		resize(size);
 	}
 
 	template <class InputIterator>
-	fixed_size_vector(InputIterator first, InputIterator last) :
+	fixed_size_vector(InputIterator first, InputIterator last, allocator* alloc = default_allocator()) :
 		begin_(elements_), capacity_(count)
 	{
 		insert(end(), first, last);
@@ -103,8 +104,18 @@ public:
 	{
 		if (begin_ != elements_)
 		{
-			delete [] begin_;
+			free(begin_);
 		}
+	}
+
+	void set_allocator(allocator* alloc)
+	{
+		if (elements_ != begin_)
+		{
+			ASSERT(0, "Can't set allocator - some data has been allocated already using different allocator");
+			return;
+		}
+		allocator_ = alloc;
 	}
 
 	// accessors
@@ -305,14 +316,11 @@ private:
 	{
 		reallocation_policy::reallocate(capacity_, new_capacity, FUNCTION_DESCRIPTION_MACRO);
 		size_t prev_capacity = capacity_;
-		T* copy = new T[prev_capacity];
-		detail::copy(begin_, end(), copy);
-		if (begin_ != elements_)
-			delete [] begin_;
+		T* copy = begin_;;
 		capacity_ = new_capacity;
-		begin_ = new T[capacity_];
+		begin_ = allocate(capacity_);
 		detail::copy(copy, copy + size_, begin_);
-		delete [] copy;
+		if (copy != elements_) free(copy);
 	}
 
 	iterator erase_impl(size_t index, size_t erased_count)
@@ -323,10 +331,21 @@ private:
 		return begin_ + index;
 	}
 
+	T* allocate(size_t n)
+	{
+		return new (allocator_) T[n];
+	}
+
+	void free(T* ptr)
+	{
+		delete[](allocator_, ptr);
+	}
+
 	T elements_[count];
 	T* begin_;
 	size_t size_;
 	size_t capacity_;
+	allocator* allocator_;
 };
 
 template <class T, size_t count, class Traits = detail::static_array_traits<T, count> >
@@ -363,6 +382,11 @@ public:
     {
         size_ = 0;
     }
+
+		bool empty() const
+		{
+			return size_ == 0;
+		}
 private:
     Traits traits_;
     size_t size_;

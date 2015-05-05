@@ -3,6 +3,7 @@
 
 #include "core/unique_ptr.hpp"
 #include "utils/pool_utils.hpp"
+#include "math/rect.hpp"
 
 namespace mhe {
 
@@ -103,12 +104,20 @@ struct RasterizerDesc
     {}
 };
 
+struct ViewportDesc
+{
+	rect<int> viewport;
+
+	ViewportDesc() : viewport(0, 0, 0, 0) {}
+};
+
 struct RenderStateDesc
 {
 	DepthDesc depth;
 	StencilDesc stencil;
 	BlendDesc blend;
     RasterizerDesc rasterizer;
+	ViewportDesc viewport;
 };
 
 class RenderStateImpl

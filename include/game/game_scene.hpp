@@ -20,6 +20,7 @@ public:
 	virtual bool init(Engine& engine, const GameSceneDesc& desc) = 0;
 	virtual void close() {}
 	virtual bool update(Engine& engine) = 0;
+	virtual void before_draw(Engine& /*engine*/) {}
     virtual void draw(const Engine& /*engine*/) {}
 };
 

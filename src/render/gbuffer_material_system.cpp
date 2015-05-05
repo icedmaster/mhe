@@ -61,6 +61,30 @@ void GBufferFillMaterialSystem::setup(Context& context, SceneContext& scene_cont
 		UberShader::Index index;
 		index.set(normalmap_info, use_normalmap);
 		material.shader_program = shader.get(index);
+
+		UniformBufferDesc uniform_buffer_desc;
+		uniform_buffer_desc.unit = material_data_unit;
+		uniform_buffer_desc.update_type = uniform_buffer_static;
+		uniform_buffer_desc.size = sizeof(PhongMaterialData);
+		UniformBuffer& uniform = create_and_get(context.uniform_pool);
+		if (!uniform.init(uniform_buffer_desc))
+		{
+			WARN_LOG("Can't initialize material uniform");
+		}
+		else
+		{
+			material.uniforms[material_data_unit] = uniform.id();
+			MaterialData material_data;
+			if (!context.material_manager.get(material_data, parts[i].material_id))
+			{
+				WARN_LOG("Can't find a material with id:" << parts[i].material_id);
+			}
+			PhongMaterialData shader_material_data;
+			shader_material_data.diffuse = vec4(material_data.render_data.diffuse, 1.0f);
+			shader_material_data.specular = vec4(material_data.render_data.specular, material_data.render_data.specular_shininess);
+			shader_material_data.params = vec4(material_data.render_data.glossiness, 0.0f, 0.0f, 0.0f);
+			uniform.update(shader_material_data);
+		}
 	}
 }
 
@@ -75,7 +99,7 @@ void GBufferFillMaterialSystem::update(Context& context, SceneContext& /*scene_c
 	for (size_t i = 0; i < count; ++i)
 	{
 		Material& material = context.materials[id()].get(nodes[i].material.id);
-		material.uniforms[perframe_data_unit] = render_context.percamera_uniform;
+		material.uniforms[perframe_data_unit] = render_context.main_camera.percamera_uniform;
 	}
 }
 
@@ -201,6 +225,7 @@ void GBufferDrawMaterialSystem::set_render_target(Context& context, RenderTarget
     const TextureInstance* textures = nullptr;
     size_t number = render_target.color_textures(&textures);
     ASSERT(number != 0, "Invalid render target");
+		albedo_texture_ = textures[0];
     normal_texture_ = textures[1];
     TextureInstance depth_texture;
     number = render_target.depth_texture(depth_texture);
@@ -222,6 +247,11 @@ void GBufferDrawMaterialSystem::update(Context& context, SceneContext& scene_con
     context.materials[id()].clear();
     clear_command_.reset();
 
+		size_t use_cubemap = 0;
+		const TextureInstance& cubemap_texture = render_context.space_grid.global_cubemap();
+		if (cubemap_texture.id != Texture::invalid_id)
+			use_cubemap = 1;
+
     for (size_t i = 0; i < render_context.lights_number; ++i)
     {
         int type = 0;
@@ -233,8 +263,9 @@ void GBufferDrawMaterialSystem::update(Context& context, SceneContext& scene_con
         data.diffuse = light.shading().diffuse;
         data.diffuse.set_w(light.type() == Light::spot ? light.spot_angle_coeff() : light.angle());
         data.specular = light.shading().specular;
+				data.specular.set_w(light.attenuation_b());
         const vec3& light_position = get_light_position(scene_context, render_context.lights[i].id);
-        data.position = vec4(light_position.x(), light_position.y(), light_position.z(), light.attenuation());
+        data.position = vec4(light_position.x(), light_position.y(), light_position.z(), light.attenuation_a());
         const vec3& light_direction = get_light_direction(scene_context, render_context.lights[i].id);
         data.direction = vec4(light_direction.x(), light_direction.y(), light_direction.z(), light.angle_attenuation());
         type = light.type();
@@ -243,7 +274,7 @@ void GBufferDrawMaterialSystem::update(Context& context, SceneContext& scene_con
         {
             use_shadowmap = 1;
             shadowmap_texture = light.shadowmap_texture();
-            data.lightvp = get_light_shadowmap_matrix(scene_context, render_context.lights[i].id);
+            data.lightvp = light.vp();
             data.shadowmap_params = vec4(light.desc().shadowmap_bias, 0.0f, 0.0f, 0.0f);
         }
 
@@ -258,6 +289,7 @@ void GBufferDrawMaterialSystem::update(Context& context, SceneContext& scene_con
         ubershader_index.set(shader.info("LIGHT_TYPE"), type);
         ubershader_index.set(shader.info("SHADOWMAP"), use_shadowmap);
         ubershader_index.set(shader.info("SHADOWMAP_QUALITY"), shadowmap_quality_.value());
+				ubershader_index.set(shader.info("CUBEMAP"), use_cubemap);
         ShaderProgram::IdType shader_program_id = ubershader(context).get(ubershader_index);
 
         // Here we go - it's time to kick off something to draw
@@ -272,10 +304,12 @@ void GBufferDrawMaterialSystem::update(Context& context, SceneContext& scene_con
 
         Material& material = create_and_get(context.materials[id()]);
         material.shader_program = shader_program_id;
-        material.textures[0] = normal_texture_;
-        material.textures[1] = depth_texture_;
+				material.textures[0] = albedo_texture_;
+        material.textures[1] = normal_texture_;
+        material.textures[2] = depth_texture_;
         material.textures[shadowmap_texture_unit] = shadowmap_texture;
-        material.uniforms[0] = render_context.percamera_uniform;
+				material.textures[env_cubemap_texture_unit] = cubemap_texture;
+        material.uniforms[0] = render_context.main_camera.percamera_uniform;
         material.uniforms[1] = uniform.id();
         draw_call.material.material_system = id();
         draw_call.material.id = material.id;

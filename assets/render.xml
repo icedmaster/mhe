@@ -4,11 +4,22 @@
 	<material name="skybox" shader="skybox" priority="0" defs="cubemaps/test.cubemap" />
 	<material name="gbuffer_fill" shader="gbuffer_fill" priority="4" />
 	<material name="gbuffer_draw" shader="gbuffer_draw_blinn_phong" priority="5" />
-	<material name="posteffect_simple" shader="gbuffer_draw" priority="6" />
+    <material name="posteffect_simple" shader="gbuffer_draw" priority="6">
+      <options>
+        <single_dc>1</single_dc>
+      </options>
+    </material>
+    <material name="posteffect_debug" shader="posteffect_draw" priority="10">
+      <options>
+        <overdraw>1</overdraw>
+      </options>
+    </material>
   <material name="depth_write" shader="depth_write" priority="3" />
+  <material name="csm_depth_write" shader="depth_write" priority="3" />
   </materials>
   <skybox name="skybox" />
-  <shadowmap_depth_write name="depth_write" />
+  <shadowmap_depth_write name="csm_depth_write" />
+  <fullscreen_debug name="posteffect_debug" />
   <gbuffer>
 	<fill name="gbuffer_fill" />
 	<use name="gbuffer_draw" />

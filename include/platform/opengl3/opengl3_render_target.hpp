@@ -16,10 +16,15 @@ public:
 
 	void enable() const;
 	void disable() const;
+
+	void set_texture_side(int side);
 private:
 	GLenum target_;
 	GLuint id_;
+	GLuint color_textures_[max_simultaneous_render_targets_number];
+	uint8_t side_offset_;
 	uint8_t targets_number_;
+	bool is_cubemap_;
 };
 
 }}

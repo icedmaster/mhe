@@ -15,8 +15,8 @@ struct RendererParams;
 class MHE_EXPORT Application : public ref_counter
 {
 public:
-	Application(const std::string& name = "");
-	virtual ~Application() {}
+	Application(const char* name = "");
+	virtual ~Application();
 	bool init(const ApplicationConfig& config);
 	void close();
 
@@ -30,7 +30,7 @@ public:
         stop_impl();
     }
 
-	const std::string& name() const
+	const string& name() const
 	{
 		return name_;
 	}
@@ -42,7 +42,7 @@ public:
 
 	game::Engine& engine()
 	{
-		return engine_;
+		return *engine_;
 	}
 protected:
 	// methods with default implementation
@@ -67,8 +67,8 @@ private:
     void add_delegates();
     bool on_system_event(const Event* event);
 
-	game::Engine engine_;
-	std::string name_;
+	game::Engine* engine_;
+	string name_;
 };
 
 }}

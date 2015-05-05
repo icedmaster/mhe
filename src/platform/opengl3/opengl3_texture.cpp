@@ -45,14 +45,15 @@ bool OpenGL3Texture::init(const TextureDesc& desc, const uint8_t* data, size_t s
 void OpenGL3Texture::init_cubemap(const TextureDesc& desc, const uint8_t* data, size_t size)
 {
 	size_t stride = desc.width * desc.height * get_bytes_per_format(get_texture_format(desc.datatype));
-	ASSERT(size == stride * 6, "Invalid size");
+	ASSERT(size ? size == stride * 6 : 1, "Invalid size");
 	GLenum targets[6] = {GL_TEXTURE_CUBE_MAP_NEGATIVE_X, GL_TEXTURE_CUBE_MAP_POSITIVE_X,
 		GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
 		GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, GL_TEXTURE_CUBE_MAP_POSITIVE_Z};
 	for (int i = 0; i < 6; ++i)
 		glTexImage2D(targets[i], 0,
 			get_format(desc.format), desc.width, desc.height, 0,
-			get_texture_format(desc.format), get_datatype(desc.datatype), data + i * stride);
+			get_texture_format(desc.format), get_datatype(desc.datatype), data ? data + i * stride : nullptr);
+	CHECK_GL_ERRORS();
 }
 
 void OpenGL3Texture::close()

@@ -5,6 +5,7 @@
 #ifdef RDBG_ENABLED
 #include "debug/rdbg.hpp"
 #endif
+#include "debug/debug_views.hpp"
 
 #include "render/context.hpp"
 #include "render/render_globals.hpp"
@@ -63,6 +64,16 @@ public:
 	{
 		renderer_ = renderer;
 	}
+
+	Renderer* renderer()
+	{
+		return renderer_.get();
+	}
+
+	RenderContext& render_context()
+	{
+		return render_context_;
+	}
 private:
 	void set_default_video_settings();
 	void setup_generated();
@@ -70,6 +81,7 @@ private:
 #ifdef RDBG_ENABLED
 	RDBGEngine rdbg_engine_;
 #endif
+	DebugViews debug_views_;
 
 	Context context_;
     RenderContext render_context_;

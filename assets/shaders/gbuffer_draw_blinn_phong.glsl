@@ -1,6 +1,7 @@
 [defs LIGHT_TYPE 0 2]
 [defs SHADOWMAP 0 1]
 [defs SHADOWMAP_QUALITY 0 2]
+[defs CUBEMAP 0 1]
 
 #define LIGHT_DIRECTION_FROM_SOURCE
 
@@ -55,10 +56,15 @@ void main()
 
 [fragment]
 
-[sampler2D normal_texture 0]
-[sampler2D depth_texture 1]
+[sampler2D albedo_texture 0]
+[sampler2D normal_texture 1]
+[sampler2D depth_texture 2]
 #if SHADOWMAP == 1
 [sampler2D shadowmap_texture 5]
+#endif
+
+#if CUBEMAP == 1
+[samplerCube env_cubemap 6]
 #endif
 
 in VSOutput vsoutput;
@@ -75,17 +81,22 @@ out vec4 color;
 #define PCF_TAPS 3
 #endif
 
-#define PCF_DIVIDER (1.0f / ((PCF_TAPS * 2 + 1) * (PCF_TAPS * 2 + 1)))
+#define PCF_SIZE (PCF_TAPS * 2 + 1)
 
+[include "pcf_kernels.h"]
+
+#define PCF_DIVIDER (1.0f / (PCF_SIZE * PCF_SIZE))
+
+#pragma optionNV (unroll all)
 float get_shadow_value(sampler2D tex, float pixel_depth, vec2 texcoord, float bias)
 {
 	float shadow_value = 0.0f;
-	for (int x = -PCF_TAPS; x <= PCF_TAPS; ++x)
+	for (int y = -PCF_TAPS; y <= PCF_TAPS; ++y)
 	{
-		for (int y= -PCF_TAPS; y <= PCF_TAPS; ++y)
+		for (int x = -PCF_TAPS; x <= PCF_TAPS; ++x)
 		{
 			float shadowmap_depth = textureOffset(tex, texcoord, ivec2(x, y)).x;
-			shadow_value += pixel_depth < shadowmap_depth + bias ? 1.0f : 0.0f;
+			shadow_value += pixel_depth < shadowmap_depth + bias ? 1.0f * pcf_weights[(y + PCF_TAPS) * PCF_SIZE + x + PCF_TAPS] : 0.0f;
 		}
 	}
 		
@@ -96,18 +107,29 @@ float get_shadow_value(sampler2D tex, float pixel_depth, vec2 texcoord, float bi
 
 void main()
 {
+	// TODO: add pack and unpack methods
 #ifndef FULLSCREEN_LAYOUT
 	vec2 tex = vsoutput.pos.xy / vsoutput.pos.w * 0.5f + 0.5f;
 #else
 	vec2 tex = vsoutput.tex;
 #endif
-	vec3 normal = texture(normal_texture, tex).xyz;
+	vec4 normal_data = texture(normal_texture, tex);
+	vec3 normal = normal_data.xyz;
+	float shininess = normal_data.w;
 	float depth = texture(depth_texture, tex).x;
 
 	vec3 pos = position_from_depth(tex, depth, inv_vp);
 	vec3 viewdir = normalize(viewpos.xyz - pos);
 
-	vec3 result = lit_blinn(light, pos, normal, viewdir);
+	#if CUBEMAP == 1
+	float glossiness = texture(albedo_texture, tex).w;
+	vec3 cubemap_refl = texture(env_cubemap, reflect(-viewdir, normal)).rgb * glossiness * 2.0f; // Looks better with mul by 2.0f
+	#else
+	vec3 cubemap_refl = vec3(0.0f, 0.0f, 0.0f);
+	#endif
+
+
+	vec3 result = lit_blinn(light, pos, normal, viewdir, shininess, cubemap_refl);
 
 	float shadow_value = 1.0f;
 #if SHADOWMAP == 1
@@ -129,5 +151,5 @@ void main()
 	}
 #endif
 
-	color = vec4(result, shadow_value);
+	color = vec4(result * shadow_value, 0.0f);
 }

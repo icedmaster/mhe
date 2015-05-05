@@ -6,3 +6,4 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../05_lighting/build/ ${CMAKE_CURRE
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../06_performance/build/ ${CMAKE_CURRENT_SOURCE_DIR}/../06_performance/build/)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../07_shadowmap/build/ ${CMAKE_CURRENT_SOURCE_DIR}/../07_shadowmap/build/)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../08_sponza/build/ ${CMAKE_CURRENT_SOURCE_DIR}/../08_sponza/build/)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../09_reflections/build/ ${CMAKE_CURRENT_SOURCE_DIR}/../09_reflections/build/)

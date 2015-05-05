@@ -23,6 +23,7 @@ private:
 
     MeshInstance skybox_mesh_;
 	UniformBuffer::IdType transform_uniform_;
+	TextureInstance skybox_texture_;
 };
 
 }

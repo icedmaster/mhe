@@ -126,6 +126,11 @@ public:
 		return vector3<T>(v_[0], v_[1], v_[2]);
 	}
 
+	vector3<T> xyz() const
+	{
+		return as_v3d();
+	}
+
 	inline bool operator== (const vector4& v)
 	{
 		return ((v_[0] == v.v_[0]) && (v_[1] == v.v_[1]) && (v_[2] == v.v_[2]) && (v_[3] == v.v_[3])) ? true : false;
@@ -223,6 +228,12 @@ vector4<T> operator* (U val, const vector4<T>& v)
 	vector4<T> vv(v);
 	vv *= static_cast<T>(val);
 	return vv;
+}
+
+template <class T>
+vector4<T> mul(const vector4<T>& v1, const vector4<T>& v2)
+{
+	return vector4<T>(v1.x() * v2.x(), v1.y() * v2.y(), v1.z() * v2.z(), v1.w() * v2.w());
 }
 
 template <class T>

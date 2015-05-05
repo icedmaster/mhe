@@ -15,6 +15,7 @@ MHE_EXPORT void set_light_rotation(SceneContext& scene_context, LightInstance::I
 MHE_EXPORT vec3 get_light_direction(SceneContext& scene_context, LightInstance::IdType id);
 
 MHE_EXPORT mat4x4 get_light_shadowmap_matrix(SceneContext& scene_context, LightInstance::IdType id);
+MHE_EXPORT mat4x4 get_light_view_matrix(SceneContext& scene_context, LightInstance::IdType id);
 
 }
 

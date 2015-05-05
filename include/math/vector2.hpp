@@ -2,6 +2,7 @@
 #define _VECTOR2D_HPP_
 
 #include <ostream>
+#include "core/types_cast.hpp"
 
 namespace mhe {
 
@@ -139,6 +140,24 @@ inline std::ostream& operator<< (std::ostream& s, const vector2<T>& v)
 
 typedef vector2<float> v2d;
 typedef vector2<float> vec2;
+
+template<>
+inline vec2 types_cast(const string& value)
+{
+	string first, second;
+	bool is_first = true;
+	for (size_t i = 0, len = value.length(); i < len; ++i)
+	{
+		if (value[i] == ' ')
+		{
+			is_first = false;
+			continue;
+		}
+		if (is_first) first += value[i];
+		else second += value[i];
+	}
+	return vec2(types_cast<float>(first), types_cast<float>(second));
+}
 }
 
 #endif

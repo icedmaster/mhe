@@ -495,9 +495,9 @@ public:
 
 	matrix<T> inverted() const
 	{
-		matrix<T> copy(*this);
-		copy.inverse();
-		return copy;
+		matrix<T> cp(*this);
+		cp.inverse();
+		return cp;
 	}
 
 	void transpose()
@@ -608,6 +608,14 @@ public:
 						  m_[1][0] * v.x() + m_[1][1] * v.y() + m_[1][2] * v.z() + m_[1][3],
 						  m_[2][0] * v.x() + m_[2][1] * v.y() + m_[2][2] * v.z() + m_[2][3]);		
 	}
+
+	vector4<T> premult(const vector4<T>& v) const
+	{
+		return vector4<T>(m_[0][0] * v.x() + m_[1][0] * v.y() + m_[2][0] * v.z() + m_[3][0] * v.w(),
+						  m_[0][1] * v.x() + m_[1][1] * v.y() + m_[2][1] * v.z() + m_[3][1] * v.w(),
+						  m_[0][2] * v.x() + m_[1][2] * v.y() + m_[2][2] * v.z() + m_[3][2] * v.w(),
+						  m_[0][3] * v.x() + m_[1][3] * v.y() + m_[2][3] * v.z() + m_[3][3] * v.w());
+	}
 };
 
 // helper functions
@@ -656,19 +664,24 @@ inline vector3<T> operator* (const matrix<T>& m, const vector3<T>& v)
 }
 
 template <class T>
+inline vector4<T> operator* (const vector4<T>& v, const matrix<T>& m)
+{
+	return m.premult(v);
+}
+
+template <class T>
 inline std::ostream& operator<< (std::ostream& stream, const matrix<T>& m)
 {
-	stream << "{";
+	stream << "{\n";
 	for (int i = 0; i < 4; ++i)
 	{
 		stream << "{";
 		for (int j = 0; j < 4; ++j)
 		{
 			stream << m.get()[i * 4 + j];
-			if (j != 3) stream << ",";
+			if (j != 3) stream << "\t";
+			else stream << "}\n";
 		}
-		stream << "}";
-		if (i != 3)	stream << ",";
 	}
 	stream << "}";
 	return stream;

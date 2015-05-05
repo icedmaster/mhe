@@ -70,6 +70,7 @@ void OpenGLExtensions::init_extensions()
 	glDrawRangeElements_ = load_extension<PFNGLDRAWRANGEELEMENTSPROC>("glDrawRangeElements");
 	glDrawElementsBaseVertex_ = load_extension<PFNGLDRAWELEMENTSBASEVERTEXPROC>("glDrawElementsBaseVertex");
 	glGenerateMipmap_ = load_extension<PFNGLGENERATEMIPMAPPROC>("glGenerateMipmap");
+	glFramebufferTexture2D_ = load_extension<PFNGLFRAMEBUFFERTEXTURE2DPROC>("glFramebufferTexture2D");
 #endif	// MHE_OPENGL_HAS_SHADERS
 
 	get_str_extensions();

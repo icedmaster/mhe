@@ -3,7 +3,7 @@
 #ifndef __MHE_NET__
 #define __MHE_NET__
 
-#include "net/socklib_config.hpp"
 #include "net/socklib.hpp"
+#include "net/socklib_config.hpp"
 
 #endif // __MHE_NET__

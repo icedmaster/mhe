@@ -15,6 +15,8 @@ class OpenGL3RenderTarget;
 struct OpenGL3ContextState
 {
     array<size_t, 16> uniforms;
+	vector2<int> window_size;
+	rect<int> viewport;
     bool depth;
     bool stencil;
     bool blend;
@@ -40,6 +42,11 @@ private:
 	void clear_stencil();
 
 	void set_clear_color(const colorf&);
+
+	void set_window_size(const vector2<int>& size)
+	{
+		state_.window_size = size;
+	}
 
 	void set_viewport(int x, int y, int w, int h);
 

@@ -4,8 +4,10 @@
 #include "core/ref_counter.hpp"
 #include "core/hash.hpp"
 #include "core/factory.hpp"
+#include "core/keyvalue.hpp"
 
 #include "shader_program.hpp"
+#include "render_target.hpp"
 
 namespace mhe {
 
@@ -35,6 +37,7 @@ struct MaterialSystemContext
 {
 	std::string shader_name;
 	std::string defs[max_material_definitions];
+	KeyValue<string, string> options;
 };
 
 class MaterialSystem : public ref_counter
@@ -49,6 +52,11 @@ public:
 
 	virtual void set_texture(const TextureInstance& /*texture*/) {}
 	virtual void set_texture(size_t /*unit*/, const TextureInstance& /*texture*/) {}
+
+	virtual RenderTarget::IdType render_target_id() const
+	{
+		return default_render_target;
+	}
 
     void setup_draw_calls(Context& context, SceneContext& scene_context, RenderContext& render_context);
 
@@ -95,7 +103,6 @@ protected:
 	bool init_default(Context& context, const MaterialSystemContext& material_system_context);
 
     void standart_material_setup(Context& context, SceneContext& scene_context, MeshPartInstance* instance_parts, MeshPart* part, ModelContext* model_contexts, size_t count);
-    void setup_textures(Context& context, Material& material, const ModelContext& model_context);
 	Transform& transform(const NodeInstance& node, const SceneContext& scene_context) const;
 
     void empty_setup(Context& context, SceneContext& scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count);

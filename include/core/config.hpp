@@ -92,6 +92,12 @@ const size_t max_scene_dips_number = 4096;
 
 const size_t default_mips_number = 6;
 
+const size_t shadowmap_default_height = 2048;
+const size_t shadowmap_default_width = 2048;
+
+const size_t cubemap_default_texture_size = 128;
+const float cubemap_default_size = 10.0f;
+
 /**
  * Scene configuration
  */

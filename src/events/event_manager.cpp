@@ -94,14 +94,14 @@ void EventManager::add_bind(const char* name, EventType type, int arg, int optar
 {
 	EventBind bind;
 	bind.id = Event::create_event_id(type, arg, optarg);
-	bindings_[hash(name)] = bind;
+	bindings_[string(name)] = bind;
 }
 
 bool EventManager::check_bind(const char* name) const
 {
-	EventBindings::const_iterator it = bindings_.find(hash(name));
+	EventBindings::const_iterator it = bindings_.find(string(name));
 	if (it == bindings_.end()) return false;
-	return it->second.enabled;
+	return it->value.enabled;
 }
 
 void EventManager::process_event(const Event* event)
@@ -130,8 +130,8 @@ void EventManager::process_event_with_id(int id, const Event* event)
 
 	for (EventBindings::iterator it = bindings_.begin(); it != bindings_.end(); ++it)
 	{
-		if (it->second.id == id)
-			it->second.enabled = true;
+		if (it->value.id == id)
+			it->value.enabled = true;
 	}
 }
 
@@ -146,7 +146,7 @@ void EventManager::init_default_bindings()
 void EventManager::clear_bindings()
 {
 	for (EventBindings::iterator it = bindings_.begin(); it != bindings_.end(); ++it)
-		it->second.enabled = false;
+		it->value.enabled = false;
 }
 
 }

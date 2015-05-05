@@ -25,4 +25,13 @@ bool ClearCommandSimple::execute()
 	return true;
 }
 
+bool SetRenderTargetTextureSideCommand::execute()
+{
+	if (executed_) return true;
+	executed_ = true;
+	render_target_->set_texture_side(side_);
+	driver_->clear(true, true, true);
+	return true;
+}
+
 }

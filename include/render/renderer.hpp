@@ -4,6 +4,7 @@
 #include "core/string.hpp"
 #include "core/hash.hpp"
 #include "core/ref_counter.hpp"
+#include "math/vector4.hpp"
 
 namespace mhe {
 
@@ -11,6 +12,7 @@ struct Context;
 struct RenderContext;
 struct SceneContext;
 struct NodeInstance;
+struct MaterialInitializationData;
 
 class MaterialSystem;
 
@@ -20,6 +22,8 @@ void sort_draw_calls(const Context& context, RenderContext& render_context);
 
 MHE_EXPORT void setup_node(NodeInstance& node, MaterialSystem* material_system, Context& context, SceneContext& scene_context,
                 const string& albedo_texture_name, const string& normalmap_texture_name = string());
+MHE_EXPORT void setup_node(NodeInstance& node, MaterialSystem* material_system, Context& context, SceneContext& scene_context,
+	const MaterialInitializationData& material_initialization_data);
 
 MHE_EXPORT bool load_node(NodeInstance& instance, const string& name, hash_type material_system_name, Context& context, SceneContext& scene_context);
 
@@ -34,6 +38,14 @@ class Renderer : public ref_counter
 public:
 	static const uint8_t skybox_material_system_priority = 2;
 	static const uint8_t shadowmap_depth_write_material_system_priority = 3;
+	static const uint8_t debug_material_system_priority = 10;
+
+	enum DebugMode
+	{
+		renderer_debug_mode_none,
+		renderer_debug_mode_main,
+		renderer_debug_mode_shadows
+	};
 public:
     Renderer(Context& context);
     virtual ~Renderer() {}
@@ -43,6 +55,23 @@ public:
 
     void set_skybox_material_system(MaterialSystem* material_system);
     void set_shadowmap_depth_write_material_system(MaterialSystem* material_system);
+		void set_fullscreen_debug_material_system(MaterialSystem* material_system);
+
+	void set_ambient_color(const colorf& color)
+	{
+		ambient_color_ = color;
+	}
+
+	void set_debug_mode(DebugMode mode)
+	{
+		debug_mode_ = mode;
+		debug_mode_changed(mode);
+	}
+
+	DebugMode debug_mode() const
+	{
+		return debug_mode_;
+	}
 
 	void flush();
 protected:
@@ -52,6 +81,8 @@ protected:
 	}
 
 	virtual void execute_render(RenderContext& render_context);
+protected:
+	virtual void debug_mode_changed(DebugMode mode);
 private:
     virtual void update_impl(Context& /*context*/, RenderContext& /*render_context*/, SceneContext& /*scene_context*/) {}
 	virtual void render_impl(Context& context, RenderContext& render_context, SceneContext& scene_context) = 0;
@@ -62,6 +93,11 @@ private:
 	// To implement
 	MaterialSystem* transparent_objects_material_system_;
 	MaterialSystem* particles_material_system_;
+
+	MaterialSystem* fullscreen_debug_material_system_;
+
+	colorf ambient_color_;
+	DebugMode debug_mode_;
 };
 
 bool init_render(Context& context);

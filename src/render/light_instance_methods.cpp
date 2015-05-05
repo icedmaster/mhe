@@ -65,4 +65,11 @@ mat4x4 get_light_shadowmap_matrix(SceneContext& scene_context, LightInstance::Id
 	return transform.view() * proj;
 }
 
+mat4x4 get_light_view_matrix(SceneContext& scene_context, LightInstance::IdType id)
+{
+	const LightInstance& light_instance = scene_context.light_pool.get(id);
+	Transform& transform = scene_context.transform_pool.get(light_instance.transform_id).transform;
+	return transform.view();
+}
+
 }

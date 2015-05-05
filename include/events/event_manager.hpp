@@ -4,6 +4,8 @@
 #include <map>
 #include "render/window_system.hpp"
 #include "core/hash.hpp"
+#include "core/hashmap.hpp"
+#include "core/string.hpp"
 #include "device.hpp"
 #include "event_listener.hpp"
 #include "event_system.hpp"
@@ -60,7 +62,7 @@ private:
 	typedef std::map< hash_type, ref_ptr<MouseDevice> > mice_map;
 	mice_map mice_;
 
-	typedef std::map<hash_type, EventBind> EventBindings;
+	typedef hashmap<string, EventBind> EventBindings;
 	EventBindings bindings_;
 
     unique_ptr<EventSystem> backend_;

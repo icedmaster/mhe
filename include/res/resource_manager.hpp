@@ -3,7 +3,8 @@
 
 #include <map>
 #include <string>
-#include "core/hash.hpp"
+#include "core/hashmap.hpp"
+#include "core/ref_counter.hpp"
 #include "core/string.hpp"
 #include "utils/file_utils.hpp"
 #include "utils/logutils.hpp"
@@ -17,7 +18,14 @@ protected:
 	typedef typename Loader::type res_type;
     typedef typename Loader::instance_type instance_type;
 	typedef typename Loader::context_type context_type;
-	typedef std::map< hash_type, res_type > resmap;
+
+	struct Info
+	{
+		ref_counter refs;
+		res_type res;
+	};
+
+	typedef hashmap< FilePath, Info > resmap;
 public:
 	virtual ~ResourceManager() {}
 
@@ -39,13 +47,6 @@ public:
 		return true;
 	}
 
-	bool have(const std::string& name) const
-	{
-		typename resmap::const_iterator it = resources_.find(name);
-		if (it == resources_.end()) return false;
-		return true;
-	}
-
 	bool get(res_type& res, const std::string& name, bool absolute_path = false) const
 	{
 		return get_impl(res, name, absolute_path);	
@@ -53,13 +54,8 @@ public:
 
     bool get(res_type& res, const string& name, bool absolute_path = false) const
     {
-        return get_impl(res, FilePath(name), hash(name), absolute_path);
+        return get_impl(res, FilePath(name), absolute_path);
     }
-
-	bool get(res_type& res, hash_type hashv) const
-	{
-		return get_impl(res, hashv);
-	}
 
     bool get_instance(instance_type& instance, const string& name, bool absolute_path = false) const
     {
@@ -79,37 +75,22 @@ public:
 		path_ = path;
 	}
 protected:
-	virtual bool get_impl(res_type& res, const std::string& name, bool absolute_path) const
-	{
-		return get_impl(res, name, hash(name), absolute_path);
-	}
-
-    bool get_impl(res_type& res, const std::string& name, hash_type hashv, bool absolute_path) const
+    bool get_impl(res_type& res, const std::string& name, bool absolute_path) const
     {
-        return get_impl(res, FilePath(name.c_str()), hashv, absolute_path);
+        return get_impl(res, FilePath(name.c_str()), absolute_path);
     }
 
-    virtual bool get_impl(res_type& res, const FilePath& name, hash_type hashv, bool absolute_path) const
+    virtual bool get_impl(res_type& res, const FilePath& name, bool absolute_path) const
 	{
-		typename resmap::iterator it = resources_.find(hashv);
+		typename resmap::iterator it = resources_.find(name);
 		if (it != resources_.end())
 		{
 			INFO_LOG("get resource:" << name);
-			res = it->second;
+			it->value.refs.add_ref();
+			res = it->value.res;
 			return true;
 		}
-		return load_impl(res, name, hashv, absolute_path);
-	}
-
-	virtual bool get_impl(res_type& res, hash_type hashv) const
-	{
-		typename resmap::iterator it = resources_.find(hashv);
-		if (it != resources_.end())
-		{
-			res = it->second;
-			return true;
-		}
-		return false;
+		return load_impl(res, name, absolute_path);
 	}
 
     const context_type* context() const
@@ -123,7 +104,6 @@ protected:
 	}
 private:
     bool load_impl(res_type& res, const FilePath& name,
-				   hash_type hashv,
 				   bool absolute_path) const
 	{
         FilePath full_path = (!absolute_path) ? utils::path_join(path_, name) : FilePath(name);
@@ -133,8 +113,11 @@ private:
 			ERROR_LOG("Can't load: " << full_path);
 			return false;
 		}
-		INFO_LOG("Resource " << name << " loaded with hash:" << hashv);
-		resources_[hashv] = res;
+		INFO_LOG("Resource " << name << " loaded");
+		Info info;
+		info.res = res;
+		info.refs.add_ref();
+		resources_[name] = info;
 		return true;
 	}
 

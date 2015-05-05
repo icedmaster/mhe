@@ -14,10 +14,28 @@ const char mhe_version = 0x2;
 
 const size_t initial_vertex_buffer_size = 100000;
 
+const mhe::vec3 default_aabb_min = mhe::vec3(9999999.0, 9999999.0f, 9999999.0f);
+const mhe::vec3 default_aabb_max = mhe::vec3(-9999999.0f, -9999999.0f, -9999999.0f);
+
 struct ExportParams
 {
 	mhe::FilePath texture_path;
 };
+
+mhe::vec3 convert(const aiVector3D& v)
+{
+	return mhe::vec3(v.x, v.y, v.z);
+}
+
+mhe::vec3 convert(const aiColor3D& v)
+{
+	return mhe::vec3(v.r, v.g, v.b);
+}
+
+mhe::string convert(const aiString& s)
+{
+	return mhe::string(s.C_Str());
+}
 
 void write_header(std::ofstream& stream, uint8_t layout)
 {
@@ -36,19 +54,39 @@ void write_vertex_data(std::ofstream& stream, uint32_t vertex_size, const char* 
 	stream.write(index_data, indexes_number * 4); // index is u32
 }
 
+void write_mesh_data(std::ofstream& stream, const mhe::MeshExportData& data)
+{
+	stream.write((const char*)&data, sizeof(mhe::MeshExportData));
+}
+
+template <class Str>
+void write_string(std::ofstream& stream, const Str& str)
+{
+	size_t len = str.length();
+	stream.write((const char*)&len, 4);
+	stream.write(str.data(), len);
+}
+
 void write_material_data(std::ofstream& stream, const mhe::MaterialExportData* data, size_t size)
 {
 	uint32_t materials_number = size;
 	stream.write((const char*)&materials_number, 4);
 	for (size_t i = 0; i < size; ++i)
 	{
-		stream.put('a'); // albedo
+		// name
+		write_string(stream, data[i].name);
+		// material_system
+		write_string(stream, data[i].material_system);
+		// lighting model
+		write_string(stream, data[i].lighting_model);
+		// material data
+		stream.write((const char*)&data[i].data, sizeof(mhe::MaterialRenderData));
+		// textures
 		uint32_t len = data[i].albedo_texture.name.length();
 		stream.write((const char*)&len, 4);
 		stream.write(data[i].albedo_texture.name.c_str(), len);
 		stream.write((const char*)&(data[i].albedo_texture.mode), 1);
 
-		stream.put('n');
 		len = data[i].normalmap_texture.name.length();
 		stream.write((const char*)&len, 4);
 		stream.write(data[i].normalmap_texture.name.c_str(), len);
@@ -64,13 +102,13 @@ void write_parts_data(std::ofstream& stream, const mhe::MeshPartExportData* data
 
 void process_scene(const char* out_filename, const aiScene* assimp_scene, const ExportParams& params)
 {
-	// get only first mesh for now
     if (!assimp_scene->HasMeshes())
     {
         ERROR_LOG("This scene has no meshes");
         return;
     }
 	
+	mhe::MeshExportData mesh_export_data;
 	std::vector<mhe::StandartGeometryLayout::Vertex> vertexes;
 	std::vector<uint32_t> indexes;
 	std::vector<mhe::MeshPartExportData> parts(assimp_scene->mNumMeshes);
@@ -78,6 +116,8 @@ void process_scene(const char* out_filename, const aiScene* assimp_scene, const 
 
 	vertexes.reserve(initial_vertex_buffer_size);
 	indexes.reserve(initial_vertex_buffer_size);
+
+	mhe::vec3 mesh_aabb_min = default_aabb_min, mesh_aabb_max = default_aabb_max;
 
 	for (unsigned int m = 0; m < assimp_scene->mNumMeshes; ++m)
 	{
@@ -89,6 +129,8 @@ void process_scene(const char* out_filename, const aiScene* assimp_scene, const 
 		part_data.vbuffer_offset = vertexes.size();
 		part_data.faces_number = mesh->mNumFaces;
 		part_data.material_index = mesh->mMaterialIndex;
+
+		mhe::vec3 submesh_aabb_min = default_aabb_min, submesh_aabb_max = default_aabb_max;
 
 		parts[m] = part_data;
 
@@ -114,14 +156,43 @@ void process_scene(const char* out_filename, const aiScene* assimp_scene, const 
 			vertex.tng.set(tng.x, tng.y, tng.z);
 
 			vertexes.push_back(vertex);
+
+			mesh_aabb_max = mhe::max(mesh_aabb_max, vertex.pos);
+			mesh_aabb_min = mhe::min(mesh_aabb_min, vertex.pos);
+			submesh_aabb_max = mhe::max(submesh_aabb_max, vertex.pos);
+			submesh_aabb_min = mhe::min(submesh_aabb_min, vertex.pos);
 		}
+		part_data.aabb = mhe::AABBf::from_min_max(submesh_aabb_min, submesh_aabb_max);
 	}
+
+	mesh_export_data.aabb = mhe::AABBf::from_min_max(mesh_aabb_min, mesh_aabb_max);
 
 	for (unsigned int i = 0; i < assimp_scene->mNumMaterials; ++i)
 	{
 		aiMaterial* material = assimp_scene->mMaterials[i];
 		mhe::MaterialExportData& material_data = materials[i];
 
+		aiString name;
+		material->Get(AI_MATKEY_NAME, name);
+
+		// render properties
+		aiColor3D diffuse, ambient, specular, emissive;
+		float shininess = 0.0f, shininess_strength = 0.0f;
+		material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);
+		material->Get(AI_MATKEY_COLOR_AMBIENT, ambient);
+		material->Get(AI_MATKEY_COLOR_SPECULAR, specular);
+		material->Get(AI_MATKEY_COLOR_EMISSIVE, emissive);
+		material->Get(AI_MATKEY_SHININESS, shininess);
+		material->Get(AI_MATKEY_SHININESS_STRENGTH, shininess_strength);
+
+		material_data.name = convert(name);
+		material_data.data.diffuse = convert(diffuse);
+		material_data.data.ambient = convert(ambient);
+		material_data.data.specular = convert(specular);
+		material_data.data.emissive = convert(emissive);
+		material_data.data.specular_shininess = shininess;
+
+		// textures
 		aiString path;
 		aiTextureMapMode map_mode;
 		if (material->GetTexture(aiTextureType_DIFFUSE, 0, &path, 0, 0, 0, 0, &map_mode) == aiReturn_SUCCESS)
@@ -150,7 +221,10 @@ void process_scene(const char* out_filename, const aiScene* assimp_scene, const 
 		return;
 	}
 
+	DEBUG_LOG("The result AABB is:" << mesh_export_data.aabb);
+
 	write_header(f, 0);
+	write_mesh_data(f, mesh_export_data);
 	write_vertex_data(f, sizeof(mhe::StandartGeometryLayout::Vertex),
 		(const char*)&vertexes[0], vertexes.size(),
 		(const char*)&indexes[0], indexes.size());

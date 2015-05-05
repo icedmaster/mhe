@@ -110,6 +110,7 @@ private:
     void update_light_sources(RenderContext& render_context);
 
     void frustum_culling();
+	void update_scene_aabb(RenderContext& render_context) const;
 
 	struct MaterialConnector
 	{

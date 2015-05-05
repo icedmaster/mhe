@@ -96,7 +96,7 @@ inline Str replace(const Str& s, const S& from, const S& to)
 		bool found = true;
 		for (size_t j = 0; j < from_len; ++j)
 		{
-			if (s[i] != from[j])
+			if (s[i + j] != from[j])
 			{
 				found = false;
 				break;

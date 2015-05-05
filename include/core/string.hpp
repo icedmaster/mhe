@@ -92,7 +92,7 @@ public:
 
 	bool operator== (const this_type& other) const
 	{
-		return operator==<this_type>(other);
+		return operator==<S>(other);
 	}
 
 	bool operator!= (const this_type& other) const
