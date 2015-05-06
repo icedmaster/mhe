@@ -6,6 +6,7 @@
 #include "render/layouts.hpp"
 #include "render/light_instance_methods.hpp"
 #include "render/uniforms.hpp"
+#include "utils/strutils.hpp"
 
 namespace mhe {
 
@@ -16,19 +17,14 @@ bool CSMDepthRenderingMaterialSystem::init(Context& context, const MaterialSyste
 	if (!init_default(context, material_system_context))
 		return false;
 
-	UniformBuffer& uniform_buffer = create_and_get(context.uniform_pool);
-	UniformBufferDesc uniform_desc;
-	uniform_desc.name = "transform";
-	uniform_desc.program = &(default_program(context));
-	if (!uniform_buffer.init(uniform_desc))
-		return false;
-	transform_uniform_id_ = uniform_buffer.id();
-
-	RenderState& render_state = create_and_get(context.render_state_pool);
-	RenderStateDesc render_state_desc;
-	render_state_desc.depth.enabled = true;
-	render_state_desc.viewport.viewport.set(0, 0, shadowmap_default_width, shadowmap_default_height);
-	if (!render_state.init(render_state_desc)) return false;
+	size_t cascades_number = material_system_context.options.get<size_t>("cascades");
+	size_t rt_height = material_system_context.options.get<size_t>("height");
+	size_t rt_width = material_system_context.options.get<size_t>("width");
+	const string& percentage_string = material_system_context.options.get<string>("percentage");
+	const std::vector<string>& percentage = utils::split(percentage_string, string(","));
+	ASSERT(percentage.size() == cascades_number, "The CSM configuration is invalid");
+	for (size_t i = 0; i < cascades_number; ++i)
+		percentage_.push_back(types_cast<float>(utils::trim_copy(percentage[i])) / 100.0f);
 
 	RenderTarget& render_target = create_and_get(context.render_target_pool);
 	RenderTargetDesc desc;
@@ -38,20 +34,39 @@ bool CSMDepthRenderingMaterialSystem::init(Context& context, const MaterialSyste
 	desc.use_stencil = false;
 	desc.depth_datatype = format_float;
 	desc.depth_format = format_d24f;
-	desc.width = shadowmap_default_width;
-	desc.height = shadowmap_default_height;
+	desc.width = rt_width * cascades_number;
+	desc.height = rt_height;
 	if (!render_target.init(context, desc)) return false;
 
 	render_target_id_ = render_target.id();
 
 	render_target.depth_texture(shadowmap_);
 
-	DrawCallData& draw_call_data = create_and_get(context.draw_call_data_pool);
-	draw_call_data.render_target = render_target.id();
-	draw_call_data.state = render_state.id();
-	draw_call_data_id_ = draw_call_data.id;
+	for (size_t i = 0; i < cascades_number; ++i)
+	{
+		UniformBuffer& uniform_buffer = create_and_get(context.uniform_pool);
+		UniformBufferDesc uniform_desc;
+		uniform_desc.name = "transform";
+		uniform_desc.program = &(default_program(context));
+		if (!uniform_buffer.init(uniform_desc))
+			return false;
+		transform_uniform_id_.push_back(uniform_buffer.id());
+
+		RenderState& render_state = create_and_get(context.render_state_pool);
+		RenderStateDesc render_state_desc;
+		render_state_desc.depth.enabled = true;
+		render_state_desc.viewport.viewport.set(i * rt_width, 0, rt_width, rt_height);
+		if (!render_state.init(render_state_desc)) return false;
+
+		DrawCallData& draw_call_data = create_and_get(context.draw_call_data_pool);
+		draw_call_data.render_target = render_target.id();
+		draw_call_data.state = render_state.id();
+		draw_call_data_id_.push_back(draw_call_data.id);
+	}
 
 	clear_command_.set_driver(&context.driver);
+
+	cascades_number_ = cascades_number;
 
 	return true;
 }
@@ -127,7 +142,7 @@ void CSMDepthRenderingMaterialSystem::update(Context& context, SceneContext& sce
 				render_context.lights[i].light.type() != Light::directional)
 				continue;
 		light_view = get_light_view_matrix(scene_context, render_context.lights[i].id);
-		render_context.lights[i].light.set_shadowmap_texture(shadowmap_);
+		shadow_info_.shadowmap = shadowmap_;
 		light = &render_context.lights[i].light;
 	}
 
@@ -151,41 +166,62 @@ void CSMDepthRenderingMaterialSystem::update(Context& context, SceneContext& sce
 		lightspace_corners[i] = p * light_view;
 	}
 
-	mat4x4 proj;
-	calculate_projection(proj, lightspace_corners, light_view, render_context.main_camera, render_context.main_camera.znear, render_context.main_camera.zfar);
+	mat4x4 proj[max_cascades_number];
+	float znear[max_cascades_number];
+	float zfar[max_cascades_number];
 
-	TransformSimpleData transform_data;
-	transform_data.vp = light_view * proj;
-	UniformBuffer& uniform = context.uniform_pool.get(transform_uniform_id_);
-	uniform.update(transform_data);
-
-	light->set_vp(transform_data.vp);
-
-	for (size_t i = 0; i < render_context.nodes_number; ++i)
+	shadow_info_.cascades_number = cascades_number_;
+	shadow_info_.lightview = light_view;
+	for (size_t i = 0; i < cascades_number_; ++i)
 	{
-		if (!render_context.nodes[i].cast_shadow && !render_context.nodes[i].receive_shadow)
-			continue;
+		zfar[i] = render_context.main_camera.zfar * percentage_[i];
+		//znear[i] = i == 0 ? render_context.main_camera.znear : zfar[i - 1];
+		znear[i] = render_context.main_camera.znear;
+		calculate_projection(proj[i], lightspace_corners, light_view, render_context.main_camera, znear[i], zfar[i]);
 
-		for (size_t j = 0; j < render_context.nodes[i].mesh.instance_parts.size(); ++j)
+		TransformSimpleData transform_data;
+		transform_data.vp = light_view * proj[i];
+		UniformBuffer& uniform = context.uniform_pool.get(transform_uniform_id_[i]);
+		uniform.update(transform_data);
+
+		shadow_info_.offset[i] = proj[i].row_vec3(3);
+		shadow_info_.scale[i] = vec3(proj[i].element(0, 0), proj[i].element(1, 1), proj[i].element(2, 2));
+		shadow_info_.znear[i] = znear[i];
+		shadow_info_.zfar[i] = zfar[i];
+
+		shadow_info_.lightvp = transform_data.vp;
+	}
+
+	light->set_shadow_info(&shadow_info_);
+
+	for (size_t pass = 0; pass < cascades_number_; ++pass)
+	{
+		for (size_t i = 0; i < render_context.nodes_number; ++i)
 		{
-			const MeshPartInstance& part = render_context.nodes[i].mesh.instance_parts[j];
-			DrawCall& draw_call = render_context.draw_calls.add();
-			draw_call.render_data = render_context.nodes[i].mesh.mesh.parts[j].render_data;
-			Material& material = create_and_get(context.materials[id()]);
-			material.shader_program = default_program(context).id();
-			material.uniforms[0] = transform_uniform_id_;
-			material.id = material.id;
-			draw_call.material.material_system = id();
-			draw_call.material.id = material.id;
+			if (!render_context.nodes[i].cast_shadow && !render_context.nodes[i].receive_shadow)
+				continue;
 
-			const MaterialInstance& original_material_instance = part.material;
-			const Material& original_material = context.materials[original_material_instance.material_system].get(original_material_instance.id);
-			material.uniforms[1] = original_material.uniforms[1];
+			for (size_t j = 0; j < render_context.nodes[i].mesh.instance_parts.size(); ++j)
+			{
+				const MeshPartInstance& part = render_context.nodes[i].mesh.instance_parts[j];
+				DrawCall& draw_call = render_context.draw_calls.add();
+				draw_call.render_data = render_context.nodes[i].mesh.mesh.parts[j].render_data;
+				Material& material = create_and_get(context.materials[id()]);
+				material.shader_program = default_program(context).id();
+				material.uniforms[0] = transform_uniform_id_[pass];
+				material.id = material.id;
+				draw_call.material.material_system = id();
+				draw_call.material.id = material.id;
 
-			draw_call.draw_call_data = draw_call_data_id_;
+				const MaterialInstance& original_material_instance = part.material;
+				const Material& original_material = context.materials[original_material_instance.material_system].get(original_material_instance.id);
+				material.uniforms[1] = original_material.uniforms[1];
 
-			draw_call.command = &clear_command_;
-			draw_call.pass = 0;
+				draw_call.draw_call_data = draw_call_data_id_[pass];
+
+				draw_call.command = &clear_command_;
+				draw_call.pass = pass;
+			}
 		}
 	}
 }

@@ -113,6 +113,8 @@ void Renderer::update(RenderContext& render_context, SceneContext& scene_context
     data.viewpos = vec4(render_context.main_camera.viewpos, 0.0f);
 
 	data.ambient = ambient_color_;
+	data.znear = render_context.main_camera.znear;
+	data.zfar = render_context.main_camera.zfar;
 
     if (render_context.main_camera.percamera_uniform == UniformBuffer::invalid_id)
     {

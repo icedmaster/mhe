@@ -4,12 +4,17 @@
 [defs CUBEMAP 0 1]
 
 #define LIGHT_DIRECTION_FROM_SOURCE
+#define CASCADED_SHADOWMAP
 
 [include "common.h"]
 [include "lighting_common.h"]
 
+#ifdef DIRECTIONAL_CSM
+//#define CASCADED_SHADOWMAP_DEBUG
+#endif
+
 // Define layout before "geometry_common.h" will be included
-// TODO: SPOT_LIGHT is temorary here
+// TODO: SPOT_LIGHT is temporary here
 #if LIGHT_TYPE == DIRECTIONAL_LIGHT || LIGHT_TYPE == SPOT_LIGHT
 #define FULLSCREEN_LAYOUT
 #else
@@ -105,6 +110,20 @@ float get_shadow_value(sampler2D tex, float pixel_depth, vec2 texcoord, float bi
 
 #endif	// SHADOWMAP
 
+#ifdef CASCADED_SHADOWMAP_DEBUG
+const vec3 cascade_color[MAX_CASCADES_NUMBER] = vec3[MAX_CASCADES_NUMBER]
+(
+	vec3(1.0f, 0.0f, 0.0f),
+	vec3(0.0f, 1.0f, 0.0f),
+	vec3(0.0f, 0.0f, 1.0f),
+	vec3(1.0f, 1.0f, 0.0f),
+	vec3(1.0f, 0.0f, 1.0f),
+	vec3(0.0f, 1.0f, 1.0f),
+	vec3(1.0f, 1.0f, 1.0f),
+	vec3(1.0f, 1.0f, 1.0f)
+);
+#endif
+
 void main()
 {
 	// TODO: add pack and unpack methods
@@ -138,6 +157,19 @@ void main()
 	// pos - position in the world-space
 	// shadowmap_pos - projected position
 	vec4 shadowmap_pos = light.lightvp * vec4(pos, 1.0f);
+
+	vec2 shadowmap_coord_offset = vec2(0.0f, 0.0f);
+	vec2 shadowmap_coord_scale = vec2(1.0f, 1.0f);
+	#ifdef DIRECTIONAL_CSM
+	int cascade = calculate_cascade(linearized_depth(depth, znear, zfar), light);
+	float fcascade = cascade;
+	shadowmap_pos.xyz *= light.csm_scale[cascade].xyz;
+	shadowmap_pos.xyz += light.csm_offset[cascade].xyz;
+	shadowmap_coord_offset.x += fcascade / light.cascades_number;
+	shadowmap_coord_scale.x *= (1.0f / light.cascades_number);
+	#endif
+
+#ifndef CASCADED_SHADOWMAP_DEBUG
 	// clip space - all parameters lie in [-1; 1] interval
 	vec3 shadowmap_clip_pos = shadowmap_pos.xyz / shadowmap_pos.w;
 	
@@ -147,9 +179,12 @@ void main()
 	else
 	{
 		float pixel_depth = shadowmap_clip_pos.z * 0.5f + 0.5f;
-		shadow_value = get_shadow_value(shadowmap_texture, pixel_depth, shadowmap_clip_pos.xy * 0.5f + 0.5f, light.shadowmap_params.x);
+		shadow_value = get_shadow_value(shadowmap_texture, pixel_depth, (shadowmap_clip_pos.xy * 0.5f + 0.5f) * shadowmap_coord_scale + shadowmap_coord_offset, light.shadowmap_params.x);
 	}
-#endif
+#else
+	result = cascade_color[cascade];
+#endif // CASCADED_SHADOWMAP_DEBUG
+#endif // SHADOWMAP
 
 	color = vec4(result * shadow_value, 0.0f);
 }

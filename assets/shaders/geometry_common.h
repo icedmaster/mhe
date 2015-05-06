@@ -6,7 +6,15 @@ uniform percamera
     mat4 inv_proj;
     vec4 viewpos;
 	vec4 ambient;
+	float znear;
+	float zfar;
 };
+
+float linearized_depth(float d, float znear, float zfar)
+{
+	return (znear / (znear - zfar) * zfar) / (d - (zfar / (zfar - znear)));
+	//return (2 * znear * zfar) / (zfar + znear - d * (zfar - znear));
+}
 
 [vertex]
 

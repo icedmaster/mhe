@@ -144,6 +144,22 @@ bool GBufferDrawMaterialSystem::init(Context& context, const MaterialSystemConte
             return false;
 	}
 
+	UberShader::Index index;
+	const UberShader::Info& info = ubershader(context).info("LIGHT_TYPE");
+	index.set(info, Light::directional);
+	ShaderProgram::IdType directional_shader_program_id = ubershader(context).get(index);
+	ShaderProgram& directional_shader_program = context.shader_pool.get(directional_shader_program_id);
+	for (size_t i = 0; i < max_directional_lights_number; ++i)
+	{
+		directional_light_uniform_[i] = context.uniform_pool.create();
+		UniformBuffer& uniform = context.uniform_pool.get(directional_light_uniform_[i]);
+		UniformBufferDesc uniform_buffer_desc;
+		uniform_buffer_desc.name = "lights";
+		uniform_buffer_desc.program = &directional_shader_program;
+		if (!uniform.init(uniform_buffer_desc))
+			return false;
+	}
+
 	clear_command_.set_driver(&context.driver);
 
     return init_meshes(context);
@@ -252,36 +268,41 @@ void GBufferDrawMaterialSystem::update(Context& context, SceneContext& scene_con
 		if (cubemap_texture.id != Texture::invalid_id)
 			use_cubemap = 1;
 
+		size_t directional_light_index = 0;
     for (size_t i = 0; i < render_context.lights_number; ++i)
     {
         int type = 0;
         size_t use_shadowmap = 0;
         TextureInstance shadowmap_texture;
+				UniformBuffer::IdType light_uniform;
         // Update light data
         LightData data;
         const Light& light = render_context.lights[i].light;
-        data.diffuse = light.shading().diffuse;
-        data.diffuse.set_w(light.type() == Light::spot ? light.spot_angle_coeff() : light.angle());
-        data.specular = light.shading().specular;
-				data.specular.set_w(light.attenuation_b());
-        const vec3& light_position = get_light_position(scene_context, render_context.lights[i].id);
-        data.position = vec4(light_position.x(), light_position.y(), light_position.z(), light.attenuation_a());
-        const vec3& light_direction = get_light_direction(scene_context, render_context.lights[i].id);
-        data.direction = vec4(light_direction.x(), light_direction.y(), light_direction.z(), light.angle_attenuation());
-        type = light.type();
+				type = light.type();
+				if (type != Light::directional)
+					update_light_data(data, scene_context, render_context.lights[i], light);
+				else
+				{
+					DirectionalLightData light_data;
+					update_directional_light_data(light_data, scene_context, render_context.lights[i], light);
+					UniformBuffer& uniform = context.uniform_pool.get(directional_light_uniform_[directional_light_index++]);
+					uniform.update(light_data);
+					light_uniform = uniform.id();
+				}
 
-        if (shadowmap_enabled_.value() && light.shadowmap_texture().id != Texture::invalid_id)
+				const ShadowInfo* shadow_info = light.shadow_info();
+        if (shadowmap_enabled_.value() && shadow_info != nullptr)
         {
             use_shadowmap = 1;
-            shadowmap_texture = light.shadowmap_texture();
-            data.lightvp = light.vp();
-            data.shadowmap_params = vec4(light.desc().shadowmap_bias, 0.0f, 0.0f, 0.0f);
+            shadowmap_texture = shadow_info->shadowmap;
         }
 
-        data.lightw = update_light_transform(light, light_position, light_direction);
-
-        UniformBuffer& uniform = context.uniform_pool.get(light_uniform_[i]);
-        uniform.update(reinterpret_cast<const uint8_t*>(&data), sizeof(LightData));
+				if (light.type() != Light::directional)
+				{
+					UniformBuffer& uniform = context.uniform_pool.get(light_uniform_[i]);
+					uniform.update(reinterpret_cast<const uint8_t*>(&data), sizeof(LightData));
+					light_uniform = uniform.id();
+				}
 
         // Choose the correct shader
         UberShader& shader = ubershader(context);
@@ -310,7 +331,7 @@ void GBufferDrawMaterialSystem::update(Context& context, SceneContext& scene_con
         material.textures[shadowmap_texture_unit] = shadowmap_texture;
 				material.textures[env_cubemap_texture_unit] = cubemap_texture;
         material.uniforms[0] = render_context.main_camera.percamera_uniform;
-        material.uniforms[1] = uniform.id();
+        material.uniforms[1] = light_uniform;
         draw_call.material.material_system = id();
         draw_call.material.id = material.id;
 
@@ -329,6 +350,53 @@ mat4x4 GBufferDrawMaterialSystem::update_light_transform(const Light& light, con
         return res;
     }
     return mat4x4::identity();
+}
+
+void GBufferDrawMaterialSystem::update_light_data(LightData& light_data, const SceneContext& scene_context, 
+	const LightInstance& light_instance, const Light& light) const
+{
+	light_data.diffuse = light.shading().diffuse;
+	light_data.diffuse.set_w(light.type() == Light::spot ? light.spot_angle_coeff() : light.angle());
+	light_data.specular = light.shading().specular;
+	light_data.specular.set_w(light.attenuation_b());
+	const vec3& light_position = get_light_position(scene_context, light_instance.id);
+	light_data.position = vec4(light_position.x(), light_position.y(), light_position.z(), light.attenuation_a());
+	const vec3& light_direction = get_light_direction(scene_context, light_instance.id);
+	light_data.direction = vec4(light_direction.x(), light_direction.y(), light_direction.z(), light.angle_attenuation());
+
+	const ShadowInfo* shadow_info = light.shadow_info();
+	if (shadowmap_enabled_.value() && shadow_info != nullptr)
+	{
+		light_data.lightvp = shadow_info->lightvp;
+		light_data.shadowmap_params = vec4(light.desc().shadowmap_bias, 0.0f, 0.0f, 0.0f);
+	}
+
+	light_data.lightw = update_light_transform(light, light_position, light_direction);
+}
+
+void GBufferDrawMaterialSystem::update_directional_light_data(DirectionalLightData& light_data,
+	const SceneContext& scene_context,
+	const LightInstance& light_instance, const Light& light) const
+{
+	light_data.diffuse = light.shading().diffuse;
+	light_data.specular = light.shading().specular;
+	light_data.direction = get_light_direction(scene_context, light_instance.id);
+
+	const ShadowInfo* shadow_info = light.shadow_info();
+	if (shadowmap_enabled_.value() && shadow_info != nullptr)
+	{
+		light_data.lightvp = shadow_info->lightview;
+		light_data.shadowmap_params = vec4(light.desc().shadowmap_bias, 0.0f, 0.0f, 0.0f);
+
+		light_data.cascades_number = shadow_info->cascades_number;
+		for (size_t i = 0; i < shadow_info->cascades_number; ++i)
+		{
+			light_data.csm_offset[i] = shadow_info->offset[i];
+			light_data.csm_scale[i] = shadow_info->scale[i];
+			light_data.cascade_znear[i] = shadow_info->znear[i];
+			light_data.cascade_zfar[i] = shadow_info->zfar[i];
+		}
+	}
 }
 
 }

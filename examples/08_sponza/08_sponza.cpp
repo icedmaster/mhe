@@ -81,6 +81,7 @@ private:
 		light.desc().directional.directional_shadowmap_projection_height = 2500.0;
 		light.desc().directional.directional_shadowmap_projection_width = 2500.0;
 		light.desc().cast_shadows = true;
+		light.desc().shadowmap_bias = 0.002;
 		light_instance.enabled = true;
 	}
 

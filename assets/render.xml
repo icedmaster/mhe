@@ -15,7 +15,14 @@
       </options>
     </material>
   <material name="depth_write" shader="depth_write" priority="3" />
-  <material name="csm_depth_write" shader="depth_write" priority="3" />
+  <material name="csm_depth_write" shader="depth_write" priority="3">
+    <options>
+      <cascades>4</cascades>
+      <height>512</height>
+      <width>512</width>
+      <percentage>10, 30, 50, 100</percentage>
+    </options>
+  </material>
   </materials>
   <skybox name="skybox" />
   <shadowmap_depth_write name="csm_depth_write" />

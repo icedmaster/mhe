@@ -93,6 +93,7 @@ void DepthWriteMaterialSystem::update(Context& context, SceneContext& scene_cont
 	clear_commands_.clear();
 	uniforms_.clear();
 	draw_call_data_.clear();
+	shadow_info_.clear();
 
     context.materials[id()].clear();
 
@@ -112,7 +113,10 @@ void DepthWriteMaterialSystem::update(Context& context, SceneContext& scene_cont
 		data.mvp = get_light_shadowmap_matrix(scene_context, render_context.lights[i].id);
 		uniform.update(data);
 
-		render_context.lights[i].light.set_shadowmap_texture(shadowmaps_[index]);
+		ShadowInfo& shadow_info = shadow_info_.add();
+		shadow_info.shadowmap = shadowmaps_[index];
+		shadow_info.lightvp = data.mvp;
+		render_context.lights[i].light.set_shadow_info(&shadow_info);
 
 		ClearCommand& command = clear_commands_.add();
 		command.set_driver(&context.driver);

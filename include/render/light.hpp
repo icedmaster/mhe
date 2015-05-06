@@ -1,6 +1,8 @@
 #ifndef __LIGHT_HPP__
 #define __LIGHT_HPP__
 
+#include "core/array.hpp"
+#include "math/matrix.hpp"
 #include "math/vector3.hpp"
 #include "math/vector4.hpp"
 #include "utils/pool_utils.hpp"
@@ -71,6 +73,18 @@ struct ShadingSettings
 	vec4 specular;
 };
 
+struct ShadowInfo
+{
+	TextureInstance shadowmap;
+	mat4x4 lightvp;
+	mat4x4 lightview;
+	array<vec3, max_shadowmap_cascades_number> offset;
+	array<vec3, max_shadowmap_cascades_number> scale;
+	array<float, max_shadowmap_cascades_number> znear;
+	array<float, max_shadowmap_cascades_number> zfar;
+	size_t cascades_number;
+};
+
 class Light
 {
 public:
@@ -84,11 +98,13 @@ public:
 	static const size_t light_types_number = directional + 1;
 public:
 	Light() :
-		type_(spot)
+		type_(spot),
+		shadow_info_(nullptr)
 	{}
 
 	Light(int type) :
-		type_(type)
+		type_(type),
+		shadow_info_(nullptr)
 	{}
 
 	void set_type(int type)
@@ -162,33 +178,20 @@ public:
 		return 1.0f;
 	}
 
-	TextureInstance shadowmap_texture() const
+	void set_shadow_info(const ShadowInfo* info)
 	{
-		return shadowmap_texture_;
+		shadow_info_ = info;
 	}
 
-	void set_shadowmap_texture(const TextureInstance& texture)
+	const ShadowInfo* shadow_info() const
 	{
-		shadowmap_texture_ = texture;
-	}
-
-	void set_vp(const mat4x4& vp)
-	{
-		light_vp_ = vp;
-	}
-
-	const mat4x4& vp() const
-	{
-		return light_vp_;
+		return shadow_info_;
 	}
 private:
 	ShadingSettings shading_;
 	LightDesc desc_;
 	int type_;
-
-	TextureInstance shadowmap_texture_;
-
-	mat4x4 light_vp_;
+	const ShadowInfo* shadow_info_;
 };
 
 }

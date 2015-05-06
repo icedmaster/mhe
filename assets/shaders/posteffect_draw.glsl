@@ -20,6 +20,8 @@ void main()
 
 [fragment]
 
+[include "geometry_common.h"]
+
 [sampler2D main_texture 0]
 
 in VSOutput vsoutput;
@@ -33,8 +35,8 @@ void main()
 #else
 	float d = texture(main_texture, vsoutput.tex).r;
 
-	const float range_start = 0.0f;
-	d = (d - range_start) / (1.0f - range_start);
+	const float range_start = 0.99f;
+	d = linearized_depth(d, znear, zfar) / zfar;
 	color = vec4(d, d, d, 1.0f);
 #endif
 }

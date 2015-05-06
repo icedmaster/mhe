@@ -14,6 +14,9 @@
 namespace mhe {
 
 class Light;
+struct LightInstance;
+struct LightData;
+struct DirectionalLightData;
 
 class AbstractGBufferFillMaterialSystem : public MaterialSystem
 {
@@ -88,6 +91,8 @@ private:
     bool init_conus(Context& context);
     void update(Context& context, SceneContext& scene_context, RenderContext& render_context);
     mat4x4 update_light_transform(const Light& light, const vec3& position, const vec3& direction) const;
+		void update_light_data(LightData& light_data, const SceneContext& scene_context, const LightInstance& light_instance, const Light& light) const;
+		void update_directional_light_data(DirectionalLightData& light_data, const SceneContext& scene_context, const LightInstance& light_instance, const Light& light) const;
 
     MeshInstance quad_mesh_;
     MeshInstance sphere_mesh_;
@@ -100,6 +105,7 @@ private:
     TextureInstance normal_texture_;
     TextureInstance depth_texture_;
 	UniformBuffer::IdType light_uniform_[max_lights_number];
+	UniformBuffer::IdType directional_light_uniform_[max_directional_lights_number];
     DrawCallData::IdType draw_call_data_;
 
 	GlobalVar<bool> shadowmap_enabled_;

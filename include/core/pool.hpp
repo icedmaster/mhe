@@ -62,6 +62,7 @@ public:
 
 	I create() const
 	{
+		ASSERT(size_ < C, "Can't get next element from the pool");
 		Index& ind = indexes_[first_];
 		ind.index = size_++;
 		T& obj = objects_[ind.index];
