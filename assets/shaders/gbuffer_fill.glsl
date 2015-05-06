@@ -51,7 +51,7 @@ layout (location = 1) out vec4 normal;
 
 void main()
 {
-	color = vec4(pow(texture(diffuse_texture, vsoutput.tex).rgb, vec3(2.2f, 2.2f, 2.2f)), PHONG_MATERIAL_GLOSSINESS(material_data));
+	color = vec4(texture(diffuse_texture, vsoutput.tex).rgb, PHONG_MATERIAL_GLOSSINESS(material_data));
 #if NORMALMAP == 0
 	normal = vec4(normalize(vsoutput.nrm), PHONG_MATERIAL_SHININESS(material_data));
 #else
