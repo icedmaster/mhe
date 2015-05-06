@@ -77,6 +77,8 @@
 const size_t max_shader_programs_number = 4096;
 const size_t max_ubershaders_number = 128;
 
+const size_t initial_material_instances_number = 2048;
+
 const size_t max_material_systems_number = 16;
 const size_t max_render_targets_number = 16;
 const size_t max_simultaneous_render_targets_number = 4;
@@ -97,6 +99,9 @@ const size_t shadowmap_default_width = 2048;
 
 const size_t cubemap_default_texture_size = 128;
 const float cubemap_default_size = 10.0f;
+
+const size_t max_shadowmap_cascades_number = 8;
+const size_t max_directional_lights_number = 8;
 
 /**
  * Scene configuration

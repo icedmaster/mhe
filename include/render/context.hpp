@@ -100,7 +100,7 @@ private:
 	vector_type systems_;
 };
 
-typedef Pool< Material, 1024, uint16_t, StructTypePolicy<Material, uint16_t> > MaterialPool;
+typedef Pool< Material, initial_material_instances_number, uint16_t, StructTypePolicy<Material, uint16_t> > MaterialPool;
 
 struct Context
 {

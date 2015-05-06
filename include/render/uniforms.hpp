@@ -2,6 +2,7 @@
 #define __UNIFORMS_HPP__
 
 #include "math/matrix.hpp"
+#include "core/config.hpp"
 
 namespace mhe {
 
@@ -17,6 +18,9 @@ struct PerCameraData
 	mat4x4 inv_proj;
 	vec4 viewpos;
 	vec4 ambient;
+	float znear;
+	float zfar;
+	float padding[2];
 };
 
 struct PerModelSimpleData
@@ -39,6 +43,21 @@ struct LightData
 	mat4x4 lightvp;
     mat4x4 lightw;
 	vec4 shadowmap_params;
+};
+
+struct DirectionalLightData
+{
+	vec4 diffuse;
+	vec4 specular;
+	vec4 direction;
+	mat4x4 lightvp;
+	vec4 csm_scale[max_shadowmap_cascades_number];
+	vec4 csm_offset[max_shadowmap_cascades_number];
+	float cascade_znear[max_shadowmap_cascades_number];
+	float cascade_zfar[max_shadowmap_cascades_number];
+	vec4 shadowmap_params;
+	uint32_t cascades_number;
+	uint32_t padding[3];
 };
 
 struct PhongMaterialData
