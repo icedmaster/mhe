@@ -12,8 +12,8 @@ uniform percamera
 
 float linearized_depth(float d, float znear, float zfar)
 {
-	return (znear / (znear - zfar) * zfar) / (d - (zfar / (zfar - znear)));
-	//return (2 * znear * zfar) / (zfar + znear - d * (zfar - znear));
+	d = d * 2.0f - 1.0f;
+	return (2 * znear * zfar) / (zfar + znear - d * (zfar - znear));
 }
 
 [vertex]
