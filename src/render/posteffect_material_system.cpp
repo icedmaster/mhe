@@ -176,7 +176,7 @@ void PosteffectDebugMaterialSystem::set_render_target(const RenderTarget& render
 {
 	for (size_t i = 0; i < max_textures_number; ++i)
 		textures_[i].id = Texture::invalid_id;
-	size_t color_textures_number = render_target.color_textures(textures_);
+    render_target.color_textures(textures_);
 	size_t depth_textures_number = render_target.depth_texture(textures_[max_textures_number - 1]);
 	texture_type_mask_ = depth_textures_number == 0 ? 0 : (1 << 3);
 }

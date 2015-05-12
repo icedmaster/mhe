@@ -319,7 +319,7 @@ void GBufferDrawMaterialSystem::update(Context& context, SceneContext& scene_con
     }
 }
 
-mat4x4 GBufferDrawMaterialSystem::update_light_transform(const Light& light, const vec3& position, const vec3& direction) const
+mat4x4 GBufferDrawMaterialSystem::update_light_transform(const Light& light, const vec3& position, const vec3& /*direction*/) const
 {
     if (light.type() == Light::directional) return mat4x4::identity();
     if (light.type() == Light::omni)

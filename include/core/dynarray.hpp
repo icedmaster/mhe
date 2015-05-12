@@ -38,7 +38,7 @@ public:
 
 	~dynarray()
 	{
-		delete[](allocator_, elements_);
+        operator delete[](allocator_, elements_);
 	}
 
 	// accessors

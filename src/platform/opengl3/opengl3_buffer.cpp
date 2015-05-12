@@ -181,7 +181,7 @@ bool OpenGL3UniformBuffer::init(const UniformBufferDesc& desc)
 			::memcpy(data_.begin() + offsets_[i], desc.uniforms[i].data, desc.uniforms[i].size);
 	}
 
-	for (int i = 0; i < max_vbo_index; ++i)
+    for (size_t i = 0; i < max_vbo_index; ++i)
 	{
 		if (!vbo_[i].init(GL_UNIFORM_BUFFER, size, &data_[0], GL_DYNAMIC_DRAW))
 		{

@@ -78,17 +78,17 @@ public:
 	typedef const T* const_iterator;
 public:
 	fixed_size_vector(allocator* alloc = default_allocator()) :
-		begin_(elements_), size_(0), capacity_(count)
+        begin_(elements_), size_(0), capacity_(count), allocator_(alloc)
 	{}
 
 	fixed_size_vector(const this_type& v, allocator* alloc = default_allocator()) :
-		begin_(elements_), size_(0), capacity_(count)
+        begin_(elements_), size_(0), capacity_(count), allocator_(alloc)
 	{
 		insert(end(), v.begin(), v.end());
 	}
 
 	fixed_size_vector(size_t size, allocator* alloc = default_allocator()) :
-		begin_(elements_), size_(0), capacity_(count)
+        begin_(elements_), size_(0), capacity_(count), allocator_(alloc)
 	{		
 		resize(size);
 	}
@@ -315,7 +315,6 @@ private:
 	void reallocate_vector(size_t new_capacity)
 	{
 		reallocation_policy::reallocate(capacity_, new_capacity, FUNCTION_DESCRIPTION_MACRO);
-		size_t prev_capacity = capacity_;
 		T* copy = begin_;;
 		capacity_ = new_capacity;
 		begin_ = allocate(capacity_);
@@ -338,7 +337,7 @@ private:
 
 	void free(T* ptr)
 	{
-		delete[](allocator_, ptr);
+        operator delete[](allocator_, ptr);
 	}
 
 	T elements_[count];
