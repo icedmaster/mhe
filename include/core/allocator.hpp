@@ -122,7 +122,7 @@ public:
 	stack_allocator(const string& name) : fixed_size_allocator_base<Align>(name)
 #endif
 	{
-		set(stack, S);
+        set(stack_, S);
 	}
 private:
 	uint8_t stack_[S];
@@ -139,7 +139,7 @@ public:
 #endif
 		stack_(new uint8_t[size])
 	{
-		set(stack_, size);
+        fixed_size_allocator_base<Align>::set(stack_, size);
 	}
 
 	~fixed_size_allocator()

@@ -21,7 +21,7 @@ int texture_format(int image_format)
 	return formats[image_format];
 }
 
-bool create_texture(Texture& texture, int target, const Image& image, const Context* context)
+bool create_texture(Texture& texture, int target, const Image& image, const Context* /*context*/)
 {
 	TextureDesc desc;
 	desc.type = target;

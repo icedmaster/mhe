@@ -133,7 +133,6 @@ void CSMDepthRenderingMaterialSystem::update(Context& context, SceneContext& sce
 	context.materials[id()].clear();
 	clear_command_.reset();
 
-	LightInstance::IdType light_idx = LightInstance::invalid_id;
 	mat4x4 light_view;
 	Light* light = nullptr;
 	for (size_t i = 0; i < render_context.lights_number; ++i)

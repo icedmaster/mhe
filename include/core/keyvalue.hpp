@@ -25,7 +25,7 @@ public:
 	template <class V>
 	V get(const K& key) const
 	{
-		StorageMap::const_iterator it = storage_.find(key);
+        typename StorageMap::const_iterator it = storage_.find(key);
 		if (it == storage_.end()) return V();
 		return types_cast<V>(it->value);
 	}
