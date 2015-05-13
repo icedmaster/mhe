@@ -162,7 +162,7 @@ void process_scene(const char* out_filename, const aiScene* assimp_scene, const 
 			submesh_aabb_max = mhe::max(submesh_aabb_max, vertex.pos);
 			submesh_aabb_min = mhe::min(submesh_aabb_min, vertex.pos);
 		}
-		part_data.aabb = mhe::AABBf::from_min_max(submesh_aabb_min, submesh_aabb_max);
+		parts[m].aabb = mhe::AABBf::from_min_max(submesh_aabb_min, submesh_aabb_max);
 	}
 
 	mesh_export_data.aabb = mhe::AABBf::from_min_max(mesh_aabb_min, mesh_aabb_max);

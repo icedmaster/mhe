@@ -3,6 +3,8 @@
 
 namespace mhe {
 
+typedef uint16_t AABBInstanceHandleType;
+
 }
 
 #endif

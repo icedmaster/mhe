@@ -83,6 +83,8 @@ bool init_mesh(Mesh& mesh, uint8_t layout, const MeshExportData& mesh_export_dat
 		initialization_data.textures[normal_texture_unit] = material_data.normalmap_texture.name;
 		part.material_id = context->material_manager.get(initialization_data);
 
+		part.aabb = part_data.aabb;
+
 		mesh.parts.push_back(part);
 	}
 

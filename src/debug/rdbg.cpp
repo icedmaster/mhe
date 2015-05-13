@@ -200,11 +200,14 @@ std::string RDBGProcessor::process_stats_command(const std::vector<std::string>&
 	add_stat_field(result, "fps", stats.frames());
 	add_stat_field(result, "tris", stats.tris() / stats.frames());
 	add_stat_field(result, "drawcalls:", stats.batches() / stats.frames());
-    const Scene::Stats& scene_stats = engine_.scene().stats();
-    add_stat_field(result, "aabbs:", scene_stats.aabbs());
-    add_stat_field(result, "aabbs_visible:", scene_stats.aabbs_visible());
-    add_stat_field(result, "nodes:", scene_stats.nodes());
-    add_stat_field(result, "nodes_visible:", scene_stats.nodes_visible());
+	const Scene::Stats& scene_stats = engine_.scene().stats();
+	add_stat_field(result, "aabbs:", scene_stats.aabbs());
+	add_stat_field(result, "aabbs_visible:", scene_stats.aabbs_visible());
+	add_stat_field(result, "nodes:", scene_stats.nodes());
+	add_stat_field(result, "nodes_visible:", scene_stats.nodes_visible());
+	add_stat_field(result, "parts:", scene_stats.parts());
+	add_stat_field(result, "parts_visible:", scene_stats.parts_visible());
+
 	return result;
 }
 

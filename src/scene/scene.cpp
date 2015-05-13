@@ -160,7 +160,7 @@ void Scene::frustum_culling()
 			aabbs[i].visible = visible;
 			visible_aabbs += static_cast<size_t>(visible);
 		}
-		
+		parts_frustum_culling(planes, abs_planes);
 	}
 	else
 	{
@@ -174,6 +174,36 @@ void Scene::frustum_culling()
 	}
 	visible_aabbs_ = visible_aabbs;
     stats_.update_aabbs(scene_context_.aabb_pool.size(), visible_aabbs);
+}
+
+void Scene::parts_frustum_culling(const planef* planes, const planef* abs_planes)
+{
+	const AABBPool& parents_pool = scene_context_.aabb_pool;
+	AABBInstance* aabbs = scene_context_.parts_aabb_pool.all_objects();
+	size_t aabbs_number = scene_context_.parts_aabb_pool.size();
+	for (size_t i = 0; i < aabbs_number; ++i)
+	{
+		if (aabbs[i].parent_id != AABBInstance::invalid_id && !parents_pool.get(aabbs[i].parent_id).visible)
+			aabbs[i].visible = false;
+		else
+			aabbs[i].visible = is_inside(aabbs[i].aabb, planes, abs_planes);
+	}
+
+	size_t parts = 0, parts_visible = 0;
+	NodeInstance* nodes = scene_context_.node_pool.all_objects();
+	size_t nodes_number = scene_context_.node_pool.size();
+	const AABBPool& parts_aabb_pool = scene_context_.parts_aabb_pool;
+	for (size_t i = 0; i < nodes_number; ++i)
+	{
+		for (size_t j = 0, size = nodes[i].mesh.instance_parts.size(); j < size; ++j, ++parts)
+		{
+			if (nodes[i].mesh.instance_parts[j].aabb_id != AABBInstance::invalid_id)
+				nodes[i].mesh.instance_parts[j].visible = parts_aabb_pool.get(nodes[i].mesh.instance_parts[j].aabb_id).visible;
+			else nodes[i].mesh.instance_parts[j].visible = true;
+			parts_visible += static_cast<size_t>(nodes[i].mesh.instance_parts[j].visible);
+		}
+	}
+	stats_.update_parts(parts, parts_visible);
 }
 
 void Scene::update_scene_aabb(RenderContext& render_context) const

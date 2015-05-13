@@ -6,17 +6,19 @@
 #include "utils/pool_utils.hpp"
 #include "node.hpp"
 #include "light.hpp"
+#include "render_common.hpp"
 
 namespace mhe {
 
 struct AABBInstance
 {
-	POOL_STRUCT(uint16_t);
+	POOL_STRUCT(AABBInstanceHandleType);
 	AABBf aabb;
+	AABBInstance::IdType parent_id;
     bool visible : 1;
     bool enabled : 1;
 
-    AABBInstance() : id(invalid_id), enabled(true) {}
+    AABBInstance() : parent_id(invalid_id), id(invalid_id), enabled(true) {}
 };
 
 struct TransformInstance

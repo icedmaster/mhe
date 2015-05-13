@@ -219,6 +219,10 @@ bool load_node(NodeInstance& node, const string& name, hash_type material_system
 	{
 		ModelContext& model_context = model_contexts[i];
 		model_context.transform_uniform = node.mesh.shared_uniform;
+		AABBInstance& part_aabb_instance = create_and_get(scene_context.parts_aabb_pool);
+		part_aabb_instance.aabb = node.mesh.mesh.parts[i].aabb;
+		node.mesh.instance_parts[i].aabb_id = part_aabb_instance.id;
+		part_aabb_instance.parent_id = aabb_instance.id;
 	}
 	material_system->setup(context, scene_context, &node.mesh.instance_parts[0], &node.mesh.mesh.parts[0], &model_contexts[0], node.mesh.instance_parts.size());
 	return true;

@@ -6,6 +6,7 @@
 #include "render_state.hpp"
 #include "material.hpp"
 #include "render_target.hpp"
+#include "render_common.hpp"
 
 namespace mhe {
 
@@ -47,7 +48,8 @@ struct RenderData
 
 struct MeshPart
 {
-    RenderData render_data;
+  RenderData render_data;
+	AABBf aabb;
 	MaterialId material_id;
 };
 
@@ -75,6 +77,10 @@ struct MeshPartInstance
 {
     MaterialInstance material;
     DrawCallData::IdType draw_call_data;
+		AABBInstanceHandleType aabb_id;
+		bool visible : 1;
+
+		MeshPartInstance() : visible(true) {}
 };
 
 struct MeshInstance

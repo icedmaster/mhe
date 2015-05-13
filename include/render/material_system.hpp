@@ -154,7 +154,7 @@ typedef Factory<MaterialSystem> MaterialSystemFactory;
         for (size_t j = 0; j < render_context.nodes[i].mesh.instance_parts.size(); ++j) \
         {   \
             MeshPartInstance& part_instance = render_context.nodes[i].mesh.instance_parts[j];   \
-            if (part_instance.material.material_system != id())    \
+            if (part_instance.material.material_system != id() || !part_instance.visible)    \
                 continue;                                                                           \
             update_method(context, scene_context, render_context, &part_instance, 1); \
             setup_draw_call(render_context.draw_calls.add(), part_instance, render_context.nodes[i].mesh.mesh.parts[j], command);   \
