@@ -80,7 +80,7 @@ struct MeshPartInstance
 		AABBInstanceHandleType aabb_id;
 		bool visible : 1;
 
-		MeshPartInstance() : visible(true) {}
+		MeshPartInstance() : aabb_id(InvalidHandle<AABBInstanceHandleType>::id), visible(true) {}
 };
 
 struct MeshInstance

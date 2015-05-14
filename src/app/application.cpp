@@ -17,9 +17,10 @@ namespace app {
 
 struct RendererParams
 {
-    string skybox;
-    string shadowmap_depth_write;
-		string fullscreen_debug;
+	string skybox;
+	string shadowmap_depth_write;
+	string directional_depth_write;
+	string fullscreen_debug;
 };
 
 Application::Application(const char* name) :
@@ -154,6 +155,9 @@ void Application::init_render(const ApplicationConfig& config)
     if (skybox_node) renderer_params.skybox = skybox_node.attribute("name").value();
     pugi::xml_node shadowmap_depth_write_node = mhe_node.child("shadowmap_depth_write");
     if (shadowmap_depth_write_node) renderer_params.shadowmap_depth_write = shadowmap_depth_write_node.attribute("name").value();
+		pugi::xml_node directional_shadowmap_depth_write_node = mhe_node.child("directional_shadowmap_depth_write");
+		if (directional_shadowmap_depth_write_node)
+			renderer_params.directional_depth_write = directional_shadowmap_depth_write_node.attribute("name").value();
 		pugi::xml_node fullscreen_debug_node = mhe_node.child("fullscreen_debug");
 		if (fullscreen_debug_node) renderer_params.fullscreen_debug = fullscreen_debug_node.attribute("name").value();
 	
@@ -212,12 +216,14 @@ void Application::init_gbuffer(pugi::xml_node gbuffer_node, const RendererParams
 
     MaterialSystem* skybox_material_system = context.material_systems.get(params.skybox);
     MaterialSystem* depth_write_material_system = context.material_systems.get(params.shadowmap_depth_write);
+		MaterialSystem* directional_depth_write_material_system = context.material_systems.get(params.directional_depth_write);
 		MaterialSystem* fullscreen_debug_material_system = context.material_systems.get(params.fullscreen_debug);
 	
 	DeferredRenderer* renderer = new DeferredRenderer(context);
-    renderer->set_skybox_material_system(skybox_material_system);
-    renderer->set_shadowmap_depth_write_material_system(depth_write_material_system);
-		renderer->set_fullscreen_debug_material_system(fullscreen_debug_material_system);
+	renderer->set_skybox_material_system(skybox_material_system);
+	renderer->set_shadowmap_depth_write_material_system(depth_write_material_system);
+	renderer->set_directional_shadowmap_depth_write_material_system(directional_depth_write_material_system);
+	renderer->set_fullscreen_debug_material_system(fullscreen_debug_material_system);
 	renderer->init(fill_material_system, use_material_system, draw_material_system);
 	engine_->set_renderer(renderer);
 }

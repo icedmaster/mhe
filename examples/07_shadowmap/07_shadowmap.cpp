@@ -107,6 +107,7 @@ private:
 		light.desc().directional.directional_shadowmap_projection_height = 100.0;
 		light.desc().directional.directional_shadowmap_projection_width = 100.0;
 		light.desc().cast_shadows = true;
+		light.desc().auto_shadow_configuration = false;
 
         mhe::LightInstance& light_instance2 = engine.scene().create_light();
 		mhe::Light& light2 = light_instance2.light;
@@ -120,6 +121,7 @@ private:
 		light2.desc().directional.directional_shadowmap_projection_height = 100.0;
 		light2.desc().directional.directional_shadowmap_projection_width = 100.0;
 		light2.desc().cast_shadows = true;
+		light2.desc().auto_shadow_configuration = false;
 
 		directional_lights_[0] = light_instance.id;
 		directional_lights_[1] = light_instance2.id;

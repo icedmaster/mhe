@@ -100,7 +100,7 @@ void DepthWriteMaterialSystem::update(Context& context, SceneContext& scene_cont
     bool have_shadowcasters = false;
 	for (size_t i = 0; i < render_context.lights_number; ++i)
 	{
-		if (!render_context.lights[i].light.desc().cast_shadows)
+		if (!render_context.lights[i].light.desc().cast_shadows || render_context.lights[i].light.shadow_info() != nullptr)
 			continue;
 		if (!init_light_data(context))
 		{
@@ -116,6 +116,10 @@ void DepthWriteMaterialSystem::update(Context& context, SceneContext& scene_cont
 		ShadowInfo& shadow_info = shadow_info_.add();
 		shadow_info.shadowmap = shadowmaps_[index];
 		shadow_info.lightvp = data.mvp;
+		shadow_info.lightview = data.mvp;
+		shadow_info.cascades_number = 1;
+		shadow_info.offset[0] = vec3::zero();
+		shadow_info.scale[0] = vec3(1.0f, 1.0f, 1.0f);
 		render_context.lights[i].light.set_shadow_info(&shadow_info);
 
 		ClearCommand& command = clear_commands_.add();

@@ -53,9 +53,10 @@ public:
 	virtual void update(RenderContext& render_context, SceneContext& scene_context);
 	virtual void render(RenderContext& render_context, SceneContext& scene_context);
 
-    void set_skybox_material_system(MaterialSystem* material_system);
-    void set_shadowmap_depth_write_material_system(MaterialSystem* material_system);
-		void set_fullscreen_debug_material_system(MaterialSystem* material_system);
+	void set_skybox_material_system(MaterialSystem* material_system);
+	void set_shadowmap_depth_write_material_system(MaterialSystem* material_system);
+	void set_directional_shadowmap_depth_write_material_system(MaterialSystem* material_system);
+	void set_fullscreen_debug_material_system(MaterialSystem* material_system);
 
 	void set_ambient_color(const colorf& color)
 	{
@@ -90,6 +91,7 @@ private:
 	Context& context_;
 	MaterialSystem* skybox_material_system_;
 	MaterialSystem* shadowmap_depth_write_material_system_;
+	MaterialSystem* directional_shadowmap_depth_write_material_system_;
 	// To implement
 	MaterialSystem* transparent_objects_material_system_;
 	MaterialSystem* particles_material_system_;

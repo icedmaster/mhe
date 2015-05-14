@@ -60,10 +60,12 @@ struct LightDesc
 
 	float shadowmap_bias;
 	bool cast_shadows;
+	bool auto_shadow_configuration; // currently works for directional lights only
 
     LightDesc() :
         shadowmap_bias(0.00125f),
-        cast_shadows(false)
+        cast_shadows(false),
+				auto_shadow_configuration(true)
 	{}
 };
 

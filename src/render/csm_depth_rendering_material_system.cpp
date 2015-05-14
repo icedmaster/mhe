@@ -138,7 +138,8 @@ void CSMDepthRenderingMaterialSystem::update(Context& context, SceneContext& sce
 	for (size_t i = 0; i < render_context.lights_number; ++i)
 	{
 		if (!render_context.lights[i].light.desc().cast_shadows ||
-				render_context.lights[i].light.type() != Light::directional)
+				render_context.lights[i].light.type() != Light::directional ||
+				!render_context.lights[i].light.desc().auto_shadow_configuration)
 				continue;
 		light_view = get_light_view_matrix(scene_context, render_context.lights[i].id);
 		shadow_info_.shadowmap = shadowmap_;

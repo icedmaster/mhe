@@ -138,10 +138,11 @@ void Scene::update_light_sources(RenderContext& render_context)
 	size_t size = 0;
 	for (size_t i = 0; i < scene_context_.light_pool.size(); ++i, ++size)
 	{
+		lights[i].light.set_shadow_info(nullptr);
 		if (!lights[i].enabled)
 			break;
 	}
-    render_context.lights_number = min(size, global_max_lights_number_.value());
+	render_context.lights_number = min(size, global_max_lights_number_.value());
 }
 
 void Scene::frustum_culling()

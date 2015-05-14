@@ -103,6 +103,8 @@ vec3 lit_blinn(Light light, vec3 pos, vec3 normal, vec3 viewdir, float shininess
 #ifdef DIRECTIONAL_CSM
 int calculate_cascade(float pixel_depth, Light light)
 {
+	if (light.cascades_number == 1)
+		return 0;
 	for (int i = 0; i < light.cascades_number; ++i)
 	{
 		float cascade_znear = light.cascade_znear[i];

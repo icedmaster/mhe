@@ -138,6 +138,8 @@ void Renderer::render(RenderContext& render_context, SceneContext& scene_context
 {
 	if (skybox_material_system_ != nullptr)
 		skybox_material_system_->setup_draw_calls(context_, scene_context, render_context);
+	if (directional_shadowmap_depth_write_material_system_ != nullptr)
+		directional_shadowmap_depth_write_material_system_->setup_draw_calls(context_, scene_context, render_context);
 	if (shadowmap_depth_write_material_system_ != nullptr)
 		shadowmap_depth_write_material_system_->setup_draw_calls(context_, scene_context, render_context);
 	render_impl(context_, render_context, scene_context);
@@ -181,6 +183,12 @@ void Renderer::set_shadowmap_depth_write_material_system(MaterialSystem* materia
 {
     shadowmap_depth_write_material_system_ = material_system;
     shadowmap_depth_write_material_system_->set_priority(shadowmap_depth_write_material_system_priority);
+}
+
+void Renderer::set_directional_shadowmap_depth_write_material_system(MaterialSystem* material_system)
+{
+	directional_shadowmap_depth_write_material_system_ = material_system;
+	directional_shadowmap_depth_write_material_system_->set_priority(shadowmap_depth_write_material_system_priority);
 }
 
 void Renderer::set_fullscreen_debug_material_system(MaterialSystem* material_system)
