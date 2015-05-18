@@ -180,17 +180,7 @@ std::string RDBGProcessor::process_get_all_command(const std::vector<std::string
 
 std::string RDBGProcessor::process_profiler_result_command(const std::vector<std::string>& /*args*/)
 {
-	const std::vector<Profiler::Data>& data = MainProfiler::instance().data();
-	std::string result;
-	for (size_t i = 0; i < data.size(); ++i)
-	{
-		result += data[i].name.c_str();
-		result += (" time:" + types_cast<std::string>(data[i].interval));
-		result += (" count:" + types_cast<std::string>(data[i].count));
-		result += (" data:" + data[i].data).c_str();
-		result += "\n";
-	}
-	return result;
+	return profiler_data_;
 }
 
 std::string RDBGProcessor::process_stats_command(const std::vector<std::string>& /*args*/)
@@ -280,6 +270,28 @@ const RDBGProcessor::Data* RDBGProcessor::find_data(const Data& root, const std:
 			process = false;
 	}
 	return nullptr;
+}
+
+void RDBGProcessor::update_profiler_data()
+{
+	std::string result;
+	result.reserve(1024);
+	const std::vector<Profiler::Data>& data = MainProfiler::instance().data();
+	const std::string separator = " ";
+	for (size_t i = 0, size = data.size(); i < size; ++i)
+	{
+		result += std::string(data[i].name.c_str());
+		result += separator;
+		result += types_cast<std::string>(data[i].id);
+		result += separator;
+		result += types_cast<std::string>(data[i].parent_id);
+		result += separator;
+		result += types_cast<std::string>(data[i].count);
+		result += separator;
+		result += types_cast<std::string>(data[i].interval);
+		result += separator;
+	}
+	profiler_data_ = result;
 }
 
 bool RDBGThread::start_impl()

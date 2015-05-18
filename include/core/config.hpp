@@ -103,6 +103,8 @@ const float cubemap_default_size = 10.0f;
 const size_t max_shadowmap_cascades_number = 8;
 const size_t max_directional_lights_number = 8;
 
+const size_t max_views_number = 16;
+
 /**
  * Scene configuration
  */

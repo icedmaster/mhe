@@ -140,6 +140,8 @@ public:
 	}
 
 	std::string process_command(const std::string& cmd);
+
+	void update_profiler_data();
 private:
 	std::string make_error(const char* message) const;
 
@@ -171,6 +173,7 @@ private:
 	typedef std::map<hash_type, Data> DataMap;
 	DataMap data_;
 	game::Engine& engine_;
+	std::string profiler_data_;
 };
 
 class RDBGThread : public thread

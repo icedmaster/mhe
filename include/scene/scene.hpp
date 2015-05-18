@@ -98,7 +98,8 @@ public:
 	}
 
 	NodeInstance& create_node() const;
-    void update(RenderContext& render_context);
+	void update(RenderContext& render_context);
+	void process_requests(RenderContext& render_context);
 
 	LightInstance& create_light() const;
 

@@ -134,6 +134,13 @@ void Renderer::update(RenderContext& render_context, SceneContext& scene_context
 	update_impl(context_, render_context, scene_context);
 }
 
+void Renderer::before_update(RenderContext& render_context, SceneContext& scene_context)
+{
+	render_context.render_view_requests.reset();
+	if (directional_shadowmap_depth_write_material_system_ != nullptr)
+		directional_shadowmap_depth_write_material_system_->start_frame(context_, scene_context, render_context);
+}
+
 void Renderer::render(RenderContext& render_context, SceneContext& scene_context)
 {
 	if (skybox_material_system_ != nullptr)

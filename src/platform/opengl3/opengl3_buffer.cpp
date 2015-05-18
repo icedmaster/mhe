@@ -59,7 +59,7 @@ void VBO::disable() const
 void VBO::update(GLsizeiptr size, GLintptr offset, const GLvoid* data)
 {
 	enable();
-	if (!gl_map_for_buffer_update.value())
+	if (!global::gl_map_for_buffer_update.value())
 		OpenGLExtensions::instance().glBufferSubData(target_, offset, size, data);
 	else
 	{

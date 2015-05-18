@@ -6,6 +6,7 @@
 #include "render/context.hpp"
 #include "render/material_system.hpp"
 #include "render/renderer.hpp"
+#include "debug/profiler.hpp"
 
 namespace mhe {
 
@@ -35,6 +36,26 @@ struct LightSortHelper
 		return light1.light.type() < light2.light.type();
 	}
 };
+
+size_t check_visibility(bool* visibility, const AABBPool& parents, const AABBPool& parts, const mat4x4& mat)
+{
+	frustumf f;
+	f.set(mat);
+	const planef* planes = f.planes();
+	const planef abs_planes[6] = {abs(planes[0]), abs(planes[1]), abs(planes[2]),
+		abs(planes[3]), abs(planes[4]), abs(planes[5])};
+	AABBInstance* aabbs = parts.all_objects();
+	size_t size = parts.size();
+	size_t total = 0;
+	size_t visible = 0;
+	for (size_t i = 0; i < size; ++i)
+	{
+		bool is_visible = is_inside(aabbs[i].aabb, planes, abs_planes);
+		visibility[total++] = is_visible;
+		visible += static_cast<size_t>(is_visible);
+	}
+	return visible;
+}
 
 }
 
@@ -106,6 +127,20 @@ void Scene::update(RenderContext& render_context)
 	render_context.nodes_number = visible_nodes;
 
     update_light_sources(render_context);
+}
+
+void Scene::process_requests(RenderContext& render_context)
+{
+	ProfilerElement pe("scene.process_requests");
+	for (size_t i = 0; i < max_views_number; ++i)
+	{
+		ViewId id = static_cast<ViewId>(i);
+		if (!render_context.render_view_requests.is_frustum_culling_request_active(id))
+			continue;
+		FrustumCullingRequestData& request_data = render_context.render_view_requests.frustum_culling_request_data(id);
+		bool* visibility = &request_data.result.visibility[0];
+		request_data.result.visible = check_visibility(visibility, scene_context_.aabb_pool, scene_context_.parts_aabb_pool, request_data.request.vp);
+	}
 }
 
 size_t Scene::nodes(NodeInstance*& nodes, size_t& offset, size_t material_system) const

@@ -79,6 +79,73 @@ void CSMDepthRenderingMaterialSystem::setup(Context& context, SceneContext& scen
 	empty_setup(context, scene_context, instance_parts, parts, model_contexts, count);
 }
 
+void CSMDepthRenderingMaterialSystem::start_frame(Context& context, SceneContext& scene_context, RenderContext& render_context)
+{
+	mat4x4 light_view;
+	Light* light = nullptr;
+	for (size_t i = 0; i < render_context.lights_number; ++i)
+	{
+		if (!render_context.lights[i].light.desc().cast_shadows ||
+			render_context.lights[i].light.type() != Light::directional ||
+			!render_context.lights[i].light.desc().auto_shadow_configuration)
+			continue;
+		light_view = get_light_view_matrix(scene_context, render_context.lights[i].id);
+		shadow_info_.shadowmap = shadowmap_;
+		light = &render_context.lights[i].light;
+	}
+
+	if (light == nullptr)
+		return;
+
+	vec4 lightspace_corners[8];
+	vec4 points[8] = { vec4(-1.0f, -1.0f, -1.0f, 1.0f),
+		vec4(-1.0f, -1.0f, +1.0f, 1.0f),
+		vec4(+1.0f, -1.0f, +1.0f, 1.0f),
+		vec4(+1.0f, -1.0f, -1.0f, 1.0f),
+		vec4(-1.0f, +1.0f, -1.0f, 1.0f),
+		vec4(-1.0f, +1.0f, +1.0f, 1.0f),
+		vec4(+1.0f, +1.0f, +1.0f, 1.0f),
+		vec4(+1.0f, +1.0f, -1.0f, 1.0f) };
+	vec4 center = vec4(render_context.aabb.center, 0.0f);
+	vec4 extents = vec4(render_context.aabb.extents, 1.0f);
+	for (int i = 0; i < 8; ++i)
+	{
+		vec4 p = mul(points[i], extents) + center;
+		lightspace_corners[i] = p * light_view;
+	}
+
+	mat4x4 proj[max_cascades_number];
+	float znear[max_cascades_number];
+	float zfar[max_cascades_number];
+
+	shadow_info_.cascades_number = cascades_number_;
+	shadow_info_.lightview = light_view;
+	for (size_t i = 0; i < cascades_number_; ++i)
+	{
+		zfar[i] = render_context.main_camera.zfar * percentage_[i];
+		znear[i] = i == 0 ? render_context.main_camera.znear : zfar[i - 1];
+		calculate_projection(proj[i], lightspace_corners, light_view, render_context.main_camera, znear[i], zfar[i]);
+
+		TransformSimpleData transform_data;
+		transform_data.vp = light_view * proj[i];
+		UniformBuffer& uniform = context.uniform_pool.get(transform_uniform_id_[i]);
+		uniform.update(transform_data);
+
+		shadow_info_.offset[i] = proj[i].row_vec3(3);
+		shadow_info_.scale[i] = vec3(proj[i].element(0, 0), proj[i].element(1, 1), proj[i].element(2, 2));
+		shadow_info_.znear[i] = znear[i];
+		shadow_info_.zfar[i] = zfar[i];
+
+		shadow_info_.lightvp = transform_data.vp;
+
+		FrustumCullingRequest request;
+		request.vp = transform_data.vp;
+		render_context.render_view_requests.register_request(static_cast<ViewId>(shadowmap_view0 + i), request);
+	}
+
+	light->set_shadow_info(&shadow_info_);
+}
+
 void CSMDepthRenderingMaterialSystem::calculate_projection(mat4x4& proj, const vec4* lightspace_aabb, const mat4x4& light_view, const CameraData& camera_data, float znear, float zfar) const
 {
 	vec3 viewspace_frustum_points[8];
@@ -133,69 +200,10 @@ void CSMDepthRenderingMaterialSystem::update(Context& context, SceneContext& sce
 	context.materials[id()].clear();
 	clear_command_.reset();
 
-	mat4x4 light_view;
-	Light* light = nullptr;
-	for (size_t i = 0; i < render_context.lights_number; ++i)
-	{
-		if (!render_context.lights[i].light.desc().cast_shadows ||
-				render_context.lights[i].light.type() != Light::directional ||
-				!render_context.lights[i].light.desc().auto_shadow_configuration)
-				continue;
-		light_view = get_light_view_matrix(scene_context, render_context.lights[i].id);
-		shadow_info_.shadowmap = shadowmap_;
-		light = &render_context.lights[i].light;
-	}
-
-	if (light == nullptr)
-		return;
-
-	vec4 lightspace_corners[8];
-	vec4 points[8] = { vec4(-1.0f, -1.0f, -1.0f, 1.0f),
-										 vec4(-1.0f, -1.0f, +1.0f, 1.0f),
-										 vec4(+1.0f, -1.0f, +1.0f, 1.0f),
-										 vec4(+1.0f, -1.0f, -1.0f, 1.0f),
-										 vec4(-1.0f, +1.0f, -1.0f, 1.0f),
-										 vec4(-1.0f, +1.0f, +1.0f, 1.0f),
-										 vec4(+1.0f, +1.0f, +1.0f, 1.0f),
-										 vec4(+1.0f, +1.0f, -1.0f, 1.0f) };
-	vec4 center = vec4(render_context.aabb.center, 0.0f);
-	vec4 extents = vec4(render_context.aabb.extents, 1.0f);
-	for (int i = 0; i < 8; ++i)
-	{
-		vec4 p = mul(points[i], extents) + center;
-		lightspace_corners[i] = p * light_view;
-	}
-
-	mat4x4 proj[max_cascades_number];
-	float znear[max_cascades_number];
-	float zfar[max_cascades_number];
-
-	shadow_info_.cascades_number = cascades_number_;
-	shadow_info_.lightview = light_view;
-	for (size_t i = 0; i < cascades_number_; ++i)
-	{
-		zfar[i] = render_context.main_camera.zfar * percentage_[i];
-		//znear[i] = i == 0 ? render_context.main_camera.znear : zfar[i - 1];
-		znear[i] = render_context.main_camera.znear;
-		calculate_projection(proj[i], lightspace_corners, light_view, render_context.main_camera, znear[i], zfar[i]);
-
-		TransformSimpleData transform_data;
-		transform_data.vp = light_view * proj[i];
-		UniformBuffer& uniform = context.uniform_pool.get(transform_uniform_id_[i]);
-		uniform.update(transform_data);
-
-		shadow_info_.offset[i] = proj[i].row_vec3(3);
-		shadow_info_.scale[i] = vec3(proj[i].element(0, 0), proj[i].element(1, 1), proj[i].element(2, 2));
-		shadow_info_.znear[i] = znear[i];
-		shadow_info_.zfar[i] = zfar[i];
-
-		shadow_info_.lightvp = transform_data.vp;
-	}
-
-	light->set_shadow_info(&shadow_info_);
-
 	for (size_t pass = 0; pass < cascades_number_; ++pass)
 	{
+		const bool* visibility = render_context.render_view_requests.frustum_culling_request_data(static_cast<ViewId>(shadowmap_view0 + pass)).result.visibility.data();
+		size_t v = 0;
 		for (size_t i = 0; i < render_context.nodes_number; ++i)
 		{
 			if (!render_context.nodes[i].cast_shadow && !render_context.nodes[i].receive_shadow)
@@ -203,6 +211,7 @@ void CSMDepthRenderingMaterialSystem::update(Context& context, SceneContext& sce
 
 			for (size_t j = 0; j < render_context.nodes[i].mesh.instance_parts.size(); ++j)
 			{
+				if (!visibility[v++]) continue;
 				const MeshPartInstance& part = render_context.nodes[i].mesh.instance_parts[j];
 				DrawCall& draw_call = render_context.draw_calls.add();
 				draw_call.render_data = render_context.nodes[i].mesh.mesh.parts[j].render_data;

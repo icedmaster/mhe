@@ -7,6 +7,7 @@
 #include "render/instances.hpp"
 #include "render/light_instance_methods.hpp"
 #include "render/utils/simple_meshes.hpp"
+#include "render/render_globals.hpp"
 
 namespace mhe {
 
@@ -57,6 +58,8 @@ void GBufferFillMaterialSystem::setup(Context& context, SceneContext& scene_cont
 		draw_call_data.render_target = render_target_;
 		Material& material = context.materials[id()].get(instance_parts[i].material.id);
 		size_t use_normalmap = material.textures[normal_texture_unit].id != Texture::invalid_id ? 1 : 0;
+		if (!global::use_normalmaps.value())
+			use_normalmap = 0;
 
 		UberShader::Index index;
 		index.set(normalmap_info, use_normalmap);
@@ -95,11 +98,17 @@ void GBufferFillMaterialSystem::update(Context& context, SceneContext& scene_con
 
 void GBufferFillMaterialSystem::update(Context& context, SceneContext& /*scene_context*/, RenderContext& render_context, MeshPartInstance* nodes, size_t count)
 {
-    clear_command_.reset();
+	UberShader& shader = ubershader(context);
+	const UberShader::Info& normalmap_info = shader.info("NORMALMAP");
+	UberShader::Index index;
+	clear_command_.reset();
 	for (size_t i = 0; i < count; ++i)
 	{
 		Material& material = context.materials[id()].get(nodes[i].material.id);
 		material.uniforms[perframe_data_unit] = render_context.main_camera.percamera_uniform;
+		size_t use_normalmap = material.textures[normal_texture_unit].id != Texture::invalid_id && global::use_normalmaps.value() ? 1 : 0;
+		index.set(normalmap_info, use_normalmap);
+		material.shader_program = shader.get(index);
 	}
 }
 

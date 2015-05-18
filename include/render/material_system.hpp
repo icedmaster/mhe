@@ -48,17 +48,19 @@ public:
 	virtual bool init(Context& context, const MaterialSystemContext& material_system_context) = 0;
 	virtual void close() = 0;
 
-    virtual void setup(Context &context, SceneContext &scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count) = 0;
+	virtual void setup(Context &context, SceneContext &scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count) = 0;
 
 	virtual void set_texture(const TextureInstance& /*texture*/) {}
 	virtual void set_texture(size_t /*unit*/, const TextureInstance& /*texture*/) {}
+
+	virtual void start_frame(Context&, SceneContext&, RenderContext&) {}
 
 	virtual RenderTarget::IdType render_target_id() const
 	{
 		return default_render_target;
 	}
 
-    void setup_draw_calls(Context& context, SceneContext& scene_context, RenderContext& render_context);
+	void setup_draw_calls(Context& context, SceneContext& scene_context, RenderContext& render_context);
 
 	uint8_t id() const
 	{

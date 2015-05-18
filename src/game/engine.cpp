@@ -106,6 +106,7 @@ void Engine::run()
 	process_ = true;
 	while (process_)
 	{
+		MainProfiler::instance().clear();
 		ProfilerElement pe("engine.run");
 		update();
 		render();
@@ -119,12 +120,14 @@ void Engine::stop()
 
 void Engine::update()
 {
-	MainProfiler::instance().clear();
+#ifdef RDBG_ENABLED
+	rdbg_engine_.processor().update_profiler_data();
+#endif
 	ProfilerElement pe("engine.update");
 
-	if (use_vsync.reset_if_changed())
+	if (global::use_vsync.reset_if_changed())
 	{
-		if (use_vsync.value())
+		if (global::use_vsync.value())
 			context_.window_system.enable_vsync();
 		else context_.window_system.disable_vsync();
 	}
@@ -145,6 +148,8 @@ void Engine::update()
     render_context_.tick = utils::get_current_time();
     render_context_.fdelta = utils::get_last_delta();
     scene_.update(render_context_);
+		renderer_->before_update(render_context_, scene_.scene_context());
+		scene_.process_requests(render_context_);
 	renderer_->update(render_context_, scene_.scene_context());
 }
 

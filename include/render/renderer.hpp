@@ -50,6 +50,7 @@ public:
     Renderer(Context& context);
     virtual ~Renderer() {}
 
+	virtual void before_update(RenderContext& render_context, SceneContext& scene_context);
 	virtual void update(RenderContext& render_context, SceneContext& scene_context);
 	virtual void render(RenderContext& render_context, SceneContext& scene_context);
 
