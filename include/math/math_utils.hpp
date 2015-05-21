@@ -9,6 +9,8 @@ namespace mhe
 	const float pi_2 = pi * 0.5f;
     const float deg2rad = pi / 180.0f;
     const float rad2deg = 180.0f / pi;
+	const float float_max = FLT_MAX;
+	const float float_mix = FLT_MIN;
 
     inline float deg_to_rad(float deg)
     {

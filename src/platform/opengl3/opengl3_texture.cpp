@@ -22,6 +22,11 @@ bool OpenGL3Texture::init(const TextureDesc& desc, const uint8_t* data, size_t s
 	if (desc.anisotropic_level > 1.0f)
 		glTexParameterf(target_, GL_TEXTURE_MAX_ANISOTROPY_EXT, desc.anisotropic_level);
 
+	format_ = get_format(desc.format);
+	width_ = desc.width;
+	height_ = desc.height;
+	datatype_ = get_datatype(desc.datatype);
+
 	if (desc.type == texture_cube)
 	{
 		init_cubemap(desc, data, size);
@@ -29,8 +34,8 @@ bool OpenGL3Texture::init(const TextureDesc& desc, const uint8_t* data, size_t s
 	else
 	{
 		glTexImage2D(target_, 0,
-			get_format(desc.format), desc.width, desc.height, 0,
-			get_texture_format(desc.format), get_datatype(desc.datatype), data);
+			format_, desc.width, desc.height, 0,
+			get_texture_format(desc.format), datatype_, data);
 		CHECK_GL_ERRORS();
 		
 		if (desc.mips > 0)
@@ -71,6 +76,13 @@ void OpenGL3Texture::enable(size_t unit) const
 void OpenGL3Texture::disable() const
 {
 	OpenGLExtensions::instance().glActiveTexture(GL_TEXTURE0 + unit_);
+	glBindTexture(target_, 0);
+}
+
+void OpenGL3Texture::update(const uint8_t* data)
+{
+	glBindTexture(target_, id_);
+	glTexSubImage2D(target_, 0, 0, 0, width_, height_, format_, datatype_, data);
 	glBindTexture(target_, 0);
 }
 

@@ -39,6 +39,18 @@ public:
 		v_[2] = 0;
 	}
 
+	template <class U>
+	vector3(U x, U y, U z)
+	{
+		v_[0] = static_cast<T>(x); v_[1] = static_cast<T>(y); v_[2] = static_cast<T>(z);
+	}
+
+	template <class U>
+	vector3(const vector3<U>& v)
+	{
+		v_[0] = static_cast<T>(v.x()); v_[1] = static_cast<T>(v.y()); v_[2] = static_cast<T>(v.z());
+	}
+
 	~vector3() {} // do nothing
 
 	inline void set(T v)
@@ -86,9 +98,26 @@ public:
 		return sqrt((v_[0] * v_[0]) + (v_[1] * v_[1]) + (v_[2] * v_[2]));
 	}
 
+	float magnitude() const
+	{
+		return length();
+	}
+
+	float magnitude2() const
+	{
+		return (v_[0] * v_[0]) + (v_[1] * v_[1]) + (v_[2] * v_[2]);
+	}
+
 	void normalize()
 	{
 		*this *= (1 / length());
+	}
+
+	vector3 normalized() const
+	{
+		vector3 v = *this;
+		v.normalize();
+		return v;
 	}
 
 	const T* get() const

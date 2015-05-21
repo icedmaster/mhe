@@ -4,9 +4,28 @@
 #include "render/context.hpp"
 #include "render/node.hpp"
 #include "render/instances.hpp"
+#include "render/mesh_grid.hpp"
 
 namespace mhe {
 namespace utils {
+
+namespace {
+
+template <class Vertices, class Indices>
+void process_flags(MeshInstance& mesh_instance, const Context& context, const Vertices& vertices, const Indices& indices, uint32_t flags)
+{
+	if (flags == mesh_creation_flag_none) return;
+	if (flags & mesh_creation_flag_trace_data)
+	{
+		MeshTraceDataInstance& mesh_trace_data = create_and_get(context.mesh_trace_data_pool);
+		MeshGrid::Size size(mesh_instance.mesh.aabb.extents * 2.0f * 10.0f);
+		mesh_trace_data.grid.resize(size.x(), size.y(), size.z(), MeshCell());
+		create_grid(mesh_trace_data.grid, vertices, indices);
+		mesh_instance.mesh.trace_data_id = mesh_trace_data.id;
+	}
+}
+
+}
 
 bool create_plane(MeshInstance& mesh_instance, const Context& context)
 {
@@ -155,7 +174,7 @@ void subdivide(std::vector<V>& vertices, std::vector<uint32_t>& indices, const v
     }
 }
 
-bool create_sphere(MeshInstance& mesh_instance, const Context& context, int subdivision)
+bool create_sphere(MeshInstance& mesh_instance, const Context& context, int subdivision, uint32_t flags)
 {
     std::vector<DebugLayout::Vertex> vertices;
     std::vector<uint32_t> indices;
@@ -178,6 +197,11 @@ bool create_sphere(MeshInstance& mesh_instance, const Context& context, int subd
     subdivide(vertices, indices, b, r, d, subdivision);
     subdivide(vertices, indices, r, f, d, subdivision);
     subdivide(vertices, indices, f, l, d, subdivision);
+
+	mesh_instance.mesh.aabb.center.set(0.5f, 0.5f, 0.5f);
+	mesh_instance.mesh.aabb.extents.set(0.5f, 0.5f, 0.5f);
+
+	process_flags(mesh_instance, context, vertices, indices, flags);
 
     MeshPart& part = mesh_instance.mesh.parts[0];
 
@@ -244,10 +268,10 @@ bool create_plane(NodeInstance& node, const Context& context)
     return create_plane(node.mesh, context);
 }
 
-bool create_sphere(NodeInstance& node, const Context& context, int subdivision)
+bool create_sphere(NodeInstance& node, const Context& context, int subdivision, uint32_t flags)
 {
     add_part(node.mesh);
-    return create_sphere(node.mesh, context, subdivision);
+    return create_sphere(node.mesh, context, subdivision, flags);
 }
 
 bool create_conus(NodeInstance& node, const Context& context, float radius, float height, int subdivision)
