@@ -103,6 +103,17 @@ private:
 	DebugMode debug_mode_;
 };
 
+class NullRenderer : public Renderer
+{
+public:
+	NullRenderer(Context& context) :
+		Renderer(context)
+		{}
+private:
+	void render_impl(Context& context, RenderContext& render_context, SceneContext& scene_context) override
+	{}
+};
+
 bool init_render(Context& context);
 
 }

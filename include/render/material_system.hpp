@@ -40,7 +40,7 @@ struct MaterialSystemContext
 	KeyValue<string, string> options;
 };
 
-class MaterialSystem : public ref_counter
+class MHE_EXPORT MaterialSystem : public ref_counter
 {
 public:
 	virtual ~MaterialSystem() {}

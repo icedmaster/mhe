@@ -27,8 +27,8 @@ struct Iterator
 		{
 			res = current_res;
 			dist = current_dist;
+			found = true;
 		}
-		found = is_intersects;
 	}
 private:
 	rayf ray_;
@@ -53,7 +53,7 @@ public:
 		t.vertices[1] = p2;
 		t.vertices[2] = p3;
 
-		grid_.add(t, lowest, highest);
+		grid_.add(t, MeshGrid::Size::zero(), MeshGrid::Size::zero());
 	}
 
 	bool closest_intersection(vec3& res, const rayf& r) const
@@ -61,9 +61,11 @@ public:
 		const MeshGrid::Size& size = grid_.size();
 		vec3 s(size.x(), size.y(), size.z());
 		MeshGrid::Size s1 = div(r.origin, s);
-		MeshGrid::Size s2 = div(r.direction, s);
-		MeshGrid::Size lowest = max(min(s1, s2), MeshGrid::Size::zero());
-		MeshGrid::Size highest = min(max(s1, s2), size - MeshGrid::Size(1, 1, 1));
+		MeshGrid::Size s2 = div(r.direction * r.length, s);
+		//MeshGrid::Size lowest = max(min(s1, s2), MeshGrid::Size::zero());
+		//MeshGrid::Size highest = min(max(s1, s2), size - MeshGrid::Size(1, 1, 1));
+		MeshGrid::Size lowest = MeshGrid::Size::zero();
+		MeshGrid::Size highest = size - MeshGrid::Size(1, 1, 1);
 
 		Iterator it(r);
 		grid_.iterate(lowest, highest, it);

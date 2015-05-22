@@ -34,22 +34,33 @@ void CPURaytracer::render(const Camera& camera)
 
 	std::vector<uint8_t> result(height * width * 4);
 
-	for (int y = 0; y < height; ++y)
 	{
-		for (int x = 0; x < width; ++x)
+		ProfilerElement pe("trace");
+		for (int y = 0; y < height; ++y)
 		{
-			vec3 screen_pos(x / width * 2.0f - 1.0f, y / height * 2.0f - 1.0f, 1.0f);
-			vec3 world_pos = screen_pos * camera_data.inv_vp;
-			rayf r(camera.position(), world_pos);
-			const vec3& pixel = trace(r);
-			result[y * width + x * 4 + 0] = pixel.x() * 255;
-			result[y * width + x * 4 + 1] = pixel.y() * 255;
-			result[y * width + x * 4 + 2] = pixel.z() * 255;
-			result[y * width + x * 4 + 3] = 255;
+			for (int x = 0; x < width; ++x)
+			{
+				vec4 ndc_pos(x * 2.0f / width - 1.0f, y * 2.0f / height - 1.0f, 1.0f, 1.0f);
+				vec4 world_pos = ndc_pos * camera_data.inv_vp;
+				vec3 pos = world_pos.xyz() / world_pos.w();
+				rayf r(camera.position(), pos);
+				const vec3& pixel = trace(r);
+				result[4 * (y * width + x) + 0] = pixel.x() * 255;
+				result[4 * (y * width + x) + 1] = pixel.y() * 255;
+				result[4 * (y * width + x) + 2] = pixel.z() * 255;
+				result[4 * (y * width + x) + 3] = 255;
+			}
 		}
+		pe.stop();
+		std::cout << "trace:" << pe.result() << std::endl;
 	}
 
-	texture_->update(static_cast<const uint8_t*>(&result[0]));
+	{
+		ProfilerElement pe("texture_update");
+		texture_->update(static_cast<const uint8_t*>(&result[0]));
+		pe.stop();
+		std::cout << "texture_update:" << pe.result() << std::endl;
+	}
 	kick_draw_call();
 }
 
@@ -61,13 +72,11 @@ vec3 CPURaytracer::trace(const rayf& r)
 	AABBInstance* aabbs = engine_->scene_context().parts_aabb_pool.all_objects();
 	for (size_t i = 0; i < nodes_number; ++i)
 	{
-		for (size_t j = 0, size = nodes[i].mesh.instance_parts.size(); j < size; ++j)
-		{
-			const AABBInstance& aabb = aabbs[nodes[i].mesh.instance_parts[j].aabb_id];
-			vec3 input, output;
-			if (!intersects(input, output, r, aabb.aabb))
-				continue;
-		}
+		MeshGrid& grid = context.mesh_trace_data_pool.get(nodes[i].mesh.mesh.trace_data_id).grid;
+		MeshGridHelper helper(grid);
+		vec3 res;
+		if (helper.closest_intersection(res, r))
+			return vec3(1.0f, 1.0f, 1.0f);
 	}
 
 	return vec3::zero();
@@ -75,5 +84,17 @@ vec3 CPURaytracer::trace(const rayf& r)
 
 void CPURaytracer::kick_draw_call()
 {
-
+	Context& context = engine_->context();
+	RenderContext local_context;
+	PosteffectSimpleMaterialSystem* material_system = context.material_systems.get<PosteffectSimpleMaterialSystem>();
+	ASSERT(material_system, "Invalid MaterialSystem");
+	material_system->enable();
+	TextureInstance texture_instance;
+	texture_instance.id = texture_->id();
+	material_system->set_texture(0, texture_instance);
+	material_system->setup_draw_calls(context, engine_->scene_context(), local_context);
+	ASSERT(local_context.draw_calls.size() == 1, "DrawCall setup failed");
+	context.driver.reset_state();
+	context.driver.render(context, local_context.draw_calls.data(), 1);
+	material_system->disable();
 }

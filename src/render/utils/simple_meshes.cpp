@@ -18,7 +18,7 @@ void process_flags(MeshInstance& mesh_instance, const Context& context, const Ve
 	if (flags & mesh_creation_flag_trace_data)
 	{
 		MeshTraceDataInstance& mesh_trace_data = create_and_get(context.mesh_trace_data_pool);
-		MeshGrid::Size size(mesh_instance.mesh.aabb.extents * 2.0f * 10.0f);
+		MeshGrid::Size size(/*mesh_instance.mesh.aabb.extents * 2.0f * 10.0f*/1, 1, 1);
 		mesh_trace_data.grid.resize(size.x(), size.y(), size.z(), MeshCell());
 		create_grid(mesh_trace_data.grid, vertices, indices);
 		mesh_instance.mesh.trace_data_id = mesh_trace_data.id;

@@ -11,6 +11,13 @@ ProfilerElement::ProfilerElement(const char* name, int mode, Profiler& profiler,
 
 ProfilerElement::~ProfilerElement()
 {
+	if (!timer_.running()) return;
+	result_ = timer_.stop();
+	profiler_.finish(this);
+}
+
+void ProfilerElement::stop()
+{
 	result_ = timer_.stop();
 	profiler_.finish(this);
 }
