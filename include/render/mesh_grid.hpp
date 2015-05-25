@@ -13,20 +13,21 @@ typedef grid<MeshCell> MeshGrid;
 
 struct Iterator
 {
-	float dist;
-	vec3 res;
+	hitf h;
 	bool found;
-	Iterator(const rayf& r) : dist(float_max), found(false), ray_(r) {}
+	Iterator(const rayf& r) : found(false), ray_(r)
+	{
+		h.distance = float_max;
+	}
 
 	void operator() (const trianglef& t)
 	{
 		vec3 current_res;
-		float current_dist;
-		bool is_intersects = intersects(current_res, current_dist, ray_, t);
-		if (is_intersects && current_dist < dist)
+		hitf current_hit;
+		bool is_intersects = intersects(current_hit, ray_, t);
+		if (is_intersects && current_hit.distance < h.distance)
 		{
-			res = current_res;
-			dist = current_dist;
+			h = current_hit;
 			found = true;
 		}
 	}
@@ -56,20 +57,21 @@ public:
 		grid_.add(t, MeshGrid::Size::zero(), MeshGrid::Size::zero());
 	}
 
-	bool closest_intersection(vec3& res, const rayf& r) const
+	bool closest_intersection(vec3& res, vec3& nrm, const rayf& r) const
 	{
 		const MeshGrid::Size& size = grid_.size();
 		vec3 s(size.x(), size.y(), size.z());
 		MeshGrid::Size s1 = div(r.origin, s);
 		MeshGrid::Size s2 = div(r.direction * r.length, s);
-		//MeshGrid::Size lowest = max(min(s1, s2), MeshGrid::Size::zero());
-		//MeshGrid::Size highest = min(max(s1, s2), size - MeshGrid::Size(1, 1, 1));
+		// TODO:
 		MeshGrid::Size lowest = MeshGrid::Size::zero();
-		MeshGrid::Size highest = size - MeshGrid::Size(1, 1, 1);
+		MeshGrid::Size highest = MeshGrid::Size::zero();
 
 		Iterator it(r);
 		grid_.iterate(lowest, highest, it);
-		res = it.res;
+		res = it.h.point;
+		//nrm = cross(it.tri.vertices[0] - res, it.tri.vertices[2] - res).normalized();
+		nrm = it.h.normal;
 		return it.found;
 	}
 private:

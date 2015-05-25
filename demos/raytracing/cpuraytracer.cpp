@@ -70,16 +70,34 @@ vec3 CPURaytracer::trace(const rayf& r)
 	NodeInstance* nodes = engine_->scene_context().node_pool.all_objects();
 	size_t nodes_number = engine_->scene_context().node_pool.size();
 	AABBInstance* aabbs = engine_->scene_context().parts_aabb_pool.all_objects();
+	LightInstance* light_sources = engine_->scene_context().light_pool.all_objects();
+	size_t lights_number = engine_->scene_context().light_pool.size();
+	vec3 res;
+	vec3 nrm;
+	bool found = false;
 	for (size_t i = 0; i < nodes_number; ++i)
 	{
 		MeshGrid& grid = context.mesh_trace_data_pool.get(nodes[i].mesh.mesh.trace_data_id).grid;
 		MeshGridHelper helper(grid);
-		vec3 res;
-		if (helper.closest_intersection(res, r))
-			return vec3(1.0f, 1.0f, 1.0f);
+		if (helper.closest_intersection(res, nrm, r))
+			found = true;
 	}
 
-	return vec3::zero();
+	return found ? saturate(lit_pixel(res, nrm, vec3(0.2f, 0.2f, 0.2f), light_sources, lights_number)) : vec3::zero();
+}
+
+vec3 CPURaytracer::lit_pixel(const vec3& pos, const vec3& nrm, const vec3& ambient, const LightInstance* light_sources, size_t lights_number) const
+{
+	vec3 res = ambient;
+	for (size_t i = 0; i < lights_number; ++i)
+	{
+		NOT_IMPLEMENTED_ASSERT(light_sources[i].light.type() == Light::directional, "Different light types");
+		vec3 direction = -get_light_direction(engine_->scene_context(), light_sources[i].id);
+		float ndotl = dot(direction, nrm);
+		if (ndotl < 0.0f) continue;
+		res += light_sources[i].light.shading().diffuse.xyz() * ndotl;
+	}
+	return res;
 }
 
 void CPURaytracer::kick_draw_call()

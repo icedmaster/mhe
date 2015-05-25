@@ -293,6 +293,19 @@ vector3<T> max(const vector3<T>& v1, const vector3<T>& v2)
 }
 
 template <class T>
+vector3<T> clamp(const vector3<T>& value, const vector3<T>& min_value, const vector3<T>& max_value)
+{
+	return vector3<T>(clamp(value.x(), min_value.x(), max_value.x()), clamp(value.y(), min_value.y(), max_value.y()),
+		clamp(value.z(), min_value.z(), max_value.z()));
+}
+
+template <class T>
+vector3<T> saturate(const vector3<T>& value)
+{
+	return clamp(value, vector3<T>::zero(), vector3<T>(1, 1, 1));
+}
+
+template <class T>
 inline std::ostream& operator<< (std::ostream& s, const vector3<T>& v)
 {
 	return s << '(' << v.x() << ", " << v.y() << ", " << v.z() << ')';

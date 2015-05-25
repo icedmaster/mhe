@@ -11,6 +11,7 @@ namespace mhe
     const float rad2deg = 180.0f / pi;
 	const float float_max = FLT_MAX;
 	const float float_mix = FLT_MIN;
+	const float fp_epsilon = 0.00001f;
 
     inline float deg_to_rad(float deg)
     {
@@ -45,7 +46,7 @@ inline T lerp(const T& begin, const T& end, float value)
 }
 
 template <class T>
-inline T clamp(const T& min, const T& max, const T& value)
+inline T clamp(const T& value, const T& min, const T& max)
 {
 	if (value > max) return max;
 	if (value < min) return min;
@@ -53,7 +54,7 @@ inline T clamp(const T& min, const T& max, const T& value)
 }
 
 template <class T>
-inline T clamp_up(const T& max, const T& value)
+inline T clamp_up(const T& value, const T& max)
 {
 	if (value > max) return max;
 	return value;
