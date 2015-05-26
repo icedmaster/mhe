@@ -199,8 +199,7 @@ bool create_sphere(MeshInstance& mesh_instance, const Context& context, int subd
     subdivide(vertices, indices, r, f, d, subdivision);
     subdivide(vertices, indices, f, l, d, subdivision);
 
-	mesh_instance.mesh.aabb.center.set(0.5f, 0.5f, 0.5f);
-	mesh_instance.mesh.aabb.extents.set(0.5f, 0.5f, 0.5f);
+	mesh_instance.mesh.aabb.extents.set(1.0f, 1.0f, 1.0f);
 
 	process_flags(mesh_instance, context, vertices, indices, flags);
 

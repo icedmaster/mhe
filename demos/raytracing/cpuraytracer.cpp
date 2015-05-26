@@ -32,6 +32,14 @@ void CPURaytracer::render(const Camera& camera)
 	CameraData camera_data;
 	camera.get(camera_data);
 
+	std::vector<mat4x4> inv_w(engine_->scene_context().node_pool.size());
+	NodeInstance* nodes = engine_->scene_context().node_pool.all_objects();
+	for (size_t i = 0, size = inv_w.size(); i < size; ++i)
+	{
+		const Transform& transform = engine_->scene_context().transform_pool.get(nodes[i].transform_id).transform;
+		inv_w[i] = transform.inverse_transform();
+	}
+
 	std::vector<uint8_t> result(height * width * 4);
 
 	{
@@ -44,7 +52,7 @@ void CPURaytracer::render(const Camera& camera)
 				vec4 world_pos = ndc_pos * camera_data.inv_vp;
 				vec3 pos = world_pos.xyz() / world_pos.w();
 				rayf r(camera.position(), pos);
-				const vec3& pixel = trace(r);
+				const vec3& pixel = trace(r, &inv_w[0]);
 				result[4 * (y * width + x) + 0] = pixel.x() * 255;
 				result[4 * (y * width + x) + 1] = pixel.y() * 255;
 				result[4 * (y * width + x) + 2] = pixel.z() * 255;
@@ -64,7 +72,7 @@ void CPURaytracer::render(const Camera& camera)
 	kick_draw_call();
 }
 
-vec3 CPURaytracer::trace(const rayf& r)
+vec3 CPURaytracer::trace(const rayf& r, const mat4x4* inv_transforms)
 {
 	Context& context = engine_->context();
 	NodeInstance* nodes = engine_->scene_context().node_pool.all_objects();
@@ -77,9 +85,12 @@ vec3 CPURaytracer::trace(const rayf& r)
 	bool found = false;
 	for (size_t i = 0; i < nodes_number; ++i)
 	{
+		vec3 input, output;
+		if (!intersects(input, output, r, nodes[i].mesh.mesh.aabb))
+			continue;
 		MeshGrid& grid = context.mesh_trace_data_pool.get(nodes[i].mesh.mesh.trace_data_id).grid;
 		MeshGridHelper helper(grid);
-		if (helper.closest_intersection(res, nrm, r))
+		if (helper.closest_intersection(res, nrm, r * inv_transforms[i]))
 			found = true;
 	}
 

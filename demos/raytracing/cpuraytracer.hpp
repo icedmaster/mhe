@@ -19,7 +19,7 @@ public:
 
 	void render(const mhe::Camera& camera);
 private:
-	mhe::vec3 trace(const mhe::rayf& r);
+	mhe::vec3 trace(const mhe::rayf& r, const mhe::mat4x4* inv_transforms);
 	mhe::vec3 lit_pixel(const mhe::vec3& pos, const mhe::vec3& nrm, const mhe::vec3& ambient,
 		const mhe::LightInstance* light_sources, size_t lights_number) const;
 	void kick_draw_call();

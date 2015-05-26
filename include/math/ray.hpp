@@ -1,8 +1,9 @@
-#ifndef __RAY_HPP__
+﻿#ifndef __RAY_HPP__
 #define __RAY_HPP__
 
 #include "geometry.hpp"
 #include "aabb.hpp"
+#include "matrix.hpp"
 
 namespace mhe {
 
@@ -12,6 +13,8 @@ struct ray
 	vector3<T> origin;
 	vector3<T> direction;
 	float length;
+
+	ray() : length(0) {}
 
 	ray(const vec3& origin_value, const vec3& dst) :
 		origin(origin_value), direction((dst - origin_value).normalized()), length((dst - origin_value).length())
@@ -34,7 +37,18 @@ struct hit
 typedef ray<float> rayf;
 typedef hit<float> hitf;
 
+template <class T>
+ray<T> operator* (const ray<T>& r, const matrix<T>& m)
+{
+	ray<T> res;
+	res.origin = r.origin * m;
+	res.direction = (vector4<T>(r.direction, 0.0f) * m).xyz();
+	res.length = r.length;
+	return res;
+}
+
 // intersections
+// TODO: use Möller-Trumbore algorithm here
 template <class T>
 bool intersects(hit<T>& h, const ray<T>& r, const Triangle<T>& tri)
 {
@@ -79,10 +93,34 @@ bool intersects(hit<T>& h, const ray<T>& r, const Triangle<T>& tri)
 	return true;
 }
 
+// http://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-box-intersection
+// http://www.cs.utah.edu/~awilliam/box/box.pdf
 template <class T>
 bool intersects(vector3<T>& input, vector3<T>& output, const ray<T>& r, const AABB<T>& aabb)
 {
-	return false;
+	vector3<T> bounds[2];
+	aabb.min_max(bounds[0], bounds[1]);
+
+	vector3<T> invdir = (T)1 / (r.direction * r.length);
+	int sign[3] = {invdir.x() < 0, invdir.y() < 0, invdir.z() < 0};
+
+	T tmin = (bounds[sign[0]].x() - r.origin.x()) * invdir.x();
+	T tmax = (bounds[1 - sign[0]].x() - r.origin.x()) * invdir.x();
+	T tymin = (bounds[sign[1]].y() - r.origin.y()) * invdir.y();
+	T tymax = (bounds[1 - sign[1]].y() - r.origin.y()) * invdir.y();
+
+	if (tmin > tymax || tymin > tmax) return false;
+	if (tymin > tmin) tmin = tymin;
+	if (tymax < tmax) tmax = tymax;
+
+	T tzmin = (bounds[sign[2]].z() - r.origin.z()) * invdir.z();
+	T tzmax = (bounds[1 - sign[2]].z() - r.origin.z()) * invdir.z();
+
+	if (tmin > tzmax || tzmin > tmax) return false;
+	if (tzmin > tmin) tmin = tzmin;
+	if (tzmax < tmax) tmax = tzmax;
+
+	return true;
 }
 
 }

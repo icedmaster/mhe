@@ -91,8 +91,6 @@ T min(const T& v1, const U& v2)
 }
 }
 
-#define nullptr 0
-
 #define UNUSED(x) (void)x;
 
 #define NOT_IMPLEMENTED(x) (void)x;

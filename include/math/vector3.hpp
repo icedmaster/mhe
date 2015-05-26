@@ -275,6 +275,12 @@ vector3<T> operator* (const vector3<T>& v1, const vector3<T>& v2)
 }
 
 template <class T>
+vector3<T> operator/ (T n, const vector3<T>& v)
+{
+	return vector3<T>(n / v.x(), n / v.y(), n / v.z());
+}
+
+template <class T>
 T dot(const vector3<T>& v1, const vector3<T>& v2)
 {
     return v1.x() * v2.x() + v1.y() * v2.y() + v1.z() * v2.z();
