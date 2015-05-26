@@ -110,7 +110,7 @@ public:
 		Renderer(context)
 		{}
 private:
-	void render_impl(Context& context, RenderContext& render_context, SceneContext& scene_context) override
+    void render_impl(Context& /*context*/, RenderContext& /*render_context*/, SceneContext& /*scene_context*/) override
 	{}
 };
 

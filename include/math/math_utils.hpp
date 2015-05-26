@@ -2,6 +2,7 @@
 #define _MATH_UTILS_HPP_
 
 #include "core/types.hpp"
+#include <cfloat>
 
 namespace mhe
 {

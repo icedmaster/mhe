@@ -4,6 +4,7 @@
 #include <cmath>
 #include <ostream>
 #include "vector2.hpp"
+#include "math_utils.hpp"
 #include "core/compiler.hpp"
 
 namespace mhe

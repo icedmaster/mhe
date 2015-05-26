@@ -37,7 +37,7 @@ struct LightSortHelper
 	}
 };
 
-size_t check_visibility(bool* visibility, const AABBPool& parents, const AABBPool& parts, const mat4x4& mat)
+size_t check_visibility(bool* visibility, const AABBPool& /*parents*/, const AABBPool& parts, const mat4x4& mat)
 {
 	frustumf f;
 	f.set(mat);

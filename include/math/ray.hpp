@@ -98,6 +98,8 @@ bool intersects(hit<T>& h, const ray<T>& r, const Triangle<T>& tri)
 template <class T>
 bool intersects(vector3<T>& input, vector3<T>& output, const ray<T>& r, const AABB<T>& aabb)
 {
+	NOT_IMPLEMENTED(input);
+	NOT_IMPLEMENTED(output);
 	vector3<T> bounds[2];
 	aabb.min_max(bounds[0], bounds[1]);
 

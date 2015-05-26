@@ -54,7 +54,7 @@ struct GridIteratorTraits<G, true>
 {
 	typedef const G Grid;
 	typedef typename Grid::Size GridSize;
-	typedef typename const Grid::Cell Cell;
+	typedef const typename Grid::Cell Cell;
 };
 
 template <class C, class S = uint32_t>
