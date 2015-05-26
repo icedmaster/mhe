@@ -70,6 +70,7 @@ public:
 	virtual ~TextureImpl() {}
 	virtual bool init(const TextureDesc& desc, const uint8_t* data, size_t size) = 0;
 	virtual void close() = 0;
+	virtual void update(const uint8_t* data) = 0;
 };
 
 class MHE_EXPORT Texture
@@ -91,6 +92,11 @@ public:
 	const TextureImpl* impl() const
 	{
 		return impl_.get();
+	}
+
+	void update(const uint8_t* data)
+	{
+		impl_->update(data);
 	}
 private:
 	unique_ptr<TextureImpl> impl_;

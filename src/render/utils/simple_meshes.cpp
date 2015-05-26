@@ -4,9 +4,29 @@
 #include "render/context.hpp"
 #include "render/node.hpp"
 #include "render/instances.hpp"
+#include "render/mesh_grid.hpp"
 
 namespace mhe {
 namespace utils {
+
+namespace {
+
+template <class Vertices, class Indices>
+void process_flags(MeshInstance& mesh_instance, const Context& context, const Vertices& vertices, const Indices& indices, uint32_t flags)
+{
+	if (flags == mesh_creation_flag_none) return;
+	if (flags & mesh_creation_flag_trace_data)
+	{
+		MeshTraceDataInstance& mesh_trace_data = create_and_get(context.mesh_trace_data_pool);
+		// TODO:
+		MeshGrid::Size size(1, 1, 1);
+		mesh_trace_data.grid.resize(size.x(), size.y(), size.z(), MeshCell());
+		create_grid(mesh_trace_data.grid, vertices, indices);
+		mesh_instance.mesh.trace_data_id = mesh_trace_data.id;
+	}
+}
+
+}
 
 bool create_plane(MeshInstance& mesh_instance, const Context& context)
 {
@@ -133,10 +153,10 @@ void subdivide(std::vector<V>& vertices, std::vector<uint32_t>& indices, const v
         m1.normalize();
         m2.normalize();
         m3.normalize();
-        subdivide(vertices, indices, p1, m3, m1, level - 1);
-        subdivide(vertices, indices, m1, m2, p2, level - 1);
-        subdivide(vertices, indices, m2, m1, m3, level - 1);
-        subdivide(vertices, indices, m3, p3, m2, level - 1);
+        subdivide(vertices, indices, p1, m1, m3, level - 1);
+        subdivide(vertices, indices, m1, p2, m2, level - 1);
+        subdivide(vertices, indices, m2, m3, m1, level - 1);
+        subdivide(vertices, indices, m3, m2, p3, level - 1);
     }
     else
     {
@@ -155,7 +175,7 @@ void subdivide(std::vector<V>& vertices, std::vector<uint32_t>& indices, const v
     }
 }
 
-bool create_sphere(MeshInstance& mesh_instance, const Context& context, int subdivision)
+bool create_sphere(MeshInstance& mesh_instance, const Context& context, int subdivision, uint32_t flags)
 {
     std::vector<DebugLayout::Vertex> vertices;
     std::vector<uint32_t> indices;
@@ -178,6 +198,10 @@ bool create_sphere(MeshInstance& mesh_instance, const Context& context, int subd
     subdivide(vertices, indices, b, r, d, subdivision);
     subdivide(vertices, indices, r, f, d, subdivision);
     subdivide(vertices, indices, f, l, d, subdivision);
+
+	mesh_instance.mesh.aabb.extents.set(1.0f, 1.0f, 1.0f);
+
+	process_flags(mesh_instance, context, vertices, indices, flags);
 
     MeshPart& part = mesh_instance.mesh.parts[0];
 
@@ -238,21 +262,68 @@ bool create_conus(MeshInstance& mesh_instance, const Context& context, float rad
     return ibuffer.init(vbuffer, &indices[0], indices.size());
 }
 
+bool create_cube(MeshInstance& mesh_instance, const Context& context, uint32_t flags)
+{
+	StandartGeometryLayout::Vertex vertices[8];
+	vertices[0].pos.set(-0.5f, -0.5f, -0.5f);
+	vertices[1].pos.set(-0.5f, 0.5f, -0.5f);
+	vertices[2].pos.set(0.5f, 0.5f, -0.5f);
+	vertices[3].pos.set(0.5f, -0.5f, -0.5f);
+	vertices[4].pos.set(-0.5f, -0.5f, 0.5f);
+	vertices[5].pos.set(-0.5f, 0.5f, 0.5f);
+	vertices[6].pos.set(0.5f, 0.5f, 0.5f);
+	vertices[7].pos.set(0.5f, -0.5f, 0.5f);
+
+	array<uint32_t, 36> indices;
+	uint32_t i[36] = {0, 1, 2, 0, 2, 3,
+		7, 2, 6, 7, 3, 2,
+		4, 7, 6, 4, 6, 5,
+		4, 1, 5, 4, 0, 1,
+		2, 5, 6, 2, 1, 5,
+		3, 7, 4, 3, 4, 0};
+	memcpy(&indices[0], i, sizeof(i));
+
+	Mesh& mesh = mesh_instance.mesh;
+
+	mesh.aabb.center = vec3(0.5f, 0.5f, 0.5f);
+	mesh.aabb.extents = vec3(0.5f, 0.5f, 0.5f);
+
+	process_flags(mesh_instance, context, vertices, indices, flags);
+
+	mesh.parts[0].render_data.vbuffer = context.vertex_buffer_pool.create();
+	mesh.parts[0].render_data.ibuffer = context.index_buffer_pool.create();
+
+	mesh.parts[0].render_data.elements_number = 12;
+
+	VertexBuffer& vbuffer = context.vertex_buffer_pool.get(mesh.parts[0].render_data.vbuffer);
+	if (!vbuffer.init(buffer_update_type_static,
+		reinterpret_cast<const uint8_t*>(&vertices[0]), 8 * sizeof(StandartGeometryLayout::Vertex), sizeof(StandartGeometryLayout::Vertex)))
+		return false;
+	IndexBuffer& ibuffer = context.index_buffer_pool.get(mesh.parts[0].render_data.ibuffer);
+	return ibuffer.init(vbuffer, &indices[0], indices.size());
+}
+
 bool create_plane(NodeInstance& node, const Context& context)
 {
     add_part(node.mesh);
     return create_plane(node.mesh, context);
 }
 
-bool create_sphere(NodeInstance& node, const Context& context, int subdivision)
+bool create_sphere(NodeInstance& node, const Context& context, int subdivision, uint32_t flags)
 {
     add_part(node.mesh);
-    return create_sphere(node.mesh, context, subdivision);
+    return create_sphere(node.mesh, context, subdivision, flags);
 }
 
 bool create_conus(NodeInstance& node, const Context& context, float radius, float height, int subdivision)
 {
     add_part(node.mesh);
     return create_conus(node.mesh, context, radius, height, subdivision);
+}
+
+bool create_cube(NodeInstance& node, const Context& context, uint32_t flags)
+{
+	add_part(node.mesh);
+	return create_cube(node.mesh, context, flags);
 }
 }}

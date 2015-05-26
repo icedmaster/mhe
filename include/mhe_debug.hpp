@@ -3,6 +3,7 @@
 #ifndef __MHE_DEBUG__
 #define __MHE_DEBUG__
 
+#include "debug/debug_views.hpp"
 #include "debug/default_rdbg_setup.hpp"
 #include "debug/light_wrapper.hpp"
 #include "debug/profiler.hpp"

@@ -66,6 +66,11 @@ public:
 		float current = get_current_time();
 		return running_ ? current - start_ : 0.0f;
 	}
+
+	bool running() const
+	{
+		return running_;
+	}
 private:
 	float start_;
 	bool running_;

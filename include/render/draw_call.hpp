@@ -16,6 +16,25 @@ struct DrawCall
     DrawCall() : draw_call_data(DrawCallData::invalid_id), command(nullptr), pass(0) {}
 };
 
+struct DrawCallExplicit
+{
+	RenderState* render_state;
+	RenderTarget* render_target;
+	Texture* textures[material_textures_number];
+	UniformBuffer* uniforms[material_uniforms_number];
+	ShaderProgram* shader_program;
+	size_t elements_number;
+	uint32_t vbuffer_offset;
+	uint32_t ibuffer_offset;
+	size_t indexes_number;
+	Primitive primitive;
+	Layout* layout;
+	IndexBuffer* ibuffer;
+	VertexBuffer* vbuffer;
+	RenderCommand* render_command;
+	uint8_t pass;
+};
+
 }
 
 #endif // DRAW_CALL_HPP

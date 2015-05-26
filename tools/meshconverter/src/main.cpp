@@ -100,6 +100,62 @@ void write_parts_data(std::ofstream& stream, const mhe::MeshPartExportData* data
 	stream.write((const char*)data, size * sizeof(mhe::MeshPartExportData));
 }
 
+void process_node(const aiScene* assimp_scene, aiNode* node, const aiMatrix4x4& parent_transform, 
+	std::vector<uint32_t>& indices, std::vector<mhe::StandartGeometryLayout::Vertex>& vertices,
+	std::vector<mhe::MeshPartExportData>& parts, mhe::vec3& mesh_aabb_min, mhe::vec3& mesh_aabb_max)
+{
+	aiMatrix4x4 transform = parent_transform * node->mTransformation;
+	aiMatrix4x4 inv_transform = transform;
+	inv_transform.Inverse().Transpose();
+	aiMatrix3x3 normal_transform(inv_transform);
+	for (unsigned int m = 0; m < node->mNumMeshes; ++m)
+	{
+		aiMesh* mesh = assimp_scene->mMeshes[node->mMeshes[m]];
+		mhe::MeshPartExportData part_data;
+		part_data.ibuffer_offset = indices.size();
+		part_data.vbuffer_offset = vertices.size();
+		part_data.faces_number = mesh->mNumFaces;
+		part_data.material_index = mesh->mMaterialIndex;
+
+		mhe::vec3 submesh_aabb_min = default_aabb_min, submesh_aabb_max = default_aabb_max;
+
+		parts.push_back(part_data);
+
+		for (unsigned int i = 0; i < mesh->mNumFaces; ++i)
+		{
+			ASSERT(mesh->mFaces[i].mNumIndices == 3, "The mesh must be triangulated");
+			for (unsigned int j = 0; j < mesh->mFaces[i].mNumIndices; ++j)
+			{
+				indices.push_back(mesh->mFaces[i].mIndices[j]);
+			}
+		}
+
+		for (unsigned int i = 0; i < mesh->mNumVertices; ++i)
+		{
+			mhe::StandartGeometryLayout::Vertex vertex;
+			aiVector3D& v = transform * mesh->mVertices[i];
+			vertex.pos.set(v.x, v.y, v.z);
+			aiVector3D& n = normal_transform * mesh->mNormals[i];
+			vertex.nrm.set(n.x, n.y, n.z);
+			aiVector3D& t = mesh->mTextureCoords[0][i];
+			vertex.tex.set(t.x, t.y);
+			aiVector3D& tng = normal_transform * mesh->mTangents[i];
+			vertex.tng.set(tng.x, tng.y, tng.z);
+
+			vertices.push_back(vertex);
+
+			mesh_aabb_max = mhe::max(mesh_aabb_max, vertex.pos);
+			mesh_aabb_min = mhe::min(mesh_aabb_min, vertex.pos);
+			submesh_aabb_max = mhe::max(submesh_aabb_max, vertex.pos);
+			submesh_aabb_min = mhe::min(submesh_aabb_min, vertex.pos);
+		}
+		parts.back().aabb = mhe::AABBf::from_min_max(submesh_aabb_min, submesh_aabb_max);
+	}
+
+	for (unsigned int n = 0; n < node->mNumChildren; ++n)
+		process_node(assimp_scene, node->mChildren[n], transform, indices, vertices, parts, mesh_aabb_min, mesh_aabb_max);
+}
+
 void process_scene(const char* out_filename, const aiScene* assimp_scene, const ExportParams& params)
 {
     if (!assimp_scene->HasMeshes())
@@ -116,53 +172,61 @@ void process_scene(const char* out_filename, const aiScene* assimp_scene, const 
 
 	vertexes.reserve(initial_vertex_buffer_size);
 	indexes.reserve(initial_vertex_buffer_size);
-
+	
 	mhe::vec3 mesh_aabb_min = default_aabb_min, mesh_aabb_max = default_aabb_max;
 
-	for (unsigned int m = 0; m < assimp_scene->mNumMeshes; ++m)
+	if (assimp_scene->mRootNode != nullptr)
 	{
-		aiMesh* mesh = assimp_scene->mMeshes[m];
-		ASSERT(mesh != nullptr, "Mesh is invalid");
-
-		mhe::MeshPartExportData part_data;
-		part_data.ibuffer_offset = indexes.size();
-		part_data.vbuffer_offset = vertexes.size();
-		part_data.faces_number = mesh->mNumFaces;
-		part_data.material_index = mesh->mMaterialIndex;
-
-		mhe::vec3 submesh_aabb_min = default_aabb_min, submesh_aabb_max = default_aabb_max;
-
-		parts[m] = part_data;
-
-		for (unsigned int i = 0; i < mesh->mNumFaces; ++i)
+		parts.resize(0);
+		process_node(assimp_scene, assimp_scene->mRootNode, aiMatrix4x4(), indexes, vertexes, parts, mesh_aabb_min, mesh_aabb_max);
+	}
+	else
+	{
+		for (unsigned int m = 0; m < assimp_scene->mNumMeshes; ++m)
 		{
-			ASSERT(mesh->mFaces[i].mNumIndices == 3, "The mesh must be triangulated");
-			for (unsigned int j = 0; j < mesh->mFaces[i].mNumIndices; ++j)
+			aiMesh* mesh = assimp_scene->mMeshes[m];
+			ASSERT(mesh != nullptr, "Mesh is invalid");
+
+			mhe::MeshPartExportData part_data;
+			part_data.ibuffer_offset = indexes.size();
+			part_data.vbuffer_offset = vertexes.size();
+			part_data.faces_number = mesh->mNumFaces;
+			part_data.material_index = mesh->mMaterialIndex;
+
+			mhe::vec3 submesh_aabb_min = default_aabb_min, submesh_aabb_max = default_aabb_max;
+
+			parts[m] = part_data;
+
+			for (unsigned int i = 0; i < mesh->mNumFaces; ++i)
 			{
-				indexes.push_back(mesh->mFaces[i].mIndices[j]);
+				ASSERT(mesh->mFaces[i].mNumIndices == 3, "The mesh must be triangulated");
+				for (unsigned int j = 0; j < mesh->mFaces[i].mNumIndices; ++j)
+				{
+					indexes.push_back(mesh->mFaces[i].mIndices[j]);
+				}
 			}
+
+			for (unsigned int i = 0; i < mesh->mNumVertices; ++i)
+			{
+				mhe::StandartGeometryLayout::Vertex vertex;
+				aiVector3D& v = mesh->mVertices[i];
+				vertex.pos.set(v.x, v.y, v.z);
+				aiVector3D& n = mesh->mNormals[i];
+				vertex.nrm.set(n.x, n.y, n.z);
+				aiVector3D& t = mesh->mTextureCoords[0][i];
+				vertex.tex.set(t.x, t.y);
+				aiVector3D& tng = mesh->mTangents[i];
+				vertex.tng.set(tng.x, tng.y, tng.z);
+
+				vertexes.push_back(vertex);
+
+				mesh_aabb_max = mhe::max(mesh_aabb_max, vertex.pos);
+				mesh_aabb_min = mhe::min(mesh_aabb_min, vertex.pos);
+				submesh_aabb_max = mhe::max(submesh_aabb_max, vertex.pos);
+				submesh_aabb_min = mhe::min(submesh_aabb_min, vertex.pos);
+			}
+			parts[m].aabb = mhe::AABBf::from_min_max(submesh_aabb_min, submesh_aabb_max);
 		}
-
-		for (unsigned int i = 0; i < mesh->mNumVertices; ++i)
-		{
-			mhe::StandartGeometryLayout::Vertex vertex;
-			aiVector3D& v = mesh->mVertices[i];
-			vertex.pos.set(v.x, v.y, v.z);
-			aiVector3D& n = mesh->mNormals[i];
-			vertex.nrm.set(n.x, n.y, n.z);
-			aiVector3D& t = mesh->mTextureCoords[0][i];
-			vertex.tex.set(t.x, t.y);
-			aiVector3D& tng = mesh->mTangents[i];
-			vertex.tng.set(tng.x, tng.y, tng.z);
-
-			vertexes.push_back(vertex);
-
-			mesh_aabb_max = mhe::max(mesh_aabb_max, vertex.pos);
-			mesh_aabb_min = mhe::min(mesh_aabb_min, vertex.pos);
-			submesh_aabb_max = mhe::max(submesh_aabb_max, vertex.pos);
-			submesh_aabb_min = mhe::min(submesh_aabb_min, vertex.pos);
-		}
-		parts[m].aabb = mhe::AABBf::from_min_max(submesh_aabb_min, submesh_aabb_max);
 	}
 
 	mesh_export_data.aabb = mhe::AABBf::from_min_max(mesh_aabb_min, mesh_aabb_max);
@@ -250,7 +314,7 @@ int main(int argc, char** argv)
 	
 	Assimp::Importer importer;
 	const aiScene* assimp_scene = importer.ReadFile(in_filename, aiProcess_CalcTangentSpace | aiProcess_Triangulate |
-        aiProcess_GenNormals | aiProcess_GenUVCoords | aiProcess_RemoveRedundantMaterials | aiProcess_TransformUVCoords);
+        aiProcess_GenNormals | aiProcess_GenUVCoords | aiProcess_TransformUVCoords /*| aiProcess_PreTransformVertices*/);
 	if (!assimp_scene)
 	{
 		ERROR_LOG("Error occured during the scene parsing:" << importer.GetErrorString());

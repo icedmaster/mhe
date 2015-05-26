@@ -109,6 +109,15 @@ public:
 		res.set_row(3, -position_ * res);
 		return res;
 	}
+
+	mat4x4 inverse_transform() const
+	{
+		mat4x4 res;
+		res = mat4x4::scaling_matrix(vec3(1.0f / scale_.x(), 1.0f / scale_.y(), 1.0f / scale_.z()));
+		res *= rotation_.conjugate().to_matrix<mat4x4>();
+		res *= mat4x4::translation_matrix(-position_);
+		return res;
+	}
 private:
 	void update()
 	{

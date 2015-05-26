@@ -3,6 +3,7 @@
 
 #include <cstdlib>
 #include <cassert>
+#include "compiler.hpp"
 
 namespace mhe {
 

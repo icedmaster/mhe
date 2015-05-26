@@ -164,6 +164,8 @@ void Application::init_render(const ApplicationConfig& config)
 	pugi::xml_node gbuffer_node = mhe_node.child("gbuffer");
 	if (gbuffer_node)
         init_gbuffer(gbuffer_node, renderer_params);
+	else
+		engine_->set_renderer(new NullRenderer(engine_->context()));
 }
 
 void Application::init_materials(pugi::xml_node materials_node)

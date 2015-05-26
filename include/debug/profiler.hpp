@@ -57,7 +57,7 @@ private:
 	~MainProfiler() {}
 };
 
-class ProfilerElement
+class MHE_EXPORT ProfilerElement
 {
 public:
 	enum
@@ -68,6 +68,8 @@ public:
 public:
 	ProfilerElement(const char* name, int mode = single, Profiler& profiler = MainProfiler::instance(), const char* data = 0);
 	~ProfilerElement();
+
+	void stop();
 
 	const char* name() const
 	{

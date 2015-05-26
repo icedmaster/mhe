@@ -9,6 +9,7 @@
 #include "material_system.hpp"
 #include "material.hpp"
 #include "node.hpp"
+#include "mesh_grid.hpp"
 #include "core/pool.hpp"
 #include "core/types_cast.hpp"
 #include "core/config.hpp"
@@ -26,6 +27,8 @@ typedef Pool<RenderState, 4096, uint16_t> RenderStatePool;
 typedef Pool<Texture, 4096, uint16_t> TexturePool;
 typedef Pool<RenderTarget, max_render_targets_number, RenderTarget::IdType> RenderTargetPool;
 typedef Pool< DrawCallData, 4096, uint16_t, StructTypePolicy<DrawCallData, uint16_t> > DrawCallDataPool;
+typedef Pool< MeshTraceDataInstance, max_trace_data_instances_number,
+	MeshTraceDataInstance::IdType, StructTypePolicy<MeshTraceDataInstance, MeshTraceDataInstance::IdType> > MeshTraceDataPool;
 
 class MaterialSystems
 {
@@ -125,6 +128,8 @@ struct Context
 	MaterialSystems material_systems;
 	MaterialPool materials[max_material_systems_number];
 	MaterialManager material_manager;
+
+	MeshTraceDataPool mesh_trace_data_pool;
 };
 
 }

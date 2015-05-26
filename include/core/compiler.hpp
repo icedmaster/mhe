@@ -35,8 +35,13 @@
 
 #ifndef MHE_CPP11
 #define override
+#define final
 #define static_assert(exp, text) { typedef char __LINE__##sa[exp] MHE_COMPILER_ATTRIBUTE_UNUSED; (void)text; }
 #else
+#endif
+
+#ifndef MHE_COMPILER_HAS_NULLPTR
+#define nullptr 0
 #endif
 
 // Disable some warnings

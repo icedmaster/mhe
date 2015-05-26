@@ -1,0 +1,9 @@
+<mhe>
+  <materials>
+    <material name="posteffect_simple" shader="posteffect_draw" priority="6">
+      <options>
+        <single_dc>1</single_dc>
+      </options>
+    </material>
+  </materials>
+</mhe>

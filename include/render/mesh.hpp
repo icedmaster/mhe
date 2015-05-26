@@ -55,12 +55,14 @@ struct MeshPart
 
 struct Mesh
 {
-    std::vector<MeshPart> parts;
-    VertexBuffer::IdType vbuffer;
-    IndexBuffer::IdType ibuffer;
-		AABBf aabb;
+	std::vector<MeshPart> parts;
+	VertexBuffer::IdType vbuffer;
+	IndexBuffer::IdType ibuffer;
+	MeshTraceDataHandleType trace_data_id;
+	AABBf aabb;
 
-    Mesh() : vbuffer(VertexBuffer::invalid_id), ibuffer(IndexBuffer::invalid_id)
+    Mesh() : vbuffer(VertexBuffer::invalid_id), ibuffer(IndexBuffer::invalid_id),
+			 trace_data_id(InvalidHandle<MeshTraceDataHandleType>::id)
     {}
 };
 

@@ -100,8 +100,10 @@ Renderer::Renderer(Context& context) :
     context_(context),
     skybox_material_system_(nullptr),
     shadowmap_depth_write_material_system_(nullptr),
+		directional_shadowmap_depth_write_material_system_(nullptr),	
     transparent_objects_material_system_(nullptr),
     particles_material_system_(nullptr),
+		fullscreen_debug_material_system_(nullptr),
 		ambient_color_(0.1f, 0.1f, 0.1f, 0.1f),
 		debug_mode_(renderer_debug_mode_none)
 {}

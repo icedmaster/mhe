@@ -5,11 +5,13 @@
 
 #include "math/aabb.hpp"
 #include "math/frustum.hpp"
+#include "math/geometry.hpp"
 #include "math/math_utils.hpp"
 #include "math/matrix.hpp"
 #include "math/matrix3x3.hpp"
 #include "math/plane.hpp"
 #include "math/quat.hpp"
+#include "math/ray.hpp"
 #include "math/rect.hpp"
 #include "math/transform.hpp"
 #include "math/vector2.hpp"

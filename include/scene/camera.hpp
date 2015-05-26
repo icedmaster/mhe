@@ -20,7 +20,7 @@ struct PerspectiveCameraParameters
 	float zfar;
 };
 
-class Camera : public ref_counter
+class MHE_EXPORT Camera : public ref_counter
 {
 public:
 	void init(Context& context, const PerspectiveCameraParameters& parameters,
