@@ -18,7 +18,7 @@ struct AABBInstance
     bool visible : 1;
     bool enabled : 1;
 
-    AABBInstance() : parent_id(invalid_id), id(invalid_id), enabled(true) {}
+    AABBInstance() : id(invalid_id), parent_id(invalid_id), enabled(true) {}
 };
 
 struct TransformInstance
