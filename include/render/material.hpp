@@ -74,7 +74,7 @@ struct MaterialInitializationData
 
 typedef uint16_t MaterialId;
 
-class MaterialManager
+class MHE_EXPORT MaterialManager
 {
 public:
 	MaterialId get(const MaterialInitializationData& data) const;

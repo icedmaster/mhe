@@ -100,7 +100,7 @@ public:
 		quat<T> qz(0.0f, 0.0f, sx, cx);
 
 		// TODO: optimize it
-		*this = qx * qz * qy;
+		*this = qx * qy * qz;
 	}
 
 	void euler(float& xangle, float& yangle, float& zangle) const

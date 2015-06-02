@@ -11,7 +11,26 @@ public:
 	{
 		mhe::NodeInstance& node = engine.scene().create_node();
 		mhe::utils::create_sphere(node, engine.context(), 3, mhe::utils::mesh_creation_flag_trace_data);
-		//mhe::utils::create_cube(node, engine.context(), mhe::utils::mesh_creation_flag_trace_data);
+		mhe::NodeInstance& node2 = engine.scene().create_node();
+		engine.context().mesh_manager.get_instance(node2.mesh, mhe::string("sphere.bin"));
+		node2.mesh.mesh.aabb.extents = mhe::vec3(1, 1, 1);
+		mhe::NodeInstance& floor = engine.scene().create_node();
+		mhe::utils::create_plane(floor, engine.context(), mhe::utils::mesh_creation_flag_trace_data);
+
+		mhe::MaterialInitializationData material_initialization_data;
+		material_initialization_data.render_data.glossiness = 0.05f;
+		mhe::MaterialId material_id = engine.context().material_manager.get(material_initialization_data);
+		node.mesh.mesh.parts[0].material_id = material_id;
+		node2.mesh.mesh.parts[0].material_id = material_id;
+		floor.mesh.mesh.parts[0].material_id = material_id;
+
+		mhe::Transform& transform = engine.scene_context().transform_pool.get(node2.transform_id).transform;
+		transform.translate_to(mhe::vec3(-2.0f, 3.0f, -2.0f));
+
+		mhe::Transform& floor_transform = engine.scene_context().transform_pool.get(floor.transform_id).transform;
+		floor_transform.translate_to(mhe::vec3(0.0f, -2.0f, 0.0f));
+		floor_transform.rotate_by(mhe::quatf(-mhe::pi_2, 0.0f, 0.0f));
+		floor_transform.scale_to(mhe::vec3(4.0f, 4.0f, 4.0f));
 
 		mhe::LightInstance& light = engine.scene().create_light();
 		light.light.set_type(mhe::Light::directional);
@@ -23,7 +42,7 @@ public:
 		camera_params.fov = 45.0f;
 		camera_params.znear = 0.1f;
 		camera_params.zfar = 30.0f;
-		camera_.init(engine.context(), camera_params, mhe::vec3(0.0f, 0.0f, 10.0f), mhe::vec3(0.0f, mhe::pi, 0.0f));
+		camera_.init(engine.context(), camera_params, mhe::vec3(0.0f, 1.0f, 10.0f), mhe::vec3(0.0f, mhe::pi, 0.0f));
 
 		engine.context().driver.set_clear_color(mhe::color_green);
 		engine.context().material_systems.disable_all();

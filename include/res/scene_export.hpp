@@ -39,6 +39,11 @@ struct MeshExportData
 	AABBf aabb;
 };
 
+enum TraceDataType
+{
+	trace_data_grid = 0
+};
+
 }
 
 #endif

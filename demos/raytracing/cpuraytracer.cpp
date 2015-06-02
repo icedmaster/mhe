@@ -3,6 +3,43 @@
 
 using namespace mhe;
 
+const size_t max_bounces = 2;
+const float trace_distance = 50.0f;
+const size_t hemisphere_reflection_rays_number = 256;
+
+//http://www.rorydriscoll.com/2009/01/07/better-sampling/
+vec3 sample_hemisphere(float u1, float u2)
+{
+	const float r = sqrt(u1);
+	const float theta = 2 * pi * u2;
+
+	const float x = r * cosf(theta);
+	const float y = r * sinf(theta);
+
+	return vec3(x, y, sqrt(std::max(0.0f, 1 - u1)));
+}
+
+vec3 least_important_direction(const vec3& v)
+{
+	vec3 abs_v = abs(v);
+	if (abs_v.x() < abs_v.y())
+		return abs_v.x() < abs_v.z() ? vec3::right() : vec3::forward();
+	else
+		return abs_v.y() < abs_v.z() ? vec3::up() : vec3::forward();
+}
+
+vec3 perpendicular(const vec3& v)
+{
+	return cross(least_important_direction(v), v);
+}
+
+vec3 tangent_space_to_world_space(const vec3& v, const vec3& nrm)
+{
+	const vec3& t1 = perpendicular(nrm);
+	const vec3& t2 = cross(nrm, t1);
+	return (v.x() * t1 + v.y() * t2 + v.z() * nrm).normalized();
+}
+
 void CPURaytracer::init(mhe::game::Engine* engine)
 {
 	engine_ = engine;
@@ -33,10 +70,12 @@ void CPURaytracer::render(const Camera& camera)
 	camera.get(camera_data);
 
 	std::vector<mat4x4> inv_w(engine_->scene_context().node_pool.size());
+	std::vector<mat4x4> world(engine_->scene_context().node_pool.size());
 	NodeInstance* nodes = engine_->scene_context().node_pool.all_objects();
 	for (size_t i = 0, size = inv_w.size(); i < size; ++i)
 	{
 		const Transform& transform = engine_->scene_context().transform_pool.get(nodes[i].transform_id).transform;
+		world[i] = transform.transform();
 		inv_w[i] = transform.inverse_transform();
 	}
 
@@ -52,7 +91,11 @@ void CPURaytracer::render(const Camera& camera)
 				vec4 world_pos = ndc_pos * camera_data.inv_vp;
 				vec3 pos = world_pos.xyz() / world_pos.w();
 				rayf r(camera.position(), pos);
-				const vec3& pixel = trace(r, &inv_w[0]);
+				TraceContext trace_context;
+				trace_context.node_id = NodeInstance::invalid_id;
+				trace_context.shade_term = 1.0f;
+				trace_context.pass = pass_default;
+				const vec3& pixel = saturate(trace(trace_context, r, &world[0], &inv_w[0], 0));
 				result[4 * (y * width + x) + 0] = pixel.x() * 255;
 				result[4 * (y * width + x) + 1] = pixel.y() * 255;
 				result[4 * (y * width + x) + 2] = pixel.z() * 255;
@@ -72,42 +115,126 @@ void CPURaytracer::render(const Camera& camera)
 	kick_draw_call();
 }
 
-vec3 CPURaytracer::trace(const rayf& r, const mat4x4* inv_transforms)
+vec3 CPURaytracer::trace(TraceContext& trace_context, const rayf& r, const mat4x4* transforms, const mat4x4* inv_transforms, size_t bounce)
 {
+	if (bounce >= max_bounces) return vec3::zero();
+
 	Context& context = engine_->context();
 	NodeInstance* nodes = engine_->scene_context().node_pool.all_objects();
 	size_t nodes_number = engine_->scene_context().node_pool.size();
-	AABBInstance* aabbs = engine_->scene_context().parts_aabb_pool.all_objects();
-	LightInstance* light_sources = engine_->scene_context().light_pool.all_objects();
-	size_t lights_number = engine_->scene_context().light_pool.size();
 	vec3 res;
 	vec3 nrm;
+	float dist = float_max;
 	bool found = false;
+	MaterialId material_id;
+	size_t index;
+	NodeInstance::IdType node_id = NodeInstance::invalid_id;
+
 	for (size_t i = 0; i < nodes_number; ++i)
 	{
+		if (nodes[i].id == trace_context.node_id) continue;
+		rayf localspace_ray = r * inv_transforms[i];
 		vec3 input, output;
-		if (!intersects(input, output, r, nodes[i].mesh.mesh.aabb))
+		if (!intersects(input, output, localspace_ray, nodes[i].mesh.mesh.aabb))
 			continue;
 		MeshGrid& grid = context.mesh_trace_data_pool.get(nodes[i].mesh.mesh.trace_data_id).grid;
+		hitf obj_hit;
 		MeshGridHelper helper(grid);
-		if (helper.closest_intersection(res, nrm, r * inv_transforms[i]))
+		if (helper.closest_intersection(obj_hit, localspace_ray))
+		{
 			found = true;
+			if (trace_context.pass == pass_shadow)
+			{
+				trace_context.shade_term = 0.0f;
+				return vec3::zero();
+			}
+			if (obj_hit.distance < dist)
+			{
+				res = obj_hit.point;
+				nrm = obj_hit.normal;
+				dist = obj_hit.distance;
+				material_id = nodes[i].mesh.mesh.parts[0].material_id;
+				index = i;
+				node_id = nodes[i].id;
+			}
+		}
 	}
 
-	return found ? saturate(lit_pixel(res, nrm, vec3(0.2f, 0.2f, 0.2f), light_sources, lights_number)) : vec3::zero();
+	if (trace_context.pass == pass_shadow)
+		return vec3::zero();
+
+	vec3 rescolor = vec3::zero();
+	if (found)
+	{
+		res = res * transforms[index];
+		mat4x4 nrm_transform = transforms[index];
+		nrm_transform.set_row(3, vec4::zero()); // consider that we're using uniform scale. Actually should be N = transpose(inverse(W))
+		nrm = nrm * nrm_transform;
+		nrm.normalize();
+
+		vec3 emission_term;
+
+		LightInstance* light_sources = engine_->scene_context().light_pool.all_objects();
+		size_t lights_number = engine_->scene_context().light_pool.size();
+
+		MaterialData material_data;
+		context.material_manager.get(material_data, material_id);
+		trace_context.shade_term = 0.0f;
+		for (size_t i = 0; i < lights_number; ++i)
+		{
+			const vec3& light_direction = get_light_direction(engine_->scene_context(), light_sources[i].id);
+
+			vec3 ambient_color = vec3(0.1f, 0.1f, 0.1f);
+			// direct lighting
+			vec3 direction = light_direction;
+			vec3 diffuse_color = light_sources[i].light.shading().diffuse.xyz();
+			rescolor = lit_pixel(res, nrm, direction, diffuse_color);
+
+			TraceContext local_context;
+			local_context.shade_term = 1.0f;
+			local_context.node_id = node_id;
+			local_context.pass = pass_shadow;
+			rayf shadow_ray(res, -light_direction, trace_distance);
+			trace(local_context, shadow_ray, transforms, inv_transforms, 0);
+			trace_context.emission = rescolor * material_data.render_data.glossiness / (bounce + 1);
+			rescolor *= local_context.shade_term;
+
+			for (size_t j = 0; j < hemisphere_reflection_rays_number / (bounce + 1); ++j)
+			{
+				vec3 random_dir = sample_hemisphere(random(0.0f, 1.0f), random(0.0f, 1.0f));
+				rayf random_ray(res, tangent_space_to_world_space(random_dir, nrm), trace_distance);
+				local_context.node_id = node_id;
+				local_context.emission = vec3::zero();
+				local_context.pass = pass_default;
+				local_context.shade_term = 1.0f;
+				trace(local_context, random_ray, transforms, inv_transforms, bounce + 1);
+				ASSERT(local_context.emission.x() >= 0.0f && local_context.emission.y() >= 0.0f && local_context.emission.z() >= 0.0f, "Invalid color");
+				rescolor += local_context.emission;
+				emission_term += local_context.emission;
+			}
+			//rescolor += ambient_color;
+			//rescolor = nrm.normalized();
+			//rescolor = emission_term;
+		}
+	}
+
+	return rescolor;
 }
 
-vec3 CPURaytracer::lit_pixel(const vec3& pos, const vec3& nrm, const vec3& ambient, const LightInstance* light_sources, size_t lights_number) const
+vec3 CPURaytracer::lit_pixel(const vec3& pos, const vec3& nrm, const mhe::LightInstance& light_instance, const vec3& light_direction) const
 {
-	vec3 res = ambient;
-	for (size_t i = 0; i < lights_number; ++i)
-	{
-		NOT_IMPLEMENTED_ASSERT(light_sources[i].light.type() == Light::directional, "Different light types");
-		vec3 direction = -get_light_direction(engine_->scene_context(), light_sources[i].id);
-		float ndotl = dot(direction, nrm);
-		if (ndotl < 0.0f) continue;
-		res += light_sources[i].light.shading().diffuse.xyz() * ndotl;
-	}
+	NOT_IMPLEMENTED_ASSERT(light_instance.light.type() == Light::directional, "Different light types");
+	return lit_pixel(pos, nrm, light_direction, light_instance.light.shading().diffuse.xyz());
+}
+
+mhe::vec3 CPURaytracer::lit_pixel(const mhe::vec3& pos, const mhe::vec3& nrm, 
+	const mhe::vec3& light_direction, const mhe::vec3& color) const
+{
+	vec3 res = vec3::zero();
+	vec3 direction = -light_direction;
+	float ndotl = dot(direction, nrm);
+	if (ndotl >= 0.0f)
+		res += color * ndotl;
 	return res;
 }
 

@@ -20,8 +20,8 @@ struct ray
 		origin(origin_value), direction((dst - origin_value).normalized()), length((dst - origin_value).length())
 	{}
 
-	ray(const vec3& origin_value, const vec3& dir, T length) :
-		origin(origin_value), direction(dir), length(1.0f)
+	ray(const vec3& origin_value, const vec3& dir, T ray_length) :
+		origin(origin_value), direction(dir), length(ray_length)
 	{}
 };
 
@@ -48,10 +48,44 @@ ray<T> operator* (const ray<T>& r, const matrix<T>& m)
 }
 
 // intersections
+
+template <class T>
+bool intersects_moller_trumbore(hit<T>& h, const ray<T>& r, const Triangle<T>& tri)
+{
+	h.intersects = false;
+
+	const vector3<T>& ac = tri.vertices[0] - tri.vertices[2];
+	const vector3<T>& bc = tri.vertices[1] - tri.vertices[2];
+	const vector3<T>& d = -r.direction;
+
+	const vector3<T>& normal = cross(ac, bc);
+	T det = dot(d, normal);
+	if (det < fp_epsilon) return false;
+
+	T inv_det = 1 / det;
+	const vector3<T>& oc = r.origin - tri.vertices[2];
+	T u = dot(cross(oc, bc), d) * inv_det;
+	if (u < 0 || u > 1) return false;
+
+	T v = dot(cross(ac, oc), d) * inv_det;
+	if (v < 0 || v > 1) return false;
+
+	if (u + v > 1) return false;
+
+	T t = dot(normal, oc) * inv_det;
+	h.distance = t;
+	h.point = r.origin + t * r.direction;
+	h.intersects = true;
+	h.normal = normal.normalized();
+	return true;
+}
+
 // TODO: use Möller-Trumbore algorithm here
 template <class T>
 bool intersects(hit<T>& h, const ray<T>& r, const Triangle<T>& tri)
 {
+	return intersects_moller_trumbore(h, r, tri);
+
 	h.intersects = false;
 	const vector3<T>& v1 = tri.vertices[1] - tri.vertices[0];
 	const vector3<T>& v2 = tri.vertices[2] - tri.vertices[0];
@@ -89,7 +123,7 @@ bool intersects(hit<T>& h, const ray<T>& r, const Triangle<T>& tri)
 	if (w < 0.0f || w > 1.0f) return false;
 
 	h.intersects = true;
-	h.normal = subtri_normal.normalized();
+	h.normal = normal.normalized();
 	return true;
 }
 
