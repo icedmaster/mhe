@@ -1,6 +1,7 @@
 #include <utils/logutils.hpp>
 #include <utils/file_utils.hpp>
 #include <render/layouts.hpp>
+#include <render/mesh_grid.hpp>
 #include <res/scene_export.hpp>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -100,6 +101,11 @@ void write_parts_data(std::ofstream& stream, const mhe::MeshPartExportData* data
 	stream.write((const char*)data, size * sizeof(mhe::MeshPartExportData));
 }
 
+void write_grid_data(std::ofstream& stream, const mhe::MeshGrid& grid)
+{
+
+}
+
 void process_node(const aiScene* assimp_scene, aiNode* node, const aiMatrix4x4& parent_transform, 
 	std::vector<uint32_t>& indices, std::vector<mhe::StandartGeometryLayout::Vertex>& vertices,
 	std::vector<mhe::MeshPartExportData>& parts, mhe::vec3& mesh_aabb_min, mhe::vec3& mesh_aabb_max)
@@ -154,6 +160,17 @@ void process_node(const aiScene* assimp_scene, aiNode* node, const aiMatrix4x4& 
 
 	for (unsigned int n = 0; n < node->mNumChildren; ++n)
 		process_node(assimp_scene, node->mChildren[n], transform, indices, vertices, parts, mesh_aabb_min, mesh_aabb_max);
+}
+
+void create_grid(mhe::MeshGrid& grid, const std::vector<mhe::StandartGeometryLayout::Vertex>& vertices,
+	const std::vector<uint32_t>& indices)
+{
+	mhe::MeshGridHelper helper(grid);
+	ASSERT(indices.size() % 3 == 0, "Only triangulated meshes are supported");
+	for (size_t i = 0, size = indices.size(); i < size; i += 3)
+	{
+		helper.add(vertices[indices[i]].pos, vertices[indices[i + 1]].pos, vertices[indices[i + 2]].pos);
+	}
 }
 
 void process_scene(const char* out_filename, const aiScene* assimp_scene, const ExportParams& params)
@@ -278,6 +295,9 @@ void process_scene(const char* out_filename, const aiScene* assimp_scene, const 
 		}
 	}
 
+	mhe::MeshGrid mesh_grid;
+	create_grid(mesh_grid, vertexes, indexes);
+
 	std::ofstream f(out_filename, std::ios::out | std::ios::binary);
 	if (!f.is_open())
 	{
@@ -294,6 +314,7 @@ void process_scene(const char* out_filename, const aiScene* assimp_scene, const 
 		(const char*)&indexes[0], indexes.size());
 	write_material_data(f, &materials[0], materials.size());
 	write_parts_data(f, &parts[0], parts.size());
+	write_grid_data(f, mesh_grid);
 
 	f.close();
 }
@@ -314,7 +335,7 @@ int main(int argc, char** argv)
 	
 	Assimp::Importer importer;
 	const aiScene* assimp_scene = importer.ReadFile(in_filename, aiProcess_CalcTangentSpace | aiProcess_Triangulate |
-        aiProcess_GenNormals | aiProcess_GenUVCoords | aiProcess_TransformUVCoords /*| aiProcess_PreTransformVertices*/);
+        aiProcess_GenNormals | aiProcess_GenUVCoords | aiProcess_TransformUVCoords);
 	if (!assimp_scene)
 	{
 		ERROR_LOG("Error occured during the scene parsing:" << importer.GetErrorString());

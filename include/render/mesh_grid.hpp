@@ -57,7 +57,7 @@ public:
 		grid_.add(t, MeshGrid::Size::zero(), MeshGrid::Size::zero());
 	}
 
-	bool closest_intersection(vec3& res, vec3& nrm, const rayf& r) const
+	bool closest_intersection(hitf& h, const rayf& r) const
 	{
 		const MeshGrid::Size& size = grid_.size();
 		vec3 s(size.x(), size.y(), size.z());
@@ -69,9 +69,7 @@ public:
 
 		Iterator it(r);
 		grid_.iterate(lowest, highest, it);
-		res = it.h.point;
-		//nrm = cross(it.tri.vertices[0] - res, it.tri.vertices[2] - res).normalized();
-		nrm = it.h.normal;
+		h = it.h;
 		return it.found;
 	}
 private:
@@ -84,11 +82,11 @@ private:
 };
 
 template <class Vertices, class Indices>
-void create_grid(MeshGrid& grid, const Vertices& vertices, const Indices& indices)
+void create_grid(MeshGrid& grid, const Vertices& vertices, size_t vertices_number, const Indices& indices, size_t indices_number)
 {
 	MeshGridHelper helper(grid);
-	ASSERT(indices.size() % 3 == 0, "Only triangulated meshes are currently supported");
-	for (size_t i = 0; i < indices.size(); i +=3)
+	ASSERT(indices_number % 3 == 0, "Only triangulated meshes are currently supported");
+	for (size_t i = 0; i < indices_number; i +=3)
 	{
 		helper.add(vertices[indices[i + 0]].pos,
 			vertices[indices[i + 1]].pos, vertices[indices[i + 2]].pos);

@@ -242,6 +242,12 @@ public:
 		static vector3 z;
 		return z;
 	}
+
+	static vector3 one()
+	{
+		static vector3 o(1, 1, 1);
+		return o;
+	}
 };
 
 template <class T>
@@ -310,6 +316,18 @@ template <class T>
 vector3<T> saturate(const vector3<T>& value)
 {
 	return clamp(value, vector3<T>::zero(), vector3<T>(1, 1, 1));
+}
+
+template <class T>
+vector3<T> reflect(const vector3<T>& v, const vector3<T>& n)
+{
+	return v - 2 * n * dot(v, n);
+}
+
+template <class T>
+vector3<T> abs(const vector3<T>& v)
+{
+	return vector3<T>(fabs(v.x()), fabs(v.y()), fabs(v.z()));
 }
 
 template <class T>

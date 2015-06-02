@@ -5,6 +5,7 @@
 #include "render/layouts.hpp"
 #include "render/material.hpp"
 #include "render/uniforms.hpp"
+#include "render/mesh_grid.hpp"
 
 namespace mhe {
 
@@ -13,6 +14,8 @@ namespace detail {
 template <class Vertex>
 bool init_mesh(Mesh& mesh, const std::vector<Vertex>& vertexes, const std::vector<uint32_t>& indexes, const Context* context)
 {
+	init_trace_data(mesh, vertexes, indexes, context);
+
 	mesh.vbuffer = context->vertex_buffer_pool.create();
 	mesh.ibuffer = context->index_buffer_pool.create();
 
@@ -27,6 +30,15 @@ bool init_mesh(Mesh& mesh, const std::vector<Vertex>& vertexes, const std::vecto
 		return false;
 	IndexBuffer& ibuffer = context->index_buffer_pool.get(mesh.ibuffer);
 	return ibuffer.init(vbuffer, &indexes[0], indexes.size());
+}
+
+template <class Vertex>
+void init_trace_data(Mesh& mesh, const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices, const Context* context)
+{
+	mesh.trace_data_id = context->mesh_trace_data_pool.create();
+	MeshGrid& grid = context->mesh_trace_data_pool.get(mesh.trace_data_id).grid;
+	grid.resize(1, 1, 1, MeshCell());
+	create_grid(grid, vertices, vertices.size(), indices, indices.size());
 }
 
 template <class Vertex>

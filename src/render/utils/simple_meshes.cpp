@@ -12,7 +12,8 @@ namespace utils {
 namespace {
 
 template <class Vertices, class Indices>
-void process_flags(MeshInstance& mesh_instance, const Context& context, const Vertices& vertices, const Indices& indices, uint32_t flags)
+void process_flags(MeshInstance& mesh_instance, const Context& context, const Vertices& vertices, size_t vertices_number,
+	const Indices& indices, size_t indices_number, uint32_t flags)
 {
 	if (flags == mesh_creation_flag_none) return;
 	if (flags & mesh_creation_flag_trace_data)
@@ -21,14 +22,14 @@ void process_flags(MeshInstance& mesh_instance, const Context& context, const Ve
 		// TODO:
 		MeshGrid::Size size(1, 1, 1);
 		mesh_trace_data.grid.resize(size.x(), size.y(), size.z(), MeshCell());
-		create_grid(mesh_trace_data.grid, vertices, indices);
+		create_grid(mesh_trace_data.grid, vertices, vertices_number, indices, indices_number);
 		mesh_instance.mesh.trace_data_id = mesh_trace_data.id;
 	}
 }
 
 }
 
-bool create_plane(MeshInstance& mesh_instance, const Context& context)
+bool create_plane(MeshInstance& mesh_instance, const Context& context, uint32_t flags)
 {
 	StandartGeometryLayout::Vertex vertexes[4];
 	vertexes[0].pos.set(-0.5f, -0.5f, 0.0);
@@ -46,7 +47,11 @@ bool create_plane(MeshInstance& mesh_instance, const Context& context)
 	vertexes[2].tex.set(1.0f, 1.0f);
 	vertexes[3].tex.set(1.0f, 0.0f);
 
-	uint32_t indexes[6] = {0, 1, 2, 2, 3, 0};
+	uint32_t indexes[6] = {0, 2, 1, 0, 3, 2};
+
+	mesh_instance.mesh.aabb.extents.set(0.5f, 0.5f, 0.01f);
+
+	process_flags(mesh_instance, context, vertexes, 4, indexes, 6, flags);
 
     Mesh& mesh = mesh_instance.mesh;
 
@@ -201,7 +206,7 @@ bool create_sphere(MeshInstance& mesh_instance, const Context& context, int subd
 
 	mesh_instance.mesh.aabb.extents.set(1.0f, 1.0f, 1.0f);
 
-	process_flags(mesh_instance, context, vertices, indices, flags);
+	process_flags(mesh_instance, context, vertices, vertices.size(), indices, indices.size(), flags);
 
     MeshPart& part = mesh_instance.mesh.parts[0];
 
@@ -288,7 +293,7 @@ bool create_cube(MeshInstance& mesh_instance, const Context& context, uint32_t f
 	mesh.aabb.center = vec3(0.5f, 0.5f, 0.5f);
 	mesh.aabb.extents = vec3(0.5f, 0.5f, 0.5f);
 
-	process_flags(mesh_instance, context, vertices, indices, flags);
+	process_flags(mesh_instance, context, vertices, 8, indices, 36, flags);
 
 	mesh.parts[0].render_data.vbuffer = context.vertex_buffer_pool.create();
 	mesh.parts[0].render_data.ibuffer = context.index_buffer_pool.create();
@@ -303,10 +308,10 @@ bool create_cube(MeshInstance& mesh_instance, const Context& context, uint32_t f
 	return ibuffer.init(vbuffer, &indices[0], indices.size());
 }
 
-bool create_plane(NodeInstance& node, const Context& context)
+bool create_plane(NodeInstance& node, const Context& context, uint32_t flags)
 {
     add_part(node.mesh);
-    return create_plane(node.mesh, context);
+    return create_plane(node.mesh, context, flags);
 }
 
 bool create_sphere(NodeInstance& node, const Context& context, int subdivision, uint32_t flags)
