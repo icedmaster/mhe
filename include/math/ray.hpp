@@ -4,6 +4,7 @@
 #include "geometry.hpp"
 #include "aabb.hpp"
 #include "matrix.hpp"
+#include "arch/arch_math.hpp"
 
 namespace mhe {
 
@@ -58,21 +59,21 @@ bool intersects_moller_trumbore(hit<T>& h, const ray<T>& r, const Triangle<T>& t
 	const vector3<T>& bc = tri.vertices[1] - tri.vertices[2];
 	const vector3<T>& d = -r.direction;
 
-	const vector3<T>& normal = cross(ac, bc);
-	T det = dot(d, normal);
+	const vector3<T>& normal = vec_cross(ac, bc);
+	T det = vec_dot(d, normal);
 	if (det < fp_epsilon) return false;
 
 	T inv_det = 1 / det;
 	const vector3<T>& oc = r.origin - tri.vertices[2];
-	T u = dot(cross(oc, bc), d) * inv_det;
+	T u = vec_dot(vec_cross(oc, bc), d) * inv_det;
 	if (u < 0 || u > 1) return false;
 
-	T v = dot(cross(ac, oc), d) * inv_det;
+	T v = vec_dot(vec_cross(ac, oc), d) * inv_det;
 	if (v < 0 || v > 1) return false;
 
 	if (u + v > 1) return false;
 
-	T t = dot(normal, oc) * inv_det;
+	T t = vec_dot(normal, oc) * inv_det;
 	h.distance = t;
 	h.point = r.origin + t * r.direction;
 	h.intersects = true;
@@ -90,13 +91,13 @@ bool intersects(hit<T>& h, const ray<T>& r, const Triangle<T>& tri)
 	const vector3<T>& v1 = tri.vertices[1] - tri.vertices[0];
 	const vector3<T>& v2 = tri.vertices[2] - tri.vertices[0];
 
-	vector3<T> normal = cross(v1, v2);
+	vector3<T> normal = vec_cross(v1, v2);
 
 	// backface culling
-	if (dot(normal.normalized(), r.direction) >= -fp_epsilon) return false;
+	if (vec_dot(normal.normalized(), r.direction) >= -fp_epsilon) return false;
 
 	T area = normal.magnitude();
-	T t = (dot(tri.vertices[0], normal) - dot(r.origin, normal)) / dot(r.direction, normal);
+	T t = (vec_dot(tri.vertices[0], normal) - vec_dot(r.origin, normal)) / vec_dot(r.direction, normal);
 	if (t < 0.0f) return false;
 
 	h.point = r.origin + t * r.direction;
@@ -105,21 +106,21 @@ bool intersects(hit<T>& h, const ray<T>& r, const Triangle<T>& tri)
 	// now we check that res is inside the triangle
 	vec3 resv0 = h.point - tri.vertices[0];
 	vec3 v1v0 = v1;
-	vector3<T> subtri_normal = cross(v1v0, resv0);
+	vector3<T> subtri_normal = vec_cross(v1v0, resv0);
 	T u = subtri_normal.magnitude() / area;
-	if (dot(normal, subtri_normal) < -fp_epsilon) return false;	
+	if (vec_dot(normal, subtri_normal) < -fp_epsilon) return false;	
 	if (u < 0.0f || u > 1.0f) return false;
 	vec3 v2v1 = tri.vertices[2] - tri.vertices[1];
 	vec3 resv1 = h.point - tri.vertices[1];
-	subtri_normal = cross(v2v1, resv1);
+	subtri_normal = vec_cross(v2v1, resv1);
 	T v = subtri_normal.magnitude() / area;
-	if (dot(normal, subtri_normal) < -fp_epsilon) return false;
+	if (vec_dot(normal, subtri_normal) < -fp_epsilon) return false;
 	if (v < 0.0f || v > 1.0f) return false;
 	T w = 1.0f - u - v;
 	vec3 resv2 = h.point - tri.vertices[2];
 	vec3 v0v2 = tri.vertices[0] - tri.vertices[2];
-	subtri_normal = cross(v0v2, resv2);
-	if (dot(normal, subtri_normal) < -fp_epsilon) return false;
+	subtri_normal = vec_cross(v0v2, resv2);
+	if (vec_dot(normal, subtri_normal) < -fp_epsilon) return false;
 	if (w < 0.0f || w > 1.0f) return false;
 
 	h.intersects = true;

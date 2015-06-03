@@ -79,6 +79,18 @@ void CPURaytracer::render(const Camera& camera)
 		inv_w[i] = transform.inverse_transform();
 	}
 
+	// lights
+	size_t lights_number = engine_->scene_context().light_pool.size();
+	LightInstance* lights = engine_->scene_context().light_pool.all_objects();
+	std::vector<vec3> directions(lights_number);
+	std::vector<vec3> diffuse_colors(lights_number);
+	for (size_t i = 0; i < lights_number; ++i)
+	{
+		directions[i] = -get_light_direction(engine_->scene_context(), lights[i].id);
+		diffuse_colors[i] = lights[i].light.shading().diffuse.xyz();
+	}
+
+	// real tracing
 	std::vector<uint8_t> result(height * width * 4);
 
 	{
@@ -95,6 +107,9 @@ void CPURaytracer::render(const Camera& camera)
 				trace_context.node_id = NodeInstance::invalid_id;
 				trace_context.shade_term = 1.0f;
 				trace_context.pass = pass_default;
+				trace_context.lights_directions = &directions[0];
+				trace_context.lights_diffuse_colors = &diffuse_colors[0];
+				trace_context.lights_number = lights_number;
 				const vec3& pixel = saturate(trace(trace_context, r, &world[0], &inv_w[0], 0));
 				result[4 * (y * width + x) + 0] = pixel.x() * 255;
 				result[4 * (y * width + x) + 1] = pixel.y() * 255;
@@ -174,20 +189,19 @@ vec3 CPURaytracer::trace(TraceContext& trace_context, const rayf& r, const mat4x
 
 		vec3 emission_term;
 
-		LightInstance* light_sources = engine_->scene_context().light_pool.all_objects();
-		size_t lights_number = engine_->scene_context().light_pool.size();
+		size_t lights_number = trace_context.lights_number;
 
 		MaterialData material_data;
 		context.material_manager.get(material_data, material_id);
 		trace_context.shade_term = 0.0f;
 		for (size_t i = 0; i < lights_number; ++i)
 		{
-			const vec3& light_direction = get_light_direction(engine_->scene_context(), light_sources[i].id);
+			const vec3& light_direction = trace_context.lights_directions[i];
 
 			vec3 ambient_color = vec3(0.1f, 0.1f, 0.1f);
 			// direct lighting
-			vec3 direction = light_direction;
-			vec3 diffuse_color = light_sources[i].light.shading().diffuse.xyz();
+			const vec3& direction = light_direction;
+			const vec3& diffuse_color = trace_context.lights_diffuse_colors[i];
 			rescolor = lit_pixel(res, nrm, direction, diffuse_color);
 
 			TraceContext local_context;
@@ -203,6 +217,7 @@ vec3 CPURaytracer::trace(TraceContext& trace_context, const rayf& r, const mat4x
 			{
 				vec3 random_dir = sample_hemisphere(random(0.0f, 1.0f), random(0.0f, 1.0f));
 				rayf random_ray(res, tangent_space_to_world_space(random_dir, nrm), trace_distance);
+				local_context = trace_context;
 				local_context.node_id = node_id;
 				local_context.emission = vec3::zero();
 				local_context.pass = pass_default;
@@ -231,8 +246,7 @@ mhe::vec3 CPURaytracer::lit_pixel(const mhe::vec3& pos, const mhe::vec3& nrm,
 	const mhe::vec3& light_direction, const mhe::vec3& color) const
 {
 	vec3 res = vec3::zero();
-	vec3 direction = -light_direction;
-	float ndotl = dot(direction, nrm);
+	float ndotl = dot(light_direction, nrm);
 	if (ndotl >= 0.0f)
 		res += color * ndotl;
 	return res;
