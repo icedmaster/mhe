@@ -31,6 +31,9 @@ private:
 		float shade_term;
 		mhe::vec3 emission;
 		Pass pass;
+		mhe::vec3* lights_directions;
+		mhe::vec3* lights_diffuse_colors;
+		size_t lights_number;
 	};
 
 	mhe::vec3 trace(TraceContext& trace_context, const mhe::rayf& r, const mhe::mat4x4* transforms,
