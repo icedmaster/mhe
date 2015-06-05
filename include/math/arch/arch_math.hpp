@@ -12,8 +12,8 @@ typedef details::float32x4_t float32x4_t;
 
 inline float32x4_t vectorize(const vec3& v)
 {
-	//float vf[4] = {v.x(), v.y(), v.z(), 0.0f};
-	return details::vectorize(v.get());
+	float vf[4] = {v.x(), v.y(), v.z(), 0.0f};
+	return details::vectorize(vf);
 }
 
 inline vec3 unvectorize(float32x4_t vv)

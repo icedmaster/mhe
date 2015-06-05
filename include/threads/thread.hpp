@@ -26,6 +26,7 @@ public:
 	void process();
 
 	static size_t hardware_threads_number();
+	static void sleep(size_t ms);
 private:
 	virtual bool start_impl() = 0;
 	virtual void process_impl() = 0;
@@ -36,7 +37,7 @@ private:
 	bool finished_;
 };
 
-class condition_variable
+class MHE_EXPORT condition_variable
 {
 	struct Info;
 public:
