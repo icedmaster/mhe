@@ -59,21 +59,21 @@ bool intersects_moller_trumbore(hit<T>& h, const ray<T>& r, const Triangle<T>& t
 	const vector3<T>& bc = tri.vertices[1] - tri.vertices[2];
 	const vector3<T>& d = -r.direction;
 
-	const vector3<T>& normal = vec_cross(ac, bc);
-	T det = vec_dot(d, normal);
+	const vector3<T>& normal = cross(ac, bc);
+	T det = dot(d, normal);
 	if (det < fp_epsilon) return false;
 
 	T inv_det = 1 / det;
 	const vector3<T>& oc = r.origin - tri.vertices[2];
-	T u = vec_dot(vec_cross(oc, bc), d) * inv_det;
+	T u = dot(cross(oc, bc), d) * inv_det;
 	if (u < 0 || u > 1) return false;
 
-	T v = vec_dot(vec_cross(ac, oc), d) * inv_det;
+	T v = dot(cross(ac, oc), d) * inv_det;
 	if (v < 0 || v > 1) return false;
 
 	if (u + v > 1) return false;
 
-	T t = vec_dot(normal, oc) * inv_det;
+	T t = dot(normal, oc) * inv_det;
 	h.distance = t;
 	h.point = r.origin + t * r.direction;
 	h.intersects = true;

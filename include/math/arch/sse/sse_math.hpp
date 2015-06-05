@@ -16,6 +16,14 @@
 #define MM_SHUFFLE _MM_SHUFFLE
 #endif
 
+//#ifdef __SSE4__
+#ifdef MHE_VS
+#define MHE_SSE4
+#include <smmintrin.h>
+#define mm_dp_ps _mm_dp_ps
+#endif
+//#endif
+
 namespace mhe {
 namespace details {
 
@@ -35,11 +43,15 @@ inline void unvectorize(float* v, float32x4_t r)
 
 inline float32x4_t dot(float32x4_t v1, float32x4_t v2)
 {
+#ifndef MHE_SSE4
 	float32x4_t r1 = mm_mul_ps(v1, v2);
 	float32x4_t r2 = mm_shuffle_ps(r1, r1, MM_SHUFFLE(2, 3, 0, 1));
 	float32x4_t r3 = mm_add_ps(r1, r2);
 	r2 = mm_shuffle_ps(r3, r3, MM_SHUFFLE(0, 1, 2, 3));
 	return mm_add_ps(r2, r3);
+#else
+	return mm_dp_ps(v1, v2, 0xff);
+#endif
 }
 
 inline float32x4_t cross(float32x4_t v1, float32x4_t v2)

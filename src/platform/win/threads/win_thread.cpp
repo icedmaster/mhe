@@ -63,6 +63,11 @@ size_t thread::hardware_threads_number()
 	return sysInfo.dwNumberOfProcessors;
 }
 
+void thread::sleep(size_t ms)
+{
+	::Sleep(ms);
+}
+
 condition_variable::condition_variable() :
 	info_(new Info)
 {
