@@ -1,8 +1,33 @@
-#include "threads/thread.hpp"
+#include "platform/win/win_thread.hpp"
 
 #include "platform/win/win_wrapper.hpp"
 
 namespace mhe {
+
+class WinThreadImpl : public ThreadImpl
+{
+public:
+	bool start() override;
+	bool stop() override;
+	bool join() override;
+	void set_thread(thread* thr)
+	{
+		thr_ = thr;
+	}
+private:
+	HANDLE id_;
+	thread* thr_;
+};
+
+class WinConditionVariable : public ConditionVariableImpl
+{
+public:
+	WinConditionVariable();
+	bool wait() override;
+	void notify() override;
+private:
+	HANDLE id_; 
+};
 
 namespace {
 
@@ -15,47 +40,29 @@ DWORD WINAPI start_thread_impl(void* param)
 
 }
 
-struct thread::Info
+bool WinThreadImpl::start()
 {
-	HANDLE id;
-};
-
-struct condition_variable::Info
-{
-	HANDLE id;
-};
-
-thread::thread() :
-	info_(new Info)
-{}
-
-thread::~thread()
-{}
-
-bool thread::start_thread()
-{
-	info_->id = CreateThread(NULL, 0, start_thread_impl, this, 0, 0);
-	return info_->id != FALSE;
+	id_ = CreateThread(NULL, 0, start_thread_impl, thr_, 0, 0);
+	return id_ != FALSE;
 }
 
-bool thread::stop()
+bool WinThreadImpl::stop()
 {
-	finished_ = true;
-	return TerminateThread(info_->id, 0) != 0;
+	return TerminateThread(id_, 0) != 0;
 }
 
-bool thread::join()
+bool WinThreadImpl::join()
 {
-	return WaitForSingleObject(info_->id, INFINITE) == WAIT_OBJECT_0;
+	return WaitForSingleObject(id_, INFINITE) == WAIT_OBJECT_0;
 }
 
-void thread::process()
+namespace details {
+ThreadImpl* create_thread_impl()
 {
-	while (!finished_)
-		process_impl();
+	return new WinThreadImpl;
 }
 
-size_t thread::hardware_threads_number()
+size_t hardware_threads_number()
 {
 	SYSTEM_INFO sysInfo;
 	GetSystemInfo( &sysInfo );
@@ -63,25 +70,30 @@ size_t thread::hardware_threads_number()
 	return sysInfo.dwNumberOfProcessors;
 }
 
-void thread::sleep(size_t ms)
+void sleep(size_t ms)
 {
 	::Sleep(ms);
 }
 
-condition_variable::condition_variable() :
-	info_(new Info)
+ConditionVariableImpl* create_condition_variable_impl()
 {
-	info_->id = CreateEvent(NULL, FALSE, FALSE, NULL);
+	return new WinConditionVariable;
 }
 
-bool condition_variable::wait()
+} // namespace details
+
+WinConditionVariable::WinConditionVariable() :
+	id_(CreateEvent(NULL, FALSE, FALSE, NULL))
+{}
+
+bool WinConditionVariable::wait()
 {
-	return WaitForSingleObject(info_->id, INFINITE) != FALSE;
+	return WaitForSingleObject(id_, INFINITE) != FALSE;
 }
 
-void condition_variable::notify()
+void WinConditionVariable::notify()
 {
-	SetEvent(info_->id);
+	SetEvent(id_);
 }
 
 }

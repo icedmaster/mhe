@@ -16,7 +16,15 @@ namespace opengl {
 OpenGL3ContextState::OpenGL3ContextState() :
     depth(false), stencil(false), blend(false)
 {
-    uniforms.fill(UniformBuffer::invalid_id);
+	uniforms.fill(UniformBuffer::invalid_id);
+}
+
+OpenGL3Driver::OpenGL3Driver()
+{
+	versions_[0].first = 4; versions_[0].second = 5;
+	versions_[1].first = 4; versions_[1].second = 3;
+	versions_[2].first = 4; versions_[2].second = 2;
+	versions_[3].first = 3; versions_[3].second = 3;
 }
 
 bool OpenGL3Driver::init(DriverRenderingCapabilities& caps)
@@ -170,5 +178,13 @@ void OpenGL3Driver::draw(const RenderData& data)
 		(void*)(data.ibuffer_offset * sizeof(uint32_t)), data.vbuffer_offset);
 	CHECK_GL_ERRORS();
 }
-    
+
+uint OpenGL3Driver::supported_versions(pair<uint, uint>* versions, uint size) const
+{
+	uint n = min(size, ARRAY_SIZE(versions_));
+	for (uint i = 0; i < n; ++i)
+		versions[i] = versions_[i];
+	return n;
+}
+
 }}

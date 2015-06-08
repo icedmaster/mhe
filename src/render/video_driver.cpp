@@ -23,9 +23,11 @@ void Driver::Stats::update_frames()
 }
 
 Driver::Driver() :
-	impl_(SystemFactory::instance().create_driver())
+	impl_(SystemFactory::instance().create_driver()),
+	current_version_(0)
 {
 	reset_state();
+	versions_number_ = impl_->supported_versions(versions_, ARRAY_SIZE(versions_));
 }
 
 void Driver::clear(bool clear_color, bool clear_depth, bool clear_stencil,

@@ -5,25 +5,49 @@
 
 namespace mhe {
 
+class thread;
+
+class ThreadImpl
+{
+public:
+	virtual ~ThreadImpl() {}
+	virtual bool start() = 0;
+	virtual bool stop() = 0;
+	virtual bool join() = 0;
+	virtual void set_thread(thread* thr) = 0;
+};
+
 class MHE_EXPORT thread
 {
-	struct Info;
 public:
 	thread();
-    virtual ~thread();
+	virtual ~thread() {}
 
 	bool start()
 	{
 		if (!start_impl())
 			return false;
 		finished_ = false;
-		return start_thread();
+		impl_->set_thread(this);
+		return impl_->start();
 	}
-	bool stop();
 
-	bool join();
+	bool stop()
+	{
+		finished_ = true;
+		return impl_->stop();
+	}
 
-	void process();
+	bool join()
+	{
+		return impl_->join();
+	}
+
+	void process()
+	{
+		while (!finished_)
+			process_impl();
+	}
 
 	static size_t hardware_threads_number();
 	static void sleep(size_t ms);
@@ -31,22 +55,34 @@ private:
 	virtual bool start_impl() = 0;
 	virtual void process_impl() = 0;
 
-	bool start_thread();
-	
-	unique_ptr<Info> info_;
+	unique_ptr<ThreadImpl> impl_;
 	bool finished_;
+};
+
+class ConditionVariableImpl
+{
+public:
+	virtual ~ConditionVariableImpl() {}
+	virtual bool wait() = 0;
+	virtual void notify() = 0;
 };
 
 class MHE_EXPORT condition_variable
 {
-	struct Info;
 public:
 	condition_variable();
 
-	bool wait();
-	void notify();
+	bool wait()
+	{
+		return impl_->wait();
+	}
+
+	void notify()
+	{
+		impl_->notify();
+	}
 private:
-	unique_ptr<Info> info_;
+	unique_ptr<ConditionVariableImpl> impl_;
 };
 
 }

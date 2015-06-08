@@ -63,13 +63,15 @@ public:
 	virtual void set_shader_program(const ShaderProgram& program) = 0;
 	virtual void set_vertex_buffer(const RenderBuffer& vbuffer) = 0;
 	virtual void set_index_buffer(const IndexBuffer& ibuffer) = 0;
-    virtual void set_uniform(const UniformBuffer& uniform, size_t unit) = 0;
+	virtual void set_uniform(const UniformBuffer& uniform, size_t unit) = 0;
 	virtual void set_layout(const Layout& layout) = 0;
 	virtual void set_texture(const Texture& texture, size_t unit) = 0;
 	virtual void set_render_target(const RenderTarget& render_target) = 0;
 	virtual void set_default_render_target() = 0;
 	virtual void draw(const RenderData& data) = 0;
-    
+
+	virtual uint supported_versions(pair<uint, uint>* versions, uint size) const = 0;
+
 	virtual uint major_version_need() const = 0;
 	virtual uint minor_version_need() const = 0;
 
@@ -185,12 +187,18 @@ public:
 
 	uint major_version_need() const
 	{
-		return impl_->major_version_need();
+		return versions_[current_version_].first;
 	}
 
 	uint minor_version_need() const
 	{
-		return impl_->minor_version_need();
+		return versions_[current_version_].second;
+	}
+
+	bool next_version()
+	{
+		if (++current_version_ >= versions_number_) return false;
+		return true;
 	}
 
 	/// Reset implementaion - need to call init()
@@ -214,8 +222,11 @@ public:
 		return caps_.max_anisotropic_level;
 	}
 private:
-    void perform_draw_call(const Context& context, const DrawCall& draw_call);
+	void perform_draw_call(const Context& context, const DrawCall& draw_call);
 
+	pair<uint, uint> versions_[8];
+	uint versions_number_;
+	uint current_version_;
 	Stats stats_;
 	State state_;
 	DriverImpl::DriverRenderingCapabilities caps_;

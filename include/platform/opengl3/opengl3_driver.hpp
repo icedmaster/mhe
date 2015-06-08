@@ -3,6 +3,7 @@
 
 #include "render/video_driver.hpp"
 #include "core/array.hpp"
+#include "core/types.hpp"
 #include "../opengl/mhe_gl.hpp"
 
 namespace mhe {
@@ -27,6 +28,7 @@ struct OpenGL3ContextState
 class OpenGL3Driver : public DriverImpl
 {
 public:
+	OpenGL3Driver();
 private:
     bool init(DriverRenderingCapabilities& caps);
 	void close() {}
@@ -50,15 +52,17 @@ private:
 
 	void set_viewport(int x, int y, int w, int h);
 
-	uint major_version_need() const
+	uint major_version_need() const override
 	{
 		return 3;
 	}
 
-	uint minor_version_need() const
+	uint minor_version_need() const override
 	{
 		return 3;
 	}
+
+	uint supported_versions(pair<uint, uint>* versions, uint size) const override;
 
 	void set_state(const RenderState& state);
 	void set_shader_program(const ShaderProgram& program);
@@ -75,7 +79,8 @@ private:
 private:
 	void setup_caps(DriverRenderingCapabilities& caps);
 
-    OpenGL3ContextState state_;
+	pair<uint, uint> versions_[4];
+	OpenGL3ContextState state_;
 	const OpenGL3IndexBuffer* current_index_buffer_;
 	const OpenGL3ShaderProgram* current_shader_program_;
 	const OpenGL3RenderTarget* current_render_target_;
