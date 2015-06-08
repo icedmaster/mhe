@@ -37,14 +37,18 @@ bool Engine::init(uint width, uint height, uint bpp, bool fullscreen)
 			{
 				ERROR_LOG("Can't initialize WindowSystem with format:" << format.major_version << " " <<
 					format.minor_version);
-				const std::string& name = SystemFactory::instance().video_driver_factory().set_next_driver();
-				if (name.empty())
+
+				if (!context_.driver.next_version())
 				{
-					ERROR_LOG("All available drivers have been tried - can't initialize engine");
-					return false;
+					const std::string& name = SystemFactory::instance().video_driver_factory().set_next_driver();
+					if (name.empty())
+					{
+						ASSERT(0, "All available drivers have been tried - can't initialize engine");
+						return false;
+					}
+					INFO_LOG("Try next driver with name:" << name);
+					context_.driver.reset();
 				}
-				INFO_LOG("Try next driver with name:" << name);
-				context_.driver.reset();
 				continue;
 			}
 			else

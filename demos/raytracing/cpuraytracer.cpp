@@ -5,7 +5,12 @@ using namespace mhe;
 
 const size_t max_bounces = 2;
 const float trace_distance = 50.0f;
+
+#ifndef MHE_DEBUG
 const size_t hemisphere_reflection_rays_number = 256;
+#else
+const size_t hemisphere_reflection_rays_number = 16;
+#endif
 
 //http://www.rorydriscoll.com/2009/01/07/better-sampling/
 vec3 sample_hemisphere(float u1, float u2)

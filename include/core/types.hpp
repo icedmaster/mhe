@@ -89,10 +89,22 @@ T min(const T& v1, const U& v2)
 {
 	return v1 < v2 ? v1 : v2;
 }
+
+template <class T, class U>
+struct pair
+{
+	T first;
+	U second;
+
+	pair() {}
+	pair(const T& f, const U& s) : first(f), second(s) {}
+};
 }
 
 #define UNUSED(x) (void)x;
 
 #define NOT_IMPLEMENTED(x) (void)x;
+
+#define ARRAY_SIZE(a) sizeof(a) / sizeof(a[0])
 
 #endif
