@@ -100,12 +100,12 @@ Renderer::Renderer(Context& context) :
     context_(context),
     skybox_material_system_(nullptr),
     shadowmap_depth_write_material_system_(nullptr),
-		directional_shadowmap_depth_write_material_system_(nullptr),	
+	directional_shadowmap_depth_write_material_system_(nullptr),	
     transparent_objects_material_system_(nullptr),
     particles_material_system_(nullptr),
-		fullscreen_debug_material_system_(nullptr),
-		ambient_color_(0.1f, 0.1f, 0.1f, 0.1f),
-		debug_mode_(renderer_debug_mode_none)
+	fullscreen_debug_material_system_(nullptr),
+	ambient_color_(0.1f, 0.1f, 0.1f, 0.1f),
+	debug_mode_(renderer_debug_mode_none)
 {}
 
 void Renderer::update(RenderContext& render_context, SceneContext& scene_context)
@@ -168,6 +168,7 @@ void Renderer::execute_render(RenderContext& render_context)
 	context_.driver.clear_depth();
 
     context_.driver.render(context_, render_context.draw_calls.data(), render_context.draw_calls.size());
+	context_.driver.render(context_, render_context.explicit_draw_calls.data(), render_context.explicit_draw_calls.size());
 }
 
 void Renderer::flush()

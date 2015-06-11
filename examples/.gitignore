@@ -8,7 +8,7 @@
 /07_shadowmap/build/*
 /08_sponza/build/*
 /09_reflections/build/*
-/10_3d_basic/build/*
+/10_imgui/build/*
 /11_material/build/*
 /13_logo/build/*
 
@@ -22,7 +22,7 @@
 !/07_shadowmap/build/CMakeLists.txt
 !/08_sponza/build/CMakeLists.txt
 !/09_reflections/build/CMakeLists.txt
-!/10_3d_basic/build/CMakeLists.txt
+!/10_imgui/build/CMakeLists.txt
 !/11_material/build/CMakeLists.txt
 !/13_logo/build/CMakeLists.txt
 

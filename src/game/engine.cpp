@@ -20,7 +20,7 @@ Engine::Engine()
 	:
     rdbg_engine_(*this),
 #endif
-		debug_views_(*this),
+	debug_views_(*this),
     scene_(context_)
 {}
 
@@ -28,35 +28,35 @@ bool Engine::init(uint width, uint height, uint bpp, bool fullscreen)
 {
 	process_ = false;
 
-		while (true)
+	while (true)
+	{
+		WindowContextFormat format;
+		format.major_version = context_.driver.major_version_need();
+		format.minor_version = context_.driver.minor_version_need();
+		if (!context_.window_system.init(width, height, bpp, fullscreen, format))
 		{
-			WindowContextFormat format;
-			format.major_version = context_.driver.major_version_need();
-			format.minor_version = context_.driver.minor_version_need();
-			if (!context_.window_system.init(width, height, bpp, fullscreen, format))
-			{
-				ERROR_LOG("Can't initialize WindowSystem with format:" << format.major_version << " " <<
-					format.minor_version);
+			ERROR_LOG("Can't initialize WindowSystem with format:" << format.major_version << " " <<
+					  format.minor_version);
 
-				if (!context_.driver.next_version())
-				{
-					const std::string& name = SystemFactory::instance().video_driver_factory().set_next_driver();
-					if (name.empty())
-					{
-						ASSERT(0, "All available drivers have been tried - can't initialize engine");
-						return false;
-					}
-					INFO_LOG("Try next driver with name:" << name);
-					context_.driver.reset();
-				}
-				continue;
-			}
-			else
+			if (!context_.driver.next_version())
 			{
-				INFO_LOG("Initialized WindowSystem with format:" << format.major_version << " " <<
-					format.minor_version);
-				break;
+				const std::string& name = SystemFactory::instance().video_driver_factory().set_next_driver();
+				if (name.empty())
+				{
+					ASSERT(0, "All available drivers have been tried - can't initialize engine");
+					return false;
+				}
+				INFO_LOG("Try next driver with name:" << name);
+				context_.driver.reset();
 			}
+			continue;
+		}
+		else
+		{
+			INFO_LOG("Initialized WindowSystem with format:" << format.major_version << " " <<
+					 format.minor_version);
+			break;
+		}
 	}
 
 	if (!context_.driver.init())
@@ -67,7 +67,7 @@ bool Engine::init(uint width, uint height, uint bpp, bool fullscreen)
 	context_.driver.set_window_size(context_.window_system.screen_size());
 	INFO_LOG("Driver has been initialized");
 
-  context_.window_system.view()->set_events_handler(new BaseViewEventsHandler(this));
+	context_.window_system.view()->set_events_handler(new BaseViewEventsHandler(this));
 
 	context_.shader_manager.set_context(&context_);
 	context_.mesh_manager.set_context(&context_);
@@ -136,6 +136,9 @@ void Engine::update()
 		else context_.window_system.disable_vsync();
 	}
 
+	render_context_.tick = utils::get_current_time();
+	render_context_.fdelta = utils::get_last_delta();
+
 	if (stats_timer_.elapsed() > 1.0f)
 	{
 		context_.driver.stats().reset();
@@ -149,11 +152,9 @@ void Engine::update()
 	if (game_scene_ != nullptr)
 		game_scene_->update(*this);
 
-    render_context_.tick = utils::get_current_time();
-    render_context_.fdelta = utils::get_last_delta();
     scene_.update(render_context_);
-		renderer_->before_update(render_context_, scene_.scene_context());
-		scene_.process_requests(render_context_);
+	renderer_->before_update(render_context_, scene_.scene_context());
+	scene_.process_requests(render_context_);
 	renderer_->update(render_context_, scene_.scene_context());
 }
 
@@ -170,6 +171,7 @@ void Engine::render()
 	renderer_->flush();
 	
     render_context_.draw_calls.clear();
+	render_context_.explicit_draw_calls.clear();
 }
 
 }}

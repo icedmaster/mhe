@@ -10,12 +10,6 @@
 
 namespace mhe {
 
-enum Primitive
-{
-	triangle = 0,
-	lines = 1
-};
-
 struct DrawCallData
 {
     POOL_STRUCT(uint16_t);

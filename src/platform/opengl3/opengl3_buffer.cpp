@@ -77,6 +77,19 @@ void VBO::update(GLsizeiptr size, GLintptr offset, const GLvoid* data)
 	disable();
 }
 
+void* VBO::map(GLsizeiptr size, GLintptr offset)
+{
+	void* res = OpenGLExtensions::instance().glMapBufferRange(target_, offset, size, GL_MAP_INVALIDATE_BUFFER_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_WRITE_BIT);
+	CHECK_GL_ERRORS();
+	return res;
+}
+
+void VBO::unmap()
+{
+	OpenGLExtensions::instance().glUnmapBuffer(target_);
+	CHECK_GL_ERRORS();
+}
+
 bool OpenGL3Buffer::init(BufferUpdateType type, const uint8_t* data, size_t size, size_t /*element_size*/)
 {
 	if (!vao_.init())
@@ -93,6 +106,23 @@ void OpenGL3Buffer::close()
 	vao_.close();
 }
 
+void OpenGL3Buffer::update(const uint8_t* data, size_t size)
+{
+	vao_.enable();
+	vbo_.update(size, 0, data);
+	vao_.disable();
+}
+
+void* OpenGL3Buffer::map(size_t size, size_t offset)
+{
+	return vbo_.map(size, offset);
+}
+
+void OpenGL3Buffer::unmap()
+{
+	vbo_.unmap();
+}
+
 void OpenGL3Buffer::enable() const
 {
 	vao_.enable();
@@ -107,13 +137,29 @@ void OpenGL3Buffer::disable() const
 
 bool OpenGL3IndexBuffer::init(const RenderBuffer& render_buffer, const uint32_t* indexes, size_t size)
 {
+	return init(buffer_update_type_static, render_buffer, indexes, size);
+}
+
+bool OpenGL3IndexBuffer::init(BufferUpdateType type, const RenderBuffer& render_buffer, const uint32_t* indices, size_t size)
+{
 	const OpenGL3Buffer* buffer = static_cast<const OpenGL3Buffer*>(render_buffer.impl());
 	buffer->vao().enable();
 	indexes_.resize(size);
-	::memcpy(&indexes_[0], indexes, size * sizeof(uint32_t));
-	bool result = vbo_.init(GL_ELEMENT_ARRAY_BUFFER, size * sizeof(uint32_t), reinterpret_cast<const GLvoid*>(indexes), GL_STATIC_DRAW);
+	if (indices != nullptr)
+		::memcpy(&indexes_[0], indices, size * sizeof(uint32_t));
+	bool result = vbo_.init(GL_ELEMENT_ARRAY_BUFFER, size * sizeof(uint32_t), reinterpret_cast<const GLvoid*>(indices), get_vbo_usage(type));
 	buffer->vao().disable();
+	vao_ = buffer->vao();
 	return result;
+}
+
+void OpenGL3IndexBuffer::update(const uint32_t* indices, size_t size)
+{
+	vao_.enable();
+	indexes_.resize(size);
+	::memcpy(&indexes_[0], indices, size * sizeof(uint32_t));
+	vbo_.update(size * sizeof(uint32_t), 0, reinterpret_cast<const GLvoid*>(indices));
+	vao_.disable();
 }
 
 void OpenGL3IndexBuffer::enable() const

@@ -5,6 +5,7 @@
 
 #include "debug/debug_views.hpp"
 #include "debug/default_rdbg_setup.hpp"
+#include "debug/imgui_helper.hpp"
 #include "debug/light_wrapper.hpp"
 #include "debug/profiler.hpp"
 #include "debug/rdbg.hpp"

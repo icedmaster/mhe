@@ -26,14 +26,21 @@ struct DrawCallExplicit
 	size_t elements_number;
 	uint32_t vbuffer_offset;
 	uint32_t ibuffer_offset;
-	size_t indexes_number;
+	size_t indices_number;
 	Primitive primitive;
 	Layout* layout;
 	IndexBuffer* ibuffer;
 	VertexBuffer* vbuffer;
 	RenderCommand* render_command;
 	uint8_t pass;
+	// Will be moved to the ID
+	uint8_t priority;
 };
+
+inline void prepare_draw_call(DrawCallExplicit& draw_call)
+{
+	::memset(&draw_call, 0, sizeof(DrawCallExplicit));
+}
 
 }
 

@@ -179,6 +179,14 @@ void OpenGL3Driver::draw(const RenderData& data)
 	CHECK_GL_ERRORS();
 }
 
+void OpenGL3Driver::draw(size_t elements_number, size_t vbuffer_offset, size_t ibuffer_offset, size_t indices_number, Primitive primitive)
+{
+	OpenGLExtensions::instance().glDrawElementsBaseVertex(get_primitive_type(primitive), 
+		indices_number != 0 ? indices_number : current_index_buffer_->size(), GL_UNSIGNED_INT,
+		(void*)(ibuffer_offset * sizeof(uint32_t)), vbuffer_offset);
+	CHECK_GL_ERRORS();	
+}
+
 uint OpenGL3Driver::supported_versions(pair<uint, uint>* versions, uint size) const
 {
 	uint n = min(size, ARRAY_SIZE(versions_));
