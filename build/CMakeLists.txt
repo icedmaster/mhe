@@ -88,6 +88,7 @@ set (SRC_PATH
   ${SOURCE_ROOT}/threads
   ${SOURCE_ROOT}/debug
   ${LIB_DIR}/pugixml
+  ${LIB_DIR}/imgui
 )
 
 set (STANDALONE_SOURCES "")

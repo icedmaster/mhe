@@ -21,6 +21,12 @@ public:
 	{
 		return id_;
 	}
+
+	VAO& operator= (const VAO& vao)
+	{
+		id_ = vao.id_;
+		return *this;
+	}
 private:
 	GLuint id_;
 };
@@ -39,6 +45,8 @@ public:
 	}
 
 	void update(GLsizeiptr size, GLintptr offset, const GLvoid* data);
+	void* map(GLsizeiptr size, GLintptr offset);
+	void unmap();
 private:
 	GLuint id_;
 	GLenum target_;
@@ -50,6 +58,10 @@ class OpenGL3Buffer : public RenderBufferImpl
 public:
 	bool init(BufferUpdateType type, const uint8_t* data, size_t size, size_t element_size);
 	void close();
+
+	void update(const uint8_t* data, size_t size) override;
+	void* map(size_t size, size_t offset) override;
+	void unmap() override;
 
 	const VAO& vao() const
 	{
@@ -71,8 +83,11 @@ private:
 class OpenGL3IndexBuffer : public IndexBufferImpl
 {
 public:
-	bool init(const RenderBuffer& render_buffer, const uint32_t* indexes, size_t size);
+	bool init(const RenderBuffer& render_buffer, const uint32_t* indexes, size_t size) override;
+	bool init(BufferUpdateType type, const RenderBuffer& render_buffer, const uint32_t* indices, size_t size) override;
 	void close() {}
+
+	void update(const uint32_t* indices, size_t size) override;
 	
 	const uint32_t* get() const
 	{
@@ -87,6 +102,7 @@ public:
 	void enable() const;
 private:
 	std::vector<uint32_t> indexes_;
+	VAO vao_;
 	VBO vbo_;
 };
 

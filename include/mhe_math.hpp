@@ -18,4 +18,8 @@
 #include "math/vector3.hpp"
 #include "math/vector4.hpp"
 
+#include "math/arch/arch_math.hpp"
+
+#include "math/arch/sse/sse_math.hpp"
+
 #endif // __MHE_MATH__

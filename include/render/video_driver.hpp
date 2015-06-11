@@ -8,6 +8,7 @@
 #include "core/ref_ptr.hpp"
 #include "core/unique_ptr.hpp"
 #include "material.hpp"
+#include "render_common.hpp"
 
 namespace mhe
 {
@@ -17,6 +18,7 @@ struct NodeInstance;
 struct RenderData;
 struct Node;
 struct DrawCall;
+struct DrawCallExplicit;
 
 class Texture;
 class RenderState;
@@ -69,6 +71,7 @@ public:
 	virtual void set_render_target(const RenderTarget& render_target) = 0;
 	virtual void set_default_render_target() = 0;
 	virtual void draw(const RenderData& data) = 0;
+	virtual void draw(size_t elements_number, size_t vbuffer_offset, size_t ibuffer_offset, size_t indices_number, Primitive primitive) = 0;
 
 	virtual uint supported_versions(pair<uint, uint>* versions, uint size) const = 0;
 
@@ -208,6 +211,7 @@ public:
 	void end_render();
 
     void render(const Context& context, const DrawCall* draw_calls, size_t count);
+	void render(const Context& context, const DrawCallExplicit* draw_calls, size_t count);
 
 	void set_window_size(const vector2<int>& size)
 	{
@@ -223,6 +227,7 @@ public:
 	}
 private:
 	void perform_draw_call(const Context& context, const DrawCall& draw_call);
+	void perform_draw_call(const Context& context, const DrawCallExplicit& draw_call);
 
 	pair<uint, uint> versions_[8];
 	uint versions_number_;

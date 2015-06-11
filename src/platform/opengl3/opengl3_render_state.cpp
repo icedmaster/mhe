@@ -16,9 +16,17 @@ void DepthState::enable(OpenGL3ContextState& state) const
 {
     if (desc_.enabled == state.depth) return;
 	if (desc_.enabled)
+	{
 		glEnable(GL_DEPTH_TEST);
-	else glDisable(GL_DEPTH_TEST);
-    state.depth = desc_.enabled;
+		glDepthMask(GL_TRUE);
+	}
+	else
+	{
+		glDisable(GL_DEPTH_TEST);
+		glDepthMask(GL_FALSE);
+	}
+
+	state.depth = desc_.enabled;
 }
 
 void StencilState::init(const StencilDesc& desc)

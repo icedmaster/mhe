@@ -24,6 +24,9 @@ class RenderBufferImpl
 public:
 	virtual ~RenderBufferImpl() {}
 	virtual bool init(BufferUpdateType type, const uint8_t* data, size_t size, size_t element_size) = 0;
+	virtual void update(const uint8_t* data, size_t size) = 0;
+	virtual void* map(size_t size, size_t offset) = 0;
+	virtual void unmap() = 0;
 	virtual void close() = 0;
 };
 
@@ -31,7 +34,9 @@ class IndexBufferImpl
 {
 public:
 	virtual ~IndexBufferImpl() {}
-	virtual bool init(const RenderBuffer& render_buffer, const uint32_t* indexes, size_t size) = 0;
+	virtual bool init(const RenderBuffer& render_buffer, const uint32_t* indices, size_t size) = 0;
+	virtual bool init(BufferUpdateType type, const RenderBuffer& render_buffer, const uint32_t* indices, size_t size) = 0;
+	virtual void update(const uint32_t* indices, size_t size) = 0;
 	virtual void close() = 0;
 };
 
@@ -70,6 +75,21 @@ public:
 		impl_->close();
 	}
 
+	void update(const uint8_t* data, size_t size)
+	{
+		impl_->update(data, size);
+	}
+
+	void* map(size_t size, size_t offset)
+	{
+		return impl_->map(size, offset);
+	}
+
+	void unmap()
+	{
+		impl_->unmap();
+	}
+
 	const RenderBufferImpl* impl() const
 	{
 		return impl_.get();
@@ -85,14 +105,24 @@ class MHE_EXPORT IndexBuffer
 public:
 	IndexBuffer();
 
-	bool init(const RenderBuffer& render_buffer, const uint32_t* indexes, size_t size)
+	bool init(const RenderBuffer& render_buffer, const uint32_t* indices, size_t size)
 	{
-		return impl_->init(render_buffer, indexes, size);
+		return impl_->init(render_buffer, indices, size);
+	}
+
+	bool init(BufferUpdateType type, const RenderBuffer& render_buffer, const uint32_t* indices, size_t size)
+	{
+		return impl_->init(type, render_buffer, indices, size);
 	}
 
 	void close()
 	{
 		impl_->close();
+	}
+
+	void update(const uint32_t* indices, size_t size)
+	{
+		impl_->update(indices, size);
 	}
 
 	const IndexBufferImpl* impl() const

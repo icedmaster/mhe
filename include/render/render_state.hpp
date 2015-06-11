@@ -116,7 +116,7 @@ struct RenderStateDesc
 	DepthDesc depth;
 	StencilDesc stencil;
 	BlendDesc blend;
-    RasterizerDesc rasterizer;
+	RasterizerDesc rasterizer;
 	ViewportDesc viewport;
 };
 

@@ -74,6 +74,7 @@ private:
 	void set_render_target(const RenderTarget& render_target);
 	void set_default_render_target();
 	void draw(const RenderData& data);
+	void draw(size_t elements_number, size_t vbuffer_offset, size_t ibuffer_offset, size_t indices_number, Primitive primitive) override;
 
 	void flush();
 private:

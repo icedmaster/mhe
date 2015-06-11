@@ -16,6 +16,7 @@ struct LightInstance;
 struct NodeInstance;
 
 typedef fixed_capacity_vector<DrawCall, max_scene_dips_number> DrawCalls;
+typedef fixed_capacity_vector<DrawCallExplicit, max_scene_dips_number> ExplicitDrawCalls;
 
 // It's just a temporary implementation
 class SpaceGrid
@@ -115,6 +116,7 @@ private:
 struct RenderContext
 {
     DrawCalls draw_calls;
+	ExplicitDrawCalls explicit_draw_calls;
 
 	NodeInstance* nodes;
 	size_t nodes_number;
