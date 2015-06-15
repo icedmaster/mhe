@@ -19,6 +19,8 @@ public:
 		ImGui::SliderFloat3("And this is a test slider", v_, 0.0f, 10.0f);
 		ImGui::End();
 
+		mhe::show_standart_stats_views(engine.stats());
+
 		return true;
 	}
 
