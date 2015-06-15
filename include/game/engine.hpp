@@ -6,6 +6,7 @@
 #include "debug/rdbg.hpp"
 #endif
 #include "debug/debug_views.hpp"
+#include "debug/stats.hpp"
 
 #include "render/context.hpp"
 #include "render/render_globals.hpp"
@@ -30,6 +31,11 @@ public:
 		return context_;
 	}
 
+	const Context& context() const
+	{
+		return context_;
+	}
+
 	SceneContext& scene_context()
 	{
 		return scene_.scene_context();
@@ -41,6 +47,11 @@ public:
 	}
 
 	Scene& scene()
+	{
+		return scene_;
+	}
+
+	const Scene& scene() const
 	{
 		return scene_;
 	}
@@ -74,6 +85,11 @@ public:
 	{
 		return render_context_;
 	}
+
+	Stats& stats()
+	{
+		return stats_;
+	}
 private:
 	void set_default_video_settings();
 	void setup_generated();
@@ -82,6 +98,7 @@ private:
 	RDBGEngine rdbg_engine_;
 #endif
 	DebugViews debug_views_;
+	Stats stats_;
 
 	Context context_;
     RenderContext render_context_;

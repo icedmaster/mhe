@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include "custom_types.hpp"
 #include "core/hash.hpp"
 #include "core/singleton.hpp"
 #include "core/types_cast.hpp"
@@ -19,16 +20,6 @@ namespace game {
 class Engine;
 
 }
-
-enum
-{
-	None,
-	Int,
-	Float,
-	String,
-	Vector3,
-	Vector4
-};
 
 typedef bool (*SetFuncInt)(game::Engine& engine, size_t id, int value);
 typedef bool (*GetFuncInt)(game::Engine& engine, size_t id, int& value);
@@ -208,18 +199,6 @@ private:
 	RDBGProcessor processor_;
 	RDBGThread thread_;
 };
-
-template <class T>
-struct TypeHelper { static const int type = None; };
-
-template <>
-struct TypeHelper<int> { static const int type = Int; };
-
-template <>
-struct TypeHelper<size_t> { static const int type = Int; };
-
-template <>
-struct TypeHelper<bool> { static const int type = Int; };
 
 class GlobalVars : public Singleton<GlobalVars>
 {

@@ -18,10 +18,10 @@ namespace game {
 Engine::Engine()
 #ifdef RDBG_ENABLED
 	:
-    rdbg_engine_(*this),
+	rdbg_engine_(*this),
 #endif
 	debug_views_(*this),
-    scene_(context_)
+	scene_(context_)
 {}
 
 bool Engine::init(uint width, uint height, uint bpp, bool fullscreen)
@@ -91,6 +91,7 @@ bool Engine::init(uint width, uint height, uint bpp, bool fullscreen)
 #endif
 
 	debug_views_.init(event_manager_);
+	init_standart_stat_views(stats_);
 
 	stats_timer_.start();
 
@@ -148,11 +149,12 @@ void Engine::update()
 	event_manager_.check(context_.window_system);
 
 	debug_views_.update();
+	update_standart_stats_views(stats_, *this);
 
 	if (game_scene_ != nullptr)
 		game_scene_->update(*this);
 
-    scene_.update(render_context_);
+	scene_.update(render_context_);
 	renderer_->before_update(render_context_, scene_.scene_context());
 	scene_.process_requests(render_context_);
 	renderer_->update(render_context_, scene_.scene_context());
@@ -170,7 +172,7 @@ void Engine::render()
 
 	renderer_->flush();
 	
-    render_context_.draw_calls.clear();
+	render_context_.draw_calls.clear();
 	render_context_.explicit_draw_calls.clear();
 }
 

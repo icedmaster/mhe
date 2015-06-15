@@ -382,16 +382,22 @@ public:
         size_ = 0;
     }
 
-		bool empty() const
-		{
-			return size_ == 0;
-		}
+	bool empty() const
+	{
+		return size_ == 0;
+	}
 
-		T& operator[] (size_t index)
-		{
-			ASSERT(index < size_, "Invalid index");
-			return traits_.elements[index];
-		}
+	T& operator[] (size_t index)
+	{
+		ASSERT(index < size_, "Invalid index");
+		return traits_.elements[index];
+	}
+
+	const T& operator[] (size_t index) const
+	{
+		ASSERT(index < size_, "Invalid index");
+		return traits_.elements[index];
+	}
 private:
     Traits traits_;
     size_t size_;
