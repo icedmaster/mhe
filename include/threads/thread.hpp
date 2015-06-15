@@ -49,6 +49,11 @@ public:
 			process_impl();
 	}
 
+	bool finished() const
+	{
+		return finished_;
+	}
+
 	static size_t hardware_threads_number();
 	static void sleep(size_t ms);
 private:

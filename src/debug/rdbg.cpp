@@ -85,12 +85,25 @@ inline void add_field(std::string& dst, const std::string& field, int type)
 	dst += " ";
 }
 
-template <class T>
-inline void add_stat_field(std::string& dst, const char* name, const T& value)
+inline void add_stat_view(std::string& dst, const Stats::View& view)
 {
-	dst += name;
-	dst += ":" + types_cast<std::string>(value);
-	dst += "\n";
+	dst += view.name.c_str();
+	dst += " ";
+	dst += types_cast<std::string>(view.fields.size());
+	dst += " ";
+	for (size_t i = 0, size = view.fields.size(); i < size; ++i)
+	{
+		dst += view.fields[i].name.c_str();
+		dst += " ";
+		char type = static_cast<char>(view.fields[i].type);
+		dst.append(&type, 1);
+		dst += " ";
+
+		char value[80];
+		size_t value_len = serialize(value, view.fields[i].type, view.fields[i].value);
+		dst.append(value, value_len);
+		dst += " ";
+	}
 }
 }
 
@@ -186,18 +199,10 @@ std::string RDBGProcessor::process_profiler_result_command(const std::vector<std
 std::string RDBGProcessor::process_stats_command(const std::vector<std::string>& /*args*/)
 {
 	std::string result;
-	Driver::Stats& stats = engine_.context().driver.stats();
-	add_stat_field(result, "fps", stats.frames());
-	add_stat_field(result, "tris", stats.tris() / stats.frames());
-	add_stat_field(result, "drawcalls:", stats.batches() / stats.frames());
-	const Scene::Stats& scene_stats = engine_.scene().stats();
-	add_stat_field(result, "aabbs:", scene_stats.aabbs());
-	add_stat_field(result, "aabbs_visible:", scene_stats.aabbs_visible());
-	add_stat_field(result, "nodes:", scene_stats.nodes());
-	add_stat_field(result, "nodes_visible:", scene_stats.nodes_visible());
-	add_stat_field(result, "parts:", scene_stats.parts());
-	add_stat_field(result, "parts_visible:", scene_stats.parts_visible());
-
+	Stats& stats = engine_.stats();
+	size_t views_number = stats.views_number();
+	for (size_t i = 0; i < views_number; ++i)
+		add_stat_view(result, stats.view(i));
 	return result;
 }
 
@@ -304,7 +309,7 @@ void RDBGThread::process_impl()
 	if (!server_socket_.connect())
 		return;
 	INFO_LOG("Client connected");
-	while (true)
+	while (!finished())
 	{
 		char length_buffer[4];
 		if (!server_socket_.read(length_buffer, 4))

@@ -12,6 +12,9 @@ size_t scene_stats_view_id;
 
 }
 
+Stats::Stats()
+{}
+
 size_t Stats::register_view(const char* name)
 {
 	View& view = views_.add();
@@ -24,11 +27,8 @@ size_t Stats::register_field(size_t stats, const char* name, int type)
 	Field& field = views_[stats].fields.add();
 	field.name = name;
 	field.type = type;
+	::memset(field.value, 0, sizeof(field.value));
 	return views_[stats].fields.size() - 1;
-}
-
-void Stats::prepare_for_rdbg(rdbg_string& str, size_t stats) const
-{
 }
 
 void Stats::show_gui(size_t view_id) const
@@ -37,8 +37,21 @@ void Stats::show_gui(size_t view_id) const
 	const Fields& fields = view.fields;
 	ImGui::Begin(view.name.c_str());
 	for (size_t i = 0, size = fields.size(); i < size; ++i)
-		ImGui::LabelText(fields[i].name.c_str(), fields[i].value.c_str());
+		ImGui::LabelText(fields[i].name.c_str(), to_string(fields[i]).c_str());
 	ImGui::End();
+}
+
+string Stats::to_string(const Field& field) const
+{
+	switch (field.type)
+	{
+	case Int:
+		return types_cast<string>(TypeHelper<int>::deserialize(field.value));
+	default:
+		break;
+	}
+
+	return string();
 }
 
 void init_standart_stat_views(Stats& stats)

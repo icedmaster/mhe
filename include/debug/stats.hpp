@@ -5,6 +5,7 @@
 #include "core/types_cast.hpp"
 #include "core/string.hpp"
 #include "core/fixed_size_vector.hpp"
+#include "core/allocator.hpp"
 
 namespace mhe {
 
@@ -21,7 +22,7 @@ public:
 	{
 		string name;
 		int type;
-		string value;
+		char value[24];
 	};
 
 	typedef fixed_capacity_vector<Field, 16> Fields;
@@ -32,23 +33,32 @@ public:
 		Fields fields;
 	};
 public:
+	Stats();
+
 	size_t register_view(const char* name);
 	size_t register_field(size_t stats, const char* name, int type);
 
 	template <class T>
-	void set_current_value(size_t view, size_t field, const T& value)
+	void set_current_value(size_t view_id, size_t field_id, const T& value)
 	{
-		views_[view].fields[field].value = types_cast<string>(value);
+		Field& field = views_[view_id].fields[field_id];
+		TypeHelper<T>::serialize(field.value, sizeof(field.value), value);
 	}
 
-	void prepare_for_rdbg(rdbg_string& str, size_t stats) const;
 	void show_gui(size_t view) const;
 
 	const View& view(size_t view_id) const
 	{
 		return views_[view_id];
 	}
+
+	size_t views_number() const
+	{
+		return views_.size();
+	}
 private:
+	string to_string(const Field& field) const;
+
 	typedef fixed_capacity_vector<View, 16> Views;
 
 	Views views_;
