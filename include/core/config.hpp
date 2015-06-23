@@ -107,6 +107,8 @@ const size_t max_directional_lights_number = 8;
 
 const size_t max_views_number = 16;
 
+const size_t max_managed_render_targets = 16;
+
 /**
  * Scene configuration
  */

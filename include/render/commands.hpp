@@ -7,6 +7,7 @@ namespace mhe {
 
 class Driver;
 class RenderTarget;
+class Texture;
 
 class MHE_EXPORT ClearCommand : public RenderCommand
 {
@@ -16,11 +17,11 @@ public:
 		driver_ = driver;
 	}
 
-    bool execute();
-    void reset();
+	void reset();
 private:
+	bool execute_impl(RenderStage current_stage) override;
 	Driver* driver_;
-    bool executed_;
+	bool executed_;
 };
 
 class MHE_EXPORT ClearCommandSimple : public RenderCommand
@@ -30,9 +31,9 @@ public:
 	{
 		driver_ = driver;
 	}
-
-    bool execute();
 private:
+	bool execute_impl(RenderStage current_stage) override;
+
 	Driver* driver_;
 };
 
@@ -46,13 +47,52 @@ public:
 		side_ = side;
 		executed_ = false;
 	}
-
-	bool execute();
 private:
+	bool execute_impl(RenderStage current_stage) override;
+
 	Driver* driver_;
 	RenderTarget* render_target_;
 	int side_;
 	bool executed_;
+};
+
+class MHE_EXPORT CopyFramebufferCommand : public RenderCommand
+{
+public:
+	CopyFramebufferCommand();
+
+	void set_texture(Texture* texture)
+	{
+		texture_ = texture;
+	}
+private:
+	bool execute_impl(RenderStage current_stage) override;
+
+	Texture* texture_;
+};
+
+class MHE_EXPORT ListOfCommands : public RenderCommand
+{
+public:
+	void add_command(RenderCommand* command)
+	{
+		commands_.push_back(command);
+		set_stages(stages() | command->stages());
+	}
+
+	void clear()
+	{
+		commands_.clear();
+	}
+
+	bool empty() const
+	{
+		return commands_.empty();
+	}
+private:
+	bool execute_impl(RenderStage current_stage) override;
+
+	fixed_capacity_vector<RenderCommand*, 4> commands_;
 };
 
 }

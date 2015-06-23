@@ -18,8 +18,10 @@ void Engine::setup_generated()
 	MaterialSystemFactory::instance().add<GBufferDrawMaterialSystem>();
 	MaterialSystemFactory::instance().add<PosteffectSimpleMaterialSystem>();
 	MaterialSystemFactory::instance().add<PosteffectDebugMaterialSystem>();
+	MaterialSystemFactory::instance().add<TonemapMaterialSystem>();
 	MaterialSystemFactory::instance().add<DepthWriteMaterialSystem>();
 	MaterialSystemFactory::instance().add<CSMDepthRenderingMaterialSystem>();
+	MaterialSystemFactory::instance().add<FXAAMaterialSystem>();
 }
 
 }}

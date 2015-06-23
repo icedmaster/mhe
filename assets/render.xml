@@ -7,6 +7,7 @@
     <material name="posteffect_simple" shader="gbuffer_draw" priority="6">
       <options>
         <single_dc>1</single_dc>
+		<blend>1</blend>
       </options>
     </material>
     <material name="posteffect_debug" shader="posteffect_draw" priority="10">
@@ -23,6 +24,8 @@
       <percentage>10, 30, 50, 100</percentage>
     </options>
   </material>
+  <material name="tonemap" shader="posteffect_tonemap" priority="8" />
+  <material name="fxaa" shader="fxaa" priority="9" />
   </materials>
   <skybox name="skybox" />
   <shadowmap_depth_write name="depth_write" />
@@ -33,4 +36,8 @@
 	<use name="gbuffer_draw" />
 	<draw name="posteffect_simple" />
   </gbuffer>
+  <posteffects>
+	<node name="tonemap" material="tonemap" copy_framebuffer="1" />
+	<node name="fxaa" material="fxaa" src="tonemap" />
+  </posteffects>
 </mhe>

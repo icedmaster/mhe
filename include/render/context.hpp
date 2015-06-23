@@ -28,7 +28,7 @@ typedef Pool<Texture, 4096, uint16_t> TexturePool;
 typedef Pool<RenderTarget, max_render_targets_number, RenderTarget::IdType> RenderTargetPool;
 typedef Pool< DrawCallData, 4096, uint16_t, StructTypePolicy<DrawCallData, uint16_t> > DrawCallDataPool;
 typedef Pool< MeshTraceDataInstance, max_trace_data_instances_number,
-	MeshTraceDataInstance::IdType, StructTypePolicy<MeshTraceDataInstance, MeshTraceDataInstance::IdType> > MeshTraceDataPool;
+			  MeshTraceDataInstance::IdType, StructTypePolicy<MeshTraceDataInstance, MeshTraceDataInstance::IdType> > MeshTraceDataPool;
 
 class MaterialSystems
 {
@@ -67,10 +67,10 @@ public:
 		return get_impl<MaterialSystem>(hash(name));
 	}
 
-    MaterialSystem* get(const string& name) const
-    {
-        return get(name.c_str());
-    }
+	MaterialSystem* get(const string& name) const
+	{
+		return get(name.c_str());
+	}
 
 	MaterialSystem* get(uint8_t id) const
 	{
@@ -83,11 +83,11 @@ public:
 		return systems_;
 	}
 
-    void disable_all()
-    {
-        for (size_t i = 0; i < systems_.size(); ++i)
-            systems_[i]->disable();
-    }
+	void disable_all()
+	{
+		for (size_t i = 0; i < systems_.size(); ++i)
+			systems_[i]->disable();
+	}
 private:
 	template <class T>
 	T* get_impl(hash_type name) const
@@ -104,6 +104,41 @@ private:
 };
 
 typedef Pool< Material, initial_material_instances_number, uint16_t, StructTypePolicy<Material, uint16_t> > MaterialPool;
+
+class RenderTargetManager
+{
+public:
+	RenderTargetManager() : context_(nullptr) {}
+
+	void set_context(Context* context)
+	{
+		context_ = context;
+	}
+
+	RenderTarget& create(Context& context, RenderTargetDesc& desc, float scale);
+	TextureInstance& create(Context& context, TextureDesc& desc, float scale);
+private:
+	struct RenderTargetData
+	{
+		float scale;
+		RenderTargetDesc desc;
+		RenderTarget::IdType render_target_id;
+	};
+
+	struct TextureData
+	{
+		float scale;
+		TextureDesc desc;
+		TextureInstance texture;
+	};
+
+	Context* context_;
+
+	typedef fixed_size_vector<RenderTargetData, max_managed_render_targets> RenderTargetsVector;
+	typedef fixed_size_vector<TextureData, max_managed_render_targets> TexturesVector;
+	RenderTargetsVector render_targets_;
+	TexturesVector textures_;
+};
 
 struct Context
 {
@@ -130,6 +165,8 @@ struct Context
 	MaterialManager material_manager;
 
 	MeshTraceDataPool mesh_trace_data_pool;
+
+	RenderTargetManager render_target_manager;
 };
 
 }

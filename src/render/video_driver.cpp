@@ -92,7 +92,7 @@ void Driver::perform_draw_call(const Context& context, const DrawCallExplicit& d
 
 	if (draw_call.render_command != nullptr)
 	{
-		if (!draw_call.render_command->execute())
+		if (!draw_call.render_command->execute(render_stage_before_submit))
 			return;
 	}
 
@@ -157,6 +157,10 @@ void Driver::perform_draw_call(const Context& context, const DrawCallExplicit& d
 
 void Driver::perform_draw_call(const Context& context, const DrawCall& draw_call)
 {
+	uint8_t command_render_stages = draw_call.command != nullptr ? draw_call.command->stages() : 0;
+	if (command_render_stages & render_stage_before_render_target_setup)
+		draw_call.command->execute(render_stage_before_render_target_setup);
+
 	if (context.draw_call_data_pool.is_valid(draw_call.draw_call_data))
 	{
 		const DrawCallData& draw_call_data = context.draw_call_data_pool.get(draw_call.draw_call_data);
@@ -177,16 +181,16 @@ void Driver::perform_draw_call(const Context& context, const DrawCall& draw_call
 			}
 		}
 
-		if (draw_call.command != nullptr)
-		{
-			if (!draw_call.command->execute())
-				return;
-		}
-
 		if (state_.state != draw_call_data.state)
 		{
 			impl_->set_state(context.render_state_pool.get(draw_call_data.state));
 			state_.state = draw_call_data.state;
+		}
+
+		if (command_render_stages & render_stage_before_submit)
+		{
+			if (!draw_call.command->execute(render_stage_before_submit))
+				return;
 		}
 	}
 	else
@@ -251,6 +255,9 @@ void Driver::perform_draw_call(const Context& context, const DrawCall& draw_call
 	}
 	impl_->draw(draw_call.render_data);
 	stats_.update(draw_call.render_data.elements_number);
+
+	if (command_render_stages & render_stage_after_submit)
+		draw_call.command->execute(render_stage_after_submit);
 }
 
 void Driver::begin_render()

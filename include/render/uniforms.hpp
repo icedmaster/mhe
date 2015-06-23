@@ -14,13 +14,13 @@ struct TransformSimpleData
 struct PerCameraData
 {
 	mat4x4 vp;
-    mat4x4 inv_vp;
+	mat4x4 inv_vp;
 	mat4x4 inv_proj;
 	vec4 viewpos;
 	vec4 ambient;
 	float znear;
 	float zfar;
-	float padding[2];
+	vec2 inv_viewport;
 };
 
 struct PerModelSimpleData

@@ -211,6 +211,13 @@ bool ShaderProgramLoader::load(type& res, const std::string& name, const context
 		ShaderInitializationParams params;
 		const std::string& vsdata = detail::load_shader_impl(params, data, detail::vertex_shader_tag, filename_with_extension);
 		const std::string& fsdata = detail::load_shader_impl(params, data, detail::fragment_shader_tag, filename_with_extension);
+
+		// TODO: parse GLSL errors to find the correct line with error
+		/*
+		const std::vector<std::string>& vs_tmp = utils::split(vsdata, "\n", true);
+		const std::vector<std::string>& fs_tmp = utils::split(fsdata, "\n", true);
+		*/
+
 		result = shader_program.init(vsdata, fsdata, params);
 		ASSERT(result, "Shader compilation failed:\n");
 		if (!result)

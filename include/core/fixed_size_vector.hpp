@@ -362,6 +362,12 @@ public:
         return traits_.elements[size_++];
     }
 
+	void push_back(const T& v)
+	{
+        ASSERT(size_ < count - 1, "fixed_capacity_vector is full");
+		traits_.elements[size_++] = v;
+	}
+
     const T* data() const
     {
         return traits_.elements;

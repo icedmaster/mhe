@@ -8,6 +8,7 @@ uniform percamera
 	vec4 ambient;
 	float znear;
 	float zfar;
+	vec2 inv_viewport;
 };
 
 float linearized_depth(float d, float znear, float zfar)

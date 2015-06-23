@@ -15,70 +15,70 @@ namespace mhe {
 
 namespace
 {
-    struct DrawCallSortHelper
-    {
-        DrawCallSortHelper(const Context& context) : context_(context) {}
-        bool operator() (const DrawCall& dc1, const DrawCall& dc2) const
-        {
+	struct DrawCallSortHelper
+	{
+		DrawCallSortHelper(const Context& context) : context_(context) {}
+		bool operator() (const DrawCall& dc1, const DrawCall& dc2) const
+		{
 			MaterialSystem* ms1 = context_.material_systems.get(dc1.material.material_system);
 			MaterialSystem* ms2 = context_.material_systems.get(dc2.material.material_system);
 			if (ms1->priority() == ms2->priority())
 				return dc1.pass < dc2.pass;
-            return ms1->priority() < ms2->priority();
-        }
+			return ms1->priority() < ms2->priority();
+		}
 
-        const Context& context_;
-    };
+		const Context& context_;
+	};
 }
 
 bool init_node(NodeInstance& node, Context& context)
 {
-    ASSERT(node.mesh.shared_uniform == UniformBuffer::invalid_id, "Try to initialize already initialized node");
-    UniformBuffer& uniform = create_and_get(context.uniform_pool);
-    UniformBufferDesc desc;
-    desc.unit = permodel_data_unit;
-    desc.size = sizeof(PerModelData);
-    desc.update_type = uniform_buffer_normal;
-    if (!uniform.init(desc))
-    {
-        ERROR_LOG("Can't initialize a UniformBuffer for node");
-        return false;
-    }
-    node.mesh.shared_uniform = uniform.id();
-    return true;
+	ASSERT(node.mesh.shared_uniform == UniformBuffer::invalid_id, "Try to initialize already initialized node");
+	UniformBuffer& uniform = create_and_get(context.uniform_pool);
+	UniformBufferDesc desc;
+	desc.unit = permodel_data_unit;
+	desc.size = sizeof(PerModelData);
+	desc.update_type = uniform_buffer_normal;
+	if (!uniform.init(desc))
+	{
+		ERROR_LOG("Can't initialize a UniformBuffer for node");
+		return false;
+	}
+	node.mesh.shared_uniform = uniform.id();
+	return true;
 }
 
 void update_nodes(Context& context, RenderContext& render_context, SceneContext& scene_context)
 {
-    for (size_t i = 0; i < render_context.nodes_number; ++i)
-    {
-        MeshInstance& mesh = render_context.nodes[i].mesh;
-        ASSERT(mesh.shared_uniform != UniformBuffer::invalid_id, "Transformation uniform has not been set");
-        Transform& transform = scene_context.transform_pool.get(render_context.nodes[i].transform_id).transform;
-        UniformBuffer& uniform = context.uniform_pool.get(mesh.shared_uniform);
+	for (size_t i = 0; i < render_context.nodes_number; ++i)
+	{
+		MeshInstance& mesh = render_context.nodes[i].mesh;
+		ASSERT(mesh.shared_uniform != UniformBuffer::invalid_id, "Transformation uniform has not been set");
+		Transform& transform = scene_context.transform_pool.get(render_context.nodes[i].transform_id).transform;
+		UniformBuffer& uniform = context.uniform_pool.get(mesh.shared_uniform);
 
-        PerModelData data;
-        data.model = transform.transform();
-        data.normal = data.model;
-        uniform.update(data);
-    }
+		PerModelData data;
+		data.model = transform.transform();
+		data.normal = data.model;
+		uniform.update(data);
+	}
 }
 
 void sort_draw_calls(const Context& context, RenderContext& render_context)
 {
-    DrawCallSortHelper helper(context);
-    DrawCall* first = render_context.draw_calls.data();
-    DrawCall* last = first + render_context.draw_calls.size();
-    std::sort(first, last, helper);
+	DrawCallSortHelper helper(context);
+	DrawCall* first = render_context.draw_calls.data();
+	DrawCall* last = first + render_context.draw_calls.size();
+	std::sort(first, last, helper);
 }
 
 void setup_node(NodeInstance& node, MaterialSystem* material_system, Context& context, SceneContext& scene_context,
-                const string& albedo_texture_name, const string& normalmap_texture_name)
+				const string& albedo_texture_name, const string& normalmap_texture_name)
 {
-    static const string material_name_prefix = string("mat_");
+	static const string material_name_prefix = string("mat_");
 
 	MaterialInitializationData initialization_data;
-    initialization_data.name = material_name_prefix + albedo_texture_name + normalmap_texture_name;
+	initialization_data.name = material_name_prefix + albedo_texture_name + normalmap_texture_name;
 	initialization_data.textures[albedo_texture_unit] = albedo_texture_name;
 	initialization_data.textures[normal_texture_unit] = normalmap_texture_name;
 	initialization_data.render_data.specular_shininess = default_shininess;
@@ -96,13 +96,62 @@ void setup_node(NodeInstance& node, MaterialSystem* material_system, Context& co
 	material_system->setup(context, scene_context, &node.mesh.instance_parts[0], &node.mesh.mesh.parts[0], &model_context, 1);
 }
 
+void PosteffectSystem::add(Context& context, const PosteffectSystem::PosteffectNodeDesc& desc)
+{
+	PosteffectNode* prev_node = nullptr;
+
+	if (!desc.prev_node.empty())
+	{
+		for (size_t i = 0, size = posteffects_.size(); i < size; ++i)
+		{
+			if (posteffects_[i].name == desc.prev_node)
+			{
+				prev_node = &posteffects_[i];
+				break;
+			}
+		}
+		ASSERT(prev_node != nullptr, "Previous node name is set but the not isn't found:" << desc.prev_node);
+	}
+	
+	PosteffectMaterialSystemBase* material_system = context.material_systems.get<PosteffectMaterialSystemBase>(desc.material.c_str());
+	if (prev_node != nullptr)
+	{
+		PosteffectMaterialSystemBase* prev_material_system = prev_node->material_system;
+		size_t inputs_number = material_system->inputs_number();
+		size_t outputs_number = prev_material_system->outputs_number();
+		if (outputs_number == 0)
+		{
+			material_system->init_screen_input(context);
+		}
+		size_t n = min(inputs_number, outputs_number);
+		for (size_t i = 0; i < n; ++i)
+			material_system->set_input(i, prev_material_system->output(i));
+	}
+	else
+	{
+		material_system->init_screen_input(context);
+	}
+
+	PosteffectNode node;
+	node.name = desc.name;
+	node.material_system = material_system;
+
+	posteffects_.push_back(node);
+}
+
+void PosteffectSystem::process(Context& context, RenderContext& render_context, SceneContext& scene_context)
+{
+	for (size_t i = 0, size = posteffects_.size(); i < size; ++i)
+		posteffects_[i].material_system->setup_draw_calls(context, scene_context, render_context);
+}
+
 Renderer::Renderer(Context& context) :
-    context_(context),
-    skybox_material_system_(nullptr),
-    shadowmap_depth_write_material_system_(nullptr),
+	context_(context),
+	skybox_material_system_(nullptr),
+	shadowmap_depth_write_material_system_(nullptr),
 	directional_shadowmap_depth_write_material_system_(nullptr),	
-    transparent_objects_material_system_(nullptr),
-    particles_material_system_(nullptr),
+	transparent_objects_material_system_(nullptr),
+	particles_material_system_(nullptr),
 	fullscreen_debug_material_system_(nullptr),
 	ambient_color_(0.1f, 0.1f, 0.1f, 0.1f),
 	debug_mode_(renderer_debug_mode_none)
@@ -110,27 +159,28 @@ Renderer::Renderer(Context& context) :
 
 void Renderer::update(RenderContext& render_context, SceneContext& scene_context)
 {
-    PerCameraData data;
-    data.vp = render_context.main_camera.vp;
-    data.inv_vp = render_context.main_camera.inv_vp;
-    data.inv_proj = render_context.main_camera.proj.inverted();
-    data.viewpos = vec4(render_context.main_camera.viewpos, 0.0f);
+	PerCameraData data;
+	data.vp = render_context.main_camera.vp;
+	data.inv_vp = render_context.main_camera.inv_vp;
+	data.inv_proj = render_context.main_camera.proj.inverted();
+	data.viewpos = vec4(render_context.main_camera.viewpos, 0.0f);
 
 	data.ambient = ambient_color_;
 	data.znear = render_context.main_camera.znear;
 	data.zfar = render_context.main_camera.zfar;
+	data.inv_viewport = vec2(1.0f / context_.window_system.width(), 1.0f / context_.window_system.height());
 
-    if (render_context.main_camera.percamera_uniform == UniformBuffer::invalid_id)
-    {
-        UniformBuffer& buffer = create_and_get(context_.uniform_pool);
-        render_context.main_camera.percamera_uniform = buffer.id();
-        UniformBufferDesc desc;
-        desc.unit = perframe_data_unit;
-        desc.size = sizeof(PerCameraData);
-        buffer.init(desc);
-    }
-    UniformBuffer& buffer = context_.uniform_pool.get(render_context.main_camera.percamera_uniform);
-    buffer.update(data);
+	if (render_context.main_camera.percamera_uniform == UniformBuffer::invalid_id)
+	{
+		UniformBuffer& buffer = create_and_get(context_.uniform_pool);
+		render_context.main_camera.percamera_uniform = buffer.id();
+		UniformBufferDesc desc;
+		desc.unit = perframe_data_unit;
+		desc.size = sizeof(PerCameraData);
+		buffer.init(desc);
+	}
+	UniformBuffer& buffer = context_.uniform_pool.get(render_context.main_camera.percamera_uniform);
+	buffer.update(data);
 
 	update_nodes(context_, render_context, scene_context);
 	update_impl(context_, render_context, scene_context);
@@ -153,11 +203,13 @@ void Renderer::render(RenderContext& render_context, SceneContext& scene_context
 		shadowmap_depth_write_material_system_->setup_draw_calls(context_, scene_context, render_context);
 	render_impl(context_, render_context, scene_context);
 
+	posteffect_system_.process(context_, render_context, scene_context);
+
 	if (fullscreen_debug_material_system_ != nullptr)
 		fullscreen_debug_material_system_->setup_draw_calls(context_, scene_context, render_context);
 
 	sort_draw_calls(context_, render_context);
-    execute_render(render_context);
+	execute_render(render_context);
 }
 
 void Renderer::execute_render(RenderContext& render_context)
@@ -167,7 +219,7 @@ void Renderer::execute_render(RenderContext& render_context)
 	context_.driver.clear_color();
 	context_.driver.clear_depth();
 
-    context_.driver.render(context_, render_context.draw_calls.data(), render_context.draw_calls.size());
+	context_.driver.render(context_, render_context.draw_calls.data(), render_context.draw_calls.size());
 	context_.driver.render(context_, render_context.explicit_draw_calls.data(), render_context.explicit_draw_calls.size());
 }
 
@@ -185,14 +237,14 @@ void Renderer::flush()
 
 void Renderer::set_skybox_material_system(MaterialSystem* material_system)
 {
-    skybox_material_system_ = material_system;
-    skybox_material_system_->set_priority(skybox_material_system_priority);
+	skybox_material_system_ = material_system;
+	skybox_material_system_->set_priority(skybox_material_system_priority);
 }
 
 void Renderer::set_shadowmap_depth_write_material_system(MaterialSystem* material_system)
 {
-    shadowmap_depth_write_material_system_ = material_system;
-    shadowmap_depth_write_material_system_->set_priority(shadowmap_depth_write_material_system_priority);
+	shadowmap_depth_write_material_system_ = material_system;
+	shadowmap_depth_write_material_system_->set_priority(shadowmap_depth_write_material_system_priority);
 }
 
 void Renderer::set_directional_shadowmap_depth_write_material_system(MaterialSystem* material_system)

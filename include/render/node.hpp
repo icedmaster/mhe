@@ -6,11 +6,42 @@
 
 namespace mhe {
 
+enum RenderStage
+{
+	render_stage_before_render_target_setup = 1,
+	render_stage_before_submit = 1 << 1,
+	render_stage_after_submit = 1 << 2
+};
+
 class RenderCommand
 {
 public:
+	RenderCommand() : stages_(render_stage_before_submit) {}
 	virtual ~RenderCommand() {}
-	virtual bool execute() = 0;
+	bool execute(RenderStage current_stage)
+	{
+		ASSERT(stages_ & current_stage, "Trying to execute a command with invalid render stage");
+		return execute_impl(current_stage);
+	}
+
+	uint8_t stages() const
+	{
+		return stages_;
+	}
+
+	void set_stages(uint8_t stages)
+	{
+		stages_ = stages;
+	}
+
+	void add_stage(uint8_t stage)
+	{
+		stages_ |= stage;
+	}
+private:
+	virtual bool execute_impl(RenderStage current_stage) = 0;
+
+	uint8_t stages_;
 };
 
 struct Node

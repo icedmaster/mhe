@@ -4,6 +4,7 @@
 #include "core/string.hpp"
 #include "core/hash.hpp"
 #include "core/ref_counter.hpp"
+#include "core/fixed_size_vector.hpp"
 #include "math/vector4.hpp"
 
 namespace mhe {
@@ -15,13 +16,14 @@ struct NodeInstance;
 struct MaterialInitializationData;
 
 class MaterialSystem;
+class PosteffectMaterialSystemBase;
 
 bool init_node(NodeInstance& node, Context& context);
 void update_nodes(Context& context, RenderContext& render_context, SceneContext& scene_context);
 void sort_draw_calls(const Context& context, RenderContext& render_context);
 
 MHE_EXPORT void setup_node(NodeInstance& node, MaterialSystem* material_system, Context& context, SceneContext& scene_context,
-                const string& albedo_texture_name, const string& normalmap_texture_name = string());
+				const string& albedo_texture_name, const string& normalmap_texture_name = string());
 MHE_EXPORT void setup_node(NodeInstance& node, MaterialSystem* material_system, Context& context, SceneContext& scene_context,
 	const MaterialInitializationData& material_initialization_data);
 
@@ -32,6 +34,31 @@ bool load_node(NodeInstance& node, const string& name, Context& context, SceneCo
 {
 	return load_node(node, name, MaterialSystem::name(), context, scene_context);
 }
+
+class PosteffectSystem
+{
+public:
+	struct PosteffectNodeDesc
+	{
+		string name;
+		string prev_node;
+		string material;
+	};
+
+	void add(Context& context, const PosteffectNodeDesc& node_desc);
+	void process(Context& context, RenderContext& render_context, SceneContext& scene_context);
+private:
+	struct PosteffectNode
+	{
+		string name;
+		PosteffectMaterialSystemBase* material_system;
+	};
+
+	PosteffectNode* find_node(const string& name) const;
+
+	typedef fixed_size_vector<PosteffectNode, 16> Posteffects;
+	Posteffects posteffects_;
+};
 
 class Renderer : public ref_counter
 {
@@ -47,8 +74,8 @@ public:
 		renderer_debug_mode_shadows
 	};
 public:
-    Renderer(Context& context);
-    virtual ~Renderer() {}
+	Renderer(Context& context);
+	virtual ~Renderer() {}
 
 	virtual void before_update(RenderContext& render_context, SceneContext& scene_context);
 	virtual void update(RenderContext& render_context, SceneContext& scene_context);
@@ -76,6 +103,11 @@ public:
 	}
 
 	void flush();
+
+	PosteffectSystem& posteffect_system()
+	{
+		return posteffect_system_;
+	}
 protected:
 	Context& context()
 	{
@@ -86,7 +118,7 @@ protected:
 protected:
 	virtual void debug_mode_changed(DebugMode mode);
 private:
-    virtual void update_impl(Context& /*context*/, RenderContext& /*render_context*/, SceneContext& /*scene_context*/) {}
+	virtual void update_impl(Context& /*context*/, RenderContext& /*render_context*/, SceneContext& /*scene_context*/) {}
 	virtual void render_impl(Context& context, RenderContext& render_context, SceneContext& scene_context) = 0;
 
 	Context& context_;
@@ -101,6 +133,8 @@ private:
 
 	colorf ambient_color_;
 	DebugMode debug_mode_;
+
+	PosteffectSystem posteffect_system_;
 };
 
 class NullRenderer : public Renderer
@@ -110,7 +144,7 @@ public:
 		Renderer(context)
 		{}
 private:
-    void render_impl(Context& /*context*/, RenderContext& /*render_context*/, SceneContext& /*scene_context*/) override
+	void render_impl(Context& /*context*/, RenderContext& /*render_context*/, SceneContext& /*scene_context*/) override
 	{}
 };
 

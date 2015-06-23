@@ -52,6 +52,7 @@ template <class Str>
 inline Str ltrim_copy(const Str& s, const Str& c = " ")
 {
 	size_t pos = s.find_first_not_of(c);
+	if (pos == Str::npos) return s;
 	return s.substr(pos, s.length() - pos);
 }
 
@@ -130,7 +131,7 @@ inline Str join(const std::vector<Str>& str, const Str2& del = Str2())
 }
 
 template <class Str, class Str2>
-inline std::vector<Str> split(const Str& str, const Str2& del)
+inline std::vector<Str> split(const Str& str, const Str2& del, bool keep_empty = false)
 {
 	std::vector<Str> splitted;
 	size_t index = 0;
@@ -143,6 +144,8 @@ inline std::vector<Str> split(const Str& str, const Str2& del)
 			const Str& element = str.substr(index, len);
 			splitted.push_back(element);
 		}
+		else if (keep_empty)
+			splitted.push_back(Str());
 		index += (len + 1);
 	}
 	return splitted;

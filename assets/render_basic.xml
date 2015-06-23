@@ -3,7 +3,11 @@
 	<material name="unlit" shader="unlit" />
 	<material name="skybox" shader="skybox" priority="0" defs="cubemaps/test.cubemap" />
 	<material name="gbuffer_fill" shader="gbuffer_fill" priority="4" />
-	<material name="posteffect_simple" shader="posteffect_draw" priority="5" />
+	<material name="posteffect_simple" shader="posteffect_draw" priority="5">
+	  <options>
+		<blend>1</blend>
+	  </options>
+	</material>
   </materials>
   <gbuffer>
 	<fill name="gbuffer_fill" />
