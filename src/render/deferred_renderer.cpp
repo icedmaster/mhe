@@ -8,6 +8,7 @@ namespace mhe {
 
 void DeferredRenderer::init(AbstractGBufferFillMaterialSystem* fill, AbstractGBufferUseMaterialSystem* light, PosteffectMaterialSystemBase* draw)
 {
+	Renderer::init();
 	ASSERT(fill != nullptr, "DeferredRenderer requires fill material system");
 	gbuffer_fill_material_system_ = fill;
 	gbuffer_light_material_system_ = light;

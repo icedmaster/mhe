@@ -8,6 +8,7 @@
 #include "math/vector3.hpp"
 #include "math/matrix.hpp"
 #include "math/aabb.hpp"
+#include "math/frustum.hpp"
 #include "draw_call.hpp"
 
 namespace mhe {

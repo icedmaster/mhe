@@ -36,6 +36,21 @@ public:
 
 	void update(Context& context, RenderContext& render_context, const EventManager& event_manager);
 	void render(Context& context, RenderContext& render_context);
+
+	void enable()
+	{
+		enabled_ = true;
+	}
+
+	void disable()
+	{
+		enabled_ = false;
+	}
+
+	void toggle_state()
+	{
+		enabled_ ^= enabled_;
+	}
 private:
 	bool init_layout(Context& context);
 	bool init_render_state(Context& context);
@@ -52,6 +67,7 @@ private:
 	UniformBufferHandleType transform_uniform_id_;
 	VertexBufferHandleType vbuffer_id_;
 	IndexBufferHandleType ibuffer_id_;
+	bool enabled_;
 };
 
 }

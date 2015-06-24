@@ -80,6 +80,8 @@ public:
 		impl_->update(data, size);
 	}
 
+	// map() and unmap() methods may not stateless! Be sure to do unmap() after map() without attempts to work with
+	// another buffers
 	void* map(size_t size, size_t offset)
 	{
 		return impl_->map(size, offset);
@@ -101,7 +103,7 @@ private:
 class MHE_EXPORT IndexBuffer
 {
 	friend class Driver;
-    POOL_ELEMENT_METHODS(uint16_t)
+	POOL_ELEMENT_METHODS(uint16_t)
 public:
 	IndexBuffer();
 

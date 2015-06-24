@@ -1,6 +1,8 @@
 #ifndef __DEBUG_VIEWS_HPP__
 #define __DEBUG_VIEWS_HPP__
 
+#include "imgui_helper.hpp"
+
 namespace mhe {
 
 class EventManager;
@@ -20,8 +22,10 @@ public:
 
 	void init(EventManager& event_maneger);
 	void update();
+	void render();
 private:
 	game::Engine& engine_;
+	ImGuiHelper imgui_;
 };
 
 }

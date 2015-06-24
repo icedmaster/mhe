@@ -13,6 +13,9 @@ void DebugViews::init(EventManager& event_manager)
 {
 	event_manager.add_bind("debug_main", keyboard_event_type, KeyboardEvent::key_down, KeyboardDevice::key_f1);
 	event_manager.add_bind("debug_shadow", keyboard_event_type, KeyboardEvent::key_down, KeyboardDevice::key_f2);
+	event_manager.add_bind("standart_stats", keyboard_event_type, KeyboardEvent::key_down, KeyboardDevice::key_f3);
+
+	imgui_.init(&engine_);
 }
 
 void DebugViews::update()
@@ -34,8 +37,19 @@ void DebugViews::update()
 		else new_mode = Renderer::renderer_debug_mode_shadows;
 	}
 
+	if (engine_.event_manager().check_bind("standart_stats"))
+		imgui_.toggle_state();
+
 	if (current_mode != new_mode)
 		renderer->set_debug_mode(new_mode);
+
+	imgui_.update(engine_.context(), engine_.render_context(), engine_.event_manager());
+}
+
+void DebugViews::render()
+{
+	show_standart_stats_views(engine_.stats());
+	imgui_.render(engine_.context(), engine_.render_context());
 }
 
 }

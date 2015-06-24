@@ -18,21 +18,36 @@ void main()
 
 [fragment]
 
+[uniform tonemap_parameters 1 perframe]
+uniform tonemap_parameters
+{
+	vec4 params;
+};
+
+#define GAMMA(p) p.x
+
 [sampler2D main_texture 0]
 
 in VSOutput vsoutput;
 
 out vec4 color;
 
+// TODO: Real tonemapping will be used after when I add HDR rendering
 vec3 tonemap_filmic(vec3 c)
 {
+	c *= 2; // TODO: add exposure
 	vec3 color = max(vec3(0.0f, 0.0f, 0.0f), c - 0.004f);
 	color = (color * (6.2f * color + 0.5f)) / (color * (6.2f * color + 1.7f) + 0.06f);
 	return pow(color, vec3(2.2f, 2.2f, 2.2f));
 }
 
+vec3 color_correction(vec3 c, float gamma)
+{
+	return pow(c, vec3(gamma, gamma, gamma));
+}
+
 void main()
 {
 	vec4 src = texture(main_texture, vsoutput.tex);
-	color = vec4(tonemap_filmic(src.rgb), src.a);
+	color = vec4(color_correction(src.rgb, 0.9f), src.a);
 }

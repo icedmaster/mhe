@@ -1,7 +1,7 @@
 #include "render/renderer.hpp"
 
 #include "render/context.hpp"
-#include "render/render_context.hpp"
+#include "render/render_globals.hpp"
 #include "render/uniforms.hpp"
 #include "render/instances.hpp"
 #include "render/scene_context.hpp"
@@ -157,59 +157,64 @@ Renderer::Renderer(Context& context) :
 	debug_mode_(renderer_debug_mode_none)
 {}
 
-void Renderer::update(RenderContext& render_context, SceneContext& scene_context)
+bool Renderer::init()
+{
+	return true;
+}
+
+void Renderer::update(SceneContext& scene_context)
 {
 	PerCameraData data;
-	data.vp = render_context.main_camera.vp;
-	data.inv_vp = render_context.main_camera.inv_vp;
-	data.inv_proj = render_context.main_camera.proj.inverted();
-	data.viewpos = vec4(render_context.main_camera.viewpos, 0.0f);
+	data.vp = render_context_.main_camera.vp;
+	data.inv_vp = render_context_.main_camera.inv_vp;
+	data.inv_proj = render_context_.main_camera.proj.inverted();
+	data.viewpos = vec4(render_context_.main_camera.viewpos, 0.0f);
 
 	data.ambient = ambient_color_;
-	data.znear = render_context.main_camera.znear;
-	data.zfar = render_context.main_camera.zfar;
+	data.znear = render_context_.main_camera.znear;
+	data.zfar = render_context_.main_camera.zfar;
 	data.inv_viewport = vec2(1.0f / context_.window_system.width(), 1.0f / context_.window_system.height());
 
-	if (render_context.main_camera.percamera_uniform == UniformBuffer::invalid_id)
+	if (render_context_.main_camera.percamera_uniform == UniformBuffer::invalid_id)
 	{
 		UniformBuffer& buffer = create_and_get(context_.uniform_pool);
-		render_context.main_camera.percamera_uniform = buffer.id();
+		render_context_.main_camera.percamera_uniform = buffer.id();
 		UniformBufferDesc desc;
 		desc.unit = perframe_data_unit;
 		desc.size = sizeof(PerCameraData);
 		buffer.init(desc);
 	}
-	UniformBuffer& buffer = context_.uniform_pool.get(render_context.main_camera.percamera_uniform);
+	UniformBuffer& buffer = context_.uniform_pool.get(render_context_.main_camera.percamera_uniform);
 	buffer.update(data);
 
-	update_nodes(context_, render_context, scene_context);
-	update_impl(context_, render_context, scene_context);
+	update_nodes(context_, render_context_, scene_context);
+	update_impl(context_, render_context_, scene_context);
 }
 
-void Renderer::before_update(RenderContext& render_context, SceneContext& scene_context)
+void Renderer::before_update(SceneContext& scene_context)
 {
-	render_context.render_view_requests.reset();
+	render_context_.render_view_requests.reset();
 	if (directional_shadowmap_depth_write_material_system_ != nullptr)
-		directional_shadowmap_depth_write_material_system_->start_frame(context_, scene_context, render_context);
+		directional_shadowmap_depth_write_material_system_->start_frame(context_, scene_context, render_context_);
 }
 
-void Renderer::render(RenderContext& render_context, SceneContext& scene_context)
+void Renderer::render(SceneContext& scene_context)
 {
 	if (skybox_material_system_ != nullptr)
-		skybox_material_system_->setup_draw_calls(context_, scene_context, render_context);
+		skybox_material_system_->setup_draw_calls(context_, scene_context, render_context_);
 	if (directional_shadowmap_depth_write_material_system_ != nullptr)
-		directional_shadowmap_depth_write_material_system_->setup_draw_calls(context_, scene_context, render_context);
+		directional_shadowmap_depth_write_material_system_->setup_draw_calls(context_, scene_context, render_context_);
 	if (shadowmap_depth_write_material_system_ != nullptr)
-		shadowmap_depth_write_material_system_->setup_draw_calls(context_, scene_context, render_context);
-	render_impl(context_, render_context, scene_context);
+		shadowmap_depth_write_material_system_->setup_draw_calls(context_, scene_context, render_context_);
+	render_impl(context_, render_context_, scene_context);
 
-	posteffect_system_.process(context_, render_context, scene_context);
+	posteffect_system_.process(context_, render_context_, scene_context);
 
 	if (fullscreen_debug_material_system_ != nullptr)
-		fullscreen_debug_material_system_->setup_draw_calls(context_, scene_context, render_context);
+		fullscreen_debug_material_system_->setup_draw_calls(context_, scene_context, render_context_);
 
-	sort_draw_calls(context_, render_context);
-	execute_render(render_context);
+	sort_draw_calls(context_, render_context_);
+	execute_render(render_context_);
 }
 
 void Renderer::execute_render(RenderContext& render_context)
@@ -233,6 +238,9 @@ void Renderer::flush()
 		ProfilerElement swap_buffers_pe("window_system.swap_buffers");
 		context_.window_system.swap_buffers();
 	}
+
+	render_context_.draw_calls.clear();
+	render_context_.explicit_draw_calls.clear();
 }
 
 void Renderer::set_skybox_material_system(MaterialSystem* material_system)
@@ -300,6 +308,8 @@ bool load_node(NodeInstance& node, const string& name, hash_type material_system
 
 bool init_render(Context& context)
 {
+	RenderGlobals render_globals;
+	setup(render_globals);
 	init_standart_layouts(context);
 
 	return true;

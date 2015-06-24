@@ -38,6 +38,7 @@ Application::Application(const char* name) :
 #ifndef MHE_STANDART_LOG_DISABLED
 	mhe::utils::create_standart_log();
 #endif
+	game::init_singletons();
 	create_default_allocator();
 	engine_ = new game::Engine;
 }
@@ -45,6 +46,7 @@ Application::Application(const char* name) :
 Application::~Application()
 {
 	delete engine_;
+	game::destroy_singletons();
 	destroy_default_allocator();
 }
 
@@ -72,6 +74,7 @@ bool Application::mhe_app_init(const ApplicationConfig& config)
 	{
 		add_delegates();
 		init_render(config);
+		engine_->init_debug_components();
 		return true;
 	}
 	return false;

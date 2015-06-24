@@ -6,6 +6,7 @@
 #include "core/ref_counter.hpp"
 #include "core/fixed_size_vector.hpp"
 #include "math/vector4.hpp"
+#include "render_context.hpp"
 
 namespace mhe {
 
@@ -77,9 +78,11 @@ public:
 	Renderer(Context& context);
 	virtual ~Renderer() {}
 
-	virtual void before_update(RenderContext& render_context, SceneContext& scene_context);
-	virtual void update(RenderContext& render_context, SceneContext& scene_context);
-	virtual void render(RenderContext& render_context, SceneContext& scene_context);
+	bool init();
+
+	virtual void before_update(SceneContext& scene_context);
+	virtual void update(SceneContext& scene_context);
+	virtual void render(SceneContext& scene_context);
 
 	void set_skybox_material_system(MaterialSystem* material_system);
 	void set_shadowmap_depth_write_material_system(MaterialSystem* material_system);
@@ -108,6 +111,11 @@ public:
 	{
 		return posteffect_system_;
 	}
+
+	RenderContext& render_context()
+	{
+		return render_context_;
+	}
 protected:
 	Context& context()
 	{
@@ -135,6 +143,8 @@ private:
 	DebugMode debug_mode_;
 
 	PosteffectSystem posteffect_system_;
+
+	RenderContext render_context_;
 };
 
 class NullRenderer : public Renderer

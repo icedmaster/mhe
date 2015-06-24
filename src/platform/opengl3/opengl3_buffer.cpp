@@ -79,6 +79,7 @@ void VBO::update(GLsizeiptr size, GLintptr offset, const GLvoid* data)
 
 void* VBO::map(GLsizeiptr size, GLintptr offset)
 {
+	enable();
 	void* res = OpenGLExtensions::instance().glMapBufferRange(target_, offset, size, GL_MAP_INVALIDATE_BUFFER_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_WRITE_BIT);
 	CHECK_GL_ERRORS();
 	return res;
@@ -88,6 +89,7 @@ void VBO::unmap()
 {
 	OpenGLExtensions::instance().glUnmapBuffer(target_);
 	CHECK_GL_ERRORS();
+	disable();
 }
 
 bool OpenGL3Buffer::init(BufferUpdateType type, const uint8_t* data, size_t size, size_t /*element_size*/)
