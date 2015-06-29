@@ -23,7 +23,22 @@ template <>
 struct TypeHelper<int>
 {
 	static const int type = Int;
-	static void serialize(char* buffer, size_t buffer_size, int value)
+	static void serialize(char* buffer, size_t /*buffer_size*/, int value)
+	{
+		::memcpy(buffer, &value, sizeof(uint32_t));
+	}
+
+	static int deserialize(const char* buffer)
+	{
+		return *(reinterpret_cast<const int32_t*>(buffer));
+	}
+};
+
+template <>
+struct TypeHelper<uint>
+{
+	static const int type = Int;
+	static void serialize(char* buffer, size_t /*buffer_size*/, int value)
 	{
 		::memcpy(buffer, &value, sizeof(uint32_t));
 	}
@@ -38,7 +53,7 @@ template <>
 struct TypeHelper<size_t>
 {
 	static const int type = Int;
-	static void serialize(char* buffer, size_t buffer_size, int value)
+	static void serialize(char* buffer, size_t /*buffer_size*/, int value)
 	{
 		::memcpy(buffer, &value, sizeof(int32_t));
 	}
