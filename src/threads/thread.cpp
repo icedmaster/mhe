@@ -2,9 +2,7 @@
 
 #include "core/config.hpp"
 
-#ifdef MHE_WIN
-#include "platform/win/win_thread.hpp"
-#endif
+#include "threads/thread_impl.hpp"
 
 namespace mhe {
 

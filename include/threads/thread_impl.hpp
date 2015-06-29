@@ -1,7 +1,7 @@
-#ifndef __WIN_THREAD_HPP__
-#define __WIN_THREAD_HPP__
+#ifndef __THREAD_IMPL_HPP__
+#define __THREAD_IMPL_HPP__
 
-#include "threads/thread.hpp"
+#include "thread.hpp"
 
 namespace mhe {
 

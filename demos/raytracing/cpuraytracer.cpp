@@ -221,7 +221,7 @@ void CPURaytracer::render(const Camera& camera)
 	// real tracing
 	std::vector<uint8_t> result(height * width * 4);
 
-	size_t threads_number = 4; //thread::hardware_threads_number();
+	size_t threads_number = thread::hardware_threads_number();
 	size_t rows = context.window_system.height() / threads_number;
 	for (size_t i = 0; i < threads_number; ++i)
 	{
@@ -246,7 +246,9 @@ void CPURaytracer::render(const Camera& camera)
 		for (size_t i = 0; i < threads_number; ++i)
 			threads_[i].condition().notify();
 		for (size_t i = 0; i < threads_number; ++i)
+		{
 			threads_[i].result_condition().wait();
+		}
 		pe.stop();
 		std::cout << "trace:" << pe.result() << std::endl;
 	}
