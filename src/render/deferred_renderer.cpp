@@ -20,11 +20,12 @@ void DeferredRenderer::init(AbstractGBufferFillMaterialSystem* fill, AbstractGBu
 	if (light != nullptr)
 		light->set_render_target(context(), fill->render_target());
 	const TextureInstance* textures = nullptr;
-	if (draw != nullptr && render_target.color_textures(&textures))
+	if (draw != nullptr)
 	{
-		draw->set_input(0, textures[0]);
+		size_t outputs_number = render_target.color_textures(&textures);
+		draw->set_inputs(outputs_number, textures);
 		if (light)
-			draw->set_input(1, light->lighting_texture());
+			draw->set_input(gbuffer_depth_render_target_index + 1, light->lighting_texture());
 	}
 }
 
@@ -46,9 +47,9 @@ void DeferredRenderer::render_impl(Context& context, RenderContext& render_conte
 		draw_material_system_->setup_draw_calls(context, scene_context, render_context);
 }
 
-void DeferredRenderer::debug_mode_changed(DebugMode mode)
+void DeferredRenderer::debug_mode_changed(DebugMode mode, MaterialSystemId material_system_id)
 {
-	Renderer::debug_mode_changed(mode);
+	Renderer::debug_mode_changed(mode, material_system_id);
 	PosteffectDebugMaterialSystem* debug_material_system = context().material_systems.get<PosteffectDebugMaterialSystem>();
 	ASSERT(debug_material_system != nullptr, "Invalid DebugMaterialSystem");
 	if (mode == Renderer::renderer_debug_mode_none)

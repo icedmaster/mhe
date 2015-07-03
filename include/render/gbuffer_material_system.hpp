@@ -18,6 +18,8 @@ struct LightInstance;
 struct LightData;
 struct DirectionalLightData;
 
+const size_t gbuffer_depth_render_target_index = 2;
+
 class AbstractGBufferFillMaterialSystem : public MaterialSystem
 {
 public:
@@ -45,9 +47,11 @@ public:
 	{
 		return render_target_;
 	}
+
+	void output(Context& context, size_t unit, TextureInstance& texture) const override;
 private:
     void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
-    void update(Context& context, SceneContext& scene_context, RenderContext& render_context, MeshPartInstance* parts, size_t count);
+    void update(Context& context, SceneContext& scene_context, RenderContext& render_context, MeshPartInstance* parts_instances, MeshPart* parts, size_t count);
     void setup_uniforms(Material& material, Context& context, SceneContext& scene_context, const MeshPartInstance& part, const ModelContext& model_context) override;
 
 	ClearCommand clear_command_;

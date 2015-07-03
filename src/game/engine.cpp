@@ -192,4 +192,9 @@ void destroy_singletons()
 	MainProfiler::destroy_singleton();
 }
 
+GlobalVars& get_global_vars()
+{
+	return GlobalVars::instance();
+}
+
 }}

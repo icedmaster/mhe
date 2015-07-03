@@ -191,10 +191,51 @@ void Application::init_posteffect_parameters(pugi::xml_node node, RendererParams
 		const char* material_name = n.attribute("material").value();
 		const char* name = n.attribute("name").value();
 		const char* prev_node_name = n.attribute("src").value();
+		size_t priority = n.attribute("priority").as_uint();
 		PosteffectSystem::PosteffectNodeDesc posteffect_node;
 		posteffect_node.name = name;
 		posteffect_node.prev_node = prev_node_name;
 		posteffect_node.material = material_name;
+		posteffect_node.priority = priority;
+
+		pugi::xml_node inputs_node = n.child("inputs");
+		if (inputs_node)
+		{
+			for (pugi::xml_node i = inputs_node.child("input"); i; i = i.next_sibling("input"))
+			{
+				PosteffectSystem::NodeInput& input = posteffect_node.inputs.add();
+				pugi::xml_attribute attr = i.attribute("index");
+				ASSERT(attr, "Malformed posteffect node: input index attribute must exists");
+				input.index = attr.as_uint();
+				attr = i.attribute("node");
+				if (attr) input.node = attr.value();
+				attr = i.attribute("output");
+				if (attr) input.node_output = attr.as_uint();
+				attr = i.attribute("material");
+				if (attr) input.material = attr.value();
+				attr = i.attribute("material_output");
+				if (attr) input.material_output = attr.as_uint();
+				attr = i.attribute("copy_current_framebuffer");
+				if (attr) input.copy_current_framebuffer = attr.as_bool();
+				else input.copy_current_framebuffer = false;
+			}
+		}
+
+		pugi::xml_node outputs_node = n.child("outputs");
+		if (outputs_node)
+		{
+			for (pugi::xml_node o = outputs_node.child("output"); o; o = o.next_sibling("output"))
+			{
+				PosteffectSystem::NodeOutput& output = posteffect_node.outputs.add();
+				pugi::xml_attribute attr = o.attribute("index");
+				ASSERT(attr, "Malformed posteffect node: output index attribute must exists");
+				output.index = attr.as_uint();
+				attr = o.attribute("scale");
+				if (attr) output.scale = attr.as_float();
+				else output.scale = 1.0f;
+			}
+		}
+
 		params.posteffect_params.nodes.push_back(posteffect_node);
 	}
 }
@@ -250,7 +291,7 @@ void Application::init_gbuffer(pugi::xml_node gbuffer_node, const RendererParams
 	MaterialSystem* skybox_material_system = context.material_systems.get(params.skybox);
 	MaterialSystem* depth_write_material_system = context.material_systems.get(params.shadowmap_depth_write);
 	MaterialSystem* directional_depth_write_material_system = context.material_systems.get(params.directional_depth_write);
-	MaterialSystem* fullscreen_debug_material_system = context.material_systems.get(params.fullscreen_debug);
+	PosteffectDebugMaterialSystem* fullscreen_debug_material_system = context.material_systems.get<PosteffectDebugMaterialSystem>(params.fullscreen_debug);
 	
 	DeferredRenderer* renderer = new DeferredRenderer(context);
 	renderer->set_skybox_material_system(skybox_material_system);

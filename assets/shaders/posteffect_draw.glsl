@@ -31,7 +31,7 @@ out vec4 color;
 void main()
 {
 #if RENDER_DEPTH == 0
-	color = texture(main_texture, vsoutput.tex);
+	color = vec4(texture(main_texture, vsoutput.tex).rgb, 1.0f);
 #else
 	float d = texture(main_texture, vsoutput.tex).r;
 

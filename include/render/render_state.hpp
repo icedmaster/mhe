@@ -126,6 +126,7 @@ public:
 	virtual ~RenderStateImpl() {}
 	virtual bool init(const RenderStateDesc& desc) = 0;
 	virtual void update(const RenderStateDesc& desc) = 0;
+	virtual void update_viewport(const ViewportDesc& viewport_desc) = 0;
 	virtual void close() = 0;
 };
 
@@ -152,6 +153,11 @@ public:
 	void update(const RenderStateDesc& desc)
 	{
 		impl_->update(desc);
+	}
+
+	void update_viewport(const ViewportDesc& viewport_desc)
+	{
+		impl_->update_viewport(viewport_desc);
 	}
 
 	const RenderStateImpl* impl() const

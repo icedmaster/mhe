@@ -9,6 +9,10 @@ public:
 		
 		mhe::NodeInstance& node = engine.scene().create_node();
 		mhe::load_node<mhe::GBufferFillMaterialSystem>(node, mhe::string("sponza.bin"), engine.context(), engine.scene_context());
+		mhe::MaterialId floor_id;
+		engine.context().material_manager.id_by_name(floor_id, mhe::string("floor"));
+		mhe::MaterialData& material = engine.context().material_manager.material_data(floor_id);
+		material.render_data.glossiness = 1.0f;
 
 		init_lighting(engine);
 
@@ -135,6 +139,8 @@ int main(int /*argc*/, char** /*argv*/)
 	app.init(config);
 
 	app.engine().renderer()->set_ambient_color(mhe::color_white * 0.5f);
+
+	mhe::game::get_global_vars().set("use_normalmaps", false);
 
 	mhe::game::GameSceneDesc desc;
 	GameScene* game_scene = new GameScene;

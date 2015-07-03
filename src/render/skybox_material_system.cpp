@@ -56,7 +56,7 @@ bool SkyboxMaterialSystem::init_mesh(Context& context, const MaterialSystemConte
     Material& material = context.materials[id()].get(skybox_mesh_.instance_parts[0].material.id);
     material.shader_program = ubershader(context).get_default();
     material.uniforms[0] = transform_uniform_;
-		material.textures[0] = skybox_texture_;
+	material.textures[0] = skybox_texture_;
     skybox_mesh_.mesh.parts[0].render_data.layout = SkyboxLayout::handle;
 
     RenderStateDesc render_state_desc;

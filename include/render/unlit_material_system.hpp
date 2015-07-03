@@ -19,7 +19,7 @@ public:
 private:
     void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
     void setup_uniforms(Material& material, Context& context, SceneContext& scene_context, const MeshPartInstance& parts, const ModelContext& model_context) override;
-    void update(Context& context, SceneContext& scene_context, RenderContext& render_context, MeshPartInstance* parts, size_t count);
+    void update(Context& context, SceneContext& scene_context, RenderContext& render_context, MeshPartInstance* instance_parts, MeshPart* parts, size_t count);
 
 	UniformBuffer::IdType transform_uniform_;
 };

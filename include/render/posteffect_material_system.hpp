@@ -29,19 +29,30 @@ public:
 	}
 
 	void set_render_target(const RenderTarget& render_target);
+
+	void set_viewports_number(size_t number)
+	{
+		textures_number_ = number;
+	}
 private:
 	bool init_mesh(Context& context, const MaterialSystemContext& material_system_context);
+	bool init_mesh_instance(Context& context, MeshInstance& mesh_instance, const rect<int>& viewport, bool overdraw);
 
 	void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
 
+	ClearCommand clear_command_;
 	MeshInstance mesh_[max_textures_number];
 	TextureInstance textures_[max_textures_number];
+	MeshInstance fullscreen_mesh_;
+	TextureInstance fullscreen_texture_;
 	uint8_t texture_type_mask_;
+	uint8_t textures_number_;
 };
 
 class PosteffectMaterialSystemBase : public MaterialSystem
 {
 	static const size_t max_textures_number = 4;
+	static const size_t invalid_index = static_cast<size_t>(-1);
 public:
 	PosteffectMaterialSystemBase();
 
@@ -73,13 +84,13 @@ public:
 	void set_input(size_t index, const TextureInstance& texture)
 	{
 		inputs_[index] = texture;
-		inputs_number_ = max(inputs_number_, index);
+		inputs_number_ = max(inputs_number_, index) + 1;
 	}
 
 	void set_output(size_t index, const TextureInstance& texture)
 	{
 		outputs_[index] = texture;
-		outputs_number_ = max(outputs_number_, index);
+		outputs_number_ = max(outputs_number_, index) + 1;
 	}
 
 	void set_inputs_number(size_t inputs)
@@ -106,9 +117,11 @@ public:
 		outputs_number_ = number;
 	}
 
-	bool init_screen_input(Context& context);
+	bool init_screen_input(Context& context, size_t index, uint8_t render_stage = render_stage_before_render_target_setup);
+	bool create_output(Context& context, size_t index, float scale);
 private:
 	void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
+	bool create_output(DrawCallData& draw_call_data, Context& context, size_t index, float scale);
 
 	bool init_mesh(Context& context, const MaterialSystemContext& material_system_context);
 
@@ -120,6 +133,7 @@ private:
 	ClearCommand clear_command_;
 	CopyFramebufferCommand copy_framebuffer_command_;
 	ListOfCommands list_of_commands_;
+	size_t framebuffer_input_;
 };
 
 class PosteffectSimpleMaterialSystem : public PosteffectMaterialSystemBase
@@ -135,6 +149,11 @@ class TonemapMaterialSystem : public PosteffectMaterialSystemBase
 class FXAAMaterialSystem : public PosteffectMaterialSystemBase
 {
 	SETUP_MATERIAL("fxaa");
+};
+
+class SSRMaterialSystem : public PosteffectMaterialSystemBase
+{
+	SETUP_MATERIAL("ssr");
 };
 
 }

@@ -49,7 +49,7 @@ public:
 
 	void toggle_state()
 	{
-		enabled_ ^= enabled_;
+		enabled_ ^= 1;
 	}
 private:
 	bool init_layout(Context& context);

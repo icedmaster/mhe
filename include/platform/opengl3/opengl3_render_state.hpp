@@ -84,6 +84,7 @@ public:
 	void close();
 
 	void update(const RenderStateDesc& desc);
+	void update_viewport(const ViewportDesc& viewport_desc) override;
 
     void enable(OpenGL3ContextState& state) const;
 	void disable() const;

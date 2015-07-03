@@ -110,18 +110,22 @@ void PosteffectSystem::add(Context& context, const PosteffectSystem::PosteffectN
 				break;
 			}
 		}
-		ASSERT(prev_node != nullptr, "Previous node name is set but the not isn't found:" << desc.prev_node);
+		ASSERT(prev_node != nullptr, "Previous node name is set but the node isn't found:" << desc.prev_node);
 	}
 	
 	PosteffectMaterialSystemBase* material_system = context.material_systems.get<PosteffectMaterialSystemBase>(desc.material.c_str());
-	if (prev_node != nullptr)
+	ASSERT(material_system != nullptr, "Can't find material system with name:" << desc.material);
+	material_system->set_priority(posteffect_material_priority_base + desc.priority);
+	if (!desc.inputs.empty())
+		init_inputs(material_system, context, desc);
+	else if (prev_node != nullptr)
 	{
 		PosteffectMaterialSystemBase* prev_material_system = prev_node->material_system;
 		size_t inputs_number = material_system->inputs_number();
 		size_t outputs_number = prev_material_system->outputs_number();
 		if (outputs_number == 0)
 		{
-			material_system->init_screen_input(context);
+			material_system->init_screen_input(context, 0);
 		}
 		size_t n = min(inputs_number, outputs_number);
 		for (size_t i = 0; i < n; ++i)
@@ -129,8 +133,11 @@ void PosteffectSystem::add(Context& context, const PosteffectSystem::PosteffectN
 	}
 	else
 	{
-		material_system->init_screen_input(context);
+		material_system->init_screen_input(context, 0);
 	}
+
+	if (!desc.outputs.empty())
+		init_outputs(material_system, context, desc);
 
 	PosteffectNode node;
 	node.name = desc.name;
@@ -139,10 +146,62 @@ void PosteffectSystem::add(Context& context, const PosteffectSystem::PosteffectN
 	posteffects_.push_back(node);
 }
 
+void PosteffectSystem::init_inputs(PosteffectMaterialSystemBase* material_system, Context& context, 
+	const PosteffectSystem::PosteffectNodeDesc& node_desc)
+{
+	for (size_t i = 0, size = node_desc.inputs.size(); i < size; ++i)
+	{
+		const NodeInput& input = node_desc.inputs[i];
+		if (!input.node.empty())
+		{
+			const PosteffectNode* node = find_node(input.node);
+			ASSERT(node != nullptr && node->material_system != nullptr, "Can't find input node or node is invalid:" << input.node);
+			material_system->set_input(input.index, node->material_system->output(input.node_output));
+		}
+		else if (!input.material.empty())
+		{
+			MaterialSystem* src_material_system = context.material_systems.get(input.material.c_str());
+			ASSERT(src_material_system != nullptr, "Can't find material system:" << input.material);
+			TextureInstance texture;
+			src_material_system->output(context, input.material_output, texture);
+			material_system->set_input(input.index, texture);
+		}
+		else
+		{
+			DEBUG_LOG("Material and node for posteffect node " << node_desc.name << " are empty - will copy the framebuffer");
+			material_system->init_screen_input(context, input.index,
+				input.copy_current_framebuffer ? render_stage_before_submit : render_stage_before_render_target_setup);
+		}
+	}
+}
+
+void PosteffectSystem::init_outputs(PosteffectMaterialSystemBase* material_system, Context& context, 
+	const PosteffectSystem::PosteffectNodeDesc& node_desc)
+{
+	for (size_t i = 0, size = node_desc.outputs.size(); i < size; ++i)
+	{
+		const NodeOutput& output = node_desc.outputs[i];
+		material_system->create_output(context, output.index, output.scale);
+	}
+}
+
 void PosteffectSystem::process(Context& context, RenderContext& render_context, SceneContext& scene_context)
 {
 	for (size_t i = 0, size = posteffects_.size(); i < size; ++i)
 		posteffects_[i].material_system->setup_draw_calls(context, scene_context, render_context);
+}
+
+const PosteffectSystem::PosteffectNode* PosteffectSystem::find_node(const string& name) const
+{
+	if (name.empty()) return nullptr;
+	for (size_t i = 0, size = posteffects_.size(); i < size; ++i)
+	{
+		if (posteffects_[i].name == name)
+		{
+			return &posteffects_[i];
+		}
+	}
+	return nullptr;
 }
 
 Renderer::Renderer(Context& context) :
@@ -261,18 +320,29 @@ void Renderer::set_directional_shadowmap_depth_write_material_system(MaterialSys
 	directional_shadowmap_depth_write_material_system_->set_priority(shadowmap_depth_write_material_system_priority);
 }
 
-void Renderer::set_fullscreen_debug_material_system(MaterialSystem* material_system)
+void Renderer::set_fullscreen_debug_material_system(PosteffectDebugMaterialSystem* material_system)
 {
 	fullscreen_debug_material_system_ = material_system;
 	fullscreen_debug_material_system_->set_priority(debug_material_system_priority);
 }
 
-void Renderer::debug_mode_changed(DebugMode mode)
+void Renderer::debug_mode_changed(DebugMode mode, MaterialSystemId material_system_id)
 {
-	if (mode == renderer_debug_mode_shadows && fullscreen_debug_material_system_ != nullptr)
+	if (fullscreen_debug_material_system_ == nullptr) return;
+
+	if (mode == renderer_debug_mode_shadows)
 	{
-		RenderTarget& render_target = context_.render_target_pool.get(shadowmap_depth_write_material_system_->render_target_id());
-		static_cast<PosteffectDebugMaterialSystem*>(fullscreen_debug_material_system_)->set_render_target(render_target);
+		RenderTarget& render_target = context_.render_target_pool.get(directional_shadowmap_depth_write_material_system_->render_target_id());
+		fullscreen_debug_material_system_->set_render_target(render_target);
+		fullscreen_debug_material_system_->enable();
+	}
+
+	if (mode == renderer_debug_mode_posteffect)
+	{
+		PosteffectMaterialSystemBase* posteffect_material_system = context_.material_systems.get<PosteffectMaterialSystemBase>(material_system_id);
+		for (size_t i = 0, n = posteffect_material_system->outputs_number(); i < n; ++i)
+			fullscreen_debug_material_system_->set_texture(i, posteffect_material_system->output(i));
+		fullscreen_debug_material_system_->set_viewports_number(posteffect_material_system->outputs_number());
 		fullscreen_debug_material_system_->enable();
 	}
 }

@@ -115,6 +115,8 @@ private:
 void init_singletons();
 void destroy_singletons();
 
+MHE_EXPORT GlobalVars& get_global_vars();
+
 }}
 
 #endif

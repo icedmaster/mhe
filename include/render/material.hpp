@@ -54,7 +54,7 @@ struct MaterialRenderData
 };
 
 const float default_shininess = 50.0f;
-const float default_glossiness = 0.5f;
+const float default_glossiness = 0.0f;
 
 struct MaterialData
 {
@@ -86,6 +86,14 @@ public:
 		material = it->value;
 		return true;
 	}
+
+	MaterialData& material_data(MaterialId id)
+	{
+		ASSERT(materials_.find(id) != materials_.end(), "Invalid material id:" << id);
+		return materials_[id];
+	}
+
+	bool id_by_name(MaterialId& id, const string& name) const;
 
 	void set_context(Context* context)
 	{

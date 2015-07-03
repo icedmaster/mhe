@@ -72,10 +72,23 @@ public:
 		return get(name.c_str());
 	}
 
+	template <class T>
+	T* get(const string& name) const
+	{
+		return get<T>(name.c_str());
+	}
+
 	MaterialSystem* get(uint8_t id) const
 	{
 		ASSERT(id < systems_.size(), "Invalid material_id " << id);
 		return systems_[id].get();
+	}
+
+	template <class M>
+	M* get(MaterialSystemId id) const
+	{
+		ASSERT(id < systems_.size(), "Invalid material id " << id);
+		return checked_static_cast<M*>(systems_[id].get());
 	}
 
 	vector_type& get_all_materials()

@@ -12,7 +12,7 @@
     </material>
     <material name="posteffect_debug" shader="posteffect_draw" priority="10">
       <options>
-        <overdraw>1</overdraw>
+        <overdraw>0</overdraw>
       </options>
     </material>
   <material name="depth_write" shader="depth_write" priority="3" />
@@ -24,8 +24,9 @@
       <percentage>10, 30, 50, 100</percentage>
     </options>
   </material>
-  <material name="tonemap" shader="posteffect_tonemap" priority="8" />
-  <material name="fxaa" shader="fxaa" priority="9" />
+  <material name="tonemap" shader="posteffect_tonemap" priority="9" />
+  <material name="fxaa" shader="fxaa" priority="10" />
+  <material name="ssr" shader="ssr" priority="8" />
   </materials>
   <skybox name="skybox" />
   <shadowmap_depth_write name="depth_write" />
@@ -37,7 +38,22 @@
 	<draw name="posteffect_simple" />
   </gbuffer>
   <posteffects>
-	<node name="tonemap" material="tonemap" copy_framebuffer="1" />
-	<node name="fxaa" material="fxaa" src="tonemap" />
+	<node name="ssr" material="ssr" priority="0">
+	  <inputs>
+		<input index="0" node="" output="" material="gbuffer_fill" material_output="0" />
+		<input index="1" node="" output="" material="gbuffer_fill" material_output="1" />
+		<input index="2" node="" output="" material="gbuffer_fill" material_output="2" />
+	  </inputs>
+	  <outputs>
+		<output index="0" scale="0.5" />
+	  </outputs>
+	</node>
+	<node name="tonemap" material="tonemap" priority="1">
+	  <inputs>
+		<input index="0" node="" output="" material="" material_output="" copy_current_framebuffer="1" />
+		<input index="1" node="ssr" output="0" material="" material_output="" />
+	  </inputs>
+	</node>
+	<node name="fxaa" material="fxaa" src="tonemap" priority="2" />
   </posteffects>
 </mhe>

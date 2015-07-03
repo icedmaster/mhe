@@ -18,6 +18,7 @@ struct MaterialInitializationData;
 
 class MaterialSystem;
 class PosteffectMaterialSystemBase;
+class PosteffectDebugMaterialSystem;
 
 bool init_node(NodeInstance& node, Context& context);
 void update_nodes(Context& context, RenderContext& render_context, SceneContext& scene_context);
@@ -39,11 +40,33 @@ bool load_node(NodeInstance& node, const string& name, Context& context, SceneCo
 class PosteffectSystem
 {
 public:
+	struct NodeInput
+	{
+		size_t index;
+		string node;
+		size_t node_output;
+		string material;
+		size_t material_output;
+		bool copy_current_framebuffer;
+	};
+
+	struct NodeOutput
+	{
+		size_t index;
+		float scale;
+	};
+
+	typedef fixed_capacity_vector<NodeInput, 4> Inputs;
+	typedef fixed_capacity_vector<NodeOutput, 4> Outputs;
+
 	struct PosteffectNodeDesc
 	{
 		string name;
 		string prev_node;
 		string material;
+		size_t priority;
+		Inputs inputs;
+		Outputs outputs;
 	};
 
 	void add(Context& context, const PosteffectNodeDesc& node_desc);
@@ -55,7 +78,9 @@ private:
 		PosteffectMaterialSystemBase* material_system;
 	};
 
-	PosteffectNode* find_node(const string& name) const;
+	const PosteffectNode* find_node(const string& name) const;
+	void init_inputs(PosteffectMaterialSystemBase* material_system, Context& context, const PosteffectNodeDesc& node_desc);
+	void init_outputs(PosteffectMaterialSystemBase* material_system, Context& context, const PosteffectNodeDesc& node_desc);
 
 	typedef fixed_size_vector<PosteffectNode, 16> Posteffects;
 	Posteffects posteffects_;
@@ -66,13 +91,14 @@ class Renderer : public ref_counter
 public:
 	static const uint8_t skybox_material_system_priority = 2;
 	static const uint8_t shadowmap_depth_write_material_system_priority = 3;
-	static const uint8_t debug_material_system_priority = 10;
+	static const uint8_t debug_material_system_priority = 32;
 
 	enum DebugMode
 	{
 		renderer_debug_mode_none,
 		renderer_debug_mode_main,
-		renderer_debug_mode_shadows
+		renderer_debug_mode_shadows,
+		renderer_debug_mode_posteffect
 	};
 public:
 	Renderer(Context& context);
@@ -87,17 +113,17 @@ public:
 	void set_skybox_material_system(MaterialSystem* material_system);
 	void set_shadowmap_depth_write_material_system(MaterialSystem* material_system);
 	void set_directional_shadowmap_depth_write_material_system(MaterialSystem* material_system);
-	void set_fullscreen_debug_material_system(MaterialSystem* material_system);
+	void set_fullscreen_debug_material_system(PosteffectDebugMaterialSystem* material_system);
 
 	void set_ambient_color(const colorf& color)
 	{
 		ambient_color_ = color;
 	}
 
-	void set_debug_mode(DebugMode mode)
+	void set_debug_mode(DebugMode mode, MaterialSystemId material_system_id)
 	{
 		debug_mode_ = mode;
-		debug_mode_changed(mode);
+		debug_mode_changed(mode, material_system_id);
 	}
 
 	DebugMode debug_mode() const
@@ -124,7 +150,7 @@ protected:
 
 	virtual void execute_render(RenderContext& render_context);
 protected:
-	virtual void debug_mode_changed(DebugMode mode);
+	virtual void debug_mode_changed(DebugMode mode, MaterialSystemId material_system_id);
 private:
 	virtual void update_impl(Context& /*context*/, RenderContext& /*render_context*/, SceneContext& /*scene_context*/) {}
 	virtual void render_impl(Context& context, RenderContext& render_context, SceneContext& scene_context) = 0;
@@ -137,7 +163,7 @@ private:
 	MaterialSystem* transparent_objects_material_system_;
 	MaterialSystem* particles_material_system_;
 
-	MaterialSystem* fullscreen_debug_material_system_;
+	PosteffectDebugMaterialSystem* fullscreen_debug_material_system_;
 
 	colorf ambient_color_;
 	DebugMode debug_mode_;

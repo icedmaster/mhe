@@ -96,7 +96,7 @@ void GBufferFillMaterialSystem::update(Context& context, SceneContext& scene_con
 	MATERIAL_UPDATE_WITH_COMMAND(context, scene_context, render_context, update, &clear_command_);
 }
 
-void GBufferFillMaterialSystem::update(Context& context, SceneContext& /*scene_context*/, RenderContext& render_context, MeshPartInstance* nodes, size_t count)
+void GBufferFillMaterialSystem::update(Context& context, SceneContext& /*scene_context*/, RenderContext& render_context, MeshPartInstance* nodes, MeshPart* parts, size_t count)
 {
 	UberShader& shader = ubershader(context);
 	const UberShader::Info& normalmap_info = shader.info("NORMALMAP");
@@ -109,6 +109,17 @@ void GBufferFillMaterialSystem::update(Context& context, SceneContext& /*scene_c
 		size_t use_normalmap = material.textures[normal_texture_unit].id != Texture::invalid_id && global::use_normalmaps.value() ? 1 : 0;
 		index.set(normalmap_info, use_normalmap);
 		material.shader_program = shader.get(index);
+
+#ifdef MHE_UPDATE_MATERIAL
+		MaterialData& material_data = context.material_manager.material_data(parts[i].material_id);
+		PhongMaterialData shader_material_data;
+		shader_material_data.diffuse = vec4(material_data.render_data.diffuse, 1.0f);
+		shader_material_data.specular = vec4(material_data.render_data.specular, material_data.render_data.specular_shininess);
+		shader_material_data.params = vec4(material_data.render_data.glossiness, 0.0f, 0.0f, 0.0f);
+
+		UniformBuffer& uniform = context.uniform_pool.get(material.uniforms[material_data_unit]);
+		uniform.update(shader_material_data);
+#endif
 	}
 }
 
@@ -116,6 +127,15 @@ void GBufferFillMaterialSystem::setup_uniforms(Material& material, Context& /*co
 {
 	material.uniforms[0] = transform_uniform_;
 	material.uniforms[1] = model_context.transform_uniform;
+}
+
+void GBufferFillMaterialSystem::output(Context& context, size_t unit, TextureInstance& texture) const
+{
+	RenderTarget& render_target = context.render_target_pool.get(render_target_);
+	if (unit == gbuffer_depth_render_target_index)
+		render_target.depth_texture(texture);
+	else
+		render_target.color_texture(texture, unit);
 }
 
 bool GBufferDrawMaterialSystem::init(Context& context, const MaterialSystemContext& material_system_context)

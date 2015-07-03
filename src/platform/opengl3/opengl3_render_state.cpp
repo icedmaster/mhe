@@ -117,6 +117,11 @@ void OpenGL3RenderState::update(const RenderStateDesc& desc)
 	init(desc);
 }
 
+void OpenGL3RenderState::update_viewport(const ViewportDesc& viewport_desc)
+{
+	viewport_ = viewport_desc.viewport;
+}
+
 void OpenGL3RenderState::enable(OpenGL3ContextState& state) const
 {
     depth_state_.enable(state);

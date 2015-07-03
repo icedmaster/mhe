@@ -12,6 +12,7 @@ namespace mhe {
 bool PosteffectDebugMaterialSystem::init(Context& context, const MaterialSystemContext& material_system_context)
 {
 	texture_type_mask_ = 0;
+	textures_number_ = 0;
 	set_layout(FullscreenLayout::handle);
 
 	if (!context.shader_manager.get(shader(), material_system_context.shader_name))
@@ -20,63 +21,78 @@ bool PosteffectDebugMaterialSystem::init(Context& context, const MaterialSystemC
 		return false;
 	}
 
+	clear_command_.set_driver(&context.driver);
+
 	return init_mesh(context, material_system_context);
 }
 
 bool PosteffectDebugMaterialSystem::init_mesh(Context& context, const MaterialSystemContext& material_system_context)
 {
-	const vec2& viewport = material_system_context.options.get<vec2>("viewport");
 	bool overdraw = material_system_context.options.get<bool>("overdraw");
 
 	int window_width = context.window_system.width();
 	int window_height = context.window_system.height();
 	rect<int> viewports[max_textures_number];
-	if (viewport.x() == 0.0f && viewport.y() == 0.0f)
-	{
-		viewports[0] = rect<int>(0, window_height / 2, window_width / 2, window_height / 2);
-		viewports[1] = rect<int>(window_width / 2, window_height / 2, window_width / 2, window_height / 2);
-		viewports[2] = rect<int>(0, 0, window_width / 2, window_height / 2);
-		viewports[3] = rect<int>(window_width / 2, 0, window_width / 2, window_height / 2);
-	}
+	viewports[0] = rect<int>(0, window_height / 2, window_width / 2, window_height / 2);
+	viewports[1] = rect<int>(window_width / 2, window_height / 2, window_width / 2, window_height / 2);
+	viewports[2] = rect<int>(0, 0, window_width / 2, window_height / 2);
+	viewports[3] = rect<int>(window_width / 2, 0, window_width / 2, window_height / 2);
 
 	for (size_t i = 0; i < max_textures_number; ++i)
 	{
-		DrawCallData& draw_call_data = create_and_get(context.draw_call_data_pool);
-		RenderState& render_state = create_and_get(context.render_state_pool);
-
-		draw_call_data.state = render_state.id();
-		RenderStateDesc desc;
-		desc.blend.enabled = true;
-		desc.viewport.viewport = viewports[i];
-		if (!overdraw)
+		if (!init_mesh_instance(context, mesh_[i], viewports[i], overdraw))
 		{
-			desc.blend.srcmode = blend_src_alpha;
-			desc.blend.dstmode = blend_src_inv_alpha;
-		}
-		else
-		{
-			desc.blend.srcmode = blend_one;
-			desc.blend.dstmode = blend_zero;
-		}
-		desc.depth.enabled = false;
-		render_state.init(desc);
-
-		mesh_[i].mesh.parts.resize(1);
-		mesh_[i].instance_parts.resize(1);
-		if (!utils::create_fullscreen_quad(mesh_[i], context))
-		{
-			ERROR_LOG("Can't create fullscreen quad");
+			ERROR_LOG("Can't initialize mesh for PosteffectDebug");
 			return false;
 		}
-		mesh_[i].mesh.parts[0].render_data.layout = layout();
-
-		mesh_[i].instance_parts[0].draw_call_data = draw_call_data.id;
-
-		Material& material = create_and_get(context.materials[id()]);
-		material.shader_program = default_program(context).id();
-		mesh_[i].instance_parts[0].material.material_system = id();
-		mesh_[i].instance_parts[0].material.id = material.id;
 	}
+
+	if (!init_mesh_instance(context, fullscreen_mesh_, rect<int>(0, 0, window_width, window_height), overdraw))
+	{
+		ERROR_LOG("Can't initialize mesh for PosteffectDebug");
+		return false;
+	}
+
+	return true;
+}
+
+bool PosteffectDebugMaterialSystem::init_mesh_instance(Context& context, MeshInstance& mesh_instance, const rect<int>& viewport, bool overdraw)
+{
+	DrawCallData& draw_call_data = create_and_get(context.draw_call_data_pool);
+	RenderState& render_state = create_and_get(context.render_state_pool);
+
+	draw_call_data.state = render_state.id();
+	RenderStateDesc desc;
+	desc.blend.enabled = true;
+	desc.viewport.viewport = viewport;
+	if (!overdraw)
+	{
+		desc.blend.srcmode = blend_src_alpha;
+		desc.blend.dstmode = blend_src_inv_alpha;
+	}
+	else
+	{
+		desc.blend.srcmode = blend_one;
+		desc.blend.dstmode = blend_zero;
+	}
+	desc.depth.enabled = false;
+	render_state.init(desc);
+
+	mesh_instance.mesh.parts.resize(1);
+	mesh_instance.instance_parts.resize(1);
+	if (!utils::create_fullscreen_quad(mesh_instance, context))
+	{
+		ERROR_LOG("Can't create fullscreen quad");
+		return false;
+	}
+	mesh_instance.mesh.parts[0].render_data.layout = layout();
+
+	mesh_instance.instance_parts[0].draw_call_data = draw_call_data.id;
+
+	Material& material = create_and_get(context.materials[id()]);
+	material.shader_program = default_program(context).id();
+	mesh_instance.instance_parts[0].material.material_system = id();
+	mesh_instance.instance_parts[0].material.id = material.id;
 
 	return true;
 }
@@ -97,16 +113,31 @@ void PosteffectDebugMaterialSystem::update(Context& context, SceneContext& /*sce
 	const UberShader::Info& info = shader.info("RENDER_DEPTH");
 	ubershader_index.set(info, 1);
 
-	for (size_t j = 0; j < max_textures_number; ++j)
+	clear_command_.reset();
+
+	if (textures_number_ == 1) // can draw fullscreen
 	{
-		if (textures_[j].id == Texture::invalid_id) continue;
-		Material& material = context.materials[id()].get(mesh_[j].instance_parts[0].material.id);
-		material.textures[0] = textures_[j];
-
-		if (texture_type_mask_ & (1 << j))
+		Material& material = context.materials[id()].get(fullscreen_mesh_.instance_parts[0].material.id);
+		size_t texture_index = textures_[0].id == Texture::invalid_id ? max_textures_number - 1 : 0;
+		material.textures[0] = textures_[texture_index];
+		if (texture_type_mask_ & (1 << texture_index))
 			material.shader_program = shader.get(ubershader_index);
+		else material.shader_program = shader.get_default();
+		setup_draw_call(render_context.draw_calls.add(), fullscreen_mesh_.instance_parts[0], fullscreen_mesh_.mesh.parts[0], &clear_command_);
+	}
+	else
+	{
+		for (size_t j = 0; j < max_textures_number; ++j)
+		{
+			if (textures_[j].id == Texture::invalid_id) continue;
+			Material& material = context.materials[id()].get(mesh_[j].instance_parts[0].material.id);
+			material.textures[0] = textures_[j];
 
-		setup_draw_call(render_context.draw_calls.add(), mesh_[j].instance_parts[0], mesh_[j].mesh.parts[0]);
+			if (texture_type_mask_ & (1 << j))
+				material.shader_program = shader.get(ubershader_index);
+
+			setup_draw_call(render_context.draw_calls.add(), mesh_[j].instance_parts[0], mesh_[j].mesh.parts[0], &clear_command_);
+		}
 	}
 }
 
@@ -114,13 +145,14 @@ void PosteffectDebugMaterialSystem::set_render_target(const RenderTarget& render
 {
 	for (size_t i = 0; i < max_textures_number; ++i)
 		textures_[i].id = Texture::invalid_id;
-	render_target.color_textures(textures_);
+	size_t color_textures_number = render_target.color_textures(textures_);
 	size_t depth_textures_number = render_target.depth_texture(textures_[max_textures_number - 1]);
 	texture_type_mask_ = depth_textures_number == 0 ? 0 : (1 << 3);
+	textures_number_ = color_textures_number + depth_textures_number;
 }
 
 PosteffectMaterialSystemBase::PosteffectMaterialSystemBase() :
-	inputs_number_(0), outputs_number_(0)
+	inputs_number_(0), outputs_number_(0), framebuffer_input_(invalid_index)
 {}
 
 bool PosteffectMaterialSystemBase::init(Context& context, const MaterialSystemContext& material_system_context)
@@ -150,7 +182,7 @@ void PosteffectMaterialSystemBase::update(Context& context, SceneContext& scene_
 {
 	list_of_commands_.clear();
 	clear_command_.reset();
-	if (inputs_number_ == 0) // current framebuffer as input
+	if (framebuffer_input_ != invalid_index) // current framebuffer as input
 	{
 		copy_framebuffer_command_.set_texture(&context.texture_pool.get(inputs_[0].id));
 		list_of_commands_.add_command(&copy_framebuffer_command_);
@@ -191,19 +223,7 @@ bool PosteffectMaterialSystemBase::init_mesh(Context& context, const MaterialSys
 	const std::vector<string>& outputs_scale = utils::split(outputs_str, string(","));
 	if (!outputs_scale.empty())
 	{
-		RenderTargetDesc render_target_desc;
-		render_target_desc.target = rt_readwrite;
-		render_target_desc.use_depth = false;
-		render_target_desc.use_stencil = false;
-		render_target_desc.color_targets = 1;
-		render_target_desc.color_datatype[0] = format_ubyte;
-		render_target_desc.color_format[0] = format_rgba;
-		RenderTarget& render_target = context.render_target_manager.create(context, render_target_desc, types_cast<float>(outputs_scale[0]));
-		draw_call_data.render_target = render_target.id();
-		const TextureInstance* ids = nullptr;
-		render_target.color_textures(&ids);
-		for (size_t i = 0; i < render_target_desc.color_targets; ++i)
-			set_output(i, ids[i]);
+		create_output(draw_call_data, context, 0, types_cast<float>(outputs_scale[0]));
 	}
 
 	mesh_.mesh.parts.resize(1);
@@ -225,13 +245,50 @@ bool PosteffectMaterialSystemBase::init_mesh(Context& context, const MaterialSys
 	return true;
 }
 
-bool PosteffectMaterialSystemBase::init_screen_input(Context& context)
+bool PosteffectMaterialSystemBase::init_screen_input(Context& context, size_t index, uint8_t render_stage)
 {
-	ASSERT(input(0).id == Texture::invalid_id, "Invalid posteffects description");
+	ASSERT(input(index).id == Texture::invalid_id, "Invalid posteffects description");
 	TextureDesc desc;
 	desc.datatype = format_ubyte;
 	desc.format = format_rgba;
-	set_input(0, context.render_target_manager.create(context, desc, 1.0f));
+	inputs_[index] = context.render_target_manager.create(context, desc, 1.0f);
+	framebuffer_input_ = index;
+	copy_framebuffer_command_.set_stages(render_stage);
+	return true;
+}
+
+bool PosteffectMaterialSystemBase::create_output(Context& context, size_t index, float scale)
+{
+	ASSERT(output(index).id == Texture::invalid_id, "create_output() - trying to create a new output when old output still exists");
+	DrawCallData& draw_call_data = context.draw_call_data_pool.get(mesh_.instance_parts[0].draw_call_data);
+	ASSERT(draw_call_data.render_target == default_render_target || draw_call_data.render_target == RenderTarget::invalid_id,
+		"RenderTarget has been set already");
+	return create_output(draw_call_data, context, index, scale);
+}
+
+bool PosteffectMaterialSystemBase::create_output(DrawCallData& draw_call_data, Context& context, size_t index, float scale)
+{
+	RenderTargetDesc render_target_desc;
+	render_target_desc.target = rt_readwrite;
+	render_target_desc.use_depth = false;
+	render_target_desc.use_stencil = false;
+	render_target_desc.color_targets = 1;
+	render_target_desc.color_datatype[0] = format_ubyte;
+	render_target_desc.color_format[0] = format_rgba;
+	RenderTarget& render_target = context.render_target_manager.create(context, render_target_desc, scale);
+	draw_call_data.render_target = render_target.id();
+	const TextureInstance* ids = nullptr;
+	render_target.color_textures(&ids);
+	set_output(index, ids[0]);
+
+	if (scale != 1.0f)
+	{
+		RenderState& render_state = context.render_state_pool.get(draw_call_data.state);
+		ViewportDesc desc;
+		desc.viewport.set(0, 0, render_target_desc.width, render_target_desc.height);
+		render_state.update_viewport(desc);
+	}
+
 	return true;
 }
 
