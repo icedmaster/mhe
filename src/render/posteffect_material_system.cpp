@@ -167,6 +167,8 @@ bool PosteffectMaterialSystemBase::init(Context& context, const MaterialSystemCo
 
 	clear_command_.set_driver(&context.driver);
 
+	inputs_number_shader_info_ = ubershader(context).info("INPUTS");
+
 	return init_mesh(context, material_system_context);
 }
 
@@ -194,11 +196,16 @@ void PosteffectMaterialSystemBase::update(Context& context, SceneContext& scene_
 		list_of_commands_.add_command(&clear_command_);
 		
 	RenderCommand* command = list_of_commands_.empty() ? nullptr : &list_of_commands_;
+
+	UberShader::Index ubershader_index;
+	ubershader_index.set(inputs_number_shader_info_, inputs_number_ - 1);
+	UberShader& shader = ubershader(context);
 	
 	Material& material = context.materials[id()].get(mesh_.instance_parts[0].material.id);
 	for (size_t j = 0; j < max_textures_number; ++j)
 		material.textures[j] = inputs_[j];
 	material.uniforms[0] = render_context.main_camera.percamera_uniform;
+	material.shader_program = shader.get(ubershader_index);
 	setup_draw_call(render_context.draw_calls.add(), mesh_.instance_parts[0], mesh_.mesh.parts[0], command);
 }
 

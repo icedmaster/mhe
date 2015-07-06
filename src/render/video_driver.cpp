@@ -269,6 +269,8 @@ void Driver::end_render()
 {
 	stats_.update_frames();
 	impl_->flush();
+
+	reset_state();
 }
 
 void Driver::reset_state()

@@ -23,7 +23,12 @@ void DeferredRenderer::init(AbstractGBufferFillMaterialSystem* fill, AbstractGBu
 	if (draw != nullptr)
 	{
 		size_t outputs_number = render_target.color_textures(&textures);
+		ASSERT(outputs_number != 0, "GBuffer has to have some color textures");
 		draw->set_inputs(outputs_number, textures);
+		TextureInstance depth_texture;
+		size_t depth_outputs = render_target.depth_texture(depth_texture);
+		ASSERT(depth_outputs != 0, "GBuffer has to have a depth texture");
+		draw->set_input(gbuffer_depth_render_target_index, depth_texture);
 		if (light)
 			draw->set_input(gbuffer_depth_render_target_index + 1, light->lighting_texture());
 	}

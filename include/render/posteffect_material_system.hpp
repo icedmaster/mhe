@@ -134,6 +134,7 @@ private:
 	CopyFramebufferCommand copy_framebuffer_command_;
 	ListOfCommands list_of_commands_;
 	size_t framebuffer_input_;
+	UberShader::Info inputs_number_shader_info_;
 };
 
 class PosteffectSimpleMaterialSystem : public PosteffectMaterialSystemBase

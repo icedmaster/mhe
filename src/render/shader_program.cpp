@@ -45,8 +45,9 @@ const UberShader::Info& UberShader::info(const char* name) const
 		if (infos_[i].name == name)
 			return infos_[i];
 	}
-	ASSERT(0, "Invalid info name:" << name);
-	return infos_.front();
+	
+	static UberShader::Info default_info = Info::empty();
+	return default_info;
 }
 
 }

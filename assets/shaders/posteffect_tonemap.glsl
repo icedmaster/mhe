@@ -1,3 +1,7 @@
+[defs INPUTS 0 1]
+
+#define INPUTS_NUMBER INPUTS + 1
+
 struct VSOutput
 {
 	vec2 tex;
@@ -50,7 +54,9 @@ vec3 color_correction(vec3 c, float gamma)
 void main()
 {
 	vec4 src = texture(main_texture, vsoutput.tex);
+	color = vec4(color_correction(src.rgb, 0.9f), src.a);
+#if INPUTS_NUMBER == 2
 	vec4 refl = texture(ssr_texture, vsoutput.tex);
-	color = vec4(color_correction(src.rgb, 0.9f), src.a) + vec4(refl.rgb, 0.0f);
-	//color = vec4(color_correction(src.rgb, 0.9f), src.a);
+	color += vec4(refl.rgb, 0.0f);
+#endif
 }

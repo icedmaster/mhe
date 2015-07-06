@@ -65,6 +65,14 @@ public:
 		size_t low;
 		size_t high;
 		size_t offset;
+
+		Info() : offset(0) {}
+
+		static Info empty()
+		{
+			static Info info;
+			return info;
+		}
 	};
 
 	class Index
