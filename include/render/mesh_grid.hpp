@@ -2,6 +2,7 @@
 #define __MESH_GRID_HPP__
 
 #include "core/grid.hpp"
+#include "utils/pool_utils.hpp"
 #include "math/ray.hpp"
 #include "math/math_utils.hpp"
 #include "render_common.hpp"
