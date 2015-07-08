@@ -347,7 +347,7 @@ void Renderer::debug_mode_changed(DebugMode mode, MaterialSystemId material_syst
 	}
 }
 
-bool load_node(NodeInstance& node, const string& name, hash_type material_system_name, Context& context, SceneContext& scene_context)
+bool load_node(NodeInstance& node, const string& name, const char* material_system_name, Context& context, SceneContext& scene_context)
 {
 	if (!context.mesh_manager.get_instance(node.mesh, name))
 	{

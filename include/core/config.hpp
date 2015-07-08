@@ -83,7 +83,7 @@ const size_t initial_material_instances_number = 2048;
 
 const size_t max_trace_data_instances_number = 128;
 
-const size_t max_material_systems_number = 16;
+const size_t max_material_systems_number = 128;
 const size_t max_render_targets_number = 16;
 const size_t max_simultaneous_render_targets_number = 4;
 const size_t max_additional_render_passes_number = 16;

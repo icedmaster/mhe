@@ -59,7 +59,12 @@ public:
 	bool init(Context& context, const MaterialSystemContext& material_system_context) override;
 	void close() override;
 
-	void setup(Context& context, SceneContext& scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count) override;	
+	void setup(Context& context, SceneContext& scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count) override;
+
+	size_t default_instances_number() const override
+	{
+		return 1;
+	}
 
 	size_t inputs_number() const
 	{

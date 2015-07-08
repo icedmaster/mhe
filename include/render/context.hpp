@@ -54,17 +54,12 @@ public:
 	template <class T>
 	T* get(const char* name) const
 	{
-		return get_impl<T>(hash(name));
-	}
-
-	MaterialSystem* get(hash_type name) const
-	{
-		return get_impl<MaterialSystem>(name);
+		return get_impl<T>(name);
 	}
 
 	MaterialSystem* get(const char* name) const
 	{
-		return get_impl<MaterialSystem>(hash(name));
+		return get_impl<MaterialSystem>(name);
 	}
 
 	MaterialSystem* get(const string& name) const
@@ -103,11 +98,11 @@ public:
 	}
 private:
 	template <class T>
-	T* get_impl(hash_type name) const
+	T* get_impl(const char* name) const
 	{
 		for (size_t i = 0; i < systems_.size(); ++i)
 		{
-			if (systems_[i]->name() == name)
+			if (strcmp(systems_[i]->name(), name) == 0)
 				return checked_static_cast<T*>(systems_[i].get());
 		}
 		return nullptr;
@@ -116,7 +111,7 @@ private:
 	vector_type systems_;
 };
 
-typedef Pool< Material, initial_material_instances_number, uint16_t, StructTypePolicy<Material, uint16_t> > MaterialPool;
+typedef Pool< Material, 0, uint16_t, StructTypePolicy<Material, uint16_t> > MaterialPool;
 
 class RenderTargetManager
 {

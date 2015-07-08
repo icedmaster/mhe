@@ -29,7 +29,7 @@ MHE_EXPORT void setup_node(NodeInstance& node, MaterialSystem* material_system, 
 MHE_EXPORT void setup_node(NodeInstance& node, MaterialSystem* material_system, Context& context, SceneContext& scene_context,
 	const MaterialInitializationData& material_initialization_data);
 
-MHE_EXPORT bool load_node(NodeInstance& instance, const string& name, hash_type material_system_name, Context& context, SceneContext& scene_context);
+MHE_EXPORT bool load_node(NodeInstance& instance, const string& name, const char* material_system_name, Context& context, SceneContext& scene_context);
 
 template <class MaterialSystem>
 bool load_node(NodeInstance& node, const string& name, Context& context, SceneContext& scene_context)

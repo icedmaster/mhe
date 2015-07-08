@@ -251,6 +251,7 @@ void Application::init_materials(pugi::xml_node materials_node)
 		const char* shader_name = n.attribute("shader").value();
 		const char* defs = n.attribute("defs").value();
 		unsigned int priority = n.attribute("priority").as_uint();
+		unsigned int material_instances_number = n.attribute("instances").as_uint();
 
 		material_context.options.clear();
 		if (pugi::xml_node options_node = n.child("options"))
@@ -268,6 +269,10 @@ void Application::init_materials(pugi::xml_node materials_node)
 			continue;
 		}
 		context.material_systems.add(material_system, priority);
+		if (material_instances_number == 0)
+			material_instances_number = material_system->default_instances_number();
+		context.materials[material_system->id()].resize(
+			material_instances_number == 0 ? initial_material_instances_number : material_instances_number);
 		material_system->init(context, material_context);
 		material_system->enable();
 	}
@@ -308,7 +313,7 @@ void Application::init_posteffects(const RendererParams& params)
 	PosteffectSystem& posteffect_system = engine_->renderer()->posteffect_system();
 	for (size_t i = 0, size = params.posteffect_params.nodes.size(); i < size; ++i)
 	{
-		PosteffectSystem::PosteffectNodeDesc& node = params.posteffect_params.nodes[i];
+		const PosteffectSystem::PosteffectNodeDesc& node = params.posteffect_params.nodes[i];
 		posteffect_system.add(context, node);
 	}
 }

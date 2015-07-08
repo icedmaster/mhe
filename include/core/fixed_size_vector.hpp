@@ -144,7 +144,7 @@ public:
 		return begin_[index];
 	}
 
-	T operator[] (size_t index) const
+	const T& operator[] (size_t index) const
 	{
 		return begin_[index];
 	}
