@@ -51,6 +51,11 @@ bool OpenGL3Driver::init(DriverRenderingCapabilities& caps)
 	return true;
 }
 
+void OpenGL3Driver::close()
+{
+	OpenGLExtensions::destroy_singleton();
+}
+
 void OpenGL3Driver::setup_caps(DriverRenderingCapabilities& caps)
 {
 	glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &caps.max_anisotropic_level);

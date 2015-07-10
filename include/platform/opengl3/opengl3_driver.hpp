@@ -31,7 +31,7 @@ public:
 	OpenGL3Driver();
 private:
     bool init(DriverRenderingCapabilities& caps);
-	void close() {}
+	void close();
 
 	void enable_blending();
 	void disable_blending();

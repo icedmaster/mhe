@@ -79,7 +79,7 @@ bool Engine::init(uint width, uint height, uint bpp, bool fullscreen)
 	setup_generated();
 
 #ifdef RDBG_ENABLED
-	if (!rdbg_engine_.start())
+	/*if (!rdbg_engine_.start())
 	{
 		WARN_LOG("RDBG engine initialization failed");
 	}
@@ -87,7 +87,7 @@ bool Engine::init(uint width, uint height, uint bpp, bool fullscreen)
 	{
 		INFO_LOG("RDBG engine started");
 	}
-	default_rdbg_setup(rdbg_engine_.processor());
+	default_rdbg_setup(rdbg_engine_.processor());*/
 #endif
 
 	init_standart_stat_views(stats_);
@@ -95,6 +95,15 @@ bool Engine::init(uint width, uint height, uint bpp, bool fullscreen)
 	stats_timer_.start();
 
 	return true;
+}
+
+void Engine::destroy()
+{
+#ifdef RDBG_ENABLED
+	//rdbg_engine_.stop();
+#endif
+	context_.driver.close();
+	context_.window_system.close();
 }
 
 bool Engine::init_debug_components()

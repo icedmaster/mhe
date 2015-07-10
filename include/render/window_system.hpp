@@ -56,11 +56,6 @@ public:
 		impl_(SystemFactory::instance().create_window_system())
 	{}
 
-	~WindowSystem()
-	{
-		impl_->close();
-	}
-
 	bool init(int w, int h, int bpp, bool fullscreen = false,
 			  const WindowContextFormat& format = WindowContextFormat(),
 			  const std::string& caption = "MHE")
@@ -74,6 +69,11 @@ public:
 		if (res)
 			impl_->set_caption(caption);
 		return res;
+	}
+
+	void close()
+	{
+		impl_->close();
 	}
 
 	void swap_buffers()

@@ -18,22 +18,27 @@ namespace details {
 
 void* allocate(size_t size)
 {
-	size_t* p = static_cast<size_t*>(::malloc(size + sizeof(size_t)));
+	size_t* p = static_cast<size_t*>(::malloc(size + 2 * sizeof(size_t)));
 	if (p == nullptr)
 		return 0;
-	p[0] = size;
+	p[0] = 0xfeefabba;
+	p[1] = size;
 	allocated += size;
 	total_allocated += size;
 	++allocations;
-	return reinterpret_cast<void*>(p + 1);
+	p += 2;
+	return reinterpret_cast<void*>(p);
 }
 
 void free(void* p)
 {
 	if (p == nullptr) return;
 	size_t* realp = static_cast<size_t*>(p);
+	if ( realp[-2] != 0xfeefabba || realp[-2] == 0xdeaddead )
+		ASSERT(0, "Invalid free() call");
 	size_t size = realp[-1];
-	::free(realp - 1);
+	*(realp - 2) = 0xdeaddead;
+	::free(realp - 2);
 	allocated -= size;
 	total_freed += size;
 	++frees;

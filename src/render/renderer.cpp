@@ -385,4 +385,23 @@ bool init_render(Context& context)
 	return true;
 }
 
+template <class Pool>
+void destroy_pool_elements(Pool& pool)
+{
+	typename Pool::type* p = pool.all_objects();
+	size_t size = pool.size();
+	for (size_t i = 0; i < size; ++i)
+		p[i].close();
+}
+
+void destroy_render(Context& context)
+{
+	// tear down the context
+	destroy_pool_elements(context.vertex_buffer_pool);
+	destroy_pool_elements(context.uniform_pool);
+	destroy_pool_elements(context.shader_pool);
+	destroy_pool_elements(context.texture_pool);
+	destroy_pool_elements(context.render_target_pool);
+}
+
 }

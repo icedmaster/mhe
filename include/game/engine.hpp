@@ -25,6 +25,7 @@ class MHE_EXPORT Engine
 public:
 	Engine();
 	bool init(uint width, uint height, uint bpp, bool fullscreen);
+	void destroy();
 	bool init_debug_components();
 
 	Context& context()

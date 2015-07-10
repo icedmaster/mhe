@@ -185,6 +185,7 @@ private:
 };
 
 bool init_render(Context& context);
+void destroy_render(Context& context);
 
 }
 

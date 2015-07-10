@@ -51,6 +51,8 @@ bool OpenGL3ShaderProgram::init(const std::string& vsdata, const std::string& fs
 
 void OpenGL3ShaderProgram::close()
 {
+	vertex_shader_.close();
+	fragment_shader_.close();
 	OpenGLExtensions::instance().glDeleteProgram(id_);
 }
 

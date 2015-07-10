@@ -62,18 +62,18 @@ public:
 
 	~Pool()
 	{
-		operator delete[](objects_, allocator_);
-		operator delete[](indexes_, allocator_);
+		destroy_array(objects_, allocator_);
+		destroy_array(indexes_, allocator_);
 	}
 
 	void resize(size_t size)
 	{
 		ASSERT(size_ == 0, "Trying to resize a pool that is already in use");
 		capacity_ = size;
-		operator delete[](objects_, allocator_);
-		operator delete[](indexes_, allocator_);
-		objects_ = new (allocator_) T[size];
-		indexes_ = new (allocator_) Index[size];
+		destroy_array(objects_, allocator_);
+		destroy_array(indexes_, allocator_);
+		objects_ = create_array<T>(size, allocator_);
+		indexes_ = create_array<Index>(size, allocator_);
 		clear();
 	}
 
@@ -150,12 +150,13 @@ public:
         first_ = 0;
         last_ = capacity_ - 1;
         size_ = 0;
-        for (size_t i = 0; i <= capacity_ - 1; ++i)
-        {
-            indexes_[i].id = i;
-            indexes_[i].next = i + 1;
-            indexes_[i].index = invalid_id;
-        }
+
+		for (size_t i = 0; i < capacity_; ++i)
+		{
+			indexes_[i].id = i;
+			indexes_[i].next = i + 1;
+			indexes_[i].index = invalid_id;
+		}
     }
 private:
 	mutable T* objects_;

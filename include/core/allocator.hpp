@@ -18,6 +18,52 @@ public:
 	virtual void* alloc(size_t size) = 0;
 	virtual void free(void* ptr) = 0;
 	virtual size_t allocated() const = 0;
+
+	template <class T>
+	T* create()
+	{
+		T* p = alloc(sizeof(T));
+		return new (p) T;
+	}
+
+	template <class T>
+	void destroy(T* ptr)
+	{
+		if (ptr == nullptr) return;
+		ptr->~T();
+		free(ptr);
+	}
+
+	template <class T, size_t N>
+	T* create_array()
+	{
+		return create_array<T>(N);
+	}
+
+	template <class T>
+	T* create_array(size_t n)
+	{
+		size_t* sptr = reinterpret_cast<size_t*>(alloc(sizeof(T) * n + sizeof(size_t)));
+		*sptr = n;
+		++sptr;
+		T* ptr = reinterpret_cast<T*>(sptr);
+		T* p = ptr;
+		for (size_t i = 0; i < n; ++i, ++p)
+			new (p) T;
+		return ptr;
+	}
+
+	template <class T>
+	void destroy_array(T* ptr)
+	{
+		if (ptr == nullptr) return;
+		size_t* sptr = reinterpret_cast<size_t*>(ptr);
+		--sptr;
+		size_t n = *sptr;
+		for (size_t i = 0; i < n; ++i, ++ptr)
+			ptr->~T();
+		free(sptr);
+	}
 #ifdef MHE_ALLOCATORS_DEBUG
 	allocator(const string& name) : name_(name) {}
 
@@ -158,25 +204,45 @@ MHE_EXPORT void destroy_default_allocator();
 template <class T>
 inline T* create(allocator* alloc)
 {
-	T* ptr = (T*)alloc->alloc(sizeof(T));
-	return ptr;
+	return alloc->create<T>();
 }
 
 template <class T>
-void destroy(T* ptr, allocator* alloc)
+inline void destroy(T* ptr, allocator* alloc)
 {
+	return alloc->destroy<T>(ptr);
+}
+
+template <class T>
+inline T* create_array(size_t n, allocator* alloc)
+{
+	return alloc->create_array<T>(n);
+}
+
+template <class T, size_t N>
+inline T* create_array(allocator* alloc)
+{
+	return alloc->create_array<T, N>();
+}
+
+template <class T>
+inline void destroy_array(T* ptr, allocator* alloc)
+{
+	alloc->destroy_array<T>(ptr);
 }
 
 }
 
-inline void* operator new(size_t size, mhe::allocator* alloc)
+inline void* operator new(size_t /*size*/, mhe::allocator* /*alloc*/)
 {
-	return alloc->alloc(size);
+	ASSERT(0, "Do not use new[] with custom allocator");
+	return nullptr;
 }
 
 inline void* operator new[](size_t size, mhe::allocator* alloc)
 {
-	return alloc->alloc(size);
+	void* p = alloc->alloc(size);
+	return p;
 }
 
 inline void operator delete(void* ptr, mhe::allocator* alloc)
@@ -184,9 +250,9 @@ inline void operator delete(void* ptr, mhe::allocator* alloc)
 	alloc->free(ptr);
 }
 
-inline void operator delete[](void* ptr, mhe::allocator* alloc)
+inline void operator delete[](void* /*ptr*/, mhe::allocator* /*alloc*/)
 {
-	alloc->free(ptr);
+	ASSERT(0, "Do not use delete[] with custom allocator");
 }
 
 #endif

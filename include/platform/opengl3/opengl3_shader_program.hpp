@@ -14,11 +14,6 @@ class OpenGL3ShaderProgram : public ShaderProgramImpl
 class Shader
 {
 public:
-	~Shader()
-	{
-		close();
-	}
-
 	bool init(GLenum type, const std::string& data);
 	void close();
 
@@ -33,10 +28,6 @@ private:
 };
 
 public:
-	~OpenGL3ShaderProgram()
-	{
-		close();
-	}
 	
 	bool init(const std::string& vsdata, const std::string& fsdata, const ShaderInitializationParams& params);
 	void close();

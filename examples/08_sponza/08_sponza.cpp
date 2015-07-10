@@ -124,6 +124,10 @@ private:
 
 int main(int /*argc*/, char** /*argv*/)
 {
+	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
+	_CrtSetReportMode( _CRT_ERROR, _CRTDBG_MODE_DEBUG );
+	_CrtSetBreakAlloc( -1 );
+
 	mhe::app::Application app("08_sponza");
 	mhe::app::ApplicationConfig config;
 	config.width = 1280;

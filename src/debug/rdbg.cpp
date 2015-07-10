@@ -332,6 +332,11 @@ bool RDBGEngine::start()
 	return thread_.start();
 }
 
+void RDBGEngine::stop()
+{
+	thread_.stop();
+}
+
 std::vector<GlobalVars::Data> GlobalVars::data() const
 {
 	std::vector<Data> result;

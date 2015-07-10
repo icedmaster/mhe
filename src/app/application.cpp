@@ -45,9 +45,13 @@ Application::Application(const char* name) :
 
 Application::~Application()
 {
+	destroy_render(engine_->context());
+	engine_->destroy();
 	delete engine_;
 	game::destroy_singletons();
+
 	destroy_default_allocator();
+	print_memory_info();
 }
 
 bool Application::init(const ApplicationConfig& config)
