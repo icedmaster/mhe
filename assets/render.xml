@@ -27,6 +27,7 @@
   <material name="tonemap" shader="posteffect_tonemap" priority="9" />
   <material name="fxaa" shader="fxaa" priority="10" />
   <material name="ssr" shader="ssr" priority="8" />
+  <material name="blur" shader="posteffect_blur" priority="8" />
   </materials>
   <skybox name="skybox" />
   <shadowmap_depth_write name="depth_write" />
@@ -45,15 +46,23 @@
 		<input index="2" node="" output="" material="gbuffer_fill" material_output="2" />
 	  </inputs>
 	  <outputs>
-		<output index="0" scale="0.5" />
+		<output index="0" scale="0.25" />
 	  </outputs>
 	</node>
-	<node name="tonemap" material="tonemap" priority="1">
+	<node name="blur" material="blur" priority="1">
+	  <inputs>
+		<input index="0" node="ssr" output="0" material="" material_output="" />
+	  </inputs>
+	  <outputs>
+		<output index="0" scale="0.25" />
+	  </outputs>
+	</node>
+	<node name="tonemap" material="tonemap" priority="2">
 	  <inputs>
 		<input index="0" node="" output="" material="" material_output="" copy_current_framebuffer="1" />
-		<input index="1" node="ssr" output="0" material="" material_output="" />
+		<input index="1" node="blur" output="0" material="" material_output="" />
 	  </inputs>
 	</node>
-	<node name="fxaa" material="fxaa" src="tonemap" priority="2" />
+	<node name="fxaa" material="fxaa" src="tonemap" priority="3" />
   </posteffects>
 </mhe>

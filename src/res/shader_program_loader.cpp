@@ -199,10 +199,13 @@ bool ShaderProgramLoader::load(type& res, const std::string& name, const context
 		for (size_t j = 0; j < definitions.size(); ++j)
 			data.push_back(std::string("#define ") + definitions[j]);
 
+		std::string debug_defs;
 		for (size_t j = 0; j < infos.size(); ++j)
 		{
 			size_t value = infos[j].low + (i / infos[j].offset) % (infos[j].high - infos[j].low + 1);
 			std::string def = "#define " + infos[j].name + " " + types_cast<std::string>(value);
+			debug_defs += def;
+			debug_defs += " ";
 			data.push_back(def);
 		}
 
@@ -219,9 +222,12 @@ bool ShaderProgramLoader::load(type& res, const std::string& name, const context
 		*/
 
 		result = shader_program.init(vsdata, fsdata, params);
-		ASSERT(result, "Shader compilation failed:\n");
 		if (!result)
+		{
+			ASSERT(0, "Shader compilation failed: " << debug_defs);
 			continue;
+		}
+
 		ubershader.add(i, shader_id);
 	}
 	if (!result) return false;

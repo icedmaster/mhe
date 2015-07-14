@@ -124,10 +124,17 @@ public:
 
 	bool init_screen_input(Context& context, size_t index, uint8_t render_stage = render_stage_before_render_target_setup);
 	bool create_output(Context& context, size_t index, float scale);
-private:
-	void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
-	bool create_output(DrawCallData& draw_call_data, Context& context, size_t index, float scale);
+protected:
+	MeshInstance& mesh_instance()
+	{
+		return mesh_;
+	}
 
+	void fill_render_target_desc(RenderTargetDesc& desc) const;
+
+	virtual bool create_output(DrawCallData& draw_call_data, Context& context, size_t index, float scale);
+	void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
+private:
 	bool init_mesh(Context& context, const MaterialSystemContext& material_system_context);
 
 	array<TextureInstance, max_textures_number> inputs_;
@@ -160,6 +167,25 @@ class FXAAMaterialSystem : public PosteffectMaterialSystemBase
 class SSRMaterialSystem : public PosteffectMaterialSystemBase
 {
 	SETUP_MATERIAL("ssr");
+};
+
+class BlurMaterialSystem : public PosteffectMaterialSystemBase
+{
+	SETUP_MATERIAL("blur");
+public:
+	bool init(Context& context, const MaterialSystemContext& material_system_context) override;
+
+	size_t default_instances_number() const override
+	{
+		return 2;
+	}
+private:
+	bool create_output(DrawCallData& draw_call_data, Context& context, size_t index, float scale) override;
+	void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
+
+	UberShader::Info pass_info_;
+	MeshInstance second_pass_mesh_;
+	ClearCommand clear_command_;
 };
 
 }

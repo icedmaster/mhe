@@ -23,6 +23,7 @@ void Engine::setup_generated()
 	MaterialSystemFactory::instance().add<CSMDepthRenderingMaterialSystem>();
 	MaterialSystemFactory::instance().add<FXAAMaterialSystem>();
 	MaterialSystemFactory::instance().add<SSRMaterialSystem>();
+	MaterialSystemFactory::instance().add<BlurMaterialSystem>();
 }
 
 }}

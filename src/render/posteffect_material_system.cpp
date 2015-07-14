@@ -273,15 +273,20 @@ bool PosteffectMaterialSystemBase::create_output(Context& context, size_t index,
 	return create_output(draw_call_data, context, index, scale);
 }
 
+void PosteffectMaterialSystemBase::fill_render_target_desc(RenderTargetDesc& desc) const
+{
+	desc.target = rt_readwrite;
+	desc.use_depth = false;
+	desc.use_stencil = false;
+	desc.color_targets = 1;
+	desc.color_datatype[0] = format_ubyte;
+	desc.color_format[0] = format_rgba;
+}
+
 bool PosteffectMaterialSystemBase::create_output(DrawCallData& draw_call_data, Context& context, size_t index, float scale)
 {
 	RenderTargetDesc render_target_desc;
-	render_target_desc.target = rt_readwrite;
-	render_target_desc.use_depth = false;
-	render_target_desc.use_stencil = false;
-	render_target_desc.color_targets = 1;
-	render_target_desc.color_datatype[0] = format_ubyte;
-	render_target_desc.color_format[0] = format_rgba;
+	fill_render_target_desc(render_target_desc);
 	RenderTarget& render_target = context.render_target_manager.create(context, render_target_desc, scale);
 	draw_call_data.render_target = render_target.id();
 	const TextureInstance* ids = nullptr;
@@ -297,6 +302,64 @@ bool PosteffectMaterialSystemBase::create_output(DrawCallData& draw_call_data, C
 	}
 
 	return true;
+}
+
+bool BlurMaterialSystem::init(Context& context, const MaterialSystemContext& material_system_context)
+{
+	if (!PosteffectMaterialSystemBase::init(context, material_system_context))
+		return false;
+	pass_info_ = ubershader(context).info("PASS");
+
+	MeshInstance& first_pass_mesh = mesh_instance();
+	DrawCallData& first_pass_draw_call_data = context.draw_call_data_pool.get(first_pass_mesh.instance_parts[0].draw_call_data);
+	second_pass_mesh_ = first_pass_mesh;
+	DrawCallData& second_pass_draw_call_data = create_and_get(context.draw_call_data_pool);
+	second_pass_draw_call_data = first_pass_draw_call_data;
+	second_pass_mesh_.instance_parts[0].draw_call_data = second_pass_draw_call_data.id;
+
+	Material& material = create_and_get(context.materials[id()]);
+	second_pass_mesh_.instance_parts[0].material.id = material.id;
+
+	clear_command_.set_driver(&context.driver);
+
+	return true;
+}
+
+bool BlurMaterialSystem::create_output(DrawCallData& draw_call_data, Context& context, size_t index, float scale)
+{
+	if (!PosteffectMaterialSystemBase::create_output(draw_call_data, context, index, scale))
+		return false;
+
+	DrawCallData& second_pass_draw_call_data = context.draw_call_data_pool.get(second_pass_mesh_.instance_parts[0].draw_call_data);
+
+	RenderTargetDesc render_target_desc;
+	fill_render_target_desc(render_target_desc);
+	RenderTarget& render_target = context.render_target_manager.create(context, render_target_desc, scale);
+	second_pass_draw_call_data.render_target = render_target.id();
+
+	// current output (first pass) as input for second pass
+	Material& second_pass_material = context.materials[id()].get(second_pass_mesh_.instance_parts[0].material.id);
+	second_pass_material.textures[0] = output(0);
+
+	TextureInstance texture;
+	render_target.color_texture(texture, 0);
+	set_output(0, texture);
+
+	return true;
+}
+
+void BlurMaterialSystem::update(Context& context, SceneContext& scene_context, RenderContext& render_context)
+{
+	PosteffectMaterialSystemBase::update(context, scene_context, render_context);
+
+	Material& material = context.materials[id()].get(second_pass_mesh_.instance_parts[0].material.id);
+	UberShader::Index ubershader_index;
+	ubershader_index.set(pass_info_, 1);
+	material.shader_program = ubershader(context).get(ubershader_index);
+	material.uniforms[0] = render_context.main_camera.percamera_uniform;
+
+	clear_command_.reset();
+	setup_draw_call(render_context.draw_calls.add(), second_pass_mesh_.instance_parts[0], second_pass_mesh_.mesh.parts[0], &clear_command_);
 }
 
 }
