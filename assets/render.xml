@@ -46,7 +46,7 @@
 		<input index="2" node="" output="" material="gbuffer_fill" material_output="2" />
 	  </inputs>
 	  <outputs>
-		<output index="0" scale="0.25" />
+		<output index="0" scale="1.0" />
 	  </outputs>
 	</node>
 	<node name="blur" material="blur" priority="1">
@@ -54,7 +54,7 @@
 		<input index="0" node="ssr" output="0" material="" material_output="" />
 	  </inputs>
 	  <outputs>
-		<output index="0" scale="0.25" />
+		<output index="0" scale="1.0" />
 	  </outputs>
 	</node>
 	<node name="tonemap" material="tonemap" priority="2">

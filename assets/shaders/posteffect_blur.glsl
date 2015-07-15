@@ -22,7 +22,7 @@ void main()
 [fragment]
 
 #if QUALITY == 0
-#define BLUR_SAMPLES 1
+#define BLUR_SAMPLES 3
 #elif QUALITY == 1
 #define BLUR_SAMPLES 3
 #endif

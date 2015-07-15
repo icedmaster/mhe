@@ -54,12 +54,12 @@ public:
 	template <class T>
 	T* get(const char* name) const
 	{
-		return get_impl<T>(name);
+		return get_instance_impl<T>(name);
 	}
 
 	MaterialSystem* get(const char* name) const
 	{
-		return get_impl<MaterialSystem>(name);
+		return get_instance_impl<MaterialSystem>(name);
 	}
 
 	MaterialSystem* get(const string& name) const
@@ -103,6 +103,17 @@ private:
 		for (size_t i = 0; i < systems_.size(); ++i)
 		{
 			if (strcmp(systems_[i]->name(), name) == 0)
+				return checked_static_cast<T*>(systems_[i].get());
+		}
+		return nullptr;
+	}
+
+	template <class T>
+	T* get_instance_impl(const char* instance_name) const
+	{
+		for (size_t i = 0, size = systems_.size(); i < size; ++i)
+		{
+			if (systems_[i]->instance_name() == instance_name)
 				return checked_static_cast<T*>(systems_[i].get());
 		}
 		return nullptr;

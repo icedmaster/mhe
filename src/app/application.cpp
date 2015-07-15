@@ -252,6 +252,7 @@ void Application::init_materials(pugi::xml_node materials_node)
 	for (pugi::xml_node n = materials_node.child("material"); n; n = n.next_sibling("material"))
 	{
 		const char* name = n.attribute("name").value();
+		string material_instance_name = n.attribute("instance_name").value();
 		const char* shader_name = n.attribute("shader").value();
 		const char* defs = n.attribute("defs").value();
 		unsigned int priority = n.attribute("priority").as_uint();
@@ -264,7 +265,11 @@ void Application::init_materials(pugi::xml_node materials_node)
 				material_context.options.add(o.name(), o.child_value());
 		}
 
+		if (material_instance_name.empty())
+			material_instance_name = name;
+
 		material_context.shader_name = shader_name;
+		material_context.instance_name = material_instance_name;
 		material_context.defs[0] = defs;
 		MaterialSystem* material_system = MaterialSystemFactory::instance().create(name);
 		if (material_system == nullptr)
@@ -272,6 +277,7 @@ void Application::init_materials(pugi::xml_node materials_node)
 			WARN_LOG("MaterialSystem initialization failed:" << name);
 			continue;
 		}
+		material_system->set_instance_name(material_instance_name);
 		context.material_systems.add(material_system, priority);
 		if (material_instances_number == 0)
 			material_instances_number = material_system->default_instances_number();

@@ -35,6 +35,7 @@ static const size_t max_material_definitions = 8;
 
 struct MaterialSystemContext
 {
+	string instance_name;
 	std::string shader_name;
 	std::string defs[max_material_definitions];
 	KeyValue<string, string> options;
@@ -108,6 +109,16 @@ public:
     {
         return enabled_;
     }
+
+	void set_instance_name(const string& name)
+	{
+		instance_name_ = name;
+	}
+
+	const string& instance_name() const
+	{
+		return instance_name_;
+	}
 protected:
 	bool init_default(Context& context, const MaterialSystemContext& material_system_context);
 
@@ -146,6 +157,7 @@ private:
     virtual void update(Context& context, SceneContext& scene_context, RenderContext& render_context) = 0;
     virtual void setup_uniforms(Material& /*material*/, Context& /*context*/, SceneContext& /*scene_context*/, const MeshPartInstance& /*parts*/, const ModelContext& /*model_context*/) {}
 
+	string instance_name_;
 	Shader shader_;
 	size_t layout_;
 	uint8_t id_;
