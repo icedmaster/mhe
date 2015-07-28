@@ -49,6 +49,8 @@ void imgui_render(ImDrawList** const cmd_lists, int cmd_lists_count)
 
 bool ImGuiHelper::init(game::Engine* engine)
 {
+	enabled_ = false;
+
 	Context& context = engine->context();
 	Shader shader;
 	if (!context.shader_manager.get(shader, string("imgui")))
@@ -105,6 +107,7 @@ void ImGuiHelper::update(Context& context, RenderContext& render_context, const 
 
 void ImGuiHelper::render(Context& context, RenderContext& render_context)
 {
+	if (!enabled_) return;
 	DrawCallExplicit& draw_call = render_context.explicit_draw_calls.add();
 	prepare_draw_call(draw_call);
 	draw_call.layout = &context.layout_pool.get(layout_id_);

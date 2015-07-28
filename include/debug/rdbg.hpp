@@ -195,6 +195,7 @@ public:
 	}
 
 	bool start();
+	void stop();
 private:
 	RDBGProcessor processor_;
 	RDBGThread thread_;

@@ -22,6 +22,8 @@ public:
 	}
 
 	void update(const uint8_t* data) override;
+
+	void copy_framebuffer() override;
 private:
 	void init_cubemap(const TextureDesc& desc, const uint8_t* data, size_t size);
 

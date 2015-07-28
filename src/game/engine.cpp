@@ -79,7 +79,7 @@ bool Engine::init(uint width, uint height, uint bpp, bool fullscreen)
 	setup_generated();
 
 #ifdef RDBG_ENABLED
-	if (!rdbg_engine_.start())
+	/*if (!rdbg_engine_.start())
 	{
 		WARN_LOG("RDBG engine initialization failed");
 	}
@@ -87,16 +87,28 @@ bool Engine::init(uint width, uint height, uint bpp, bool fullscreen)
 	{
 		INFO_LOG("RDBG engine started");
 	}
-	default_rdbg_setup(rdbg_engine_.processor());
+	default_rdbg_setup(rdbg_engine_.processor());*/
 #endif
 
-	debug_views_.init(event_manager_);
 	init_standart_stat_views(stats_);
 
 	stats_timer_.start();
 
-	setup(render_globals_);
+	return true;
+}
 
+void Engine::destroy()
+{
+#ifdef RDBG_ENABLED
+	//rdbg_engine_.stop();
+#endif
+	context_.driver.close();
+	context_.window_system.close();
+}
+
+bool Engine::init_debug_components()
+{
+	debug_views_.init(event_manager_);
 	return true;
 }
 
@@ -137,8 +149,9 @@ void Engine::update()
 		else context_.window_system.disable_vsync();
 	}
 
-	render_context_.tick = utils::get_current_time();
-	render_context_.fdelta = utils::get_last_delta();
+	RenderContext& render_context = renderer_->render_context();
+	render_context.tick = utils::get_current_time();
+	render_context.fdelta = utils::get_last_delta();
 
 	if (stats_timer_.elapsed() > 1.0f)
 	{
@@ -154,26 +167,43 @@ void Engine::update()
 	if (game_scene_ != nullptr)
 		game_scene_->update(*this);
 
-	scene_.update(render_context_);
-	renderer_->before_update(render_context_, scene_.scene_context());
-	scene_.process_requests(render_context_);
-	renderer_->update(render_context_, scene_.scene_context());
+	scene_.update(render_context);
+	renderer_->before_update(scene_.scene_context());
+	scene_.process_requests(render_context);
+	renderer_->update(scene_.scene_context());
 }
 
 void Engine::render()
 {
 	if (game_scene_ != nullptr)
 		game_scene_->before_draw(*this);
+	debug_views_.render();
 	ProfilerElement pe("engine.render");
-	renderer_->render(render_context_, scene_.scene_context());
+	renderer_->render(scene_.scene_context());
 
 	if (game_scene_ != nullptr)
 		game_scene_->draw(*this);
 
 	renderer_->flush();
-	
-	render_context_.draw_calls.clear();
-	render_context_.explicit_draw_calls.clear();
+}
+
+void init_singletons()
+{
+	MainProfiler::create_singleton();
+	GlobalVars::create_singleton();
+	MaterialSystemFactory::create_singleton();
+}
+
+void destroy_singletons()
+{
+	MaterialSystemFactory::destroy_singleton();
+	GlobalVars::destroy_singleton();
+	MainProfiler::destroy_singleton();
+}
+
+GlobalVars& get_global_vars()
+{
+	return GlobalVars::instance();
 }
 
 }}

@@ -14,7 +14,7 @@ struct MHE_EXPORT StandartGeometryLayout
 	{
 		vec3 pos;
 		vec3 nrm;
-		vec3 tng;
+		vec4 tng;
 		vec2 tex;
 	};
 

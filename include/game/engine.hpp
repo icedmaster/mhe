@@ -25,6 +25,8 @@ class MHE_EXPORT Engine
 public:
 	Engine();
 	bool init(uint width, uint height, uint bpp, bool fullscreen);
+	void destroy();
+	bool init_debug_components();
 
 	Context& context()
 	{
@@ -83,7 +85,7 @@ public:
 
 	RenderContext& render_context()
 	{
-		return render_context_;
+		return renderer_->render_context();
 	}
 
 	Stats& stats()
@@ -101,17 +103,20 @@ private:
 	Stats stats_;
 
 	Context context_;
-    RenderContext render_context_;
 	EventManager event_manager_;
 	Scene scene_;
 	utils::Timer stats_timer_;
 
-	RenderGlobals render_globals_;
 	ref_ptr<Renderer> renderer_;
 
 	ref_ptr<GameScene> game_scene_;
 	bool process_;
 };
+
+void init_singletons();
+void destroy_singletons();
+
+MHE_EXPORT GlobalVars& get_global_vars();
 
 }}
 

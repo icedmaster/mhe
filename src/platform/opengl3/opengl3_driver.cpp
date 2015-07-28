@@ -37,6 +37,7 @@ bool OpenGL3Driver::init(DriverRenderingCapabilities& caps)
 	glGetIntegerv(GL_MAJOR_VERSION, &major);
 	glGetIntegerv(GL_MINOR_VERSION, &minor);
 	INFO_LOG("OpenGL3Driver::context:" << major << "." << minor);
+	OpenGLExtensions::create_singleton();
 	OpenGLExtensions::instance().init_extensions();
 
 	current_render_target_ = nullptr;
@@ -48,6 +49,11 @@ bool OpenGL3Driver::init(DriverRenderingCapabilities& caps)
 #endif
 
 	return true;
+}
+
+void OpenGL3Driver::close()
+{
+	OpenGLExtensions::destroy_singleton();
 }
 
 void OpenGL3Driver::setup_caps(DriverRenderingCapabilities& caps)

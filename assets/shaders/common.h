@@ -11,3 +11,11 @@ vec3 mhe_reflect(vec3 I, vec3 N)
 {
 	return I - 2.0f * dot(I, N) * N;
 }
+
+bool check_clamping(vec2 pos)
+{
+	return pos.x < 0.0f || pos.x > 1.0f || pos.y < 0.0f || pos.y > 1.0f;
+}
+
+#define VEC3_ZERO vec3(0.0f, 0.0f, 0.0f)
+#define VEC4_ZERO vec4(0.0f, 0.0f, 0.0f, 0.0f);

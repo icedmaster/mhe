@@ -12,7 +12,7 @@ namespace mhe {
 
 struct DrawCallData
 {
-    POOL_STRUCT(uint16_t);
+    POOL_STRUCT_COPYABLE(DrawCallData, uint16_t);
     RenderState::IdType state;
     RenderTarget::IdType render_target;
 

@@ -8,6 +8,9 @@
 #include "pugixml/pugixml.hpp"
 
 namespace mhe {
+
+class PosteffectMaterialSystemBase;
+
 namespace app {
 
 struct RendererParams;
@@ -25,10 +28,10 @@ public:
 		return run_impl();
 	}
 
-    void stop()
-    {
-        stop_impl();
-    }
+	void stop()
+	{
+		stop_impl();
+	}
 
 	const string& name() const
 	{
@@ -49,7 +52,7 @@ protected:
 	virtual bool mhe_app_init(const ApplicationConfig& config);
 	virtual void mhe_app_close();
 	virtual int run_impl();
-    virtual void stop_impl();
+	virtual void stop_impl();
 	virtual void init_assets_path(const std::string& config_assets_path);
 
 	virtual std::string application_base_path() const
@@ -62,10 +65,12 @@ private:
 
 	void init_render(const ApplicationConfig& config);
 	void init_materials(pugi::xml_node materials_node);
-    void init_gbuffer(pugi::xml_node gbuffer_node, const RendererParams& params);
+	void init_gbuffer(pugi::xml_node gbuffer_node, const RendererParams& params);
+	void init_posteffect_parameters(pugi::xml_node node, RendererParams& params) const;
+	void init_posteffects(const RendererParams& params);
 
-    void add_delegates();
-    bool on_system_event(const Event* event);
+	void add_delegates();
+	bool on_system_event(const Event* event);
 
 	game::Engine* engine_;
 	string name_;

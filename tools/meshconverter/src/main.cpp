@@ -114,6 +114,12 @@ void process_node(const aiScene* assimp_scene, aiNode* node, const aiMatrix4x4& 
 	aiMatrix4x4 inv_transform = transform;
 	inv_transform.Inverse().Transpose();
 	aiMatrix3x3 normal_transform(inv_transform);
+
+	mhe::mat4x4 mhe_normal_transform;
+	mhe_normal_transform.set(normal_transform.a1, normal_transform.b1, normal_transform.c1, 0.0f,
+							 normal_transform.a2, normal_transform.b2, normal_transform.c2, 0.0f,
+							 normal_transform.a3, normal_transform.b3, normal_transform.c3, 0.0f,
+							 0.0f, 0.0f, 0.0f, 0.0f);
 	for (unsigned int m = 0; m < node->mNumMeshes; ++m)
 	{
 		aiMesh* mesh = assimp_scene->mMeshes[node->mMeshes[m]];
@@ -145,8 +151,14 @@ void process_node(const aiScene* assimp_scene, aiNode* node, const aiMatrix4x4& 
 			vertex.nrm.set(n.x, n.y, n.z);
 			aiVector3D& t = mesh->mTextureCoords[0][i];
 			vertex.tex.set(t.x, t.y);
-			aiVector3D& tng = normal_transform * mesh->mTangents[i];
-			vertex.tng.set(tng.x, tng.y, tng.z);
+
+			aiVector3D& aiTng = normal_transform * mesh->mTangents[i];
+			aiVector3D& aiBitng = normal_transform * mesh->mBitangents[i];
+			mhe::vec3 tng(aiTng.x, aiTng.y, aiTng.z);
+			mhe::vec3 bitng(aiBitng.x, aiBitng.y, aiBitng.z);
+			float sign = mhe::dot(bitng, mhe::cross(vertex.nrm, tng)) > 0.0f ? 1.0f : -1.0f;
+
+			vertex.tng = mhe::vec4(tng, sign);
 
 			vertices.push_back(vertex);
 
@@ -232,8 +244,14 @@ void process_scene(const char* out_filename, const aiScene* assimp_scene, const 
 				vertex.nrm.set(n.x, n.y, n.z);
 				aiVector3D& t = mesh->mTextureCoords[0][i];
 				vertex.tex.set(t.x, t.y);
-				aiVector3D& tng = mesh->mTangents[i];
-				vertex.tng.set(tng.x, tng.y, tng.z);
+
+				aiVector3D& aiTng = mesh->mTangents[i];
+				aiVector3D& aiBitng = mesh->mBitangents[i];
+				mhe::vec3 tng(aiTng.x, aiTng.y, aiTng.z);
+				mhe::vec3 bitng(aiBitng.x, aiBitng.y, aiBitng.z);
+				float sign = mhe::dot(bitng, mhe::cross(vertex.nrm, tng)) > 0.0f ? 1.0f : -1.0f;
+
+				vertex.tng = mhe::vec4(tng, sign);
 
 				vertexes.push_back(vertex);
 
@@ -295,8 +313,8 @@ void process_scene(const char* out_filename, const aiScene* assimp_scene, const 
 		}
 	}
 
-	mhe::MeshGrid mesh_grid;
-	create_grid(mesh_grid, vertexes, indexes);
+	//mhe::MeshGrid mesh_grid;
+	//create_grid(mesh_grid, vertexes, indexes);
 
 	std::ofstream f(out_filename, std::ios::out | std::ios::binary);
 	if (!f.is_open())
@@ -314,7 +332,7 @@ void process_scene(const char* out_filename, const aiScene* assimp_scene, const 
 		(const char*)&indexes[0], indexes.size());
 	write_material_data(f, &materials[0], materials.size());
 	write_parts_data(f, &parts[0], parts.size());
-	write_grid_data(f, mesh_grid);
+	//write_grid_data(f, mesh_grid);
 
 	f.close();
 }

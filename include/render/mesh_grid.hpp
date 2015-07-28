@@ -2,6 +2,7 @@
 #define __MESH_GRID_HPP__
 
 #include "core/grid.hpp"
+#include "utils/pool_utils.hpp"
 #include "math/ray.hpp"
 #include "math/math_utils.hpp"
 #include "render_common.hpp"
@@ -82,7 +83,7 @@ private:
 };
 
 template <class Vertices, class Indices>
-void create_grid(MeshGrid& grid, const Vertices& vertices, size_t /*vertices_number*/, const Indices& indices, size_t indices_number)
+void create_grid(MeshGrid& grid, const Vertices& vertices, size_t vertices_number, const Indices& indices, size_t indices_number)
 {
 	MeshGridHelper helper(grid);
 	ASSERT(indices_number % 3 == 0, "Only triangulated meshes are currently supported");

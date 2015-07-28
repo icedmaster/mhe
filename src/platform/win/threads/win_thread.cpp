@@ -1,4 +1,4 @@
-#include "threads/thread_impl.hpp"
+#include "platform/win/win_thread.hpp"
 
 #include "platform/win/win_wrapper.hpp"
 

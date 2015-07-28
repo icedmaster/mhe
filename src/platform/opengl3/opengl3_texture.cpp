@@ -86,4 +86,11 @@ void OpenGL3Texture::update(const uint8_t* data)
 	glBindTexture(target_, 0);
 }
 
+void OpenGL3Texture::copy_framebuffer()
+{
+	glBindTexture(target_, id_);
+	glCopyTexSubImage2D(target_, 0, 0, 0, 0, 0, width_, height_);
+	glBindTexture(target_, 0);
+}
+
 }}

@@ -1,7 +1,6 @@
 #include "threads/thread.hpp"
 
 #include "core/config.hpp"
-
 #include "threads/thread_impl.hpp"
 
 namespace mhe {

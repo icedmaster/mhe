@@ -13,6 +13,12 @@ public: void set_id(Type id) { id_ = id; }								\
 	typedef Type IdType;															\
 	static const Type invalid_id = static_cast<Type>(-1);
 
+#define POOL_STRUCT_COPYABLE(T, Type)												\
+	Type id;																		\
+	typedef Type IdType;															\
+	static const Type invalid_id = static_cast<Type>(-1);							\
+	T& operator= (const T& t) {Type cur_id = id; ::memcpy(this, &t, sizeof(T)); id = cur_id; return *this;}
+
 template <class Pool>
 inline typename Pool::type& create_and_get(Pool& pool)
 {

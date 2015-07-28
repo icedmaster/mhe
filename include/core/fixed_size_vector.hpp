@@ -144,7 +144,7 @@ public:
 		return begin_[index];
 	}
 
-	T operator[] (size_t index) const
+	const T& operator[] (size_t index) const
 	{
 		return begin_[index];
 	}
@@ -361,6 +361,12 @@ public:
         ASSERT(size_ < count - 1, "fixed_capacity_vector is full");
         return traits_.elements[size_++];
     }
+
+	void push_back(const T& v)
+	{
+        ASSERT(size_ < count - 1, "fixed_capacity_vector is full");
+		traits_.elements[size_++] = v;
+	}
 
     const T* data() const
     {

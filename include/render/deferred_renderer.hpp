@@ -13,17 +13,17 @@ public:
 		Renderer(context)
 	{}
 
-	void init(AbstractGBufferFillMaterialSystem* fill, AbstractGBufferUseMaterialSystem* light, MaterialSystem* draw);
+	void init(AbstractGBufferFillMaterialSystem* fill, AbstractGBufferUseMaterialSystem* light, PosteffectMaterialSystemBase* draw);
 private:
 	void init_priorities();
 
-    void render_impl(Context& context, RenderContext& render_context, SceneContext& scene_context) override;
-	void debug_mode_changed(DebugMode mode) override;
+	void render_impl(Context& context, RenderContext& render_context, SceneContext& scene_context) override;
+	void debug_mode_changed(DebugMode mode, MaterialSystemId material_system_id) override;
 
 	MaterialSystem* shadowmap_depth_write_material_system_;
 	AbstractGBufferFillMaterialSystem* gbuffer_fill_material_system_;
 	AbstractGBufferUseMaterialSystem* gbuffer_light_material_system_;
-	MaterialSystem* draw_material_system_;
+	PosteffectMaterialSystemBase* draw_material_system_;
 };
 
 }

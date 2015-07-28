@@ -7,11 +7,12 @@
     <material name="posteffect_simple" shader="gbuffer_draw" priority="6">
       <options>
         <single_dc>1</single_dc>
+		<blend>1</blend>
       </options>
     </material>
     <material name="posteffect_debug" shader="posteffect_draw" priority="10">
       <options>
-        <overdraw>1</overdraw>
+        <overdraw>0</overdraw>
       </options>
     </material>
   <material name="depth_write" shader="depth_write" priority="3" />
@@ -23,6 +24,11 @@
       <percentage>10, 30, 50, 100</percentage>
     </options>
   </material>
+  <material name="tonemap" shader="posteffect_tonemap" priority="9" />
+  <material name="fxaa" shader="fxaa" priority="10" />
+  <material name="ssr" shader="ssr" priority="8" />
+  <material name="blur" shader="posteffect_blur" priority="8" />
+  <material name="dof" shader="posteffect_dof" priority="8" />
   </materials>
   <skybox name="skybox" />
   <shadowmap_depth_write name="depth_write" />
@@ -33,4 +39,37 @@
 	<use name="gbuffer_draw" />
 	<draw name="posteffect_simple" />
   </gbuffer>
+  <posteffects>
+	<node name="ssr" material="ssr" priority="0">
+	  <inputs>
+		<input index="0" node="" output="" material="gbuffer_fill" material_output="0" />
+		<input index="1" node="" output="" material="gbuffer_fill" material_output="1" />
+		<input index="2" node="" output="" material="gbuffer_fill" material_output="2" />
+	  </inputs>
+	  <outputs>
+		<output index="0" scale="1.0" />
+	  </outputs>
+	</node>
+	<node name="blur" material="blur" priority="1">
+	  <inputs>
+		<input index="0" node="ssr" output="0" material="" material_output="" />
+	  </inputs>
+	  <outputs>
+		<output index="0" scale="1.0" />
+	  </outputs>
+	</node>
+	<node name="tonemap" material="tonemap" priority="2">
+	  <inputs>
+		<input index="0" node="" output="" material="" material_output="" copy_current_framebuffer="1" />
+		<input index="1" node="blur" output="0" material="" material_output="" />
+	  </inputs>
+	</node>
+	<node name="dof" material="dof" priority="3">
+	  <inputs>
+		<input index="2" node="" output="" material="gbuffer_fill" material_output="2" />
+		<input index="3" copy_current_framebuffer="1" />
+	  </inputs>
+	</node>
+	<node name="fxaa" material="fxaa" src="tonemap" priority="4" />
+  </posteffects>
 </mhe>

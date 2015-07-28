@@ -26,6 +26,7 @@ void MaterialSystem::setup_draw_calls(Context& context, SceneContext& scene_cont
 
 bool MaterialSystem::init_default(Context& context, const MaterialSystemContext& material_system_context)
 {
+	instance_name_ = material_system_context.instance_name;
 	return context.shader_manager.get(shader_, material_system_context.shader_name);
 }
 

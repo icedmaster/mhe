@@ -71,6 +71,7 @@ public:
 	virtual bool init(const TextureDesc& desc, const uint8_t* data, size_t size) = 0;
 	virtual void close() = 0;
 	virtual void update(const uint8_t* data) = 0;
+	virtual void copy_framebuffer() = 0;
 };
 
 class MHE_EXPORT Texture
@@ -97,6 +98,11 @@ public:
 	void update(const uint8_t* data)
 	{
 		impl_->update(data);
+	}
+
+	void copy_framebuffer()
+	{
+		impl_->copy_framebuffer();
 	}
 private:
 	unique_ptr<TextureImpl> impl_;

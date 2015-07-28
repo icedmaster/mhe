@@ -27,4 +27,17 @@ MaterialId MaterialManager::get(const MaterialInitializationData& data) const
 	return id;
 }
 
+bool MaterialManager::id_by_name(MaterialId& id, const string& name) const
+{
+	for (MaterialsMap::iterator it = materials_.begin(); it != materials_.end(); ++it)
+	{
+		if (it->value.name == name)
+		{
+			id = it->key;
+			return true;
+		}
+	}
+	return false;
+}
+
 }

@@ -16,6 +16,8 @@ namespace sdl {
 
 	void SDL2WindowSystem::close()
 	{
+		if (view_.surface_ != nullptr)
+			SDL_DestroyWindow(view_.surface_);
 		SDL_Quit();
 	}
 

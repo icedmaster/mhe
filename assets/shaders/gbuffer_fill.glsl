@@ -21,9 +21,9 @@ void main()
 	vsoutput.tex = tex;
 	vsoutput.nrm = (normal * vec4(nrm, 0.0f)).xyz;
 #if NORMALMAP == 1
-	vsoutput.tng = tng;
+	vsoutput.tng = (normal * vec4(tng.xyz, 0.0f)).xyz;
 	// TODO: add handedness
-	vsoutput.bitng = cross(nrm, tng);
+	vsoutput.bitng = cross(nrm, tng.xyz) * tng.w;
 #endif
 
 	gl_Position = vp * model * vec4(pos, 1.0f);
@@ -57,6 +57,6 @@ void main()
 #else
 	vec3 normal_tngspace = texture(normalmap_texture, vsoutput.tex).xyz * 2.0f - 1.0f;
 	vec3 normal_wspace = vsoutput.tng * normal_tngspace.x + vsoutput.bitng * normal_tngspace.y + vsoutput.nrm * normal_tngspace.z;
-	normal = vec4(normal_wspace, PHONG_MATERIAL_SHININESS(material_data));
+	normal = vec4(normalize(normal_wspace), PHONG_MATERIAL_SHININESS(material_data));
 #endif
 }

@@ -39,7 +39,7 @@ struct ClassTypePolicy
 	}
 };
 
-template < class T, size_t C, class I = uint16_t, class Policy = ClassTypePolicy<T, I> >
+template < class T, size_t C = 0, class I = uint16_t, class Policy = ClassTypePolicy<T, I> >
 class Pool
 {
 	struct Index
@@ -53,16 +53,33 @@ class Pool
 public:
 	typedef T type;
 	typedef I index_type;
-	static const size_t capacity = C;
 
-    Pool()
+	Pool(allocator* alloc = default_allocator()) : objects_(nullptr), indexes_(nullptr), size_(0), capacity_(0), allocator_(alloc)
 	{
-        clear();
+		if (C != 0)
+			resize(C);
+	}
+
+	~Pool()
+	{
+		destroy_array(objects_, allocator_);
+		destroy_array(indexes_, allocator_);
+	}
+
+	void resize(size_t size)
+	{
+		ASSERT(size_ == 0, "Trying to resize a pool that is already in use");
+		capacity_ = size;
+		destroy_array(objects_, allocator_);
+		destroy_array(indexes_, allocator_);
+		objects_ = create_array<T>(size, allocator_);
+		indexes_ = create_array<Index>(size, allocator_);
+		clear();
 	}
 
 	I create() const
 	{
-		ASSERT(size_ < C, "Can't get next element from the pool");
+		ASSERT(size_ < capacity_, "Can't get next element from the pool");
 		Index& ind = indexes_[first_];
 		ind.index = size_++;
 		T& obj = objects_[ind.index];
@@ -131,21 +148,24 @@ public:
     void clear()
     {
         first_ = 0;
-        last_ = C - 1;
+        last_ = capacity_ - 1;
         size_ = 0;
-        for (size_t i = 0; i < C - 1; ++i)
-        {
-            indexes_[i].id = i;
-            indexes_[i].next = i + 1;
-            indexes_[i].index = invalid_id;
-        }
+
+		for (size_t i = 0; i < capacity_; ++i)
+		{
+			indexes_[i].id = i;
+			indexes_[i].next = i + 1;
+			indexes_[i].index = invalid_id;
+		}
     }
 private:
-	mutable dynarray<T, C> objects_;
-	mutable dynarray<Index, C> indexes_;
+	mutable T* objects_;
+	mutable Index* indexes_;
 	mutable I first_;
 	mutable I last_;
 	mutable I size_;
+	size_t capacity_;
+	allocator* allocator_;
 };
 
 }

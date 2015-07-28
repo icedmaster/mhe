@@ -70,7 +70,6 @@ public:
 	virtual ~ConditionVariableImpl() {}
 	virtual bool wait() = 0;
 	virtual void notify() = 0;
-	virtual bool check() const = 0;
 };
 
 class MHE_EXPORT condition_variable
@@ -86,11 +85,6 @@ public:
 	void notify()
 	{
 		impl_->notify();
-	}
-
-	bool check() const
-	{
-		return impl_->check();
 	}
 private:
 	unique_ptr<ConditionVariableImpl> impl_;

@@ -35,6 +35,7 @@ static const size_t max_material_definitions = 8;
 
 struct MaterialSystemContext
 {
+	string instance_name;
 	std::string shader_name;
 	std::string defs[max_material_definitions];
 	KeyValue<string, string> options;
@@ -55,9 +56,16 @@ public:
 
 	virtual void start_frame(Context&, SceneContext&, RenderContext&) {}
 
+	virtual void output(Context&, size_t /*unit*/, TextureInstance& /*texture*/) const {}
+
 	virtual RenderTarget::IdType render_target_id() const
 	{
 		return default_render_target;
+	}
+
+	virtual size_t default_instances_number() const
+	{
+		return 0;
 	}
 
 	void setup_draw_calls(Context& context, SceneContext& scene_context, RenderContext& render_context);
@@ -82,7 +90,7 @@ public:
 		priority_ = priority;
 	}
 
-	hash_type name() const
+	const char* name() const
 	{
 		return name_impl();
 	}
@@ -101,6 +109,16 @@ public:
     {
         return enabled_;
     }
+
+	void set_instance_name(const string& name)
+	{
+		instance_name_ = name;
+	}
+
+	const string& instance_name() const
+	{
+		return instance_name_;
+	}
 protected:
 	bool init_default(Context& context, const MaterialSystemContext& material_system_context);
 
@@ -135,10 +153,11 @@ protected:
 
     void setup_draw_call(DrawCall& draw_call, const MeshPartInstance& instance_part, const MeshPart& part, RenderCommand* command = nullptr) const;
 private:
-	virtual hash_type name_impl() const = 0;
+	virtual const char* name_impl() const = 0;
     virtual void update(Context& context, SceneContext& scene_context, RenderContext& render_context) = 0;
     virtual void setup_uniforms(Material& /*material*/, Context& /*context*/, SceneContext& /*scene_context*/, const MeshPartInstance& /*parts*/, const ModelContext& /*model_context*/) {}
 
+	string instance_name_;
 	Shader shader_;
 	size_t layout_;
 	uint8_t id_;
@@ -148,7 +167,7 @@ private:
 
 typedef Factory<MaterialSystem> MaterialSystemFactory;
 
-#define SETUP_MATERIAL(mname) public: static hash_type name() {return hash(mname);} private: hash_type name_impl() const {static hash_type n = hash(mname); return n;}
+#define SETUP_MATERIAL(mname) public: static const char* name() {return mname;} private: const char* name_impl() const { return mname; }
 
 #define MATERIAL_UPDATE_WITH_COMMAND(context, scene_context, render_context, update_method, command)    \
     for (size_t i = 0; i < render_context.nodes_number; ++i)                \
@@ -156,9 +175,10 @@ typedef Factory<MaterialSystem> MaterialSystemFactory;
         for (size_t j = 0; j < render_context.nodes[i].mesh.instance_parts.size(); ++j) \
         {   \
             MeshPartInstance& part_instance = render_context.nodes[i].mesh.instance_parts[j];   \
+			MeshPart& part = render_context.nodes[i].mesh.mesh.parts[j]; \
             if (part_instance.material.material_system != id() || !part_instance.visible)    \
                 continue;                                                                           \
-            update_method(context, scene_context, render_context, &part_instance, 1); \
+            update_method(context, scene_context, render_context, &part_instance, &part, 1); \
             setup_draw_call(render_context.draw_calls.add(), part_instance, render_context.nodes[i].mesh.mesh.parts[j], command);   \
         }   \
     }

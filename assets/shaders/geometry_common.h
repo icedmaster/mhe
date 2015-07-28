@@ -8,6 +8,7 @@ uniform percamera
 	vec4 ambient;
 	float znear;
 	float zfar;
+	vec2 inv_viewport;
 };
 
 float linearized_depth(float d, float znear, float zfar)
@@ -33,6 +34,6 @@ layout (location = 0) in vec3 pos;
 #else
 layout (location = 0) in vec3 pos;
 layout (location = 1) in vec3 nrm;
-layout (location = 2) in vec3 tng;
+layout (location = 2) in vec4 tng;
 layout (location = 3) in vec2 tex;
 #endif
