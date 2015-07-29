@@ -24,6 +24,7 @@ void Engine::setup_generated()
 	MaterialSystemFactory::instance().add<FXAAMaterialSystem>();
 	MaterialSystemFactory::instance().add<SSRMaterialSystem>();
 	MaterialSystemFactory::instance().add<BlurMaterialSystem>();
+	MaterialSystemFactory::instance().add<DOFMaterialSystem>();
 }
 
 }}

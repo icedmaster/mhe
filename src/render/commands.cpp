@@ -4,7 +4,7 @@
 
 namespace mhe {
 
-bool ClearCommand::execute_impl(RenderStage current_stage)
+bool ClearCommand::execute_impl(RenderStage /*current_stage*/)
 {
     if (executed_) return true;
 	ASSERT(driver_ != nullptr, "You must setup the driver first");
@@ -18,14 +18,14 @@ void ClearCommand::reset()
     executed_ = false;
 }
 
-bool ClearCommandSimple::execute_impl(RenderStage current_stage)
+bool ClearCommandSimple::execute_impl(RenderStage /*current_stage*/)
 {
 	ASSERT(driver_ != nullptr, "You must setup the driver first");
 	driver_->clear(true, true, true, vec4(0.0, 0.0, 0.0, 0.0));
 	return true;
 }
 
-bool SetRenderTargetTextureSideCommand::execute_impl(RenderStage current_stage)
+bool SetRenderTargetTextureSideCommand::execute_impl(RenderStage /*current_stage*/)
 {
 	if (executed_) return true;
 	executed_ = true;
@@ -39,7 +39,7 @@ CopyFramebufferCommand::CopyFramebufferCommand()
 	set_stages(render_stage_before_render_target_setup);
 }
 
-bool CopyFramebufferCommand::execute_impl(RenderStage current_stage)
+bool CopyFramebufferCommand::execute_impl(RenderStage /*current_stage*/)
 {
 	texture_->copy_framebuffer();
 	return true;

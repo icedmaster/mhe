@@ -8,14 +8,14 @@ namespace mhe {
 
 namespace detail {
 
-const std::string vertex_shader_tag = "[vertex]";
-const std::string fragment_shader_tag = "[fragment]";
-const std::string include_tag = "[include";
-const std::string defs_tag = "[defs";
-const std::string sampler_tag = "[sampler";
-const std::string uniform_tag = "[uniform";
-const std::string shader_header = "#version 330 core";
-const std::string shader_extension = ".glsl";
+const char* vertex_shader_tag = "[vertex]";
+const char* fragment_shader_tag = "[fragment]";
+const char* include_tag = "[include";
+const char* defs_tag = "[defs";
+const char* sampler_tag = "[sampler";
+const char* uniform_tag = "[uniform";
+const char* shader_header = "#version 330 core";
+const char* shader_extension = ".glsl";
 
 const std::string tags[] = {vertex_shader_tag, fragment_shader_tag};
 
@@ -224,7 +224,7 @@ bool ShaderProgramLoader::load(type& res, const std::string& name, const context
 		result = shader_program.init(vsdata, fsdata, params);
 		if (!result)
 		{
-			ASSERT(0, "Shader compilation failed: " << debug_defs);
+			ASSERT(0, "Shader compilation failed: " << name << "\n" << debug_defs);
 			continue;
 		}
 

@@ -186,7 +186,7 @@ void PosteffectMaterialSystemBase::update(Context& context, SceneContext& scene_
 	clear_command_.reset();
 	if (framebuffer_input_ != invalid_index) // current framebuffer as input
 	{
-		copy_framebuffer_command_.set_texture(&context.texture_pool.get(inputs_[0].id));
+		copy_framebuffer_command_.set_texture(&context.texture_pool.get(inputs_[framebuffer_input_].id));
 		list_of_commands_.add_command(&copy_framebuffer_command_);
 	}
 

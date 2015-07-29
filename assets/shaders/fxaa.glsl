@@ -40,6 +40,10 @@ void main()
 
 [fragment]
 
+#ifdef GL_ARB_gpu_shader5
+#extension GL_ARB_gpu_shader5 : enable
+#endif
+
 [include "Fxaa3_11.h"]
 
 [sampler2D main_texture 0]

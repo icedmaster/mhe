@@ -1,8 +1,46 @@
 #include "threads/thread.hpp"
 
 #include <pthread.h>
+#include <unistd.h>
+
+#include "utils/global_log.hpp"
 
 namespace mhe {
+
+class LinuxThreadImpl : public ThreadImpl
+{
+public:
+	bool start() override;
+	bool stop() override;
+	bool join() override;
+	void set_thread(thread* thr)
+	{
+		thr_ = thr;
+	}
+private:
+	pthread_t pthr_;
+	int id_;
+	thread* thr_;
+};
+
+class LinuxConditionVariable : public ConditionVariableImpl
+{
+public:
+	LinuxConditionVariable();
+	~LinuxConditionVariable();
+
+	bool wait() override;
+	void notify() override;
+	bool check() const override
+	{
+		return flag_;
+	}
+private:
+	pthread_cond_t cond_;
+	pthread_mutexattr_t mutex_attr_;
+	pthread_mutex_t mutex_;
+	bool flag_;
+};
 
 namespace {
 
@@ -15,65 +53,81 @@ void* start_thread_impl(void* param)
 
 }
 
-struct thread::Info
+bool LinuxThreadImpl::start()
 {
-	pthread_t thr;
-	int id;
-};
-
-struct condition_variable::Info
-{
-	int id;
-};
-
-thread::thread() :
-	info_(new Info)
-{}
-
-thread::~thread()
-{}
-
-bool thread::start_thread()
-{
-	info_->id = pthread_create(&info_->thr, 0, start_thread_impl, this);
-	return info_->id == 0;
+	id_ = pthread_create(&pthr_, 0, start_thread_impl, thr_);
+	return id_ == 0;
 }
 
-bool thread::stop()
+bool LinuxThreadImpl::stop()
 {
-	finished_ = true;
-//return TerminateThread(info_->id, 0) != 0;
 	return true;
 }
 
-bool thread::join()
+bool LinuxThreadImpl::join()
 {
-	return pthread_join(info_->thr, 0);
+	return pthread_join(pthr_, 0);
 }
 
-void thread::process()
+LinuxConditionVariable::LinuxConditionVariable() : flag_(false)
 {
-	while (!finished_)
-		process_impl();
+	pthread_cond_init(&cond_, nullptr);
+	pthread_mutexattr_init(&mutex_attr_);
+	pthread_mutex_init(&mutex_, &mutex_attr_);
 }
 
-size_t thread::hardware_threads_number()
+LinuxConditionVariable::~LinuxConditionVariable()
 {
-	return 1;
+	pthread_mutexattr_destroy(&mutex_attr_);
+	pthread_mutex_destroy(&mutex_);
+	pthread_cond_destroy(&cond_);
 }
 
-condition_variable::condition_variable() :
-	info_(new Info)
+bool LinuxConditionVariable::wait()
 {
+	pthread_mutex_lock(&mutex_);
+	if (flag_)
+	{
+		flag_ = false;
+		pthread_mutex_unlock(&mutex_);
+		return true;
+	}
+	if (pthread_cond_wait(&cond_, &mutex_) != 0)
+		return false;
+	flag_ = false;
+	pthread_mutex_unlock(&mutex_);
+	return true;
 }
 
-bool condition_variable::wait()
+void LinuxConditionVariable::notify()
 {
-    return false;
+	pthread_mutex_lock(&mutex_);
+	flag_ = true;
+	pthread_mutex_unlock(&mutex_);
+	pthread_cond_signal(&cond_);
 }
 
-void condition_variable::notify()
+namespace details {
+ThreadImpl* create_thread_impl()
 {
+	return new LinuxThreadImpl;
 }
+
+size_t hardware_threads_number()
+{
+	return sysconf(_SC_NPROCESSORS_ONLN);
+}
+
+void sleep(size_t ms)
+{
+	usleep(ms * 1000);
+}
+
+ConditionVariableImpl* create_condition_variable_impl()
+{
+	return new LinuxConditionVariable;
+}
+
+} // namespace details
 
 }

@@ -188,6 +188,11 @@ private:
 	ClearCommand clear_command_;
 };
 
+class DOFMaterialSystem : public PosteffectMaterialSystemBase
+{
+	SETUP_MATERIAL("dof");
+};
+
 }
 
 #endif

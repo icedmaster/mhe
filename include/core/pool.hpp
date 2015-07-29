@@ -54,7 +54,7 @@ public:
 	typedef T type;
 	typedef I index_type;
 
-	Pool(allocator* alloc = default_allocator()) : size_(0), objects_(nullptr), indexes_(nullptr), capacity_(0), allocator_(alloc)
+	Pool(allocator* alloc = default_allocator()) : objects_(nullptr), indexes_(nullptr), size_(0), capacity_(0), allocator_(alloc)
 	{
 		if (C != 0)
 			resize(C);

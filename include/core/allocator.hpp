@@ -233,7 +233,7 @@ inline void destroy_array(T* ptr, allocator* alloc)
 
 }
 
-inline void* operator new(size_t /*size*/, mhe::allocator* /*alloc*/)
+inline void* operator new(size_t /*size*/, mhe::allocator* /*alloc*/) throw()
 {
 	ASSERT(0, "Do not use new[] with custom allocator");
 	return nullptr;

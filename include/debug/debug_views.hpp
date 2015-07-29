@@ -23,6 +23,7 @@ public:
 	{}
 
 	void init(EventManager& event_maneger);
+	void destroy();
 	void update();
 	void render();
 private:

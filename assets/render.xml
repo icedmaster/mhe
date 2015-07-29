@@ -28,6 +28,7 @@
   <material name="fxaa" shader="fxaa" priority="10" />
   <material name="ssr" shader="ssr" priority="8" />
   <material name="blur" shader="posteffect_blur" priority="8" />
+  <material name="dof" shader="posteffect_dof" priority="8" />
   </materials>
   <skybox name="skybox" />
   <shadowmap_depth_write name="depth_write" />
@@ -63,6 +64,12 @@
 		<input index="1" node="blur" output="0" material="" material_output="" />
 	  </inputs>
 	</node>
-	<node name="fxaa" material="fxaa" src="tonemap" priority="3" />
+	<node name="dof" material="dof" priority="3">
+	  <inputs>
+		<input index="2" node="" output="" material="gbuffer_fill" material_output="2" />
+		<input index="3" copy_current_framebuffer="1" />
+	  </inputs>
+	</node>
+	<node name="fxaa" material="fxaa" src="tonemap" priority="4" />
   </posteffects>
 </mhe>

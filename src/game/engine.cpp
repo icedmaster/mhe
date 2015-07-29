@@ -102,6 +102,8 @@ void Engine::destroy()
 #ifdef RDBG_ENABLED
 	//rdbg_engine_.stop();
 #endif
+	debug_views_.destroy();
+
 	context_.driver.close();
 	context_.window_system.close();
 }
