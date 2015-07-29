@@ -21,6 +21,11 @@ void DebugViews::init(EventManager& event_manager)
 	posteffect_id_[posteffect_ssr] = engine_.context().material_systems.get("ssr")->id();
 }
 
+void DebugViews::destroy()
+{
+	imgui_.destroy();
+}
+
 void DebugViews::update()
 {
 	Renderer* renderer = engine_.renderer();

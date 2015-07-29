@@ -332,12 +332,12 @@ private:
 
 	T* allocate(size_t n)
 	{
-		return new (allocator_) T[n];
+		return create_array<T>(n, allocator_);
 	}
 
 	void free(T* ptr)
 	{
-        operator delete[](allocator_, ptr);
+		destroy_array(ptr, allocator_);
 	}
 
 	T elements_[count];

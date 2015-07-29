@@ -90,6 +90,7 @@ bool ImGuiHelper::init(game::Engine* engine)
 
 void ImGuiHelper::destroy()
 {
+	ImGui::Shutdown();
 }
 
 void ImGuiHelper::update(Context& context, RenderContext& render_context, const EventManager& event_manager)
