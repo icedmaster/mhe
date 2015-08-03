@@ -124,6 +124,9 @@ public:
 
 	bool init_screen_input(Context& context, size_t index, uint8_t render_stage = render_stage_before_render_target_setup);
 	bool create_output(Context& context, size_t index, float scale);
+
+	// This method will be called when PosteffectChain has initialized this material system
+	virtual void postinit(Context& /*context*/) {}
 protected:
 	MeshInstance& mesh_instance()
 	{
@@ -134,6 +137,7 @@ protected:
 
 	virtual bool create_output(DrawCallData& draw_call_data, Context& context, size_t index, float scale);
 	void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
+	void prepare_draw_call(DrawCall& draw_call, Context& context, SceneContext& scene_context, RenderContext& render_context);
 private:
 	bool init_mesh(Context& context, const MaterialSystemContext& material_system_context);
 
@@ -191,6 +195,37 @@ private:
 class DOFMaterialSystem : public PosteffectMaterialSystemBase
 {
 	SETUP_MATERIAL("dof");
+
+	static const size_t input_texture_unit = 3;
+	static const size_t blur_texture_unit = 4;
+	static const size_t dof_texture_unit = 5;
+
+	struct DOFShaderData
+	{
+		vec4 planes;
+		vec4 coc;
+	};
+public:
+	bool init(Context& context, const MaterialSystemContext& material_system_context) override;
+
+	size_t default_instances_number() const override
+	{
+		return 3; // blur resolve pass + DOF pass + composite pass
+	}
+
+	void postinit(Context& context) override;
+private:
+	void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
+	void update_uniforms(Context& context);
+
+	ClearCommandSimple clear_command_simple_;
+	MeshInstance dof_pass_mesh_instance_;
+	MeshInstance composite_pass_mesh_instance_;
+	UberShader::Info pass_info_;
+	float blur_resolve_pass_scale_;
+
+	DOFShaderData dof_shader_data_;
+	UniformBuffer::IdType dof_uniform_;
 };
 
 }

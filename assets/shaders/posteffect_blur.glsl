@@ -40,11 +40,11 @@ out vec4 color;
 vec4 blur(vec2 tex, ivec2 dir)
 {
 	vec4 res = VEC4_ZERO;
-	for (int i = -BLUR_SAMPLES; i <= BLUR_SAMPLES; ++i)
+	/*for (int i = -BLUR_SAMPLES; i <= BLUR_SAMPLES; ++i)
 	{
 		vec4 c = textureOffset(main_texture, tex, dir * i) * blur_weights[i + BLUR_SAMPLES];
 		res += c;
-	}
+	}*/
 	return res;
 }
 

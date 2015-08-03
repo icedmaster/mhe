@@ -40,6 +40,7 @@
 	<draw name="posteffect_simple" />
   </gbuffer>
   <posteffects>
+	<!-->
 	<node name="ssr" material="ssr" priority="0">
 	  <inputs>
 		<input index="0" node="" output="" material="gbuffer_fill" material_output="0" />
@@ -64,12 +65,15 @@
 		<input index="1" node="blur" output="0" material="" material_output="" />
 	  </inputs>
 	</node>
+	<-->
 	<node name="dof" material="dof" priority="3">
 	  <inputs>
 		<input index="2" node="" output="" material="gbuffer_fill" material_output="2" />
-		<input index="3" copy_current_framebuffer="1" />
+		<input index="3" />
 	  </inputs>
 	</node>
+	<!-->
 	<node name="fxaa" material="fxaa" src="tonemap" priority="4" />
+	<-->
   </posteffects>
 </mhe>

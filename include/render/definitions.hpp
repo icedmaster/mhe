@@ -8,7 +8,9 @@ enum
 	format_bgra,
 	format_rgba32f,
 	format_d24s8,
-	format_d24f
+	format_d24f,
+	format_r32f,
+	format_r16f
 };
 
 // texture datatype

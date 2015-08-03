@@ -139,6 +139,8 @@ void PosteffectSystem::add(Context& context, const PosteffectSystem::PosteffectN
 	if (!desc.outputs.empty())
 		init_outputs(material_system, context, desc);
 
+	material_system->postinit(context);
+
 	PosteffectNode node;
 	node.name = desc.name;
 	node.material_system = material_system;
