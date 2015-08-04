@@ -1,3 +1,14 @@
+// Resources:
+// http://amd-dev.wpengine.netdna-cdn.com/wordpress/media/2012/10/Scheuermann_DepthOfField.pdf
+// https://mynameismjp.wordpress.com/2011/02/28/bokeh/
+
+[defs PASS 0 2]
+
+#define BLUR_RESOLVE_PASS 0
+#define DOF_PASS 1
+#define COMPOSITE_PASS 2
+
+
 struct VSOutput
 {
 	vec2 tex;
@@ -21,50 +32,62 @@ void main()
 [include "common.h"]
 [include "gbuffer_common.h"]
 
-#define BLUR_SAMPLES 5
 [include "poisson_disc_kernel.h"]
 
 [uniform dofparams 1 perframe]
 uniform dofparams
 {
-	float focus;
+	vec4 planes; // x - focus plane, y - near blur plane, z - far blur plane, w - max blurriness
+	vec4 coc; // x - diameter
 };
 
 [sampler2D main_texture 3]
+[sampler2D blur_texture 4]
+[sampler2D dof_texture 5]
 
 in VSOutput vsoutput;
 
+#if PASS == BLUR_RESOLVE_PASS
+out float color;
+#else
 out vec4 color;
+#endif
+
 
 #pragma optionNV (unroll all)
-vec4 blur(vec2 tex, float depth, float cocvalue)
+vec4 blur(vec2 tex, vec4 pixel_color, float depth, float blur)
 {
 	float weight = 1.0f;
-	vec4 color = texture(main_texture, tex);
+	vec4 color = pixel_color;
 
-	vec2 r = cocvalue * 0.5f / textureSize(main_texture, 0);
+	ivec2 texsize = textureSize(main_texture, 0);
 
-	for (int i = 0; i < BLUR_SAMPLES; ++i)
+	vec2 radius = blur * coc.x / texsize;
+
+	for (int i = 0; i < DISC_SAMPLES; ++i)
 	{
 		vec2 kernel = disc_kernel[i];
-		vec2 offset = kernel * r;
+		vec2 offset = kernel * radius;
 		vec4 c = texture(main_texture, tex + offset);
 		float pixel_depth = texture(depth_texture, tex + offset);
-		float contribution = abs(pixel_depth - depth) / cocvalue;
+		float pixel_blurriness = texture(blur_texture, tex + offset);
+		float contribution = pixel_blurriness;
 		color += c * contribution;
 		weight += contribution;
 	}
 
 	return vec4(color.rgb / weight, 1.0f);
 }
-/*
-float coc(float focus, float far_blur_distance, float near_blur_distance, float distance)
+
+float calculate_blur(float focus, float far_blur_distance, float near_blur_distance, float distance, float max_blurriness)
 {
-	float f1 = (distance - focus) / (focus - near_blur_distance);
-	float f2 = (distance - focus) / (far_blur_distance - focus);
-	return saturate(f1 + f2);	
+	float f;
+	if (distance < focus)
+	    f = (focus - distance) / (focus - near_blur_distance);
+	else
+		f = (distance - focus) / (far_blur_distance - focus);
+	return clamp(f, 0.0f, max_blurriness);
 }
-*/
 
 float calculate_focal_length(float zfar, float focus)
 {
@@ -76,17 +99,41 @@ float calculate_coc(float aperture, float focus, float focal_length, float dista
 	return abs(aperture * focus * (focus - distance) / (distance * (focus - focal_length)));
 }
 
+#if PASS == BLUR_RESOLVE_PASS
 void main()
 {
-	float focus_distance = 300.0f;
-	float far_dof_blur_distance = 500.0f;
-	float near_dof_blur_distance = 100.0f;
+	float focus_distance = planes.x;
+	float near_dof_blur_distance = planes.y;
+	float far_dof_blur_distance = planes.z;
+	float max_blurriness = planes.w;
 
 	GBuffer gbuffer = gbuffer_unpack(vsoutput.tex);
 	float linear_depth = linearized_depth(gbuffer.depth, znear, zfar);
+ 
+	vec4 pixel_color = texture(main_texture, vsoutput.tex);
 
-	//float cocvalue = coc(focus, far_dof_blur_distance, near_dof_blur_distance, linear_depth);	
-	float coc = calculate_coc(1.0f, focus_distance, calculate_focal_length(zfar, focus), linear_depth);
-	vec4 blurred = blur(vsoutput.tex, linear_depth, coc);
-	color = vec4(blurred.rgb, 1.0f);
+	float blurriness = calculate_blur(focus_distance, far_dof_blur_distance, near_dof_blur_distance, linear_depth, max_blurriness);	
+	color = blurriness;
 }
+#elif PASS == DOF_PASS
+void main()
+{
+ 	GBuffer gbuffer = gbuffer_unpack(vsoutput.tex);
+ 	float linear_depth = linearized_depth(gbuffer.depth, znear, zfar);
+
+	vec4 pixel_color = texture(main_texture, vsoutput.tex);
+	float blurriness = texture(blur_texture, vsoutput.tex).r;
+
+	vec4 blurred = blur(vsoutput.tex, pixel_color, linear_depth, blurriness);
+	color = blurred;
+}
+#elif PASS == COMPOSITE_PASS
+void main()
+{
+	float blur = texture(blur_texture, vsoutput.tex).r;
+	vec4 dof_value = texture(dof_texture, vsoutput.tex);
+	vec4 original = texture(main_texture, vsoutput.tex);
+	
+	color = mix(original, dof_value, saturate(blur));
+}
+#endif

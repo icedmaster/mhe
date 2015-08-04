@@ -88,6 +88,11 @@ public:
 			return index_;
 		}
 
+		void reset()
+		{
+			index_ = 0;
+		}
+
 		static size_t calculate_index(const Info& info, size_t value);
 	private:
 		size_t index_;

@@ -6,6 +6,7 @@
 #include "render/utils/simple_meshes.hpp"
 #include "render/render_context.hpp"
 #include "utils/strutils.hpp"
+#include "debug/debug_views.hpp"
 
 namespace mhe {
 
@@ -180,7 +181,7 @@ void PosteffectMaterialSystemBase::setup(Context& context, SceneContext& scene_c
 	empty_setup(context, scene_context, instance_parts, parts, model_contexts, count);
 }
 
-void PosteffectMaterialSystemBase::update(Context& context, SceneContext& scene_context, RenderContext& render_context)
+void PosteffectMaterialSystemBase::prepare_draw_call(DrawCall& draw_call, Context& context, SceneContext& scene_context, RenderContext& render_context)
 {
 	list_of_commands_.clear();
 	clear_command_.reset();
@@ -206,7 +207,12 @@ void PosteffectMaterialSystemBase::update(Context& context, SceneContext& scene_
 		material.textures[j] = inputs_[j];
 	material.uniforms[0] = render_context.main_camera.percamera_uniform;
 	material.shader_program = shader.get(ubershader_index);
-	setup_draw_call(render_context.draw_calls.add(), mesh_.instance_parts[0], mesh_.mesh.parts[0], command);
+	setup_draw_call(draw_call, mesh_.instance_parts[0], mesh_.mesh.parts[0], command);
+}
+
+void PosteffectMaterialSystemBase::update(Context& context, SceneContext& scene_context, RenderContext& render_context)
+{
+	prepare_draw_call(render_context.draw_calls.add(), context, scene_context, render_context);
 }
 
 bool PosteffectMaterialSystemBase::init_mesh(Context& context, const MaterialSystemContext& material_system_context)
@@ -360,6 +366,138 @@ void BlurMaterialSystem::update(Context& context, SceneContext& scene_context, R
 
 	clear_command_.reset();
 	setup_draw_call(render_context.draw_calls.add(), second_pass_mesh_.instance_parts[0], second_pass_mesh_.mesh.parts[0], &clear_command_);
+}
+
+bool DOFMaterialSystem::init(Context& context, const MaterialSystemContext& material_system_context)
+{
+	if (!PosteffectMaterialSystemBase::init(context, material_system_context))
+	{
+		WARN_LOG("DOFMaterialSystem: PosteffectMaterialSystemBase::init failed");
+		return false;
+	}
+
+	// parse options
+	blur_resolve_pass_scale_ = material_system_context.options.get<float>("blur_pass_scale");
+	if (blur_resolve_pass_scale_ == 0.0f) blur_resolve_pass_scale_ = 1.0f;
+
+	UberShader& shader = ubershader(context);
+	pass_info_ = shader.info("PASS");
+
+	clear_command_simple_.set_driver(&context.driver);
+
+	UniformBuffer& dof_uniform = create_and_get(context.uniform_pool);
+	UniformBufferDesc desc;
+	desc.size = sizeof(DOFShaderData);
+	desc.unit = 1;
+	desc.update_type = uniform_buffer_normal;
+	if (!dof_uniform.init(desc))
+	{
+		ERROR_LOG("Can't initialize a UniformBuffer for DOF material");
+		return false;
+	}
+	dof_uniform_ = dof_uniform.id();
+
+	dof_shader_data_.planes = vec4(300.0f, 100.0f, 500.0f, 1.0f);
+	dof_shader_data_.coc = vec4(4.0f, 0.0f, 0.0f, 0.0f);
+
+	return true;
+}
+
+void DOFMaterialSystem::postinit(Context& context)
+{
+	MeshInstance& blur_resolve_pass_mesh_instance = mesh_instance();
+	Material& blur_resolve_pass_material = context.materials[id()].get(blur_resolve_pass_mesh_instance.instance_parts[0].material.id);
+	DrawCallData& blur_resolve_pass_draw_call_data = context.draw_call_data_pool.get(blur_resolve_pass_mesh_instance.instance_parts[0].draw_call_data);
+	RenderTarget::IdType composite_pass_rt_id = blur_resolve_pass_draw_call_data.render_target;
+	blur_resolve_pass_material.uniforms[1] = dof_uniform_;
+
+	dof_pass_mesh_instance_ = blur_resolve_pass_mesh_instance;
+	DrawCallData& dof_pass_pass_draw_call_data = create_and_get(context.draw_call_data_pool);
+	dof_pass_pass_draw_call_data = blur_resolve_pass_draw_call_data;
+	dof_pass_mesh_instance_.instance_parts[0].draw_call_data = dof_pass_pass_draw_call_data.id;
+
+	composite_pass_mesh_instance_ = blur_resolve_pass_mesh_instance;
+	DrawCallData& composite_pass_draw_call_data = create_and_get(context.draw_call_data_pool);
+	composite_pass_draw_call_data = blur_resolve_pass_draw_call_data;
+	composite_pass_mesh_instance_.instance_parts[0].draw_call_data = composite_pass_draw_call_data.id;
+
+	// R16 for blur. I could've used R16G16 format for the pair depth-blur, but I hope I'll add
+	// a depth linearization pass as a part of the rendering pipeline
+	RenderTargetDesc rt_desc;
+	rt_desc.color_datatype[0] = format_float;
+	rt_desc.color_format[0] = format_r16f;
+	rt_desc.color_targets = 1;
+	rt_desc.target = rt_readwrite;
+	rt_desc.texture_type = texture_2d;
+	rt_desc.use_depth = false;
+	rt_desc.use_stencil = false;
+
+	RenderTarget& blur_rt = context.render_target_manager.create(context, rt_desc, blur_resolve_pass_scale_);
+	blur_resolve_pass_draw_call_data.render_target = blur_rt.id();
+
+	Material& dof_pass_material = create_and_get(context.materials[id()]);
+	dof_pass_mesh_instance_.instance_parts[0].material.id = dof_pass_material.id;
+
+	rt_desc.color_datatype[0] = format_ubyte;
+	rt_desc.color_format[0] = format_rgba;
+	RenderTarget& dof_rt = context.render_target_manager.create(context, rt_desc, 1.0f);
+	dof_pass_pass_draw_call_data.render_target = dof_rt.id();
+
+	Material& composite_material = create_and_get(context.materials[id()]);
+	composite_pass_mesh_instance_.instance_parts[0].material.id = composite_material.id;
+	composite_pass_draw_call_data.render_target = composite_pass_rt_id;
+
+	UberShader& shader = ubershader(context);
+
+	UberShader::Index index;
+	index.set(pass_info_, 1);
+	dof_pass_material.shader_program = shader.get(index);
+	dof_pass_material.textures[input_texture_unit] = input(input_texture_unit);
+	blur_rt.color_texture(dof_pass_material.textures[blur_texture_unit], 0);
+	dof_pass_material.uniforms[1] = dof_uniform_;
+
+	index.reset();
+	index.set(pass_info_, 2);
+	composite_material.shader_program = shader.get(index);
+	composite_material.textures[input_texture_unit] = input(input_texture_unit);
+	composite_material.textures[blur_texture_unit] = dof_pass_material.textures[blur_texture_unit];
+	dof_rt.color_texture(composite_material.textures[dof_texture_unit], 0);
+	composite_material.uniforms[1] = dof_uniform_;
+}
+
+void DOFMaterialSystem::init_debug_views(Context& context)
+{
+	size_t debug_view_id = context.debug_views->add_view("Depth of field");
+	DebugViews::DebugView& view = context.debug_views->get_view(debug_view_id);
+	view.add("focus", 0.0f, 1000.0f, &dof_shader_data_.planes.x());
+	view.add("near", 0.0f, 1000.0f, &dof_shader_data_.planes.y());
+	view.add("far", 0.0f, 1000.0f, &dof_shader_data_.planes.z());
+	view.add("max blur", 0.0f, 10.0f, &dof_shader_data_.planes.w());
+}
+
+void DOFMaterialSystem::update(Context& context, SceneContext& scene_context, RenderContext& render_context)
+{
+	update_uniforms(context);
+
+	DrawCall& dc1 = render_context.draw_calls.add();
+	PosteffectMaterialSystemBase::prepare_draw_call(dc1, context, scene_context, render_context);
+	dc1.pass = 0;
+
+	DrawCall& dc2 = render_context.draw_calls.add();
+	setup_draw_call(dc2,
+		dof_pass_mesh_instance_.instance_parts[0], dof_pass_mesh_instance_.mesh.parts[0], &clear_command_simple_);
+	dc2.pass = 1;
+
+	DrawCall& dc3 = render_context.draw_calls.add();
+	setup_draw_call(dc3,
+		composite_pass_mesh_instance_.instance_parts[0], composite_pass_mesh_instance_.mesh.parts[0], nullptr);
+	dc3.pass = 2;
+}
+
+void DOFMaterialSystem::update_uniforms(Context& context)
+{
+	UniformBuffer& uniform = context.uniform_pool.get(dof_uniform_);
+	uniform.update(dof_shader_data_);
 }
 
 }

@@ -34,6 +34,7 @@ struct TypeHelper<int>
 	}
 };
 
+#ifndef MHE_VS
 template <>
 struct TypeHelper<unsigned int>
 {
@@ -48,6 +49,7 @@ struct TypeHelper<unsigned int>
 		return *(reinterpret_cast<const int32_t*>(buffer));
 	}
 };
+#endif
 
 template <>
 struct TypeHelper<size_t>

@@ -56,17 +56,17 @@ inline GLenum get_texture_address_mode(int mode)
 
 inline GLenum get_format(int format)
 {
-	ASSERT(format < 5, "Invalid format");
-	GLenum formats[5] = {GL_RGBA, GL_BGRA, GL_RGBA32F, GL_DEPTH_STENCIL, GL_DEPTH_COMPONENT24};
+	ASSERT(format < 7, "Invalid format");
+	GLenum formats[7] = {GL_RGBA, GL_BGRA, GL_RGBA32F, GL_DEPTH_STENCIL, GL_DEPTH_COMPONENT24, GL_R32F, GL_R16F};
 	return formats[format];
 }
 
-inline GLenum get_texture_format(int format)
-{
-	ASSERT(format < 5, "Invalid texture format");
-	GLenum formats[5] = {GL_RGBA, GL_BGRA, GL_RGBA, GL_DEPTH_STENCIL, GL_DEPTH_COMPONENT};
-	return formats[format];
-}
+inline GLenum get_pixel_data_format(int format)
+ {
+	ASSERT(format < 7, "Invalid texture format");
+	GLenum formats[7] = {GL_RGBA, GL_BGRA, GL_RGBA, GL_DEPTH_STENCIL, GL_DEPTH_COMPONENT, GL_RED, GL_RED};
+ 	return formats[format];
+ }
 
 inline GLenum get_datatype(int type)
 {

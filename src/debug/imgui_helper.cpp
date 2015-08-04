@@ -49,7 +49,7 @@ void imgui_render(ImDrawList** const cmd_lists, int cmd_lists_count)
 
 bool ImGuiHelper::init(game::Engine* engine)
 {
-	enabled_ = false;
+	enabled_ = true;
 
 	Context& context = engine->context();
 	Shader shader;

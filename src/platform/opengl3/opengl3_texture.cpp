@@ -34,8 +34,11 @@ bool OpenGL3Texture::init(const TextureDesc& desc, const uint8_t* data, size_t s
 	else
 	{
 		glTexImage2D(target_, 0,
-			format_, desc.width, desc.height, 0,
-			get_texture_format(desc.format), datatype_, data);
+			format_, // internalFormat, Specifies the number of color components in the texture
+			desc.width, desc.height, 0,
+			// Specifies the format of the pixel data. The following symbolic values are accepted: GL_RED, GL_RG, GL_RGB, GL_BGR, GL_RGBA, and GL_BGRA.
+			get_pixel_data_format(desc.format), 
+			datatype_, data);
 		CHECK_GL_ERRORS();
 		
 		if (desc.mips > 0)
@@ -49,7 +52,7 @@ bool OpenGL3Texture::init(const TextureDesc& desc, const uint8_t* data, size_t s
 
 void OpenGL3Texture::init_cubemap(const TextureDesc& desc, const uint8_t* data, size_t size)
 {
-	size_t stride = desc.width * desc.height * get_bytes_per_format(get_texture_format(desc.datatype));
+	size_t stride = desc.width * desc.height * get_bytes_per_format(get_pixel_data_format(desc.datatype));
 	ASSERT(size ? size == stride * 6 : 1, "Invalid size");
 	GLenum targets[6] = {GL_TEXTURE_CUBE_MAP_NEGATIVE_X, GL_TEXTURE_CUBE_MAP_POSITIVE_X,
 		GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
@@ -57,7 +60,7 @@ void OpenGL3Texture::init_cubemap(const TextureDesc& desc, const uint8_t* data, 
 	for (int i = 0; i < 6; ++i)
 		glTexImage2D(targets[i], 0,
 			get_format(desc.format), desc.width, desc.height, 0,
-			get_texture_format(desc.format), get_datatype(desc.datatype), data ? data + i * stride : nullptr);
+			get_pixel_data_format(desc.format), get_datatype(desc.datatype), data ? data + i * stride : nullptr);
 	CHECK_GL_ERRORS();
 }
 
