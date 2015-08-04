@@ -81,7 +81,7 @@ float calculate_blur(float focus, float far_blur_distance, float near_blur_dista
 {
 	float f;
 	if (distance < focus)
-	    f = (distance - near_blur_distance) / (focus - near_blur_distance);
+	    f = (focus - distance) / (focus - near_blur_distance);
 	else
 		f = (distance - focus) / (far_blur_distance - focus);
 	return clamp(f, 0.0f, max_blurriness);
