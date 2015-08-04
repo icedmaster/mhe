@@ -6,6 +6,7 @@
 #include "render/utils/simple_meshes.hpp"
 #include "render/render_context.hpp"
 #include "utils/strutils.hpp"
+#include "debug/debug_views.hpp"
 
 namespace mhe {
 
@@ -463,6 +464,16 @@ void DOFMaterialSystem::postinit(Context& context)
 	composite_material.textures[blur_texture_unit] = dof_pass_material.textures[blur_texture_unit];
 	dof_rt.color_texture(composite_material.textures[dof_texture_unit], 0);
 	composite_material.uniforms[1] = dof_uniform_;
+}
+
+void DOFMaterialSystem::init_debug_views(Context& context)
+{
+	size_t debug_view_id = context.debug_views->add_view("Depth of field");
+	DebugViews::DebugView& view = context.debug_views->get_view(debug_view_id);
+	view.add("focus", 0.0f, 1000.0f, &dof_shader_data_.planes.x());
+	view.add("near", 0.0f, 1000.0f, &dof_shader_data_.planes.y());
+	view.add("far", 0.0f, 1000.0f, &dof_shader_data_.planes.z());
+	view.add("max blur", 0.0f, 10.0f, &dof_shader_data_.planes.w());
 }
 
 void DOFMaterialSystem::update(Context& context, SceneContext& scene_context, RenderContext& render_context)

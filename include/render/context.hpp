@@ -17,6 +17,8 @@
 
 namespace mhe {
 
+class DebugViews;
+
 typedef Pool<VertexBuffer, 4096, uint16_t> VertexBufferPool;
 typedef Pool<IndexBuffer, 4096, uint16_t> IndexBufferPool;
 typedef Pool<UniformBuffer, 4096, uint16_t> UniformPool;
@@ -186,6 +188,10 @@ struct Context
 	MeshTraceDataPool mesh_trace_data_pool;
 
 	RenderTargetManager render_target_manager;
+
+	DebugViews* debug_views;
+
+	Context() : debug_views(nullptr) {}
 };
 
 }

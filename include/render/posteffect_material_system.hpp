@@ -214,6 +214,7 @@ public:
 	}
 
 	void postinit(Context& context) override;
+	void init_debug_views(Context& context) override;
 private:
 	void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
 	void update_uniforms(Context& context);

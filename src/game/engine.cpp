@@ -111,6 +111,10 @@ void Engine::destroy()
 bool Engine::init_debug_components()
 {
 	debug_views_.init(event_manager_);
+	context_.debug_views = &debug_views_;
+	MaterialSystems::Values& materials = context_.material_systems.get_all_materials();
+	for (size_t i = 0, size = materials.size(); i < size; ++i)
+		materials[i]->init_debug_views(context_);
 	return true;
 }
 

@@ -61,6 +61,26 @@ public:
 		return v_[0];
 	}
 
+	T& x()
+	{
+		return v_[0];
+	}
+
+	T& y()
+	{
+		return v_[1];
+	}
+
+	T& z()
+	{
+		return v_[2];
+	}
+
+	T& w()
+	{
+		return v_[3];
+	}
+
 	inline T y() const
 	{
 		return v_[1];

@@ -68,6 +68,9 @@ public:
 		return 0;
 	}
 
+	virtual void init_debug_views(Context& /*context*/)
+	{}
+
 	void setup_draw_calls(Context& context, SceneContext& scene_context, RenderContext& render_context);
 
 	uint8_t id() const
