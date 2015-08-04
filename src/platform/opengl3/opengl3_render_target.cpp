@@ -66,6 +66,7 @@ bool OpenGL3RenderTarget::init(const RenderTargetDesc& desc, Texture** color_tex
 
 void OpenGL3RenderTarget::close()
 {
+	OpenGLExtensions::instance().glDeleteFramebuffers(1, &id_);
 }
 
 void OpenGL3RenderTarget::enable() const

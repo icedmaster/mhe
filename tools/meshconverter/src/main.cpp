@@ -133,6 +133,11 @@ void process_node(const aiScene* assimp_scene, aiNode* node, const aiMatrix4x4& 
 
 		parts.push_back(part_data);
 
+		if (mesh->mTextureCoords[0] == nullptr)
+		{
+			WARN_LOG("The mesh with index:" << m << " doesn't contain any UV");
+		}
+
 		for (unsigned int i = 0; i < mesh->mNumFaces; ++i)
 		{
 			ASSERT(mesh->mFaces[i].mNumIndices == 3, "The mesh must be triangulated");
@@ -145,20 +150,24 @@ void process_node(const aiScene* assimp_scene, aiNode* node, const aiMatrix4x4& 
 		for (unsigned int i = 0; i < mesh->mNumVertices; ++i)
 		{
 			mhe::StandartGeometryLayout::Vertex vertex;
-			aiVector3D& v = transform * mesh->mVertices[i];
+			aiVector3D v = transform * mesh->mVertices[i];
 			vertex.pos.set(v.x, v.y, v.z);
-			aiVector3D& n = normal_transform * mesh->mNormals[i];
+			aiVector3D n = normal_transform * mesh->mNormals[i];
 			vertex.nrm.set(n.x, n.y, n.z);
-			aiVector3D& t = mesh->mTextureCoords[0][i];
-			vertex.tex.set(t.x, t.y);
 
-			aiVector3D& aiTng = normal_transform * mesh->mTangents[i];
-			aiVector3D& aiBitng = normal_transform * mesh->mBitangents[i];
-			mhe::vec3 tng(aiTng.x, aiTng.y, aiTng.z);
-			mhe::vec3 bitng(aiBitng.x, aiBitng.y, aiBitng.z);
-			float sign = mhe::dot(bitng, mhe::cross(vertex.nrm, tng)) > 0.0f ? 1.0f : -1.0f;
+			if (mesh->mTextureCoords[0] != nullptr)
+			{
+				aiVector3D t = mesh->mTextureCoords[0][i];
+				vertex.tex.set(t.x, t.y);
 
-			vertex.tng = mhe::vec4(tng, sign);
+				aiVector3D aiTng = normal_transform * mesh->mTangents[i];
+				aiVector3D aiBitng = normal_transform * mesh->mBitangents[i];
+				mhe::vec3 tng(aiTng.x, aiTng.y, aiTng.z);
+				mhe::vec3 bitng(aiBitng.x, aiBitng.y, aiBitng.z);
+				float sign = mhe::dot(bitng, mhe::cross(vertex.nrm, tng)) > 0.0f ? 1.0f : -1.0f;
+
+				vertex.tng = mhe::vec4(tng, sign);
+			}
 
 			vertices.push_back(vertex);
 

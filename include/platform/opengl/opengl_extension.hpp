@@ -567,6 +567,15 @@ public:
 		::glFramebufferTexture2D(target, attachment, textarget, texture, level);
 #endif
 	}
+
+	void glDeleteFramebuffers(GLsizei n, GLuint *framebuffers)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glDeleteFramebuffers_(n, framebuffers);
+#else
+		::glDeleteFramebuffers(n, framebuffers);
+#endif
+	}
 private:
 	OpenGLExtensions() {}
 	~OpenGLExtensions() {}
@@ -648,6 +657,7 @@ private:
 	PFNGLDRAWELEMENTSBASEVERTEXPROC glDrawElementsBaseVertex_;
 	PFNGLGENERATEMIPMAPPROC glGenerateMipmap_;
 	PFNGLFRAMEBUFFERTEXTURE2DPROC glFramebufferTexture2D_;
+	PFNGLDELETEFRAMEBUFFERSPROC glDeleteFramebuffers_;
 #endif
 	std::map<std::string, bool> loaded_extensions_;
 };
