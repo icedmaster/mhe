@@ -85,7 +85,7 @@ class OpenGL3IndexBuffer : public IndexBufferImpl
 public:
 	bool init(const RenderBuffer& render_buffer, const uint32_t* indexes, size_t size) override;
 	bool init(BufferUpdateType type, const RenderBuffer& render_buffer, const uint32_t* indices, size_t size) override;
-	void close() {}
+	void close();
 
 	void update(const uint32_t* indices, size_t size) override;
 	

@@ -155,6 +155,11 @@ bool OpenGL3IndexBuffer::init(BufferUpdateType type, const RenderBuffer& render_
 	return result;
 }
 
+void OpenGL3IndexBuffer::close()
+{
+	vbo_.close();
+}
+
 void OpenGL3IndexBuffer::update(const uint32_t* indices, size_t size)
 {
 	vao_.enable();

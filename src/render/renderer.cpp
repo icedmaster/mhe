@@ -400,6 +400,7 @@ void destroy_render(Context& context)
 {
 	// tear down the context
 	destroy_pool_elements(context.vertex_buffer_pool);
+	destroy_pool_elements(context.index_buffer_pool);
 	destroy_pool_elements(context.uniform_pool);
 	destroy_pool_elements(context.shader_pool);
 	destroy_pool_elements(context.texture_pool);

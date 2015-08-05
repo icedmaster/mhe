@@ -62,11 +62,11 @@ inline GLenum get_format(int format)
 }
 
 inline GLenum get_pixel_data_format(int format)
-{
+ {
 	ASSERT(format < 7, "Invalid texture format");
 	GLenum formats[7] = {GL_RGBA, GL_BGRA, GL_RGBA, GL_DEPTH_STENCIL, GL_DEPTH_COMPONENT, GL_RED, GL_RED};
-	return formats[format];
-}
+ 	return formats[format];
+ }
 
 inline GLenum get_datatype(int type)
 {

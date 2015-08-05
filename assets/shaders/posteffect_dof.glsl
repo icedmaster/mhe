@@ -8,6 +8,7 @@
 #define DOF_PASS 1
 #define COMPOSITE_PASS 2
 
+
 struct VSOutput
 {
 	vec2 tex;
@@ -52,6 +53,7 @@ out float color;
 out vec4 color;
 #endif
 
+
 #pragma optionNV (unroll all)
 vec4 blur(vec2 tex, vec4 pixel_color, float depth, float blur)
 {
@@ -62,7 +64,7 @@ vec4 blur(vec2 tex, vec4 pixel_color, float depth, float blur)
 
 	vec2 radius = blur * coc.x / texsize;
 
-	for (int i = 0; i < DISC_SAMPLES / 2; ++i)
+	for (int i = 0; i < DISC_SAMPLES; ++i)
 	{
 		vec2 kernel = disc_kernel[i];
 		vec2 offset = kernel * radius;
@@ -107,7 +109,7 @@ void main()
 
 	GBuffer gbuffer = gbuffer_unpack(vsoutput.tex);
 	float linear_depth = linearized_depth(gbuffer.depth, znear, zfar);
-
+ 
 	vec4 pixel_color = texture(main_texture, vsoutput.tex);
 
 	float blurriness = calculate_blur(focus_distance, far_dof_blur_distance, near_dof_blur_distance, linear_depth, max_blurriness);	
@@ -116,8 +118,8 @@ void main()
 #elif PASS == DOF_PASS
 void main()
 {
-	GBuffer gbuffer = gbuffer_unpack(vsoutput.tex);
-	float linear_depth = linearized_depth(gbuffer.depth, znear, zfar);
+ 	GBuffer gbuffer = gbuffer_unpack(vsoutput.tex);
+ 	float linear_depth = linearized_depth(gbuffer.depth, znear, zfar);
 
 	vec4 pixel_color = texture(main_texture, vsoutput.tex);
 	float blurriness = texture(blur_texture, vsoutput.tex).r;

@@ -56,6 +56,26 @@ public:
 		v_[0] = v.x(); v_[1] = v.y(); v_[2] = v.z(); v_[3] = w;
 	}
 
+	T& x()
+	{
+		return v_[0];
+	}
+
+	T& y()
+	{
+		return v_[1];
+	}
+
+	T& z()
+	{
+		return v_[2];
+	}
+
+	T& w()
+	{
+		return v_[3];
+	}
+
 	inline T x() const
 	{
 		return v_[0];
