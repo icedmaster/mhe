@@ -27,8 +27,11 @@
   <material name="tonemap" shader="posteffect_tonemap" priority="9" />
   <material name="fxaa" shader="fxaa" priority="10" />
   <material name="ssr" shader="ssr" priority="8" />
-  <material name="blur" shader="posteffect_blur" priority="8" />
   <material name="dof" shader="posteffect_dof" priority="8" />
+  <material name="blur" shader="posteffect_blur" priority="8" on_demand="1" />
+  <material name="ssao" shader="posteffect_ssao" priority="8" />
+  <material name="comp_mul" shader="posteffect_composite_mul" priority="8" />
+  <material name="comp_add" shader="posteffect_composite_add" priority="8" />
   </materials>
   <skybox name="skybox" />
   <shadowmap_depth_write name="depth_write" />
@@ -50,7 +53,7 @@
 		<output index="0" scale="1.0" />
 	  </outputs>
 	</node>
-	<node name="blur" material="blur" priority="1">
+	<node name="ssr_blur" material="blur" priority="1" instantiate="1">
 	  <inputs>
 		<input index="0" node="ssr" output="0" material="" material_output="" />
 	  </inputs>
@@ -58,20 +61,42 @@
 		<output index="0" scale="1.0" />
 	  </outputs>
 	</node>
-	<node name="tonemap" material="tonemap" priority="2">
+	<node name="ssao" material="ssao" priority="2">
 	  <inputs>
-		<input index="0" node="" output="" material="" material_output="" copy_current_framebuffer="1" />
-		<input index="1" node="blur" output="0" material="" material_output="" />
+		<input index="0" node="" output="" material="gbuffer_fill" material_output="0" />
+		<input index="1" node="" output="" material="gbuffer_fill" material_output="1" />
+		<input index="2" node="" output="" material="gbuffer_fill" material_output="2" />
+	  </inputs>
+	  <outputs>
+		<output index="0" scale="1.0" format="rgba" />
+	  </outputs>
+	</node>
+	<node name="ssao_blur" material="blur" priority="3" instantiate="1">
+	  <inputs>
+		<input index="0" node="ssao" output="0" material="" material_output="" />
+	  </inputs>
+	  <outputs>
+		<output index="0" scale="1.0" />
+	  </outputs>
+	</node>
+	<node name="ssao_mul" material="comp_mul" priority="4">
+	  <inputs>
+		<input index="0" copy_current_framebuffer="1" />
+		<input index="1" node="ssao_blur" output="0" />
 	  </inputs>
 	</node>
-	<node name="dof" material="dof" priority="3">
+	<node name="tonemap" material="tonemap" priority="5">
+	  <inputs>
+		<input index="0" node="" output="" material="" material_output="" copy_current_framebuffer="1" />
+		<input index="1" node="ssr_blur" output="0" material="" material_output="" />
+	  </inputs>
+	</node>
+	<node name="dof" material="dof" priority="6">
 	  <inputs>
 		<input index="2" node="" output="" material="gbuffer_fill" material_output="2" />
 		<input index="3" />
 	  </inputs>
 	</node>
-	<!-->
-	<node name="fxaa" material="fxaa" src="tonemap" priority="4" />
-	<-->
+	<node name="fxaa" material="fxaa" src="" priority="7" />
   </posteffects>
 </mhe>

@@ -114,7 +114,13 @@ void PosteffectSystem::add(Context& context, const PosteffectSystem::PosteffectN
 		ASSERT(prev_node != nullptr, "Previous node name is set but the node isn't found:" << desc.prev_node);
 	}
 	
-	PosteffectMaterialSystemBase* material_system = context.material_systems.get<PosteffectMaterialSystemBase>(desc.material.c_str());
+	PosteffectMaterialSystemBase* material_system = nullptr;
+	if (!desc.instantiate)
+		material_system = context.material_systems.get<PosteffectMaterialSystemBase>(desc.material.c_str());
+	else
+	{
+		material_system = create<PosteffectMaterialSystemBase>(context, desc.material, desc.name);
+	}
 	ASSERT(material_system != nullptr, "Can't find material system with name:" << desc.material);
 	material_system->set_priority(posteffect_material_priority_base + desc.priority);
 	if (!desc.inputs.empty())

@@ -39,6 +39,8 @@ struct MaterialSystemContext
 	std::string shader_name;
 	std::string defs[max_material_definitions];
 	KeyValue<string, string> options;
+	size_t material_instances_number;
+	size_t priority;
 };
 
 class MHE_EXPORT MaterialSystem : public ref_counter

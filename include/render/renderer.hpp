@@ -68,6 +68,7 @@ public:
 		size_t priority;
 		Inputs inputs;
 		Outputs outputs;
+		bool instantiate;
 	};
 
 	void add(Context& context, const PosteffectNodeDesc& node_desc);

@@ -6,10 +6,10 @@
 #include "render_buffer.hpp"
 #include "render_state.hpp"
 #include "render_target.hpp"
-#include "material_system.hpp"
 #include "material.hpp"
 #include "node.hpp"
 #include "mesh_grid.hpp"
+#include "initialization.hpp"
 #include "core/pool.hpp"
 #include "core/types_cast.hpp"
 #include "core/config.hpp"
@@ -163,6 +163,8 @@ private:
 
 struct Context
 {
+	RenderDataInitializationParameters initialization_parameters;
+
 	WindowSystem window_system;
 	Driver driver;
 

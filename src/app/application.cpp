@@ -196,11 +196,13 @@ void Application::init_posteffect_parameters(pugi::xml_node node, RendererParams
 		const char* name = n.attribute("name").value();
 		const char* prev_node_name = n.attribute("src").value();
 		size_t priority = n.attribute("priority").as_uint();
+		bool instantiate = n.attribute("instantiate").as_bool();
 		PosteffectSystem::PosteffectNodeDesc posteffect_node;
 		posteffect_node.name = name;
 		posteffect_node.prev_node = prev_node_name;
 		posteffect_node.material = material_name;
 		posteffect_node.priority = priority;
+		posteffect_node.instantiate = instantiate;
 
 		pugi::xml_node inputs_node = n.child("inputs");
 		if (inputs_node)
@@ -260,6 +262,7 @@ void Application::init_materials(pugi::xml_node materials_node)
 		const char* defs = n.attribute("defs").value();
 		unsigned int priority = n.attribute("priority").as_uint();
 		unsigned int material_instances_number = n.attribute("instances").as_uint();
+		bool on_demand = n.attribute("on_demand").as_bool();
 
 		material_context.options.clear();
 		if (pugi::xml_node options_node = n.child("options"))
@@ -274,20 +277,20 @@ void Application::init_materials(pugi::xml_node materials_node)
 		material_context.shader_name = shader_name;
 		material_context.instance_name = material_instance_name;
 		material_context.defs[0] = defs;
-		MaterialSystem* material_system = MaterialSystemFactory::instance().create(name);
-		if (material_system == nullptr)
+		material_context.priority = priority;
+		material_context.material_instances_number = material_instances_number;
+
+		context.initialization_parameters.add(name, material_context);
+
+		if (!on_demand)
 		{
-			WARN_LOG("MaterialSystem initialization failed:" << name);
-			continue;
+			MaterialSystem* material_system = create(context, name, material_instance_name);
+			if (material_system == nullptr)
+			{
+				WARN_LOG("MaterialSystem initialization failed:" << name);
+				continue;
+			}
 		}
-		material_system->set_instance_name(material_instance_name);
-		context.material_systems.add(material_system, priority);
-		if (material_instances_number == 0)
-			material_instances_number = material_system->default_instances_number();
-		context.materials[material_system->id()].resize(
-			material_instances_number == 0 ? initial_material_instances_number : material_instances_number);
-		material_system->init(context, material_context);
-		material_system->enable();
 	}
 }
 
