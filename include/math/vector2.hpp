@@ -56,6 +56,18 @@ public:
 		y_ = y;
 	}
 
+	T magnitude() const
+	{
+		return sqrt(x_ * x_ + y_ * y_);
+	}
+
+	void normalize()
+	{
+		T invm = 1.0f / magnitude();
+		x_ *= m;
+		y_ *= m;
+	}
+
 	inline bool operator== (const vector2& v) const
 	{
 		return ((x_ == v.x_) && (y_ == v.y_)) ? true : false;
@@ -83,8 +95,8 @@ public:
 	template <class Y>
 	vector2<T> operator= (const vector2<Y>& v)
 	{
-		x_ = v.x;
-		y_ = v.y;
+		x_ = static_cast<T>(v.x());
+		y_ = static_cast<T>(v.y());
 		return *this;
 	}
 

@@ -139,6 +139,7 @@ int main(int /*argc*/, char** /*argv*/)
 	app.init(config);
 
 	app.engine().renderer()->set_ambient_color(mhe::color_white * 0.5f);
+	//mhe::game::get_global_vars().set("use_normalmaps", false);
 
 	mhe::game::GameSceneDesc desc;
 	GameScene* game_scene = new GameScene;

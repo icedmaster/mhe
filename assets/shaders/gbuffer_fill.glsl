@@ -23,7 +23,7 @@ void main()
 #if NORMALMAP == 1
 	vsoutput.tng = (normal * vec4(tng.xyz, 0.0f)).xyz;
 	// TODO: add handedness
-	vsoutput.bitng = cross(nrm, tng.xyz) * tng.w;
+	vsoutput.bitng = cross(vsoutput.nrm, vsoutput.tng) * tng.w;
 #endif
 
 	gl_Position = vp * model * vec4(pos, 1.0f);

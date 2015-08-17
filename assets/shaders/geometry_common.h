@@ -2,12 +2,15 @@
 uniform percamera
 {
     mat4 vp;
+	mat4 view;
+	mat4 proj;
     mat4 inv_vp;
     mat4 inv_proj;
     vec4 viewpos;
 	vec4 ambient;
 	float znear;
 	float zfar;
+	vec2 viewport; 
 	vec2 inv_viewport;
 };
 

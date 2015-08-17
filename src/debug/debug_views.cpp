@@ -17,12 +17,15 @@ void DebugViews::init(EventManager& event_manager)
 	event_manager.add_bind("debug_shadow", keyboard_event_type, KeyboardEvent::key_down, KeyboardDevice::key_f2);
 	event_manager.add_bind("standart_stats", keyboard_event_type, KeyboardEvent::key_down, KeyboardDevice::key_f3);
 	event_manager.add_bind("debug_ssr", keyboard_event_type, KeyboardEvent::key_down, KeyboardDevice::key_f4);
+	event_manager.add_bind("debug_ssao", keyboard_event_type, KeyboardEvent::key_down, KeyboardDevice::key_f5);
 
 	stats_enabled_ = false;
 
 	imgui_.init(&engine_);
 
 	posteffect_id_[posteffect_ssr] = engine_.context().material_systems.get("ssr")->id();
+	posteffect_id_[posteffect_ssao] = engine_.context().material_systems.get("ssao")->id();
+	posteffect_debug_mode_ = posteffect_max;
 }
 
 void DebugViews::destroy()
@@ -51,12 +54,30 @@ void DebugViews::update()
 	}
 	else if (engine_.event_manager().check_bind("debug_ssr"))
 	{
-		if (current_mode == Renderer::renderer_debug_mode_posteffect)
+		if (current_mode == Renderer::renderer_debug_mode_posteffect && posteffect_debug_mode_ == posteffect_ssr)
+		{
 			new_mode = Renderer::renderer_debug_mode_none;
+			posteffect_debug_mode_ = posteffect_max;
+		}
 		else
 		{
 			new_mode = Renderer::renderer_debug_mode_posteffect;
+			posteffect_debug_mode_ = posteffect_ssr;
 			material_system_id = posteffect_id_[posteffect_ssr];
+		}
+	}
+	else if (engine_.event_manager().check_bind("debug_ssao"))
+	{
+		if (current_mode == Renderer::renderer_debug_mode_posteffect && posteffect_debug_mode_ == posteffect_ssao)
+		{
+			new_mode = Renderer::renderer_debug_mode_none;
+			posteffect_debug_mode_ = posteffect_max;
+		}
+		else
+		{
+			new_mode = Renderer::renderer_debug_mode_posteffect;
+			posteffect_debug_mode_ = posteffect_ssao;
+			material_system_id = posteffect_id_[posteffect_ssao];
 		}
 	}
 

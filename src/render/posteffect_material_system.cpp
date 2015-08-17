@@ -236,7 +236,7 @@ bool PosteffectMaterialSystemBase::init_mesh(Context& context, const MaterialSys
 	const std::vector<string>& outputs_scale = utils::split(outputs_str, string(","));
 	if (!outputs_scale.empty())
 	{
-		create_output(draw_call_data, context, 0, types_cast<float>(outputs_scale[0]));
+		create_output(draw_call_data, context, 0, types_cast<float>(outputs_scale[0]), format_rgba);
 	}
 
 	mesh_.mesh.parts.resize(1);
@@ -270,29 +270,29 @@ bool PosteffectMaterialSystemBase::init_screen_input(Context& context, size_t in
 	return true;
 }
 
-bool PosteffectMaterialSystemBase::create_output(Context& context, size_t index, float scale)
+bool PosteffectMaterialSystemBase::create_output(Context& context, size_t index, float scale, int format)
 {
 	ASSERT(output(index).id == Texture::invalid_id, "create_output() - trying to create a new output when old output still exists");
 	DrawCallData& draw_call_data = context.draw_call_data_pool.get(mesh_.instance_parts[0].draw_call_data);
 	ASSERT(draw_call_data.render_target == default_render_target || draw_call_data.render_target == RenderTarget::invalid_id,
 		"RenderTarget has been set already");
-	return create_output(draw_call_data, context, index, scale);
+	return create_output(draw_call_data, context, index, scale, format);
 }
 
-void PosteffectMaterialSystemBase::fill_render_target_desc(RenderTargetDesc& desc) const
+void PosteffectMaterialSystemBase::fill_render_target_desc(RenderTargetDesc& desc, int format) const
 {
 	desc.target = rt_readwrite;
 	desc.use_depth = false;
 	desc.use_stencil = false;
 	desc.color_targets = 1;
-	desc.color_datatype[0] = format_ubyte;
-	desc.color_format[0] = format_rgba;
+	desc.color_datatype[0] = format_default;
+	desc.color_format[0] = format != format_max ? format : format_rgba;
 }
 
-bool PosteffectMaterialSystemBase::create_output(DrawCallData& draw_call_data, Context& context, size_t index, float scale)
+bool PosteffectMaterialSystemBase::create_output(DrawCallData& draw_call_data, Context& context, size_t index, float scale, int format)
 {
 	RenderTargetDesc render_target_desc;
-	fill_render_target_desc(render_target_desc);
+	fill_render_target_desc(render_target_desc, format);
 	RenderTarget& render_target = context.render_target_manager.create(context, render_target_desc, scale);
 	draw_call_data.render_target = render_target.id();
 	const TextureInstance* ids = nullptr;
@@ -308,6 +308,11 @@ bool PosteffectMaterialSystemBase::create_output(DrawCallData& draw_call_data, C
 	}
 
 	return true;
+}
+
+Material& PosteffectMaterialSystemBase::default_material(Context& context)
+{
+	return context.materials[id()].get(mesh_.instance_parts[0].material.id);
 }
 
 bool BlurMaterialSystem::init(Context& context, const MaterialSystemContext& material_system_context)
@@ -331,9 +336,9 @@ bool BlurMaterialSystem::init(Context& context, const MaterialSystemContext& mat
 	return true;
 }
 
-bool BlurMaterialSystem::create_output(DrawCallData& draw_call_data, Context& context, size_t index, float scale)
+bool BlurMaterialSystem::create_output(DrawCallData& draw_call_data, Context& context, size_t index, float scale, int format)
 {
-	if (!PosteffectMaterialSystemBase::create_output(draw_call_data, context, index, scale))
+	if (!PosteffectMaterialSystemBase::create_output(draw_call_data, context, index, scale, format))
 		return false;
 
 	DrawCallData& second_pass_draw_call_data = context.draw_call_data_pool.get(second_pass_mesh_.instance_parts[0].draw_call_data);
@@ -498,6 +503,82 @@ void DOFMaterialSystem::update_uniforms(Context& context)
 {
 	UniformBuffer& uniform = context.uniform_pool.get(dof_uniform_);
 	uniform.update(dof_shader_data_);
+}
+
+bool SSAOMaterialSystem::init(Context& context, const MaterialSystemContext& material_system_context)
+{
+	if (!PosteffectMaterialSystemBase::init(context, material_system_context))
+	{
+		ERROR_LOG("SSAO: can't initialize PosteffectMaterialSystemBase");
+		return false;
+	}
+
+	UniformBuffer& uniform = create_and_get(context.uniform_pool);
+	UniformBufferDesc desc;
+	desc.size = sizeof(SSAOShaderData);
+	desc.unit = 1;
+	desc.update_type = uniform_buffer_normal;
+	if (!uniform.init(desc))
+	{
+		ERROR_LOG("Can't initialize SSAO uniform");
+		return false;
+	}
+
+	ssao_uniform_ = uniform.id();
+	default_material(context).uniforms[1] = uniform.id();
+
+	create_noise_texture(default_material(context).textures[noise_texture_unit], context);
+
+	ssao_shader_data_.ssaodata[0] = vec4(3.0f, 1.0f, 0.5f, 30.0f);
+	ssao_shader_data_.ssaodata[1] = vec4(700.0f, 1000.0f, 1.0f, 0.0f);
+
+	return true;
+}
+
+void SSAOMaterialSystem::init_debug_views(Context& context)
+{
+	size_t debug_view_id = context.debug_views->add_view("SSAO");
+	DebugViews::DebugView& view = context.debug_views->get_view(debug_view_id);
+	view.add("radius", 0.0f, 50.0f, &ssao_shader_data_.ssaodata[0].x());
+	view.add("power", 1.0f, 5.0f, &ssao_shader_data_.ssaodata[0].y());
+	view.add("threshold", 0.0f, 20.0f, &ssao_shader_data_.ssaodata[0].z());
+	view.add("max distance", 0.0f, 500.0f, &ssao_shader_data_.ssaodata[0].w());
+	view.add("fade start", 100.0f, 2000.0f, &ssao_shader_data_.ssaodata[1].x());
+	view.add("fade distance", 100.0f, 2000.0f, &ssao_shader_data_.ssaodata[1].y());
+	view.add("intensity", 0.0f, 10.0f, &ssao_shader_data_.ssaodata[1].z());
+}
+
+void SSAOMaterialSystem::update(Context& context, SceneContext& scene_context, RenderContext& render_context)
+{
+	UniformBuffer& uniform = context.uniform_pool.get(ssao_uniform_);
+	uniform.update(ssao_shader_data_);
+
+	PosteffectMaterialSystemBase::update(context, scene_context, render_context);
+}
+
+void SSAOMaterialSystem::create_noise_texture(TextureInstance& texture_instance, Context& context)
+{
+	TextureDesc desc;
+	desc.address_mode_s = desc.address_mode_t = texture_clamp;
+	desc.anisotropic_level = 0.0f;
+	desc.datatype = format_float;
+	desc.format = format_rg16f;
+	desc.height = desc.width = 4;
+	desc.mag_filter = texture_filter_linear;
+	desc.min_filter = texture_filter_linear;
+	desc.mips = 1;
+	desc.type = texture_2d;
+
+	vec2 data[4 * 4];
+	for (size_t i = 0; i < 4 * 4; ++i)
+	{
+		vec2 p(random(-1.0f, 1.0f), random(-1.0f, 1.0f));
+		data[i] = p;
+	}
+
+	Texture& texture = create_and_get(context.texture_pool);
+	texture.init(desc, reinterpret_cast<uint8_t*>(&data), sizeof(data));
+	texture_instance.id = texture.id();
 }
 
 }

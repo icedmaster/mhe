@@ -237,6 +237,9 @@ void Application::init_posteffect_parameters(pugi::xml_node node, RendererParams
 				attr = o.attribute("scale");
 				if (attr) output.scale = attr.as_float();
 				else output.scale = 1.0f;
+				attr = o.attribute("format");
+				if (attr) output.format = get_format_by_name(attr.value());
+				else output.format = format_max;
 			}
 		}
 

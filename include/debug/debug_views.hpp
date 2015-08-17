@@ -66,12 +66,14 @@ private:
 	enum
 	{
 		posteffect_ssr,
+		posteffect_ssao,
 		posteffect_max
 	};
 
 	game::Engine& engine_;
 	ImGuiHelper imgui_;
 	array<MaterialSystemId, posteffect_max> posteffect_id_;
+	int posteffect_debug_mode_;
 	fixed_size_vector<DebugView, 16> debug_views_;
 	bool stats_enabled_;
 };

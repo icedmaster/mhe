@@ -123,7 +123,7 @@ public:
 	}
 
 	bool init_screen_input(Context& context, size_t index, uint8_t render_stage = render_stage_before_render_target_setup);
-	bool create_output(Context& context, size_t index, float scale);
+	bool create_output(Context& context, size_t index, float scale, int format);
 
 	// This method will be called when PosteffectChain has initialized this material system
 	virtual void postinit(Context& /*context*/) {}
@@ -133,9 +133,11 @@ protected:
 		return mesh_;
 	}
 
-	void fill_render_target_desc(RenderTargetDesc& desc) const;
+	Material& default_material(Context& context);
 
-	virtual bool create_output(DrawCallData& draw_call_data, Context& context, size_t index, float scale);
+	void fill_render_target_desc(RenderTargetDesc& desc, int format = format_rgba) const;
+
+	virtual bool create_output(DrawCallData& draw_call_data, Context& context, size_t index, float scale, int format);
 	void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
 	void prepare_draw_call(DrawCall& draw_call, Context& context, SceneContext& scene_context, RenderContext& render_context);
 private:
@@ -184,7 +186,7 @@ public:
 		return 2;
 	}
 private:
-	bool create_output(DrawCallData& draw_call_data, Context& context, size_t index, float scale) override;
+	bool create_output(DrawCallData& draw_call_data, Context& context, size_t index, float scale, int format) override;
 	void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
 
 	UberShader::Info pass_info_;
@@ -227,6 +229,37 @@ private:
 
 	DOFShaderData dof_shader_data_;
 	UniformBuffer::IdType dof_uniform_;
+};
+
+class SSAOMaterialSystem : public PosteffectMaterialSystemBase
+{
+	SETUP_MATERIAL("ssao");
+
+	static const size_t noise_texture_unit = 4;
+public:
+	bool init(Context& context, const MaterialSystemContext& material_system_context) override;
+	void init_debug_views(Context& context) override;
+private:
+	void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
+	void create_noise_texture(TextureInstance& texture, Context& context);
+
+	struct SSAOShaderData
+	{
+		vec4 ssaodata[2];
+	};
+
+	SSAOShaderData ssao_shader_data_;
+	UniformBuffer::IdType ssao_uniform_;
+};
+
+class CompositeMulMaterialSystem : public PosteffectMaterialSystemBase
+{
+	SETUP_MATERIAL("comp_mul");
+};
+
+class CompositeAddMaterialSystem : public PosteffectMaterialSystemBase
+{
+	SETUP_MATERIAL("comp_add");
 };
 
 }

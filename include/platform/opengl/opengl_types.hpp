@@ -56,23 +56,32 @@ inline GLenum get_texture_address_mode(int mode)
 
 inline GLenum get_format(int format)
 {
-	ASSERT(format < 7, "Invalid format");
-	GLenum formats[7] = {GL_RGBA, GL_BGRA, GL_RGBA32F, GL_DEPTH_STENCIL, GL_DEPTH_COMPONENT24, GL_R32F, GL_R16F};
+	ASSERT(format < 9, "Invalid format");
+	GLenum formats[9] = {GL_RGBA, GL_BGRA, GL_RGBA32F, GL_DEPTH_STENCIL, GL_DEPTH_COMPONENT24, GL_R32F, GL_R16F, GL_RGB, GL_RG16F};
 	return formats[format];
 }
 
 inline GLenum get_pixel_data_format(int format)
  {
-	ASSERT(format < 7, "Invalid texture format");
-	GLenum formats[7] = {GL_RGBA, GL_BGRA, GL_RGBA, GL_DEPTH_STENCIL, GL_DEPTH_COMPONENT, GL_RED, GL_RED};
+	ASSERT(format < 9, "Invalid texture format");
+	GLenum formats[9] = {GL_RGBA, GL_BGRA, GL_RGBA, GL_DEPTH_STENCIL, GL_DEPTH_COMPONENT, GL_RED, GL_RED, GL_RGB, GL_RG};
  	return formats[format];
  }
 
 inline GLenum get_datatype(int type)
 {
-	ASSERT(type < 2, "Invalid texture datatype");
-	GLenum types[2] = {GL_UNSIGNED_BYTE, GL_FLOAT};
+	ASSERT(type < 3, "Invalid texture datatype");
+	ASSERT(type != format_default, "You must use method get_datatype_by_format()");
+	GLenum types[3] = {GL_UNSIGNED_BYTE, GL_UNSIGNED_BYTE, GL_FLOAT};
 	return types[type];
+}
+
+inline GLenum get_datatype_by_format(int format)
+{
+	ASSERT(format < 9, "Invalid texture format");
+	GLenum types[9] = {GL_UNSIGNED_BYTE, GL_UNSIGNED_BYTE, GL_UNSIGNED_BYTE, GL_UNSIGNED_BYTE, GL_UNSIGNED_BYTE,
+		GL_FLOAT, GL_FLOAT, GL_UNSIGNED_BYTE, GL_FLOAT};
+	return types[format];
 }
 
 inline GLenum get_framebuffer_format(int format)

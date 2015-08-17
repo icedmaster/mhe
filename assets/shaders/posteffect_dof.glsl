@@ -8,24 +8,7 @@
 #define DOF_PASS 1
 #define COMPOSITE_PASS 2
 
-
-struct VSOutput
-{
-	vec2 tex;
-};
-
-#define FULLSCREEN_LAYOUT
-[include "geometry_common.h"]
-
-[vertex]
-
-out VSOutput vsoutput;
-
-void main()
-{
-	vsoutput.tex = tex;
-	gl_Position = pos;
-}
+[include "posteffect_vs_common.h"]
 
 [fragment]
 

@@ -25,7 +25,7 @@ bool OpenGL3Texture::init(const TextureDesc& desc, const uint8_t* data, size_t s
 	format_ = get_format(desc.format);
 	width_ = desc.width;
 	height_ = desc.height;
-	datatype_ = get_datatype(desc.datatype);
+	datatype_ = desc.datatype == format_default ? get_datatype_by_format(desc.format) : get_datatype(desc.datatype);
 
 	if (desc.type == texture_cube)
 	{
@@ -60,7 +60,9 @@ void OpenGL3Texture::init_cubemap(const TextureDesc& desc, const uint8_t* data, 
 	for (int i = 0; i < 6; ++i)
 		glTexImage2D(targets[i], 0,
 			get_format(desc.format), desc.width, desc.height, 0,
-			get_pixel_data_format(desc.format), get_datatype(desc.datatype), data ? data + i * stride : nullptr);
+			get_pixel_data_format(desc.format),
+			desc.datatype == format_default ? get_datatype_by_format(desc.format) : get_datatype(desc.datatype),
+			data ? data + i * stride : nullptr);
 	CHECK_GL_ERRORS();
 }
 

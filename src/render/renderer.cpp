@@ -60,6 +60,7 @@ void update_nodes(Context& context, RenderContext& render_context, SceneContext&
 		PerModelData data;
 		data.model = transform.transform();
 		data.normal = data.model;
+		data.normal.set_row(3, vec4::zero());
 		uniform.update(data);
 	}
 }
@@ -183,7 +184,7 @@ void PosteffectSystem::init_outputs(PosteffectMaterialSystemBase* material_syste
 	for (size_t i = 0, size = node_desc.outputs.size(); i < size; ++i)
 	{
 		const NodeOutput& output = node_desc.outputs[i];
-		material_system->create_output(context, output.index, output.scale);
+		material_system->create_output(context, output.index, output.scale, output.format);
 	}
 }
 
@@ -227,6 +228,8 @@ void Renderer::update(SceneContext& scene_context)
 {
 	PerCameraData data;
 	data.vp = render_context_.main_camera.vp;
+	data.view = render_context_.main_camera.view;
+	data.proj = render_context_.main_camera.proj;
 	data.inv_vp = render_context_.main_camera.inv_vp;
 	data.inv_proj = render_context_.main_camera.proj.inverted();
 	data.viewpos = vec4(render_context_.main_camera.viewpos, 0.0f);
@@ -235,6 +238,7 @@ void Renderer::update(SceneContext& scene_context)
 	data.znear = render_context_.main_camera.znear;
 	data.zfar = render_context_.main_camera.zfar;
 	data.inv_viewport = vec2(1.0f / context_.window_system.width(), 1.0f / context_.window_system.height());
+	data.viewport = context_.window_system.screen_size();
 
 	if (render_context_.main_camera.percamera_uniform == UniformBuffer::invalid_id)
 	{

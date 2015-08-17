@@ -1,22 +1,6 @@
 #define EARLY_EXIT
 
-struct VSOutput
-{
-	vec2 tex;
-};
-
-#define FULLSCREEN_LAYOUT
-[include "geometry_common.h"]
-
-[vertex]
-
-out VSOutput vsoutput;
-
-void main()
-{
-	vsoutput.tex = tex;
-	gl_Position = pos;
-}
+[include "posteffect_vs_common.h"]
 
 [fragment]
 
@@ -50,7 +34,7 @@ vec4 ssr(vec3 ray_origin, vec3 ray_dir, GBuffer gbuffer, int samples, float init
 		vec3 dst_pos = origin + reflected * probe_distance;
 		vec4 dst_pos_proj = vp * vec4(dst_pos, 1.0f);
 		vec3 dst_pos_ndc = dst_pos_proj.xyz / dst_pos_proj.w * 0.5f + 0.5f; // after perspective division is in [-1, 1] range + move to [0, 1]
-		if (check_clamping(dst_pos_ndc.xy)) continue;
+		float enabled = check_clamping(dst_pos_ndc.xy) ? 0.0f : 1.0f;
 		float scene_depth = gbuffer_depth(dst_pos_ndc.xy); //[0, 1]
 		float linear_scene_depth = linearized_depth(scene_depth, znear, zfar);
 		float linear_pixel_depth = linearized_depth(dst_pos_ndc.z, znear, zfar);
@@ -58,7 +42,7 @@ vec4 ssr(vec3 ray_origin, vec3 ray_dir, GBuffer gbuffer, int samples, float init
 		if (abs(err) < max_error)
 		{
 			res_pos = dst_pos_ndc.xy;
-			weight = fresnel * (1.0f - abs(err));
+			weight = fresnel * (1.0f - abs(err)) * enabled;
 		}
 		vec3 probe_pos = position_from_depth(dst_pos_ndc.xy, scene_depth, inv_vp);
 		probe_distance = clamp(length(probe_pos - origin), min_distance, max_distance);

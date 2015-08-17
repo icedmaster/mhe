@@ -34,3 +34,13 @@ vec3 gbuffer_albedo(vec2 tex)
 {
 	return texture(albedo_texture, tex).rgb;
 }
+
+vec3 gbuffer_normal(vec2 tex)
+{
+	return texture(normal_texture, tex).xyz;
+}
+
+vec3 gbuffer_normal(vec2 tex, ivec2 offset)
+{
+	return textureOffset(normal_texture, tex, offset).xyz;
+}

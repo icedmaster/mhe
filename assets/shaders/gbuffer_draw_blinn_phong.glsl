@@ -5,6 +5,7 @@
 
 #define LIGHT_DIRECTION_FROM_SOURCE
 #define CASCADED_SHADOWMAP
+#define SHADOWMAP_DISC_FILTER
 
 [include "common.h"]
 [include "lighting_common.h"]
@@ -88,24 +89,63 @@ out vec4 color;
 
 #define PCF_SIZE (PCF_TAPS * 2 + 1)
 
-[include "pcf_kernels.h"]
+#if SHADOWMAP_QUALITY == 0
+#define DISC_TAPS 0
+#elif SHADOWMAP_QUALITY == 1
+#define DISC_TAPS 8
+#elif SHADOWMAP_QUALITY == 2
+#define DISC_TAPS 16
+#endif
 
-#define PCF_DIVIDER (1.0f / (PCF_SIZE * PCF_SIZE))
+[include "pcf_kernels.h"]
+[include "poisson_disc_kernel.h"]
 
 #pragma optionNV (unroll all)
-float get_shadow_value(sampler2D tex, float pixel_depth, vec2 texcoord, float bias)
+
+float pcf_filter(sampler2D tex, float pixel_depth, vec2 texcoord, float bias)
 {
 	float shadow_value = 0.0f;
+	float weight = 0.0f;
 	for (int y = -PCF_TAPS; y <= PCF_TAPS; ++y)
 	{
 		for (int x = -PCF_TAPS; x <= PCF_TAPS; ++x)
 		{
 			float shadowmap_depth = textureOffset(tex, texcoord, ivec2(x, y)).x;
-			shadow_value += pixel_depth < shadowmap_depth + bias ? 1.0f * pcf_weights[(y + PCF_TAPS) * PCF_SIZE + x + PCF_TAPS] : 0.0f;
+			float tap_weight = pcf_weights[(y + PCF_TAPS) * PCF_SIZE + x + PCF_TAPS];
+			shadow_value += pixel_depth < shadowmap_depth + bias ? 1.0f * tap_weight : 0.0f;
+			weight += tap_weight;
 		}
 	}
 		
-	return saturate(shadow_value * PCF_DIVIDER);
+	return saturate(shadow_value / weight);
+}
+
+float disc_filter(sampler2D tex, float pixel_depth, vec2 texcoord, float bias)
+{
+	vec2 inv_tex_size = 1.0f / textureSize(tex, 0);
+	float weight = DISC_TAPS;
+	float shadow_value = 0.0f;
+	for (int i = 0; i < DISC_TAPS; ++i)
+	{
+		vec2 offset = disc_kernel[i] * inv_tex_size;
+		float shadowmap_depth = texture(tex, texcoord + offset).x;
+		shadow_value += pixel_depth < shadowmap_depth + bias ? 1.0f : 0.0f;
+	}
+
+	return shadow_value / weight;
+}
+
+float get_shadow_value(sampler2D tex, float pixel_depth, vec2 texcoord, float bias)
+{
+#if SHADOWMAP_QUALITY != 0
+	#ifndef SHADOWMAP_DISC_FILTER
+	return pcf_filter(tex, pixel_depth, texcoord, bias);
+	#else
+	return disc_filter(tex, pixel_depth, texcoord, bias);
+	#endif
+#else
+	return pixel_depth < texture(tex, texcoord).r + bias ? 1.0f : 0.0f;
+#endif
 }
 
 #endif	// SHADOWMAP

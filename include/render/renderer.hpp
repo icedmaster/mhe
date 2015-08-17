@@ -54,6 +54,7 @@ public:
 	{
 		size_t index;
 		float scale;
+		int format;
 	};
 
 	typedef fixed_capacity_vector<NodeInput, 4> Inputs;
