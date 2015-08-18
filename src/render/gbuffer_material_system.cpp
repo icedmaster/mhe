@@ -18,7 +18,7 @@ GBufferFillMaterialSystem::GBufferFillMaterialSystem()
 	gbuffer_desc_.color_datatype[0] = format_ubyte;
 	gbuffer_desc_.color_datatype[1] = format_float;
 	gbuffer_desc_.color_format[0] = format_rgba;
-	gbuffer_desc_.color_format[1] = format_rgba32f;
+	gbuffer_desc_.color_format[1] = format_rgba16f;
 	gbuffer_desc_.color_targets = 2;
 	gbuffer_desc_.depth_format = format_d24f;
 	gbuffer_desc_.depth_datatype = format_float;
@@ -143,7 +143,7 @@ bool GBufferDrawMaterialSystem::init(Context& context, const MaterialSystemConte
 	RenderTargetDesc light_buffer_desc;
 	light_buffer_desc.target = rt_readwrite;
 	light_buffer_desc.color_datatype[0] = format_float;
-	light_buffer_desc.color_format[0] = format_rgba32f;
+	light_buffer_desc.color_format[0] = format_rgba16f;
 	light_buffer_desc.color_targets = 1;
 	light_buffer_desc.use_depth = false;
 	light_buffer_desc.use_stencil = false;
@@ -384,9 +384,9 @@ mat4x4 GBufferDrawMaterialSystem::update_light_transform(const Light& light, con
 void GBufferDrawMaterialSystem::update_light_data(LightData& light_data, const SceneContext& scene_context, 
 	const LightInstance& light_instance, const Light& light) const
 {
-	light_data.diffuse = light.shading().diffuse;
+	light_data.diffuse = light.shading().diffuse * light.shading().intensity;
 	light_data.diffuse.set_w(light.type() == Light::spot ? light.spot_angle_coeff() : light.angle());
-	light_data.specular = light.shading().specular;
+	light_data.specular = light.shading().specular * light.shading().specular_intensity;
 	light_data.specular.set_w(light.attenuation_b());
 	const vec3& light_position = get_light_position(scene_context, light_instance.id);
 	light_data.position = vec4(light_position.x(), light_position.y(), light_position.z(), light.attenuation_a());
@@ -407,8 +407,8 @@ void GBufferDrawMaterialSystem::update_directional_light_data(DirectionalLightDa
 	const SceneContext& scene_context,
 	const LightInstance& light_instance, const Light& light) const
 {
-	light_data.diffuse = light.shading().diffuse;
-	light_data.specular = light.shading().specular;
+	light_data.diffuse = light.shading().diffuse * light.shading().intensity;
+	light_data.specular = light.shading().specular * light.shading().specular_intensity;
 	light_data.direction = get_light_direction(scene_context, light_instance.id);
 
 	const ShadowInfo* shadow_info = light.shadow_info();

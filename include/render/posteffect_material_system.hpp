@@ -86,6 +86,11 @@ public:
 		return outputs_[index];
 	}
 
+	void output(Context&, size_t unit, TextureInstance& texture) const override
+	{
+		texture = outputs_[unit];
+	}
+
 	void set_input(size_t index, const TextureInstance& texture)
 	{
 		inputs_[index] = texture;

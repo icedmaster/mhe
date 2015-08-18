@@ -73,6 +73,10 @@ struct ShadingSettings
 {
 	vec4 diffuse;
 	vec4 specular;
+	float intensity;
+	float specular_intensity;
+
+	ShadingSettings() : intensity(1.0f), specular_intensity(1.0f) {}
 };
 
 struct ShadowInfo

@@ -13,10 +13,11 @@ enum
 	format_r16f,
 	format_rgb,
 	format_rg16f,
+	format_rgba16f,
 	format_max
 };
 
-static const char* format_str[format_max] = {"rgba", "bgra", "rgba32f", "d24s8", "r32f", "r16f", "rgb", "rg16f"};
+static const char* format_str[format_max] = {"rgba", "bgra", "rgba32f", "d24s8", "d24f", "r32f", "r16f", "rgb", "rg16f", "rgba16f"};
 
 inline int get_format_by_name(const char* name)
 {

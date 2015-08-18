@@ -31,6 +31,10 @@ void DeferredRenderer::init(AbstractGBufferFillMaterialSystem* fill, AbstractGBu
 		draw->set_input(gbuffer_depth_render_target_index, depth_texture);
 		if (light)
 			draw->set_input(gbuffer_depth_render_target_index + 1, light->lighting_texture());
+		// gbuffer draw system writes final image to the HDR buffer which must be postprocessed later
+		// TODO: Do we need some setting in the config file in order to understand whether to write result
+		// to the screen of to texture?
+		draw->create_output(context(), 0, 1.0f, format_rgba16f);
 	}
 }
 

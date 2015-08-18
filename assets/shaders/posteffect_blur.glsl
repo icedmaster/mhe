@@ -39,10 +39,12 @@ out vec4 color;
 #pragma optionNV (unroll all)
 vec4 blur(vec2 tex, ivec2 dir)
 {
+	// NSIGHT gives up here when I use textureOffset() method ("texel offset is out of range error")
 	vec4 res = VEC4_ZERO;
+	vec2 inv_texsize = 1.0f / textureSize(main_texture, 0);
 	for (int i = -BLUR_SAMPLES; i <= BLUR_SAMPLES; ++i)
 	{
-		vec4 c = textureOffset(main_texture, tex, dir * i) * blur_weights[i + BLUR_SAMPLES];
+		vec4 c = texture(main_texture, tex + dir * i * inv_texsize) * blur_weights[i + BLUR_SAMPLES];
 		res += c;
 	}
 	return res;

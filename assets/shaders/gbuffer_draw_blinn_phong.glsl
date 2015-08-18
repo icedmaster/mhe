@@ -5,7 +5,7 @@
 
 #define LIGHT_DIRECTION_FROM_SOURCE
 #define CASCADED_SHADOWMAP
-#define SHADOWMAP_DISC_FILTER
+//#define SHADOWMAP_DISC_FILTER
 
 [include "common.h"]
 [include "lighting_common.h"]

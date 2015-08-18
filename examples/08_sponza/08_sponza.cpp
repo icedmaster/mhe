@@ -75,8 +75,9 @@ private:
 	{
         mhe::LightInstance& light_instance = engine.scene().create_light();
 		mhe::Light& light = light_instance.light;
-		light.shading().diffuse = mhe::vec4(0.5f, 0.5f, 0.5f, 1.0f);
+		light.shading().diffuse = mhe::vec4(240.0f / 255.0f, 150.0f / 255.0f, 80.0f / 255.0f, 1.0f);
 		light.shading().specular = mhe::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+		light.shading().intensity = 5.0f;
 		mhe::set_light_position(engine.scene_context(), light_instance.id, mhe::vec3(0, 2000, 0));
 		mhe::set_light_rotation(engine.scene_context(), light_instance.id, mhe::quatf(-mhe::pi_2, 0.0f, 0.0f));
 		light.set_type(mhe::Light::directional);

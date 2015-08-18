@@ -28,8 +28,6 @@ bool check_clamping(vec2 pos)
 	return pos.x < 0.0f || pos.x > 1.0f || pos.y < 0.0f || pos.y > 1.0f;
 }
 
-// http://obge.paradice-insight.us/wiki/Ambient_Occlusion_%28Effects%29
-// http://obge.paradice-insight.us/wiki/Includes_%28Effects%29
 float random(vec2 pos, float seed)
 {
 	float t = seed * dot(pos, vec2(12.9898, 78.233));

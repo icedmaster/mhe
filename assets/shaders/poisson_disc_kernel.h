@@ -1,3 +1,5 @@
+// Stolen from MJP's bokeh example 
+// https://mynameismjp.wordpress.com/2011/02/28/bokeh/
 #define DISC_SAMPLES 16
 const vec2 disc_kernel[DISC_SAMPLES] = vec2[DISC_SAMPLES](
     vec2(0.2069841f, 0.2245269f),
