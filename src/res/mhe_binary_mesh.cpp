@@ -140,6 +140,15 @@ void load_texture(TextureExportData& texture_data, std::istream& stream)
 	stream.read(reinterpret_cast<char*>(&texture_data.mode), 1);
 }
 
+void load_bone(Bone& bone, std::istream& stream)
+{
+	load_string(bone.name, stream);
+	stream.read(reinterpret_cast<char*>(&bone.id), 4);
+	stream.read(reinterpret_cast<char*>(&bone.parent_id), 4);
+	stream.read(reinterpret_cast<char*>(&bone.inv_transform), sizeof(mat4x4));
+	stream.read(reinterpret_cast<char*>(&bone.local_transform), sizeof(mat4x4));
+}
+
 bool load_mesh_version2(Mesh& mesh, std::istream& stream, const Context* context)
 {
 	uint8_t layout;
@@ -148,11 +157,28 @@ bool load_mesh_version2(Mesh& mesh, std::istream& stream, const Context* context
 	stream.read(reinterpret_cast<char*>(&mesh_export_data), sizeof(MeshExportData));
 	uint32_t size, vertex_size;
 	stream.read(reinterpret_cast<char*>(&vertex_size), sizeof(uint32_t));
-	ASSERT(vertex_size == sizeof(StandartGeometryLayout::Vertex), "Invalid vertex size");
     stream.read(reinterpret_cast<char*>(&size), sizeof(uint32_t));
-    // TODO: check layout
-    std::vector<StandartGeometryLayout::Vertex> vertexes(size);
-    stream.read(reinterpret_cast<char*>(&vertexes[0]), size * vertex_size);
+
+    std::vector<StandartGeometryLayout::Vertex> vertices;
+	std::vector<SkinnedGeometryLayout::Vertex> skinned_vertices;
+
+	if (layout == StandartGeometryLayout::handle)
+	{
+		ASSERT(vertex_size == sizeof(StandartGeometryLayout::Vertex), "Invalid vertex size");
+		vertices.resize(size);
+		stream.read(reinterpret_cast<char*>(&vertices[0]), size * vertex_size);
+	}
+	else if (layout == SkinnedGeometryLayout::handle)
+	{
+		ASSERT(vertex_size == sizeof(SkinnedGeometryLayout::Vertex), "Invalid vertex size");
+		skinned_vertices.resize(size);
+		stream.read(reinterpret_cast<char*>(&skinned_vertices[0]), size * vertex_size);
+	}
+	else
+	{
+		ASSERT(0, "Unsupported for export layout found:" << layout);
+		return false;
+	}
 
     stream.read(reinterpret_cast<char*>(&size), sizeof(uint32_t));
     std::vector<uint32_t> indexes(size);
@@ -176,7 +202,20 @@ bool load_mesh_version2(Mesh& mesh, std::istream& stream, const Context* context
 	std::vector<MeshPartExportData> parts_data(parts_number);
 	stream.read(reinterpret_cast<char*>(&parts_data[0]), parts_number * sizeof(MeshPartExportData));
 
-	return detail::init_mesh(mesh, layout, mesh_export_data, vertexes, indexes, material_data, parts_data, context);
+	// skeleton if needed
+	if (layout == SkinnedGeometryLayout::handle)
+	{
+		uint32_t bones_number;
+		stream.read(reinterpret_cast<char*>(&bones_number), 4);
+		mesh.skeleton.bones.resize(bones_number);
+		for (size_t i = 0; i < bones_number; ++i)
+		{
+			load_bone(mesh.skeleton.bones[i], stream);
+		}
+		return detail::init_mesh(mesh, layout, mesh_export_data, skinned_vertices, indexes, material_data, parts_data, context);
+	}
+	else
+		return detail::init_mesh(mesh, layout, mesh_export_data, vertices, indexes, material_data, parts_data, context);
 }
 
 }

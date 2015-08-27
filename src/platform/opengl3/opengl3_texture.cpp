@@ -26,6 +26,7 @@ bool OpenGL3Texture::init(const TextureDesc& desc, const uint8_t* data, size_t s
 	width_ = desc.width;
 	height_ = desc.height;
 	datatype_ = desc.datatype == format_default ? get_datatype_by_format(desc.format) : get_datatype(desc.datatype);
+	pixel_data_format_ = get_pixel_data_format(desc.format);
 
 	if (desc.type == texture_cube)
 	{
@@ -37,7 +38,7 @@ bool OpenGL3Texture::init(const TextureDesc& desc, const uint8_t* data, size_t s
 			format_, // internalFormat, Specifies the number of color components in the texture
 			desc.width, desc.height, 0,
 			// Specifies the format of the pixel data. The following symbolic values are accepted: GL_RED, GL_RG, GL_RGB, GL_BGR, GL_RGBA, and GL_BGRA.
-			get_pixel_data_format(desc.format), 
+			pixel_data_format_,
 			datatype_, data);
 		CHECK_GL_ERRORS();
 		
@@ -87,7 +88,8 @@ void OpenGL3Texture::disable() const
 void OpenGL3Texture::update(const uint8_t* data)
 {
 	glBindTexture(target_, id_);
-	glTexSubImage2D(target_, 0, 0, 0, width_, height_, format_, datatype_, data);
+	glTexSubImage2D(target_, 0, 0, 0, width_, height_, pixel_data_format_, datatype_, data);
+	CHECK_GL_ERRORS();
 	glBindTexture(target_, 0);
 }
 
@@ -95,6 +97,7 @@ void OpenGL3Texture::copy_framebuffer()
 {
 	glBindTexture(target_, id_);
 	glCopyTexSubImage2D(target_, 0, 0, 0, 0, 0, width_, height_);
+	CHECK_GL_ERRORS();
 	glBindTexture(target_, 0);
 }
 

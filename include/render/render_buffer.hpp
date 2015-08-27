@@ -59,6 +59,22 @@ public:
 	virtual void update(const uint8_t* data, size_t offset, size_t size) = 0;
 };
 
+struct TextureBufferDesc
+{
+	BufferUpdateType update_type;
+	int format;
+	size_t unit;
+};
+
+class TextureBufferImpl
+{
+public:
+	virtual ~TextureBufferImpl() {}
+	virtual bool init(const TextureBufferDesc& desc, size_t size, const uint8_t* data) = 0;
+	virtual void destroy() = 0;
+	virtual void update(const uint8_t* data) = 0;
+};
+
 class MHE_EXPORT RenderBuffer
 {
 	friend class Driver;
@@ -140,6 +156,7 @@ struct LayoutElement
 	size_t offset;
 	size_t size;
 	size_t stride;
+	int datatype;
 	uint8_t position;
 };
 
@@ -253,6 +270,35 @@ public:
 	}
 private:
 	unique_ptr<UniformBufferImpl> impl_;
+};
+
+class MHE_EXPORT TextureBuffer
+{
+	POOL_ELEMENT_METHODS(uint16_t);
+public:
+	TextureBuffer();
+
+	bool init(const TextureBufferDesc& desc, size_t size, const uint8_t* data)
+	{
+		return impl_->init(desc, size, data);
+	}
+
+	void destroy()
+	{
+		impl_->destroy();
+	}
+
+	void update(const uint8_t* data)
+	{
+		impl_->update(data);
+	}
+
+	const TextureBufferImpl* impl() const
+	{
+		return impl_.get();
+	}
+private:
+	unique_ptr<TextureBufferImpl> impl_;
 };
 
 typedef RenderBuffer VertexBuffer;

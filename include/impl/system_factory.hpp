@@ -15,6 +15,7 @@ class LayoutImpl;
 class UniformBufferImpl;
 class ShaderProgramImpl;
 class TextureImpl;
+class TextureBufferImpl;
 
 class MHE_EXPORT SystemFactory
 {
@@ -36,6 +37,7 @@ public:
 	TextureImpl* create_texture() const;
 	RenderStateImpl* create_render_state() const;
 	RenderTargetImpl* create_render_target() const;
+	TextureBufferImpl* create_texture_buffer() const;
 
 	// input devices
 	KeyboardDeviceImpl* create_keyboard_device_impl() const

@@ -65,6 +65,11 @@ public:
 	{
 		return new OpenGL3RenderTarget;
 	}
+
+	TextureBufferImpl* create_texture_buffer() const
+	{
+		return new OpenGL3TextureBuffer;
+	}
 };
 
 }}

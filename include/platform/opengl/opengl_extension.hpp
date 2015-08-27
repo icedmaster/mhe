@@ -246,6 +246,15 @@ public:
 #endif
 	}
 
+	void glVertexAttribIPointer(GLuint index, GLint size, GLenum type, GLsizei stride, const GLvoid *pointer)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glVertexAttribIPointer_(index, size, type, stride, pointer);
+#else
+		::glVertexAttribIPointer(index, size, type, stride, pointer);
+#endif
+	}
+
 	void glEnableVertexAttribArray(GLint attr)
 	{
 #ifndef MHE_USE_NATIVE_OPENGL
@@ -576,6 +585,15 @@ public:
 		::glDeleteFramebuffers(n, framebuffers);
 #endif
 	}
+
+	void glTexBuffer(GLenum target, GLenum internalformat, GLuint buffer)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glTexBuffer_(target, internalformat, buffer);
+#else
+		::glTexBuffer(taret, internalformat, buffer);
+#endif
+	}
 private:
 	OpenGLExtensions() {}
 	~OpenGLExtensions() {}
@@ -624,6 +642,7 @@ private:
     PFNGLUNIFORM1FPROC glUniform1f_;
 	PFNGLGETATTRIBLOCATIONPROC glGetAttribLocation_;
 	PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer_;
+	PFNGLVERTEXATTRIBIPOINTERPROC glVertexAttribIPointer_;
 	PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray_;
 	PFNGLDISABLEVERTEXATTRIBARRAYPROC glDisableVertexAttribArray_;
 	PFNGLGENBUFFERSPROC glGenBuffers_;
@@ -658,6 +677,7 @@ private:
 	PFNGLGENERATEMIPMAPPROC glGenerateMipmap_;
 	PFNGLFRAMEBUFFERTEXTURE2DPROC glFramebufferTexture2D_;
 	PFNGLDELETEFRAMEBUFFERSPROC glDeleteFramebuffers_;
+	PFNGLTEXBUFFERPROC glTexBuffer_;
 #endif
 	std::map<std::string, bool> loaded_extensions_;
 };

@@ -186,8 +186,12 @@ void OpenGL3Layout::enable() const
 	for (size_t i = 0; i < desc_.layout.size(); ++i)
 	{
 		const LayoutElement& element = desc_.layout[i];
-		OpenGLExtensions::instance().glVertexAttribPointer(element.position, element.size, GL_FLOAT, GL_FALSE,
-														   element.stride, reinterpret_cast<const void*>(element.offset));
+		if (element.datatype == format_int || element.datatype == format_uint)
+			OpenGLExtensions::instance().glVertexAttribIPointer(element.position, element.size, get_datatype(element.datatype),
+				element.stride, reinterpret_cast<const void*>(element.offset));
+		else
+			OpenGLExtensions::instance().glVertexAttribPointer(element.position, element.size, get_datatype(element.datatype), GL_FALSE,
+														element.stride, reinterpret_cast<const void*>(element.offset));
 		OpenGLExtensions::instance().glEnableVertexAttribArray(element.position);
 	}
 }
@@ -291,6 +295,51 @@ void OpenGL3UniformBuffer::enable(const OpenGL3ShaderProgram* program, size_t un
 void OpenGL3UniformBuffer::disable() const
 {
 	vbo_[current_].disable();
+}
+
+bool OpenGL3TextureBuffer::init(const TextureBufferDesc& desc, size_t size, const uint8_t* data)
+{
+	if (!vbo_.init(GL_TEXTURE_BUFFER, size, data, get_vbo_usage(desc.update_type)))
+	{
+		ERROR_LOG("Can't initialize VBO for OpenGL3TextureBuffer");
+		return false;
+	}
+	CHECK_GL_ERRORS();
+	glGenTextures(1, &tex_id_);
+	CHECK_GL_ERRORS();
+	vbo_.disable();
+
+	format_ = get_format(desc.format);
+	size_ = size;
+
+	return true;
+}
+
+void OpenGL3TextureBuffer::destroy()
+{
+	glDeleteTextures(1, &tex_id_);
+	vbo_.close();
+}
+
+void OpenGL3TextureBuffer::update(const uint8_t* data)
+{
+	vbo_.update(size_, 0, data);
+	CHECK_GL_ERRORS();
+}
+
+void OpenGL3TextureBuffer::enable(const OpenGL3ShaderProgram* shader_program, size_t unit) const
+{
+	OpenGLExtensions::instance().glActiveTexture(GL_TEXTURE0 + unit);
+	glBindTexture(GL_TEXTURE_BUFFER, tex_id_);
+	OpenGLExtensions::instance().glTexBuffer(GL_TEXTURE_BUFFER, format_, vbo_.id());
+	OpenGLExtensions::instance().glUniform1i(shader_program->texture_buffer_location(unit), unit);
+	CHECK_GL_ERRORS();
+}
+
+void OpenGL3TextureBuffer::disable() const
+{
+	OpenGLExtensions::instance().glActiveTexture(GL_TEXTURE0 + unit_);
+	glBindTexture(GL_TEXTURE_BUFFER, 0);
 }
 
 }}

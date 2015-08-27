@@ -8,3 +8,4 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../07_shadowmap/build/ ${CMAKE_CURR
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../08_sponza/build/ ${CMAKE_CURRENT_SOURCE_DIR}/../08_sponza/build/)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../09_reflections/build/ ${CMAKE_CURRENT_SOURCE_DIR}/../09_reflections/build/)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../10_imgui/build/ ${CMAKE_CURRENT_SOURCE_DIR}/../10_imgui/build/)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../11_animation/build/ ${CMAKE_CURRENT_SOURCE_DIR}/../11_animation/build/)

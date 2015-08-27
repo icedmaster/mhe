@@ -20,4 +20,8 @@ UniformBuffer::UniformBuffer() :
 	impl_(SystemFactory::instance().create_uniform_buffer())
 {}
 
+TextureBuffer::TextureBuffer() :
+	impl_(SystemFactory::instance().create_texture_buffer())
+{}
+
 }

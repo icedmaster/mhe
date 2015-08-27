@@ -143,6 +143,23 @@ private:
 	uint8_t current_;
 };
 
+class OpenGL3TextureBuffer : public TextureBufferImpl
+{
+public:
+	bool init(const TextureBufferDesc& desc, size_t size, const uint8_t* data) override;
+	void destroy() override;
+	void update(const uint8_t* data) override;
+
+	void enable(const OpenGL3ShaderProgram* shader_program, size_t unit) const;
+	void disable() const;
+private:
+	VBO vbo_;
+	GLuint tex_id_;
+	GLenum format_;
+	size_t size_;
+	size_t unit_;
+};
+
 }}
 
 #endif

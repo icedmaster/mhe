@@ -135,16 +135,19 @@ bool ImGuiHelper::init_layout(Context& context)
 	desc.layout[0].size = 4;
 	desc.layout[0].stride = sizeof(Vertex);
 	desc.layout[0].position = 0;
+	desc.layout[0].datatype = format_float;
 
 	desc.layout[1].offset = 4 * sizeof(float);
 	desc.layout[1].size = 4;
 	desc.layout[1].stride = sizeof(Vertex);
 	desc.layout[1].position = 1;
+	desc.layout[1].datatype = format_float;
 
 	desc.layout[2].offset = 8 * sizeof(float);
 	desc.layout[2].size = 2;
 	desc.layout[2].stride = sizeof(Vertex);
 	desc.layout[2].position = 2;
+	desc.layout[2].datatype = format_float;
 
 	Layout& layout = create_and_get(context.layout_pool);
 	layout_id_ = layout.id();

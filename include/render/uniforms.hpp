@@ -77,6 +77,7 @@ const size_t material_data_unit = 2;
 
 // Textures
 const size_t albedo_texture_unit = 0;
+const size_t animation_texture_unit = 1;
 const size_t normal_texture_unit = 2;
 const size_t shadowmap_texture_unit = 5;
 const size_t env_cubemap_texture_unit = 6;

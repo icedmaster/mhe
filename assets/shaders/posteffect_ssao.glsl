@@ -64,7 +64,7 @@ float ssao_probe(vec3 position, vec3 direction, vec3 normal, SSAOParameters para
 	float enabled = check_clamping(screen_position) ? 0.0f : 1.0f;
 
 	// real scene depth
-	float probe_nonlinear_depth = texture(depth_texture, screen_position);
+	float probe_nonlinear_depth = texture(depth_texture, screen_position).r;
 	float probe_depth = linearized_depth(probe_nonlinear_depth, znear, zfar);
 	// if scene depth is lesser it means that the probe point is occluded by something
 #ifdef CHECK_NORMAL

@@ -31,6 +31,7 @@ typedef Pool<RenderTarget, max_render_targets_number, RenderTarget::IdType> Rend
 typedef Pool< DrawCallData, 4096, uint16_t, StructTypePolicy<DrawCallData, uint16_t> > DrawCallDataPool;
 typedef Pool< MeshTraceDataInstance, max_trace_data_instances_number,
 			  MeshTraceDataInstance::IdType, StructTypePolicy<MeshTraceDataInstance, MeshTraceDataInstance::IdType> > MeshTraceDataPool;
+typedef Pool<TextureBuffer, 4096, TextureBuffer::IdType> TextureBufferPool;
 
 class MaterialSystems
 {
@@ -182,6 +183,7 @@ struct Context
 	RenderTargetPool render_target_pool;
 	TexturePool texture_pool;
 	DrawCallDataPool draw_call_data_pool;
+	TextureBufferPool texture_buffer_pool;
 
 	MaterialSystems material_systems;
 	MaterialPool materials[max_material_systems_number];

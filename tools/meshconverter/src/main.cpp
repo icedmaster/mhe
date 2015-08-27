@@ -2,6 +2,7 @@
 #include <utils/file_utils.hpp>
 #include <render/layouts.hpp>
 #include <render/mesh_grid.hpp>
+#include <render/mesh.hpp>
 #include <res/scene_export.hpp>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -14,6 +15,7 @@ const char mhe_header[mhe_header_length + 1] = "mhe";
 const char mhe_version = 0x2;
 
 const size_t initial_vertex_buffer_size = 100000;
+const size_t initial_animations_frames_number = 256;
 
 const mhe::vec3 default_aabb_min = mhe::vec3(9999999.0, 9999999.0f, 9999999.0f);
 const mhe::vec3 default_aabb_max = mhe::vec3(-9999999.0f, -9999999.0f, -9999999.0f);
@@ -21,6 +23,20 @@ const mhe::vec3 default_aabb_max = mhe::vec3(-9999999.0f, -9999999.0f, -9999999.
 struct ExportParams
 {
 	mhe::FilePath texture_path;
+};
+
+struct ExportBone
+{
+	size_t index;
+	float weight;
+};
+
+struct SkinningExportContext
+{
+	std::vector<mhe::Bone> bones;
+	mhe::hashmap<mhe::string, size_t> bone_name_to_index;
+	mhe::hashmap<uint32_t, std::vector<ExportBone> > vertices_to_bones;
+	mhe::mat4x4 global_inv_transform;
 };
 
 mhe::vec3 convert(const aiVector3D& v)
@@ -36,6 +52,16 @@ mhe::vec3 convert(const aiColor3D& v)
 mhe::string convert(const aiString& s)
 {
 	return mhe::string(s.C_Str());
+}
+
+mhe::mat4x4 convert(const aiMatrix4x4& m)
+{
+	mhe::mat4x4 r;
+	r.set(m.a1, m.b1, m.c1, m.d1,
+		  m.a2, m.b2, m.c2, m.d2,
+		  m.a3, m.b3, m.c3, m.d3,
+		  m.a4, m.b4, m.c4, m.d4);
+	return r;
 }
 
 void write_header(std::ofstream& stream, uint8_t layout)
@@ -106,9 +132,135 @@ void write_grid_data(std::ofstream& stream, const mhe::MeshGrid& grid)
 
 }
 
+void write_bones_data(std::ofstream& stream, const mhe::Bone* bones, size_t bones_number)
+{
+	uint32_t num = bones_number;
+	stream.write((const char*)&num, sizeof(uint32_t));
+	for (size_t i = 0; i < bones_number; ++i)
+	{
+		write_string(stream, bones[i].name);
+		stream.write((const char*)&bones[i].id, sizeof(uint32_t));
+		stream.write((const char*)&bones[i].parent_id, sizeof(uint32_t));
+		stream.write((const char*)&bones[i].inv_transform, sizeof(mhe::mat4x4));
+		stream.write((const char*)&bones[i].local_transform, sizeof(mhe::mat4x4));
+	}
+}
+
+aiNode* get_node(const aiScene* ai_scene, const char* node_name)
+{
+	if (ai_scene->mRootNode == nullptr) return nullptr;
+	return ai_scene->mRootNode->FindNode(node_name);
+}
+
+void add_bone(const aiScene* ai_scene, const aiBone* ai_bone, SkinningExportContext& skinning_context, size_t buffer_offset)
+{
+	mhe::hashmap<mhe::string, size_t>::iterator it = skinning_context.bone_name_to_index.find(convert(ai_bone->mName));
+	if (it != skinning_context.bone_name_to_index.end())
+		return;
+	mhe::Bone bone;
+	bone.name = convert(ai_bone->mName);
+	bone.id = skinning_context.bones.size();
+	bone.inv_transform = convert(ai_bone->mOffsetMatrix);
+	skinning_context.bones.push_back(bone);
+
+	for (size_t j = 0; j < ai_bone->mNumWeights; ++j)
+	{
+		size_t vertex_id = buffer_offset + ai_bone->mWeights[j].mVertexId;
+
+		ExportBone export_bone;
+		export_bone.index = bone.id;
+		export_bone.weight = ai_bone->mWeights[j].mWeight;
+		skinning_context.vertices_to_bones[vertex_id].push_back(export_bone);
+	}
+}
+
+mhe::mat4x4 calculate_parent_transform(const aiNode* node)
+{
+	mhe::mat4x4 m = convert(node->mTransformation);
+	if (node->mParent)
+		m = calculate_parent_transform(node->mParent) * m;
+	return m;
+}
+
+void setup_parents(const aiScene* ai_scene, const aiMesh* mesh, SkinningExportContext& skinning_context)
+{
+	aiNode* root = ai_scene->mRootNode;
+	for (size_t i = 0, size = mesh->mNumBones; i < size; ++i)
+	{
+		aiBone* ai_bone = mesh->mBones[i];
+		mhe::hashmap<mhe::string, size_t>::iterator it = skinning_context.bone_name_to_index.find(mhe::string(ai_bone->mName.C_Str()));
+		ASSERT(it != skinning_context.bone_name_to_index.end(), "Can't find bone " << ai_bone->mName.C_Str());
+		mhe::Bone& bone = skinning_context.bones[it->value];
+		aiNode* node = get_node(ai_scene, ai_bone->mName.C_Str());
+		ASSERT(node != nullptr, "Can't find node with name:" << ai_bone->mName.C_Str());
+		bone.local_transform = convert(node->mTransformation);
+		if (node->mParent != nullptr)
+		{
+			mhe::hashmap<mhe::string, size_t>::iterator it = skinning_context.bone_name_to_index.find(mhe::string(node->mParent->mName.C_Str()));
+			if (it != skinning_context.bone_name_to_index.end())
+			{
+				bone.parent_id = it->value;
+			}
+			else
+				bone.local_transform = calculate_parent_transform(node) * bone.local_transform;
+		}
+	}
+}
+
+struct WeightSortHelper
+{
+	bool operator()(const ExportBone& b1, const ExportBone& b2) const
+	{
+		return b1.weight > b2.weight;
+	}
+};
+
+void sort_by_weight(std::vector<ExportBone>& bones)
+{
+	std::sort(bones.begin(), bones.end(), WeightSortHelper());
+}
+
+void fill_skinned_vertices(std::vector<mhe::SkinnedGeometryLayout::Vertex> &out_vertices,
+	std::vector<mhe::StandartGeometryLayout::Vertex>& vertices, SkinningExportContext& skinning_context)
+{
+	for (size_t i = 0, size = vertices.size(); i < size; ++i)
+	{
+		out_vertices[i].pos = vertices[i].pos;
+		out_vertices[i].nrm = vertices[i].nrm;
+		out_vertices[i].tng = vertices[i].tng;
+		out_vertices[i].tex = vertices[i].tex;
+	}
+
+	for (mhe::hashmap<size_t, std::vector<ExportBone> >::iterator it = skinning_context.vertices_to_bones.begin(),
+		end = skinning_context.vertices_to_bones.end(); it != end; ++it)
+	{
+		mhe::SkinnedGeometryLayout::Vertex& v = out_vertices[it->key];
+		sort_by_weight(it->value);
+		size_t n = mhe::min(it->value.size(), 4);
+		float weight_total = 0.0f;
+
+		memset(v.ids, 0, sizeof(v.ids));
+		memset(v.weights, 0, sizeof(v.weights));
+
+		for (size_t i = 0; i < n; ++i)
+		{
+			v.ids[i] = it->value[i].index;
+			v.weights[i] = it->value[i].weight;
+			weight_total += v.weights[i];
+		}
+
+		float left = 1.0f - weight_total;
+		float add = left / n;
+		for (size_t i = 0; i < n; ++i)
+			v.weights[i] += add;
+	}
+}
+
+template <class V>
 void process_node(const aiScene* assimp_scene, aiNode* node, const aiMatrix4x4& parent_transform, 
-	std::vector<uint32_t>& indices, std::vector<mhe::StandartGeometryLayout::Vertex>& vertices,
-	std::vector<mhe::MeshPartExportData>& parts, mhe::vec3& mesh_aabb_min, mhe::vec3& mesh_aabb_max)
+	std::vector<uint32_t>& indices, std::vector<V>& vertices,
+	std::vector<mhe::MeshPartExportData>& parts, mhe::vec3& mesh_aabb_min, mhe::vec3& mesh_aabb_max,
+	SkinningExportContext& skinning_context)
 {
 	aiMatrix4x4 transform = parent_transform * node->mTransformation;
 	aiMatrix4x4 inv_transform = transform;
@@ -176,11 +328,43 @@ void process_node(const aiScene* assimp_scene, aiNode* node, const aiMatrix4x4& 
 			submesh_aabb_max = mhe::max(submesh_aabb_max, vertex.pos);
 			submesh_aabb_min = mhe::min(submesh_aabb_min, vertex.pos);
 		}
+
+		if (mesh->HasBones())
+		{
+			size_t bones_number = mesh->mNumBones;
+			for (size_t i = 0; i < bones_number; ++i)
+			{
+				aiBone* ai_bone = mesh->mBones[i];
+				mhe::hashmap<mhe::string, size_t>::iterator it = skinning_context.bone_name_to_index.find(convert(ai_bone->mName));
+				ASSERT(it == skinning_context.bone_name_to_index.end(), "Are bones duplicated?");
+				mhe::Bone bone;
+				bone.name = convert(ai_bone->mName);
+				bone.id = skinning_context.bones.size();
+				bone.parent_id = mhe::Bone::invalid_id;
+				bone.inv_transform = convert(ai_bone->mOffsetMatrix);
+				skinning_context.bones.push_back(bone);
+
+				skinning_context.bone_name_to_index[convert(ai_bone->mName)] = bone.id;
+
+				for (size_t j = 0; j < ai_bone->mNumWeights; ++j)
+				{
+					size_t vertex_id = part_data.ibuffer_offset + ai_bone->mWeights[j].mVertexId;
+
+					ExportBone export_bone;
+					export_bone.index = bone.id;
+					export_bone.weight = ai_bone->mWeights[j].mWeight;
+					skinning_context.vertices_to_bones[vertex_id].push_back(export_bone);
+				}
+			}
+		}
+
+		setup_parents(assimp_scene, mesh, skinning_context);
+
 		parts.back().aabb = mhe::AABBf::from_min_max(submesh_aabb_min, submesh_aabb_max);
 	}
 
 	for (unsigned int n = 0; n < node->mNumChildren; ++n)
-		process_node(assimp_scene, node->mChildren[n], transform, indices, vertices, parts, mesh_aabb_min, mesh_aabb_max);
+		process_node(assimp_scene, node->mChildren[n], transform, indices, vertices, parts, mesh_aabb_min, mesh_aabb_max, skinning_context);
 }
 
 void create_grid(mhe::MeshGrid& grid, const std::vector<mhe::StandartGeometryLayout::Vertex>& vertices,
@@ -194,19 +378,38 @@ void create_grid(mhe::MeshGrid& grid, const std::vector<mhe::StandartGeometryLay
 	}
 }
 
+void process_animations(const aiScene* assimp_scene, const char* out_filename, const ExportParams& params)
+{
+	for (size_t i = 0; i < assimp_scene->mNumAnimations; ++i)
+	{
+		mhe::AnimationExportData animation_data;
+		std::vector<mhe::TranslationAnimationFrame> translations;
+		std::vector<mhe::RotationAnimationFrame> rotations;
+		std::vector<mhe::ScaleAnimationFrame> scaling;
+
+		aiAnimation* ai_animation = assimp_scene->mAnimations[i];
+		animation_data.duration = ai_animation->mDuration;
+		animation_data.fps = ai_animation->mTicksPerSecond;
+		animation_data.name = convert(ai_animation->mName);
+	}
+}
+
 void process_scene(const char* out_filename, const aiScene* assimp_scene, const ExportParams& params)
 {
-    if (!assimp_scene->HasMeshes())
+    if (!assimp_scene->HasMeshes() && !assimp_scene->HasAnimations())
     {
-        ERROR_LOG("This scene has no meshes");
+        ERROR_LOG("This scene has neither meshes, nor animations");
         return;
     }
 	
 	mhe::MeshExportData mesh_export_data;
 	std::vector<mhe::StandartGeometryLayout::Vertex> vertexes;
+	std::vector<mhe::SkinnedGeometryLayout::Vertex> skinned_vertices;
 	std::vector<uint32_t> indexes;
 	std::vector<mhe::MeshPartExportData> parts(assimp_scene->mNumMeshes);
 	std::vector<mhe::MaterialExportData> materials(assimp_scene->mNumMaterials);
+
+	SkinningExportContext skinning_context;
 
 	vertexes.reserve(initial_vertex_buffer_size);
 	indexes.reserve(initial_vertex_buffer_size);
@@ -216,7 +419,9 @@ void process_scene(const char* out_filename, const aiScene* assimp_scene, const 
 	if (assimp_scene->mRootNode != nullptr)
 	{
 		parts.resize(0);
-		process_node(assimp_scene, assimp_scene->mRootNode, aiMatrix4x4(), indexes, vertexes, parts, mesh_aabb_min, mesh_aabb_max);
+		skinning_context.global_inv_transform = convert(assimp_scene->mRootNode->mTransformation);
+		skinning_context.global_inv_transform.inverse();
+		process_node(assimp_scene, assimp_scene->mRootNode, aiMatrix4x4(), indexes, vertexes, parts, mesh_aabb_min, mesh_aabb_max, skinning_context);
 	}
 	else
 	{
@@ -334,21 +539,40 @@ void process_scene(const char* out_filename, const aiScene* assimp_scene, const 
 
 	DEBUG_LOG("The result AABB is:" << mesh_export_data.aabb);
 
-	write_header(f, 0);
+	uint8_t layout = mhe::StandartGeometryLayout::handle;
+	size_t vertex_size = sizeof(mhe::StandartGeometryLayout::Vertex);
+	const char* vertex_data = (const char*)&vertexes[0];
+
+	if (!skinning_context.bones.empty())
+	{
+		INFO_LOG("The scene contains bones - SkinnedGeometryLayout will be exported");
+		layout = mhe::SkinnedGeometryLayout::handle;
+		vertex_size = sizeof(mhe::SkinnedGeometryLayout::Vertex);
+
+		skinned_vertices.resize(vertexes.size());
+		fill_skinned_vertices(skinned_vertices, vertexes, skinning_context);
+		vertex_data = (const char*)&skinned_vertices[0];
+	}
+
+	write_header(f, layout);
 	write_mesh_data(f, mesh_export_data);
-	write_vertex_data(f, sizeof(mhe::StandartGeometryLayout::Vertex),
-		(const char*)&vertexes[0], vertexes.size(),
+	write_vertex_data(f, vertex_size,
+		vertex_data, vertexes.size(),
 		(const char*)&indexes[0], indexes.size());
 	write_material_data(f, &materials[0], materials.size());
 	write_parts_data(f, &parts[0], parts.size());
+	write_bones_data(f, &skinning_context.bones[0], skinning_context.bones.size());
 	//write_grid_data(f, mesh_grid);
 
 	f.close();
+
+	process_animations(assimp_scene, out_filename, params);
 }
 
 int main(int argc, char** argv)
 {
 	mhe::utils::create_standart_log();
+	mhe::create_default_allocator();
 	if (argc < 3)
 	{
 		ERROR_LOG("Invalid number of arguments");
@@ -374,6 +598,8 @@ int main(int argc, char** argv)
 		params.texture_path = texture_path;
 
 	process_scene(out_filename, assimp_scene, params);
+
+	mhe::destroy_default_allocator();
 
 	return 0;
 }

@@ -87,4 +87,9 @@ RenderTargetImpl* VideoDriverFactory::create_render_target() const
 	return current_driver_factory_->create_render_target();
 }
 
+TextureBufferImpl* VideoDriverFactory::create_texture_buffer() const
+{
+	return current_driver_factory_->create_texture_buffer();
+}
+
 }

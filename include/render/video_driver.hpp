@@ -69,6 +69,7 @@ public:
 	virtual void set_layout(const Layout& layout) = 0;
 	virtual void set_texture(const Texture& texture, size_t unit) = 0;
 	virtual void set_render_target(const RenderTarget& render_target) = 0;
+	virtual void set_texture_buffer(const TextureBuffer& texture_buffer, size_t unit) = 0;
 	virtual void set_default_render_target() = 0;
 	virtual void draw(const RenderData& data) = 0;
 	virtual void draw(size_t elements_number, size_t vbuffer_offset, size_t ibuffer_offset, size_t indices_number, Primitive primitive) = 0;
@@ -135,6 +136,7 @@ public:
 		size_t state;
 		size_t textures[material_textures_number];
 		size_t uniforms[material_uniforms_number];
+		size_t texture_buffers[material_texture_buffers_number];
 	};
 public:
 	Driver();

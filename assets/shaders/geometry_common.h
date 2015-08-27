@@ -39,4 +39,9 @@ layout (location = 0) in vec3 pos;
 layout (location = 1) in vec3 nrm;
 layout (location = 2) in vec4 tng;
 layout (location = 3) in vec2 tex;
+#if SKINNING == 1
+layout (location = 4) in ivec4 ids;
+layout (location = 5) in vec4 weights;
+#endif
+
 #endif

@@ -126,6 +126,7 @@ public:
 
 	void free(void* /*ptr*/) override
 	{
+		ASSERT(0, "You shouldn't call free() when memory was allocated using fixed_size_allocator");
 	}
 
 	size_t allocated() const override

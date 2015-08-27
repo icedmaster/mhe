@@ -167,6 +167,13 @@ void OpenGL3Driver::set_render_target(const RenderTarget& render_target)
 	CHECK_GL_ERRORS();
 }
 
+void OpenGL3Driver::set_texture_buffer(const TextureBuffer& texture_buffer, size_t unit)
+{
+	const OpenGL3TextureBuffer* buffer = static_cast<const OpenGL3TextureBuffer*>(texture_buffer.impl());
+	buffer->enable(current_shader_program_, unit);
+	CHECK_GL_ERRORS();
+}
+
 void OpenGL3Driver::set_default_render_target()
 {
 	if (current_render_target_ != nullptr)

@@ -35,6 +35,7 @@ float random(vec2 pos, float seed)
 }
 
 
+#define VEC2_ZERO vec2(0.0f, 0.0f)
 #define VEC3_ZERO vec3(0.0f, 0.0f, 0.0f)
 #define VEC4_ZERO vec4(0.0f, 0.0f, 0.0f, 0.0f);
 

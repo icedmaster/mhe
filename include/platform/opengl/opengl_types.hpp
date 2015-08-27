@@ -70,16 +70,16 @@ inline GLenum get_pixel_data_format(int format)
 
 inline GLenum get_datatype(int type)
 {
-	ASSERT(type < 3, "Invalid texture datatype");
+	ASSERT(type < 5, "Invalid texture datatype");
 	ASSERT(type != format_default, "You must use method get_datatype_by_format()");
-	GLenum types[3] = {GL_UNSIGNED_BYTE, GL_UNSIGNED_BYTE, GL_FLOAT};
+	GLenum types[5] = {GL_UNSIGNED_BYTE, GL_FLOAT, GL_UNSIGNED_INT, GL_INT, GL_UNSIGNED_BYTE};
 	return types[type];
 }
 
 inline GLenum get_datatype_by_format(int format)
 {
 	ASSERT(format < format_max, "Invalid texture format");
-	GLenum types[format_max] = {GL_UNSIGNED_BYTE, GL_UNSIGNED_BYTE, GL_UNSIGNED_BYTE, GL_UNSIGNED_BYTE, GL_UNSIGNED_BYTE,
+	GLenum types[format_max] = {GL_UNSIGNED_BYTE, GL_UNSIGNED_BYTE, GL_FLOAT, GL_UNSIGNED_BYTE, GL_UNSIGNED_BYTE,
 		GL_FLOAT, GL_FLOAT, GL_UNSIGNED_BYTE, GL_FLOAT, GL_FLOAT};
 	return types[format];
 }

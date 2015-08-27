@@ -46,6 +46,9 @@ bool OpenGL3ShaderProgram::init(const std::string& vsdata, const std::string& fs
 	bool result = attach_shaders();
 	if (result)
 		init(params);
+#ifdef MHE_DEBUG
+	//print_uniforms();
+#endif
 	return result;
 }
 
@@ -93,12 +96,17 @@ void OpenGL3ShaderProgram::set() const
 void OpenGL3ShaderProgram::init(const ShaderInitializationParams& params)
 {
 	memset(&texture_location_[0], 0xff, sizeof(texture_location_));
+	memset(&texture_buffer_location_[0], 0xff, sizeof(texture_buffer_location_));
 
 	// check samplers locations
 	for (size_t i = 0; i < params.samplers.size(); ++i)
 	{
 		texture_location_[params.samplers[i].index] = OpenGLExtensions::instance().glGetUniformLocation(id_, params.samplers[i].name.c_str());
 	}
+
+	// texture buffers
+	for (size_t i = 0, size = params.texture_buffers.size(); i < size; ++i)
+		texture_buffer_location_[params.texture_buffers[i].index] = OpenGLExtensions::instance().glGetUniformLocation(id_, params.texture_buffers[i].name.c_str());
 
 	// check uniform locations
 	for (size_t i = 0; i < params.uniforms.size(); ++i)
@@ -110,6 +118,26 @@ void OpenGL3ShaderProgram::init(const ShaderInitializationParams& params)
 GLuint OpenGL3ShaderProgram::uniform_location(size_t unit) const
 {
 	return shader_bind_indexes_[unit];
+}
+
+GLuint OpenGL3ShaderProgram::texture_buffer_location(size_t unit) const
+{
+	return texture_buffer_location_[unit];
+}
+
+void OpenGL3ShaderProgram::print_uniforms()
+{
+	GLint number;
+	OpenGLExtensions::instance().glGetProgramiv(id_, GL_ACTIVE_UNIFORMS, &number);
+	for (GLint i = 0; i < number; ++i)
+	{
+		GLchar buffer[128];
+		GLsizei length;
+		GLint size;
+		GLenum type;
+		OpenGLExtensions::instance().glGetActiveUniform(id_, i, sizeof(buffer), &length, &size, &type, buffer);
+		DEBUG_LOG("Shader id:" << id_ << " uniform:" << i << " name:" << buffer << " type:" << type << " size:" << size);
+	}
 }
 
 }}

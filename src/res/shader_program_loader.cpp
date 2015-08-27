@@ -16,6 +16,7 @@ const char* sampler_tag = "[sampler";
 const char* uniform_tag = "[uniform";
 const char* shader_header = "#version 330 core";
 const char* shader_extension = ".glsl";
+const char* texture_buffer_sampler = "samplerBuffer";
 
 const std::string tags[] = {vertex_shader_tag, fragment_shader_tag};
 
@@ -49,7 +50,10 @@ std::string parse_sampler(ShaderInitializationParams& params, const std::string&
 	SamplerData sampler_data;
 	sampler_data.name = data[1];
 	sampler_data.index = types_cast<size_t>(data[2]);
-	params.samplers.push_back(sampler_data);
+	if (data[0] == texture_buffer_sampler)
+		params.texture_buffers.push_back(sampler_data);
+	else
+		params.samplers.push_back(sampler_data);
 	return "uniform " + data[0] + " " + data[1] + ";\n";
 }
 

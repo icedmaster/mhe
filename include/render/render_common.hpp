@@ -15,6 +15,7 @@ typedef uint16_t RenderStateHandleType;
 typedef uint16_t UniformBufferHandleType;
 typedef uint16_t VertexBufferHandleType;
 typedef uint16_t IndexBufferHandleType;
+typedef uint16_t TextureBufferHandleType;
 
 typedef uint16_t AABBInstanceHandleType;
 typedef uint16_t MeshTraceDataHandleType;

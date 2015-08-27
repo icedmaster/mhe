@@ -32,6 +32,7 @@ private:
 	GLsizei width_;
 	GLsizei height_;
 	GLenum format_;
+	GLenum pixel_data_format_;
 	GLenum datatype_;
 	mutable size_t unit_;
 };

@@ -86,7 +86,6 @@ void Driver::perform_draw_call(const Context& context, const DrawCallExplicit& d
 		{
 			state_.render_target = default_render_target;
 			impl_->set_default_render_target();
-			
 		}
 	}
 
@@ -252,6 +251,14 @@ void Driver::perform_draw_call(const Context& context, const DrawCall& draw_call
 		const UniformBuffer& uniform = context.uniform_pool.get(material.uniforms[j]);
 		impl_->set_uniform(uniform, j);
 		state_.uniforms[j] = material.uniforms[j];
+	}
+	for (size_t j = 0; j < material_texture_buffers_number; ++j)
+	{
+		if (material.texture_buffers[j] == TextureBuffer::invalid_id || material.texture_buffers[j] == state_.texture_buffers[j])
+			continue;
+		const TextureBuffer& texture_buffer = context.texture_buffer_pool.get(material.texture_buffers[j]);
+		impl_->set_texture_buffer(texture_buffer, j);
+		state_.texture_buffers[j] = texture_buffer.id();
 	}
 	impl_->draw(draw_call.render_data);
 	stats_.update(draw_call.render_data.elements_number);

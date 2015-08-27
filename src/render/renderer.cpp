@@ -45,6 +45,12 @@ bool init_node(NodeInstance& node, Context& context)
 		return false;
 	}
 	node.mesh.shared_uniform = uniform.id();
+
+	// Create texture for skinned geometry
+	if (!node.mesh.mesh.skeleton.bones.empty())
+	{
+
+	}
 	return true;
 }
 
@@ -94,6 +100,7 @@ void setup_node(NodeInstance& node, MaterialSystem* material_system, Context& co
 	node.mesh.mesh.parts[0].material_id = context.material_manager.get(material_initialization_data);
 	ModelContext model_context;
 	model_context.transform_uniform = node.mesh.shared_uniform;
+	model_context.animation_texture_buffer = node.mesh.skeleton_instance.texture_buffer;
 	material_system->setup(context, scene_context, &node.mesh.instance_parts[0], &node.mesh.mesh.parts[0], &model_context, 1);
 }
 
@@ -379,6 +386,7 @@ bool load_node(NodeInstance& node, const string& name, const char* material_syst
 	{
 		ModelContext& model_context = model_contexts[i];
 		model_context.transform_uniform = node.mesh.shared_uniform;
+		model_context.animation_texture_buffer = node.mesh.skeleton_instance.texture_buffer;
 		AABBInstance& part_aabb_instance = create_and_get(scene_context.parts_aabb_pool);
 		part_aabb_instance.aabb = node.mesh.mesh.parts[i].aabb;
 		node.mesh.instance_parts[i].aabb_id = part_aabb_instance.id;

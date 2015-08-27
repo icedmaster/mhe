@@ -113,12 +113,14 @@
 	  </inputs>
 	</node>
 	<-->
+	<!-->
 	<node name="dof" material="dof" priority="7">
 	  <inputs>
 		<input index="2" node="" output="" material="gbuffer_fill" material_output="2" />
 		<input index="3" />
 	  </inputs>
 	</node>
+	<-->
 	<node name="fxaa" material="fxaa" src="" priority="8" />
   </posteffects>
 </mhe>

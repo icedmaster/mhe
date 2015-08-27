@@ -62,7 +62,7 @@ public:
         res_type& res = Loader::get_resource(instance);
         if (!get(res, name, absolute_path))
             return false;
-        return Loader::setup_instance(instance);
+        return Loader::setup_instance(instance, context_);
     }
 
 	void clear()

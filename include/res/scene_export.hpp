@@ -5,9 +5,57 @@
 #include "core/string.hpp"
 #include "math/vector3.hpp"
 #include "math/aabb.hpp"
+#include "math/matrix.hpp"
+#include "math/quat.hpp"
 #include "render/material.hpp" // MaterialRenderData
 
 namespace mhe {
+
+const size_t max_weights_per_bone = 4;
+
+struct Weight
+{
+	uint32_t vertex_id;
+	float weight;
+};
+
+struct TranslationAnimationFrame
+{
+	float time;
+	vec3 position;
+};
+
+struct RotationAnimationFrame
+{
+	float time;
+	quatf rotation;
+};
+
+struct ScaleAnimationFrame
+{
+	float time;
+	vec3 scale;
+};
+
+enum
+{
+	play_mode_clamp,
+	play_mode_loop
+};
+
+struct AnimationExportData
+{
+	string name;
+	float fps;
+	float duration;
+	size_t translation_frames;
+	TranslationAnimationFrame* translations;
+	size_t rotation_frames;
+	RotationAnimationFrame* rotations;
+	size_t scale_frames;
+	ScaleAnimationFrame* scalings;
+	int play_mode;
+};
 
 struct MeshPartExportData
 {

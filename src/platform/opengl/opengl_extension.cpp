@@ -38,6 +38,7 @@ void OpenGLExtensions::init_extensions()
     glUniform1f_ = load_extension<PFNGLUNIFORM1FPROC>("glUniform1f");
 	glGetAttribLocation_ = load_extension<PFNGLGETATTRIBLOCATIONPROC>("glGetAttribLocation");
 	glVertexAttribPointer_ = load_extension<PFNGLVERTEXATTRIBPOINTERPROC>("glVertexAttribPointer");
+	glVertexAttribIPointer_ = load_extension<PFNGLVERTEXATTRIBIPOINTERPROC>("glVertexAttribIPointer");
 	glEnableVertexAttribArray_ = load_extension<PFNGLENABLEVERTEXATTRIBARRAYPROC>("glEnableVertexAttribArray");
 	glDisableVertexAttribArray_ = load_extension<PFNGLDISABLEVERTEXATTRIBARRAYPROC>("glDisableVertexAttribArray");
 	glGenBuffers_ = load_extension<PFNGLGENBUFFERSPROC>("glGenBuffers");
@@ -72,6 +73,7 @@ void OpenGLExtensions::init_extensions()
 	glGenerateMipmap_ = load_extension<PFNGLGENERATEMIPMAPPROC>("glGenerateMipmap");
 	glFramebufferTexture2D_ = load_extension<PFNGLFRAMEBUFFERTEXTURE2DPROC>("glFramebufferTexture2D");
 	glDeleteFramebuffers_ = load_extension<PFNGLDELETEFRAMEBUFFERSPROC>("glDeleteFramebuffers");
+	glTexBuffer_ = load_extension<PFNGLTEXBUFFERPROC>("glTexBuffer");
 #endif	// MHE_OPENGL_HAS_SHADERS
 
 	get_str_extensions();

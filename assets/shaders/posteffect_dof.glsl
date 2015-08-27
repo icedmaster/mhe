@@ -52,8 +52,8 @@ vec4 blur(vec2 tex, vec4 pixel_color, float depth, float blur)
 		vec2 kernel = disc_kernel[i];
 		vec2 offset = kernel * radius;
 		vec4 c = texture(main_texture, tex + offset);
-		float pixel_depth = texture(depth_texture, tex + offset);
-		float pixel_blurriness = texture(blur_texture, tex + offset);
+		float pixel_depth = texture(depth_texture, tex + offset).r;
+		float pixel_blurriness = texture(blur_texture, tex + offset).r;
 		float contribution = pixel_blurriness;
 		color += c * contribution;
 		weight += contribution;

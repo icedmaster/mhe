@@ -71,7 +71,6 @@ public:
 
 	this_type& operator= (const std::basic_string<T>& str)
 	{
-		if (this == &str) return *this;
 		assign(str.c_str(), str.length());
 		return *this;
 	}

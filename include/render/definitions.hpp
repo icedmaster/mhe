@@ -35,6 +35,8 @@ enum
 {
 	format_ubyte,
 	format_float,
+	format_uint,
+	format_int,
 	format_default,
 	format_datatype_max
 };

@@ -18,7 +18,7 @@ struct MeshLoader
         return instance.mesh;
     }
 
-    static MHE_EXPORT bool setup_instance(MeshInstance& instance);
+    static MHE_EXPORT bool setup_instance(MeshInstance& instance, const context_type* context);
 };
 
 }

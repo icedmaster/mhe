@@ -51,6 +51,7 @@ void GBufferFillMaterialSystem::setup(Context& context, SceneContext& scene_cont
 
 	UberShader& shader = ubershader(context);
 	const UberShader::Info& normalmap_info = shader.info("NORMALMAP");
+	const UberShader::Info& skinning_info = shader.info("SKINNING");
 
 	for (size_t i = 0; i < count; ++i)
 	{
@@ -60,9 +61,14 @@ void GBufferFillMaterialSystem::setup(Context& context, SceneContext& scene_cont
 		size_t use_normalmap = material.textures[normal_texture_unit].id != Texture::invalid_id ? 1 : 0;
 		if (!global::use_normalmaps.value())
 			use_normalmap = 0;
+		size_t use_skinning = parts[i].render_data.layout == SkinnedGeometryLayout::handle ? 1 : 0;
+
+		if (use_skinning)
+			material.texture_buffers[animation_texture_unit] = model_contexts[i].animation_texture_buffer;
 
 		UberShader::Index index;
 		index.set(normalmap_info, use_normalmap);
+		index.set(skinning_info, use_skinning);
 		material.shader_program = shader.get(index);
 
 		UniformBufferDesc uniform_buffer_desc;
@@ -100,6 +106,7 @@ void GBufferFillMaterialSystem::update(Context& context, SceneContext& /*scene_c
 {
 	UberShader& shader = ubershader(context);
 	const UberShader::Info& normalmap_info = shader.info("NORMALMAP");
+	const UberShader::Info& skinning_info = shader.info("SKINNING");
 	UberShader::Index index;
 	clear_command_.reset();
 	for (size_t i = 0; i < count; ++i)
@@ -107,7 +114,9 @@ void GBufferFillMaterialSystem::update(Context& context, SceneContext& /*scene_c
 		Material& material = context.materials[id()].get(nodes[i].material.id);
 		material.uniforms[perframe_data_unit] = render_context.main_camera.percamera_uniform;
 		size_t use_normalmap = material.textures[normal_texture_unit].id != Texture::invalid_id && global::use_normalmaps.value() ? 1 : 0;
+		size_t use_skinning = material.texture_buffers[animation_texture_unit] != TextureBuffer::invalid_id ? 1 : 0;
 		index.set(normalmap_info, use_normalmap);
+		index.set(skinning_info, use_skinning);
 		material.shader_program = shader.get(index);
 
 #ifdef MHE_UPDATE_MATERIAL

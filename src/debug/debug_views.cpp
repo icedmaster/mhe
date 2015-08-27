@@ -23,8 +23,12 @@ void DebugViews::init(EventManager& event_manager)
 
 	imgui_.init(&engine_);
 
-	posteffect_id_[posteffect_ssr] = engine_.context().material_systems.get("ssr")->id();
-	posteffect_id_[posteffect_ssao] = engine_.context().material_systems.get("ssao")->id();
+	MaterialSystem* material_system = engine_.context().material_systems.get("ssr");
+	if (material_system != nullptr)
+		posteffect_id_[posteffect_ssr] = material_system->id();
+	material_system = engine_.context().material_systems.get("ssao");
+	if (material_system != nullptr)
+		posteffect_id_[posteffect_ssao] = material_system->id();
 	posteffect_debug_mode_ = posteffect_max;
 }
 

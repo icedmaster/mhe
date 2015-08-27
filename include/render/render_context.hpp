@@ -143,9 +143,10 @@ const size_t max_color_textures = 2;
 
 struct ModelContext
 {
-    UniformBuffer::IdType transform_uniform;
+	UniformBuffer::IdType transform_uniform;
+	TextureBuffer::IdType animation_texture_buffer;
 
-    ModelContext() : transform_uniform(UniformBuffer::invalid_id) {}
+	ModelContext() : transform_uniform(UniformBuffer::invalid_id), animation_texture_buffer(TextureBuffer::invalid_id) {}
 };
 
 }
