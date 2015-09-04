@@ -1,5 +1,184 @@
 #include "mhe.hpp"
 
+struct Frame
+{
+	float time;
+	mhe::vec3 position;
+	mhe::quatf rotation;
+	mhe::vec3 scale;
+};
+
+struct PositionAnimationFrame
+{
+	float time;
+	mhe::vec3 position;
+};
+
+struct RotationAnimationFrame
+{
+	float time;
+	mhe::quatf rotation;
+};
+
+struct ScaleAnimationFrame
+{
+	float time;
+	mhe::vec3 scale;
+};
+
+struct NodeAnimationFrame
+{
+	size_t node_id;
+	std::vector<PositionAnimationFrame> positions;
+	std::vector<RotationAnimationFrame> rotations;
+	std::vector<ScaleAnimationFrame> scalings;
+};
+
+struct AnimationData
+{
+	float fps;
+	float duration;
+	std::vector<NodeAnimationFrame> frames;
+	int play_mode;
+};
+
+class AnimationLoader
+{
+public:
+	static bool load(AnimationData& data, std::istream& stream)
+	{
+		char header[3];
+		stream.read(header, sizeof(header));
+		if (strncmp(header, "mhe", 3))
+		{
+			DEBUG_LOG("AnimationLoader - header is invalid");
+			return false;
+		}
+		char version;
+		stream.read(&version, 1);
+		if (version != 1)
+		{
+			DEBUG_LOG("AnimationLoader - version is invalid");
+			return false;
+		}
+		stream.read(reinterpret_cast<char*>(&data.duration), sizeof(float));
+		stream.read(reinterpret_cast<char*>(&data.fps), sizeof(float));
+		char play_mode;
+		stream.read(&play_mode, 1);
+		data.play_mode = play_mode;
+		uint32_t frames_number;
+		stream.read(reinterpret_cast<char*>(&frames_number), sizeof(uint32_t));
+		data.frames.resize(frames_number);
+		for (size_t i = 0; i < frames_number; ++i)
+		{
+			NodeAnimationFrame& frame = data.frames[i];
+			stream.read(reinterpret_cast<char*>(&frame.node_id), sizeof(uint32_t));
+			uint32_t number;
+			stream.read(reinterpret_cast<char*>(&number), sizeof(uint32_t));
+			frame.positions.resize(number);
+			stream.read(reinterpret_cast<char*>(&frame.positions[0]), sizeof(PositionAnimationFrame) * number);
+			stream.read(reinterpret_cast<char*>(&number), sizeof(uint32_t));
+			frame.rotations.resize(number);
+			stream.read(reinterpret_cast<char*>(&frame.rotations[0]), sizeof(RotationAnimationFrame) * number);
+			stream.read(reinterpret_cast<char*>(&number), sizeof(uint32_t));
+			frame.scalings.resize(number);
+			stream.read(reinterpret_cast<char*>(&frame.scalings[0]), sizeof(ScaleAnimationFrame) * number);
+		}
+
+		return true;
+	}
+};
+
+class AnimationController
+{
+public:
+	void set_animation(const AnimationData* data, const mhe::Skeleton& skeleton)
+	{
+		data_ = data;
+		time_ = 0.0f;
+		transforms_.resize(skeleton.bones.size());
+		for (size_t i = 0, size = transforms_.size(); i < size; ++i)
+			transforms_[i] = skeleton.bones[i].local_transform;
+		bind_pose_transforms_ = transforms_;
+	}
+
+	void update(float dt)
+	{
+		time_ += dt;
+		if (time_ > data_->duration)
+			time_ -= data_->duration;
+		size_t size = data_->frames.size();
+		for (size_t i = 0; i < size; ++i)
+		{
+			const NodeAnimationFrame& frame = data_->frames[i];
+			mhe::Transform transform;
+
+			mhe::vec3 position;
+			mhe::quatf rotation;
+			mhe::vec3 scale(1, 1, 1);
+			bool found = false;
+			
+			for (int j = frame.positions.size() - 1; j >= 0; --j)
+			{
+				size_t curr = j;
+				size_t next = (j + 1) % frame.positions.size();
+
+				if (time_ >= frame.positions[j].time)
+				{
+					float t = (time_ - frame.positions[curr].time) / (frame.positions[next].time - frame.positions[curr].time);
+					position = mhe::lerp(frame.positions[curr].position, frame.positions[next].position, t);
+					found = true;
+					break;
+				}
+			}
+
+			for (int j = frame.rotations.size() - 1; j >= 0; --j)
+			{
+				size_t curr = j;
+				size_t next = (j + 1) % frame.rotations.size();
+				if (time_ >= frame.rotations[j].time)
+				{
+					float t = (time_ - frame.rotations[curr].time) / (frame.rotations[next].time - frame.rotations[curr].time);
+					rotation = mhe::slerp(frame.rotations[curr].rotation, frame.rotations[next].rotation, t);
+					found = true;
+					break;
+				}
+			}
+
+			for (int j = frame.scalings.size() - 1; j >= 0; --j)
+			{
+				size_t curr = j;
+				size_t next = (j + 1) % frame.scalings.size();
+				if (time_ >= frame.scalings[j].time)
+				{
+					float t = (time_ - frame.scalings[curr].time) / (frame.scalings[next].time - frame.scalings[curr].time);
+					scale = mhe::lerp(frame.scalings[curr].scale, frame.scalings[next].scale, t);
+					found = true;
+					break;
+				}
+			}
+
+			if (found)
+			{
+				transform.set(position, rotation, scale);
+				transforms_[frame.node_id] = transform.transform();
+			}
+			else
+				transforms_[frame.node_id] = bind_pose_transforms_[frame.node_id];
+		}
+	}
+
+	const mhe::mat4x4* matrices() const
+	{
+		return &transforms_[0];
+	}
+private:
+	const AnimationData* data_;
+	std::vector<mhe::mat4x4> transforms_;
+	std::vector<mhe::mat4x4> bind_pose_transforms_;
+	float time_;
+};
+
 class GameScene : public mhe::game::GameScene
 {
 public:
@@ -9,12 +188,15 @@ public:
 	{
 		mhe::NodeInstance& node = engine.scene().create_node();
 		mhe::load_node<mhe::GBufferFillMaterialSystem>(node, mhe::string("rainbow_dash.bin"), engine.context(), engine.scene_context());
-		engine.scene_context().transform_pool.get(node.transform_id).transform.rotate_by(mhe::quatf(0.0f, mhe::pi, 0.0f));
+		engine.scene_context().transform_pool.get(node.transform_id).transform.rotate_by(mhe::quatf(-mhe::pi_2, 0.0f, 0.0f));
 		engine.scene_context().transform_pool.get(node.transform_id).transform.scale_by(mhe::vec3(1.0f, 1.0f, 1.0f));
 
 		engine.scene_context().aabb_pool.get(node.aabb_id).aabb.extents *= 1.0f;
 
 		node_ = node.id;
+
+		load_animation(engine);
+		controller_.set_animation(&animation_, node.mesh.mesh.skeleton);
 
 		mhe::TextureInstance texture;
 		engine.context().texture_manager.get(texture, mhe::string("rainbow-dash/rainbow_dash.tga"));
@@ -39,10 +221,13 @@ public:
 	bool update(mhe::game::Engine& engine) override
 	{
 		allocator_.reset();
+
+		controller_.update(engine.render_context().fdelta);
+
 		mhe::NodeInstance& node = engine.scene_context().node_pool.get(node_);
 		mhe::Skeleton& skeleton = node.mesh.mesh.skeleton;
 		mhe::TextureBuffer& texture = engine.context().texture_buffer_pool.get(node.mesh.skeleton_instance.texture_buffer);
-		mhe::mat4x4* matrices = static_cast<mhe::mat4x4*>(allocator_.alloc(sizeof(mhe::mat4x4) * skeleton.bones.size()));
+		mhe::mat4x4* matrices = allocator_.create_array<mhe::mat4x4>(skeleton.bones.size());
 		update_skeleton(matrices, skeleton);
 		uint8_t* data = reinterpret_cast<uint8_t*>(matrices);
 		texture.update(data);
@@ -52,24 +237,38 @@ private:
 	void update_skeleton(mhe::mat4x4* matrices, const mhe::Skeleton& skeleton)
 	{
 		size_t size = skeleton.bones.size();
+		const mhe::mat4x4* transforms = controller_.matrices();
+		
 		for (size_t i = 0; i < size; ++i)
 		{
-			matrices[i] = mhe::mat4x4::identity();
-			update_bone(matrices[i], i, skeleton);
-			matrices[i] *= skeleton.bones[i].inv_transform;
-			matrices[i].transpose();
+			update_bone(matrices[i], i, skeleton, controller_.matrices(), i == 5);
+			matrices[i] = skeleton.bones[i].inv_transform * matrices[i];
+			matrices[i] *= skeleton.root_transform;
 		}
 	}
 
-	void update_bone(mhe::mat4x4& m, size_t index, const mhe::Skeleton& skeleton)
+	void update_bone(mhe::mat4x4& m, size_t index, const mhe::Skeleton& skeleton, const mhe::mat4x4* xforms, bool log)
 	{
-		m *= skeleton.bones[index].local_transform;
+		const mhe::mat4x4& parent_transform = xforms[index];
+		m *= parent_transform;
 		if (skeleton.bones[index].parent_id != mhe::Bone::invalid_id)
-			update_bone(m, skeleton.bones[index].parent_id, skeleton);
+			update_bone(m, skeleton.bones[index].parent_id, skeleton, xforms, log);
+	}
+
+	void load_animation(mhe::game::Engine& engine)
+	{
+		mhe::FilePath path = mhe::utils::path_join(engine.context().mesh_manager.path(), mhe::FilePath("rainbow_dash-default.anim"));
+		std::ifstream stream(path.c_str(), std::ios::binary);
+		if (!stream.is_open())
+			return;
+		AnimationLoader::load(animation_, stream);
+		stream.close();
 	}
 
 	mhe::NodeInstance::IdType node_;
 	mhe::fixed_size_allocator<true> allocator_;
+	AnimationData animation_;
+	AnimationController controller_;
 };
 
 int main(int /*argc*/, char** /*argv*/)
@@ -95,11 +294,11 @@ int main(int /*argc*/, char** /*argv*/)
 
 	mhe::PerspectiveCameraParameters camera_parameters;
 	camera_parameters.fov = 60.0f;
-	camera_parameters.znear = 0.5f;
+	camera_parameters.znear = 0.1f;
 	camera_parameters.zfar = 100.0f;
 	mhe::game::FPSCameraController* camera_controller = new mhe::game::FPSCameraController(app.engine(), camera_parameters,
-		mhe::vec3(0, 0, 3), mhe::vec3(0.0f, mhe::pi, 0));
-	camera_controller->set_move_speed(10.0f);
+		mhe::vec3(0, 0, 1), mhe::vec3(0.0f, mhe::pi, 0));
+	camera_controller->set_move_speed(5.0f);
 	app.engine().scene().set_camera_controller(camera_controller);
 
 	return app.run();

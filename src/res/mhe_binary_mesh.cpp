@@ -205,6 +205,7 @@ bool load_mesh_version2(Mesh& mesh, std::istream& stream, const Context* context
 	// skeleton if needed
 	if (layout == SkinnedGeometryLayout::handle)
 	{
+		stream.read(reinterpret_cast<char*>(&mesh.skeleton.root_transform), sizeof(mat4x4));
 		uint32_t bones_number;
 		stream.read(reinterpret_cast<char*>(&bones_number), 4);
 		mesh.skeleton.bones.resize(bones_number);

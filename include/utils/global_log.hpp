@@ -2,18 +2,14 @@
 #define __GLOBAL_LOG_HPP__
 
 #include "log.hpp"
+#include "core/singleton.hpp"
 
 namespace mhe {
 namespace utils {
 
-class GlobalLog : public MixLog
+class GlobalLog : public MixLog, public Singleton<GlobalLog>
 {
-public:
-	static GlobalLog& instance()
-	{
-		static GlobalLog log;
-		return log;
-	}
+	friend class Singleton<GlobalLog>;
 private:
 	GlobalLog() {}
 	~GlobalLog() {}

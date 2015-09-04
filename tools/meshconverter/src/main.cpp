@@ -13,6 +13,7 @@
 const size_t mhe_header_length = 3;
 const char mhe_header[mhe_header_length + 1] = "mhe";
 const char mhe_version = 0x2;
+const char mhe_animation_version = 0x1;
 
 const size_t initial_vertex_buffer_size = 100000;
 const size_t initial_animations_frames_number = 256;
@@ -36,7 +37,8 @@ struct SkinningExportContext
 	std::vector<mhe::Bone> bones;
 	mhe::hashmap<mhe::string, size_t> bone_name_to_index;
 	mhe::hashmap<uint32_t, std::vector<ExportBone> > vertices_to_bones;
-	mhe::mat4x4 global_inv_transform;
+	mhe::mat4x4 root_local_to_world_transform;
+	mhe::mat4x4 inv_mesh_transform;
 };
 
 mhe::vec3 convert(const aiVector3D& v)
@@ -62,6 +64,11 @@ mhe::mat4x4 convert(const aiMatrix4x4& m)
 		  m.a3, m.b3, m.c3, m.d3,
 		  m.a4, m.b4, m.c4, m.d4);
 	return r;
+}
+
+mhe::quatf convert(const aiQuaternion& q)
+{
+	return mhe::quatf(q.x, q.y, q.z, q.w);
 }
 
 void write_header(std::ofstream& stream, uint8_t layout)
@@ -132,11 +139,13 @@ void write_grid_data(std::ofstream& stream, const mhe::MeshGrid& grid)
 
 }
 
-void write_bones_data(std::ofstream& stream, const mhe::Bone* bones, size_t bones_number)
+void write_skinning_data(std::ofstream& stream, const SkinningExportContext& skinning_context)
 {
-	uint32_t num = bones_number;
+	uint32_t num = skinning_context.bones.size();
+	const mhe::Bone* bones = &skinning_context.bones[0];
+	stream.write((const char*)&skinning_context.root_local_to_world_transform, sizeof(mhe::mat4x4));
 	stream.write((const char*)&num, sizeof(uint32_t));
-	for (size_t i = 0; i < bones_number; ++i)
+	for (size_t i = 0; i < num; ++i)
 	{
 		write_string(stream, bones[i].name);
 		stream.write((const char*)&bones[i].id, sizeof(uint32_t));
@@ -178,13 +187,12 @@ mhe::mat4x4 calculate_parent_transform(const aiNode* node)
 {
 	mhe::mat4x4 m = convert(node->mTransformation);
 	if (node->mParent)
-		m = calculate_parent_transform(node->mParent) * m;
+		m *= calculate_parent_transform(node->mParent);
 	return m;
 }
 
 void setup_parents(const aiScene* ai_scene, const aiMesh* mesh, SkinningExportContext& skinning_context)
 {
-	aiNode* root = ai_scene->mRootNode;
 	for (size_t i = 0, size = mesh->mNumBones; i < size; ++i)
 	{
 		aiBone* ai_bone = mesh->mBones[i];
@@ -202,7 +210,9 @@ void setup_parents(const aiScene* ai_scene, const aiMesh* mesh, SkinningExportCo
 				bone.parent_id = it->value;
 			}
 			else
-				bone.local_transform = calculate_parent_transform(node) * bone.local_transform;
+			{
+				skinning_context.root_local_to_world_transform = calculate_parent_transform(node->mParent) * skinning_context.inv_mesh_transform;
+			}
 		}
 	}
 }
@@ -236,7 +246,7 @@ void fill_skinned_vertices(std::vector<mhe::SkinnedGeometryLayout::Vertex> &out_
 	{
 		mhe::SkinnedGeometryLayout::Vertex& v = out_vertices[it->key];
 		sort_by_weight(it->value);
-		size_t n = mhe::min(it->value.size(), 4);
+		size_t n = mhe::min(it->value.size(), 4u);
 		float weight_total = 0.0f;
 
 		memset(v.ids, 0, sizeof(v.ids));
@@ -272,6 +282,7 @@ void process_node(const aiScene* assimp_scene, aiNode* node, const aiMatrix4x4& 
 							 normal_transform.a2, normal_transform.b2, normal_transform.c2, 0.0f,
 							 normal_transform.a3, normal_transform.b3, normal_transform.c3, 0.0f,
 							 0.0f, 0.0f, 0.0f, 0.0f);
+
 	for (unsigned int m = 0; m < node->mNumMeshes; ++m)
 	{
 		aiMesh* mesh = assimp_scene->mMeshes[node->mMeshes[m]];
@@ -331,6 +342,8 @@ void process_node(const aiScene* assimp_scene, aiNode* node, const aiMatrix4x4& 
 
 		if (mesh->HasBones())
 		{
+			ASSERT(node->mNumMeshes < 2, "Currently only single mesh per export is supported");
+			skinning_context.inv_mesh_transform = convert(transform.Inverse());
 			size_t bones_number = mesh->mNumBones;
 			for (size_t i = 0; i < bones_number; ++i)
 			{
@@ -341,7 +354,7 @@ void process_node(const aiScene* assimp_scene, aiNode* node, const aiMatrix4x4& 
 				bone.name = convert(ai_bone->mName);
 				bone.id = skinning_context.bones.size();
 				bone.parent_id = mhe::Bone::invalid_id;
-				bone.inv_transform = convert(ai_bone->mOffsetMatrix);
+				bone.inv_transform = skinning_context.inv_mesh_transform * convert(ai_bone->mOffsetMatrix);
 				skinning_context.bones.push_back(bone);
 
 				skinning_context.bone_name_to_index[convert(ai_bone->mName)] = bone.id;
@@ -378,19 +391,118 @@ void create_grid(mhe::MeshGrid& grid, const std::vector<mhe::StandartGeometryLay
 	}
 }
 
-void process_animations(const aiScene* assimp_scene, const char* out_filename, const ExportParams& params)
+void write_animation(mhe::AnimationExportData& animation_data, const char* out_filename, const ExportParams& params)
+{
+	// write out data to the file with name "out_filename-<animation_name>.anim"
+	mhe::FilePath filename = mhe::utils::get_file_name(mhe::string(out_filename));
+	filename += "-";
+	filename += animation_data.name;
+	filename += ".anim";
+
+	INFO_LOG("Exporting animation " << filename << " ...");
+
+	std::ofstream stream(filename.c_str(), std::ios::binary);
+	if (!stream.is_open())
+	{
+		ERROR_LOG("Can't open file " << filename << " for writing");
+		return;
+	}
+	stream.write(mhe_header, mhe_header_length);
+	stream.write(&mhe_animation_version, 1);
+	stream.write(reinterpret_cast<const char*>(&animation_data.duration), sizeof(float));
+	stream.write(reinterpret_cast<const char*>(&animation_data.fps), sizeof(float));
+	stream.write(reinterpret_cast<const char*>(&animation_data.play_mode), sizeof(uint8_t));
+	stream.write(reinterpret_cast<const char*>(&animation_data.frames_number), sizeof(uint32_t));
+	for (size_t i = 0; i < animation_data.frames_number; ++i)
+	{
+		stream.write(reinterpret_cast<const char*>(&animation_data.frames[i].node_id), sizeof(uint32_t));
+		stream.write(reinterpret_cast<const char*>(&animation_data.frames[i].position_frames_number), sizeof(uint32_t));
+		stream.write(reinterpret_cast<const char*>(animation_data.frames[i].position_frames),
+			animation_data.frames[i].position_frames_number * sizeof(mhe::PositionAnimationFrame));
+		stream.write(reinterpret_cast<const char*>(&animation_data.frames[i].rotation_frames_number), sizeof(uint32_t));
+		stream.write(reinterpret_cast<const char*>(animation_data.frames[i].rotation_frames),
+			animation_data.frames[i].rotation_frames_number * sizeof(mhe::RotationAnimationFrame));
+		stream.write(reinterpret_cast<const char*>(&animation_data.frames[i].scale_frames_number), sizeof(uint32_t));
+		stream.write(reinterpret_cast<const char*>(animation_data.frames[i].scale_frames),
+			animation_data.frames[i].scale_frames_number * sizeof(mhe::ScaleAnimationFrame));
+	}
+
+	stream.close();
+	INFO_LOG("Export finished");
+}
+
+void process_animations(const aiScene* assimp_scene, const char* out_filename, const ExportParams& params, const SkinningExportContext& skinning_context)
 {
 	for (size_t i = 0; i < assimp_scene->mNumAnimations; ++i)
 	{
 		mhe::AnimationExportData animation_data;
-		std::vector<mhe::TranslationAnimationFrame> translations;
-		std::vector<mhe::RotationAnimationFrame> rotations;
-		std::vector<mhe::ScaleAnimationFrame> scaling;
 
 		aiAnimation* ai_animation = assimp_scene->mAnimations[i];
-		animation_data.duration = ai_animation->mDuration;
-		animation_data.fps = ai_animation->mTicksPerSecond;
+		animation_data.duration = static_cast<float>(ai_animation->mDuration);
+		animation_data.fps = static_cast<float>(ai_animation->mTicksPerSecond);
 		animation_data.name = convert(ai_animation->mName);
+		if (animation_data.name.empty())
+			animation_data.name = "default";
+
+		std::vector<mhe::NodeAnimationFrame> frames;
+		typedef std::vector<mhe::PositionAnimationFrame> PositionFramesVector;
+		typedef std::vector<mhe::RotationAnimationFrame> RotationFramesVector;
+		typedef std::vector<mhe::ScaleAnimationFrame> ScaleFramesVector;
+
+		std::vector<PositionFramesVector> positions;
+		std::vector<RotationFramesVector> rotations;
+		std::vector<ScaleFramesVector> scalings;
+
+		for (unsigned int i = 0; i < ai_animation->mNumChannels; ++i)
+		{
+			aiNodeAnim* ai_node_anim = ai_animation->mChannels[i];
+			const mhe::string& bone_name = convert(ai_node_anim->mNodeName);
+			mhe::hashmap<mhe::string, size_t>::const_iterator it = skinning_context.bone_name_to_index.find(bone_name);
+			if (it == skinning_context.bone_name_to_index.end()) continue;
+			mhe::NodeAnimationFrame frame;
+			frame.node_id = it->value;
+			frame.position_frames_number = ai_node_anim->mNumPositionKeys;
+			PositionFramesVector pos;
+			for (size_t j = 0; j < ai_node_anim->mNumPositionKeys; ++j)
+			{
+				mhe::PositionAnimationFrame pos_frame;
+				pos_frame.time = static_cast<float>(ai_node_anim->mPositionKeys[j].mTime);
+				pos_frame.position = convert(ai_node_anim->mPositionKeys[j].mValue);
+				pos.push_back(pos_frame);
+			}
+			positions.push_back(pos);
+			frame.position_frames = &positions.back()[0];
+
+			frame.rotation_frames_number = ai_node_anim->mNumRotationKeys;
+			RotationFramesVector rot;
+			for (size_t j = 0; j < ai_node_anim->mNumRotationKeys; ++j)
+			{
+				mhe::RotationAnimationFrame rot_frame;
+				rot_frame.time = static_cast<float>(ai_node_anim->mRotationKeys[j].mTime);
+				rot_frame.rotation = convert(ai_node_anim->mRotationKeys[j].mValue);
+				rot.push_back(rot_frame);
+			}
+			rotations.push_back(rot);
+			frame.rotation_frames = &rotations.back()[0];
+
+			frame.scale_frames_number = ai_node_anim->mNumScalingKeys;
+			ScaleFramesVector sc;
+			for (size_t j = 0; j < ai_node_anim->mNumScalingKeys; ++j)
+			{
+				mhe::ScaleAnimationFrame scale_frame;
+				scale_frame.time = static_cast<float>(ai_node_anim->mScalingKeys[j].mTime);
+				scale_frame.scale = convert(ai_node_anim->mScalingKeys[j].mValue);
+				sc.push_back(scale_frame);
+			}
+			scalings.push_back(sc);
+			frame.scale_frames = &scalings.back()[0];
+
+			frames.push_back(frame);
+		}
+
+		animation_data.frames_number = frames.size();
+		animation_data.frames = &frames[0];
+		write_animation(animation_data, out_filename, params);
 	}
 }
 
@@ -419,8 +531,6 @@ void process_scene(const char* out_filename, const aiScene* assimp_scene, const 
 	if (assimp_scene->mRootNode != nullptr)
 	{
 		parts.resize(0);
-		skinning_context.global_inv_transform = convert(assimp_scene->mRootNode->mTransformation);
-		skinning_context.global_inv_transform.inverse();
 		process_node(assimp_scene, assimp_scene->mRootNode, aiMatrix4x4(), indexes, vertexes, parts, mesh_aabb_min, mesh_aabb_max, skinning_context);
 	}
 	else
@@ -529,6 +639,8 @@ void process_scene(const char* out_filename, const aiScene* assimp_scene, const 
 
 	//mhe::MeshGrid mesh_grid;
 	//create_grid(mesh_grid, vertexes, indexes);
+	
+	INFO_LOG("Exporting geometry " << out_filename << " ...");
 
 	std::ofstream f(out_filename, std::ios::out | std::ios::binary);
 	if (!f.is_open())
@@ -561,12 +673,14 @@ void process_scene(const char* out_filename, const aiScene* assimp_scene, const 
 		(const char*)&indexes[0], indexes.size());
 	write_material_data(f, &materials[0], materials.size());
 	write_parts_data(f, &parts[0], parts.size());
-	write_bones_data(f, &skinning_context.bones[0], skinning_context.bones.size());
+	write_skinning_data(f, skinning_context);
 	//write_grid_data(f, mesh_grid);
 
 	f.close();
 
-	process_animations(assimp_scene, out_filename, params);
+	INFO_LOG("Export finished");
+
+	process_animations(assimp_scene, out_filename, params, skinning_context);
 }
 
 int main(int argc, char** argv)

@@ -53,6 +53,7 @@ struct Bone
 
 struct Skeleton
 {
+	mat4x4 root_transform;
 	std::vector<Bone> bones;
 };
 

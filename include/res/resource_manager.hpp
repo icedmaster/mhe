@@ -74,6 +74,11 @@ public:
 	{
 		path_ = path;
 	}
+
+	const FilePath& path() const
+	{
+		return path_;
+	}
 protected:
     bool get_impl(res_type& res, const std::string& name, bool absolute_path) const
     {

@@ -52,6 +52,10 @@ Application::~Application()
 
 	destroy_default_allocator();
 	print_memory_info();
+
+#ifndef MHE_STANDART_LOG_DISABLED
+	mhe::utils::destroy_standart_log();
+#endif
 }
 
 bool Application::init(const ApplicationConfig& config)

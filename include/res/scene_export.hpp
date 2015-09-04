@@ -19,7 +19,7 @@ struct Weight
 	float weight;
 };
 
-struct TranslationAnimationFrame
+struct PositionAnimationFrame
 {
 	float time;
 	vec3 position;
@@ -43,17 +43,33 @@ enum
 	play_mode_loop
 };
 
+struct AnimationFrame
+{
+	size_t node_id;
+	float time;
+	vec3 position;
+	quatf rotation;
+	vec3 scale;
+};
+
+struct NodeAnimationFrame
+{
+	size_t node_id;
+	size_t position_frames_number;
+	PositionAnimationFrame* position_frames;
+	size_t rotation_frames_number;
+	RotationAnimationFrame* rotation_frames;
+	size_t scale_frames_number;
+	ScaleAnimationFrame* scale_frames;
+};
+
 struct AnimationExportData
 {
 	string name;
 	float fps;
 	float duration;
-	size_t translation_frames;
-	TranslationAnimationFrame* translations;
-	size_t rotation_frames;
-	RotationAnimationFrame* rotations;
-	size_t scale_frames;
-	ScaleAnimationFrame* scalings;
+	size_t frames_number;
+	NodeAnimationFrame* frames;
 	int play_mode;
 };
 
