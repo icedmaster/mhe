@@ -11,19 +11,19 @@ struct Frame
 struct PositionAnimationFrame
 {
 	float time;
-	mhe::vec3 position;
+	mhe::vec3 value;
 };
 
 struct RotationAnimationFrame
 {
 	float time;
-	mhe::quatf rotation;
+	mhe::quatf value;
 };
 
 struct ScaleAnimationFrame
 {
 	float time;
-	mhe::vec3 scale;
+	mhe::vec3 value;
 };
 
 struct NodeAnimationFrame
@@ -102,6 +102,41 @@ public:
 		bind_pose_transforms_ = transforms_;
 	}
 
+	mhe::vec3 lerp(const mhe::vec3& v1, const mhe::vec3& v2, float t) const
+	{
+		return mhe::lerp(v1, v2, t);
+	}
+
+	mhe::quatf lerp(const mhe::quatf& q1, const mhe::quatf& q2, float t) const
+	{
+		return mhe::slerp(q1, q2, t);
+	}
+
+	template <class T, class V>
+	bool sample(T& res, const std::vector<V>& data, float time, float duration)
+	{
+		size_t size = data.size();
+		for (int j = size - 1; j >= 0; --j)
+		{
+			size_t curr = j;
+			size_t next = (j + 1) % size;
+
+			float curr_time = data[curr].time;
+			float next_time = next != 0 ? data[next].time : duration + data[0].time;
+
+			float start_time = j == 0 ? 0.0f : data[curr].time;
+			float end_time = next == 0 ? duration : data[next].time;
+
+			if (time >= start_time && time <= end_time)
+			{
+				float t = (time - curr_time) / (next_time - curr_time);
+				res = lerp(data[curr].value, data[next].value, t);
+				return true;
+			}
+		}
+		return false;
+	}
+
 	void update(float dt)
 	{
 		time_ += dt;
@@ -111,57 +146,20 @@ public:
 		for (size_t i = 0; i < size; ++i)
 		{
 			const NodeAnimationFrame& frame = data_->frames[i];
-			mhe::Transform transform;
 
 			mhe::vec3 position;
 			mhe::quatf rotation;
 			mhe::vec3 scale(1, 1, 1);
-			bool found = false;
-			
-			for (int j = frame.positions.size() - 1; j >= 0; --j)
-			{
-				size_t curr = j;
-				size_t next = (j + 1) % frame.positions.size();
-
-				if (time_ >= frame.positions[j].time)
-				{
-					float t = (time_ - frame.positions[curr].time) / (frame.positions[next].time - frame.positions[curr].time);
-					position = mhe::lerp(frame.positions[curr].position, frame.positions[next].position, t);
-					found = true;
-					break;
-				}
-			}
-
-			for (int j = frame.rotations.size() - 1; j >= 0; --j)
-			{
-				size_t curr = j;
-				size_t next = (j + 1) % frame.rotations.size();
-				if (time_ >= frame.rotations[j].time)
-				{
-					float t = (time_ - frame.rotations[curr].time) / (frame.rotations[next].time - frame.rotations[curr].time);
-					rotation = mhe::slerp(frame.rotations[curr].rotation, frame.rotations[next].rotation, t);
-					found = true;
-					break;
-				}
-			}
-
-			for (int j = frame.scalings.size() - 1; j >= 0; --j)
-			{
-				size_t curr = j;
-				size_t next = (j + 1) % frame.scalings.size();
-				if (time_ >= frame.scalings[j].time)
-				{
-					float t = (time_ - frame.scalings[curr].time) / (frame.scalings[next].time - frame.scalings[curr].time);
-					scale = mhe::lerp(frame.scalings[curr].scale, frame.scalings[next].scale, t);
-					found = true;
-					break;
-				}
-			}
+			bool found = sample(position, frame.positions, time_, data_->duration);
+			found |= sample(rotation, frame.rotations, time_, data_->duration);
+			found |= sample(scale, frame.scalings, time_, data_->duration);
 
 			if (found)
 			{
-				transform.set(position, rotation, scale);
-				transforms_[frame.node_id] = transform.transform();
+				mhe::mat4x4 m = mhe::mat4x4::scaling_matrix(scale);
+				m *= rotation.to_matrix<mhe::mat4x4>();
+				m.set_row(3, position);
+				transforms_[frame.node_id] = m;
 			}
 			else
 				transforms_[frame.node_id] = bind_pose_transforms_[frame.node_id];
