@@ -64,8 +64,8 @@ public:
 	void normalize()
 	{
 		T invm = 1.0f / magnitude();
-		x_ *= m;
-		y_ *= m;
+		x_ *= invm;
+		y_ *= invm;
 	}
 
 	inline bool operator== (const vector2& v) const

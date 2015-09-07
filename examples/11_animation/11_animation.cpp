@@ -113,7 +113,7 @@ public:
 	}
 
 	template <class T, class V>
-	bool sample(T& res, const std::vector<V>& data, float time, float duration)
+	bool sample(T& res, const V& data, float time, float duration)
 	{
 		size_t size = data.size();
 		for (int j = size - 1; j >= 0; --j)
@@ -186,7 +186,7 @@ public:
 	{
 		mhe::NodeInstance& node = engine.scene().create_node();
 		mhe::load_node<mhe::GBufferFillMaterialSystem>(node, mhe::string("rainbow_dash.bin"), engine.context(), engine.scene_context());
-		engine.scene_context().transform_pool.get(node.transform_id).transform.rotate_by(mhe::quatf(-mhe::pi_2, 0.0f, 0.0f));
+		engine.scene_context().transform_pool.get(node.transform_id).transform.rotate_by(mhe::quatf(mhe::pi_2, mhe::pi, 0.0f));
 		engine.scene_context().transform_pool.get(node.transform_id).transform.scale_by(mhe::vec3(1.0f, 1.0f, 1.0f));
 
 		engine.scene_context().aabb_pool.get(node.aabb_id).aabb.extents *= 1.0f;

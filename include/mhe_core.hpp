@@ -28,5 +28,6 @@
 #include "core/types.hpp"
 #include "core/types_cast.hpp"
 #include "core/unique_ptr.hpp"
+#include "core/vector.hpp"
 
 #endif // __MHE_CORE__

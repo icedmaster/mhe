@@ -418,13 +418,13 @@ void write_animation(mhe::AnimationExportData& animation_data, const char* out_f
 		stream.write(reinterpret_cast<const char*>(&animation_data.frames[i].node_id), sizeof(uint32_t));
 		stream.write(reinterpret_cast<const char*>(&animation_data.frames[i].position_frames_number), sizeof(uint32_t));
 		stream.write(reinterpret_cast<const char*>(animation_data.frames[i].position_frames),
-			animation_data.frames[i].position_frames_number * sizeof(mhe::PositionAnimationFrame));
+			animation_data.frames[i].position_frames_number * sizeof(mhe::PositionAnimationExportFrame));
 		stream.write(reinterpret_cast<const char*>(&animation_data.frames[i].rotation_frames_number), sizeof(uint32_t));
 		stream.write(reinterpret_cast<const char*>(animation_data.frames[i].rotation_frames),
-			animation_data.frames[i].rotation_frames_number * sizeof(mhe::RotationAnimationFrame));
+			animation_data.frames[i].rotation_frames_number * sizeof(mhe::RotationAnimationExportFrame));
 		stream.write(reinterpret_cast<const char*>(&animation_data.frames[i].scale_frames_number), sizeof(uint32_t));
 		stream.write(reinterpret_cast<const char*>(animation_data.frames[i].scale_frames),
-			animation_data.frames[i].scale_frames_number * sizeof(mhe::ScaleAnimationFrame));
+			animation_data.frames[i].scale_frames_number * sizeof(mhe::ScaleAnimationExportFrame));
 	}
 
 	stream.close();
@@ -444,10 +444,10 @@ void process_animations(const aiScene* assimp_scene, const char* out_filename, c
 		if (animation_data.name.empty())
 			animation_data.name = "default";
 
-		std::vector<mhe::NodeAnimationFrame> frames;
-		typedef std::vector<mhe::PositionAnimationFrame> PositionFramesVector;
-		typedef std::vector<mhe::RotationAnimationFrame> RotationFramesVector;
-		typedef std::vector<mhe::ScaleAnimationFrame> ScaleFramesVector;
+		std::vector<mhe::NodeAnimationExportFrame> frames;
+		typedef std::vector<mhe::PositionAnimationExportFrame> PositionFramesVector;
+		typedef std::vector<mhe::RotationAnimationExportFrame> RotationFramesVector;
+		typedef std::vector<mhe::ScaleAnimationExportFrame> ScaleFramesVector;
 
 		std::vector<PositionFramesVector> positions;
 		std::vector<RotationFramesVector> rotations;
@@ -459,13 +459,13 @@ void process_animations(const aiScene* assimp_scene, const char* out_filename, c
 			const mhe::string& bone_name = convert(ai_node_anim->mNodeName);
 			mhe::hashmap<mhe::string, size_t>::const_iterator it = skinning_context.bone_name_to_index.find(bone_name);
 			if (it == skinning_context.bone_name_to_index.end()) continue;
-			mhe::NodeAnimationFrame frame;
+			mhe::NodeAnimationExportFrame frame;
 			frame.node_id = it->value;
 			frame.position_frames_number = ai_node_anim->mNumPositionKeys;
 			PositionFramesVector pos;
 			for (size_t j = 0; j < ai_node_anim->mNumPositionKeys; ++j)
 			{
-				mhe::PositionAnimationFrame pos_frame;
+				mhe::PositionAnimationExportFrame pos_frame;
 				pos_frame.time = static_cast<float>(ai_node_anim->mPositionKeys[j].mTime);
 				pos_frame.position = convert(ai_node_anim->mPositionKeys[j].mValue);
 				pos.push_back(pos_frame);
@@ -477,7 +477,7 @@ void process_animations(const aiScene* assimp_scene, const char* out_filename, c
 			RotationFramesVector rot;
 			for (size_t j = 0; j < ai_node_anim->mNumRotationKeys; ++j)
 			{
-				mhe::RotationAnimationFrame rot_frame;
+				mhe::RotationAnimationExportFrame rot_frame;
 				rot_frame.time = static_cast<float>(ai_node_anim->mRotationKeys[j].mTime);
 				rot_frame.rotation = convert(ai_node_anim->mRotationKeys[j].mValue);
 				rot.push_back(rot_frame);
@@ -489,7 +489,7 @@ void process_animations(const aiScene* assimp_scene, const char* out_filename, c
 			ScaleFramesVector sc;
 			for (size_t j = 0; j < ai_node_anim->mNumScalingKeys; ++j)
 			{
-				mhe::ScaleAnimationFrame scale_frame;
+				mhe::ScaleAnimationExportFrame scale_frame;
 				scale_frame.time = static_cast<float>(ai_node_anim->mScalingKeys[j].mTime);
 				scale_frame.scale = convert(ai_node_anim->mScalingKeys[j].mValue);
 				sc.push_back(scale_frame);

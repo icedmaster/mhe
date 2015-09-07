@@ -19,19 +19,19 @@ struct Weight
 	float weight;
 };
 
-struct PositionAnimationFrame
+struct PositionAnimationExportFrame
 {
 	float time;
 	vec3 position;
 };
 
-struct RotationAnimationFrame
+struct RotationAnimationExportFrame
 {
 	float time;
 	quatf rotation;
 };
 
-struct ScaleAnimationFrame
+struct ScaleAnimationExportFrame
 {
 	float time;
 	vec3 scale;
@@ -52,15 +52,15 @@ struct AnimationFrame
 	vec3 scale;
 };
 
-struct NodeAnimationFrame
+struct NodeAnimationExportFrame
 {
 	size_t node_id;
 	size_t position_frames_number;
-	PositionAnimationFrame* position_frames;
+	PositionAnimationExportFrame* position_frames;
 	size_t rotation_frames_number;
-	RotationAnimationFrame* rotation_frames;
+	RotationAnimationExportFrame* rotation_frames;
 	size_t scale_frames_number;
-	ScaleAnimationFrame* scale_frames;
+	ScaleAnimationExportFrame* scale_frames;
 };
 
 struct AnimationExportData
@@ -69,7 +69,7 @@ struct AnimationExportData
 	float fps;
 	float duration;
 	size_t frames_number;
-	NodeAnimationFrame* frames;
+	NodeAnimationExportFrame* frames;
 	int play_mode;
 };
 

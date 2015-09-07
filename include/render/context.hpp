@@ -172,6 +172,7 @@ struct Context
 	MeshManager mesh_manager;
 	ShaderManager shader_manager;
 	TextureManager texture_manager;
+	AnimationManager animation_manager;
 
 	VertexBufferPool vertex_buffer_pool;
 	IndexBufferPool index_buffer_pool;

@@ -1,5 +1,5 @@
-#ifndef __FIXED_SIZE_VECTOR_HPP__
-#define __FIXED_SIZE_VECTOR_HPP__
+#ifndef __VECTOR_HPP__
+#define __VECTOR_HPP__
 
 #include "compiler.hpp"
 #include "allocator.hpp"
@@ -17,90 +17,47 @@
 
 namespace mhe {
 
-namespace detail {
-
-struct default_reallocation_policy
-{
-	static void reallocate(size_t /*prev_size*/, size_t /*new_size*/, const char* /*additional_info*/) {}
-};
-
-struct log_reallocation_policy
-{
-	static void reallocate(size_t prev_size, size_t new_size, const char* additional_info)
-	{
-		std::cout << "reallocate(), " << prev_size << " " << new_size << " info:" << additional_info << std::endl;
-	}
-};
-
-struct assert_reallocation_policy
-{
-	static void reallocate(size_t /*prev_size*/, size_t /*new_size*/, const char* /*additional_info*/)
-	{
-		assert(false);
-	}
-};
-
-template <class T, size_t count>
-struct static_array_traits
-{
-    T elements[count];
-};
-
-template <class T, size_t count>
-struct dynamic_array_traits
-{
-    dynamic_array_traits() : elements(new T[count]) {}
-    ~dynamic_array_traits() { delete [] elements; }
-    T* elements;
-};
-
-}	// detail
-
-#define DEFAULT_REALLOCATION_POLICY			detail::default_reallocation_policy
-
-template <class T, size_t count, class reallocation_policy = DEFAULT_REALLOCATION_POLICY>
-class fixed_size_vector
+template <class T>
+class vector
 {
 public:
-	typedef fixed_size_vector<T, count> this_type;
+	typedef vector<T> this_type;
 	typedef T value_type;
 	typedef T* iterator;
 	typedef const T* const_iterator;
 public:
-	fixed_size_vector(allocator* alloc = default_allocator()) :
-        begin_(elements_), size_(0), capacity_(count), allocator_(alloc)
+	vector(allocator* alloc = default_allocator()) :
+        begin_(nullptr), size_(0), capacity_(0), allocator_(alloc)
 	{}
 
-	fixed_size_vector(const this_type& v, allocator* alloc = default_allocator()) :
-        begin_(elements_), size_(0), capacity_(count), allocator_(alloc)
+	vector(const this_type& v, allocator* alloc = default_allocator()) :
+        begin_(nullptr), size_(0), capacity_(0), allocator_(alloc)
 	{
 		insert(end(), v.begin(), v.end());
 	}
 
-	fixed_size_vector(size_t size, allocator* alloc = default_allocator()) :
-        begin_(elements_), size_(0), capacity_(count), allocator_(alloc)
+	vector(size_t size, allocator* alloc = default_allocator()) :
+        begin_(nullptr), size_(0), capacity_(0), allocator_(alloc)
 	{		
 		resize(size);
 	}
 
 	template <class InputIterator>
-	fixed_size_vector(InputIterator first, InputIterator last, allocator* alloc = default_allocator()) :
-		begin_(elements_), capacity_(count)
+	vector(InputIterator first, InputIterator last, allocator* alloc = default_allocator()) :
+		begin_(nullptr), size_(0), capacity_(0)
 	{
 		insert(end(), first, last);
 	}
 
-	~fixed_size_vector()
+	~vector()
 	{
-		if (begin_ != elements_)
-		{
-			free(begin_);
-		}
+		clear();
+		free(begin_);
 	}
 
 	void set_allocator(allocator* alloc)
 	{
-		if (elements_ != begin_)
+		if (capacity_ != 0)
 		{
 			ASSERT(0, "Can't set allocator - some data has been allocated already using different allocator");
 			return;
@@ -131,23 +88,25 @@ public:
 
 	T& operator[] (size_t index)
 	{
+		ASSERT(index < size_, "Invalid index " << index);
 		return begin_[index];
 	}
 
 	const T& operator[] (size_t index) const
 	{
+		ASSERT(index < size_, "Invalid index " << index);
 		return begin_[index];
 	}
 
 	T& at(size_t index)
 	{
-		assert(index < size_);
+		ASSERT(index < size_, "Invalid index " << index);
 		return begin_[index];
 	}
 
 	T at(size_t index) const
 	{
-		assert(index < size_);
+		ASSERT(index < size_, "Invalid index " << index);
 		return begin_[index];
 	}
 
@@ -235,6 +194,8 @@ public:
 
 	void clear()
 	{
+		for (size_t i = 0; i < size_; ++i)
+			begin_[i].~T();
 		size_ = 0;
 	}	
 
@@ -249,23 +210,6 @@ public:
 		size_t erased_count = 0;
 		for (; first != last; ++first) ++erased_count;
 		return erase_impl(index, erased_count);
-	}
-
-	// optimization, use this methods carefully
-	iterator next_predefined_element()
-	{
-		size_t index = size_;		
-		if (index >= capacity_)
-			return end();
-		++size_;
-		return begin_ + index;
-	}
-
-	T& add()
-	{
-		iterator it = next_predefined_element();
-		ASSERT(it != end(), "Can not add a new element");
-		return *it;
 	}
 
 	// operators
@@ -294,7 +238,7 @@ private:
 	iterator insert_impl(size_t index, const T& value)
 	{
 		if ((size_ + 1) > capacity_)
-			reallocate_vector(capacity_ * 2);
+			reallocate_vector(static_cast<size_t>(capacity_ * 1.5f));
 		if (index != size_)
 			mhe::copy(begin_ + index, begin_ + size_ - index, begin_ + index + 1);
 		begin_[index] = value;
@@ -304,12 +248,11 @@ private:
 
 	void reallocate_vector(size_t new_capacity)
 	{
-		reallocation_policy::reallocate(capacity_, new_capacity, FUNCTION_DESCRIPTION_MACRO);
-		T* copy = begin_;;
+		T* copy = begin_;
 		capacity_ = new_capacity;
 		begin_ = allocate(capacity_);
 		mhe::copy(copy, copy + size_, begin_);
-		if (copy != elements_) free(copy);
+		free(copy);
 	}
 
 	iterator erase_impl(size_t index, size_t erased_count)
@@ -330,82 +273,19 @@ private:
 		destroy_array(ptr, allocator_);
 	}
 
-	T elements_[count];
 	T* begin_;
 	size_t size_;
 	size_t capacity_;
 	allocator* allocator_;
 };
 
-template <class T, size_t count, class Traits = detail::static_array_traits<T, count> >
-class fixed_capacity_vector
-{
-public:
-    typedef T* iterator;
-    typedef const T* const_iterator;
-public:
-    fixed_capacity_vector() : size_(0) {}
-
-    T& add()
-    {
-        ASSERT(size_ < count - 1, "fixed_capacity_vector is full");
-        return traits_.elements[size_++];
-    }
-
-	void push_back(const T& v)
-	{
-        ASSERT(size_ < count - 1, "fixed_capacity_vector is full");
-		traits_.elements[size_++] = v;
-	}
-
-    const T* data() const
-    {
-        return traits_.elements;
-    }
-
-    T* data()
-    {
-        return traits_.elements;
-    }
-
-    size_t size() const
-    {
-        return size_;
-    }
-
-    void clear()
-    {
-        size_ = 0;
-    }
-
-	bool empty() const
-	{
-		return size_ == 0;
-	}
-
-	T& operator[] (size_t index)
-	{
-		ASSERT(index < size_, "Invalid index");
-		return traits_.elements[index];
-	}
-
-	const T& operator[] (size_t index) const
-	{
-		ASSERT(index < size_, "Invalid index");
-		return traits_.elements[index];
-	}
-private:
-    Traits traits_;
-    size_t size_;
-};
-
-template <class T, size_t count>
-inline std::ostream& operator<< (std::ostream& stream, const fixed_size_vector<T, count>& vector)
+template <class T>
+inline std::ostream& operator<< (std::ostream& stream, const vector<T>& v)
 {
 	std::stringstream ss;
 	ss << "{";
-	for (size_t i = 0; i < vector.size(); ++i)
-		ss << vector[i] << ", ";
+	for (size_t i = 0; i < v.size(); ++i)
+		ss << v[i] << ", ";
 	ss << "}";
 	stream << ss.str();
 	return stream;
