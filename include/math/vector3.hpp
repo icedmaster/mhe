@@ -52,6 +52,11 @@ public:
 		v_[0] = static_cast<T>(v.x()); v_[1] = static_cast<T>(v.y()); v_[2] = static_cast<T>(v.z());
 	}
 
+	vector3(T v)
+	{
+		v_[0] = v_[1] = v_[2] = v;
+	}
+
 	~vector3() {} // do nothing
 
 	inline void set(T v)
@@ -92,6 +97,11 @@ public:
 	inline T z() const
 	{
 		return v_[2];
+	}
+
+	vector2<T> xy() const
+	{
+		return vector2<T>(v_[0], v_[1]);
 	}
 
 	float length() const
@@ -302,7 +312,7 @@ vector3<T> min(const vector3<T>& v1, const vector3<T>& v2)
 template <class T>
 vector3<T> max(const vector3<T>& v1, const vector3<T>& v2)
 {
-	return vector3<T>(std::max(v1.x(), v2.x()), std::max(v1.y(), v2.y()), std::max(v1.z(), v2.z()));
+	return vector3<T>(mhe::max(v1.x(), v2.x()), mhe::max(v1.y(), v2.y()), mhe::max(v1.z(), v2.z()));
 }
 
 template <class T>

@@ -38,6 +38,9 @@ bool CSMDepthRenderingMaterialSystem::init(Context& context, const MaterialSyste
 	desc.height = rt_height;
 	if (!render_target.init(context, desc)) return false;
 
+	texture_size_.set(desc.width, desc.height);
+	cascade_size_.set(rt_width, rt_height);
+
 	render_target_id_ = render_target.id();
 
 	render_target.depth_texture(shadowmap_);
@@ -68,6 +71,11 @@ bool CSMDepthRenderingMaterialSystem::init(Context& context, const MaterialSyste
 
 	cascades_number_ = cascades_number;
 
+	UberShader::Info info = ubershader(context).info("SKINNING");
+	UberShader::Index index;
+	index.set(info, 1);
+	shader_program_with_skinning_ = ubershader(context).get(index);
+
 	return true;
 }
 
@@ -82,6 +90,7 @@ void CSMDepthRenderingMaterialSystem::setup(Context& context, SceneContext& scen
 void CSMDepthRenderingMaterialSystem::start_frame(Context& context, SceneContext& scene_context, RenderContext& render_context)
 {
 	mat4x4 light_view;
+	LightInstance* light_instance = nullptr;
 	Light* light = nullptr;
 	for (size_t i = 0; i < render_context.lights_number; ++i)
 	{
@@ -92,12 +101,13 @@ void CSMDepthRenderingMaterialSystem::start_frame(Context& context, SceneContext
 		light_view = get_light_view_matrix(scene_context, render_context.lights[i].id);
 		shadow_info_.shadowmap = shadowmap_;
 		light = &render_context.lights[i].light;
+		light_instance = &render_context.lights[i];
 	}
 
 	if (light == nullptr)
 		return;
 
-	vec4 lightspace_corners[8];
+	vec4 aabb_points[8];
 	vec4 points[8] = { vec4(-1.0f, -1.0f, -1.0f, 1.0f),
 		vec4(-1.0f, -1.0f, +1.0f, 1.0f),
 		vec4(+1.0f, -1.0f, +1.0f, 1.0f),
@@ -111,23 +121,29 @@ void CSMDepthRenderingMaterialSystem::start_frame(Context& context, SceneContext
 	for (int i = 0; i < 8; ++i)
 	{
 		vec4 p = mul(points[i], extents) + center;
-		lightspace_corners[i] = p * light_view;
+		aabb_points[i] = p;
 	}
 
+	const vec3& light_direction = get_light_direction(scene_context, light_instance->id);
+	float max_extents = mhe::max(mhe::max(extents.x(), extents.y()), extents.z());
+	vec3 light_position = center.xyz() - light_direction * max_extents;
+	light_view.set_row(3, light_position * light_view.as_rotation_matrix());
+
 	mat4x4 proj[max_cascades_number];
+	mat4x4 view[max_cascades_number];
 	float znear[max_cascades_number];
 	float zfar[max_cascades_number];
 
 	shadow_info_.cascades_number = cascades_number_;
-	shadow_info_.lightview = light_view;
 	for (size_t i = 0; i < cascades_number_; ++i)
 	{
 		zfar[i] = render_context.main_camera.zfar * percentage_[i];
 		znear[i] = i == 0 ? render_context.main_camera.znear : zfar[i - 1];
-		calculate_projection(proj[i], lightspace_corners, light_view, render_context.main_camera, znear[i], zfar[i]);
+		view[i] = light_view;
+		calculate_projection(proj[i], view[i], aabb_points, render_context.main_camera, znear[i], zfar[i]);
 
 		TransformSimpleData transform_data;
-		transform_data.vp = light_view * proj[i];
+		transform_data.vp = view[i] * proj[i];
 		UniformBuffer& uniform = context.uniform_pool.get(transform_uniform_id_[i]);
 		uniform.update(transform_data);
 
@@ -136,7 +152,8 @@ void CSMDepthRenderingMaterialSystem::start_frame(Context& context, SceneContext
 		shadow_info_.znear[i] = znear[i];
 		shadow_info_.zfar[i] = zfar[i];
 
-		shadow_info_.lightvp = transform_data.vp;
+		shadow_info_.lightvp[i] = transform_data.vp;
+		shadow_info_.lightview[i] = view[i];
 
 		FrustumCullingRequest request;
 		request.vp = transform_data.vp;
@@ -146,7 +163,7 @@ void CSMDepthRenderingMaterialSystem::start_frame(Context& context, SceneContext
 	light->set_shadow_info(&shadow_info_);
 }
 
-void CSMDepthRenderingMaterialSystem::calculate_projection(mat4x4& proj, const vec4* lightspace_aabb, const mat4x4& light_view, const CameraData& camera_data, float znear, float zfar) const
+void CSMDepthRenderingMaterialSystem::calculate_projection(mat4x4& proj, mat4x4& view, const vec4* aabb, const CameraData& camera_data, float znear, float zfar) const
 {
 	vec3 viewspace_frustum_points[8];
 	const vec3& fwd = -vec3::forward();
@@ -170,10 +187,31 @@ void CSMDepthRenderingMaterialSystem::calculate_projection(mat4x4& proj, const v
 	viewspace_frustum_points[6] = far_center - up * far_height - right * far_width;
 	viewspace_frustum_points[7] = far_center - up * far_height + right * far_width;
 
-	mat4x4 view_to_lightspace = camera_data.inv_v * light_view;
+	vec4 frustum_points_ws[8];
+	vec3 frustum_center_ws;
+	for (int i = 0; i < 8; ++i)
+	{
+		frustum_points_ws[i] = vec4(viewspace_frustum_points[i], 1.0f) * camera_data.inv_v;
+		frustum_center_ws += frustum_points_ws[i].xyz();
+	}
+	frustum_center_ws /= 8.0f;
+
+	vec4 lightspace_aabb[8];
+	for (int i = 0; i < 8; ++i)
+		lightspace_aabb[i] = aabb[i] * view;
+	vec3 lightspace_aabb_min(9999999.0f, 9999999.0f, 9999999.0f);
+	vec3 lightspace_aabb_max(-9999999.0f, -9999999.0f, -9999999.0f);
+	for (int i = 0; i < 8; ++i)
+	{
+		lightspace_aabb_min = min(lightspace_aabb_min, lightspace_aabb[i].xyz());
+		lightspace_aabb_max = max(lightspace_aabb_max, lightspace_aabb[i].xyz());
+	}
+
+	mat4x4 aabb_calculation_view = view;
+
 	vec4 lightspace_frustum_points[8];
 	for (int i = 0; i < 8; ++i)
-		lightspace_frustum_points[i] = vec4(viewspace_frustum_points[i], 1.0f) * view_to_lightspace;
+		lightspace_frustum_points[i] = frustum_points_ws[i] * aabb_calculation_view;
 
 	// find LR and TB points for the projection matrix
 	vec3 lightspace_min(9999999.0f, 9999999.0f, 9999999.0f);
@@ -184,15 +222,28 @@ void CSMDepthRenderingMaterialSystem::calculate_projection(mat4x4& proj, const v
 		lightspace_max = max(lightspace_max, lightspace_frustum_points[i].xyz());
 	}
 
-	vec3 lightspace_aabb_min(9999999.0f, 9999999.0f, 9999999.0f);
-	vec3 lightspace_aabb_max(-9999999.0f, -9999999.0f, -9999999.0f);
-	for (int i = 0; i < 8; ++i)
-	{
-		lightspace_aabb_min = min(lightspace_aabb_min, lightspace_aabb[i].xyz());
-		lightspace_aabb_max = max(lightspace_aabb_max, lightspace_aabb[i].xyz());
-	}
+	vec2 inv_cascade_size = 1.0f / cascade_size_;
+	vec2 proj_min = lightspace_min.xy();
+	vec2 proj_max = lightspace_max.xy();
 
-	proj.set_ortho(lightspace_min.x(), lightspace_max.x(), lightspace_min.y(), lightspace_max.y(), -lightspace_aabb_max.z(), -lightspace_aabb_min.z());
+	vec2 delta = proj_max - proj_min;
+	vec2 offset = delta * inv_cascade_size * 0.5f;
+	proj_max += offset;
+	proj_min -= offset;
+
+	vec2 fit_coeff = delta * inv_cascade_size;
+
+	proj_max = proj_max / fit_coeff;
+	proj_max = floor(proj_max);
+	proj_max = proj_max * fit_coeff;
+
+	proj_min = proj_min / fit_coeff;
+	proj_min = floor(proj_min);
+	proj_min = proj_min * fit_coeff;
+
+	proj.set_ortho(proj_min.x(), proj_max.x(),
+		proj_min.y(), proj_max.y(),
+		-lightspace_aabb_max.z(), -lightspace_aabb_min.z());
 }
 
 void CSMDepthRenderingMaterialSystem::update(Context& context, SceneContext& scene_context, RenderContext& render_context)
@@ -216,7 +267,8 @@ void CSMDepthRenderingMaterialSystem::update(Context& context, SceneContext& sce
 				DrawCall& draw_call = render_context.draw_calls.add();
 				draw_call.render_data = render_context.nodes[i].mesh.mesh.parts[j].render_data;
 				Material& material = create_and_get(context.materials[id()]);
-				material.shader_program = default_program(context).id();
+				material.shader_program = render_context.nodes[i].mesh.mesh.skeleton.bones.empty() ? default_program(context).id() :
+					shader_program_with_skinning_;
 				material.uniforms[0] = transform_uniform_id_[pass];
 				material.id = material.id;
 				draw_call.material.material_system = id();
@@ -225,6 +277,8 @@ void CSMDepthRenderingMaterialSystem::update(Context& context, SceneContext& sce
 				const MaterialInstance& original_material_instance = part.material;
 				const Material& original_material = context.materials[original_material_instance.material_system].get(original_material_instance.id);
 				material.uniforms[1] = original_material.uniforms[1];
+
+				material.texture_buffers[1] = original_material.texture_buffers[1];
 
 				draw_call.draw_call_data = draw_call_data_id_[pass];
 

@@ -19,8 +19,8 @@
   <material name="csm_depth_write" shader="depth_write" priority="3">
     <options>
       <cascades>4</cascades>
-      <height>512</height>
-      <width>512</width>
+      <height>1024</height>
+      <width>1024</width>
       <percentage>20, 40, 60, 100</percentage>
     </options>
   </material>
@@ -103,24 +103,15 @@
 	</node>
 	<node name="tonemap" material="tonemap" priority="6">
 	  <inputs>
-		<input index="0" node="ssao_mul" output="0" material="" material_output="" />
+		<input index="0" node="ssao_mul" material_output="0" />
 	  </inputs>
 	</node>
-	<!-->
-	<node name="tonemap" material="tonemap" priority="6">
-	  <inputs>
-		<input index="0" material="posteffect_simple" material_output="0" />
-	  </inputs>
-	</node>
-	<-->
-	<!-->
 	<node name="dof" material="dof" priority="7">
 	  <inputs>
 		<input index="2" node="" output="" material="gbuffer_fill" material_output="2" />
 		<input index="3" />
 	  </inputs>
 	</node>
-	<-->
 	<node name="fxaa" material="fxaa" src="" priority="8" />
   </posteffects>
 </mhe>

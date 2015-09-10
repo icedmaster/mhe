@@ -73,6 +73,10 @@
 
 #define MHE_UPDATE_MATERIAL
 
+#ifdef MHE_HEADERS_ONLY
+#define MHE_SYSTEM_NEW_DELETE
+#endif
+
 /**
 * Rendering configuration
 */

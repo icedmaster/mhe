@@ -405,7 +405,7 @@ void GBufferDrawMaterialSystem::update_light_data(LightData& light_data, const S
 	const ShadowInfo* shadow_info = light.shadow_info();
 	if (shadowmap_enabled_.value() && shadow_info != nullptr)
 	{
-		light_data.lightvp = shadow_info->lightvp;
+		light_data.lightvp = shadow_info->lightvp[0];
 		light_data.shadowmap_params = vec4(light.desc().shadowmap_bias, 0.0f, 0.0f, 0.0f);
 	}
 
@@ -423,7 +423,6 @@ void GBufferDrawMaterialSystem::update_directional_light_data(DirectionalLightDa
 	const ShadowInfo* shadow_info = light.shadow_info();
 	if (shadowmap_enabled_.value() && shadow_info != nullptr)
 	{
-		light_data.lightvp = shadow_info->lightview;
 		light_data.shadowmap_params = vec4(light.desc().shadowmap_bias, 0.0f, 0.0f, 0.0f);
 
 		light_data.cascades_number = shadow_info->cascades_number;
@@ -433,6 +432,7 @@ void GBufferDrawMaterialSystem::update_directional_light_data(DirectionalLightDa
 			light_data.csm_scale[i] = shadow_info->scale[i];
 			light_data.cascade_znear[i] = shadow_info->znear[i];
 			light_data.cascade_zfar[i] = shadow_info->zfar[i];
+			light_data.lightvp[i] = shadow_info->lightview[i];
 		}
 	}
 }

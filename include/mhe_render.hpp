@@ -3,6 +3,7 @@
 #ifndef __MHE_RENDER__
 #define __MHE_RENDER__
 
+#include "render/animation.hpp"
 #include "render/commands.hpp"
 #include "render/context.hpp"
 #include "render/csm_depth_rendering_material_system.hpp"
@@ -25,6 +26,7 @@
 #include "render/mesh.hpp"
 #include "render/mesh_grid.hpp"
 #include "render/node.hpp"
+#include "render/node_instance_methods.hpp"
 #include "render/posteffect_material_system.hpp"
 #include "render/renderer.hpp"
 #include "render/render_buffer.hpp"

@@ -54,7 +54,7 @@ struct DirectionalLightData
 	vec4 diffuse;
 	vec4 specular;
 	vec4 direction;
-	mat4x4 lightvp;
+	mat4x4 lightvp[max_shadowmap_cascades_number];
 	vec4 csm_scale[max_shadowmap_cascades_number];
 	vec4 csm_offset[max_shadowmap_cascades_number];
 	float cascade_znear[max_shadowmap_cascades_number];

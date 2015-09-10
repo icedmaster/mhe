@@ -69,10 +69,15 @@ bool Engine::init(uint width, uint height, uint bpp, bool fullscreen)
 
 	context_.window_system.view()->set_events_handler(new BaseViewEventsHandler(this));
 
+#ifdef MHE_DEBUG
+	context_.window_system.disable_vsync();
+#endif
+
 	context_.shader_manager.set_context(&context_);
 	context_.mesh_manager.set_context(&context_);
 	context_.texture_manager.set_context(&context_);
 	context_.material_manager.set_context(&context_);
+	context_.animation_manager.set_context(&context_);
 
 	set_default_video_settings();
 
@@ -156,7 +161,7 @@ void Engine::update()
 	}
 
 	RenderContext& render_context = renderer_->render_context();
-	render_context.tick = utils::get_current_time();
+	render_context.tick = static_cast<uint32_t>(utils::get_current_time());
 	render_context.fdelta = utils::get_last_delta();
 
 	if (stats_timer_.elapsed() > 1.0f)

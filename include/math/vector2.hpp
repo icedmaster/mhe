@@ -36,6 +36,13 @@ public:
 		x_ = x; y_ = y;
 	}
 
+	template <class U>
+	void set(U x, U y)
+	{
+		x_ = static_cast<T>(x);
+		y_ = static_cast<T>(y);
+	}
+
 	inline T x() const
 	{
 		return x_;
@@ -85,6 +92,13 @@ public:
 		return *this;
 	}
 
+	vector2<T>& operator+= (const vector2& v)
+	{
+		x_ += v.x_;
+		y_ += v.y_;
+		return *this;
+	}
+
 	vector2<T>& operator*= (T v)
 	{
 		x_ *= v;
@@ -127,9 +141,27 @@ inline vector2<T> operator* (const vector2<T>& v1, const vector2<U>& v2)
 }
 
 template <class T, class U>
+inline vector2<T> operator* (const vector2<T>& v, U t)
+{
+	return vector2<T>(v.x() * t, v.y() * t);
+}
+
+template <class T, class U>
 inline vector2<T> operator/ (const vector2<T>& v1, const vector2<U>& v2)
 {
 	return vector2<T>(v1.x() / v2.x(), v1.y() / v2.y());
+}
+
+template <class T>
+inline vector2<T> operator/ (T t, const vector2<T>& v)
+{
+	return vector2<T>(t / v.x(), t / v.y());
+}
+
+template <class T>
+inline vector2<T> floor(const vector2<T>& v)
+{
+	return vector2<T>(std::floor(v.x()), std::floor(v.y()));
 }
 
 template <class T, class U>

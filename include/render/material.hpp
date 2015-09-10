@@ -46,6 +46,9 @@ struct MaterialInstance
     MaterialInstance() : id(Material::invalid_id), material_system(invalid_material_system_id) {}
 };
 
+const float default_shininess = 50.0f;
+const float default_glossiness = 0.0f;
+
 struct MaterialRenderData
 {
 	vec3 diffuse;
@@ -54,10 +57,9 @@ struct MaterialRenderData
 	vec3 emissive;
 	float specular_shininess;
 	float glossiness;
-};
 
-const float default_shininess = 50.0f;
-const float default_glossiness = 0.0f;
+	MaterialRenderData() : specular_shininess(default_shininess), glossiness(default_glossiness) {}
+};
 
 struct MaterialData
 {

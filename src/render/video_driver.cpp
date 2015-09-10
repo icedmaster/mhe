@@ -254,7 +254,7 @@ void Driver::perform_draw_call(const Context& context, const DrawCall& draw_call
 	}
 	for (size_t j = 0; j < material_texture_buffers_number; ++j)
 	{
-		if (material.texture_buffers[j] == TextureBuffer::invalid_id || material.texture_buffers[j] == state_.texture_buffers[j])
+		if (material.texture_buffers[j] == TextureBuffer::invalid_id || material.texture_buffers[j] == state_.texture_buffers[j] && !shader_program_changed)
 			continue;
 		const TextureBuffer& texture_buffer = context.texture_buffer_pool.get(material.texture_buffers[j]);
 		impl_->set_texture_buffer(texture_buffer, j);

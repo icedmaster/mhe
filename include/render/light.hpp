@@ -82,8 +82,8 @@ struct ShadingSettings
 struct ShadowInfo
 {
 	TextureInstance shadowmap;
-	mat4x4 lightvp;
-	mat4x4 lightview;
+	array<mat4x4, max_shadowmap_cascades_number> lightvp;
+	array<mat4x4, max_shadowmap_cascades_number> lightview;
 	array<vec3, max_shadowmap_cascades_number> offset;
 	array<vec3, max_shadowmap_cascades_number> scale;
 	array<float, max_shadowmap_cascades_number> znear;

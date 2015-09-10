@@ -121,6 +121,8 @@ void ImGuiHelper::render(Context& context, RenderContext& render_context)
 	draw_call.textures[0] = &context.texture_pool.get(font_texture_id_);
 	draw_call.uniforms[0] = &context.uniform_pool.get(transform_uniform_id_);
 	draw_call.render_command = nullptr;
+	draw_call.indices_number = 0;
+	draw_call.elements_number = 0;
 
 	ImGui::GetIO().UserData = &draw_call;
 	ImGui::Render();

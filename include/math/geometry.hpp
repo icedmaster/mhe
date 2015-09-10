@@ -13,6 +13,12 @@ struct Triangle
 
 typedef Triangle<float> trianglef;
 
+template <class T>
+inline std::ostream& operator<< (std::ostream& s, const Triangle<T>& t)
+{
+	return s << '{' << t.vertices[0] << " " << t.vertices[1] << " " << t.vertices[2] << '}';
+}
+
 }
 
 #endif

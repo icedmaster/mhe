@@ -194,6 +194,9 @@ void OpenGL3Driver::draw(const RenderData& data)
 
 void OpenGL3Driver::draw(size_t /*elements_number*/, size_t vbuffer_offset, size_t ibuffer_offset, size_t indices_number, Primitive primitive)
 {
+	if (indices_number == 0)
+		return;
+
 	OpenGLExtensions::instance().glDrawElementsBaseVertex(get_primitive_type(primitive), 
 		indices_number != 0 ? indices_number : current_index_buffer_->size(), GL_UNSIGNED_INT,
 		(void*)(ibuffer_offset * sizeof(uint32_t)), vbuffer_offset);

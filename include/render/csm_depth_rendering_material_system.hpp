@@ -28,8 +28,10 @@ public:
 	}
 private:
 	void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
-	void calculate_projection(mat4x4& proj, const vec4* lightspace_aabb, const mat4x4& light_view, const CameraData& camera_data, float znear, float zfar) const;
+	void calculate_projection(mat4x4& proj, mat4x4& view, const vec4* aabb, const CameraData& camera_data, float znear, float zfar) const;
 
+	vec2 texture_size_;
+	vec2 cascade_size_;
 	ClearCommand clear_command_;
 	fixed_size_vector<DrawCallData::IdType, max_cascades_number> draw_call_data_id_;
 	fixed_size_vector<UniformBuffer::IdType, max_cascades_number> transform_uniform_id_;
@@ -38,6 +40,7 @@ private:
 	size_t cascades_number_;
 	fixed_size_vector<float, max_cascades_number> percentage_;
 	ShadowInfo shadow_info_;
+	ShaderProgram::IdType shader_program_with_skinning_;
 };
 
 }

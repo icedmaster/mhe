@@ -126,7 +126,6 @@ public:
 
 	void free(void* /*ptr*/) override
 	{
-		ASSERT(0, "You shouldn't call free() when memory was allocated using fixed_size_allocator");
 	}
 
 	size_t allocated() const override
@@ -197,10 +196,17 @@ private:
 	uint8_t* stack_;
 };
 
+#ifndef MHE_HEADERS_ONLY
 void set_default_allocator(allocator* alloc);
 MHE_EXPORT allocator* default_allocator();
 MHE_EXPORT void create_default_allocator();
 MHE_EXPORT void destroy_default_allocator();
+#else
+inline allocator* default_allocator()
+{
+	return nullptr;
+}
+#endif
 
 template <class T>
 inline T* create(allocator* alloc)

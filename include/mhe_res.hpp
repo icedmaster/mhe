@@ -3,6 +3,7 @@
 #ifndef __MHE_RES__
 #define __MHE_RES__
 
+#include "res/animation_loader.hpp"
 #include "res/mesh_loader.hpp"
 #include "res/mhe_binary_mesh.hpp"
 #include "res/resource_manager.hpp"

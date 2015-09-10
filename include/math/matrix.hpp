@@ -541,6 +541,13 @@ public:
                 m_[2][0], m_[2][1], m_[2][2]);
     }
 
+	matrix<T> as_rotation_matrix() const
+	{
+		matrix<T> c = *this;
+		c.set_row(3, vector4<T>::zero());
+		return c;
+	}
+
 	// create identity matrix
 	static matrix identity()
 	{

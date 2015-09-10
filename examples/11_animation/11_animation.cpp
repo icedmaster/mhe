@@ -202,12 +202,21 @@ public:
 			node.mesh.instance_parts[0].material.id);
 		material.textures[mhe::albedo_texture_unit] = texture;
 
+		mhe::GBufferFillMaterialSystem* material_system = engine.context().material_systems.get<mhe::GBufferFillMaterialSystem>();
+		mhe::NodeInstance& plane = engine.scene().create_node();
+		mhe::utils::create_plane(plane, engine.context());
+		mhe::MaterialInitializationData material_initialization_data;
+		material_initialization_data.textures[0] = mhe::string("test.tga");
+		mhe::setup_node(plane, material_system, engine.context(), engine.scene_context(), material_initialization_data);
+		mhe::set_node_transform(engine.scene_context(), plane, mhe::vec3::zero(), mhe::quatf(-mhe::pi_2, 0.0f, 0.0f),
+			mhe::vec3(5.0f, 5.0f, 5.0f));
+
 		mhe::LightInstance& light_instance = engine.scene().create_light();
 		mhe::Light& light = light_instance.light;
 		light.shading().diffuse = mhe::vec4(240.0f / 255.0f, 150.0f / 255.0f, 80.0f / 255.0f, 1.0f);
 		light.shading().specular = mhe::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 		light.shading().intensity = 5.0f;
-		mhe::set_light_position(engine.scene_context(), light_instance.id, mhe::vec3(0, 10.0f, 0));
+		mhe::set_light_position(engine.scene_context(), light_instance.id, mhe::vec3(0, 1.0f, 0));
 		mhe::set_light_rotation(engine.scene_context(), light_instance.id, mhe::quatf(-mhe::pi_2, 0.0f, 0.0f));
 		light.set_type(mhe::Light::directional);
 		light.desc().cast_shadows = true;
@@ -292,10 +301,10 @@ int main(int /*argc*/, char** /*argv*/)
 
 	mhe::PerspectiveCameraParameters camera_parameters;
 	camera_parameters.fov = 60.0f;
-	camera_parameters.znear = 0.1f;
-	camera_parameters.zfar = 100.0f;
+	camera_parameters.znear = 0.5f;
+	camera_parameters.zfar = 20.0f;
 	mhe::game::FPSCameraController* camera_controller = new mhe::game::FPSCameraController(app.engine(), camera_parameters,
-		mhe::vec3(0, 0, 1), mhe::vec3(0.0f, mhe::pi, 0));
+		mhe::vec3(0, 1, 1), mhe::vec3(0.0f, mhe::pi, 0));
 	camera_controller->set_move_speed(5.0f);
 	app.engine().scene().set_camera_controller(camera_controller);
 

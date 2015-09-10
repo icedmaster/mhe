@@ -17,7 +17,7 @@ struct Light
 	vec4 diffuse;
 	vec4 specular;
 	vec4 direction;
-	mat4 lightvp;
+	mat4 lightvp[MAX_CASCADES_NUMBER];
 	vec4 csm_scale[MAX_CASCADES_NUMBER];
 	vec4 csm_offset[MAX_CASCADES_NUMBER];
 	float cascade_znear[MAX_CASCADES_NUMBER];
@@ -57,7 +57,7 @@ vec3 blinn(vec3 specular, vec3 material_specular, vec3 lightdir, vec3 normal, ve
 	// The standart reflect() method requires incident vector. We have lightdir vector directed FROM the surface,
 	// therefore it's easier to calculate reflected vector manually, besides we've calculated NdotL already
 	vec3 reflected = -lightdir + 2.0f * ndotl * normal;
-	float vdotr = saturate(dot(viewdir, reflected));
+	float vdotr = max(dot(viewdir, reflected), 0.001f);
 
 	return (specular + env_color) * material_specular * pow(vdotr, shininess) * enable;
 }
