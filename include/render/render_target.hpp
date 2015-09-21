@@ -29,11 +29,24 @@ struct RenderTargetDesc
 	int depth_format;
 	int color_datatype[max_simultaneous_render_targets_number];
 	int depth_datatype;
+	int color_filter[max_simultaneous_render_targets_number];
+	int depth_filter;
+	float color_anisotropy[max_simultaneous_render_targets_number];
+	float depth_anisotropy;
 	uint8_t color_targets;
 	bool use_depth;
 	bool use_stencil;
 
-	RenderTargetDesc() : texture_type(texture_2d) {}
+	RenderTargetDesc() : texture_type(texture_2d)
+	{
+		for (size_t i = 0; i < max_simultaneous_render_targets_number; ++i)
+		{
+			color_filter[i] = texture_filter_linear;
+			color_anisotropy[i] = 1.0f;
+		}
+		depth_filter = texture_filter_linear;
+		depth_anisotropy = 1.0f;
+	}
 };
 
 class RenderTargetImpl

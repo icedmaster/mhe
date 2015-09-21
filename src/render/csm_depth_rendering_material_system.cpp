@@ -36,6 +36,8 @@ bool CSMDepthRenderingMaterialSystem::init(Context& context, const MaterialSyste
 	desc.depth_format = format_d24f;
 	desc.width = rt_width * cascades_number;
 	desc.height = rt_height;
+	desc.depth_anisotropy = 1.0f;
+	desc.depth_filter = texture_filter_nearest;
 	if (!render_target.init(context, desc)) return false;
 
 	texture_size_.set(desc.width, desc.height);
@@ -126,7 +128,10 @@ void CSMDepthRenderingMaterialSystem::start_frame(Context& context, SceneContext
 
 	const vec3& light_direction = get_light_direction(scene_context, light_instance->id);
 	float max_extents = mhe::max(mhe::max(extents.x(), extents.y()), extents.z());
-	vec3 light_position = center.xyz() - light_direction * max_extents;
+	rayf r(center.xyz() - light_direction * max_extents, light_direction, max_extents);
+	vec3 input = r.origin, output;
+	intersects(input, output, r, render_context.aabb);
+	vec3 light_position = input;
 	light_view.set_row(3, light_position * light_view.as_rotation_matrix());
 
 	mat4x4 proj[max_cascades_number];

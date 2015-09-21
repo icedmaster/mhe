@@ -1,4 +1,4 @@
-#define EARLY_EXIT
+//#define EARLY_EXIT
 
 [include "posteffect_vs_common.h"]
 
@@ -51,7 +51,7 @@ vec4 ssr(vec3 ray_origin, vec3 ray_dir, GBuffer gbuffer, int samples, float init
 	return vec4(gbuffer_albedo(res_pos) * weight * gbuffer.glossiness, weight);
 }
 
-#define SSR_SAMPLES 10
+#define SSR_SAMPLES 25
 
 void main()
 {
@@ -64,7 +64,7 @@ void main()
 	float max_distance = zfar;
 	float min_distance = znear;
 	float initial_probe_distance = (zfar - znear) / SSR_SAMPLES;
-	float max_error = initial_probe_distance * 0.5f;
+	float max_error = initial_probe_distance * 0.05f;
 	
 	vec4 ssr_pixel = ssr(world_pos, view_dir, gbuffer, SSR_SAMPLES, initial_probe_distance, max_error, max_distance, min_distance);
 	color = vec4(ssr_pixel.rgb, 1.0f);

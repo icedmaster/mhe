@@ -133,8 +133,6 @@ bool intersects(hit<T>& h, const ray<T>& r, const Triangle<T>& tri)
 template <class T>
 bool intersects(vector3<T>& input, vector3<T>& output, const ray<T>& r, const AABB<T>& aabb)
 {
-	NOT_IMPLEMENTED(input);
-	NOT_IMPLEMENTED(output);
 	vector3<T> bounds[2];
 	aabb.min_max(bounds[0], bounds[1]);
 
@@ -156,6 +154,9 @@ bool intersects(vector3<T>& input, vector3<T>& output, const ray<T>& r, const AA
 	if (tmin > tzmax || tzmin > tmax) return false;
 	if (tzmin > tmin) tmin = tzmin;
 	if (tzmax < tmax) tmax = tzmax;
+
+	input = r.origin + r.direction * tmin;
+	output = r.origin + r.direction * tmax;
 
 	return true;
 }

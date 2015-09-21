@@ -106,6 +106,11 @@ float pcf_filter(sampler2D tex, float pixel_depth, vec2 texcoord, float bias, ve
 {
 	float shadow_value = 0.0f;
 	float weight = 0.0f;
+	vec2 f = fract(texcoord / sample_size);
+	float left_edge = 1.0f - f.x;
+	float right_edge = f.x;
+	float top_edge = f.y;
+	float bottom_edge = 1.0 - f.y;
 	for (int y = -PCF_TAPS; y <= PCF_TAPS; ++y)
 	{
 		for (int x = -PCF_TAPS; x <= PCF_TAPS; ++x)
@@ -113,8 +118,12 @@ float pcf_filter(sampler2D tex, float pixel_depth, vec2 texcoord, float bias, ve
 			vec2 offset = vec2(x * sample_size.x, y * sample_size.y);
 			float shadowmap_depth = texture(tex, texcoord + offset).x;
 			float tap_weight = pcf_weights[(y + PCF_TAPS) * PCF_SIZE + x + PCF_TAPS];
+			if (x == -PCF_TAPS) tap_weight = left_edge;
+			else if (x == PCF_TAPS) tap_weight = right_edge;
+			if (y == -PCF_TAPS) tap_weight *= bottom_edge;
+			else if (y == PCF_TAPS) tap_weight *= top_edge;
 			shadow_value += pixel_depth < shadowmap_depth + bias ? 1.0f * tap_weight : 0.0f;
-			weight += 1.0f; //tap_weight;
+			weight += 1.0f;
 		}
 	}
 		

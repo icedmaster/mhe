@@ -220,7 +220,7 @@ public:
 		mhe::set_light_rotation(engine.scene_context(), light_instance.id, mhe::quatf(-mhe::pi_2, 0.0f, 0.0f));
 		light.set_type(mhe::Light::directional);
 		light.desc().cast_shadows = true;
-		light.desc().shadowmap_bias = 0.005f;
+		light.desc().shadowmap_bias = 0.05f;
 		light_instance.enabled = true;
 		return true;
 	}
