@@ -22,10 +22,16 @@ void main()
 [fragment]
 
 #if QUALITY == 0
-#define BLUR_SAMPLES 3
+#define BLUR_SAMPLES 1
 #elif QUALITY == 1
 #define BLUR_SAMPLES 3
 #endif
+
+[uniform blur_params 1 per_frame]
+uniform blur_params
+{
+	vec4 params;
+};
 
 [include "common.h"]
 [include "gaussian_blur_kernels.h"]
@@ -37,9 +43,8 @@ in VSOutput vsoutput;
 out vec4 color;
 
 #pragma optionNV (unroll all)
-vec4 blur(vec2 tex, ivec2 dir)
+vec4 blur(vec2 tex, vec2 dir)
 {
-	// NSIGHT gives up here when I use textureOffset() method ("texel offset is out of range error")
 	vec4 res = VEC4_ZERO;
 	vec2 inv_texsize = 1.0f / textureSize(main_texture, 0);
 	for (int i = -BLUR_SAMPLES; i <= BLUR_SAMPLES; ++i)
@@ -52,10 +57,11 @@ vec4 blur(vec2 tex, ivec2 dir)
 
 void main()
 {
+	float size = params.x;
 #if PASS == 0
-	vec4 res = blur(vsoutput.tex, ivec2(1, 0));
+	vec4 res = blur(vsoutput.tex, vec2(size, 0));
 #elif PASS == 1
-	vec4 res = blur(vsoutput.tex, ivec2(0, 1));
+	vec4 res = blur(vsoutput.tex, vec2(0, size));
 #endif
 	color = res;
 }

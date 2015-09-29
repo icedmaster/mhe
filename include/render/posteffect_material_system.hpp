@@ -178,25 +178,70 @@ class FXAAMaterialSystem : public PosteffectMaterialSystemBase
 class SSRMaterialSystem : public PosteffectMaterialSystemBase
 {
 	SETUP_MATERIAL("ssr");
+public:
+	bool init(Context& context, const MaterialSystemContext& material_system_context) override;
+	void init_debug_views(Context& context) override;
+private:
+	void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
+
+	struct SSRShaderData
+	{
+		vec4 ssrdata[3];
+	};
+
+	SSRShaderData ssr_shader_data_;
+	UniformBuffer::IdType ssr_uniform_;
 };
 
 class BlurMaterialSystem : public PosteffectMaterialSystemBase
 {
 	SETUP_MATERIAL("blur");
+
+	struct ShaderData
+	{
+		vec4 params;
+	};
 public:
+	struct Settings
+	{
+		float size;
+
+		Settings() : size(1.0f) {}
+	};
+
+	enum
+	{
+		quality_normal,
+		quality_high
+	};
+
 	bool init(Context& context, const MaterialSystemContext& material_system_context) override;
 
 	size_t default_instances_number() const override
 	{
 		return 2;
 	}
+
+	Settings& settings()
+	{
+		return settings_;
+	}
+
+	void set_quality(int quality)
+	{
+		quality_ = quality;
+	}
 private:
 	bool create_output(DrawCallData& draw_call_data, Context& context, size_t index, float scale, int format) override;
 	void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
 
+	Settings settings_;
+	UniformBuffer::IdType uniform_;
 	UberShader::Info pass_info_;
+	UberShader::Info quality_info_;
 	MeshInstance second_pass_mesh_;
 	ClearCommand clear_command_;
+	int quality_;
 };
 
 class DOFMaterialSystem : public PosteffectMaterialSystemBase

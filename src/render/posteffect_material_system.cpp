@@ -315,13 +315,81 @@ Material& PosteffectMaterialSystemBase::default_material(Context& context)
 	return context.materials[id()].get(mesh_.instance_parts[0].material.id);
 }
 
+bool SSRMaterialSystem::init(Context& context, const MaterialSystemContext& material_system_context)
+{
+	if (!PosteffectMaterialSystemBase::init(context, material_system_context))
+	{
+		ERROR_LOG("SSR: can't initialize PosteffectMaterialSystemBase");
+		return false;
+	}
+
+	UniformBuffer& uniform = create_and_get(context.uniform_pool);
+	UniformBufferDesc desc;
+	desc.size = sizeof(SSRShaderData);
+	desc.unit = 1;
+	desc.update_type = uniform_buffer_normal;
+	if (!uniform.init(desc))
+	{
+		ERROR_LOG("Can't initialize SSR uniform");
+		return false;
+	}
+
+	ssr_uniform_ = uniform.id();
+	default_material(context).uniforms[1] = uniform.id();
+
+	ssr_shader_data_.ssrdata[0] = vec4(10.0f, 1000.0f, 0.5f, 0.5f);
+	ssr_shader_data_.ssrdata[1] = vec4(10.0f, 1000.0f, 1.0f, 20.0f);
+	ssr_shader_data_.ssrdata[2] = vec4(0.9f, 0.0f, 0.0f, 0.0f);
+
+	return true;
+}
+
+void SSRMaterialSystem::init_debug_views(Context& context)
+{
+	size_t debug_view_id = context.debug_views->add_view("SSR");
+	DebugViews::DebugView& view = context.debug_views->get_view(debug_view_id);
+	view.add("probes", 0.0f, 30.0f, &ssr_shader_data_.ssrdata[0].x());
+	view.add("max_probe_distance", 100.0f, 2000.0f, &ssr_shader_data_.ssrdata[0].y());
+	view.add("min_probe_distance", 0.0f, 10.0f, &ssr_shader_data_.ssrdata[0].z());
+	view.add("max error", 0.0f, 10.0f, &ssr_shader_data_.ssrdata[0].w());
+	view.add("start distance", 0.0f, 500.0f, &ssr_shader_data_.ssrdata[1].x());
+	view.add("end distance", 600.0f, 2000.0f, &ssr_shader_data_.ssrdata[1].y());
+	view.add("intensity", 0.0f, 5.0f, &ssr_shader_data_.ssrdata[1].z());
+	view.add("fade distance", 0.0f, 100.0f, &ssr_shader_data_.ssrdata[1].w());
+	view.add("UV fade", 0.0f, 1.0f, &ssr_shader_data_.ssrdata[2].x());
+}
+
+void SSRMaterialSystem::update(Context& context, SceneContext& scene_context, RenderContext& render_context)
+{
+	UniformBuffer& uniform = context.uniform_pool.get(ssr_uniform_);
+	uniform.update(ssr_shader_data_);
+
+	PosteffectMaterialSystemBase::update(context, scene_context, render_context);
+}
+
 bool BlurMaterialSystem::init(Context& context, const MaterialSystemContext& material_system_context)
 {
 	if (!PosteffectMaterialSystemBase::init(context, material_system_context))
 		return false;
 	pass_info_ = ubershader(context).info("PASS");
+	quality_info_ = ubershader(context).info("QUALITY");
+
+	quality_ = quality_normal;
+
+	UniformBuffer& uniform_buffer = create_and_get(context.uniform_pool);
+	UniformBufferDesc uniform_buffer_desc;
+	uniform_buffer_desc.size = sizeof(ShaderData);
+	uniform_buffer_desc.unit = 1;
+	uniform_buffer_desc.update_type = uniform_buffer_normal;
+	if (!uniform_buffer.init(uniform_buffer_desc))
+	{
+		ERROR_LOG("Can't initialize a UniformBuffer");
+		return false;
+	}
+	uniform_ = uniform_buffer.id();
 
 	MeshInstance& first_pass_mesh = mesh_instance();
+	context.materials[id()].get(first_pass_mesh.instance_parts[0].material.id).uniforms[1] = uniform_;
 	DrawCallData& first_pass_draw_call_data = context.draw_call_data_pool.get(first_pass_mesh.instance_parts[0].draw_call_data);
 	second_pass_mesh_ = first_pass_mesh;
 	DrawCallData& second_pass_draw_call_data = create_and_get(context.draw_call_data_pool);
@@ -330,6 +398,7 @@ bool BlurMaterialSystem::init(Context& context, const MaterialSystemContext& mat
 
 	Material& material = create_and_get(context.materials[id()]);
 	second_pass_mesh_.instance_parts[0].material.id = material.id;
+	material.uniforms[1] = uniform_;
 
 	clear_command_.set_driver(&context.driver);
 
@@ -361,10 +430,19 @@ bool BlurMaterialSystem::create_output(DrawCallData& draw_call_data, Context& co
 
 void BlurMaterialSystem::update(Context& context, SceneContext& scene_context, RenderContext& render_context)
 {
+	ShaderData data;
+	data.params.set_x(settings_.size);
+	context.uniform_pool.get(uniform_).update(data);
+
+	UberShader::Index ubershader_index;
+	ubershader_index.set(quality_info_, quality_);
+	context.materials[id()].get(mesh_instance().instance_parts[0].material.id).shader_program = 
+		ubershader(context).get(ubershader_index);
+
 	PosteffectMaterialSystemBase::update(context, scene_context, render_context);
 
 	Material& material = context.materials[id()].get(second_pass_mesh_.instance_parts[0].material.id);
-	UberShader::Index ubershader_index;
+	
 	ubershader_index.set(pass_info_, 1);
 	material.shader_program = ubershader(context).get(ubershader_index);
 	material.uniforms[0] = render_context.main_camera.percamera_uniform;
