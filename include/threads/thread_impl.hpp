@@ -13,6 +13,7 @@ size_t hardware_threads_number();
 void sleep(size_t ms);
 
 ConditionVariableImpl* create_condition_variable_impl();
+MutexImpl* create_mutex_impl();
 
 }}
 

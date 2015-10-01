@@ -17,7 +17,7 @@
 
 namespace mhe {
 
-template <class T>
+template <class T, size_t S = 0>
 class vector
 {
 public:
@@ -28,7 +28,10 @@ public:
 public:
 	vector(allocator* alloc = default_allocator()) :
         begin_(nullptr), size_(0), capacity_(0), allocator_(alloc)
-	{}
+	{
+		if (S != 0)
+			resize(S);
+	}
 
 	vector(const this_type& v, allocator* alloc = default_allocator()) :
         begin_(nullptr), size_(0), capacity_(0), allocator_(alloc)
@@ -166,9 +169,15 @@ public:
 		return insert_impl(position - begin(), value);
 	}
 
-	void push_back(const T& value)
+	T& push_back(const T& value)
 	{
 		insert(end(), value);
+		return back();
+	}
+
+	void append(const T* values, size_t size)
+	{
+		insert(end(), values, values + size);
 	}
 
 	void resize(size_t new_size)
@@ -238,7 +247,7 @@ private:
 	iterator insert_impl(size_t index, const T& value)
 	{
 		if ((size_ + 1) > capacity_)
-			reallocate_vector(static_cast<size_t>(capacity_ * 1.5f));
+			reallocate_vector(static_cast<size_t>(capacity_ == 0 ? 1 : capacity_ * 2.0f));
 		if (index != size_)
 			mhe::copy(begin_ + index, begin_ + size_ - index, begin_ + index + 1);
 		begin_[index] = value;

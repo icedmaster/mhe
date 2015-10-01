@@ -305,7 +305,7 @@ int main(int /*argc*/, char** /*argv*/)
 	camera_parameters.zfar = 20.0f;
 	mhe::game::FPSCameraController* camera_controller = new mhe::game::FPSCameraController(app.engine(), camera_parameters,
 		mhe::vec3(0, 1, 1), mhe::vec3(0.0f, mhe::pi, 0));
-	camera_controller->set_move_speed(5.0f);
+	camera_controller->set_move_speed(15.0f);
 	app.engine().scene().set_camera_controller(camera_controller);
 
 	return app.run();

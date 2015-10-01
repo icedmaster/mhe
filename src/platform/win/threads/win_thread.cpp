@@ -29,6 +29,16 @@ private:
 	HANDLE id_; 
 };
 
+class WinMutex : public MutexImpl
+{
+public:
+	WinMutex();
+	bool lock() override;
+	void unlock() override;
+private:
+	CRITICAL_SECTION id_;
+};
+
 namespace {
 
 DWORD WINAPI start_thread_impl(void* param)
@@ -80,6 +90,11 @@ ConditionVariableImpl* create_condition_variable_impl()
 	return new WinConditionVariable;
 }
 
+MutexImpl* create_mutex_impl()
+{
+	return new WinMutex;
+}
+
 } // namespace details
 
 WinConditionVariable::WinConditionVariable() :
@@ -94,6 +109,22 @@ bool WinConditionVariable::wait()
 void WinConditionVariable::notify()
 {
 	SetEvent(id_);
+}
+
+WinMutex::WinMutex()
+{
+	InitializeCriticalSection(&id_);
+}
+
+bool WinMutex::lock()
+{
+	EnterCriticalSection(&id_);
+	return true;
+}
+
+void WinMutex::unlock()
+{
+	LeaveCriticalSection(&id_);
 }
 
 }

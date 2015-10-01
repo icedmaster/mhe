@@ -18,7 +18,6 @@ namespace game {
 Engine::Engine()
 #ifdef RDBG_ENABLED
 	:
-	rdbg_engine_(*this),
 #endif
 	debug_views_(*this),
 	scene_(context_)
@@ -83,18 +82,6 @@ bool Engine::init(uint width, uint height, uint bpp, bool fullscreen)
 
 	setup_generated();
 
-#ifdef RDBG_ENABLED
-	/*if (!rdbg_engine_.start())
-	{
-		WARN_LOG("RDBG engine initialization failed");
-	}
-	else
-	{
-		INFO_LOG("RDBG engine started");
-	}
-	default_rdbg_setup(rdbg_engine_.processor());*/
-#endif
-
 	init_standart_stat_views(stats_);
 
 	stats_timer_.start();
@@ -105,7 +92,7 @@ bool Engine::init(uint width, uint height, uint bpp, bool fullscreen)
 void Engine::destroy()
 {
 #ifdef RDBG_ENABLED
-	//rdbg_engine_.stop();
+	rdbg_engine_->stop();
 #endif
 	debug_views_.destroy();
 
@@ -120,6 +107,18 @@ bool Engine::init_debug_components()
 	MaterialSystems::Values& materials = context_.material_systems.get_all_materials();
 	for (size_t i = 0, size = materials.size(); i < size; ++i)
 		materials[i]->init_debug_views(context_);
+#ifdef RDBG_ENABLED
+	rdbg_engine_.reset(new RDBGEngine(*this));
+	if (!rdbg_engine_->start())
+	{
+		WARN_LOG("RDBG engine initialization failed");
+	}
+	else
+	{
+		INFO_LOG("RDBG engine started");
+	}
+	default_rdbg_setup(rdbg_engine_->processor());
+#endif
 	return true;
 }
 
@@ -149,7 +148,7 @@ void Engine::stop()
 void Engine::update()
 {
 #ifdef RDBG_ENABLED
-	rdbg_engine_.processor().update_profiler_data();
+	rdbg_engine_->update();
 #endif
 	ProfilerElement pe("engine.update");
 

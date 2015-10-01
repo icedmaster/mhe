@@ -212,6 +212,11 @@ public:
 		insert(end(), value);
 	}
 
+	void append(const T* values, size_t size)
+	{
+		insert(end(), values, values + size);
+	}
+
 	void resize(size_t new_size)
 	{
 		if (new_size > capacity_)

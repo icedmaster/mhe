@@ -90,6 +90,48 @@ private:
 	unique_ptr<ConditionVariableImpl> impl_;
 };
 
+class MutexImpl
+{
+public:
+	virtual ~MutexImpl() {}
+	virtual bool lock() = 0;
+	virtual void unlock() = 0;
+};
+
+class MHE_EXPORT mutex
+{
+public:
+	mutex();
+
+	bool lock()
+	{
+		return impl_->lock();
+	}
+
+	void unlock()
+	{
+		impl_->unlock();
+	}
+private:
+	unique_ptr<MutexImpl> impl_;
+};
+
+class MHE_EXPORT lock_guard
+{
+public:
+	lock_guard(mutex& m) : mutex_(m)
+	{
+		mutex_.lock();
+	}
+
+	~lock_guard()
+	{
+		mutex_.unlock();
+	}
+private:
+	mutex& mutex_;
+};
+
 }
 
 #endif

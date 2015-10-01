@@ -23,4 +23,9 @@ condition_variable::condition_variable() :
 	impl_(details::create_condition_variable_impl())
 {}
 
+mutex::mutex() :
+	impl_(details::create_mutex_impl())
+{
+}
+
 }

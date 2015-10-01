@@ -26,6 +26,20 @@ public:
 		return new (p) T;
 	}
 
+	template <class T, class A>
+	T* create(A arg)
+	{
+		T* p = alloc(sizeof(T));
+		return new (p) T(arg);
+	}
+
+	template <class T, class A1, class A2>
+	T* create(A1 arg1, A2 arg2)
+	{
+		T* p = alloc(sizeof(T));
+		return new (p) T(arg1, arg2);
+	}
+
 	template <class T>
 	void destroy(T* ptr)
 	{
@@ -212,6 +226,18 @@ template <class T>
 inline T* create(allocator* alloc)
 {
 	return alloc->create<T>();
+}
+
+template <class T, class A>
+inline T* create(allocator* alloc, A arg)
+{
+	return alloc->create<T, A>(arg);
+}
+
+template <class T, class A1, class A2>
+inline T* create(allocator* alloc, A1 arg1, A2 arg2)
+{
+	return alloc->create<T, A1, A2>(arg1, arg2);
 }
 
 template <class T>

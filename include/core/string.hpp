@@ -298,6 +298,14 @@ public:
 		append(s, strlen(s));
 	}
 
+	void append(const T* s, size_t len)
+	{
+		ASSERT(size_ + len + 1 < S, "Can't append a string");
+		::memcpy(str_ + size_, s, len);
+		size_ += len;
+		str_[size_] = 0;
+	}
+
 	void erase(size_t index = 0, size_t length = npos)
 	{
 		size_t len = length == npos ? size_ - index : length;
@@ -431,14 +439,6 @@ private:
 		str_[0] = s;
 		str_[1] = 0;
 		size_ = 1;
-	}
-
-	void append(const T* s, size_t len)
-	{
-		ASSERT(size_ + len + 1 < S, "Can't append a string");
-		::memcpy(str_ + size_, s, len);
-		size_ += len;
-		str_[size_] = 0;
 	}
 
 	size_t find(const T* s, size_t len, size_t pos) const

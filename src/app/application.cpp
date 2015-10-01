@@ -38,8 +38,8 @@ Application::Application(const char* name) :
 #ifndef MHE_STANDART_LOG_DISABLED
 	mhe::utils::create_standart_log();
 #endif
-	game::init_singletons();
 	create_default_allocator();
+	game::init_singletons();
 	engine_ = new game::Engine;
 }
 

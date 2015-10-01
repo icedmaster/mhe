@@ -60,7 +60,7 @@ public:
 
 	RDBGProcessor& rdbg_processor()
 	{
-		return rdbg_engine_.processor();
+		return rdbg_engine_->processor();
 	}
 
 	void run();
@@ -97,7 +97,7 @@ private:
 	void setup_generated();
 
 #ifdef RDBG_ENABLED
-	RDBGEngine rdbg_engine_;
+	unique_ptr<RDBGEngine> rdbg_engine_;
 #endif
 	DebugViews debug_views_;
 	Stats stats_;
