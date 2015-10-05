@@ -66,19 +66,6 @@ vec4 convert(const std::string* args, size_t argc)
 		types_cast<float>(args[2]), types_cast<float>(args[3]));
 }
 
-uint32_t construct(const char* data)
-{
-	return ((data[0] << 24) & 0xff000000) | ((data[1] << 16) & 0xff0000) | ((data[2] << 8) & 0xff00) | (data[3] & 0xff);
-}
-
-void split(uint32_t value, char* buffer)
-{
-	buffer[0] = (value >> 24) & 0xff;
-	buffer[1] = (value >> 16) & 0xff;
-	buffer[2] = (value >> 8) & 0xff;
-	buffer[3] = value & 0xff;
-}
-
 template <class S>
 string decode_string(ByteStream& stream)
 {
@@ -97,7 +84,7 @@ inline void add_field(S& dst, const char* field)
 }
 
 template <class S>
-inline void add_field(S& dst, const std::string& field)
+inline void add_field(S& dst, const string& field)
 {
 	add_field(dst, field.c_str());
 }
@@ -110,24 +97,31 @@ inline void add_field(S& dst, int n)
 	dst.append(b, 4);
 }
 
-inline void add_stat_view(std::string& dst, const Stats::View& view)
+template <class S>
+inline void add_field(S& dst, size_t n)
 {
-	dst += view.name.c_str();
-	dst += " ";
-	dst += types_cast<std::string>(view.fields.size());
-	dst += " ";
+	add_field<S>(dst, static_cast<int>(n));
+}
+
+template <class S>
+inline void add_field(S& dst, float f)
+{
+	dst.append(reinterpret_cast<const char*>(&f), 4);
+}
+
+inline void add_stat_view(rdbgvector& dst, const Stats::View& view)
+{
+	add_field(dst, view.name);
+	add_field(dst, static_cast<int>(view.fields.size()));
 	for (size_t i = 0, size = view.fields.size(); i < size; ++i)
 	{
-		dst += view.fields[i].name.c_str();
-		dst += " ";
-		char type = static_cast<char>(view.fields[i].type);
-		dst.append(&type, 1);
-		dst += " ";
+		add_field(dst, view.fields[i].name);
+		add_field(dst, view.fields[i].type);
 
 		char value[80];
 		size_t value_len = serialize(value, view.fields[i].type, view.fields[i].value);
+		add_field(dst, static_cast<int>(value_len));
 		dst.append(value, value_len);
-		dst += " ";
 	}
 }
 }
@@ -150,6 +144,7 @@ void RDBGProcessor::update()
 
 	update_variables_data();
 	update_profiler_data();
+	update_stats_data();
 }
 
 RDBGData RDBGProcessor::process_command(const RDBGData& cmd)
@@ -212,20 +207,18 @@ RDBGData RDBGProcessor::process_get_all_command(const RDBGData&)
 
 RDBGData RDBGProcessor::process_profiler_result_command(const RDBGData&)
 {
-	//return profiler_data_;
-	return RDBGData();
+	RDBGData result;
+	result.cmd = result_ok;
+	result.data = profiler_data_;
+	return result;
 }
 
 RDBGData RDBGProcessor::process_stats_command(const RDBGData&)
 {
-	/*std::string result;
-	Stats& stats = engine_.stats();
-	size_t views_number = stats.views_number();
-	for (size_t i = 0; i < views_number; ++i)
-		add_stat_view(result, stats.view(i));
-	return result;
-	*/
-	return RDBGData();
+	RDBGData res;
+	res.cmd = result_ok;
+	res.data = stats_data_;
+	return res;
 }
 
 /*void RDBGProcessor::process_get_data(std::string& result, const Data& data) const
@@ -302,24 +295,17 @@ RDBGData RDBGProcessor::make_error(const char* message) const
 
 void RDBGProcessor::update_profiler_data()
 {
-	/*std::string result;
-	result.reserve(1024);
+	profiler_data_.clear();
 	const std::vector<Profiler::Data>& data = MainProfiler::instance().data();
-	const std::string separator = " ";
+	add_field(profiler_data_, data.size());
 	for (size_t i = 0, size = data.size(); i < size; ++i)
 	{
-		result += std::string(data[i].name.c_str());
-		result += separator;
-		result += types_cast<std::string>(data[i].id);
-		result += separator;
-		result += types_cast<std::string>(data[i].parent_id);
-		result += separator;
-		result += types_cast<std::string>(data[i].count);
-		result += separator;
-		result += types_cast<std::string>(data[i].interval);
-		result += separator;
+		add_field(profiler_data_, data[i].id);
+		add_field(profiler_data_, data[i].parent_id);
+		add_field(profiler_data_, data[i].name);
+		add_field(profiler_data_, data[i].count);
+		add_field(profiler_data_, data[i].interval);
 	}
-	profiler_data_ = result;*/
 }
 
 void RDBGProcessor::update_variables_data()
@@ -338,6 +324,16 @@ void RDBGProcessor::update_variables_data()
 			global_vars_copy_[i].value = vars[i].value;
 		}
 	}
+}
+
+void RDBGProcessor::update_stats_data()
+{
+	stats_data_.clear();
+	Stats& stats = engine_.stats();
+	size_t views_number = stats.views_number();
+	add_field(stats_data_, views_number);
+	for (size_t i = 0; i < views_number; ++i)
+		add_stat_view(stats_data_, stats.view(i));
 }
 
 bool RDBGThread::start_impl()
@@ -374,6 +370,7 @@ void RDBGThread::process_impl()
 			return;
 		server_socket_.write(answer.data.data(), answer.data.size());
 	}
+	INFO_LOG("Client disconnected");
 }
 
 bool RDBGEngine::start()

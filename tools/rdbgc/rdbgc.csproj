@@ -42,6 +42,8 @@
     <Compile Include="forms\main_window.cs" />
     <Compile Include="console_parser.cs" />
     <Compile Include="log.cs" />
+    <Compile Include="protocol_helper.cs" />
+    <Compile Include="profiler.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

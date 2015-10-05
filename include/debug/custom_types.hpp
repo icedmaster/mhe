@@ -69,11 +69,29 @@ struct TypeHelper<size_t>
 template <>
 struct TypeHelper<bool> { static const int type = Int; };
 
+inline uint32_t construct(const char* data)
+{
+	return ((data[0] << 24) & 0xff000000) | ((data[1] << 16) & 0xff0000) | ((data[2] << 8) & 0xff00) | (data[3] & 0xff);
+}
+
+inline void split(uint32_t value, char* buffer)
+{
+	buffer[0] = (value >> 24) & 0xff;
+	buffer[1] = (value >> 16) & 0xff;
+	buffer[2] = (value >> 8) & 0xff;
+	buffer[3] = value & 0xff;
+}
+
 inline size_t serialize(char* dst, int type, const char* src)
 {
 	switch (type)
 	{
-	case Int: ::memcpy(dst, src, sizeof(int32_t)); return sizeof(int32_t);
+	case Int:
+	{
+		uint32_t n = *(reinterpret_cast<const uint32_t*>(src));
+		split(n, dst);
+		return sizeof(int32_t);
+	}
 	default: return 0;
 	}
 	return 0;

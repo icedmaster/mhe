@@ -67,6 +67,12 @@ namespace mhe
 			return ConvertToInt(stream.ReadBytes(4));
 		}
 
+		public static float ParseFloat(ByteStream stream)
+		{
+			byte[] b = stream.ReadBytes(4);
+			return System.BitConverter.ToSingle(b, 0);
+		}
+
 		public static byte[] EncodeString(string s)
 		{
 			byte[] res = new byte[4 + s.Length];
@@ -115,7 +121,7 @@ namespace mhe
 
 		public void SendProfilerCommand(OnAnswer onAnswer)
 		{
-			//SendCommand(PROFILER_COMMAND, null, onAnswer, false);
+			SendCommand(Command.GET_PROFILER_DATA, null, onAnswer);
 		}
 
 		public void SendSetVarCommand(byte[] varData, OnAnswer onAnswer)

@@ -96,7 +96,7 @@ namespace mhe
 			{
 				Gtk.Application.Invoke(delegate
 				{
-					//statTextView.Buffer.Text = answer;
+					statTextView.Buffer.Text = ProtocolHelper.DecodeStats(answer);
 				});
 			});
 		}
@@ -107,7 +107,9 @@ namespace mhe
 			{
 				Gtk.Application.Invoke(delegate
 				{
-					//profilerTextView.Buffer.Text = protocol.ParseProfilerData(answer);
+					var nodes = ProtocolHelper.DecodeProfilerData(answer);
+					profiler.UpdateData(nodes);
+					profilerTextView.Buffer.Text = profiler.GetTextData();
 				});
 			});
 		}
@@ -117,6 +119,7 @@ namespace mhe
 		private List<string> history = new List<string>();
 		private int historyCurrent = 0;
 		private Timer pollTimer;
+		private Profiler profiler = new Profiler();
 	}
 }
 
