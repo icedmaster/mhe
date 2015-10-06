@@ -3,8 +3,9 @@
 namespace mhe {
 
 ProfilerElement::ProfilerElement(const char* name, int mode, Profiler& profiler, const char* data) :
-	name_(name), profiler_(profiler), mode_(mode), data_(data)
+	profiler_(profiler), mode_(mode), data_(data)
 {
+	name_ = name == nullptr ? FUNCTION_NAME : name;
 	timer_.start();
 	profiler_.start(this);
 }

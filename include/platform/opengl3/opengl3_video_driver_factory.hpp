@@ -9,6 +9,7 @@
 #include "opengl3_texture.hpp"
 #include "opengl3_render_state.hpp"
 #include "opengl3_render_target.hpp"
+#include "opengl3_query.hpp"
 
 namespace mhe {
 namespace opengl {
@@ -69,6 +70,11 @@ public:
 	TextureBufferImpl* create_texture_buffer() const
 	{
 		return new OpenGL3TextureBuffer;
+	}
+
+	QueryImpl* create_query() const override
+	{
+		return new OpenGL3Query;
 	}
 };
 

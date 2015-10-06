@@ -594,6 +594,60 @@ public:
 		::glTexBuffer(taret, internalformat, buffer);
 #endif
 	}
+
+	void glGenQueries(GLsizei n, GLuint *ids)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glGenQueries_(n, ids);
+#else
+		::glGenQueries(n, ids);
+#endif
+	}
+
+	void glDeleteQueries(GLsizei n, const GLuint *ids)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glDeleteQueries_(n, ids);
+#else
+		::glDeleteQueries(n, ids);
+#endif
+	}
+
+	void glBeginQuery(GLenum target, GLuint id)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glBeginQuery_(target, id);
+#else
+		::glBeginQuery(target, id);
+#endif
+	}
+
+	void glEndQuery(GLenum target)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glEndQuery_(target);
+#else
+		::glEndQuery(target);
+#endif
+	}
+
+	void glGetQueryiv(GLenum target, GLenum pname, GLint *params)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glGetQueryiv_(target, pname, params);
+#else
+		::glGetQueryiv(target, pname, params);
+#endif
+	}
+
+	void glGetQueryObjectiv(GLuint id, GLenum pname, GLint *params)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glGetQueryObjectiv_(id, pname, params);
+#else
+		::glGetQueryObjectiv(id, pname, params);
+#endif
+	}
 private:
 	OpenGLExtensions() {}
 	~OpenGLExtensions() {}
@@ -678,6 +732,12 @@ private:
 	PFNGLFRAMEBUFFERTEXTURE2DPROC glFramebufferTexture2D_;
 	PFNGLDELETEFRAMEBUFFERSPROC glDeleteFramebuffers_;
 	PFNGLTEXBUFFERPROC glTexBuffer_;
+	PFNGLGENQUERIESPROC glGenQueries_;
+	PFNGLDELETEQUERIESPROC glDeleteQueries_;
+	PFNGLBEGINQUERYPROC glBeginQuery_;
+	PFNGLENDQUERYPROC glEndQuery_;
+	PFNGLGETQUERYIVPROC glGetQueryiv_;
+	PFNGLGETQUERYOBJECTIVPROC glGetQueryObjectiv_;
 #endif
 	std::map<std::string, bool> loaded_extensions_;
 };

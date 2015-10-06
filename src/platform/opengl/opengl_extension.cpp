@@ -31,11 +31,11 @@ void OpenGLExtensions::init_extensions()
 	glGetProgramInfoLog_ = load_extension<PFNGLGETPROGRAMINFOLOGPROC>("glGetProgramInfoLog");
 	glGetUniformLocation_ = load_extension<PFNGLGETUNIFORMLOCATIONPROC>("glGetUniformLocation");
 	glUniformMatrix4fv_ = load_extension<PFNGLUNIFORMMATRIX4FVPROC>("glUniformMatrix4fv");
-    glUniformMatrix3fv_ = load_extension<PFNGLUNIFORMMATRIX3FVPROC>("glUniformMatrix3fv");
-    glUniform3fv_ = load_extension<PFNGLUNIFORM3FVPROC>("glUniform3fv");
-    glUniform4fv_ = load_extension<PFNGLUNIFORM4FVPROC>("glUniform4fv");
+	glUniformMatrix3fv_ = load_extension<PFNGLUNIFORMMATRIX3FVPROC>("glUniformMatrix3fv");
+	glUniform3fv_ = load_extension<PFNGLUNIFORM3FVPROC>("glUniform3fv");
+	glUniform4fv_ = load_extension<PFNGLUNIFORM4FVPROC>("glUniform4fv");
 	glUniform1i_ = load_extension<PFNGLUNIFORM1IPROC>("glUniform1i");
-    glUniform1f_ = load_extension<PFNGLUNIFORM1FPROC>("glUniform1f");
+	glUniform1f_ = load_extension<PFNGLUNIFORM1FPROC>("glUniform1f");
 	glGetAttribLocation_ = load_extension<PFNGLGETATTRIBLOCATIONPROC>("glGetAttribLocation");
 	glVertexAttribPointer_ = load_extension<PFNGLVERTEXATTRIBPOINTERPROC>("glVertexAttribPointer");
 	glVertexAttribIPointer_ = load_extension<PFNGLVERTEXATTRIBIPOINTERPROC>("glVertexAttribIPointer");
@@ -74,6 +74,12 @@ void OpenGLExtensions::init_extensions()
 	glFramebufferTexture2D_ = load_extension<PFNGLFRAMEBUFFERTEXTURE2DPROC>("glFramebufferTexture2D");
 	glDeleteFramebuffers_ = load_extension<PFNGLDELETEFRAMEBUFFERSPROC>("glDeleteFramebuffers");
 	glTexBuffer_ = load_extension<PFNGLTEXBUFFERPROC>("glTexBuffer");
+	glGenQueries_ = load_extension<PFNGLGENQUERIESPROC>("glGenQueries");
+	glDeleteQueries_ = load_extension<PFNGLDELETEQUERIESPROC>("glDeleteQueries");
+	glBeginQuery_ = load_extension<PFNGLBEGINQUERYPROC>("glBeginQuery");
+	glEndQuery_ = load_extension<PFNGLENDQUERYPROC>("glEndQuery");
+	glGetQueryiv_ = load_extension<PFNGLGETQUERYIVPROC>("glGetQueryiv");
+	glGetQueryObjectiv_ = load_extension<PFNGLGETQUERYOBJECTIVPROC>("glGetQueryObjectiv");
 #endif	// MHE_OPENGL_HAS_SHADERS
 
 	get_str_extensions();

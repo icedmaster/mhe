@@ -38,6 +38,7 @@ public:
 	RenderStateImpl* create_render_state() const;
 	RenderTargetImpl* create_render_target() const;
 	TextureBufferImpl* create_texture_buffer() const;
+	QueryImpl* create_query() const;
 
 	// input devices
 	KeyboardDeviceImpl* create_keyboard_device_impl() const

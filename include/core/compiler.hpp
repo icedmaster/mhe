@@ -16,6 +16,7 @@
 
 #ifdef MHE_VS
 #define FUNCTION_DESCRIPTION_MACRO						__FUNCSIG__
+#define FUNCTION_NAME									__FUNCTION__
 #else
 #define FUNCTION_DESCRIPTION_MACRO						__PRETTY_FUNCTION__
 #endif

@@ -5,6 +5,7 @@
 #include "render/mesh.hpp"
 #include "render/texture.hpp"
 #include "render/render_state.hpp"
+#include "render/query.hpp"
 
 namespace mhe {
 namespace opengl {
@@ -158,6 +159,13 @@ inline GLenum get_side(int side)
 inline GLenum get_side_offset(int side)
 {
 	return get_side(side) - GL_TEXTURE_CUBE_MAP_POSITIVE_X;
+}
+
+inline GLenum get_query_target(int target)
+{
+	ASSERT(target < query_max, "invalid target");
+	GLenum targets[query_max] = {GL_TIMESTAMP, GL_TIME_ELAPSED};
+	return targets[target];
 }
 
 }}

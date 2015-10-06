@@ -92,4 +92,9 @@ TextureBufferImpl* VideoDriverFactory::create_texture_buffer() const
 	return current_driver_factory_->create_texture_buffer();
 }
 
+QueryImpl* VideoDriverFactory::create_query() const
+{
+	return current_driver_factory_->create_query();
+}
+
 }

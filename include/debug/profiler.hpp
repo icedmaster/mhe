@@ -66,7 +66,7 @@ public:
 		add
 	};
 public:
-	ProfilerElement(const char* name, int mode = single, Profiler& profiler = MainProfiler::instance(), const char* data = 0);
+	ProfilerElement(const char* name = nullptr, int mode = single, Profiler& profiler = MainProfiler::instance(), const char* data = 0);
 	~ProfilerElement();
 
 	void stop();
