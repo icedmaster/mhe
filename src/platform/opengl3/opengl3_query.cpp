@@ -24,22 +24,35 @@ void OpenGL3Query::destroy()
 
 void OpenGL3Query::begin()
 {
-	if (target_ == GL_TIMESTAMP) return;
+	ASSERT(target_ != GL_TIMESTAMP, "begin() and end() methods are not support for timestamp queries");
 	OpenGLExtensions::instance().glBeginQuery(target_, id_);
 	CHECK_GL_ERRORS();
 }
 
 void OpenGL3Query::end()
 {
-	if (target_ == GL_TIMESTAMP) return;
+	ASSERT(target_ != GL_TIMESTAMP, "begin() and end() methods are not support for timestamp queries");
 	OpenGLExtensions::instance().glEndQuery(target_);
 	CHECK_GL_ERRORS();
 }
 
 void OpenGL3Query::get(int& res) const
 {
-	NOT_IMPLEMENTED_ASSERT(target_ != GL_TIMESTAMP, "Timestamp queries");
+	ASSERT(target_ != GL_TIMESTAMP, "Only uin64_t type is supported for timestamps");
 	OpenGLExtensions::instance().glGetQueryObjectiv(id_, GL_QUERY_RESULT, &res);
+	CHECK_GL_ERRORS();
+}
+
+void OpenGL3Query::get(uint64_t& res) const
+{
+	OpenGLExtensions::instance().glGetQueryObjectui64v(id_, GL_QUERY_RESULT, &res);
+	CHECK_GL_ERRORS();
+}
+
+void OpenGL3Query::set()
+{
+	ASSERT(target_ == GL_TIMESTAMP, "set() method is supported for timestamp queries only");
+	OpenGLExtensions::instance().glQueryCounter(id_, target_);
 	CHECK_GL_ERRORS();
 }
 

@@ -103,7 +103,7 @@ namespace mhe
 
 		private void RequestProfilerData()
 		{
-			protocol.SendProfilerCommand((answer) =>
+			protocol.SendGPUProfilerCommand((answer) =>
 			{
 				Gtk.Application.Invoke(delegate
 				{

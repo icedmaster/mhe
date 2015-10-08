@@ -117,6 +117,8 @@ const size_t max_managed_render_targets = 16;
 
 const size_t posteffect_material_priority_base = 10;
 
+const size_t gpu_profiler_queries_number = 32;
+
 /**
  * Scene configuration
  */

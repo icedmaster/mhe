@@ -296,6 +296,7 @@ private:
 
 	void update_variables_data();
 	void update_profiler_data();
+	void update_gpu_profiler_data();
 	void update_stats_data();
 
 	typedef std::map<hash_type, Data> DataMap;
@@ -304,6 +305,7 @@ private:
 	vector<GlobalVars::Data> global_vars_copy_;
 	rdbgvector all_variables_;
 	rdbgvector profiler_data_;
+	rdbgvector gpu_profiler_data_;
 	rdbgvector stats_data_;
 	mutex mutex_;
 };

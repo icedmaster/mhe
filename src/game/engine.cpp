@@ -11,6 +11,7 @@
 #endif
 
 #include "debug/profiler.hpp"
+#include "debug/gpu_profiler.hpp"
 
 namespace mhe {
 namespace game {
@@ -84,6 +85,8 @@ bool Engine::init(uint width, uint height, uint bpp, bool fullscreen)
 
 	init_standart_stat_views(stats_);
 
+	MainGPUProfiler::create_singleton(); // GPU profiler depends on graphics context so we init it here
+
 	stats_timer_.start();
 
 	return true;
@@ -95,6 +98,8 @@ void Engine::destroy()
 	rdbg_engine_->stop();
 #endif
 	debug_views_.destroy();
+
+	MainGPUProfiler::destroy_singleton();
 
 	context_.driver.close();
 	context_.window_system.close();

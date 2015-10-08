@@ -35,6 +35,7 @@ namespace mhe
 			List<ProfilerNode> nodes = new List<ProfilerNode>();
 
 			ByteStream stream = new ByteStream(data);
+			Protocol.ProfileDataType profilerType = (Protocol.ProfileDataType)stream.ReadBytes(1)[0];
 			int fieldsNumber = Protocol.ParseInt(stream);
 			for (int i = 0; i < fieldsNumber; ++i)
 			{
@@ -49,8 +50,11 @@ namespace mhe
 					parentId = nodeParentId,
 					name = nodeName,
 					count = nodeCount,
-					interval = nodeInterval * 1000.0f // it's more convinient to display time in ms
+					interval = nodeInterval
 				};
+
+				if (profilerType == Protocol.ProfileDataType.CPU)
+					node.interval *= 1000.0f;
 
 				nodes.Add(node);
 			}

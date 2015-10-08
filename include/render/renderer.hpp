@@ -8,6 +8,8 @@
 #include "math/vector4.hpp"
 #include "render_context.hpp"
 
+#include "debug/gpu_profiler.hpp"
+
 namespace mhe {
 
 struct Context;

@@ -648,6 +648,24 @@ public:
 		::glGetQueryObjectiv(id, pname, params);
 #endif
 	}
+
+	void glGetQueryObjectui64v(GLuint id, GLenum pname, GLuint64 *params)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glGetQueryObjectui64v_(id, pname, params);
+#else
+		::glGetQueryObjectui64v(id, pname, params);
+#endif
+	}
+
+	void glQueryCounter(GLuint id, GLenum target)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glQueryCounter_(id, target);
+#else
+		::glQueryCounter(id, target);
+#endif
+	}
 private:
 	OpenGLExtensions() {}
 	~OpenGLExtensions() {}
@@ -738,6 +756,8 @@ private:
 	PFNGLENDQUERYPROC glEndQuery_;
 	PFNGLGETQUERYIVPROC glGetQueryiv_;
 	PFNGLGETQUERYOBJECTIVPROC glGetQueryObjectiv_;
+	PFNGLGETQUERYOBJECTUI64VPROC glGetQueryObjectui64v_;
+	PFNGLQUERYCOUNTERPROC glQueryCounter_;
 #endif
 	std::map<std::string, bool> loaded_extensions_;
 };

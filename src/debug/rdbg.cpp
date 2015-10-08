@@ -42,6 +42,9 @@ enum Results
 	result_error
 };
 
+const uint8_t cpu_profiler_data = 0;
+const uint8_t gpu_profiler_data = 1;
+
 const size_t cmd_length = 1;
 
 template <class T>
@@ -144,6 +147,7 @@ void RDBGProcessor::update()
 
 	update_variables_data();
 	update_profiler_data();
+	update_gpu_profiler_data();
 	update_stats_data();
 }
 
@@ -205,11 +209,14 @@ RDBGData RDBGProcessor::process_get_all_command(const RDBGData&)
 	return result;
 }
 
-RDBGData RDBGProcessor::process_profiler_result_command(const RDBGData&)
+RDBGData RDBGProcessor::process_profiler_result_command(const RDBGData& data)
 {
+	ASSERT(data.data.size() == 1, "Invalid request for profilers data");
 	RDBGData result;
 	result.cmd = result_ok;
-	result.data = profiler_data_;
+	result.data.push_back(data.data[0]);
+	const rdbgvector& res = data.data[0] == cpu_profiler_data ? profiler_data_ : gpu_profiler_data_;
+	result.data.insert(result.data.end(), res.begin(), res.end());
 	return result;
 }
 
@@ -296,6 +303,7 @@ RDBGData RDBGProcessor::make_error(const char* message) const
 void RDBGProcessor::update_profiler_data()
 {
 	profiler_data_.clear();
+	profiler_data_.push_back(cpu_profiler_data);
 	const std::vector<Profiler::Data>& data = MainProfiler::instance().data();
 	add_field(profiler_data_, data.size());
 	for (size_t i = 0, size = data.size(); i < size; ++i)
@@ -305,6 +313,23 @@ void RDBGProcessor::update_profiler_data()
 		add_field(profiler_data_, data[i].name);
 		add_field(profiler_data_, data[i].count);
 		add_field(profiler_data_, data[i].interval);
+	}
+}
+
+void RDBGProcessor::update_gpu_profiler_data()
+{
+	const GPUProfiler::Nodes& nodes = MainGPUProfiler::instance().nodes();
+	gpu_profiler_data_.clear();
+	profiler_data_.push_back(gpu_profiler_data);
+	add_field(gpu_profiler_data_, nodes.size());
+	for (size_t i = 0, size = nodes.size(); i < size; ++i)
+	{
+		const GPUProfiler::Node& node = nodes[i];
+		add_field(gpu_profiler_data_, node.node->id());
+		add_field(gpu_profiler_data_, node.parent_id);
+		add_field(gpu_profiler_data_, node.name);
+		add_field(gpu_profiler_data_, 1);
+		add_field(gpu_profiler_data_, node.interval);
 	}
 }
 

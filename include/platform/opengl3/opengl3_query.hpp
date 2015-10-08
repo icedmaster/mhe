@@ -15,6 +15,8 @@ public:
 	void begin() override;
 	void end() override;
 	void get(int& res) const override;
+	void get(uint64_t& res) const override;
+	void set() override;
 private:
 	GLuint id_;
 	GLenum target_;

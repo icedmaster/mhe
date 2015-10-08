@@ -52,6 +52,12 @@ namespace mhe
 			ERROR
 		};
 
+		public enum ProfileDataType
+		{
+			CPU,
+			GPU
+		};
+
 		private const int CMD_LENGTH = 1;
 
 		public delegate void OnAnswer(byte[] data);
@@ -119,9 +125,16 @@ namespace mhe
 			SendCommand(Command.GET_STATS, null, onAnswer);
 		}
 
-		public void SendProfilerCommand(OnAnswer onAnswer)
+		public void SendCPUProfilerCommand(OnAnswer onAnswer)
 		{
-			SendCommand(Command.GET_PROFILER_DATA, null, onAnswer);
+			byte[] data = new byte[] { (byte)ProfileDataType.CPU };
+			SendCommand(Command.GET_PROFILER_DATA, data, onAnswer);
+		}
+
+		public void SendGPUProfilerCommand(OnAnswer onAnswer)
+		{
+			byte[] data = new byte[] { (byte)ProfileDataType.GPU };
+			SendCommand(Command.GET_PROFILER_DATA, data, onAnswer);
 		}
 
 		public void SendSetVarCommand(byte[] varData, OnAnswer onAnswer)

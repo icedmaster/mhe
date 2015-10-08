@@ -56,6 +56,7 @@ bool init_node(NodeInstance& node, Context& context)
 
 void update_nodes(Context& context, RenderContext& render_context, SceneContext& scene_context)
 {
+	GPU_PROFILE("update_nodes");
 	for (size_t i = 0; i < render_context.nodes_number; ++i)
 	{
 		MeshInstance& mesh = render_context.nodes[i].mesh;
@@ -239,6 +240,7 @@ bool Renderer::init()
 
 void Renderer::update(SceneContext& scene_context)
 {
+	GPU_PROFILE("update");
 	PerCameraData data;
 	data.vp = render_context_.main_camera.vp;
 	data.view = render_context_.main_camera.view;
@@ -271,6 +273,8 @@ void Renderer::update(SceneContext& scene_context)
 
 void Renderer::before_update(SceneContext& scene_context)
 {
+	MainGPUProfiler::instance().clear();
+
 	render_context_.render_view_requests.reset();
 	if (directional_shadowmap_depth_write_material_system_ != nullptr)
 		directional_shadowmap_depth_write_material_system_->start_frame(context_, scene_context, render_context_);
@@ -302,14 +306,21 @@ void Renderer::execute_render(RenderContext& render_context)
 	context_.driver.clear_color();
 	context_.driver.clear_depth();
 
-	context_.driver.render(context_, render_context.draw_calls.data(), render_context.draw_calls.size());
-	context_.driver.render(context_, render_context.explicit_draw_calls.data(), render_context.explicit_draw_calls.size());
+	{
+		GPU_PROFILE("main_pass");
+		context_.driver.render(context_, render_context.draw_calls.data(), render_context.draw_calls.size());
+	}
+	{
+		GPU_PROFILE("main_pass_exp");
+		context_.driver.render(context_, render_context.explicit_draw_calls.data(), render_context.explicit_draw_calls.size());
+	}
 }
 
 void Renderer::flush()
 {
 	{
 		ProfilerElement end_render_pe("driver.end_render");
+		GPU_PROFILE("flush");
 		context_.driver.end_render();
 	}
 	{
@@ -319,6 +330,8 @@ void Renderer::flush()
 
 	render_context_.draw_calls.clear();
 	render_context_.explicit_draw_calls.clear();
+
+	MainGPUProfiler::instance().update();
 }
 
 void Renderer::set_skybox_material_system(MaterialSystem* material_system)

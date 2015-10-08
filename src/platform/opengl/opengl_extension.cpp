@@ -80,6 +80,8 @@ void OpenGLExtensions::init_extensions()
 	glEndQuery_ = load_extension<PFNGLENDQUERYPROC>("glEndQuery");
 	glGetQueryiv_ = load_extension<PFNGLGETQUERYIVPROC>("glGetQueryiv");
 	glGetQueryObjectiv_ = load_extension<PFNGLGETQUERYOBJECTIVPROC>("glGetQueryObjectiv");
+	glGetQueryObjectui64v_ = load_extension<PFNGLGETQUERYOBJECTUI64VPROC>("glGetQueryObjectui64v");
+	glQueryCounter_ = load_extension<PFNGLQUERYCOUNTERPROC>("glQueryCounter");
 #endif	// MHE_OPENGL_HAS_SHADERS
 
 	get_str_extensions();
