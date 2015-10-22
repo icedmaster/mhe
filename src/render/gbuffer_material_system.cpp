@@ -11,7 +11,8 @@
 
 namespace mhe {
 
-GBufferFillMaterialSystem::GBufferFillMaterialSystem()
+GBufferFillMaterialSystem::GBufferFillMaterialSystem() :
+	profile_command_("gbuffer_fill")
 {
 	gbuffer_desc_.target = rt_readwrite;
 	gbuffer_desc_.width = gbuffer_desc_.height = 0;
@@ -31,6 +32,9 @@ bool GBufferFillMaterialSystem::init(Context& context, const MaterialSystemConte
 	set_layout(StandartGeometryLayout::handle);
 
 	clear_command_.set_driver(&context.driver);
+	profile_command_.set_stages(render_stage_begin_priority | render_stage_end_priority);
+	list_of_commands_.add_command(&clear_command_);
+	list_of_commands_.add_command(&profile_command_);
 
 	if (!context.shader_manager.get(shader(), material_system_context.shader_name))
 		return false;
@@ -99,7 +103,7 @@ void GBufferFillMaterialSystem::setup(Context& context, SceneContext& scene_cont
 
 void GBufferFillMaterialSystem::update(Context& context, SceneContext& scene_context, RenderContext& render_context)
 {
-	MATERIAL_UPDATE_WITH_COMMAND(context, scene_context, render_context, update, &clear_command_);
+	MATERIAL_UPDATE_WITH_COMMAND(context, scene_context, render_context, update, &list_of_commands_);
 }
 
 void GBufferFillMaterialSystem::update(Context& context, SceneContext& /*scene_context*/, RenderContext& render_context, MeshPartInstance* nodes, MeshPart* parts, size_t count)
@@ -199,6 +203,9 @@ bool GBufferDrawMaterialSystem::init(Context& context, const MaterialSystemConte
 	}
 
 	clear_command_.set_driver(&context.driver);
+	profile_command_.set_stages(render_stage_begin_priority | render_stage_end_priority);
+	list_of_commands_.add_command(&clear_command_);
+	list_of_commands_.add_command(&profile_command_);
 
 	return init_meshes(context);
 }
@@ -374,7 +381,7 @@ void GBufferDrawMaterialSystem::update(Context& context, SceneContext& scene_con
 		draw_call.material.id = material.id;
 
 		draw_call.draw_call_data = draw_call_data_;
-		draw_call.command = &clear_command_;
+		draw_call.command = &list_of_commands_;
 	}
 }
 

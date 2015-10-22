@@ -10,6 +10,10 @@
 
 namespace mhe {
 
+CSMDepthRenderingMaterialSystem::CSMDepthRenderingMaterialSystem() :
+	profile_command_("shadowmap")
+{}
+
 bool CSMDepthRenderingMaterialSystem::init(Context& context, const MaterialSystemContext& material_system_context)
 {
 	set_layout(StandartGeometryLayout::handle);
@@ -70,6 +74,9 @@ bool CSMDepthRenderingMaterialSystem::init(Context& context, const MaterialSyste
 	}
 
 	clear_command_.set_driver(&context.driver);
+	profile_command_.set_stages(render_stage_begin_priority | render_stage_end_priority);
+	list_of_commands_.add_command(&clear_command_);
+	list_of_commands_.add_command(&profile_command_);
 
 	cascades_number_ = cascades_number;
 
@@ -287,7 +294,7 @@ void CSMDepthRenderingMaterialSystem::update(Context& context, SceneContext& sce
 
 				draw_call.draw_call_data = draw_call_data_id_[pass];
 
-				draw_call.command = &clear_command_;
+				draw_call.command = &list_of_commands_;
 				draw_call.pass = pass;
 			}
 		}

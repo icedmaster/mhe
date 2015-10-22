@@ -152,8 +152,8 @@ void PosteffectDebugMaterialSystem::set_render_target(const RenderTarget& render
 	textures_number_ = color_textures_number + depth_textures_number;
 }
 
-PosteffectMaterialSystemBase::PosteffectMaterialSystemBase() :
-	inputs_number_(0), outputs_number_(0), framebuffer_input_(invalid_index)
+PosteffectMaterialSystemBase::PosteffectMaterialSystemBase(const char* name) :
+	inputs_number_(0), outputs_number_(0), profile_command_(name), framebuffer_input_(invalid_index)
 {}
 
 bool PosteffectMaterialSystemBase::init(Context& context, const MaterialSystemContext& material_system_context)
@@ -195,6 +195,8 @@ void PosteffectMaterialSystemBase::prepare_draw_call(DrawCall& draw_call, Contex
 	if (draw_call_data.render_target != default_render_target &&
 		draw_call_data.render_target != RenderTarget::invalid_id)
 		list_of_commands_.add_command(&clear_command_);
+
+	list_of_commands_.add_command(&profile_command_);
 		
 	RenderCommand* command = list_of_commands_.empty() ? nullptr : &list_of_commands_;
 

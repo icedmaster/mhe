@@ -16,6 +16,8 @@ class CSMDepthRenderingMaterialSystem : public MaterialSystem
 
 	static const size_t max_cascades_number = 8;
 public:
+	CSMDepthRenderingMaterialSystem();
+
 	bool init(Context& context, const MaterialSystemContext& material_system_context) override;
 	void close() override;
 
@@ -33,6 +35,8 @@ private:
 	vec2 texture_size_;
 	vec2 cascade_size_;
 	ClearCommand clear_command_;
+	GPUProfileCommand profile_command_;
+	ListOfCommands list_of_commands_;
 	fixed_size_vector<DrawCallData::IdType, max_cascades_number> draw_call_data_id_;
 	fixed_size_vector<UniformBuffer::IdType, max_cascades_number> transform_uniform_id_;
 	TextureInstance shadowmap_;

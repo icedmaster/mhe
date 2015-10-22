@@ -29,14 +29,21 @@
 #endif
 
 #define MHE_OPENGL_HAS_SHADERS
+#define MHE_OPENGL_ABORT_ON_ERROR
 //#define MHE_OPENGL_UBO_DOUBLEBUFFERING
 //#define MHE_OPENGL_USE_SRGB
+
+#ifdef MHE_OPENGL_ABORT_ON_ERROR
+#define PRINT_ERROR(m) ASSERT(0, FUNCTION_DESCRIPTION_MACRO << ":" << e)
+#else
+#define PRINT_ERROR(m) WARN_LOG(FUNCTION_DESCRIPTION_MACRO << ":" << e);
+#endif
 
 #define CHECK_GL_ERRORS()						\
 	{											\
 		GLenum e = glGetError();					\
 		if (e != GL_NO_ERROR)						\
-			WARN_LOG(FUNCTION_DESCRIPTION_MACRO << ":" << e);					\
+			PRINT_ERROR(e);					\
 	}											
 
 #endif

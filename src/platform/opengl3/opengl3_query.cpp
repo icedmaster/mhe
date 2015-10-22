@@ -38,7 +38,7 @@ void OpenGL3Query::end()
 
 void OpenGL3Query::get(int& res) const
 {
-	ASSERT(target_ != GL_TIMESTAMP, "Only uin64_t type is supported for timestamps");
+	ASSERT(target_ != GL_TIMESTAMP, "Only uint64_t type is supported for timestamps");
 	OpenGLExtensions::instance().glGetQueryObjectiv(id_, GL_QUERY_RESULT, &res);
 	CHECK_GL_ERRORS();
 }

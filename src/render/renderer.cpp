@@ -311,7 +311,6 @@ void Renderer::execute_render(RenderContext& render_context)
 		context_.driver.render(context_, render_context.draw_calls.data(), render_context.draw_calls.size());
 	}
 	{
-		GPU_PROFILE("main_pass_exp");
 		context_.driver.render(context_, render_context.explicit_draw_calls.data(), render_context.explicit_draw_calls.size());
 	}
 }

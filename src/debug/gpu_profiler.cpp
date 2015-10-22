@@ -10,7 +10,9 @@ GPUProfilerNode::GPUProfilerNode() :
 	end_[0].init(query_timestamp);
 	end_[1].init(query_timestamp);
 
+	begin_[0].set();
 	begin_[1].set();
+	end_[0].set();
 	end_[1].set();
 }
 

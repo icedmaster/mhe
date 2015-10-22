@@ -214,7 +214,6 @@ RDBGData RDBGProcessor::process_profiler_result_command(const RDBGData& data)
 	ASSERT(data.data.size() == 1, "Invalid request for profilers data");
 	RDBGData result;
 	result.cmd = result_ok;
-	result.data.push_back(data.data[0]);
 	const rdbgvector& res = data.data[0] == cpu_profiler_data ? profiler_data_ : gpu_profiler_data_;
 	result.data.insert(result.data.end(), res.begin(), res.end());
 	return result;
@@ -320,7 +319,7 @@ void RDBGProcessor::update_gpu_profiler_data()
 {
 	const GPUProfiler::Nodes& nodes = MainGPUProfiler::instance().nodes();
 	gpu_profiler_data_.clear();
-	profiler_data_.push_back(gpu_profiler_data);
+	gpu_profiler_data_.push_back(gpu_profiler_data);
 	add_field(gpu_profiler_data_, nodes.size());
 	for (size_t i = 0, size = nodes.size(); i < size; ++i)
 	{

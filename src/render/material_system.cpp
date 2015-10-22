@@ -10,18 +10,18 @@ namespace mhe {
 
 void MaterialSystem::setup_draw_call(DrawCall& draw_call, const MeshPartInstance& instance_part, const MeshPart& part, RenderCommand* command) const
 {
-    draw_call.material = instance_part.material;
-    draw_call.draw_call_data = instance_part.draw_call_data;
-    draw_call.render_data = part.render_data;
-    draw_call.command = command;
+	draw_call.material = instance_part.material;
+	draw_call.draw_call_data = instance_part.draw_call_data;
+	draw_call.render_data = part.render_data;
+	draw_call.command = command;
 
-    ASSERT(draw_call.material.material_system != invalid_material_system_id, "Invalid draw call");
+	ASSERT(draw_call.material.material_system != invalid_material_system_id, "Invalid draw call");
 }
 
 void MaterialSystem::setup_draw_calls(Context& context, SceneContext& scene_context, RenderContext& render_context)
 {
-    if (!enabled_) return;
-    update(context, scene_context, render_context);
+	if (!enabled_) return;
+	update(context, scene_context, render_context);
 }
 
 bool MaterialSystem::init_default(Context& context, const MaterialSystemContext& material_system_context)
@@ -31,10 +31,10 @@ bool MaterialSystem::init_default(Context& context, const MaterialSystemContext&
 }
 
 void MaterialSystem::standart_material_setup(Context& context, SceneContext& scene_context,
-                                             MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count)
+											 MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count)
 {
 	if (!count) return;
-    ASSERT(parts, "Invalid materials parameter");
+	ASSERT(parts, "Invalid materials parameter");
 	ASSERT(model_contexts, "Invalid model contexts");
 
 	size_t layout_id = layout();
@@ -89,12 +89,12 @@ ShaderProgram& MaterialSystem::default_program(const Context& context) const
 
 void MaterialSystem::empty_setup(Context& /*context*/, SceneContext& /*scene_context*/, MeshPartInstance* /*parts*/, MeshPart* /*parts*/, ModelContext* /*model_contexts*/, size_t /*count*/)
 {
-    ASSERT(0, "This method should not be called");
+	ASSERT(0, "This method should not be called");
 }
 
 void MaterialSystem::empty_update(Context& /*context*/, SceneContext& /*scene_context*/, RenderContext& /*render_context*/, MeshPartInstance* /*parts*/, size_t /*count*/)
 {
-    ASSERT(0, "This method should not be called");
+	ASSERT(0, "This method should not be called");
 }
 
 }

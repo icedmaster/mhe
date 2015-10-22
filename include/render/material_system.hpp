@@ -172,7 +172,7 @@ private:
 
 typedef Factory<MaterialSystem> MaterialSystemFactory;
 
-#define SETUP_MATERIAL(mname) public: static const char* name() {return mname;} private: const char* name_impl() const { return mname; }
+#define SETUP_MATERIAL(mname) public: static const char* material_name() {return mname;} private: const char* name_impl() const { return mname; }
 
 #define MATERIAL_UPDATE_WITH_COMMAND(context, scene_context, render_context, update_method, command)    \
     for (size_t i = 0; i < render_context.nodes_number; ++i)                \

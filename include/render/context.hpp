@@ -51,7 +51,7 @@ public:
 	template <class T>
 	T* get() const
 	{
-		return get_impl<T>(T::name());
+		return get_impl<T>(T::material_name());
 	}
 
 	template <class T>

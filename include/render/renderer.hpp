@@ -36,7 +36,7 @@ MHE_EXPORT bool load_node(NodeInstance& instance, const string& name, const char
 template <class MaterialSystem>
 bool load_node(NodeInstance& node, const string& name, Context& context, SceneContext& scene_context)
 {
-	return load_node(node, name, MaterialSystem::name(), context, scene_context);
+	return load_node(node, name, MaterialSystem::material_name(), context, scene_context);
 }
 
 class PosteffectSystem

@@ -54,7 +54,7 @@ class PosteffectMaterialSystemBase : public MaterialSystem
 	static const size_t max_textures_number = 4;
 	static const size_t invalid_index = static_cast<size_t>(-1);
 public:
-	PosteffectMaterialSystemBase();
+	PosteffectMaterialSystemBase(const char* name);
 
 	bool init(Context& context, const MaterialSystemContext& material_system_context) override;
 	void close() override;
@@ -156,28 +156,33 @@ private:
 	ClearCommand clear_command_;
 	CopyFramebufferCommand copy_framebuffer_command_;
 	ListOfCommands list_of_commands_;
+	GPUProfileCommand profile_command_;
 	size_t framebuffer_input_;
 	UberShader::Info inputs_number_shader_info_;
 };
 
+#define SETUP_POSTEFFECT_MATERIAL(class_name, name)					\
+	public: class_name() : PosteffectMaterialSystemBase(name) {} \
+	private: SETUP_MATERIAL(name)
+
 class PosteffectSimpleMaterialSystem : public PosteffectMaterialSystemBase
 {
-	SETUP_MATERIAL("posteffect_simple");
+	SETUP_POSTEFFECT_MATERIAL(PosteffectSimpleMaterialSystem, "posteffect_simple");
 };
 
 class TonemapMaterialSystem : public PosteffectMaterialSystemBase
 {
-	SETUP_MATERIAL("tonemap");
+	SETUP_POSTEFFECT_MATERIAL(TonemapMaterialSystem, "tonemap");
 };
 
 class FXAAMaterialSystem : public PosteffectMaterialSystemBase
 {
-	SETUP_MATERIAL("fxaa");
+	SETUP_POSTEFFECT_MATERIAL(FXAAMaterialSystem, "fxaa");
 };
 
 class SSRMaterialSystem : public PosteffectMaterialSystemBase
 {
-	SETUP_MATERIAL("ssr");
+	SETUP_POSTEFFECT_MATERIAL(SSRMaterialSystem, "ssr");
 public:
 	bool init(Context& context, const MaterialSystemContext& material_system_context) override;
 	void init_debug_views(Context& context) override;
@@ -195,7 +200,7 @@ private:
 
 class BlurMaterialSystem : public PosteffectMaterialSystemBase
 {
-	SETUP_MATERIAL("blur");
+	SETUP_POSTEFFECT_MATERIAL(BlurMaterialSystem, "blur");
 
 	struct ShaderData
 	{
@@ -246,7 +251,7 @@ private:
 
 class DOFMaterialSystem : public PosteffectMaterialSystemBase
 {
-	SETUP_MATERIAL("dof");
+	SETUP_POSTEFFECT_MATERIAL(DOFMaterialSystem, "dof");
 
 	static const size_t input_texture_unit = 3;
 	static const size_t blur_texture_unit = 4;
@@ -283,7 +288,7 @@ private:
 
 class SSAOMaterialSystem : public PosteffectMaterialSystemBase
 {
-	SETUP_MATERIAL("ssao");
+	SETUP_POSTEFFECT_MATERIAL(SSAOMaterialSystem, "ssao");
 
 	static const size_t noise_texture_unit = 4;
 public:
@@ -304,12 +309,12 @@ private:
 
 class CompositeMulMaterialSystem : public PosteffectMaterialSystemBase
 {
-	SETUP_MATERIAL("comp_mul");
+	SETUP_POSTEFFECT_MATERIAL(CompositeMulMaterialSystem, "comp_mul");
 };
 
 class CompositeAddMaterialSystem : public PosteffectMaterialSystemBase
 {
-	SETUP_MATERIAL("comp_add");
+	SETUP_POSTEFFECT_MATERIAL(CompositeAddMaterialSystem, "comp_add");
 };
 
 }

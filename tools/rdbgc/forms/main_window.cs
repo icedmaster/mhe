@@ -103,13 +103,23 @@ namespace mhe
 
 		private void RequestProfilerData()
 		{
-			protocol.SendGPUProfilerCommand((answer) =>
+			protocol.SendCPUProfilerCommand((answer) =>
 			{
 				Gtk.Application.Invoke(delegate
 				{
 					var nodes = ProtocolHelper.DecodeProfilerData(answer);
 					profiler.UpdateData(nodes);
 					profilerTextView.Buffer.Text = profiler.GetTextData();
+				});
+			});
+
+			protocol.SendGPUProfilerCommand((answer) =>
+			{
+				Gtk.Application.Invoke(delegate
+				{
+					var nodes = ProtocolHelper.DecodeProfilerData(answer);
+					gpuProfiler.UpdateData(nodes);
+					GPUProfilerTextView.Buffer.Text = gpuProfiler.GetTextData();
 				});
 			});
 		}
@@ -120,6 +130,7 @@ namespace mhe
 		private int historyCurrent = 0;
 		private Timer pollTimer;
 		private Profiler profiler = new Profiler();
+		private Profiler gpuProfiler = new Profiler();
 	}
 }
 

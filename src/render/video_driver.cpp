@@ -61,6 +61,8 @@ void Driver::render(const Context& context, const DrawCall* draw_calls, size_t c
 	ProfilerElement pe("driver.render");
 	for (size_t i = 0; i < count; ++i)
 		perform_draw_call(context, draw_calls[i]);
+	if (state_.last_command != nullptr && state_.last_command->stages() & render_stage_end_priority)
+		state_.last_command->execute(render_stage_end_priority);
 }
 
 void Driver::render(const Context& context, const DrawCallExplicit* draw_calls, size_t count)
@@ -156,7 +158,21 @@ void Driver::perform_draw_call(const Context& context, const DrawCallExplicit& d
 
 void Driver::perform_draw_call(const Context& context, const DrawCall& draw_call)
 {
+	uint8_t material_system_id = draw_call.material.material_system;
+	uint8_t material_system_priority = context.material_systems.get(material_system_id)->priority();
+
 	uint8_t command_render_stages = draw_call.command != nullptr ? draw_call.command->stages() : 0;
+
+	if (material_system_priority != state_.priority)
+	{
+		if (state_.last_command != nullptr && state_.last_command->stages() & render_stage_end_priority)
+			state_.last_command->execute(render_stage_end_priority);
+		if (command_render_stages & render_stage_begin_priority)
+			draw_call.command->execute(render_stage_begin_priority);
+		state_.priority = material_system_priority;
+	}
+	state_.last_command = draw_call.command;
+
 	if (command_render_stages & render_stage_before_render_target_setup)
 		draw_call.command->execute(render_stage_before_render_target_setup);
 
@@ -201,7 +217,6 @@ void Driver::perform_draw_call(const Context& context, const DrawCall& draw_call
 		}
 	}
 
-	uint8_t material_system_id = draw_call.material.material_system;
 	Material::IdType material_id = draw_call.material.id;
 	const Material& material =
 		context.materials[material_system_id].get(material_id);
@@ -283,6 +298,7 @@ void Driver::end_render()
 void Driver::reset_state()
 {
 	::memset(&state_, 0xff, sizeof(state_));
+	state_.last_command = nullptr;
 }
 
 }

@@ -40,7 +40,7 @@ public:
 	template <class T>
 	void add()
 	{
-		add<T>(T::name());
+		add<T>(T::material_name());
 	}
 
 	Base* create(const char* name) const

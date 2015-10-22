@@ -8,6 +8,7 @@ namespace mhe {
 class Driver;
 class RenderTarget;
 class Texture;
+class GPUProfilerNode;
 
 class MHE_EXPORT ClearCommand : public RenderCommand
 {
@@ -93,6 +94,16 @@ private:
 	bool execute_impl(RenderStage current_stage) override;
 
 	fixed_capacity_vector<RenderCommand*, 4> commands_;
+};
+
+class MHE_EXPORT GPUProfileCommand : public RenderCommand
+{
+public:
+	GPUProfileCommand(const char* name);
+private:
+	bool execute_impl(RenderStage current_stage) override;
+
+	GPUProfilerNode& node_;
 };
 
 }

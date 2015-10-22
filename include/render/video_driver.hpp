@@ -28,6 +28,7 @@ class IndexBuffer;
 class UniformBuffer;
 class Layout;
 class RenderTarget;
+class RenderCommand;
 
 class DriverImpl
 {
@@ -137,6 +138,8 @@ public:
 		size_t textures[material_textures_number];
 		size_t uniforms[material_uniforms_number];
 		size_t texture_buffers[material_texture_buffers_number];
+		RenderCommand* last_command;
+		uint8_t priority;
 	};
 public:
 	Driver();
