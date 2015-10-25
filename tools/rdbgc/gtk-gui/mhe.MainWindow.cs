@@ -31,6 +31,10 @@ namespace mhe
 		private global::Gtk.Label label1;
 		
 		private global::Gtk.Entry entry5;
+		
+		private global::Gtk.Statusbar statusbar1;
+		
+		private global::Gtk.Label connectionStatusLabel;
 
 		protected virtual void Build ()
 		{
@@ -135,12 +139,30 @@ namespace mhe
 			w12.Position = 2;
 			w12.Expand = false;
 			w12.Fill = false;
+			// Container child vbox2.Gtk.Box+BoxChild
+			this.statusbar1 = new global::Gtk.Statusbar ();
+			this.statusbar1.Name = "statusbar1";
+			this.statusbar1.Spacing = 6;
+			// Container child statusbar1.Gtk.Box+BoxChild
+			this.connectionStatusLabel = new global::Gtk.Label ();
+			this.connectionStatusLabel.Name = "connectionStatusLabel";
+			this.connectionStatusLabel.LabelProp = global::Mono.Unix.Catalog.GetString ("Disconnected");
+			this.statusbar1.Add (this.connectionStatusLabel);
+			global::Gtk.Box.BoxChild w13 = ((global::Gtk.Box.BoxChild)(this.statusbar1 [this.connectionStatusLabel]));
+			w13.Position = 2;
+			w13.Expand = false;
+			w13.Fill = false;
+			this.vbox2.Add (this.statusbar1);
+			global::Gtk.Box.BoxChild w14 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.statusbar1]));
+			w14.Position = 3;
+			w14.Expand = false;
+			w14.Fill = false;
 			this.Add (this.vbox2);
 			if ((this.Child != null)) {
 				this.Child.ShowAll ();
 			}
 			this.DefaultWidth = 1064;
-			this.DefaultHeight = 724;
+			this.DefaultHeight = 736;
 			this.Show ();
 			this.entry5.KeyPressEvent += new global::Gtk.KeyPressEventHandler (this.OnConsoleKeyPressEvent);
 			this.entry5.Activated += new global::System.EventHandler (this.OnConsoleEntryActivated);

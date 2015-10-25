@@ -20,18 +20,16 @@ namespace rdbgc
 
 		static public void Main()
 		{
-			DataModel dataModel = null;
-
 			Protocol protocol = new Protocol ();
-			protocol.Connect(DEFAULT_HOST, DEFAULT_PORT);
-			protocol.SendGetAllCommand ((s) =>
-				{
-					dataModel = new DataModel(s);
-				});
 
 			Application.Init ();
 
-			MainWindow main = new MainWindow(dataModel, protocol);
+			mhe.Settings settings = new mhe.Settings() {
+				connectionHost = DEFAULT_HOST,
+				connectionPort = DEFAULT_PORT
+			};
+
+			MainWindow main = new MainWindow(null, protocol, settings);
 			main.DeleteEvent += OnDelete;
 			main.Show();
 

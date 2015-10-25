@@ -6,12 +6,13 @@ namespace mhe
 {
 	public partial class MainWindow : Gtk.Window
 	{
-		public MainWindow (DataModel dataModel, Protocol protocol) :
+		public MainWindow (DataModel dataModel, Protocol protocol, Settings settings) :
 			base (Gtk.WindowType.Toplevel)
 		{
 			this.Build ();
 			this.dataModel = dataModel;
 			this.protocol = protocol;
+			this.settings = settings;
 			pollTimer = new Timer(2000);
 			pollTimer.Elapsed += OnTimer;
 			pollTimer.Enabled = true;
@@ -86,6 +87,15 @@ namespace mhe
 
 		private void OnTimer(Object o, ElapsedEventArgs e)
 		{
+			UpdateConnectionState();
+			if (!protocol.IsConnected)
+			{
+				protocol.Connect(settings.connectionHost, settings.connectionPort);
+				protocol.SendGetAllCommand((s) =>
+				{
+					dataModel = new DataModel(s);
+				});
+			}
 			RequestStats();
 			RequestProfilerData();
 		}
@@ -124,6 +134,14 @@ namespace mhe
 			});
 		}
 
+		private void UpdateConnectionState()
+		{
+			if (protocol.IsConnected)
+				connectionStatusLabel.Text = "Connected";
+			else
+				connectionStatusLabel.Text = "Disconnected";
+		}
+
 		private DataModel dataModel;
 		private Protocol protocol;
 		private List<string> history = new List<string>();
@@ -131,6 +149,7 @@ namespace mhe
 		private Timer pollTimer;
 		private Profiler profiler = new Profiler();
 		private Profiler gpuProfiler = new Profiler();
+		private Settings settings;
 	}
 }
 

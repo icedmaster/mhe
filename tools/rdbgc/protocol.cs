@@ -5,6 +5,12 @@ using System.Text;
 
 namespace mhe
 {
+	public class Settings
+	{
+		public string connectionHost;
+		public int connectionPort;
+	};
+
 	public class ByteStream
 	{
 		public ByteStream(byte[] b)
@@ -104,7 +110,8 @@ namespace mhe
 		{
 			try
 			{
-				client = new TcpClient(host, port);
+				client = new TcpClient();
+				client.Connect(host, port);
 			}
 			catch (Exception e)
 			{
@@ -275,6 +282,6 @@ namespace mhe
 			public string interval;
 		};
 
-		private TcpClient client;
+		private TcpClient client = new TcpClient();
 	}
 }
