@@ -90,7 +90,7 @@ private:
 	Posteffects posteffects_;
 };
 
-class Renderer : public ref_counter
+class MHE_EXPORT Renderer : public ref_counter
 {
 public:
 	static const uint8_t skybox_material_system_priority = 2;

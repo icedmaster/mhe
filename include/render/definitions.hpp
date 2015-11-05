@@ -1,6 +1,8 @@
 #ifndef __DEFINITIONS_HPP__
 #define __DEFINITIONS_HPP__
 
+namespace mhe {
+
 // image format
 enum
 {
@@ -40,5 +42,7 @@ enum
 	format_default,
 	format_datatype_max
 };
+
+}
 
 #endif

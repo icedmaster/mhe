@@ -61,6 +61,12 @@ inline T clamp_up(const T& value, const T& max)
 	return value;
 }
 
+template <class T>
+inline T saturate(const T& v)
+{
+	return clamp(v, (T)0, (T)1);
+}
+
 };
 
 #endif

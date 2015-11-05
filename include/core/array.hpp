@@ -88,6 +88,11 @@ public:
 		return elements_;
 	}
 
+	T* data()
+	{
+		return elements_;
+	}
+
 	size_t size() const
 	{
 		return count;

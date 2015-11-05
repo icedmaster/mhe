@@ -99,6 +99,21 @@ public:
 		return v_[2];
 	}
 
+	T& x()
+	{
+		return v_[0];
+	}
+
+	T& y()
+	{
+		return v_[1];
+	}
+
+	T& z()
+	{
+		return v_[2];
+	}
+
 	vector2<T> xy() const
 	{
 		return vector2<T>(v_[0], v_[1]);
@@ -338,6 +353,12 @@ template <class T>
 vector3<T> abs(const vector3<T>& v)
 {
 	return vector3<T>(fabs(v.x()), fabs(v.y()), fabs(v.z()));
+}
+
+template <class T>
+vector3<T> mul(const vector3<T>& v1, const vector3<T>& v2)
+{
+	return vector3<T>(v1.x() * v2.x(), v1.y() * v2.y(), v1.z() * v2.z());
 }
 
 template <class T>

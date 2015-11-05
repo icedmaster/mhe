@@ -10,7 +10,7 @@
 /09_reflections/build/*
 /10_imgui/build/*
 /11_animation/build/*
-/13_logo/build/*
+/12_sh/build/*
 
 !/build/CMakeLists.txt
 !/01_init/build/CMakeLists.txt
@@ -24,7 +24,7 @@
 !/09_reflections/build/CMakeLists.txt
 !/10_imgui/build/CMakeLists.txt
 !/11_animation/build/CMakeLists.txt
-!/13_logo/build/CMakeLists.txt
+!/12_sh/build/CMakeLists.txt
 
 
 

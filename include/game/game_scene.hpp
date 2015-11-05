@@ -21,7 +21,7 @@ public:
 	virtual void close() {}
 	virtual bool update(Engine& engine) = 0;
 	virtual void before_draw(Engine& /*engine*/) {}
-    virtual void draw(const Engine& /*engine*/) {}
+	virtual void draw(Engine& /*engine*/) {}
 };
 
 }}

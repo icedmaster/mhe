@@ -64,6 +64,13 @@ struct SkeletonInstance
 	SkeletonInstance() : texture_buffer(InvalidHandle<TextureBufferHandleType>::id) {}
 };
 
+struct GIDataInstance
+{
+	TextureBufferHandleType texture_buffer;
+
+	GIDataInstance() : texture_buffer(InvalidHandle<TextureBufferHandleType>::id) {}
+};
+
 struct MeshPart
 {
 	RenderData render_data;
@@ -87,11 +94,11 @@ struct Mesh
 
 inline MeshPart& add_part(Mesh& mesh)
 {
-    MeshPart part;
-    part.render_data.ibuffer = mesh.ibuffer;
-    part.render_data.vbuffer = mesh.vbuffer;
-    mesh.parts.push_back(part);
-    return mesh.parts.back();
+	MeshPart part;
+	part.render_data.ibuffer = mesh.ibuffer;
+	part.render_data.vbuffer = mesh.vbuffer;
+	mesh.parts.push_back(part);
+	return mesh.parts.back();
 }
 
 struct MeshPartInstance
@@ -110,6 +117,7 @@ struct MeshInstance
 	std::vector<MeshPartInstance> instance_parts;
 	UniformBuffer::IdType shared_uniform;
 	SkeletonInstance skeleton_instance;
+	GIDataInstance gi_data;
 
 	MeshInstance() : shared_uniform(UniformBuffer::invalid_id) {}
 };

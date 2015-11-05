@@ -77,12 +77,17 @@ void DebugLayout::init(Context& context)
 	context.layout_pool.create();
 
     LayoutDesc desc;
-    desc.layout.resize(1);
+    desc.layout.resize(2);
     desc.layout[0].offset = 0;
     desc.layout[0].size = 3;
     desc.layout[0].stride = sizeof(Vertex);
     desc.layout[0].position = 0;
 	desc.layout[0].datatype = format_float;
+	desc.layout[1].offset = 3 * sizeof(float);
+	desc.layout[1].size = 3;
+	desc.layout[1].stride = sizeof(Vertex);
+	desc.layout[1].position = 1;
+	desc.layout[1].datatype = format_float;
 
     context.layout_pool.get(handle).init(desc);
 }

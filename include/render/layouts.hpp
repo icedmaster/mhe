@@ -68,6 +68,7 @@ struct MHE_EXPORT DebugLayout
     struct Vertex
     {
         vec3 pos;
+		vec3 nrm;
     };
 
     static const char* name()

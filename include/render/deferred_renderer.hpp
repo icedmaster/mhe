@@ -6,7 +6,7 @@
 
 namespace mhe {
 
-class DeferredRenderer : public Renderer
+class MHE_EXPORT DeferredRenderer : public Renderer
 {
 public:
 	DeferredRenderer(Context& context) :
@@ -14,6 +14,8 @@ public:
 	{}
 
 	void init(AbstractGBufferFillMaterialSystem* fill, AbstractGBufferUseMaterialSystem* light, PosteffectMaterialSystemBase* draw);
+	void enable();
+	void disable();
 private:
 	void init_priorities();
 

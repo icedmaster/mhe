@@ -161,6 +161,42 @@ bool intersects(vector3<T>& input, vector3<T>& output, const ray<T>& r, const AA
 	return true;
 }
 
+template <class T>
+vector3<T> random_sample_over_hemisphere(T u1, T u2)
+{
+	const T r = sqrt(u1);
+	const T theta = 2 * pi * u2;
+
+	const T x = r * cosf(theta);
+	const T y = r * sinf(theta);
+
+	return vector3<T>(x, y, sqrt((T)mhe::max(0, 1 - u1)));
+}
+
+template <class T>
+vector3<T> least_important_direction(const vector3<T>& v)
+{
+	vector3<T> abs_v = abs(v);
+	if (abs_v.x() < abs_v.y())
+		return abs_v.x() < abs_v.z() ? vector3<T>::right() : vector3<T>::forward();
+	else
+		return abs_v.y() < abs_v.z() ? vector3<T>::up() : vector3<T>::forward();
+}
+
+template <class T>
+vector3<T> perpendicular(const vector3<T>& v)
+{
+	return cross(least_important_direction(v), v);
+}
+
+template <class T>
+vector3<T> tangent_space_to_world_space(const vector3<T>& v, const vector3<T>& nrm)
+{
+	const vector3<T>& t1 = perpendicular(nrm);
+	const vector3<T>& t2 = cross(nrm, t1);
+	return (v.x() * t1 + v.y() * t2 + v.z() * nrm).normalized();
+}
+
 }
 
 #endif

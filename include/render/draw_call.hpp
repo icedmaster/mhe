@@ -22,6 +22,7 @@ struct DrawCallExplicit
 	RenderTarget* render_target;
 	Texture* textures[material_textures_number];
 	UniformBuffer* uniforms[material_uniforms_number];
+	TextureBuffer* texture_buffers[material_texture_buffers_number];
 	ShaderProgram* shader_program;
 	size_t elements_number;
 	uint32_t vbuffer_offset;

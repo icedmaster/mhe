@@ -4,171 +4,104 @@
 #include "math/vector3.hpp"
 #include "allocator.hpp"
 #include "assert.hpp"
+#include "vector.hpp"
 #include "fixed_size_vector.hpp"
 
 namespace mhe {
 
 class allocator;
 
-template <class E, size_t S>
-struct Cell
-{
-	typedef E Element;
-	fixed_size_vector<E, S> elements;
-
-	Cell(allocator* alloc = default_allocator()) : elements(alloc) {}
-
-	void add(const E& e)
-	{
-		//ASSERT(elements.size() < S, "Too many elements in the cell");
-		elements.push_back(e);
-	}
-
-	size_t size() const
-	{
-		return elements.size();
-	}
-
-	template <class Functor>
-	void iterate(Functor& f)
-	{
-		for (size_t i = 0; i < elements.size(); ++i)
-			f(elements[i]);
-	}
-};
-
-template <class G, bool B>
-struct GridIteratorTraits
-{};
-
-template <class G>
-struct GridIteratorTraits<G, false>
-{
-	typedef G Grid;
-	typedef typename Grid::Size GridSize;
-	typedef typename Grid::CellElement Cell;
-};
-
-template <class G>
-struct GridIteratorTraits<G, true>
-{
-	typedef const G Grid;
-	typedef typename Grid::Size GridSize;
-	typedef const typename Grid::Cell Cell;
-};
-
-template <class C, class S = uint32_t>
+template <class E, class I>
 class grid
 {
-public:
-	typedef vector3<S> Size;
-	typedef C Cell;
-	typedef typename C::Element CellElement;
-	typedef grid<C, S> this_type;
-
-	template <class Traits>
-	class Iterator
+	struct Cell
 	{
-	public:
-		typedef typename Traits::CellElement CellElement;
-
-		Iterator(typename Traits::Grid& grid, const typename Traits::GridSize& pos) : grid_(grid), pos_(pos) {}
-
-		Cell* operator->()
-		{
-			return grid_.get(pos_);
-		}
-	private:
-		typename Traits::Grid& grid_;
-		typename Traits::GridSize pos_;
+		typedef vector<I> Data;
+		Data data;
 	};
 
-	grid(allocator* alloc = default_allocator()) :
-		cells_(nullptr), allocator_(alloc)
+	typedef E Element;
+	typedef I Index;
+public:
+	grid(allocator* alloc) :
+		data_(alloc), alloc_(alloc), cells_(nullptr)
+		{}
+
+	void add(const Element& e, size_t x, size_t y, size_t z)
 	{
+		I index = static_cast<I>(data_.size());
+		data_.push_back(e);
+		size_t cell_index = z * dim_.x() * dim_.y() + y * dim_.x() + x;
+		ASSERT(cell_index < dim_.x() * dim_.y() * dim_.z(), "Invalid index:" << index);
+		cells_[cell_index].data.push_back(cell_index);
 	}
 
-	grid(S dim, allocator* alloc = default_allocator()) :
-		cells_(nullptr), allocator_(alloc)
+	void add(const Element& e, const vector3<int>& from, const vector3<int>& to)
 	{
-		resize(dim, dim, dim, C(allocator_));
-	}
-
-	grid(S dim, const C& value, allocator* alloc = default_allocator()) :
-		cells_(nullptr), allocator_(alloc)
-	{
-		resize(dim, dim, dim, value);
-	}
-
-	const vector3<S>& size() const
-	{
-		return size_;
-	}
-
-	C& get(S x, S y, S z)
-	{
-		ASSERT(is_inside(x, y, z), "Invalid cell position");
-		return cells_[x * size_.y() * size_.z() + y * size_.z() + z];
-	}
-
-	bool is_inside(S x, S y, S z) const
-	{
-		return x < size_.x() && y < size_.y() && z < size_.z();
-	}
-
-	bool is_inside(const Size& s) const
-	{
-		return is_inside(s.x(), s.y(), s.z());
-	}
-
-	void resize(S x, S y, S z, const C& initial_value)
-	{
-		allocator_->free(cells_);
-		size_.set(x, y, z);
-		S total = x * y * z;
-		cells_ = new (allocator_) C[total];
-		for (S i = 0; i < total; ++i)
-			cells_[i] = initial_value;
-	}
-
-	void add(const CellElement& e, S x, S y, S z)
-	{
-		ASSERT(is_inside(x, y, z), "Invalid cell position");
-		get(x, y, z).add(e);
-	}
-
-	void add(const CellElement& e, const Size& lowest, const Size& highest)
-	{
-		ASSERT(is_inside(lowest) && is_inside(highest), "Invalid bounds");
-		for (S x = lowest.x(); x <= highest.x(); ++x)
+		I index = static_cast<I>(data_.size());
+		data_.push_back(e);
+		for (int x = from.x(); x <= to.x(); ++x)
 		{
-			for (S y = lowest.y(); y <= highest.y(); ++y)
+			for (int y = from.y(); y <= to.y(); ++y)
 			{
-				for (S z = lowest.z(); z <= highest.z(); ++z)
-					get(x, y, z).add(e);
-			}
-		}
-	}
-
-	template <class Functor>
-	void iterate(const Size& lowest, const Size& highest, Functor& f)
-	{
-		ASSERT(is_inside(lowest) && is_inside(highest), "Invalid bounds");
-		for (S x = lowest.x(); x <= highest.x(); ++x)
-		{
-			for (S y = lowest.y(); y <= highest.y(); ++y)
-			{
-				for (S z = lowest.z(); z <= highest.z(); ++z)
+				for (int z = from.z(); z <= to.z(); ++z)
 				{
-					get(x, y, z).iterate(f);
+					size_t cell_index = z * dim_.x() * dim_.y() + y * dim_.x() + x;
+					ASSERT(cell_index < dim_.x() * dim_.y() * dim_.z(), "Invalid index:" << index);
+					cells_[cell_index].data.push_back(index);
 				}
 			}
 		}
 	}
+
+	void resize(size_t dim)
+	{
+		dim_.set(dim, dim, dim);
+		resize_impl();
+	}
+
+	void resize(const vector3<int>& dim)
+	{
+		dim_ = dim;
+		resize_impl();
+	}
+
+	template <class Iterator>
+	void iterate(Iterator& it, const vector3<int>& from, const vector3<int>& to)
+	{
+		for (int x = from.x(); x <= to.x(); ++x)
+		{
+			for (int y = from.y(); y <= to.y(); ++y)
+			{
+				for (int z = from.z(); z <= to.z(); ++z)
+				{
+					size_t cell_index = z * dim_.x() * dim_.y() + y * dim_.x() + x;
+					ASSERT(cell_index < dim_.x() * dim_.y() * dim_.z(), "Invalid index:" << cell_index);
+					for (size_t i = 0, size = cells_[cell_index].data.size(); i < size; ++i)
+						it(data_[cells_[cell_index].data[i]]);
+				}
+			}
+		}
+	}
+
+	const vector<E>& data() const
+	{
+		return data_;
+	}
 private:
-	C* cells_;
-	vector3<S> size_;
-	allocator* allocator_;
+	void resize_impl()
+	{
+		alloc_->destroy_array(cells_);
+		size_t size = dim_.x() * dim_.y() * dim_.z();
+		cells_ = alloc_->create_array<Cell>(size);
+		for (size_t i = 0; i < size; ++i)
+			cells_[i].data.set_allocator(alloc_);
+	}
+
+	vector<E> data_;
+	Cell* cells_;
+	vector3<size_t> dim_;
+	allocator* alloc_;
 };
 
 }

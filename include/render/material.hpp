@@ -17,7 +17,7 @@ struct Context;
 
 const size_t material_textures_number = 8;
 const size_t material_uniforms_number = 4;
-const size_t material_texture_buffers_number = 2;
+const size_t material_texture_buffers_number = 3;
 
 // TODO: change ShaderProgram::IdType -> ShaderInstance
 struct Material

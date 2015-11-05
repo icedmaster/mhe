@@ -16,7 +16,6 @@ void init_trace_data(Mesh& mesh, const std::vector<Vertex>& vertices, const std:
 {
 	mesh.trace_data_id = context->mesh_trace_data_pool.create();
 	MeshGrid& grid = context->mesh_trace_data_pool.get(mesh.trace_data_id).grid;
-	grid.resize(1, 1, 1, MeshCell());
 	create_grid(grid, vertices, vertices.size(), indices, indices.size());
 }
 

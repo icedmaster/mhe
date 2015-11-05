@@ -19,9 +19,6 @@ void process_flags(MeshInstance& mesh_instance, const Context& context, const Ve
 	if (flags & mesh_creation_flag_trace_data)
 	{
 		MeshTraceDataInstance& mesh_trace_data = create_and_get(context.mesh_trace_data_pool);
-		// TODO:
-		MeshGrid::Size size(1, 1, 1);
-		mesh_trace_data.grid.resize(size.x(), size.y(), size.z(), MeshCell());
 		create_grid(mesh_trace_data.grid, vertices, vertices_number, indices, indices_number);
 		mesh_instance.mesh.trace_data_id = mesh_trace_data.id;
 	}
@@ -204,6 +201,8 @@ bool create_sphere(MeshInstance& mesh_instance, const Context& context, int subd
     subdivide(vertices, indices, r, f, d, subdivision);
     subdivide(vertices, indices, f, l, d, subdivision);
 
+	caculate_normals(&vertices[0], &indices[0], indices.size());
+
 	mesh_instance.mesh.aabb.extents.set(1.0f, 1.0f, 1.0f);
 
 	process_flags(mesh_instance, context, vertices, vertices.size(), indices, indices.size(), flags);
@@ -214,6 +213,10 @@ bool create_sphere(MeshInstance& mesh_instance, const Context& context, int subd
     part.render_data.ibuffer = context.index_buffer_pool.create();
     part.render_data.layout = DebugLayout::handle;
     part.render_data.elements_number = indices.size() / 3;
+	part.render_data.indexes_number = indices.size();
+
+	mesh_instance.mesh.ibuffer = part.render_data.ibuffer;
+	mesh_instance.mesh.vbuffer = part.render_data.vbuffer;
 
     VertexBuffer& vbuffer = context.vertex_buffer_pool.get(part.render_data.vbuffer);
     if (!vbuffer.init(buffer_update_type_static,

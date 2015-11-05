@@ -38,6 +38,24 @@ void DeferredRenderer::init(AbstractGBufferFillMaterialSystem* fill, AbstractGBu
 	}
 }
 
+void DeferredRenderer::enable()
+{
+	gbuffer_fill_material_system_->enable();
+	if (gbuffer_light_material_system_ != nullptr)
+		gbuffer_light_material_system_->enable();
+	if (draw_material_system_ != nullptr)
+		draw_material_system_->enable();
+}
+
+void DeferredRenderer::disable()
+{
+	gbuffer_fill_material_system_->disable();
+	if (gbuffer_light_material_system_ != nullptr)
+		gbuffer_light_material_system_->disable();
+	if (draw_material_system_ != nullptr)
+		draw_material_system_->disable();
+}
+
 void DeferredRenderer::init_priorities()
 {
 	gbuffer_fill_material_system_->set_priority(4);
