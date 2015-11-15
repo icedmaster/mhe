@@ -45,6 +45,8 @@ bool init_mesh(Mesh& mesh, uint8_t layout, const MeshExportData& mesh_export_dat
 	const std::vector<Vertex>& vertexes, const std::vector<uint32_t>& indexes, 
 	const std::vector<MaterialExportData>& materials_data, const std::vector<MeshPartExportData>& parts_data, const Context* context)
 {
+	init_trace_data(mesh, vertexes, indexes, context);
+
 	mesh.aabb = mesh_export_data.aabb;
 
 	mesh.vbuffer = context->vertex_buffer_pool.create();

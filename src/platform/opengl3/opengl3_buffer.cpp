@@ -32,12 +32,13 @@ void VAO::disable() const
 
 bool VBO::init(GLenum target, GLsizeiptr size, const GLvoid* data, GLenum usage)
 {
-    OpenGLExtensions::instance().glGenBuffers(1, &id_);
+	OpenGLExtensions::instance().glGenBuffers(1, &id_);
 	if (!id_) return false;
 	OpenGLExtensions::instance().glBindBuffer(target, id_);
 	OpenGLExtensions::instance().glBufferData(target, size, data, usage);
 	target_ = target;
 	usage_ = usage;
+	size_ = size;
 	return true;
 }
 
@@ -92,6 +93,13 @@ void VBO::unmap()
 	disable();
 }
 
+void VBO::data(uint8_t* dst, size_t size) const
+{
+	ASSERT(size >= size_, "Invalid size");
+	OpenGLExtensions::instance().glGetBufferSubData(target_, 0, size_, dst);
+	CHECK_GL_ERRORS();
+}
+
 bool OpenGL3Buffer::init(BufferUpdateType type, const uint8_t* data, size_t size, size_t /*element_size*/)
 {
 	if (!vao_.init())
@@ -125,6 +133,11 @@ void OpenGL3Buffer::unmap()
 	vbo_.unmap();
 }
 
+void OpenGL3Buffer::data(uint8_t* vertices, size_t size) const
+{
+	vbo_.data(vertices, size);
+}
+
 void OpenGL3Buffer::enable() const
 {
 	vao_.enable();
@@ -146,9 +159,9 @@ bool OpenGL3IndexBuffer::init(BufferUpdateType type, const RenderBuffer& render_
 {
 	const OpenGL3Buffer* buffer = static_cast<const OpenGL3Buffer*>(render_buffer.impl());
 	buffer->vao().enable();
-	indexes_.resize(size);
+	indices_.resize(size);
 	if (indices != nullptr)
-		::memcpy(&indexes_[0], indices, size * sizeof(uint32_t));
+		::memcpy(&indices_[0], indices, size * sizeof(uint32_t));
 	bool result = vbo_.init(GL_ELEMENT_ARRAY_BUFFER, size * sizeof(uint32_t), reinterpret_cast<const GLvoid*>(indices), get_vbo_usage(type));
 	buffer->vao().disable();
 	vao_ = buffer->vao();
@@ -163,10 +176,16 @@ void OpenGL3IndexBuffer::close()
 void OpenGL3IndexBuffer::update(const uint32_t* indices, size_t size)
 {
 	vao_.enable();
-	indexes_.resize(size);
-	::memcpy(&indexes_[0], indices, size * sizeof(uint32_t));
+	indices_.resize(size);
+	::memcpy(&indices_[0], indices, size * sizeof(uint32_t));
 	vbo_.update(size * sizeof(uint32_t), 0, reinterpret_cast<const GLvoid*>(indices));
 	vao_.disable();
+}
+
+void OpenGL3IndexBuffer::data(uint32_t* indices, size_t size) const
+{
+	ASSERT(size >= indices_.size(), "Invalid size");
+	memcpy(indices, &indices_[0], indices_.size() * sizeof(uint32_t));
 }
 
 void OpenGL3IndexBuffer::enable() const
@@ -176,7 +195,7 @@ void OpenGL3IndexBuffer::enable() const
 
 bool OpenGL3Layout::init(const LayoutDesc& desc)
 {
-    ASSERT(!desc.layout.empty(), "Getting layout automatically is not supported yet");
+	ASSERT(!desc.layout.empty(), "Getting layout automatically is not supported yet");
 	desc_ = desc;
 	return true;
 }

@@ -90,7 +90,7 @@ void SkyboxMaterialSystem::update(Context& context, SceneContext& /*scene_contex
 	uniform_buffer_desc.name = "transform";
 	uniform.update(uniform_buffer_desc);
 
-    setup_draw_call(render_context.draw_calls.add(), skybox_mesh_.instance_parts[0], skybox_mesh_.mesh.parts[0]);
+	setup_draw_call(render_context.draw_calls.add(), skybox_mesh_.instance_parts[0], skybox_mesh_.mesh.parts[0]);
 }
 
 }

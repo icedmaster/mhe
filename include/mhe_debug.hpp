@@ -6,6 +6,7 @@
 #include "debug/custom_types.hpp"
 #include "debug/debug_views.hpp"
 #include "debug/default_rdbg_setup.hpp"
+#include "debug/gpu_profiler.hpp"
 #include "debug/imgui_helper.hpp"
 #include "debug/light_wrapper.hpp"
 #include "debug/profiler.hpp"

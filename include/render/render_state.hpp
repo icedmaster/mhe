@@ -111,6 +111,14 @@ struct ViewportDesc
 	ViewportDesc() : viewport(0, 0, 0, 0) {}
 };
 
+struct ScissorDesc
+{
+	rect<int> scissor_rect;
+	bool enabled;
+
+	ScissorDesc() : scissor_rect(0, 0, 0, 0), enabled(false) {}
+};
+
 struct RenderStateDesc
 {
 	DepthDesc depth;
@@ -118,6 +126,7 @@ struct RenderStateDesc
 	BlendDesc blend;
 	RasterizerDesc rasterizer;
 	ViewportDesc viewport;
+	ScissorDesc scissor;
 };
 
 class RenderStateImpl
@@ -127,12 +136,13 @@ public:
 	virtual bool init(const RenderStateDesc& desc) = 0;
 	virtual void update(const RenderStateDesc& desc) = 0;
 	virtual void update_viewport(const ViewportDesc& viewport_desc) = 0;
+	virtual void update_scissor(const ScissorDesc& scissor_desc) = 0;
 	virtual void close() = 0;
 };
 
 class MHE_EXPORT RenderState
 {
-    POOL_ELEMENT_METHODS(uint16_t)
+	POOL_ELEMENT_METHODS(uint16_t)
 public:
 	RenderState();
 	~RenderState()
@@ -158,6 +168,11 @@ public:
 	void update_viewport(const ViewportDesc& viewport_desc)
 	{
 		impl_->update_viewport(viewport_desc);
+	}
+
+	void update_scissor(const ScissorDesc& scissor_desc)
+	{
+		impl_->update_scissor(scissor_desc);
 	}
 
 	const RenderStateImpl* impl() const

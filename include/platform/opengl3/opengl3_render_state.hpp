@@ -85,17 +85,20 @@ public:
 
 	void update(const RenderStateDesc& desc);
 	void update_viewport(const ViewportDesc& viewport_desc) override;
+	void update_scissor(const ScissorDesc& scissor_desc) override;
 
-    void enable(OpenGL3ContextState& state) const;
+	void enable(OpenGL3ContextState& state) const;
 	void disable() const;
 private:
 	void set_viewport(OpenGL3ContextState& state, const rect<int>& viewport) const;
+	void set_scissor(OpenGL3ContextState& state, const ScissorDesc& scissor_desc) const;
 
 	DepthState depth_state_;
 	StencilState stencil_state_;
 	BlendState blend_state_;
-    RasterizerState rasterizer_state_;
+	RasterizerState rasterizer_state_;
 	rect<int> viewport_;
+	ScissorDesc scissor_state_;
 };
 
 }}

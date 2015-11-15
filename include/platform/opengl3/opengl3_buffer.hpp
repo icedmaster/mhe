@@ -1,6 +1,7 @@
 #ifndef __OPENGL3_BUFFER_HPP__
 #define __OPENGL3_BUFFER_HPP__
 
+#include "core/vector.hpp"
 #include "render/render_buffer.hpp"
 #include "../opengl/mhe_gl.hpp"
 
@@ -47,7 +48,15 @@ public:
 	void update(GLsizeiptr size, GLintptr offset, const GLvoid* data);
 	void* map(GLsizeiptr size, GLintptr offset);
 	void unmap();
+
+	void data(uint8_t* dst, size_t size) const;
+
+	size_t size() const
+	{
+		return size_;
+	}
 private:
+	size_t size_;
 	GLuint id_;
 	GLenum target_;
 	GLenum usage_;
@@ -62,6 +71,12 @@ public:
 	void update(const uint8_t* data, size_t size) override;
 	void* map(size_t size, size_t offset) override;
 	void unmap() override;
+
+	void data(uint8_t* vertices, size_t size) const override;
+	size_t size() const override
+	{
+		return vbo_.size();
+	}
 
 	const VAO& vao() const
 	{
@@ -91,17 +106,19 @@ public:
 	
 	const uint32_t* get() const
 	{
-		return indexes_.data();
+		return indices_.data();
 	}
 
-	size_t size() const
+	size_t size() const override
 	{
-		return indexes_.size();
+		return indices_.size();
 	}
+
+	void data(uint32_t* indices, size_t size) const override;
 
 	void enable() const;
 private:
-	std::vector<uint32_t> indexes_;
+	vector<uint32_t> indices_;
 	VAO vao_;
 	VBO vbo_;
 };
@@ -132,8 +149,8 @@ public:
 	void update(const UniformBufferDesc& desc);
 	void update(const uint8_t* data, size_t offset, size_t size);
 
-    void bind(size_t unit) const;
-    void enable(const OpenGL3ShaderProgram* program, size_t unit) const;
+	void bind(size_t unit) const;
+	void enable(const OpenGL3ShaderProgram* program, size_t unit) const;
 	void disable() const;
 private:
 	fixed_size_vector<uint8_t, max_uniforms_per_block * 4 * sizeof(float)> data_;

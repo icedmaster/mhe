@@ -37,6 +37,11 @@ public:
 	{
 		move_speed_ = speed;
 	}
+
+	void set_rotation_speed(float speed)
+	{
+		rotation_speed_ = speed;
+	}
 protected:
 	float move_speed() const
 	{

@@ -141,6 +141,8 @@ void write_grid_data(std::ofstream& stream, const mhe::MeshGrid& grid)
 
 void write_skinning_data(std::ofstream& stream, const SkinningExportContext& skinning_context)
 {
+	if (skinning_context.bones.empty())
+		return;
 	uint32_t num = skinning_context.bones.size();
 	const mhe::Bone* bones = &skinning_context.bones[0];
 	stream.write((const char*)&skinning_context.root_local_to_world_transform, sizeof(mhe::mat4x4));
@@ -383,12 +385,12 @@ void process_node(const aiScene* assimp_scene, aiNode* node, const aiMatrix4x4& 
 void create_grid(mhe::MeshGrid& grid, const std::vector<mhe::StandartGeometryLayout::Vertex>& vertices,
 	const std::vector<uint32_t>& indices)
 {
-	mhe::MeshGridHelper helper(grid);
+	/*mhe::MeshGridHelper helper(grid);
 	ASSERT(indices.size() % 3 == 0, "Only triangulated meshes are supported");
 	for (size_t i = 0, size = indices.size(); i < size; i += 3)
 	{
 		helper.add(vertices[indices[i]].pos, vertices[indices[i + 1]].pos, vertices[indices[i + 2]].pos);
-	}
+	}*/
 }
 
 void write_animation(mhe::AnimationExportData& animation_data, const char* out_filename, const ExportParams& params)

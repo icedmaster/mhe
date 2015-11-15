@@ -1,5 +1,7 @@
 [defs NORMALMAP 0 1]
 
+[include "sh.h"]
+
 struct VSOutput
 {
 	vec3 nrm;
@@ -9,11 +11,11 @@ struct VSOutput
 	vec3 bitng;
 #endif
 	vec3 baked_diffuse;
+	ColorSH9 baked_radiance;
 };
 
 [vertex]
 
-[include "sh.h"]
 [include "geometry_common.h"]
 
 [samplerBuffer gi_buffer 2]
@@ -37,7 +39,8 @@ void main()
 	vec3 light = vec3(0, 1, 0) * saturate(dot(vsoutput.nrm, vec3(0, 1, 0)));
 	ColorSH9 baked_radiance = fetch_sh9_color(gi_buffer, gl_VertexID);
 	vec3 baked_irradiance = calculate_irradiance(vsoutput.nrm, baked_radiance);
-	vsoutput.baked_diffuse = light + baked_irradiance;
+	vsoutput.baked_diffuse = /*light +*/ baked_irradiance;
+	vsoutput.baked_radiance = baked_radiance;
 
 	gl_Position = vp * model * pos_os;
 }
@@ -60,9 +63,13 @@ uniform material
 in VSOutput vsoutput;
 
 layout (location = 0) out vec4 color;
-layout (location = 1) out vec4 normal;
 
 void main()
 {
-	color = vec4(vsoutput.baked_diffuse, 1);
+	vec3 nrm = normalize(vsoutput.nrm);
+	vec3 nrm_ts = vec3(0, 0, 1);
+	//color = vec4(vsoutput.baked_diffuse, 1);
+	color = vec4(calculate_irradiance(nrm_ts, vsoutput.baked_radiance), 1);
+	//color = vec4(vec3(0, 1, 0) * saturate(dot(nrm, vec3(0, 1, 0))), 1);
+	//color = vec4(nrm * 0.5f + 0.5f, 1);
 }

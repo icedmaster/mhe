@@ -15,14 +15,16 @@ class OpenGL3RenderTarget;
 
 struct OpenGL3ContextState
 {
-    array<size_t, 16> uniforms;
+	array<size_t, 16> uniforms;
 	vector2<int> window_size;
 	rect<int> viewport;
-    bool depth;
-    bool stencil;
-    bool blend;
+	rect<int> scissor;
+	bool depth;
+	bool stencil;
+	bool blend;
+	bool scissor_test;
 
-    OpenGL3ContextState();
+	OpenGL3ContextState();
 };
 
 class OpenGL3Driver : public DriverImpl

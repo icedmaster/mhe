@@ -19,6 +19,7 @@ typedef uint16_t TextureBufferHandleType;
 
 typedef uint16_t AABBInstanceHandleType;
 typedef uint16_t MeshTraceDataHandleType;
+typedef uint16_t MeshRawDataHandleType;
 
 template <class T>
 struct InvalidHandle

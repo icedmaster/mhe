@@ -84,11 +84,12 @@ struct Mesh
 	VertexBuffer::IdType vbuffer;
 	IndexBuffer::IdType ibuffer;
 	MeshTraceDataHandleType trace_data_id;
+	MeshRawDataHandleType raw_data_id;
 	AABBf aabb;
 	Skeleton skeleton;
 
 	Mesh() : vbuffer(VertexBuffer::invalid_id), ibuffer(IndexBuffer::invalid_id),
-			 trace_data_id(InvalidHandle<MeshTraceDataHandleType>::id)
+			 trace_data_id(InvalidHandle<MeshTraceDataHandleType>::id), raw_data_id(InvalidHandle<MeshRawDataHandleType>::id)
 	{}
 };
 

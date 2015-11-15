@@ -197,6 +197,15 @@ vector3<T> tangent_space_to_world_space(const vector3<T>& v, const vector3<T>& n
 	return (v.x() * t1 + v.y() * t2 + v.z() * nrm).normalized();
 }
 
+template <class T>
+void build_tangent_space(vector3<T>& res_nrm, vector3<T>& res_tng, vector3<T>& res_bitng, const vector3<T>& nrm)
+{
+	res_nrm = nrm;
+	res_bitng = cross(nrm, least_important_direction(nrm));
+	res_tng = cross(res_bitng, res_nrm);
+	//res_tng = cross(res_bitng, res_nrm);
+}
+
 }
 
 #endif

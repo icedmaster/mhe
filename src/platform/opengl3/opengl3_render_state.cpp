@@ -14,7 +14,7 @@ void DepthState::init(const DepthDesc& desc)
 
 void DepthState::enable(OpenGL3ContextState& state) const
 {
-    if (desc_.enabled == state.depth) return;
+	if (desc_.enabled == state.depth) return;
 	if (desc_.enabled)
 	{
 		glEnable(GL_DEPTH_TEST);
@@ -42,7 +42,7 @@ void StencilState::init(const StencilDesc& desc)
 
 void StencilState::enable(OpenGL3ContextState& state) const
 {
-    if (state.stencil == desc_.enabled) return;
+	if (state.stencil == desc_.enabled) return;
 	if (desc_.enabled)
 	{
 		glEnable(GL_STENCIL_TEST);
@@ -50,7 +50,7 @@ void StencilState::enable(OpenGL3ContextState& state) const
 		OpenGLExtensions::instance().glStencilOpSeparate(GL_FRONT, desc_.front_op_sfail, desc_.front_op_dfail, desc_.front_op_pass);
 	}
 	else glDisable(GL_STENCIL_TEST);
-    state.stencil = desc_.enabled;
+	state.stencil = desc_.enabled;
 }
 
 void BlendState::init(const BlendDesc& desc)
@@ -69,7 +69,7 @@ void BlendState::init(const BlendDesc& desc)
 
 void BlendState::enable(OpenGL3ContextState& state) const
 {
-    //if (state.blend == desc_.enabled) return;
+	//if (state.blend == desc_.enabled) return;
 	if (desc_.enabled)
 	{
 		glEnable(GL_BLEND);
@@ -77,23 +77,23 @@ void BlendState::enable(OpenGL3ContextState& state) const
 		OpenGLExtensions::instance().glBlendEquation(desc_.func);
 	}
 	else glDisable(GL_BLEND);
-    state.blend = desc_.enabled;
+	state.blend = desc_.enabled;
 }
 
 void RasterizerState::init(const RasterizerDesc& desc)
 {
-    desc_.cull = get_cull_mode(desc.cull);
-    desc_.winding = get_winding_order(desc.order);
+	desc_.cull = get_cull_mode(desc.cull);
+	desc_.winding = get_winding_order(desc.order);
 }
 
 void RasterizerState::enable(OpenGL3ContextState& state) const
 {
-    NOT_IMPLEMENTED(state);
-    if (desc_.cull == GL_NONE)
-        glDisable(GL_CULL_FACE);
-    else
+	NOT_IMPLEMENTED(state);
+	if (desc_.cull == GL_NONE)
+		glDisable(GL_CULL_FACE);
+	else
 	{
-        glEnable(GL_CULL_FACE);
+		glEnable(GL_CULL_FACE);
 		glFrontFace(desc_.winding);
 		glCullFace(desc_.cull);
 	}
@@ -104,8 +104,9 @@ bool OpenGL3RenderState::init(const RenderStateDesc& desc)
 	depth_state_.init(desc.depth);
 	stencil_state_.init(desc.stencil);
 	blend_state_.init(desc.blend);
-    rasterizer_state_.init(desc.rasterizer);
+	rasterizer_state_.init(desc.rasterizer);
 	viewport_ = desc.viewport.viewport;
+	scissor_state_ = desc.scissor;
 	return true;
 }
 
@@ -122,16 +123,22 @@ void OpenGL3RenderState::update_viewport(const ViewportDesc& viewport_desc)
 	viewport_ = viewport_desc.viewport;
 }
 
+void OpenGL3RenderState::update_scissor(const ScissorDesc& scissor_desc)
+{
+	scissor_state_ = scissor_desc;
+}
+
 void OpenGL3RenderState::enable(OpenGL3ContextState& state) const
 {
-    depth_state_.enable(state);
-    stencil_state_.enable(state);
-    blend_state_.enable(state);
-    rasterizer_state_.enable(state);
+	depth_state_.enable(state);
+	stencil_state_.enable(state);
+	blend_state_.enable(state);
+	rasterizer_state_.enable(state);
 	if (viewport_.is_empty())
 		set_viewport(state, rect<int>(0, 0, state.window_size.x(), state.window_size.y()));
 	else
 		set_viewport(state, viewport_);
+	set_scissor(state, scissor_state_);
 }
 
 void OpenGL3RenderState::disable() const
@@ -143,6 +150,24 @@ void OpenGL3RenderState::set_viewport(OpenGL3ContextState& state, const rect<int
 		return;
 	glViewport(viewport.ll().x(), viewport.ll().y(), viewport.width(), viewport.height());
 	state.viewport = viewport;
+}
+
+void OpenGL3RenderState::set_scissor(OpenGL3ContextState& state, const ScissorDesc& scissor_desc) const
+{
+	if (state.scissor_test == scissor_desc.enabled)
+		return;
+	if (state.scissor == scissor_desc.scissor_rect)
+		return;
+	if (scissor_desc.enabled)
+		glEnable(GL_SCISSOR_TEST);
+	else
+		glDisable(GL_SCISSOR_TEST);
+	CHECK_GL_ERRORS();
+	glScissor(scissor_desc.scissor_rect.ll().x(), scissor_desc.scissor_rect.ll().y(),
+		scissor_desc.scissor_rect.width(), scissor_desc.scissor_rect.height());
+	CHECK_GL_ERRORS();
+	state.scissor = scissor_desc.scissor_rect;
+	state.scissor_test = scissor_desc.enabled;
 }
 
 }}

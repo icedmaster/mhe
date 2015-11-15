@@ -666,6 +666,15 @@ public:
 		::glQueryCounter(id, target);
 #endif
 	}
+
+	void glGetBufferSubData(GLenum target, GLintptr offset, GLsizeiptr size, GLvoid *data)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glGetBufferSubData_(target, offset, size, data);
+#else
+		::glGetBufferSubData(target, offset, size, data);
+#endif
+	}
 private:
 	OpenGLExtensions() {}
 	~OpenGLExtensions() {}
@@ -758,6 +767,7 @@ private:
 	PFNGLGETQUERYOBJECTIVPROC glGetQueryObjectiv_;
 	PFNGLGETQUERYOBJECTUI64VPROC glGetQueryObjectui64v_;
 	PFNGLQUERYCOUNTERPROC glQueryCounter_;
+	PFNGLGETBUFFERSUBDATAPROC glGetBufferSubData_;
 #endif
 	std::map<std::string, bool> loaded_extensions_;
 };

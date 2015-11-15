@@ -14,9 +14,16 @@ namespace mhe {
 template <class Loader>
 class ResourceManager
 {
+public:
+	struct LoadingParameters
+	{
+		uint32_t flags;
+
+		LoadingParameters() : flags(0) {}
+	};
 protected:
 	typedef typename Loader::type res_type;
-    typedef typename Loader::instance_type instance_type;
+	typedef typename Loader::instance_type instance_type;
 	typedef typename Loader::context_type context_type;
 
 	struct Info

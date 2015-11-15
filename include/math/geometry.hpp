@@ -33,9 +33,13 @@ void caculate_normals(V* vertices, const I* indices, size_t indices_number)
 		vec3 v3v1 = v3.pos - v1.pos;
 		vec3 v3v2 = v3.pos - v2.pos;
 
-		v1.nrm = cross(v2v1, v3v1).normalized();
-		v2.nrm = cross(v3v2, -v2v1).normalized();
-		v3.nrm = cross(-v3v1, -v3v2).normalized();
+		v1.nrm += cross(v2v1, v3v1).normalized();
+		v2.nrm += cross(v3v2, -v2v1).normalized();
+		v3.nrm += cross(-v3v1, -v3v2).normalized();
+
+		v1.nrm.normalize();
+		v2.nrm.normalize();
+		v3.nrm.normalize();
 	}
 }
 

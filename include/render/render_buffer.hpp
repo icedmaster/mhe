@@ -27,6 +27,8 @@ public:
 	virtual void update(const uint8_t* data, size_t size) = 0;
 	virtual void* map(size_t size, size_t offset) = 0;
 	virtual void unmap() = 0;
+	virtual void data(uint8_t* vertices, size_t size) const = 0;
+	virtual size_t size() const = 0;
 	virtual void close() = 0;
 };
 
@@ -37,6 +39,8 @@ public:
 	virtual bool init(const RenderBuffer& render_buffer, const uint32_t* indices, size_t size) = 0;
 	virtual bool init(BufferUpdateType type, const RenderBuffer& render_buffer, const uint32_t* indices, size_t size) = 0;
 	virtual void update(const uint32_t* indices, size_t size) = 0;
+	virtual void data(uint32_t* indices, size_t size) const = 0;
+	virtual size_t size() const = 0;
 	virtual void close() = 0;
 };
 
@@ -78,7 +82,7 @@ public:
 class MHE_EXPORT RenderBuffer
 {
 	friend class Driver;
-    POOL_ELEMENT_METHODS(uint16_t)
+	POOL_ELEMENT_METHODS(uint16_t)
 public:
 	RenderBuffer();
 	bool init(BufferUpdateType type, const uint8_t* data, size_t size, size_t element_size)
@@ -106,6 +110,16 @@ public:
 	void unmap()
 	{
 		impl_->unmap();
+	}
+
+	void data(uint8_t* vertices, size_t size) const
+	{
+		impl_->data(vertices, size);
+	}
+
+	size_t size() const
+	{
+		return impl_->size();
 	}
 
 	const RenderBufferImpl* impl() const
@@ -141,6 +155,16 @@ public:
 	void update(const uint32_t* indices, size_t size)
 	{
 		impl_->update(indices, size);
+	}
+
+	void data(uint32_t* indices, size_t size) const
+	{
+		impl_->data(indices, size);
+	}
+
+	size_t size() const
+	{
+		return impl_->size();
 	}
 
 	const IndexBufferImpl* impl() const

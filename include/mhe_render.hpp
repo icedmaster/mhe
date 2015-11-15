@@ -28,6 +28,7 @@
 #include "render/node.hpp"
 #include "render/node_instance_methods.hpp"
 #include "render/posteffect_material_system.hpp"
+#include "render/query.hpp"
 #include "render/renderer.hpp"
 #include "render/render_buffer.hpp"
 #include "render/render_common.hpp"
@@ -45,6 +46,7 @@
 #include "render/view.hpp"
 #include "render/window_system.hpp"
 
+#include "render/utils/explicit_draw_call_helper.hpp"
 #include "render/utils/simple_meshes.hpp"
 
 #endif // __MHE_RENDER__

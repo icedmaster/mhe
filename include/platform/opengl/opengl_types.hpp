@@ -12,6 +12,18 @@ namespace opengl {
 
 const GLuint invalid_unit = static_cast<GLuint>(-1);
 
+inline const char* get_error_desc(GLenum err)
+{
+	switch (err)
+	{
+	case GL_NO_ERROR: return "GL_NO_ERROR";
+	case GL_INVALID_ENUM: return "GL_INVALID_ENUM";
+	case GL_INVALID_VALUE: return "GL_INVALID_VALUE";
+	case GL_INVALID_OPERATION: return "GL_INVALID_OPERATION";
+	default: NOT_IMPLEMENTED_ASSERT(0, "Error description"); return "";
+	}
+}
+
 inline GLenum get_vbo_usage(BufferUpdateType type)
 {
 	switch (type)
@@ -63,11 +75,11 @@ inline GLenum get_format(int format)
 }
 
 inline GLenum get_pixel_data_format(int format)
- {
+{
 	ASSERT(format < format_max, "Invalid texture format");
 	GLenum formats[format_max] = {GL_RGBA, GL_BGRA, GL_RGBA, GL_DEPTH_STENCIL, GL_DEPTH_COMPONENT, GL_RED, GL_RED, GL_RGB, GL_RG, GL_RGBA};
- 	return formats[format];
- }
+	return formats[format];
+}
 
 inline GLenum get_datatype(int type)
 {
@@ -126,6 +138,10 @@ inline size_t get_bytes_per_format(GLenum format)
 	{
 	case GL_RGBA:
 		return 4;
+	case GL_RGBA16F:
+		return 4 * 2;
+	case GL_RGBA32F:
+		return 4 * 4;
 	default:
 		ASSERT(false, "Invalid format:" << format);
 		break;

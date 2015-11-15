@@ -14,7 +14,7 @@ namespace mhe {
 namespace opengl {
 
 OpenGL3ContextState::OpenGL3ContextState() :
-    depth(false), stencil(false), blend(false)
+	depth(false), stencil(false), blend(false), scissor_test(false)
 {
 	uniforms.fill(UniformBuffer::invalid_id);
 }

@@ -72,6 +72,7 @@ public:
 	virtual void close() = 0;
 	virtual void update(const uint8_t* data) = 0;
 	virtual void copy_framebuffer() = 0;
+	virtual void read(uint8_t* data, size_t size) = 0;
 };
 
 class MHE_EXPORT Texture
@@ -103,6 +104,11 @@ public:
 	void copy_framebuffer()
 	{
 		impl_->copy_framebuffer();
+	}
+
+	void read(uint8_t* data, size_t size)
+	{
+		impl_->read(data, size);
 	}
 private:
 	unique_ptr<TextureImpl> impl_;

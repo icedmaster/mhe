@@ -53,7 +53,7 @@ bool OpenGL3Texture::init(const TextureDesc& desc, const uint8_t* data, size_t s
 
 void OpenGL3Texture::init_cubemap(const TextureDesc& desc, const uint8_t* data, size_t size)
 {
-	size_t stride = desc.width * desc.height * get_bytes_per_format(get_pixel_data_format(desc.datatype));
+	size_t stride = desc.width * desc.height * get_bytes_per_format(get_format(desc.format));
 	ASSERT(size ? size == stride * 6 : 1, "Invalid size");
 	GLenum targets[6] = {GL_TEXTURE_CUBE_MAP_NEGATIVE_X, GL_TEXTURE_CUBE_MAP_POSITIVE_X,
 		GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
@@ -97,6 +97,15 @@ void OpenGL3Texture::copy_framebuffer()
 {
 	glBindTexture(target_, id_);
 	glCopyTexSubImage2D(target_, 0, 0, 0, 0, 0, width_, height_);
+	CHECK_GL_ERRORS();
+	glBindTexture(target_, 0);
+}
+
+void OpenGL3Texture::read(uint8_t* data, size_t size)
+{
+	ASSERT(size >= width_ * height_ * get_bytes_per_format(format_), "Buffer is too small");
+	glBindTexture(target_, id_);
+	glGetTexImage(target_, 0, pixel_data_format_, datatype_, data);
 	CHECK_GL_ERRORS();
 	glBindTexture(target_, 0);
 }
