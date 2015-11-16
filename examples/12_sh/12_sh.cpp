@@ -649,7 +649,7 @@ public:
 		mhe::TextureBufferDesc desc;
 		desc.update_type = mhe::buffer_update_type_static;
 		desc.unit = 2;
-		desc.format = mhe::format_r32f;
+		desc.format = mhe::format_rgb32f;
 		texture_buffer.init(desc, triangles.size() * 3 * sh::ColorSH::coefficients_number * sizeof(sh::ColorSH::datatype), nullptr);
 		texture_buffer_ = &texture_buffer;
 

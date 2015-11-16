@@ -16,14 +16,12 @@ struct ColorSH9
 
 ColorSH9 fetch_sh9_color(samplerBuffer buffer, int vertex)
 {
-	int stride = 9 * 3;
+	int stride = 9;
 	ColorSH9 res;
 	for (int i = 0; i < 9; ++i)
 	{
-		float r = texelFetch(buffer, vertex * stride + i * 3 + 0).r;
-		float g = texelFetch(buffer, vertex * stride + i * 3 + 1).r;
-		float b = texelFetch(buffer, vertex * stride + i * 3 + 2).r;
-		res.c[i] = vec3(r, g, b);
+		vec3 c = texelFetch(buffer, vertex * stride + i).rgb;
+		res.c[i] = c;
 	}
 
 	return res;
