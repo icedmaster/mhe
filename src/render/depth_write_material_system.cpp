@@ -47,7 +47,6 @@ bool DepthWriteMaterialSystem::init_light_data(Context& context)
 		next_draw_call_data = context.draw_call_data_pool.create();
 		RenderState& render_state = create_and_get(context.render_state_pool);
 		RenderStateDesc render_state_desc;
-		render_state_desc.depth.enabled = true;
 		render_state_desc.viewport.viewport.set(0, 0, shadowmap_default_width, shadowmap_default_height);
 		if (!render_state.init(render_state_desc)) return false;
 		render_states_.push_back(render_state.id());

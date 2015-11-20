@@ -27,10 +27,10 @@ bool init_mesh(Mesh& mesh, const std::vector<Vertex>& vertexes, const std::vecto
 	mesh.vbuffer = context->vertex_buffer_pool.create();
 	mesh.ibuffer = context->index_buffer_pool.create();
 
-    mesh.parts.resize(1);
-    mesh.parts[0].render_data.elements_number = indexes.size() / 3;
-    mesh.parts[0].render_data.vbuffer = mesh.vbuffer;
-    mesh.parts[0].render_data.ibuffer = mesh.ibuffer;
+	mesh.parts.resize(1);
+	mesh.parts[0].render_data.elements_number = indexes.size() / 3;
+	mesh.parts[0].render_data.vbuffer = mesh.vbuffer;
+	mesh.parts[0].render_data.ibuffer = mesh.ibuffer;
 
 	VertexBuffer& vbuffer = context->vertex_buffer_pool.get(mesh.vbuffer);
 	if (!vbuffer.init(buffer_update_type_static,
@@ -106,21 +106,21 @@ bool init_mesh(Mesh& mesh, uint8_t layout, const MeshExportData& mesh_export_dat
 
 bool load_mesh_version1(Mesh& mesh, std::istream& stream, const Context* context)
 {
-    uint32_t size, vertex_size;
-    stream.read(reinterpret_cast<char*>(&size), sizeof(uint32_t));
-    stream.read(reinterpret_cast<char*>(&vertex_size), sizeof(uint32_t));
-    ASSERT(vertex_size == sizeof(StandartGeometryLayout::Vertex), "Invalid vertex size");
-    // TODO: check layout
-    std::vector<StandartGeometryLayout::Vertex> vertexes(size);
-    stream.read(reinterpret_cast<char*>(&vertexes[0]), size * vertex_size);
+	uint32_t size, vertex_size;
+	stream.read(reinterpret_cast<char*>(&size), sizeof(uint32_t));
+	stream.read(reinterpret_cast<char*>(&vertex_size), sizeof(uint32_t));
+	ASSERT(vertex_size == sizeof(StandartGeometryLayout::Vertex), "Invalid vertex size");
+	// TODO: check layout
+	std::vector<StandartGeometryLayout::Vertex> vertexes(size);
+	stream.read(reinterpret_cast<char*>(&vertexes[0]), size * vertex_size);
 
-    uint32_t index_size;
-    stream.read(reinterpret_cast<char*>(&size), sizeof(uint32_t));
-    stream.read(reinterpret_cast<char*>(&index_size), sizeof(uint32_t));
-    std::vector<uint32_t> indexes(size);
-    stream.read(reinterpret_cast<char*>(&indexes[0]), size * index_size);
+	uint32_t index_size;
+	stream.read(reinterpret_cast<char*>(&size), sizeof(uint32_t));
+	stream.read(reinterpret_cast<char*>(&index_size), sizeof(uint32_t));
+	std::vector<uint32_t> indexes(size);
+	stream.read(reinterpret_cast<char*>(&indexes[0]), size * index_size);
 
-    return detail::init_mesh(mesh, vertexes, indexes, context);
+	return detail::init_mesh(mesh, vertexes, indexes, context);
 }
 
 template <class Str>
@@ -158,9 +158,9 @@ bool load_mesh_version2(Mesh& mesh, std::istream& stream, const Context* context
 	stream.read(reinterpret_cast<char*>(&mesh_export_data), sizeof(MeshExportData));
 	uint32_t size, vertex_size;
 	stream.read(reinterpret_cast<char*>(&vertex_size), sizeof(uint32_t));
-    stream.read(reinterpret_cast<char*>(&size), sizeof(uint32_t));
+	stream.read(reinterpret_cast<char*>(&size), sizeof(uint32_t));
 
-    std::vector<StandartGeometryLayout::Vertex> vertices;
+	std::vector<StandartGeometryLayout::Vertex> vertices;
 	std::vector<SkinnedGeometryLayout::Vertex> skinned_vertices;
 
 	if (layout == StandartGeometryLayout::handle)
@@ -181,9 +181,9 @@ bool load_mesh_version2(Mesh& mesh, std::istream& stream, const Context* context
 		return false;
 	}
 
-    stream.read(reinterpret_cast<char*>(&size), sizeof(uint32_t));
-    std::vector<uint32_t> indexes(size);
-    stream.read(reinterpret_cast<char*>(&indexes[0]), size * 4);
+	stream.read(reinterpret_cast<char*>(&size), sizeof(uint32_t));
+	std::vector<uint32_t> indexes(size);
+	stream.read(reinterpret_cast<char*>(&indexes[0]), size * 4);
 	// materials
 	uint32_t materials_number;
 	stream.read(reinterpret_cast<char*>(&materials_number), 4);
@@ -224,18 +224,18 @@ bool load_mesh_version2(Mesh& mesh, std::istream& stream, const Context* context
 
 bool mhe_binary_mesh_load(Mesh& mesh, std::istream& stream, const Context* context)
 {
-    char header[3];
+	char header[3];
 	stream.read(header, 3);
 	if (memcmp(header, "mhe", 3))
 		return false;
 
-    char version;
+	char version;
 	stream.read(&version, 1);
-    if (version == 1)
-        return detail::load_mesh_version1(mesh, stream, context);
+	if (version == 1)
+		return detail::load_mesh_version1(mesh, stream, context);
 	else if (version == 2)
 		return detail::load_mesh_version2(mesh, stream, context);
-    return false;
+	return false;
 }
 
 }

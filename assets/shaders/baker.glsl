@@ -1,4 +1,6 @@
-[defs NORMALMAP 0 1]
+[defs BOUNCE 0 1]
+
+#define NORMALMAP 0
 
 [include "sh.h"]
 
@@ -6,12 +8,10 @@ struct VSOutput
 {
 	vec3 nrm;
 	vec2 tex;
-#if NORMALMAP == 1
-	vec3 tng;
-	vec3 bitng;
-#endif
-	vec3 baked_diffuse;
+
+#if BOUNCE == 1
 	ColorSH9 baked_radiance;
+#endif
 };
 
 [vertex]
@@ -28,19 +28,13 @@ void main()
 
 	vec4 nrm_os = vec4(nrm, 0.0f);
 	vec4 pos_os = vec4(pos, 1.0f);
-	vec4 tng_os = vec4(tng.xyz, 0.0f);
 
 	vsoutput.nrm = (normal * nrm_os).xyz;
-#if NORMALMAP == 1
-	vsoutput.tng = (normal * tng_os).xyz;
-	vsoutput.bitng = cross(vsoutput.nrm, vsoutput.tng) * tng.w;
-#endif
 
-	vec3 light = vec3(0, 1, 0) * saturate(dot(vsoutput.nrm, vec3(0, 1, 0)));
+#if BOUNCE == 1
 	ColorSH9 baked_radiance = fetch_sh9_color(gi_buffer, gl_VertexID);
-	vec3 baked_irradiance = calculate_irradiance(vsoutput.nrm, baked_radiance);
-	vsoutput.baked_diffuse = /*light +*/ baked_irradiance;
 	vsoutput.baked_radiance = baked_radiance;
+#endif
 
 	gl_Position = vp * model * pos_os;
 }
@@ -50,9 +44,6 @@ void main()
 [include "material_common.h"]
 
 [sampler2D diffuse_texture 0]
-#if NORMALMAP == 1
-[sampler2D normalmap_texture 2]
-#endif
 
 [uniform material 2 permodel]
 uniform material
@@ -67,5 +58,11 @@ layout (location = 0) out vec4 color;
 void main()
 {
 	vec3 nrm_ts = vec3(0, 0, 1);
-	color = vec4(calculate_irradiance(nrm_ts, vsoutput.baked_radiance), 1);
+#if BOUNCE == 1
+	vec3 baked_irradiance = calculate_irradiance(nrm_ts, vsoutput.baked_radiance);
+#else
+	vec3 baked_irradiance = vec3(1, 1, 1);
+#endif
+	vec3 albedo = texture(diffuse_texture, vsoutput.tex).rgb;
+	color = vec4(albedo * baked_irradiance, 1);
 }

@@ -166,7 +166,8 @@ bool ImGuiHelper::init_render_state(Context& context)
 	desc.blend.func = blend_add;
 	desc.blend.func_alpha = blend_add;
 
-	desc.depth.enabled = false;
+	desc.depth.test_enabled = false;
+	desc.depth.write_enabled = false;
 
 	RenderState& render_state = create_and_get(context.render_state_pool);
 	render_state_id_ = render_state.id();

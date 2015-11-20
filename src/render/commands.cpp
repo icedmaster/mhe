@@ -5,13 +5,24 @@
 
 namespace mhe {
 
+ClearCommand::ClearCommand() :
+	executed_(false), clear_color_(true), clear_depth_(true), clear_stencil_(true)
+{}
+
 bool ClearCommand::execute_impl(RenderStage /*current_stage*/)
 {
 	if (executed_) return true;
 	ASSERT(driver_ != nullptr, "You must setup the driver first");
-	driver_->clear(true, true, true, vec4(0.0, 0.0, 0.0, 0.0));
+	driver_->clear(clear_color_, clear_depth_, clear_stencil_, vec4(0.0, 0.0, 0.0, 0.0));
 	executed_ = true;
 	return true;
+}
+
+void ClearCommand::set_clear_mask(bool color, bool depth, bool stencil)
+{
+	clear_color_ = color;
+	clear_depth_ = depth;
+	clear_stencil_ = stencil;
 }
 
 void ClearCommand::reset()

@@ -76,7 +76,8 @@ bool PosteffectDebugMaterialSystem::init_mesh_instance(Context& context, MeshIns
 		desc.blend.srcmode = blend_one;
 		desc.blend.dstmode = blend_zero;
 	}
-	desc.depth.enabled = false;
+	desc.depth.test_enabled = false;
+	desc.depth.write_enabled = false;
 	render_state.init(desc);
 
 	mesh_instance.mesh.parts.resize(1);
@@ -229,7 +230,8 @@ bool PosteffectMaterialSystemBase::init_mesh(Context& context, const MaterialSys
 	desc.blend.enabled = use_blend;
 	desc.blend.srcmode = blend_src_alpha;
 	desc.blend.dstmode = blend_src_inv_alpha;
-	desc.depth.enabled = false;
+	desc.depth.test_enabled = false;
+	desc.depth.write_enabled = false;
 	render_state.init(desc);
 
 	// outputs

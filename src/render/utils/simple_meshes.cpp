@@ -96,9 +96,9 @@ bool create_axes(MeshInstance& mesh_instance, const Context& context)
 bool create_skybox_quad(MeshInstance& mesh, const Context& context)
 {
 	SkyboxLayout::Vertex vertexes[3];
-	vertexes[0].pos.set(-1.0f, -3.0f, 1.0f, 1.0f);
-	vertexes[1].pos.set(-1.0f, 1.0f, 1.0f, 1.0f);
-	vertexes[2].pos.set(3.0f, 1.0f, 1.0f, 1.0f);
+	vertexes[0].pos.set(-1.0f, -3.0f, 0.999f, 1.0f);
+	vertexes[1].pos.set(-1.0f, 1.0f, 0.999f, 1.0f);
+	vertexes[2].pos.set(3.0f, 1.0f, 0.999f, 1.0f);
 
 	uint32_t indexes[3] = {0, 1, 2};
 

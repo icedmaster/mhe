@@ -77,7 +77,7 @@ public:
 		}
 	};
 
-	class Index
+	class MHE_EXPORT Index
 	{
 	public:
 		Index() :

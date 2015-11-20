@@ -319,6 +319,7 @@ void process_node(const aiScene* assimp_scene, aiNode* node, const aiMatrix4x4& 
 			vertex.pos.set(v.x, v.y, v.z);
 			aiVector3D n = normal_transform * mesh->mNormals[i];
 			vertex.nrm.set(n.x, n.y, n.z);
+			vertex.nrm.normalize();
 
 			if (mesh->mTextureCoords[0] != nullptr)
 			{
@@ -331,7 +332,7 @@ void process_node(const aiScene* assimp_scene, aiNode* node, const aiMatrix4x4& 
 				mhe::vec3 bitng(aiBitng.x, aiBitng.y, aiBitng.z);
 				float sign = mhe::dot(bitng, mhe::cross(vertex.nrm, tng)) > 0.0f ? 1.0f : -1.0f;
 
-				vertex.tng = mhe::vec4(tng, sign);
+				vertex.tng = mhe::vec4(tng.normalized(), sign);
 			}
 
 			vertices.push_back(vertex);

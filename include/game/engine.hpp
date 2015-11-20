@@ -92,6 +92,11 @@ public:
 	{
 		return stats_;
 	}
+
+	DebugViews& debug_views()
+	{
+		return debug_views_;
+	}
 private:
 	void set_default_video_settings();
 	void setup_generated();

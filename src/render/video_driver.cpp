@@ -91,17 +91,19 @@ void Driver::perform_draw_call(const Context& context, const DrawCallExplicit& d
 		}
 	}
 
-	if (draw_call.render_command != nullptr)
-	{
-		if (!draw_call.render_command->execute(render_stage_before_submit))
-			return;
-	}
+	uint8_t render_command_stages = draw_call.render_command != nullptr ? draw_call.render_command->stages() : 0;
 
 	ASSERT(draw_call.render_state != nullptr, "Invalid RenderState");
 	if (state_.state != draw_call.render_state->id())
 	{
 		impl_->set_state(*draw_call.render_state);
 		state_.state = draw_call.render_state->id();
+	}
+
+	if (render_command_stages & render_stage_before_submit)
+	{
+		if (!draw_call.render_command->execute(render_stage_before_submit))
+			return;
 	}
 
 	bool shader_program_changed = false;

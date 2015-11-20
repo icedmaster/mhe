@@ -135,7 +135,9 @@ void OpenGL3Buffer::unmap()
 
 void OpenGL3Buffer::data(uint8_t* vertices, size_t size) const
 {
+	vbo_.enable();
 	vbo_.data(vertices, size);
+	vbo_.disable();
 }
 
 void OpenGL3Buffer::enable() const

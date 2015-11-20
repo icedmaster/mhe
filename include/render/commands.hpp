@@ -13,16 +13,23 @@ class GPUProfilerNode;
 class MHE_EXPORT ClearCommand : public RenderCommand
 {
 public:
+	ClearCommand();
+
 	void set_driver(Driver* driver)
 	{
 		driver_ = driver;
 	}
+
+	void set_clear_mask(bool color, bool depth, bool stencil);
 
 	void reset();
 private:
 	bool execute_impl(RenderStage current_stage) override;
 	Driver* driver_;
 	bool executed_;
+	bool clear_color_;
+	bool clear_depth_;
+	bool clear_stencil_;
 };
 
 class MHE_EXPORT ClearCommandSimple : public RenderCommand

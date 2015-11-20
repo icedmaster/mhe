@@ -19,7 +19,8 @@ struct OpenGL3ContextState
 	vector2<int> window_size;
 	rect<int> viewport;
 	rect<int> scissor;
-	bool depth;
+	bool depth_test;
+	bool depth_write;
 	bool stencil;
 	bool blend;
 	bool scissor_test;

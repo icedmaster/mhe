@@ -218,7 +218,8 @@ bool GBufferDrawMaterialSystem::init_meshes(Context &context)
 	draw_call_data.state = context.render_state_pool.create();
 	RenderState& render_state = context.render_state_pool.get(draw_call_data.state);
 	RenderStateDesc desc;
-	desc.depth.enabled = false;
+	desc.depth.test_enabled = false;
+	desc.depth.write_enabled = false;
 	desc.blend.enabled = true;
 	desc.blend.dstmode = blend_one;
 	desc.blend.srcmode = blend_one;

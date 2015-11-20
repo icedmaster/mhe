@@ -9,24 +9,28 @@ namespace opengl {
 
 void DepthState::init(const DepthDesc& desc)
 {
-	desc_.enabled = desc.enabled;
+	desc_.test_enabled = desc.test_enabled;
+	desc_.write_enabled = desc.write_enabled;
 }
 
 void DepthState::enable(OpenGL3ContextState& state) const
 {
-	if (desc_.enabled == state.depth) return;
-	if (desc_.enabled)
+	if (desc_.test_enabled != state.depth_test)
 	{
-		glEnable(GL_DEPTH_TEST);
-		glDepthMask(GL_TRUE);
-	}
-	else
-	{
-		glDisable(GL_DEPTH_TEST);
-		glDepthMask(GL_FALSE);
+		if (desc_.test_enabled)
+			glEnable(GL_DEPTH_TEST);
+		else
+			glDisable(GL_DEPTH_TEST);
+		state.depth_test = desc_.test_enabled;
 	}
 
-	state.depth = desc_.enabled;
+	if (desc_.write_enabled != state.depth_write)
+	{
+		if (desc_.write_enabled)
+			glDepthMask(GL_TRUE);
+		else glDepthMask(GL_FALSE);
+		state.depth_write = desc_.write_enabled;
+	}
 }
 
 void StencilState::init(const StencilDesc& desc)
@@ -84,6 +88,11 @@ void RasterizerState::init(const RasterizerDesc& desc)
 {
 	desc_.cull = get_cull_mode(desc.cull);
 	desc_.winding = get_winding_order(desc.order);
+	GLboolean write_color = desc.color_write ? GL_TRUE : GL_FALSE;
+	desc_.color_mask[0] = write_color;
+	desc_.color_mask[1] = write_color;
+	desc_.color_mask[2] = write_color;
+	desc_.color_mask[3] = write_color;
 }
 
 void RasterizerState::enable(OpenGL3ContextState& state) const
@@ -97,6 +106,8 @@ void RasterizerState::enable(OpenGL3ContextState& state) const
 		glFrontFace(desc_.winding);
 		glCullFace(desc_.cull);
 	}
+
+	glColorMask(desc_.color_mask[0], desc_.color_mask[1], desc_.color_mask[2], desc_.color_mask[3]);
 }
 
 bool OpenGL3RenderState::init(const RenderStateDesc& desc)
@@ -128,6 +139,11 @@ void OpenGL3RenderState::update_scissor(const ScissorDesc& scissor_desc)
 	scissor_state_ = scissor_desc;
 }
 
+void OpenGL3RenderState::update_rasterizer(const RasterizerDesc& rasterizer_desc)
+{
+	rasterizer_state_.init(rasterizer_desc);
+}
+
 void OpenGL3RenderState::enable(OpenGL3ContextState& state) const
 {
 	depth_state_.enable(state);
@@ -154,9 +170,7 @@ void OpenGL3RenderState::set_viewport(OpenGL3ContextState& state, const rect<int
 
 void OpenGL3RenderState::set_scissor(OpenGL3ContextState& state, const ScissorDesc& scissor_desc) const
 {
-	if (state.scissor_test == scissor_desc.enabled)
-		return;
-	if (state.scissor == scissor_desc.scissor_rect)
+	if (state.scissor_test == scissor_desc.enabled && state.scissor == scissor_desc.scissor_rect)
 		return;
 	if (scissor_desc.enabled)
 		glEnable(GL_SCISSOR_TEST);

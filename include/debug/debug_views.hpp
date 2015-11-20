@@ -62,6 +62,11 @@ public:
 
 	size_t add_view(const string& name);
 	DebugView& get_view(size_t id);
+
+	ImGuiHelper& imgui_helper()
+	{
+		return imgui_;
+	}
 private:
 	enum
 	{

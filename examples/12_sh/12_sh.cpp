@@ -1,5 +1,7 @@
 #include "mhe.hpp"
 
+//#define NSIGHT
+
 namespace sh
 {
 
@@ -270,13 +272,14 @@ using namespace mhe;
 class MeshBaker
 {
 	static const size_t texture_size = 64;
+	static const size_t bounces = 0;
 
 	struct DepthWriteShaderData
 	{
 		mat4x4 vp;
 	};
 public:
-	bool init(mhe::Context& context, mhe::SceneContext& scene_context)
+	bool init(mhe::Context& context, mhe::SceneContext& scene_context, mhe::game::Engine& engine)
 	{
 		mhe::RenderTargetDesc render_target_desc;
 		render_target_desc.width = texture_size;
@@ -301,19 +304,6 @@ public:
 			render_target_[i] = &render_target;
 		}
 
-		render_target_desc.color_targets = 0;
-		render_target_desc.texture_type = mhe::texture_2d;
-		for (size_t i = 0; i < 5; ++i)
-		{
-			mhe::RenderTarget& render_target_depth_only = create_and_get(context.render_target_pool);
-			if (!render_target_depth_only.init(context, render_target_desc))
-			{
-				ERROR_LOG("Couldn't initialize a depth only render target for MeshBaker");
-				return false;
-			}
-			render_target_depth_only_[i] = &render_target_depth_only;
-		}
-
 		// shader programs
 		mhe::Shader shader;
 		bool res = context.shader_manager.get(shader, mhe::string("depth_write"));
@@ -332,10 +322,39 @@ public:
 				return false;
 			}
 			depth_write_uniform_ = &uniform;
+
+			uniform_buffer_desc.size = sizeof(PerCameraData);
+			UniformBuffer& baker_uniform = create_and_get(context.uniform_pool);
+			if (!baker_uniform.init(uniform_buffer_desc))
+			{
+				ERROR_LOG("Can't init a baker uniform");
+				return false;
+			}
+			baker_uniform_ = &baker_uniform;
+		}
+
+		{
+			mhe::Shader shader;
+			bool res = context.shader_manager.get(shader, mhe::string("baker"));
+			ASSERT(res, "Can't get baker shader");
+			UberShader& ubershader = context.ubershader_pool.get(shader.shader_program_handle);
+			const UberShader::Info& info = ubershader.info("BOUNCE");
+			UberShader::Index index;
+			index.set(info, 1);
+			baker_shader_program_ = &context.shader_pool.get(ubershader.get(index));
+		}
+
+		{
+			RenderState& render_state = create_and_get(context.render_state_pool);
+			RenderStateDesc render_state_desc;
+			render_state_desc.viewport.viewport.set(0, 0, texture_size, texture_size);
+			render_state.init(render_state_desc);
+			render_state_ = &render_state;
 		}
 
 		context_ = &context;
 		scene_context_ = &scene_context;
+		engine_ = &engine;
 
 		clear_command_.set_driver(&context.driver);
 
@@ -353,16 +372,29 @@ public:
 		ASSERT(node_instance.mesh.mesh.parts[0].render_data.layout == mhe::StandartGeometryLayout::handle, "Invalid layout");
 
 		const VertexBuffer& vbuffer = context_->vertex_buffer_pool.get(node_instance.mesh.mesh.vbuffer);
-		const IndexBuffer& ibuffer = context_->index_buffer_pool.get(node_instance.mesh.mesh.ibuffer);
 
 		vector<StandartGeometryLayout::Vertex> vertices(vbuffer.size() / sizeof(StandartGeometryLayout::Vertex));
-		vector<uint32_t> indices(ibuffer.size());
-
 		vbuffer.data(reinterpret_cast<uint8_t*>(&vertices[0]), vertices.size() * sizeof(StandartGeometryLayout::Vertex));
-		ibuffer.data(&indices[0], indices.size());
 
-		mhe::vector<uint8_t> baked_data(indices.size() * sh::ColorSH::coefficients_number * sizeof(sh::ColorSH::datatype));
+		// Iteration 0 - skybox and depth rendering
+		render_iteration(texture_buffer, 0, vertices, node_instance);
+		// Iteration 1 - direction lights rendering
+		// Iteration 2 and next - bounces
+		for (size_t i = 0; i < bounces; ++i)
+		{
+			render_iteration(texture_buffer, 2 + i, vertices, node_instance);
+		}
+	}
+private:
+	void render_iteration(TextureBuffer& texture_buffer, size_t iteration, const vector<StandartGeometryLayout::Vertex>& vertices, const mhe::NodeInstance& node_instance)
+	{
+		std::cout << "Start iteration:" << iteration << std::endl;
+
+		mhe::vector<uint8_t> baked_data(vertices.size() * sh::ColorSH::coefficients_number * sizeof(sh::ColorSH::datatype));
+		memset(&baked_data[0], 0, baked_data.size());
 		float* data_ptr = reinterpret_cast<float*>(&baked_data[0]);
+
+		const size_t stride = sh::ColorSH::coefficients_number * sizeof(sh::ColorSH::datatype) / sizeof(float);
 
 		mhe::DrawCallExplicit draw_call;
 
@@ -374,18 +406,24 @@ public:
 			z = vertex_normal;
 			x = vertices[i].tng.xyz();
 			y = cross(z, x) * vertices[i].tng.w();
-			const sh::ColorSH& harmonics = render(0, draw_call, x, y, z, vertex_position, node_instance);
-			memcpy(data_ptr, harmonics.coeff.data(), harmonics.coeff.size() * sizeof(sh::ColorSH::datatype));
-			data_ptr += harmonics.coeff.size() * sizeof(sh::ColorSH::datatype) / sizeof(float);
+
+			context_->driver.begin_render();
+			const sh::ColorSH& harmonics = render(iteration, draw_call, x, y, z, vertex_position, node_instance);
+			memcpy(data_ptr, harmonics.coeff.data(), stride * sizeof(float));
+			data_ptr += stride;
+
+			//show_gui(iteration, 0, i);
+			context_->driver.end_render();
+			context_->window_system.swap_buffers();
 		}
 
 		texture_buffer.update(&baked_data[0]);
 	}
-private:
+
 	sh::ColorSH render(size_t iteration, DrawCallExplicit& draw_call, const vec3& x, const vec3& y, const vec3& z, const vec3& pos, const mhe::NodeInstance& node_instance)
 	{
 		mat4x4 proj;
-		proj.set_perspective(pi_2, 1.0f, 0.1f, 10.0f);
+		proj.set_perspective(pi_2, 1.0f, 1.0f, 50.0f);
 
 		NodeInstance* nodes = scene_context_->node_pool.all_objects();
 		size_t nodes_number = scene_context_->node_pool.size();
@@ -395,6 +433,10 @@ private:
 
 		ViewportDesc viewport_desc_default;
 		ScissorDesc scissor_desc_default;
+		RasterizerDesc default_rasterizer_state;
+
+		RasterizerDesc rasterizer_state_depth_only;
+		rasterizer_state_depth_only.color_write = false;
 
 		mat4x4 view[5];
 
@@ -410,34 +452,49 @@ private:
 				shader_data.vp = vp;
 				depth_write_uniform_->update(shader_data);
 				draw_call.uniforms[0] = depth_write_uniform_;
-
 				draw_call.shader_program = shader_program_depth_only_;
-				draw_call.render_target = render_target_depth_only_[i];
+				draw_call.render_target = render_target_[i];
 				draw_call.render_command = &clear_command_;
 
 				clear_command_.reset();
+				clear_command_.set_clear_mask(true, true, true);
 			}
-			else
+			else if (iteration > 1) // bounces
 			{
-				NOT_IMPLEMENTED_ASSERT(0, "Everything");
+				PerCameraData shader_data;
+				shader_data.vp = vp;
+				baker_uniform_->update(shader_data);
+				draw_call.uniforms[0] = baker_uniform_;
+
+				draw_call.shader_program = baker_shader_program_;
+				draw_call.render_command = &clear_command_;
+				draw_call.render_target = render_target_[i];
+
+				clear_command_.reset();
+				clear_command_.set_clear_mask(true, true, true);
 			}
 
 			for (size_t n = 0; n < nodes_number; ++n)
 			{
-				setup_draw_call(draw_call, nodes[n]);
-				draw_call.render_state->update_viewport(viewport_desc);
-				draw_call.render_state->update_scissor(scissor_desc);
-				draw_call.uniforms[1]->update(mat4x4::identity());
-				context_->driver.render(*context_, &draw_call, 1);
-				// restore viewport and scissor settings
-				draw_call.render_state->update_viewport(viewport_desc_default);
-				draw_call.render_state->update_scissor(scissor_desc_default);
+				NodeInstance& node = nodes[n];
+				for (size_t p = 0, size = node.mesh.instance_parts.size(); p < size; ++p)
+				{
+					setup_draw_call(draw_call, nodes[n], p);
+					draw_call.render_state = render_state_;
+					draw_call.render_state->update_viewport(viewport_desc);
+					draw_call.render_state->update_scissor(scissor_desc);
+					draw_call.render_state->update_rasterizer(iteration == 0 ? rasterizer_state_depth_only : default_rasterizer_state);
+					draw_call.uniforms[1]->update(mat4x4::identity());
+					context_->driver.render(*context_, &draw_call, 1);
 
-				context_->driver.reset_state();
+					context_->driver.reset_state();
+				}
 			}
 
+			if (iteration == 0)
 			{
 				clear_command_.reset();
+				clear_command_.set_clear_mask(true, false, false);
 
 				mhe::RenderContext render_context;
 				render_context.main_camera.vp = vp;
@@ -446,12 +503,14 @@ private:
 				DrawCallExplicit skybox_draw_call;
 				utils::convert(skybox_draw_call, render_context.draw_calls[0], *context_);
 				skybox_draw_call.render_target = render_target_[i];
-				skybox_draw_call.render_state->update_viewport(viewport_desc);
-				skybox_draw_call.render_state->update_scissor(scissor_desc);
+				skybox_draw_call.render_state = render_state_;
+				//skybox_draw_call.render_state->update_viewport(viewport_desc);
+				//skybox_draw_call.render_state->update_scissor(scissor_desc);
+				render_state_->update_rasterizer(default_rasterizer_state);
 				skybox_draw_call.render_command = &clear_command_;
 				context_->driver.render(*context_, &skybox_draw_call, 1);
-				skybox_draw_call.render_state->update_viewport(viewport_desc_default);
-				skybox_draw_call.render_state->update_scissor(scissor_desc_default);
+				//skybox_draw_call.render_state->update_viewport(viewport_desc_default);
+				//skybox_draw_call.render_state->update_scissor(scissor_desc_default);
 
 				context_->driver.reset_state();
 			}
@@ -460,24 +519,25 @@ private:
 		return integrate(view, x, y, z);
 	}
 
-	void setup_draw_call(DrawCallExplicit& draw_call, const mhe::NodeInstance& node_instance) const
+	void setup_draw_call(DrawCallExplicit& draw_call, const mhe::NodeInstance& node_instance, size_t part) const
 	{
-		mhe::Material& material = context_->materials[node_instance.mesh.instance_parts[0].material.material_system].get(node_instance.mesh.instance_parts[0].material.id);
-		mhe::DrawCallData& draw_call_data = context_->draw_call_data_pool.get(node_instance.mesh.instance_parts[0].draw_call_data);
+		mhe::Material& material = context_->materials[node_instance.mesh.instance_parts[part].material.material_system].get(node_instance.mesh.instance_parts[part].material.id);
+		mhe::DrawCallData& draw_call_data = context_->draw_call_data_pool.get(node_instance.mesh.instance_parts[part].draw_call_data);
 
-		draw_call.elements_number = node_instance.mesh.mesh.parts[0].render_data.elements_number;
+		draw_call.elements_number = node_instance.mesh.mesh.parts[part].render_data.elements_number;
 		draw_call.ibuffer = &context_->index_buffer_pool.get(node_instance.mesh.mesh.ibuffer);
-		draw_call.ibuffer_offset = 0;
-		draw_call.indices_number = node_instance.mesh.mesh.parts[0].render_data.indexes_number;
-		draw_call.layout = &context_->layout_pool.get(node_instance.mesh.mesh.parts[0].render_data.layout);
+		draw_call.ibuffer_offset = node_instance.mesh.mesh.parts[part].render_data.ibuffer_offset;
+		draw_call.indices_number = node_instance.mesh.mesh.parts[part].render_data.indexes_number;
+		draw_call.layout = &context_->layout_pool.get(node_instance.mesh.mesh.parts[part].render_data.layout);
 		draw_call.pass = 0;
 		draw_call.primitive = mhe::triangle;
 		draw_call.priority = 0;
 		draw_call.render_state = &context_->render_state_pool.get(draw_call_data.state);
-		draw_call.textures[0] = &context_->texture_pool.get(material.textures[mhe::albedo_texture_unit].id);
+		if (material.textures[mhe::albedo_texture_unit].id != Texture::invalid_id)
+			draw_call.textures[0] = &context_->texture_pool.get(material.textures[mhe::albedo_texture_unit].id);
 		draw_call.uniforms[1] = &context_->uniform_pool.get(material.uniforms[1]);
 		draw_call.vbuffer = &context_->vertex_buffer_pool.get(node_instance.mesh.mesh.vbuffer);
-		draw_call.vbuffer_offset = 0;
+		draw_call.vbuffer_offset = node_instance.mesh.mesh.parts[part].render_data.vbuffer_offset;
 	}
 
 	mat4x4 build_view_matrix(int side, const vec3& x, const vec3& y, const vec3& z, const vec3& pos) const
@@ -608,15 +668,34 @@ private:
 		return res * factor;
 	}
 
+	void show_gui(size_t iteration, size_t mesh_index, size_t vertex_index)
+	{
+		ImGuiHelper& imgui_helper = engine_->debug_views().imgui_helper();
+		engine_->render_context().fdelta = 0.01f; // just a small number because ImGUI requires some update delta
+		imgui_helper.update(*context_, engine_->render_context(), engine_->event_manager());
+
+		ImGui::Begin("Baking stats:");
+		ImGui::LabelText("iteration:", "%u", iteration);
+		ImGui::LabelText("mesh:", "%u", mesh_index);
+		ImGui::LabelText("vertex:", "%u", vertex_index);
+		ImGui::End();
+
+		imgui_helper.render(*context_, engine_->render_context());
+	}
+
 	mhe::Context* context_;
 	mhe::SceneContext* scene_context_;
+	mhe::game::Engine* engine_;
 	mhe::RenderTarget* render_target_[5];
-	mhe::RenderTarget* render_target_depth_only_[5];
 	mhe::ShaderProgram* shader_program_depth_only_;
+	mhe::ShaderProgram* baker_shader_program_;
 
 	mhe::SkyboxMaterialSystem* skybox_material_system_;
 
 	mhe::UniformBuffer* depth_write_uniform_;
+	mhe::UniformBuffer* baker_uniform_;
+
+	mhe::RenderState* render_state_;
 
 	mhe::ClearCommand clear_command_;
 };
@@ -624,45 +703,48 @@ private:
 class GameScene : public mhe::game::GameScene
 {
 	static const size_t test_samples_number = 100;
-	static const size_t trace_samples_number = 64;
-	static const size_t trace_distance = 100.0f;
 public:
 	bool init(mhe::game::Engine& engine, const mhe::game::GameSceneDesc& /*desc*/) override
 	{
 		init_render_data(engine);
 
 		mhe::NodeInstance& node = engine.scene().create_node();
-		engine.context().mesh_manager.get_instance(node.mesh, mhe::string("sphere.bin"));
+		mhe::load_node<mhe::GBufferFillMaterialSystem>(node, mhe::string("cube.bin"), engine.context(), engine.scene_context());
 		node_ = &node;
 
 		node.mesh.gi_data.texture_buffer = engine.context().texture_buffer_pool.create();
 		mhe::TextureBuffer& texture_buffer = engine.context().texture_buffer_pool.get(node.mesh.gi_data.texture_buffer);
 
-		mhe::setup_node(node, engine.context().material_systems.get<mhe::GBufferFillMaterialSystem>(), engine.context(), engine.scene_context(), mhe::string("white.tga"));
+		//mhe::setup_node(node, engine.context().material_systems.get<mhe::GBufferFillMaterialSystem>(), engine.context(), engine.scene_context(), mhe::string("white.tga"));
 
 		sh::generate_random_samples(samples_.data(), test_samples_number);
 
-		mhe::MeshTraceDataInstance& trace_data = engine.context().mesh_trace_data_pool.get(node.mesh.mesh.trace_data_id);
-		const mhe::vector<mhe::MeshGridTriangle>& triangles = trace_data.grid.data();
+		mhe::VertexBuffer& vbuffer = engine.context().vertex_buffer_pool.get(node.mesh.mesh.vbuffer);
 
 		// now we can init the texture buffer
 		mhe::TextureBufferDesc desc;
 		desc.update_type = mhe::buffer_update_type_static;
 		desc.unit = 2;
 		desc.format = mhe::format_rgb32f;
-		texture_buffer.init(desc, triangles.size() * 3 * sh::ColorSH::coefficients_number * sizeof(sh::ColorSH::datatype), nullptr);
+		texture_buffer.init(desc, vbuffer.size() / sizeof(mhe::StandartGeometryLayout::Vertex) * sh::ColorSH::coefficients_number * sizeof(sh::ColorSH::datatype), nullptr);
 		texture_buffer_ = &texture_buffer;
 
 		renderer_ = static_cast<mhe::DeferredRenderer*>(engine.renderer());
 		renderer_->disable();
+		// update the renderer once to update all nodes' transformations
+		//renderer_->update(engine.scene_context());
 
-		if (!mesh_baker.init(engine.context(), engine.scene_context()))
+		if (!mesh_baker.init(engine.context(), engine.scene_context(), engine))
 		{
 			ERROR_LOG("MeshBaker initialization failed");
 			return false;
 		}
 
+#ifndef NSIGHT
 		for (size_t i = 0; i < 1; ++i)
+#else
+		for (size_t i = 0; i < 1000; ++i)
+#endif
 		{
 			//engine.context().driver.begin_render();
 			mesh_baker.bake(texture_buffer, node);
@@ -682,31 +764,35 @@ public:
 	{
 		mhe::Context& context = engine.context();
 
-		mhe::Material& material = context.materials[node_->mesh.instance_parts[0].material.material_system].get(node_->mesh.instance_parts[0].material.id);
-		mhe::DrawCallData& draw_call_data = context.draw_call_data_pool.get(node_->mesh.instance_parts[0].draw_call_data);
+		for (size_t i = 0, size = node_->mesh.instance_parts.size(); i < size; ++i)
+		{
+			mhe::Material& material = context.materials[node_->mesh.instance_parts[i].material.material_system].get(node_->mesh.instance_parts[i].material.id);
+			mhe::DrawCallData& draw_call_data = context.draw_call_data_pool.get(node_->mesh.instance_parts[i].draw_call_data);
 
-		mhe::DrawCallExplicit draw_call;
-		mhe::prepare_draw_call(draw_call);
-		draw_call.elements_number = node_->mesh.mesh.parts[0].render_data.elements_number;
-		draw_call.ibuffer = &context.index_buffer_pool.get(node_->mesh.mesh.ibuffer);
-		draw_call.ibuffer_offset = 0;
-		draw_call.indices_number = node_->mesh.mesh.parts[0].render_data.indexes_number;
-		draw_call.layout = &context.layout_pool.get(node_->mesh.mesh.parts[0].render_data.layout);
-		draw_call.pass = 0;
-		draw_call.primitive = mhe::triangle;
-		draw_call.priority = 0;
-		draw_call.render_command = nullptr;
-		draw_call.render_state = &context.render_state_pool.get(draw_call_data.state);
-		draw_call.render_target = nullptr;
-		draw_call.shader_program = default_program_;
-		draw_call.textures[0] = &context.texture_pool.get(material.textures[mhe::albedo_texture_unit].id);
-		draw_call.uniforms[0] = &context.uniform_pool.get(engine.render_context().main_camera.percamera_uniform);
-		draw_call.uniforms[1] = &context.uniform_pool.get(material.uniforms[1]);
-		draw_call.vbuffer = &context.vertex_buffer_pool.get(node_->mesh.mesh.vbuffer);
-		draw_call.vbuffer_offset = 0;
-		draw_call.texture_buffers[2] = texture_buffer_;
+			mhe::DrawCallExplicit draw_call;
+			mhe::prepare_draw_call(draw_call);
+			draw_call.elements_number = node_->mesh.mesh.parts[i].render_data.elements_number;
+			draw_call.ibuffer = &context.index_buffer_pool.get(node_->mesh.mesh.ibuffer);
+			draw_call.ibuffer_offset = node_->mesh.mesh.parts[i].render_data.ibuffer_offset;
+			draw_call.indices_number = node_->mesh.mesh.parts[i].render_data.indexes_number;
+			draw_call.layout = &context.layout_pool.get(node_->mesh.mesh.parts[i].render_data.layout);
+			draw_call.pass = 0;
+			draw_call.primitive = mhe::triangle;
+			draw_call.priority = 0;
+			draw_call.render_command = nullptr;
+			draw_call.render_state = &context.render_state_pool.get(draw_call_data.state);
+			draw_call.render_target = nullptr;
+			draw_call.shader_program = default_program_;
+			if (material.textures[mhe::albedo_texture_unit].id != Texture::invalid_id)
+				draw_call.textures[0] = &context.texture_pool.get(material.textures[mhe::albedo_texture_unit].id);
+			draw_call.uniforms[0] = &context.uniform_pool.get(engine.render_context().main_camera.percamera_uniform);
+			draw_call.uniforms[1] = &context.uniform_pool.get(material.uniforms[1]);
+			draw_call.vbuffer = &context.vertex_buffer_pool.get(node_->mesh.mesh.vbuffer);
+			draw_call.vbuffer_offset = node_->mesh.mesh.parts[i].render_data.vbuffer_offset;
+			draw_call.texture_buffers[2] = texture_buffer_;
 
-		context.driver.render(context, &draw_call, 1);
+			context.driver.render(context, &draw_call, 1);
+		}
 	}
 private:
 	void init_render_data(mhe::game::Engine& engine)
@@ -788,7 +874,7 @@ int main(int /*argc*/, char** /*argv*/)
 	mhe::PerspectiveCameraParameters camera_parameters;
 	camera_parameters.fov = 60.0f;
 	camera_parameters.znear = 0.5f;
-	camera_parameters.zfar = 20.0f;
+	camera_parameters.zfar = 50.0f;
 	mhe::game::FPSCameraController* camera_controller = new mhe::game::FPSCameraController(app.engine(), camera_parameters,
 		mhe::vec3(0, 1, 5), mhe::vec3(0.0f, mhe::pi, 0));
 	camera_controller->set_move_speed(75.0f);
