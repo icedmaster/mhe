@@ -4,5 +4,6 @@
 #define __MHE_THREADS__
 
 #include "threads/thread.hpp"
+#include "threads/thread_impl.hpp"
 
 #endif // __MHE_THREADS__

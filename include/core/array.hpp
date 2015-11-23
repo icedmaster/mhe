@@ -3,6 +3,7 @@
 
 #include <cstdlib>
 #include <cassert>
+#include "compiler.hpp"
 
 namespace mhe {
 
@@ -83,6 +84,11 @@ public:
 	}
 
 	const T* data() const
+	{
+		return elements_;
+	}
+
+	T* data()
 	{
 		return elements_;
 	}

@@ -14,11 +14,6 @@ class OpenGL3ShaderProgram : public ShaderProgramImpl
 class Shader
 {
 public:
-	~Shader()
-	{
-		close();
-	}
-
 	bool init(GLenum type, const std::string& data);
 	void close();
 
@@ -33,10 +28,6 @@ private:
 };
 
 public:
-	~OpenGL3ShaderProgram()
-	{
-		close();
-	}
 	
 	bool init(const std::string& vsdata, const std::string& fsdata, const ShaderInitializationParams& params);
 	void close();
@@ -49,12 +40,16 @@ public:
 	void set() const;
 
 	GLuint uniform_location(size_t unit) const;
+	GLuint texture_buffer_location(size_t unit) const;
 private:
 	bool attach_shaders();
 	bool check_status(GLenum param) const;
 	void init(const ShaderInitializationParams& params);
 
+	void print_uniforms();
+
 	array<GLuint, 16> texture_location_;	// TODO: need to find a GL constant for this
+	array<GLuint, 16> texture_buffer_location_;
 	array<GLuint, 16> shader_bind_indexes_;
 	Shader vertex_shader_;
 	Shader fragment_shader_;

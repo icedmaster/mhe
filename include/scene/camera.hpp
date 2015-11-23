@@ -11,6 +11,7 @@
 namespace mhe {
 
 struct Context;
+struct CameraData;
 
 struct PerspectiveCameraParameters
 {
@@ -19,7 +20,7 @@ struct PerspectiveCameraParameters
 	float zfar;
 };
 
-class Camera : public ref_counter
+class MHE_EXPORT Camera : public ref_counter
 {
 public:
 	void init(Context& context, const PerspectiveCameraParameters& parameters,
@@ -82,6 +83,7 @@ public:
 	}
 
 	void get(mat4x4& v, mat4x4& p, mat4x4& vp) const;
+	void get(CameraData& camera_data) const;
 
 	const frustumf& camera_frustum() const
 	{
@@ -96,6 +98,14 @@ private:
 	mat4x4 projection_;
 	quatf rotation_;
 	vec3 position_;
+	float znear_;
+	float zfar_;
+	float near_height_;
+	float near_width_;
+	float far_height_;
+	float far_width_;
+	float angle_;
+	float aspect_ratio_;
 };
 
 struct CameraNode

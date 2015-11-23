@@ -21,7 +21,7 @@ int texture_format(int image_format)
 	return formats[image_format];
 }
 
-bool create_texture(Texture& texture, int target, const Image& image, const Context* context)
+bool create_texture(Texture& texture, int target, const Image& image, const Context* /*context*/)
 {
 	TextureDesc desc;
 	desc.type = target;
@@ -31,7 +31,7 @@ bool create_texture(Texture& texture, int target, const Image& image, const Cont
 	desc.mips = image.has_mips ? 0 : default_mips_number;
 	desc.mag_filter = texture_filter_linear_mipmap_linear;
 	desc.min_filter = texture_filter_linear_mipmap_linear;
-	desc.anisotropic_level = texture_anisotropic_level.value();
+	desc.anisotropic_level = global::texture_anisotropic_level.value();
 	if (target == texture_cube)
 	{
 		desc.address_mode_s = desc.address_mode_t = texture_clamp_to_edge;

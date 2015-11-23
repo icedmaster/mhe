@@ -8,14 +8,15 @@ namespace mhe {
 
 namespace detail {
 
-const std::string vertex_shader_tag = "[vertex]";
-const std::string fragment_shader_tag = "[fragment]";
-const std::string include_tag = "[include";
-const std::string defs_tag = "[defs";
-const std::string sampler_tag = "[sampler";
-const std::string uniform_tag = "[uniform";
-const std::string shader_header = "#version 330 core";
-const std::string shader_extension = ".glsl";
+const char* vertex_shader_tag = "[vertex]";
+const char* fragment_shader_tag = "[fragment]";
+const char* include_tag = "[include";
+const char* defs_tag = "[defs";
+const char* sampler_tag = "[sampler";
+const char* uniform_tag = "[uniform";
+const char* shader_header = "#version 330 core";
+const char* shader_extension = ".glsl";
+const char* texture_buffer_sampler = "samplerBuffer";
 
 const std::string tags[] = {vertex_shader_tag, fragment_shader_tag};
 
@@ -49,7 +50,10 @@ std::string parse_sampler(ShaderInitializationParams& params, const std::string&
 	SamplerData sampler_data;
 	sampler_data.name = data[1];
 	sampler_data.index = types_cast<size_t>(data[2]);
-	params.samplers.push_back(sampler_data);
+	if (data[0] == texture_buffer_sampler)
+		params.texture_buffers.push_back(sampler_data);
+	else
+		params.samplers.push_back(sampler_data);
 	return "uniform " + data[0] + " " + data[1] + ";\n";
 }
 
@@ -199,10 +203,13 @@ bool ShaderProgramLoader::load(type& res, const std::string& name, const context
 		for (size_t j = 0; j < definitions.size(); ++j)
 			data.push_back(std::string("#define ") + definitions[j]);
 
+		std::string debug_defs;
 		for (size_t j = 0; j < infos.size(); ++j)
 		{
 			size_t value = infos[j].low + (i / infos[j].offset) % (infos[j].high - infos[j].low + 1);
 			std::string def = "#define " + infos[j].name + " " + types_cast<std::string>(value);
+			debug_defs += def;
+			debug_defs += " ";
 			data.push_back(def);
 		}
 
@@ -211,10 +218,20 @@ bool ShaderProgramLoader::load(type& res, const std::string& name, const context
 		ShaderInitializationParams params;
 		const std::string& vsdata = detail::load_shader_impl(params, data, detail::vertex_shader_tag, filename_with_extension);
 		const std::string& fsdata = detail::load_shader_impl(params, data, detail::fragment_shader_tag, filename_with_extension);
+
+		// TODO: parse GLSL errors to find the correct line with error
+		
+		const std::vector<std::string>& vs_tmp = utils::split(vsdata, "\n", true);
+		const std::vector<std::string>& fs_tmp = utils::split(fsdata, "\n", true);
+		
+
 		result = shader_program.init(vsdata, fsdata, params);
-		ASSERT(result, "Shader compilation failed:\n");
 		if (!result)
+		{
+			ASSERT(0, "Shader compilation failed: " << name << "\n" << debug_defs);
 			continue;
+		}
+
 		ubershader.add(i, shader_id);
 	}
 	if (!result) return false;

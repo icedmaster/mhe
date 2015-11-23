@@ -1,11 +1,11 @@
 #ifndef __FACTORY_HPP__
 #define __FACTORY_HPP__
 
-#include <map>
+#include "hashmap.hpp"
 #include "singleton.hpp"
-#include "hash.hpp"
 #include "ref_ptr.hpp"
 #include "types_cast.hpp"
+#include "string.hpp"
 
 namespace mhe {
 
@@ -32,7 +32,7 @@ class Factory : public Singleton< Factory<Base> >
 	};
 public:
 	template <class T>
-	void add(hash_type name)
+	void add(const char* name)
 	{
 		creators_[name] = ref_ptr<AbstractCreator>(new Creator<T>);
 	}
@@ -40,14 +40,14 @@ public:
 	template <class T>
 	void add()
 	{
-		add<T>(T::name());
+		add<T>(T::material_name());
 	}
 
 	Base* create(const char* name) const
 	{
-        typename std::map<hash_type, ref_ptr<AbstractCreator> >::const_iterator it = creators_.find(hash(name));
+        typename hashmap<string, ref_ptr<AbstractCreator> >::const_iterator it = creators_.find(name);
 		if (it == creators_.end()) return nullptr;
-		return it->second->create();
+		return it->value->create();
 	}
 
 	template <class Arg0, class Arg1>
@@ -66,7 +66,7 @@ private:
 	Factory() {}
 	~Factory() {}
 	
-	std::map<hash_type, ref_ptr<AbstractCreator> > creators_;
+	hashmap<string, ref_ptr<AbstractCreator> > creators_;
 };
 
 }

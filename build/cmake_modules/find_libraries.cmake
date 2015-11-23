@@ -188,6 +188,10 @@ macro(mhe_find_libraries)
 	  endif()
 	endif()
 
+	if (WIN32)
+	  set(MHE_LIBS_FOUND ${MHE_LIBS_FOUND} Ws2_32)
+	endif()
+
   endif() #DONT_FIND_LIBRARIES
 
 endmacro()

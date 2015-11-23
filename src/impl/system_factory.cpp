@@ -48,6 +48,16 @@ RenderTargetImpl* SystemFactory::create_render_target() const
 	return video_driver_factory_.create_render_target();
 }
 
+TextureBufferImpl* SystemFactory::create_texture_buffer() const
+{
+	return video_driver_factory_.create_texture_buffer();
+}
+
+QueryImpl* SystemFactory::create_query() const
+{
+	return video_driver_factory_.create_query();
+}
+
 WindowSystemImpl* SystemFactory::create_window_system() const
 {
 	return window_system_factory_.create_window_system();

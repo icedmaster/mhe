@@ -14,9 +14,16 @@ namespace mhe {
 template <class Loader>
 class ResourceManager
 {
+public:
+	struct LoadingParameters
+	{
+		uint32_t flags;
+
+		LoadingParameters() : flags(0) {}
+	};
 protected:
 	typedef typename Loader::type res_type;
-    typedef typename Loader::instance_type instance_type;
+	typedef typename Loader::instance_type instance_type;
 	typedef typename Loader::context_type context_type;
 
 	struct Info
@@ -62,7 +69,7 @@ public:
         res_type& res = Loader::get_resource(instance);
         if (!get(res, name, absolute_path))
             return false;
-        return Loader::setup_instance(instance);
+        return Loader::setup_instance(instance, context_);
     }
 
 	void clear()
@@ -73,6 +80,11 @@ public:
     void set_path(const FilePath& path)
 	{
 		path_ = path;
+	}
+
+	const FilePath& path() const
+	{
+		return path_;
 	}
 protected:
     bool get_impl(res_type& res, const std::string& name, bool absolute_path) const

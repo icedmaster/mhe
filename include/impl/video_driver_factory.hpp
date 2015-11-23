@@ -27,6 +27,8 @@ public:
 	TextureImpl* create_texture() const;
 	RenderStateImpl* create_render_state() const;
 	RenderTargetImpl* create_render_target() const;
+	TextureBufferImpl* create_texture_buffer() const;
+	QueryImpl* create_query() const;
 private:
 	typedef std::vector< ref_ptr<AbstractVideoDriverFactory> > drvvec;
 	drvvec drivers_;

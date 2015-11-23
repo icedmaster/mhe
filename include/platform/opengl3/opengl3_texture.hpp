@@ -20,11 +20,21 @@ public:
 	{
 		return id_;
 	}
+
+	void update(const uint8_t* data) override;
+
+	void copy_framebuffer() override;
+	void read(uint8_t* data, size_t size) override;
 private:
 	void init_cubemap(const TextureDesc& desc, const uint8_t* data, size_t size);
 
 	GLuint id_;
 	GLenum target_;
+	GLsizei width_;
+	GLsizei height_;
+	GLenum format_;
+	GLenum pixel_data_format_;
+	GLenum datatype_;
 	mutable size_t unit_;
 };
 

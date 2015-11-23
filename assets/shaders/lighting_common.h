@@ -6,6 +6,26 @@
 #define LIGHT_TYPE POINT_LIGHT
 #endif
 
+#define MAX_CASCADES_NUMBER 8
+
+#if LIGHT_TYPE == DIRECTIONAL_LIGHT && defined(CASCADED_SHADOWMAP)
+
+#define DIRECTIONAL_CSM
+
+struct Light
+{
+	vec4 diffuse;
+	vec4 specular;
+	vec4 direction;
+	mat4 lightvp[MAX_CASCADES_NUMBER];
+	vec4 csm_scale[MAX_CASCADES_NUMBER];
+	vec4 csm_offset[MAX_CASCADES_NUMBER];
+	float cascade_znear[MAX_CASCADES_NUMBER];
+	float cascade_zfar[MAX_CASCADES_NUMBER];
+	vec4 shadowmap_params;	// x - shadowmap bias
+	int cascades_number;
+};
+#else
 struct Light
 {
 	vec4 diffuse; // w - angle for SPOT light, radius for OMNI
@@ -16,6 +36,7 @@ struct Light
     mat4 lightw;
 	vec4 shadowmap_params;	// x - shadowmap bias
 };
+#endif
 
 #define SPOT_LIGHT_ANGLE(light) light.diffuse.w
 #define OMNI_LIGHT_RADIUS(light) light.diffuse.w
@@ -36,7 +57,7 @@ vec3 blinn(vec3 specular, vec3 material_specular, vec3 lightdir, vec3 normal, ve
 	// The standart reflect() method requires incident vector. We have lightdir vector directed FROM the surface,
 	// therefore it's easier to calculate reflected vector manually, besides we've calculated NdotL already
 	vec3 reflected = -lightdir + 2.0f * ndotl * normal;
-	float vdotr = saturate(dot(viewdir, reflected));
+	float vdotr = max(dot(viewdir, reflected), 0.001f);
 
 	return (specular + env_color) * material_specular * pow(vdotr, shininess) * enable;
 }
@@ -77,3 +98,20 @@ vec3 lit_blinn(Light light, vec3 pos, vec3 normal, vec3 viewdir, float shininess
 	return lambert(light.diffuse.rgb, vec3(1.0f), lightdir, normal) * attenuation + 
 		blinn(light.specular.rgb, vec3(1.0f), lightdir, normal, viewdir, shininess, env_color) * attenuation;
 }
+
+// shadowmap functions
+#ifdef DIRECTIONAL_CSM
+int calculate_cascade(float pixel_depth, Light light)
+{
+	if (light.cascades_number == 1)
+		return 0;
+	for (int i = 0; i < light.cascades_number; ++i)
+	{
+		float cascade_znear = light.cascade_znear[i];
+		float cascade_zfar = light.cascade_zfar[i];
+		if (pixel_depth >= cascade_znear && pixel_depth < cascade_zfar)
+			return i;
+	}
+	return light.cascades_number - 1;
+}
+#endif

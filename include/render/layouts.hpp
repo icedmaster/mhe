@@ -14,7 +14,7 @@ struct MHE_EXPORT StandartGeometryLayout
 	{
 		vec3 pos;
 		vec3 nrm;
-		vec3 tng;
+		vec4 tng;
 		vec2 tex;
 	};
 
@@ -23,7 +23,7 @@ struct MHE_EXPORT StandartGeometryLayout
 		return "standart_geometry";
 	}
 
-	static uint16_t handle;
+	static const uint16_t handle = 0;
 
 	static void init(Context& context);
 };
@@ -40,7 +40,7 @@ struct MHE_EXPORT SkyboxLayout
 		return "skybox";
 	}
 
-	static uint16_t handle;
+	static const uint16_t handle = 1;
 
 	static void init(Context& context);
 };
@@ -58,7 +58,7 @@ struct MHE_EXPORT FullscreenLayout
 		return "fullscreen";
 	}
 
-	static uint16_t handle;
+	static const uint16_t handle = 2;
 
 	static void init(Context& context);
 };
@@ -68,6 +68,7 @@ struct MHE_EXPORT DebugLayout
     struct Vertex
     {
         vec3 pos;
+		vec3 nrm;
     };
 
     static const char* name()
@@ -75,9 +76,31 @@ struct MHE_EXPORT DebugLayout
         return "debug";
     }
 
-    static uint16_t handle;
+    static const uint16_t handle = 3;
 
     static void init(Context& context);
+};
+
+struct MHE_EXPORT SkinnedGeometryLayout
+{
+	struct Vertex
+	{
+		vec3 pos;
+		vec3 nrm;
+		vec4 tng;
+		vec2 tex;
+		uint ids[4];
+		float weights[4];
+	};
+
+	static const char* name()
+	{
+		return "skinned_geometry";
+	}
+
+	static const uint16_t handle = 4;
+
+	static void init(Context& context);
 };
 
 bool init_standart_layouts(Context& context);

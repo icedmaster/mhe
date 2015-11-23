@@ -33,6 +33,16 @@ enum
 	texture_clamp_to_edge
 };
 
+enum
+{
+	texture_posx,
+	texture_negx,
+	texture_posy,
+	texture_negy,
+	texture_posz,
+	texture_negz
+};
+
 struct TextureDesc
 {
 	int type;
@@ -60,6 +70,9 @@ public:
 	virtual ~TextureImpl() {}
 	virtual bool init(const TextureDesc& desc, const uint8_t* data, size_t size) = 0;
 	virtual void close() = 0;
+	virtual void update(const uint8_t* data) = 0;
+	virtual void copy_framebuffer() = 0;
+	virtual void read(uint8_t* data, size_t size) = 0;
 };
 
 class MHE_EXPORT Texture
@@ -81,6 +94,21 @@ public:
 	const TextureImpl* impl() const
 	{
 		return impl_.get();
+	}
+
+	void update(const uint8_t* data)
+	{
+		impl_->update(data);
+	}
+
+	void copy_framebuffer()
+	{
+		impl_->copy_framebuffer();
+	}
+
+	void read(uint8_t* data, size_t size)
+	{
+		impl_->read(data, size);
 	}
 private:
 	unique_ptr<TextureImpl> impl_;

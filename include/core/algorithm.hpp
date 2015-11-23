@@ -11,6 +11,17 @@ inline InputIterator find(InputIterator first, InputIterator last, const T& valu
     return std::find<InputIterator, T>(first, last, value);
 }
 
+template<class InputIterator, class OutputIterator>
+inline OutputIterator copy(InputIterator first, InputIterator last, OutputIterator result)
+{
+	while (first!=last)
+	{
+		*result = *first;
+		++result; ++first;
+	}
+	return result;
+}
+
 }
 
 #endif

@@ -13,7 +13,7 @@ void set_light_position(SceneContext& scene_context, LightInstance::IdType id, c
     aabb.center = position;
 }
 
-const vec3& get_light_position(SceneContext& scene_context, LightInstance::IdType id)
+const vec3& get_light_position(const SceneContext& scene_context, LightInstance::IdType id)
 {
 	Transform& transform = scene_context.transform_pool.get(scene_context.light_pool.get(id).transform_id).transform;
 	return transform.position();
@@ -36,7 +36,7 @@ void set_light_direction(SceneContext& scene_context, LightInstance::IdType id, 
 	transform.set(m);
 }
 
-vec3 get_light_direction(SceneContext& scene_context, LightInstance::IdType id)
+vec3 get_light_direction(const SceneContext& scene_context, LightInstance::IdType id)
 {
 	LightInstance& light_instance = scene_context.light_pool.get(id);
 	Transform& transform = scene_context.transform_pool.get(light_instance.transform_id).transform;
@@ -63,6 +63,13 @@ mat4x4 get_light_shadowmap_matrix(SceneContext& scene_context, LightInstance::Id
 	
 	Transform& transform = scene_context.transform_pool.get(light_instance.transform_id).transform;
 	return transform.view() * proj;
+}
+
+mat4x4 get_light_view_matrix(SceneContext& scene_context, LightInstance::IdType id)
+{
+	const LightInstance& light_instance = scene_context.light_pool.get(id);
+	Transform& transform = scene_context.transform_pool.get(light_instance.transform_id).transform;
+	return transform.view();
 }
 
 }

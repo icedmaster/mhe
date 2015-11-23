@@ -40,6 +40,12 @@ public:
             state_.nodes_visible = visible;
         }
 
+				void update_parts(size_t total, size_t visible)
+				{
+					state_.parts = total;
+					state_.parts_visible = visible;
+				}
+
         size_t aabbs() const
         {
             return prev_state_.aabbs;
@@ -59,6 +65,16 @@ public:
         {
             return prev_state_.nodes_visible;
         }
+
+				size_t parts() const
+				{
+					return prev_state_.parts;
+				}
+
+				size_t parts_visible() const
+				{
+					return prev_state_.parts_visible;
+				}
     private:
         struct State
         {
@@ -66,6 +82,8 @@ public:
             size_t aabbs_visible;
             size_t nodes;
             size_t nodes_visible;
+						size_t parts;
+						size_t parts_visible;
         };
 
         State state_;
@@ -80,7 +98,8 @@ public:
 	}
 
 	NodeInstance& create_node() const;
-    void update(RenderContext& render_context);
+	void update(RenderContext& render_context);
+	void process_requests(RenderContext& render_context);
 
 	LightInstance& create_light() const;
 
@@ -109,7 +128,10 @@ private:
 	void refresh_node_material_link(NodeInstance* nodes);
     void update_light_sources(RenderContext& render_context);
 
-    void frustum_culling();
+	void frustum_culling();
+	void parts_frustum_culling(const planef* planes, const planef* abs_planes);
+
+	void update_scene_aabb(RenderContext& render_context) const;
 
 	struct MaterialConnector
 	{

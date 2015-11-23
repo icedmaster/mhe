@@ -3,6 +3,7 @@
 
 #include "compiler.hpp"
 #include "allocator.hpp"
+#include "algorithm.hpp"
 
 #ifdef MHE_VS
 // TODO: need to check out this warning later
@@ -53,17 +54,6 @@ struct dynamic_array_traits
     T* elements;
 };
 
-template<class InputIterator, class OutputIterator>
-OutputIterator copy(InputIterator first, InputIterator last, OutputIterator result)
-{
-	while (first!=last)
-	{
-		*result = *first;
-		++result; ++first;
-	}
-	return result;
-}
-
 }	// detail
 
 #define DEFAULT_REALLOCATION_POLICY			detail::default_reallocation_policy
@@ -78,17 +68,17 @@ public:
 	typedef const T* const_iterator;
 public:
 	fixed_size_vector(allocator* alloc = default_allocator()) :
-		begin_(elements_), size_(0), capacity_(count)
+        begin_(elements_), size_(0), capacity_(count), allocator_(alloc)
 	{}
 
 	fixed_size_vector(const this_type& v, allocator* alloc = default_allocator()) :
-		begin_(elements_), size_(0), capacity_(count)
+        begin_(elements_), size_(0), capacity_(count), allocator_(alloc)
 	{
 		insert(end(), v.begin(), v.end());
 	}
 
 	fixed_size_vector(size_t size, allocator* alloc = default_allocator()) :
-		begin_(elements_), size_(0), capacity_(count)
+        begin_(elements_), size_(0), capacity_(count), allocator_(alloc)
 	{		
 		resize(size);
 	}
@@ -144,7 +134,7 @@ public:
 		return begin_[index];
 	}
 
-	T operator[] (size_t index) const
+	const T& operator[] (size_t index) const
 	{
 		return begin_[index];
 	}
@@ -220,6 +210,11 @@ public:
 	void push_back(const T& value)
 	{
 		insert(end(), value);
+	}
+
+	void append(const T* values, size_t size)
+	{
+		insert(end(), values, values + size);
 	}
 
 	void resize(size_t new_size)
@@ -306,7 +301,7 @@ private:
 		if ((size_ + 1) > capacity_)
 			reallocate_vector(capacity_ * 2);
 		if (index != size_)
-			detail::copy(begin_ + index, begin_ + size_ - index, begin_ + index + 1);
+			mhe::copy(begin_ + index, begin_ + size_ - index, begin_ + index + 1);
 		begin_[index] = value;
 		++size_;
 		return begin_ + index;
@@ -315,30 +310,29 @@ private:
 	void reallocate_vector(size_t new_capacity)
 	{
 		reallocation_policy::reallocate(capacity_, new_capacity, FUNCTION_DESCRIPTION_MACRO);
-		size_t prev_capacity = capacity_;
 		T* copy = begin_;;
 		capacity_ = new_capacity;
 		begin_ = allocate(capacity_);
-		detail::copy(copy, copy + size_, begin_);
+		mhe::copy(copy, copy + size_, begin_);
 		if (copy != elements_) free(copy);
 	}
 
 	iterator erase_impl(size_t index, size_t erased_count)
 	{
 		if (index != (size_ - erased_count))
-			detail::copy(begin_ + index + erased_count, begin_ + size_, begin_ + index);
+			mhe::copy(begin_ + index + erased_count, begin_ + size_, begin_ + index);
 		size_ -= erased_count;
 		return begin_ + index;
 	}
 
 	T* allocate(size_t n)
 	{
-		return new (allocator_) T[n];
+		return create_array<T>(n, allocator_);
 	}
 
 	void free(T* ptr)
 	{
-		delete[](allocator_, ptr);
+		destroy_array(ptr, allocator_);
 	}
 
 	T elements_[count];
@@ -363,6 +357,12 @@ public:
         return traits_.elements[size_++];
     }
 
+	void push_back(const T& v)
+	{
+        ASSERT(size_ < count - 1, "fixed_capacity_vector is full");
+		traits_.elements[size_++] = v;
+	}
+
     const T* data() const
     {
         return traits_.elements;
@@ -382,6 +382,23 @@ public:
     {
         size_ = 0;
     }
+
+	bool empty() const
+	{
+		return size_ == 0;
+	}
+
+	T& operator[] (size_t index)
+	{
+		ASSERT(index < size_, "Invalid index");
+		return traits_.elements[index];
+	}
+
+	const T& operator[] (size_t index) const
+	{
+		ASSERT(index < size_, "Invalid index");
+		return traits_.elements[index];
+	}
 private:
     Traits traits_;
     size_t size_;

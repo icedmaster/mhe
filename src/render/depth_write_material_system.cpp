@@ -47,7 +47,6 @@ bool DepthWriteMaterialSystem::init_light_data(Context& context)
 		next_draw_call_data = context.draw_call_data_pool.create();
 		RenderState& render_state = create_and_get(context.render_state_pool);
 		RenderStateDesc render_state_desc;
-		render_state_desc.depth.enabled = true;
 		render_state_desc.viewport.viewport.set(0, 0, shadowmap_default_width, shadowmap_default_height);
 		if (!render_state.init(render_state_desc)) return false;
 		render_states_.push_back(render_state.id());
@@ -93,13 +92,14 @@ void DepthWriteMaterialSystem::update(Context& context, SceneContext& scene_cont
 	clear_commands_.clear();
 	uniforms_.clear();
 	draw_call_data_.clear();
+	shadow_info_.clear();
 
     context.materials[id()].clear();
 
     bool have_shadowcasters = false;
 	for (size_t i = 0; i < render_context.lights_number; ++i)
 	{
-		if (!render_context.lights[i].light.desc().cast_shadows)
+		if (!render_context.lights[i].light.desc().cast_shadows || render_context.lights[i].light.shadow_info() != nullptr)
 			continue;
 		if (!init_light_data(context))
 		{
@@ -112,7 +112,14 @@ void DepthWriteMaterialSystem::update(Context& context, SceneContext& scene_cont
 		data.mvp = get_light_shadowmap_matrix(scene_context, render_context.lights[i].id);
 		uniform.update(data);
 
-		render_context.lights[i].light.set_shadowmap_texture(shadowmaps_[index]);
+		ShadowInfo& shadow_info = shadow_info_.add();
+		shadow_info.shadowmap = shadowmaps_[index];
+		shadow_info.lightvp = data.mvp;
+		shadow_info.lightview = data.mvp;
+		shadow_info.cascades_number = 1;
+		shadow_info.offset[0] = vec3::zero();
+		shadow_info.scale[0] = vec3(1.0f, 1.0f, 1.0f);
+		render_context.lights[i].light.set_shadow_info(&shadow_info);
 
 		ClearCommand& command = clear_commands_.add();
 		command.set_driver(&context.driver);

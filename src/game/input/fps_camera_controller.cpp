@@ -24,6 +24,8 @@ FPSCameraController::FPSCameraController(Engine& engine, const PerspectiveCamera
 	CameraController(engine.scene()),
 	event_manager_(engine.event_manager())
 {
+    NOT_IMPLEMENTED(direction);
+    NOT_IMPLEMENTED(up);
 	// TODO: need to implement correct behaviour
 	camera().init(engine.context(), parameters, position, vec3::zero());
 	transform_instance().transform.set(position, camera().rotation());

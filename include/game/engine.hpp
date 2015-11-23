@@ -5,6 +5,8 @@
 #ifdef RDBG_ENABLED
 #include "debug/rdbg.hpp"
 #endif
+#include "debug/debug_views.hpp"
+#include "debug/stats.hpp"
 
 #include "render/context.hpp"
 #include "render/render_globals.hpp"
@@ -23,8 +25,15 @@ class MHE_EXPORT Engine
 public:
 	Engine();
 	bool init(uint width, uint height, uint bpp, bool fullscreen);
+	void destroy();
+	bool init_debug_components();
 
 	Context& context()
+	{
+		return context_;
+	}
+
+	const Context& context() const
 	{
 		return context_;
 	}
@@ -44,9 +53,14 @@ public:
 		return scene_;
 	}
 
+	const Scene& scene() const
+	{
+		return scene_;
+	}
+
 	RDBGProcessor& rdbg_processor()
 	{
-		return rdbg_engine_.processor();
+		return rdbg_engine_->processor();
 	}
 
 	void run();
@@ -68,26 +82,46 @@ public:
 	{
 		return renderer_.get();
 	}
+
+	RenderContext& render_context()
+	{
+		return renderer_->render_context();
+	}
+
+	Stats& stats()
+	{
+		return stats_;
+	}
+
+	DebugViews& debug_views()
+	{
+		return debug_views_;
+	}
 private:
 	void set_default_video_settings();
 	void setup_generated();
 
 #ifdef RDBG_ENABLED
-	RDBGEngine rdbg_engine_;
+	unique_ptr<RDBGEngine> rdbg_engine_;
 #endif
+	DebugViews debug_views_;
+	Stats stats_;
 
 	Context context_;
-    RenderContext render_context_;
 	EventManager event_manager_;
 	Scene scene_;
 	utils::Timer stats_timer_;
 
-	RenderGlobals render_globals_;
 	ref_ptr<Renderer> renderer_;
 
 	ref_ptr<GameScene> game_scene_;
 	bool process_;
 };
+
+void init_singletons();
+void destroy_singletons();
+
+MHE_EXPORT GlobalVars& get_global_vars();
 
 }}
 

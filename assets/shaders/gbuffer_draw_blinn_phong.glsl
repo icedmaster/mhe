@@ -4,12 +4,18 @@
 [defs CUBEMAP 0 1]
 
 #define LIGHT_DIRECTION_FROM_SOURCE
+#define CASCADED_SHADOWMAP
+//#define SHADOWMAP_DISC_FILTER
 
 [include "common.h"]
 [include "lighting_common.h"]
 
+#ifdef DIRECTIONAL_CSM
+//#define CASCADED_SHADOWMAP_DEBUG
+#endif
+
 // Define layout before "geometry_common.h" will be included
-// TODO: SPOT_LIGHT is temorary here
+// TODO: SPOT_LIGHT is temporary here
 #if LIGHT_TYPE == DIRECTIONAL_LIGHT || LIGHT_TYPE == SPOT_LIGHT
 #define FULLSCREEN_LAYOUT
 #else
@@ -81,25 +87,92 @@ out vec4 color;
 #define PCF_TAPS 3
 #endif
 
-#define PCF_DIVIDER (1.0f / ((PCF_TAPS * 2 + 1) * (PCF_TAPS * 2 + 1)))
+#define PCF_SIZE (PCF_TAPS * 2 + 1)
+
+#if SHADOWMAP_QUALITY == 0
+#define DISC_TAPS 0
+#elif SHADOWMAP_QUALITY == 1
+#define DISC_TAPS 8
+#elif SHADOWMAP_QUALITY == 2
+#define DISC_TAPS 16
+#endif
+
+[include "pcf_kernels.h"]
+[include "poisson_disc_kernel.h"]
 
 #pragma optionNV (unroll all)
-float get_shadow_value(sampler2D tex, float pixel_depth, vec2 texcoord, float bias)
+
+float pcf_filter(sampler2D tex, float pixel_depth, vec2 texcoord, float bias, vec2 sample_size)
 {
 	float shadow_value = 0.0f;
-	for (int x = -PCF_TAPS; x <= PCF_TAPS; ++x)
+	float weight = 0.0f;
+	vec2 f = fract(texcoord / sample_size);
+	float left_edge = 1.0f - f.x;
+	float right_edge = f.x;
+	float top_edge = f.y;
+	float bottom_edge = 1.0 - f.y;
+	for (int y = -PCF_TAPS; y <= PCF_TAPS; ++y)
 	{
-		for (int y= -PCF_TAPS; y <= PCF_TAPS; ++y)
+		for (int x = -PCF_TAPS; x <= PCF_TAPS; ++x)
 		{
-			float shadowmap_depth = textureOffset(tex, texcoord, ivec2(x, y)).x;
-			shadow_value += pixel_depth < shadowmap_depth + bias ? 1.0f : 0.0f;
+			vec2 offset = vec2(x * sample_size.x, y * sample_size.y);
+			float shadowmap_depth = texture(tex, texcoord + offset).x;
+			float tap_weight = pcf_weights[(y + PCF_TAPS) * PCF_SIZE + x + PCF_TAPS];
+			if (x == -PCF_TAPS) tap_weight = left_edge;
+			else if (x == PCF_TAPS) tap_weight = right_edge;
+			if (y == -PCF_TAPS) tap_weight *= bottom_edge;
+			else if (y == PCF_TAPS) tap_weight *= top_edge;
+			shadow_value += pixel_depth < shadowmap_depth + bias ? 1.0f * tap_weight : 0.0f;
+			weight += 1.0f;
 		}
 	}
 		
-	return saturate(shadow_value * PCF_DIVIDER);
+	return saturate(shadow_value / weight);
+}
+
+float disc_filter(sampler2D tex, float pixel_depth, vec2 texcoord, float bias)
+{
+	vec2 inv_tex_size = 1.0f / textureSize(tex, 0);
+	float weight = DISC_TAPS;
+	float shadow_value = 0.0f;
+	for (int i = 0; i < DISC_TAPS; ++i)
+	{
+		vec2 offset = disc_kernel[i] * inv_tex_size;
+		float shadowmap_depth = texture(tex, texcoord + offset).x;
+		shadow_value += pixel_depth < shadowmap_depth + bias ? 1.0f : 0.0f;
+	}
+
+	return shadow_value / weight;
+}
+
+float get_shadow_value(sampler2D tex, float pixel_depth, vec2 texcoord, float bias, vec2 sample_size)
+{
+#if SHADOWMAP_QUALITY != 0
+	#ifndef SHADOWMAP_DISC_FILTER
+	return pcf_filter(tex, pixel_depth, texcoord, bias, sample_size);
+	#else
+	return disc_filter(tex, pixel_depth, texcoord, bias);
+	#endif
+#else
+	return pixel_depth < texture(tex, texcoord).r + bias ? 1.0f : 0.0f;
+#endif
 }
 
 #endif	// SHADOWMAP
+
+#ifdef CASCADED_SHADOWMAP_DEBUG
+const vec3 cascade_color[MAX_CASCADES_NUMBER] = vec3[MAX_CASCADES_NUMBER]
+(
+	vec3(1.0f, 0.0f, 0.0f),
+	vec3(0.0f, 1.0f, 0.0f),
+	vec3(0.0f, 0.0f, 1.0f),
+	vec3(1.0f, 1.0f, 0.0f),
+	vec3(1.0f, 0.0f, 1.0f),
+	vec3(0.0f, 1.0f, 1.0f),
+	vec3(1.0f, 1.0f, 1.0f),
+	vec3(1.0f, 1.0f, 1.0f)
+);
+#endif
 
 void main()
 {
@@ -129,13 +202,29 @@ void main()
 
 	float shadow_value = 1.0f;
 #if SHADOWMAP == 1
-	// We try to compare current pixel depth from the position of a light source with the depth
-	// we get from the shadowmap.
-	// pos - position in the world-space
-	// shadowmap_pos - projected position
+#ifndef DIRECTIONAL_CSM
 	vec4 shadowmap_pos = light.lightvp * vec4(pos, 1.0f);
+#endif
+
+	vec2 shadowmap_coord_offset = vec2(0.0f, 0.0f);
+	vec2 shadowmap_coord_scale = vec2(1.0f, 1.0f);
+	#ifdef DIRECTIONAL_CSM
+	int cascade = calculate_cascade(linearized_depth(depth, znear, zfar), light);
+	float fcascade = cascade;
+	vec4 shadowmap_pos = light.lightvp[cascade] * vec4(pos, 1.0f);
+	shadowmap_pos.xyz *= light.csm_scale[cascade].xyz;
+	shadowmap_pos.xyz += light.csm_offset[cascade].xyz;
+	shadowmap_coord_offset.x += fcascade / light.cascades_number;
+	shadowmap_coord_scale.x *= (1.0f / light.cascades_number);
+	#endif
+
+#ifndef CASCADED_SHADOWMAP_DEBUG
 	// clip space - all parameters lie in [-1; 1] interval
 	vec3 shadowmap_clip_pos = shadowmap_pos.xyz / shadowmap_pos.w;
+	vec2 sample_size = 1.0f / textureSize(shadowmap_texture, 0);
+#ifdef DIRECTIONAL_CSM
+	sample_size *= (1.0f / (fcascade + 1.0f));
+#endif
 	
 	if (shadowmap_clip_pos.x < -0.999f || shadowmap_clip_pos.y < -0.999f ||
 		shadowmap_clip_pos.x > 0.999f || shadowmap_clip_pos.y > 0.999f)
@@ -143,9 +232,12 @@ void main()
 	else
 	{
 		float pixel_depth = shadowmap_clip_pos.z * 0.5f + 0.5f;
-		shadow_value = get_shadow_value(shadowmap_texture, pixel_depth, shadowmap_clip_pos.xy * 0.5f + 0.5f, light.shadowmap_params.x);
+		shadow_value = get_shadow_value(shadowmap_texture, pixel_depth, (shadowmap_clip_pos.xy * 0.5f + 0.5f) * shadowmap_coord_scale + shadowmap_coord_offset, light.shadowmap_params.x, sample_size);
 	}
-#endif
+#else
+	result = cascade_color[cascade];
+#endif // CASCADED_SHADOWMAP_DEBUG
+#endif // SHADOWMAP
 
 	color = vec4(result * shadow_value, 0.0f);
 }

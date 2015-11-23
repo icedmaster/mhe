@@ -2,6 +2,7 @@
 #define _MATH_UTILS_HPP_
 
 #include "core/types.hpp"
+#include <cfloat>
 
 namespace mhe
 {
@@ -9,6 +10,9 @@ namespace mhe
 	const float pi_2 = pi * 0.5f;
     const float deg2rad = pi / 180.0f;
     const float rad2deg = 180.0f / pi;
+	const float float_max = FLT_MAX;
+	const float float_min = FLT_MIN;
+	const float fp_epsilon = 0.00001f;
 
     inline float deg_to_rad(float deg)
     {
@@ -43,7 +47,7 @@ inline T lerp(const T& begin, const T& end, float value)
 }
 
 template <class T>
-inline T clamp(const T& min, const T& max, const T& value)
+inline T clamp(const T& value, const T& min, const T& max)
 {
 	if (value > max) return max;
 	if (value < min) return min;
@@ -51,10 +55,16 @@ inline T clamp(const T& min, const T& max, const T& value)
 }
 
 template <class T>
-inline T clamp_up(const T& max, const T& value)
+inline T clamp_up(const T& value, const T& max)
 {
 	if (value > max) return max;
 	return value;
+}
+
+template <class T>
+inline T saturate(const T& v)
+{
+	return clamp(v, (T)0, (T)1);
 }
 
 };

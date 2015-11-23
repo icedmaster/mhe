@@ -3,6 +3,7 @@
 
 #include <ostream>
 #include <cmath>
+#include "vector4.hpp"
 
 namespace mhe {
 
@@ -18,6 +19,11 @@ public:
 	quat(const T& x, const T& y, const T& z, const T& w)
 	{
 		set(x, y, z, w);
+	}
+
+	quat(const vector4<T>& v)
+	{
+		set(v.x(), v.y(), v.z(), v.w());
 	}
 
 	template <class U>
@@ -55,6 +61,11 @@ public:
 	T w() const
 	{
 		return q_[3];
+	}
+
+	vector4<T> as_vec4() const
+	{
+		return vector4<T>(q_[0], q_[1], q_[2], q_[3]);
 	}
 
 	void set(const T& x, const T& y, const T& z, const T& w)
@@ -100,7 +111,7 @@ public:
 		quat<T> qz(0.0f, 0.0f, sx, cx);
 
 		// TODO: optimize it
-		*this = qx * qz * qy;
+		*this = qx * qy * qz;
 	}
 
 	void euler(float& xangle, float& yangle, float& zangle) const
@@ -226,6 +237,29 @@ public:
 private:
 	T q_[4];
 };
+
+template <class T>
+quat<T> slerp(const quat<T>& q1, const quat<T>& q2, float t)
+{
+	const vector4<T> &fromvector = q1.as_vec4();
+	const vector4<T> &tovector = q2.as_vec4();
+	T c = dot(fromvector, tovector);
+
+	float s0, s1;
+	if ((1 - c) > fp_epsilon)
+	{
+		float angle = acos(c);
+		float s = sin(angle);
+		s0 = sin((1.0f - t) * angle) / s;
+		s1 = sin(t * angle) / s;
+	}
+	else
+	{
+		s0 = 1.0f - t;
+		s1 = t;
+	}
+	return quat<T>(fromvector * s0 + tovector * s1);
+}
 
 template <class T, class U>
 quat<T> operator* (const quat<T>& a, const quat<U>& b)

@@ -5,6 +5,7 @@
 
 #include "node.hpp"
 #include "commands.hpp"
+#include "light.hpp"
 #include "core/fixed_size_vector.hpp"
 #include "math/matrix.hpp"
 
@@ -35,6 +36,7 @@ private:
 	fixed_size_vector<TextureInstance, default_number_of_shadowcasters> shadowmaps_;
 	fixed_size_vector<RenderState::IdType, default_number_of_shadowcasters> render_states_;
 	fixed_size_vector<RenderTarget::IdType, default_number_of_shadowcasters> render_targets_;
+	fixed_size_vector<ShadowInfo, default_number_of_shadowcasters> shadow_info_;
 };
 
 }

@@ -16,6 +16,7 @@
 
 #ifdef MHE_VS
 #define FUNCTION_DESCRIPTION_MACRO						__FUNCSIG__
+#define FUNCTION_NAME									__FUNCTION__
 #else
 #define FUNCTION_DESCRIPTION_MACRO						__PRETTY_FUNCTION__
 #endif
@@ -35,8 +36,13 @@
 
 #ifndef MHE_CPP11
 #define override
+#define final
 #define static_assert(exp, text) { typedef char __LINE__##sa[exp] MHE_COMPILER_ATTRIBUTE_UNUSED; (void)text; }
 #else
+#endif
+
+#ifndef MHE_COMPILER_HAS_NULLPTR
+#define nullptr 0
 #endif
 
 // Disable some warnings
@@ -44,6 +50,7 @@
 #pragma warning( disable: 4251 )
 #pragma warning( disable: 4275 )
 #define _SCL_SECURE_NO_WARNINGS
+#define NOMINMAX
 #endif
 
 #endif

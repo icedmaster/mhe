@@ -5,19 +5,20 @@
 #include <vector>
 #include "core/unique_ptr.hpp"
 #include "core/fixed_size_vector.hpp"
+#include "core/string.hpp"
 #include "utils/pool_utils.hpp"
 
 namespace mhe {
 
 struct SamplerData
 {
-	std::string name;
+	string name;
 	size_t index;
 };
 
 struct UniformData
 {
-	std::string name;
+	string name;
 	size_t index;
 };
 
@@ -25,6 +26,7 @@ struct ShaderInitializationParams
 {
 	fixed_size_vector<SamplerData, 16> samplers;
 	fixed_size_vector<UniformData, 16> uniforms;
+	fixed_size_vector<SamplerData, 16> texture_buffers;
 };
 
 class ShaderProgramImpl
@@ -65,9 +67,17 @@ public:
 		size_t low;
 		size_t high;
 		size_t offset;
+
+		Info() : offset(0) {}
+
+		static Info empty()
+		{
+			static Info info;
+			return info;
+		}
 	};
 
-	class Index
+	class MHE_EXPORT Index
 	{
 	public:
 		Index() :
@@ -78,6 +88,11 @@ public:
 		size_t index() const
 		{
 			return index_;
+		}
+
+		void reset()
+		{
+			index_ = 0;
 		}
 
 		static size_t calculate_index(const Info& info, size_t value);

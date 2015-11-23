@@ -1,22 +1,19 @@
 #ifndef __MESH_HPP__
 #define __MESH_HPP__
 
+#include "math/matrix.hpp"
+#include "math/aabb.hpp"
 #include "render_buffer.hpp"
 #include "render_state.hpp"
 #include "material.hpp"
 #include "render_target.hpp"
+#include "render_common.hpp"
 
 namespace mhe {
 
-enum Primitive
-{
-	triangle = 0,
-	lines = 1
-};
-
 struct DrawCallData
 {
-    POOL_STRUCT(uint16_t);
+    POOL_STRUCT_COPYABLE(DrawCallData, uint16_t);
     RenderState::IdType state;
     RenderTarget::IdType render_target;
 
@@ -44,44 +41,86 @@ struct RenderData
 	{}
 };
 
+struct Bone
+{
+	static const size_t invalid_id = static_cast<size_t>(-1);
+	string name;
+	uint32_t id;
+	uint32_t parent_id;
+	mat4x4 inv_transform;	// inverse bind pose transform
+	mat4x4 local_transform;
+};
+
+struct Skeleton
+{
+	mat4x4 root_transform;
+	std::vector<Bone> bones;
+};
+
+struct SkeletonInstance
+{
+	TextureBufferHandleType texture_buffer;
+
+	SkeletonInstance() : texture_buffer(InvalidHandle<TextureBufferHandleType>::id) {}
+};
+
+struct GIDataInstance
+{
+	TextureBufferHandleType texture_buffer;
+
+	GIDataInstance() : texture_buffer(InvalidHandle<TextureBufferHandleType>::id) {}
+};
+
 struct MeshPart
 {
-    RenderData render_data;
+	RenderData render_data;
+	AABBf aabb;
 	MaterialId material_id;
 };
 
 struct Mesh
 {
-    std::vector<MeshPart> parts;
-    VertexBuffer::IdType vbuffer;
-    IndexBuffer::IdType ibuffer;
+	std::vector<MeshPart> parts;
+	VertexBuffer::IdType vbuffer;
+	IndexBuffer::IdType ibuffer;
+	MeshTraceDataHandleType trace_data_id;
+	MeshRawDataHandleType raw_data_id;
+	AABBf aabb;
+	Skeleton skeleton;
 
-    Mesh() : vbuffer(VertexBuffer::invalid_id), ibuffer(IndexBuffer::invalid_id)
-    {}
+	Mesh() : vbuffer(VertexBuffer::invalid_id), ibuffer(IndexBuffer::invalid_id),
+			 trace_data_id(InvalidHandle<MeshTraceDataHandleType>::id), raw_data_id(InvalidHandle<MeshRawDataHandleType>::id)
+	{}
 };
 
 inline MeshPart& add_part(Mesh& mesh)
 {
-    MeshPart part;
-    part.render_data.ibuffer = mesh.ibuffer;
-    part.render_data.vbuffer = mesh.vbuffer;
-    mesh.parts.push_back(part);
-    return mesh.parts.back();
+	MeshPart part;
+	part.render_data.ibuffer = mesh.ibuffer;
+	part.render_data.vbuffer = mesh.vbuffer;
+	mesh.parts.push_back(part);
+	return mesh.parts.back();
 }
 
 struct MeshPartInstance
 {
-    MaterialInstance material;
-    DrawCallData::IdType draw_call_data;
+	MaterialInstance material;
+	DrawCallData::IdType draw_call_data;
+	AABBInstanceHandleType aabb_id;
+	bool visible : 1;
+
+	MeshPartInstance() : aabb_id(InvalidHandle<AABBInstanceHandleType>::id), visible(true) {}
 };
 
 struct MeshInstance
 {
-    Mesh mesh;
-    std::vector<MeshPartInstance> instance_parts;
-    UniformBuffer::IdType shared_uniform;
+	Mesh mesh;
+	std::vector<MeshPartInstance> instance_parts;
+	UniformBuffer::IdType shared_uniform;
+	SkeletonInstance skeleton_instance;
+	GIDataInstance gi_data;
 
-    MeshInstance() : shared_uniform(UniformBuffer::invalid_id) {}
+	MeshInstance() : shared_uniform(UniformBuffer::invalid_id) {}
 };
 
 inline MeshPartInstance& add_part(MeshInstance& mesh)

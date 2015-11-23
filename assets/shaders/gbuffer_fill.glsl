@@ -1,4 +1,5 @@
 [defs NORMALMAP 0 1]
+[defs SKINNING 0 1]
 
 struct VSOutput
 {
@@ -8,25 +9,41 @@ struct VSOutput
 	vec3 tng;
 	vec3 bitng;
 #endif
+	vec4 test;
 };
 
 [vertex]
 
+[include "common.h"]
 [include "geometry_common.h"]
+[include "skinning_common.h"]
 
 out VSOutput vsoutput;
 
 void main()
 {
 	vsoutput.tex = tex;
-	vsoutput.nrm = (normal * vec4(nrm, 0.0f)).xyz;
-#if NORMALMAP == 1
-	vsoutput.tng = tng;
-	// TODO: add handedness
-	vsoutput.bitng = cross(nrm, tng);
+
+#if SKINNING == 0
+	vec4 nrm_os = vec4(nrm, 0.0f);
+	vec4 pos_os = vec4(pos, 1.0f);
+	vec4 tng_os = vec4(tng.xyz, 0.0f);
+#else
+	mat4 skinning_transform;
+	skinning(skinning_transform, skin_texture, ids, weights);
+	vec4 nrm_os = skinning_transform * vec4(nrm, 0.0f);
+	vec4 pos_os = skinning_transform * vec4(pos, 1.0f);
+	vec4 tng_os = skinning_transform * vec4(tng.xyz, 0.0f);
 #endif
 
-	gl_Position = vp * model * vec4(pos, 1.0f);
+	vsoutput.nrm = (normal * nrm_os).xyz;
+#if NORMALMAP == 1
+	vsoutput.tng = (normal * tng_os).xyz;
+	// TODO: add handedness
+	vsoutput.bitng = cross(vsoutput.nrm, vsoutput.tng) * tng.w;
+#endif
+
+	gl_Position = vp * model * pos_os;
 }
 
 [fragment]
@@ -57,6 +74,6 @@ void main()
 #else
 	vec3 normal_tngspace = texture(normalmap_texture, vsoutput.tex).xyz * 2.0f - 1.0f;
 	vec3 normal_wspace = vsoutput.tng * normal_tngspace.x + vsoutput.bitng * normal_tngspace.y + vsoutput.nrm * normal_tngspace.z;
-	normal = vec4(normal_wspace, PHONG_MATERIAL_SHININESS(material_data));
+	normal = vec4(normalize(normal_wspace), PHONG_MATERIAL_SHININESS(material_data));
 #endif
 }

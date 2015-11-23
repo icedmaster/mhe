@@ -3,6 +3,7 @@
 
 #include "render/video_driver.hpp"
 #include "core/array.hpp"
+#include "core/types.hpp"
 #include "../opengl/mhe_gl.hpp"
 
 namespace mhe {
@@ -14,22 +15,26 @@ class OpenGL3RenderTarget;
 
 struct OpenGL3ContextState
 {
-    array<size_t, 16> uniforms;
+	array<size_t, 16> uniforms;
 	vector2<int> window_size;
 	rect<int> viewport;
-    bool depth;
-    bool stencil;
-    bool blend;
+	rect<int> scissor;
+	bool depth_test;
+	bool depth_write;
+	bool stencil;
+	bool blend;
+	bool scissor_test;
 
-    OpenGL3ContextState();
+	OpenGL3ContextState();
 };
 
 class OpenGL3Driver : public DriverImpl
 {
 public:
+	OpenGL3Driver();
 private:
     bool init(DriverRenderingCapabilities& caps);
-	void close() {}
+	void close();
 
 	void enable_blending();
 	void disable_blending();
@@ -50,15 +55,17 @@ private:
 
 	void set_viewport(int x, int y, int w, int h);
 
-	uint major_version_need() const
+	uint major_version_need() const override
 	{
 		return 3;
 	}
 
-	uint minor_version_need() const
+	uint minor_version_need() const override
 	{
 		return 3;
 	}
+
+	uint supported_versions(pair<uint, uint>* versions, uint size) const override;
 
 	void set_state(const RenderState& state);
 	void set_shader_program(const ShaderProgram& program);
@@ -68,14 +75,17 @@ private:
 	void set_layout(const Layout& layout);
 	void set_texture(const Texture& texture, size_t unit);
 	void set_render_target(const RenderTarget& render_target);
+	void set_texture_buffer(const TextureBuffer& texture_buffer, size_t unit) override;
 	void set_default_render_target();
 	void draw(const RenderData& data);
+	void draw(size_t elements_number, size_t vbuffer_offset, size_t ibuffer_offset, size_t indices_number, Primitive primitive) override;
 
 	void flush();
 private:
 	void setup_caps(DriverRenderingCapabilities& caps);
 
-    OpenGL3ContextState state_;
+	pair<uint, uint> versions_[4];
+	OpenGL3ContextState state_;
 	const OpenGL3IndexBuffer* current_index_buffer_;
 	const OpenGL3ShaderProgram* current_shader_program_;
 	const OpenGL3RenderTarget* current_render_target_;

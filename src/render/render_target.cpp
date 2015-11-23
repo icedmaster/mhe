@@ -12,6 +12,11 @@ RenderTarget::RenderTarget() :
 bool RenderTarget::init(Context& context, const RenderTargetDesc& desc)
 {
 	desc_ = desc;
+	if (desc.texture_type == texture_cube && desc.color_targets != 1)
+	{
+		ASSERT(0, "Invalid render target description");
+		return false;
+	}
 	Texture* rt[max_simultaneous_render_targets_number];
 	for (size_t i = 0; i < desc.color_targets; ++i)
 	{
@@ -35,10 +40,30 @@ size_t RenderTarget::color_textures(const TextureInstance** ids) const
 	return desc_.color_targets;
 }
 
+size_t RenderTarget::color_textures(TextureInstance* ids) const
+{
+	for (size_t i = 0; i < desc_.color_targets; ++i)
+		ids[i] = rt_[i];
+	return desc_.color_targets;
+}
+
 size_t RenderTarget::depth_texture(TextureInstance& id) const
 {
 	id = ds_;
 	return (desc_.use_depth || desc_.use_stencil) ? 1 : 0;
+}
+
+size_t RenderTarget::color_texture(TextureInstance& id, size_t index) const
+{
+	ASSERT(index < max_simultaneous_render_targets_number, "Invalid index");
+	id = rt_[index];
+	return desc_.color_targets >= index ? 1 : 0;
+}
+
+void RenderTarget::set_texture_side(int side)
+{
+	ASSERT(desc_.texture_type == texture_cube, "Invalid call");
+	impl_->set_texture_side(side);
 }
 
 }

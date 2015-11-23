@@ -246,6 +246,15 @@ public:
 #endif
 	}
 
+	void glVertexAttribIPointer(GLuint index, GLint size, GLenum type, GLsizei stride, const GLvoid *pointer)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glVertexAttribIPointer_(index, size, type, stride, pointer);
+#else
+		::glVertexAttribIPointer(index, size, type, stride, pointer);
+#endif
+	}
+
 	void glEnableVertexAttribArray(GLint attr)
 	{
 #ifndef MHE_USE_NATIVE_OPENGL
@@ -558,6 +567,114 @@ public:
 		::glGenerateMipmap(target);
 #endif
 	}
+
+	void glFramebufferTexture2D(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glFramebufferTexture2D_(target, attachment, textarget, texture, level);
+#else
+		::glFramebufferTexture2D(target, attachment, textarget, texture, level);
+#endif
+	}
+
+	void glDeleteFramebuffers(GLsizei n, GLuint *framebuffers)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glDeleteFramebuffers_(n, framebuffers);
+#else
+		::glDeleteFramebuffers(n, framebuffers);
+#endif
+	}
+
+	void glTexBuffer(GLenum target, GLenum internalformat, GLuint buffer)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glTexBuffer_(target, internalformat, buffer);
+#else
+		::glTexBuffer(taret, internalformat, buffer);
+#endif
+	}
+
+	void glGenQueries(GLsizei n, GLuint *ids)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glGenQueries_(n, ids);
+#else
+		::glGenQueries(n, ids);
+#endif
+	}
+
+	void glDeleteQueries(GLsizei n, const GLuint *ids)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glDeleteQueries_(n, ids);
+#else
+		::glDeleteQueries(n, ids);
+#endif
+	}
+
+	void glBeginQuery(GLenum target, GLuint id)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glBeginQuery_(target, id);
+#else
+		::glBeginQuery(target, id);
+#endif
+	}
+
+	void glEndQuery(GLenum target)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glEndQuery_(target);
+#else
+		::glEndQuery(target);
+#endif
+	}
+
+	void glGetQueryiv(GLenum target, GLenum pname, GLint *params)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glGetQueryiv_(target, pname, params);
+#else
+		::glGetQueryiv(target, pname, params);
+#endif
+	}
+
+	void glGetQueryObjectiv(GLuint id, GLenum pname, GLint *params)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glGetQueryObjectiv_(id, pname, params);
+#else
+		::glGetQueryObjectiv(id, pname, params);
+#endif
+	}
+
+	void glGetQueryObjectui64v(GLuint id, GLenum pname, GLuint64 *params)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glGetQueryObjectui64v_(id, pname, params);
+#else
+		::glGetQueryObjectui64v(id, pname, params);
+#endif
+	}
+
+	void glQueryCounter(GLuint id, GLenum target)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glQueryCounter_(id, target);
+#else
+		::glQueryCounter(id, target);
+#endif
+	}
+
+	void glGetBufferSubData(GLenum target, GLintptr offset, GLsizeiptr size, GLvoid *data)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glGetBufferSubData_(target, offset, size, data);
+#else
+		::glGetBufferSubData(target, offset, size, data);
+#endif
+	}
 private:
 	OpenGLExtensions() {}
 	~OpenGLExtensions() {}
@@ -606,6 +723,7 @@ private:
     PFNGLUNIFORM1FPROC glUniform1f_;
 	PFNGLGETATTRIBLOCATIONPROC glGetAttribLocation_;
 	PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer_;
+	PFNGLVERTEXATTRIBIPOINTERPROC glVertexAttribIPointer_;
 	PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray_;
 	PFNGLDISABLEVERTEXATTRIBARRAYPROC glDisableVertexAttribArray_;
 	PFNGLGENBUFFERSPROC glGenBuffers_;
@@ -638,6 +756,18 @@ private:
 	PFNGLDRAWRANGEELEMENTSPROC glDrawRangeElements_;
 	PFNGLDRAWELEMENTSBASEVERTEXPROC glDrawElementsBaseVertex_;
 	PFNGLGENERATEMIPMAPPROC glGenerateMipmap_;
+	PFNGLFRAMEBUFFERTEXTURE2DPROC glFramebufferTexture2D_;
+	PFNGLDELETEFRAMEBUFFERSPROC glDeleteFramebuffers_;
+	PFNGLTEXBUFFERPROC glTexBuffer_;
+	PFNGLGENQUERIESPROC glGenQueries_;
+	PFNGLDELETEQUERIESPROC glDeleteQueries_;
+	PFNGLBEGINQUERYPROC glBeginQuery_;
+	PFNGLENDQUERYPROC glEndQuery_;
+	PFNGLGETQUERYIVPROC glGetQueryiv_;
+	PFNGLGETQUERYOBJECTIVPROC glGetQueryObjectiv_;
+	PFNGLGETQUERYOBJECTUI64VPROC glGetQueryObjectui64v_;
+	PFNGLQUERYCOUNTERPROC glQueryCounter_;
+	PFNGLGETBUFFERSUBDATAPROC glGetBufferSubData_;
 #endif
 	std::map<std::string, bool> loaded_extensions_;
 };

@@ -18,8 +18,9 @@ void main()
 
 [fragment]
 
-[sampler2D albedo_texture 0]
-[sampler2D light_texture 1]
+[include "gbuffer_common.h"]
+
+[sampler2D light_texture 3]
 
 in VSOutput vsoutput;
 
@@ -29,6 +30,7 @@ void main()
 {
 	vec4 albedo = texture(albedo_texture, vsoutput.tex);
 	vec4 light = texture(light_texture, vsoutput.tex);
+	float depth = gbuffer_depth(vsoutput.tex);
 
-	color = vec4(albedo.rgb * light.rgb + albedo.rgb * ambient.rgb, albedo.a > 0.0f ? 1.0f : 0.0f);
+	color = vec4(albedo.rgb * light.rgb + albedo.rgb * ambient.rgb, depth < 1.0f ? 1.0f : 0.0f);
 }

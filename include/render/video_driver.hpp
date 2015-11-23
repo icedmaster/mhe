@@ -8,6 +8,7 @@
 #include "core/ref_ptr.hpp"
 #include "core/unique_ptr.hpp"
 #include "material.hpp"
+#include "render_common.hpp"
 
 namespace mhe
 {
@@ -17,6 +18,7 @@ struct NodeInstance;
 struct RenderData;
 struct Node;
 struct DrawCall;
+struct DrawCallExplicit;
 
 class Texture;
 class RenderState;
@@ -26,6 +28,7 @@ class IndexBuffer;
 class UniformBuffer;
 class Layout;
 class RenderTarget;
+class RenderCommand;
 
 class DriverImpl
 {
@@ -63,13 +66,17 @@ public:
 	virtual void set_shader_program(const ShaderProgram& program) = 0;
 	virtual void set_vertex_buffer(const RenderBuffer& vbuffer) = 0;
 	virtual void set_index_buffer(const IndexBuffer& ibuffer) = 0;
-    virtual void set_uniform(const UniformBuffer& uniform, size_t unit) = 0;
+	virtual void set_uniform(const UniformBuffer& uniform, size_t unit) = 0;
 	virtual void set_layout(const Layout& layout) = 0;
 	virtual void set_texture(const Texture& texture, size_t unit) = 0;
 	virtual void set_render_target(const RenderTarget& render_target) = 0;
+	virtual void set_texture_buffer(const TextureBuffer& texture_buffer, size_t unit) = 0;
 	virtual void set_default_render_target() = 0;
 	virtual void draw(const RenderData& data) = 0;
-    
+	virtual void draw(size_t elements_number, size_t vbuffer_offset, size_t ibuffer_offset, size_t indices_number, Primitive primitive) = 0;
+
+	virtual uint supported_versions(pair<uint, uint>* versions, uint size) const = 0;
+
 	virtual uint major_version_need() const = 0;
 	virtual uint minor_version_need() const = 0;
 
@@ -130,6 +137,9 @@ public:
 		size_t state;
 		size_t textures[material_textures_number];
 		size_t uniforms[material_uniforms_number];
+		size_t texture_buffers[material_texture_buffers_number];
+		RenderCommand* last_command;
+		uint8_t priority;
 	};
 public:
 	Driver();
@@ -185,12 +195,18 @@ public:
 
 	uint major_version_need() const
 	{
-		return impl_->major_version_need();
+		return versions_[current_version_].first;
 	}
 
 	uint minor_version_need() const
 	{
-		return impl_->minor_version_need();
+		return versions_[current_version_].second;
+	}
+
+	bool next_version()
+	{
+		if (++current_version_ >= versions_number_) return false;
+		return true;
 	}
 
 	/// Reset implementaion - need to call init()
@@ -200,11 +216,14 @@ public:
 	void end_render();
 
     void render(const Context& context, const DrawCall* draw_calls, size_t count);
+	void render(const Context& context, const DrawCallExplicit* draw_calls, size_t count);
 
 	void set_window_size(const vector2<int>& size)
 	{
 		impl_->set_window_size(size);
 	}
+
+	void reset_state();
 
 	// capabilities
 	float max_anisotropic_level() const
@@ -212,8 +231,12 @@ public:
 		return caps_.max_anisotropic_level;
 	}
 private:
-    void perform_draw_call(const Context& context, const DrawCall& draw_call);
+	void perform_draw_call(const Context& context, const DrawCall& draw_call);
+	void perform_draw_call(const Context& context, const DrawCallExplicit& draw_call);
 
+	pair<uint, uint> versions_[8];
+	uint versions_number_;
+	uint current_version_;
 	Stats stats_;
 	State state_;
 	DriverImpl::DriverRenderingCapabilities caps_;

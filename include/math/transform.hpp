@@ -101,9 +101,22 @@ public:
 
 	mat4x4 view() const
 	{
-        mat4x4 res;
-        res.set_lookAt(position_, position_ + transform_.forward_vector(), vec3::up());
-        return res;
+		static quatf zaxis_rotation(0.0f, pi, 0.0f);
+		mat4x4 res =  transform_;
+		res.set_row(3, vec3::zero());
+		res *= zaxis_rotation.to_matrix<mat4x4>();
+		res.transpose();
+		res.set_row(3, -position_ * res);
+		return res;
+	}
+
+	mat4x4 inverse_transform() const
+	{
+		mat4x4 res;
+		res = mat4x4::scaling_matrix(vec3(1.0f / scale_.x(), 1.0f / scale_.y(), 1.0f / scale_.z()));
+		res *= rotation_.conjugate().to_matrix<mat4x4>();
+		res *= mat4x4::translation_matrix(-position_);
+		return res;
 	}
 private:
 	void update()

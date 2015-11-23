@@ -16,10 +16,11 @@ enum CompareMode
 
 struct DepthDesc
 {
-	bool enabled;
+	bool test_enabled;
+	bool write_enabled;
 
 	DepthDesc() :
-		enabled(true)
+		test_enabled(true), write_enabled(true)
 	{}
 };
 
@@ -81,27 +82,28 @@ struct BlendDesc
 
 enum WindingOrder
 {
-    winding_cw,
-    winding_ccw
+	winding_cw,
+	winding_ccw
 };
 
 enum CullMode
 {
-    cull_none,
-    cull_front,
-    cull_back,
-    cull_front_and_back
+	cull_none,
+	cull_front,
+	cull_back,
+	cull_front_and_back
 };
 
 struct RasterizerDesc
 {
-    CullMode cull;
-    WindingOrder order;
+	CullMode cull;
+	WindingOrder order;
+	bool color_write;
 
-    RasterizerDesc() :
-        // TODO: the default cull value should be cull_back
-        cull(cull_none), order(winding_ccw)
-    {}
+	RasterizerDesc() :
+		// TODO: the default cull value should be cull_back
+		cull(cull_none), order(winding_ccw), color_write(true)
+	{}
 };
 
 struct ViewportDesc
@@ -111,13 +113,22 @@ struct ViewportDesc
 	ViewportDesc() : viewport(0, 0, 0, 0) {}
 };
 
+struct ScissorDesc
+{
+	rect<int> scissor_rect;
+	bool enabled;
+
+	ScissorDesc() : scissor_rect(0, 0, 0, 0), enabled(false) {}
+};
+
 struct RenderStateDesc
 {
 	DepthDesc depth;
 	StencilDesc stencil;
 	BlendDesc blend;
-    RasterizerDesc rasterizer;
+	RasterizerDesc rasterizer;
 	ViewportDesc viewport;
+	ScissorDesc scissor;
 };
 
 class RenderStateImpl
@@ -126,12 +137,15 @@ public:
 	virtual ~RenderStateImpl() {}
 	virtual bool init(const RenderStateDesc& desc) = 0;
 	virtual void update(const RenderStateDesc& desc) = 0;
+	virtual void update_viewport(const ViewportDesc& viewport_desc) = 0;
+	virtual void update_scissor(const ScissorDesc& scissor_desc) = 0;
+	virtual void update_rasterizer(const RasterizerDesc& rasterizer_desc) = 0;
 	virtual void close() = 0;
 };
 
 class MHE_EXPORT RenderState
 {
-    POOL_ELEMENT_METHODS(uint16_t)
+	POOL_ELEMENT_METHODS(uint16_t)
 public:
 	RenderState();
 	~RenderState()
@@ -152,6 +166,21 @@ public:
 	void update(const RenderStateDesc& desc)
 	{
 		impl_->update(desc);
+	}
+
+	void update_viewport(const ViewportDesc& viewport_desc)
+	{
+		impl_->update_viewport(viewport_desc);
+	}
+
+	void update_scissor(const ScissorDesc& scissor_desc)
+	{
+		impl_->update_scissor(scissor_desc);
+	}
+
+	void update_rasterizer(const RasterizerDesc& rasterizer_desc)
+	{
+		impl_->update_rasterizer(rasterizer_desc);
 	}
 
 	const RenderStateImpl* impl() const

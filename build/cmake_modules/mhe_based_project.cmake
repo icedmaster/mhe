@@ -24,6 +24,7 @@ macro(mhe_based_project NAME)
 
 	include_directories(${MHE_INCLUDE_DIR})
 	include_directories(${MHE_DIR})
+	include_directories(${MHE_DIR}/3rdparty)
 	message("Trying to find mhe library...")
 	message(${MHE_LIB_DIR})
 	find_library(MHE_LIB mhe ${MHE_LIB_DIR})

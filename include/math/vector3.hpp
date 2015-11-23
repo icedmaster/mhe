@@ -4,6 +4,8 @@
 #include <cmath>
 #include <ostream>
 #include "vector2.hpp"
+#include "math_utils.hpp"
+#include "core/compiler.hpp"
 
 namespace mhe
 {
@@ -36,6 +38,23 @@ public:
 		v_[0] = v.x();
 		v_[1] = v.y();
 		v_[2] = 0;
+	}
+
+	template <class U>
+	vector3(U x, U y, U z)
+	{
+		v_[0] = static_cast<T>(x); v_[1] = static_cast<T>(y); v_[2] = static_cast<T>(z);
+	}
+
+	template <class U>
+	vector3(const vector3<U>& v)
+	{
+		v_[0] = static_cast<T>(v.x()); v_[1] = static_cast<T>(v.y()); v_[2] = static_cast<T>(v.z());
+	}
+
+	vector3(T v)
+	{
+		v_[0] = v_[1] = v_[2] = v;
 	}
 
 	~vector3() {} // do nothing
@@ -80,14 +99,51 @@ public:
 		return v_[2];
 	}
 
+	T& x()
+	{
+		return v_[0];
+	}
+
+	T& y()
+	{
+		return v_[1];
+	}
+
+	T& z()
+	{
+		return v_[2];
+	}
+
+	vector2<T> xy() const
+	{
+		return vector2<T>(v_[0], v_[1]);
+	}
+
 	float length() const
 	{
 		return sqrt((v_[0] * v_[0]) + (v_[1] * v_[1]) + (v_[2] * v_[2]));
 	}
 
+	float magnitude() const
+	{
+		return length();
+	}
+
+	float magnitude2() const
+	{
+		return (v_[0] * v_[0]) + (v_[1] * v_[1]) + (v_[2] * v_[2]);
+	}
+
 	void normalize()
 	{
 		*this *= (1 / length());
+	}
+
+	vector3 normalized() const
+	{
+		vector3 v = *this;
+		v.normalize();
+		return v;
 	}
 
 	const T* get() const
@@ -211,6 +267,12 @@ public:
 		static vector3 z;
 		return z;
 	}
+
+	static vector3 one()
+	{
+		static vector3 o(1, 1, 1);
+		return o;
+	}
 };
 
 template <class T>
@@ -245,9 +307,58 @@ vector3<T> operator* (const vector3<T>& v1, const vector3<T>& v2)
 }
 
 template <class T>
+vector3<T> operator/ (T n, const vector3<T>& v)
+{
+	return vector3<T>(n / v.x(), n / v.y(), n / v.z());
+}
+
+template <class T>
 T dot(const vector3<T>& v1, const vector3<T>& v2)
 {
-    return v1.x() * v2.x() + v1.y() * v2.y() + v1.z() * v2.z();
+	return v1.x() * v2.x() + v1.y() * v2.y() + v1.z() * v2.z();
+}
+
+template <class T>
+vector3<T> min(const vector3<T>& v1, const vector3<T>& v2)
+{
+	return vector3<T>(std::min(v1.x(), v2.x()), std::min(v1.y(), v2.y()), std::min(v1.z(), v2.z()));
+}
+
+template <class T>
+vector3<T> max(const vector3<T>& v1, const vector3<T>& v2)
+{
+	return vector3<T>(mhe::max(v1.x(), v2.x()), mhe::max(v1.y(), v2.y()), mhe::max(v1.z(), v2.z()));
+}
+
+template <class T>
+vector3<T> clamp(const vector3<T>& value, const vector3<T>& min_value, const vector3<T>& max_value)
+{
+	return vector3<T>(clamp(value.x(), min_value.x(), max_value.x()), clamp(value.y(), min_value.y(), max_value.y()),
+		clamp(value.z(), min_value.z(), max_value.z()));
+}
+
+template <class T>
+vector3<T> saturate(const vector3<T>& value)
+{
+	return clamp(value, vector3<T>::zero(), vector3<T>(1, 1, 1));
+}
+
+template <class T>
+vector3<T> reflect(const vector3<T>& v, const vector3<T>& n)
+{
+	return v - 2 * n * dot(v, n);
+}
+
+template <class T>
+vector3<T> abs(const vector3<T>& v)
+{
+	return vector3<T>(fabs(v.x()), fabs(v.y()), fabs(v.z()));
+}
+
+template <class T>
+vector3<T> mul(const vector3<T>& v1, const vector3<T>& v2)
+{
+	return vector3<T>(v1.x() * v2.x(), v1.y() * v2.y(), v1.z() * v2.z());
 }
 
 template <class T>

@@ -3,6 +3,7 @@
 
 #include "types.hpp"
 #include "compiler.hpp"
+#include "config.hpp"
 
 namespace mhe {
 namespace details {
@@ -32,6 +33,8 @@ inline void free(void* p)
 
 }
 
+#ifndef MHE_SYSTEM_NEW_DELETE
+
 inline void* operator new(size_t size)
 {
 	return mhe::details::allocate(size);
@@ -51,5 +54,7 @@ inline void operator delete[] (void* p)
 {
 	return mhe::details::free(p);
 }
+
+#endif
 
 #endif

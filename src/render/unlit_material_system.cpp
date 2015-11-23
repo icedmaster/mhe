@@ -32,11 +32,11 @@ void UnlitMaterialSystem::update(Context& context, SceneContext& scene_context, 
     DEFAULT_MATERIAL_UPDATE(context, scene_context, render_context);
 }
 
-void UnlitMaterialSystem::update(Context& context, SceneContext& /*scene_context*/, RenderContext& render_context, MeshPartInstance* /*parts*/, size_t /*count*/)
+void UnlitMaterialSystem::update(Context& context, SceneContext& /*scene_context*/, RenderContext& render_context, MeshPartInstance* /*parts*/, MeshPart* /*parts*/, size_t /*count*/)
 {
 	UniformBuffer& uniform = context.uniform_pool.get(transform_uniform_);
 	TransformSimpleData transform_data;
-	transform_data.vp = render_context.vp;
+	transform_data.vp = render_context.main_camera.vp;
 	uniform.update(transform_data);
 }
 

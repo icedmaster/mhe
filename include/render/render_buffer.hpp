@@ -24,6 +24,11 @@ class RenderBufferImpl
 public:
 	virtual ~RenderBufferImpl() {}
 	virtual bool init(BufferUpdateType type, const uint8_t* data, size_t size, size_t element_size) = 0;
+	virtual void update(const uint8_t* data, size_t size) = 0;
+	virtual void* map(size_t size, size_t offset) = 0;
+	virtual void unmap() = 0;
+	virtual void data(uint8_t* vertices, size_t size) const = 0;
+	virtual size_t size() const = 0;
 	virtual void close() = 0;
 };
 
@@ -31,7 +36,11 @@ class IndexBufferImpl
 {
 public:
 	virtual ~IndexBufferImpl() {}
-	virtual bool init(const RenderBuffer& render_buffer, const uint32_t* indexes, size_t size) = 0;
+	virtual bool init(const RenderBuffer& render_buffer, const uint32_t* indices, size_t size) = 0;
+	virtual bool init(BufferUpdateType type, const RenderBuffer& render_buffer, const uint32_t* indices, size_t size) = 0;
+	virtual void update(const uint32_t* indices, size_t size) = 0;
+	virtual void data(uint32_t* indices, size_t size) const = 0;
+	virtual size_t size() const = 0;
 	virtual void close() = 0;
 };
 
@@ -54,10 +63,26 @@ public:
 	virtual void update(const uint8_t* data, size_t offset, size_t size) = 0;
 };
 
+struct TextureBufferDesc
+{
+	BufferUpdateType update_type;
+	int format;
+	size_t unit;
+};
+
+class TextureBufferImpl
+{
+public:
+	virtual ~TextureBufferImpl() {}
+	virtual bool init(const TextureBufferDesc& desc, size_t size, const uint8_t* data) = 0;
+	virtual void destroy() = 0;
+	virtual void update(const uint8_t* data) = 0;
+};
+
 class MHE_EXPORT RenderBuffer
 {
 	friend class Driver;
-    POOL_ELEMENT_METHODS(uint16_t)
+	POOL_ELEMENT_METHODS(uint16_t)
 public:
 	RenderBuffer();
 	bool init(BufferUpdateType type, const uint8_t* data, size_t size, size_t element_size)
@@ -68,6 +93,33 @@ public:
 	void close()
 	{
 		impl_->close();
+	}
+
+	void update(const uint8_t* data, size_t size)
+	{
+		impl_->update(data, size);
+	}
+
+	// map() and unmap() methods may not stateless! Be sure to do unmap() after map() without attempts to work with
+	// another buffers
+	void* map(size_t size, size_t offset)
+	{
+		return impl_->map(size, offset);
+	}
+
+	void unmap()
+	{
+		impl_->unmap();
+	}
+
+	void data(uint8_t* vertices, size_t size) const
+	{
+		impl_->data(vertices, size);
+	}
+
+	size_t size() const
+	{
+		return impl_->size();
 	}
 
 	const RenderBufferImpl* impl() const
@@ -81,18 +133,38 @@ private:
 class MHE_EXPORT IndexBuffer
 {
 	friend class Driver;
-    POOL_ELEMENT_METHODS(uint16_t)
+	POOL_ELEMENT_METHODS(uint16_t)
 public:
 	IndexBuffer();
 
-	bool init(const RenderBuffer& render_buffer, const uint32_t* indexes, size_t size)
+	bool init(const RenderBuffer& render_buffer, const uint32_t* indices, size_t size)
 	{
-		return impl_->init(render_buffer, indexes, size);
+		return impl_->init(render_buffer, indices, size);
+	}
+
+	bool init(BufferUpdateType type, const RenderBuffer& render_buffer, const uint32_t* indices, size_t size)
+	{
+		return impl_->init(type, render_buffer, indices, size);
 	}
 
 	void close()
 	{
 		impl_->close();
+	}
+
+	void update(const uint32_t* indices, size_t size)
+	{
+		impl_->update(indices, size);
+	}
+
+	void data(uint32_t* indices, size_t size) const
+	{
+		impl_->data(indices, size);
+	}
+
+	size_t size() const
+	{
+		return impl_->size();
 	}
 
 	const IndexBufferImpl* impl() const
@@ -108,6 +180,7 @@ struct LayoutElement
 	size_t offset;
 	size_t size;
 	size_t stride;
+	int datatype;
 	uint8_t position;
 };
 
@@ -221,6 +294,35 @@ public:
 	}
 private:
 	unique_ptr<UniformBufferImpl> impl_;
+};
+
+class MHE_EXPORT TextureBuffer
+{
+	POOL_ELEMENT_METHODS(uint16_t);
+public:
+	TextureBuffer();
+
+	bool init(const TextureBufferDesc& desc, size_t size, const uint8_t* data)
+	{
+		return impl_->init(desc, size, data);
+	}
+
+	void destroy()
+	{
+		impl_->destroy();
+	}
+
+	void update(const uint8_t* data)
+	{
+		impl_->update(data);
+	}
+
+	const TextureBufferImpl* impl() const
+	{
+		return impl_.get();
+	}
+private:
+	unique_ptr<TextureBufferImpl> impl_;
 };
 
 typedef RenderBuffer VertexBuffer;

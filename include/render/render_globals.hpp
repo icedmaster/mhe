@@ -14,10 +14,13 @@ struct RenderGlobals
 
 	RenderGlobals();
 };
+
+namespace global {
 extern GlobalVar<bool> gl_map_for_buffer_update;
 extern GlobalVar<bool> use_vsync;
 extern GlobalVar<float> texture_anisotropic_level;
 extern GlobalVar<bool> use_normalmaps;
+}
 
 void setup(RenderGlobals& render_globals);
 

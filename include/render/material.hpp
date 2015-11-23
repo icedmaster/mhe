@@ -17,6 +17,7 @@ struct Context;
 
 const size_t material_textures_number = 8;
 const size_t material_uniforms_number = 4;
+const size_t material_texture_buffers_number = 3;
 
 // TODO: change ShaderProgram::IdType -> ShaderInstance
 struct Material
@@ -24,12 +25,14 @@ struct Material
 	POOL_STRUCT(uint16_t);
 	TextureInstance textures[material_textures_number];
 	UniformBuffer::IdType uniforms[material_uniforms_number];
+	TextureBuffer::IdType texture_buffers[material_texture_buffers_number];
 	ShaderProgram::IdType shader_program;
 
 	Material() : shader_program(ShaderProgram::invalid_id)
 	{
 		::memset(uniforms, UniformBuffer::invalid_id, sizeof(uniforms));
 		::memset(textures, Texture::invalid_id, sizeof(textures));
+		::memset(texture_buffers, TextureBuffer::invalid_id, sizeof(texture_buffers));
 	}
 };
 
@@ -43,6 +46,9 @@ struct MaterialInstance
     MaterialInstance() : id(Material::invalid_id), material_system(invalid_material_system_id) {}
 };
 
+const float default_shininess = 50.0f;
+const float default_glossiness = 0.0f;
+
 struct MaterialRenderData
 {
 	vec3 diffuse;
@@ -51,10 +57,9 @@ struct MaterialRenderData
 	vec3 emissive;
 	float specular_shininess;
 	float glossiness;
-};
 
-const float default_shininess = 50.0f;
-const float default_glossiness = 0.5f;
+	MaterialRenderData() : specular_shininess(default_shininess), glossiness(default_glossiness) {}
+};
 
 struct MaterialData
 {
@@ -74,7 +79,7 @@ struct MaterialInitializationData
 
 typedef uint16_t MaterialId;
 
-class MaterialManager
+class MHE_EXPORT MaterialManager
 {
 public:
 	MaterialId get(const MaterialInitializationData& data) const;
@@ -86,6 +91,14 @@ public:
 		material = it->value;
 		return true;
 	}
+
+	MaterialData& material_data(MaterialId id)
+	{
+		ASSERT(materials_.find(id) != materials_.end(), "Invalid material id:" << id);
+		return materials_[id];
+	}
+
+	bool id_by_name(MaterialId& id, const string& name) const;
 
 	void set_context(Context* context)
 	{

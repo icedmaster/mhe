@@ -16,6 +16,8 @@ namespace sdl {
 
 	void SDL2WindowSystem::close()
 	{
+		if (view_.surface_ != nullptr)
+			SDL_DestroyWindow(view_.surface_);
 		SDL_Quit();
 	}
 
@@ -73,6 +75,9 @@ namespace sdl {
 
 	void SDL2WindowSystem::set_vsync_enabled(bool enabled)
 	{
-		SDL_GL_SetSwapInterval(enabled ? 1 : 0);
+		if (SDL_GL_SetSwapInterval(enabled ? 1 : 0) != 0)
+		{
+			ERROR_LOG("Can't set vsync settings:" << SDL_GetError());
+		}
 	}
 }}

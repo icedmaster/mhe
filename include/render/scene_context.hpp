@@ -18,6 +18,7 @@ struct SceneContext
 {
 	TransformPool transform_pool;
 	AABBPool aabb_pool;
+	AABBPool parts_aabb_pool;
 	NodePool node_pool;
 	LightPool light_pool;
 };

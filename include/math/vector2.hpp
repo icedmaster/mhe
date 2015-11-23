@@ -2,6 +2,7 @@
 #define _VECTOR2D_HPP_
 
 #include <ostream>
+#include "core/types_cast.hpp"
 
 namespace mhe {
 
@@ -35,6 +36,13 @@ public:
 		x_ = x; y_ = y;
 	}
 
+	template <class U>
+	void set(U x, U y)
+	{
+		x_ = static_cast<T>(x);
+		y_ = static_cast<T>(y);
+	}
+
 	inline T x() const
 	{
 		return x_;
@@ -55,6 +63,18 @@ public:
 		y_ = y;
 	}
 
+	T magnitude() const
+	{
+		return sqrt(x_ * x_ + y_ * y_);
+	}
+
+	void normalize()
+	{
+		T invm = 1.0f / magnitude();
+		x_ *= invm;
+		y_ *= invm;
+	}
+
 	inline bool operator== (const vector2& v) const
 	{
 		return ((x_ == v.x_) && (y_ == v.y_)) ? true : false;
@@ -72,6 +92,13 @@ public:
 		return *this;
 	}
 
+	vector2<T>& operator+= (const vector2& v)
+	{
+		x_ += v.x_;
+		y_ += v.y_;
+		return *this;
+	}
+
 	vector2<T>& operator*= (T v)
 	{
 		x_ *= v;
@@ -82,8 +109,8 @@ public:
 	template <class Y>
 	vector2<T> operator= (const vector2<Y>& v)
 	{
-		x_ = v.x;
-		y_ = v.y;
+		x_ = static_cast<T>(v.x());
+		y_ = static_cast<T>(v.y());
 		return *this;
 	}
 
@@ -114,9 +141,27 @@ inline vector2<T> operator* (const vector2<T>& v1, const vector2<U>& v2)
 }
 
 template <class T, class U>
+inline vector2<T> operator* (const vector2<T>& v, U t)
+{
+	return vector2<T>(v.x() * t, v.y() * t);
+}
+
+template <class T, class U>
 inline vector2<T> operator/ (const vector2<T>& v1, const vector2<U>& v2)
 {
 	return vector2<T>(v1.x() / v2.x(), v1.y() / v2.y());
+}
+
+template <class T>
+inline vector2<T> operator/ (T t, const vector2<T>& v)
+{
+	return vector2<T>(t / v.x(), t / v.y());
+}
+
+template <class T>
+inline vector2<T> floor(const vector2<T>& v)
+{
+	return vector2<T>(std::floor(v.x()), std::floor(v.y()));
 }
 
 template <class T, class U>
@@ -139,6 +184,24 @@ inline std::ostream& operator<< (std::ostream& s, const vector2<T>& v)
 
 typedef vector2<float> v2d;
 typedef vector2<float> vec2;
+
+template<>
+inline vec2 types_cast(const string& value)
+{
+	string first, second;
+	bool is_first = true;
+	for (size_t i = 0, len = value.length(); i < len; ++i)
+	{
+		if (value[i] == ' ')
+		{
+			is_first = false;
+			continue;
+		}
+		if (is_first) first += value[i];
+		else second += value[i];
+	}
+	return vec2(types_cast<float>(first), types_cast<float>(second));
+}
 }
 
 #endif

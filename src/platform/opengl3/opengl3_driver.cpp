@@ -14,9 +14,17 @@ namespace mhe {
 namespace opengl {
 
 OpenGL3ContextState::OpenGL3ContextState() :
-    depth(false), stencil(false), blend(false)
+	depth_test(false), depth_write(false), stencil(false), blend(false), scissor_test(false)
 {
-    uniforms.fill(UniformBuffer::invalid_id);
+	uniforms.fill(UniformBuffer::invalid_id);
+}
+
+OpenGL3Driver::OpenGL3Driver()
+{
+	versions_[0].first = 4; versions_[0].second = 5;
+	versions_[1].first = 4; versions_[1].second = 3;
+	versions_[2].first = 4; versions_[2].second = 2;
+	versions_[3].first = 3; versions_[3].second = 3;
 }
 
 bool OpenGL3Driver::init(DriverRenderingCapabilities& caps)
@@ -29,13 +37,23 @@ bool OpenGL3Driver::init(DriverRenderingCapabilities& caps)
 	glGetIntegerv(GL_MAJOR_VERSION, &major);
 	glGetIntegerv(GL_MINOR_VERSION, &minor);
 	INFO_LOG("OpenGL3Driver::context:" << major << "." << minor);
+	OpenGLExtensions::create_singleton();
 	OpenGLExtensions::instance().init_extensions();
 
 	current_render_target_ = nullptr;
 
 	setup_caps(caps);
 
+#ifdef MHE_OPENGL_USE_SRGB
+	glEnable(GL_FRAMEBUFFER_SRGB);
+#endif
+
 	return true;
+}
+
+void OpenGL3Driver::close()
+{
+	OpenGLExtensions::destroy_singleton();
 }
 
 void OpenGL3Driver::setup_caps(DriverRenderingCapabilities& caps)
@@ -149,6 +167,13 @@ void OpenGL3Driver::set_render_target(const RenderTarget& render_target)
 	CHECK_GL_ERRORS();
 }
 
+void OpenGL3Driver::set_texture_buffer(const TextureBuffer& texture_buffer, size_t unit)
+{
+	const OpenGL3TextureBuffer* buffer = static_cast<const OpenGL3TextureBuffer*>(texture_buffer.impl());
+	buffer->enable(current_shader_program_, unit);
+	CHECK_GL_ERRORS();
+}
+
 void OpenGL3Driver::set_default_render_target()
 {
 	if (current_render_target_ != nullptr)
@@ -166,5 +191,24 @@ void OpenGL3Driver::draw(const RenderData& data)
 		(void*)(data.ibuffer_offset * sizeof(uint32_t)), data.vbuffer_offset);
 	CHECK_GL_ERRORS();
 }
-    
+
+void OpenGL3Driver::draw(size_t /*elements_number*/, size_t vbuffer_offset, size_t ibuffer_offset, size_t indices_number, Primitive primitive)
+{
+	if (indices_number == 0)
+		return;
+
+	OpenGLExtensions::instance().glDrawElementsBaseVertex(get_primitive_type(primitive), 
+		indices_number != 0 ? indices_number : current_index_buffer_->size(), GL_UNSIGNED_INT,
+		(void*)(ibuffer_offset * sizeof(uint32_t)), vbuffer_offset);
+	CHECK_GL_ERRORS();	
+}
+
+uint OpenGL3Driver::supported_versions(pair<uint, uint>* versions, uint size) const
+{
+	uint n = min(size, ARRAY_SIZE(versions_));
+	for (uint i = 0; i < n; ++i)
+		versions[i] = versions_[i];
+	return n;
+}
+
 }}

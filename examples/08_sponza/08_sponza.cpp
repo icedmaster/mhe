@@ -9,8 +9,15 @@ public:
 		
 		mhe::NodeInstance& node = engine.scene().create_node();
 		mhe::load_node<mhe::GBufferFillMaterialSystem>(node, mhe::string("sponza.bin"), engine.context(), engine.scene_context());
+		mhe::MaterialId floor_id;
+		engine.context().material_manager.id_by_name(floor_id, mhe::string("floor"));
+		mhe::MaterialData& material = engine.context().material_manager.material_data(floor_id);
+		material.render_data.glossiness = 1.0f;
 
 		init_lighting(engine);
+
+		mhe::BlurMaterialSystem* ssr_blur = engine.context().material_systems.get<mhe::BlurMaterialSystem>(mhe::string("ssr_blur"));
+		ssr_blur->settings().size = 2.0f;
 
 		return true;
 	}
@@ -71,16 +78,18 @@ private:
 	{
         mhe::LightInstance& light_instance = engine.scene().create_light();
 		mhe::Light& light = light_instance.light;
-		light.shading().diffuse = mhe::vec4(0.5f, 0.5f, 0.5f, 1.0f);
+		light.shading().diffuse = mhe::vec4(240.0f / 255.0f, 150.0f / 255.0f, 80.0f / 255.0f, 1.0f);
 		light.shading().specular = mhe::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+		light.shading().intensity = 5.0f;
 		mhe::set_light_position(engine.scene_context(), light_instance.id, mhe::vec3(0, 2000, 0));
 		mhe::set_light_rotation(engine.scene_context(), light_instance.id, mhe::quatf(-mhe::pi_2, 0.0f, 0.0f));
 		light.set_type(mhe::Light::directional);
-		light.desc().directional.directional_shadowmap_projection_znear = 0.1f;
-		light.desc().directional.directional_shadowmap_projection_zfar = 2100.0f;
-		light.desc().directional.directional_shadowmap_projection_height = 2000.0;
-		light.desc().directional.directional_shadowmap_projection_width = 2000.0;
+		light.desc().directional.directional_shadowmap_projection_znear = 10.0f;
+		light.desc().directional.directional_shadowmap_projection_zfar = 2200.0f;
+		light.desc().directional.directional_shadowmap_projection_height = 2500.0;
+		light.desc().directional.directional_shadowmap_projection_width = 2500.0;
 		light.desc().cast_shadows = true;
+		light.desc().shadowmap_bias = 0.002;
 		light_instance.enabled = true;
 	}
 
@@ -133,7 +142,8 @@ int main(int /*argc*/, char** /*argv*/)
 	config.render_config_filename = mhe::utils::path_join(config.assets_path, "render.xml");
 	app.init(config);
 
-	app.engine().renderer()->set_ambient_color(mhe::color_white * 0.5f);
+	app.engine().renderer()->set_ambient_color(mhe::color_white * 0.35f);
+	//mhe::game::get_global_vars().set("use_normalmaps", false);
 
 	mhe::game::GameSceneDesc desc;
 	GameScene* game_scene = new GameScene;

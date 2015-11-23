@@ -6,6 +6,7 @@
 #include "render/context.hpp"
 #include "render/material_system.hpp"
 #include "render/renderer.hpp"
+#include "debug/profiler.hpp"
 
 namespace mhe {
 
@@ -35,6 +36,26 @@ struct LightSortHelper
 		return light1.light.type() < light2.light.type();
 	}
 };
+
+size_t check_visibility(bool* visibility, const AABBPool& /*parents*/, const AABBPool& parts, const mat4x4& mat)
+{
+	frustumf f;
+	f.set(mat);
+	const planef* planes = f.planes();
+	const planef abs_planes[6] = {abs(planes[0]), abs(planes[1]), abs(planes[2]),
+		abs(planes[3]), abs(planes[4]), abs(planes[5])};
+	AABBInstance* aabbs = parts.all_objects();
+	size_t size = parts.size();
+	size_t total = 0;
+	size_t visible = 0;
+	for (size_t i = 0; i < size; ++i)
+	{
+		bool is_visible = is_inside(aabbs[i].aabb, planes, abs_planes);
+		visibility[total++] = is_visible;
+		visible += static_cast<size_t>(is_visible);
+	}
+	return visible;
+}
 
 }
 
@@ -80,9 +101,7 @@ void Scene::update(RenderContext& render_context)
     {
         camera_controller_->update(render_context);
         const Camera& camera = camera_controller_->camera();
-        camera.get(render_context.view, render_context.proj, render_context.vp);
-        render_context.viewpos = camera.position();
-		render_context.inv_vp = render_context.vp.inverted();
+        camera.get(render_context.main_camera);
 
         frustum_culling();
     }
@@ -102,10 +121,26 @@ void Scene::update(RenderContext& render_context)
     visible_nodes_ = visible_nodes;
     stats_.update_nodes(nodes_number, visible_nodes);
 
+	update_scene_aabb(render_context);
+
 	render_context.nodes = nodes;
 	render_context.nodes_number = visible_nodes;
 
     update_light_sources(render_context);
+}
+
+void Scene::process_requests(RenderContext& render_context)
+{
+	ProfilerElement pe("scene.process_requests");
+	for (size_t i = 0; i < max_views_number; ++i)
+	{
+		ViewId id = static_cast<ViewId>(i);
+		if (!render_context.render_view_requests.is_frustum_culling_request_active(id))
+			continue;
+		FrustumCullingRequestData& request_data = render_context.render_view_requests.frustum_culling_request_data(id);
+		bool* visibility = &request_data.result.visibility[0];
+		request_data.result.visible = check_visibility(visibility, scene_context_.aabb_pool, scene_context_.parts_aabb_pool, request_data.request.vp);
+	}
 }
 
 size_t Scene::nodes(NodeInstance*& nodes, size_t& offset, size_t material_system) const
@@ -138,10 +173,11 @@ void Scene::update_light_sources(RenderContext& render_context)
 	size_t size = 0;
 	for (size_t i = 0; i < scene_context_.light_pool.size(); ++i, ++size)
 	{
+		lights[i].light.set_shadow_info(nullptr);
 		if (!lights[i].enabled)
 			break;
 	}
-    render_context.lights_number = min(size, global_max_lights_number_.value());
+	render_context.lights_number = min(size, global_max_lights_number_.value());
 }
 
 void Scene::frustum_culling()
@@ -160,7 +196,7 @@ void Scene::frustum_culling()
 			aabbs[i].visible = visible;
 			visible_aabbs += static_cast<size_t>(visible);
 		}
-		
+		parts_frustum_culling(planes, abs_planes);
 	}
 	else
 	{
@@ -174,6 +210,53 @@ void Scene::frustum_culling()
 	}
 	visible_aabbs_ = visible_aabbs;
     stats_.update_aabbs(scene_context_.aabb_pool.size(), visible_aabbs);
+}
+
+void Scene::parts_frustum_culling(const planef* planes, const planef* abs_planes)
+{
+	const AABBPool& parents_pool = scene_context_.aabb_pool;
+	AABBInstance* aabbs = scene_context_.parts_aabb_pool.all_objects();
+	size_t aabbs_number = scene_context_.parts_aabb_pool.size();
+	for (size_t i = 0; i < aabbs_number; ++i)
+	{
+		if (aabbs[i].parent_id != AABBInstance::invalid_id && !parents_pool.get(aabbs[i].parent_id).visible)
+			aabbs[i].visible = false;
+		else
+			aabbs[i].visible = is_inside(aabbs[i].aabb, planes, abs_planes);
+	}
+
+	size_t parts = 0, parts_visible = 0;
+	NodeInstance* nodes = scene_context_.node_pool.all_objects();
+	size_t nodes_number = scene_context_.node_pool.size();
+	const AABBPool& parts_aabb_pool = scene_context_.parts_aabb_pool;
+	for (size_t i = 0; i < nodes_number; ++i)
+	{
+		for (size_t j = 0, size = nodes[i].mesh.instance_parts.size(); j < size; ++j, ++parts)
+		{
+			if (nodes[i].mesh.instance_parts[j].aabb_id != AABBInstance::invalid_id)
+				nodes[i].mesh.instance_parts[j].visible = parts_aabb_pool.get(nodes[i].mesh.instance_parts[j].aabb_id).visible;
+			else nodes[i].mesh.instance_parts[j].visible = true;
+			parts_visible += static_cast<size_t>(nodes[i].mesh.instance_parts[j].visible);
+		}
+	}
+	stats_.update_parts(parts, parts_visible);
+}
+
+void Scene::update_scene_aabb(RenderContext& render_context) const
+{
+	vec3 aabb_min(9999999.0f, 9999999.0f, 9999999.0f);
+	vec3 aabb_max(-9999999.0f, -9999999.0f, -9999999.0f);
+
+	// Check aabbs for lights as well. Probably it'd be a good idea to create the additional AABB pool for lights only
+	AABBInstance* aabbs = scene_context_.aabb_pool.all_objects();
+	for (size_t i = 0; i < visible_aabbs_; ++i)
+	{
+		vec3 cur_min, cur_max;
+		aabbs[i].aabb.min_max(cur_min, cur_max);
+		aabb_min = min(cur_min, aabb_min);
+		aabb_max = max(cur_max, aabb_max);
+	}
+	render_context.aabb = AABBf::from_min_max(aabb_min, aabb_max);
 }
 
 }
