@@ -363,4 +363,11 @@ void OpenGL3TextureBuffer::disable() const
 	glBindTexture(GL_TEXTURE_BUFFER, 0);
 }
 
+void OpenGL3TextureBuffer::data(uint8_t* ptr, size_t size) const
+{
+	vbo_.enable();
+	vbo_.data(ptr, size);
+	vbo_.disable();
+}
+
 }}

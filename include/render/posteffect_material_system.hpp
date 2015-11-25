@@ -51,7 +51,7 @@ private:
 
 class PosteffectMaterialSystemBase : public MaterialSystem
 {
-	static const size_t max_textures_number = 4;
+	static const size_t max_textures_number = 5;
 	static const size_t invalid_index = static_cast<size_t>(-1);
 public:
 	PosteffectMaterialSystemBase(const char* name);

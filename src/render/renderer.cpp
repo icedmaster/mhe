@@ -399,6 +399,7 @@ bool load_node(NodeInstance& node, const string& name, const char* material_syst
 		ModelContext& model_context = model_contexts[i];
 		model_context.transform_uniform = node.mesh.shared_uniform;
 		model_context.animation_texture_buffer = node.mesh.skeleton_instance.texture_buffer;
+		model_context.baked_light_texture_buffer = node.mesh.gi_data.texture_buffer;
 		AABBInstance& part_aabb_instance = create_and_get(scene_context.parts_aabb_pool);
 		part_aabb_instance.aabb = node.mesh.mesh.parts[i].aabb;
 		node.mesh.instance_parts[i].aabb_id = part_aabb_instance.id;

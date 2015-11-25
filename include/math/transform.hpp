@@ -106,7 +106,8 @@ public:
 		res.set_row(3, vec3::zero());
 		res *= zaxis_rotation.to_matrix<mat4x4>();
 		res.transpose();
-		res.set_row(3, -position_ * res);
+		//res.set_row(3, -position_ * res);
+		res.multTranslate(-position_);
 		return res;
 	}
 

@@ -169,6 +169,12 @@ public:
 
 	void enable(const OpenGL3ShaderProgram* shader_program, size_t unit) const;
 	void disable() const;
+
+	void data(uint8_t* ptr, size_t size) const override;
+	size_t size() const override
+	{
+		return vbo_.size();
+	}
 private:
 	VBO vbo_;
 	GLuint tex_id_;

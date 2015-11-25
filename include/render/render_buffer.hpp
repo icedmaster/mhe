@@ -77,6 +77,8 @@ public:
 	virtual bool init(const TextureBufferDesc& desc, size_t size, const uint8_t* data) = 0;
 	virtual void destroy() = 0;
 	virtual void update(const uint8_t* data) = 0;
+	virtual void data(uint8_t* indices, size_t size) const = 0;
+	virtual size_t size() const = 0;
 };
 
 class MHE_EXPORT RenderBuffer
@@ -254,7 +256,7 @@ inline void create_uniform_buffer_element(UniformBufferDesc& desc, const char* n
 class MHE_EXPORT UniformBuffer
 {
 	friend class Driver;
-    POOL_ELEMENT_METHODS(uint16_t)
+	POOL_ELEMENT_METHODS(uint16_t)
 public:
 	UniformBuffer();
 	bool init(const UniformBufferDesc& desc)
@@ -315,6 +317,16 @@ public:
 	void update(const uint8_t* data)
 	{
 		impl_->update(data);
+	}
+
+	size_t size() const
+	{
+		return impl_->size();
+	}
+
+	void data(uint8_t* ptr, size_t size) const
+	{
+		impl_->data(ptr, size);
 	}
 
 	const TextureBufferImpl* impl() const
