@@ -628,6 +628,7 @@ void process_scene(const char* out_filename, const aiScene* assimp_scene, const 
 			filename = filename.empty() ? filename : mhe::utils::path_join(params.texture_path, mhe::utils::get_file_name_with_extension(filename));
 			material_data.albedo_texture.name = filename;
 			material_data.albedo_texture.mode = static_cast<uint8_t>(map_mode);
+			INFO_LOG("Found an albedo texture:" << filename);
 		}
 
 		if (material->GetTexture(aiTextureType_HEIGHT, 0, &path, 0, 0, 0, 0, &map_mode) == aiReturn_SUCCESS)
@@ -637,6 +638,7 @@ void process_scene(const char* out_filename, const aiScene* assimp_scene, const 
 			filename = filename.empty() ? filename : mhe::utils::path_join(params.texture_path, mhe::utils::get_file_name_with_extension(filename));
 			material_data.normalmap_texture.name = filename;
 			material_data.normalmap_texture.mode = static_cast<uint8_t>(map_mode);
+			INFO_LOG("Found a normalmap texture:" << filename);
 		}
 	}
 

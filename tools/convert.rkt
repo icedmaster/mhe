@@ -3,7 +3,7 @@
 (require racket/path)
 
 (define mhe_working_directory "../bin/Debug/")
-(define exporter_cmdline "\"../../tools/meshconverter/build/Debug/meshconverter.exe\" ~a ~a /textures")
+(define exporter_cmdline "\"../../tools/meshconverter/build/Debug/meshconverter.exe\" ~a ~a")
 (define binary_extension "bin")
 
 ;; Put in the same directory with the same name but the extension changed to .bin

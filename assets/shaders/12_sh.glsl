@@ -67,5 +67,7 @@ layout (location = 0) out vec4 color;
 void main()
 {
 	vec3 nrm_ts = vec3(0, 0, 1);
-	color = vec4(calculate_irradiance(nrm_ts, vsoutput.baked_radiance), 1);
+	vec3 irradiance = calculate_irradiance(nrm_ts, vsoutput.baked_radiance);
+	vec3 albedo = texture(diffuse_texture, vsoutput.tex).rgb;
+	color = vec4(irradiance * albedo, 4);
 }
