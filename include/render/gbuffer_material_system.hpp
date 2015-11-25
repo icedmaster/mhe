@@ -18,7 +18,7 @@ struct LightInstance;
 struct LightData;
 struct DirectionalLightData;
 
-const size_t gbuffer_depth_render_target_index = 2;
+const size_t gbuffer_depth_render_target_index = 3;
 
 class AbstractGBufferFillMaterialSystem : public MaterialSystem
 {

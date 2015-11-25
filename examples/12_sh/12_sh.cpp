@@ -2,6 +2,7 @@
 
 //#define NSIGHT
 //#define DISABLE_DEPTH_TEST
+#define BAKE_LIGHT
 
 namespace sh
 {
@@ -273,7 +274,7 @@ using namespace mhe;
 class MeshBaker
 {
 	static const size_t texture_size = 64;
-	static const size_t bounces = 3;
+	static const size_t bounces = 1;
 
 	struct DepthWriteShaderData
 	{
@@ -690,7 +691,7 @@ private:
 			}
 		}
 
-		float factor = 4 * 0.5f * pi / weight_total;
+		float factor = 4 * 0.25f * pi / weight_total;
 		return res * factor;
 	}
 
@@ -755,8 +756,29 @@ public:
 		texture_buffer.init(desc, vbuffer.size() / sizeof(mhe::StandartGeometryLayout::Vertex) * sh::ColorSH::coefficients_number * sizeof(sh::ColorSH::datatype), nullptr);
 		texture_buffer_ = &texture_buffer;
 
-		renderer_ = static_cast<mhe::DeferredRenderer*>(engine.renderer());
-		renderer_->disable();
+#ifdef BAKE_LIGHT
+		// manually set baked light data for each mesh part instance
+		for (size_t i = 0, size = node.mesh.instance_parts.size(); i < size; ++i)
+		{
+			Material& material = engine.context().materials[node.mesh.instance_parts[i].material.material_system].get(node.mesh.instance_parts[i].material.id);
+			material.texture_buffers[mhe::baked_light_texture_unit] = texture_buffer.id();
+		}
+#endif
+
+		mhe::LightInstance& light_instance = engine.scene().create_light();
+		mhe::Light& light = light_instance.light;
+		light.shading().diffuse = mhe::vec4(240.0f / 255.0f, 150.0f / 255.0f, 80.0f / 255.0f, 1.0f);
+		light.shading().specular = mhe::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+		light.shading().intensity = 5.0f;
+		mhe::set_light_position(engine.scene_context(), light_instance.id, mhe::vec3(0, 20.0f, 0.0f));
+		mhe::set_light_rotation(engine.scene_context(), light_instance.id, mhe::quatf(-mhe::pi_2 * 1.5f, -pi_2 * 0.5f, 0.0f));
+		light.set_type(mhe::Light::directional);
+		light.desc().cast_shadows = true;
+		light.desc().shadowmap_bias = 0.005f;
+		light_instance.enabled = true;
+
+		//renderer_ = static_cast<mhe::DeferredRenderer*>(engine.renderer());
+		//renderer_->disable();
 		// update the renderer once to update all nodes' transformations
 		//renderer_->update(engine.scene_context());
 
@@ -773,7 +795,9 @@ public:
 #endif
 		{
 			//engine.context().driver.begin_render();
+#ifdef BAKE_LIGHT
 			mesh_baker.bake(texture_buffer, node);
+#endif
 			//engine.context().driver.end_render();
 			//engine.context().window_system.swap_buffers();
 		}
@@ -788,6 +812,8 @@ public:
 
 	void draw(mhe::game::Engine& engine) override
 	{
+		return;
+
 		mhe::Context& context = engine.context();
 
 		for (size_t i = 0, size = node_->mesh.instance_parts.size(); i < size; ++i)
@@ -906,6 +932,9 @@ int main(int /*argc*/, char** /*argv*/)
 	camera_controller->set_move_speed(75.0f);
 	camera_controller->set_rotation_speed(50.0f);
 	app.engine().scene().set_camera_controller(camera_controller);
+
+	//app.engine().renderer()->set_ambient_color(mhe::color_black);
+	app.engine().renderer()->set_ambient_color(mhe::color_white * 0.5f);
 
 	return app.run();
 }

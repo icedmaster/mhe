@@ -18,9 +18,11 @@ GBufferFillMaterialSystem::GBufferFillMaterialSystem() :
 	gbuffer_desc_.width = gbuffer_desc_.height = 0;
 	gbuffer_desc_.color_datatype[0] = format_ubyte;
 	gbuffer_desc_.color_datatype[1] = format_float;
+	gbuffer_desc_.color_datatype[2] = format_float;
 	gbuffer_desc_.color_format[0] = format_rgba;
 	gbuffer_desc_.color_format[1] = format_rgba16f;
-	gbuffer_desc_.color_targets = 2;
+	gbuffer_desc_.color_format[2] = format_rgba16f;
+	gbuffer_desc_.color_targets = 3;
 	gbuffer_desc_.depth_format = format_d24f;
 	gbuffer_desc_.depth_datatype = format_float;
 	gbuffer_desc_.use_depth = true;
@@ -70,6 +72,8 @@ void GBufferFillMaterialSystem::setup(Context& context, SceneContext& scene_cont
 		if (use_skinning)
 			material.texture_buffers[animation_texture_unit] = model_contexts[i].animation_texture_buffer;
 
+		material.texture_buffers[baked_light_texture_unit] = model_contexts[i].baked_light_texture_buffer;
+
 		UberShader::Index index;
 		index.set(normalmap_info, use_normalmap);
 		index.set(skinning_info, use_skinning);
@@ -111,6 +115,7 @@ void GBufferFillMaterialSystem::update(Context& context, SceneContext& /*scene_c
 	UberShader& shader = ubershader(context);
 	const UberShader::Info& normalmap_info = shader.info("NORMALMAP");
 	const UberShader::Info& skinning_info = shader.info("SKINNING");
+	const UberShader::Info& baked_light_info = shader.info("BAKED_LIGHT");
 	UberShader::Index index;
 	clear_command_.reset();
 	for (size_t i = 0; i < count; ++i)
@@ -119,8 +124,10 @@ void GBufferFillMaterialSystem::update(Context& context, SceneContext& /*scene_c
 		material.uniforms[perframe_data_unit] = render_context.main_camera.percamera_uniform;
 		size_t use_normalmap = material.textures[normal_texture_unit].id != Texture::invalid_id && global::use_normalmaps.value() ? 1 : 0;
 		size_t use_skinning = material.texture_buffers[animation_texture_unit] != TextureBuffer::invalid_id ? 1 : 0;
+		size_t use_baked_light = material.texture_buffers[baked_light_texture_unit] != TextureBuffer::invalid_id ? 1 : 0;
 		index.set(normalmap_info, use_normalmap);
 		index.set(skinning_info, use_skinning);
+		index.set(baked_light_info, use_baked_light);
 		material.shader_program = shader.get(index);
 
 #ifdef MHE_UPDATE_MATERIAL
