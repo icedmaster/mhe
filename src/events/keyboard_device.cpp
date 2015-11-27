@@ -15,16 +15,37 @@ KeyboardDevice::KeyboardDevice(const std::string& name) :
 
 void KeyboardDevice::check_impl(Device::events_vector& events, const WindowSystem& ws)
 {
+	::memset(was_pressed_, 0, sizeof(was_pressed_));
+	::memset(was_released_, 0, sizeof(was_released_));
 	impl_->check(events, ws);
 	for (size_t i = 0; i < events.size(); ++i)
+	{
 		// for KeyboardEvent optarg() == sym() and arg() == state()
 		// see keyboard_event.hpp
-		keys_[events[i]->optarg()] = (events[i]->arg() == KeyboardEvent::key_down) ? true : false;
+		bool pressed = (events[i]->arg() == KeyboardEvent::key_down) ? true : false;
+		int sym = events[i]->optarg();
+		if (pressed != keys_[sym])
+		{
+			if (pressed) was_pressed_[sym] = true;
+			else was_released_[sym] = true;
+		}
+		keys_[sym] = pressed;
+	}
+}
+
+bool KeyboardDevice::is_key_down(int sym) const
+{
+	return keys_[sym];
 }
 
 bool KeyboardDevice::is_key_pressed(int sym) const
 {
-	return keys_[sym];
+	return was_pressed_[sym];
+}
+
+bool KeyboardDevice::is_key_released(int sym) const
+{
+	return was_released_[sym];
 }
 
 

@@ -102,7 +102,10 @@ public:
 		renderer_debug_mode_none,
 		renderer_debug_mode_main,
 		renderer_debug_mode_shadows,
-		renderer_debug_mode_posteffect
+		renderer_debug_mode_posteffect,
+		renderer_debug_mode_albedo,
+		renderer_debug_mode_normal,
+		renderer_debug_mode_baked_irradiance
 	};
 public:
 	Renderer(Context& context);

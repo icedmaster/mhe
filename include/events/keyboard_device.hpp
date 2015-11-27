@@ -103,12 +103,16 @@ enum
 };
 public:
 	KeyboardDevice(const std::string& name);
+	bool is_key_down(int sym) const;
 	bool is_key_pressed(int sym) const;
+	bool is_key_released(int sym) const;
 private:
 	void check_impl(Device::events_vector& events, const WindowSystem&);
 
 	unique_ptr<KeyboardDeviceImpl> impl_;
 	bool keys_[300];
+	bool was_pressed_[300];
+	bool was_released_[300];
 };
 
 }

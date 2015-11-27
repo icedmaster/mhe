@@ -117,7 +117,7 @@ void PosteffectDebugMaterialSystem::update(Context& context, SceneContext& /*sce
 
 	clear_command_.reset();
 
-	if (textures_number_ == 1) // can draw fullscreen
+	if (textures_number_ <= 1) // can draw fullscreen. textures_number_ can be 0
 	{
 		Material& material = context.materials[id()].get(fullscreen_mesh_.instance_parts[0].material.id);
 		size_t texture_index = textures_[0].id == Texture::invalid_id ? max_textures_number - 1 : 0;

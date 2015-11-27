@@ -18,6 +18,7 @@ void DebugViews::init(EventManager& event_manager)
 	event_manager.add_bind("standart_stats", keyboard_event_type, KeyboardEvent::key_down, KeyboardDevice::key_f3);
 	event_manager.add_bind("debug_ssr", keyboard_event_type, KeyboardEvent::key_down, KeyboardDevice::key_f4);
 	event_manager.add_bind("debug_ssao", keyboard_event_type, KeyboardEvent::key_down, KeyboardDevice::key_f5);
+	event_manager.add_bind("debug_baked_irradiance", keyboard_event_type, KeyboardEvent::key_down, KeyboardDevice::key_f6);
 
 	stats_enabled_ = false;
 
@@ -82,6 +83,18 @@ void DebugViews::update()
 			new_mode = Renderer::renderer_debug_mode_posteffect;
 			posteffect_debug_mode_ = posteffect_ssao;
 			material_system_id = posteffect_id_[posteffect_ssao];
+		}
+	}
+	else if (engine_.event_manager().check_bind("debug_baked_irradiance"))
+	{
+		if (current_mode == Renderer::renderer_debug_mode_baked_irradiance)
+		{
+			new_mode = Renderer::renderer_debug_mode_none;
+			posteffect_debug_mode_ = posteffect_max;
+		}
+		else
+		{
+			new_mode = Renderer::renderer_debug_mode_baked_irradiance;
 		}
 	}
 
