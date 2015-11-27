@@ -3,6 +3,7 @@
 //#define NSIGHT
 //#define DISABLE_DEPTH_TEST
 #define BAKE_LIGHT
+#define BOUNCES 1
 
 namespace sh
 {
@@ -274,7 +275,7 @@ using namespace mhe;
 class MeshBaker
 {
 	static const size_t texture_size = 64;
-	static const size_t bounces = 1;
+	static const size_t bounces = BOUNCES;
 
 	struct DepthWriteShaderData
 	{
@@ -404,29 +405,20 @@ private:
 
 		for (size_t i = 0, size = vertices.size(); i < size; ++i)
 		{
-			size_t iter = 1;
-			if (i == 117)
-			{
-				iter = 1;
-				std::cout << "aa\n";
-			}
-			for (size_t j = 0; j < iter; ++j)
-			{
-				const vec3& vertex_position = vertices[i].pos;
-				const vec3& vertex_normal = vertices[i].nrm;
-				vec3 x, y, z;
-				z = vertex_normal;
-				x = vertices[i].tng.xyz();
-				y = cross(z, x) * vertices[i].tng.w();
+			const vec3& vertex_position = vertices[i].pos;
+			const vec3& vertex_normal = vertices[i].nrm;
+			vec3 x, y, z;
+			z = vertex_normal;
+			x = vertices[i].tng.xyz();
+			y = cross(z, x) * vertices[i].tng.w();
 
-				context_->driver.begin_render();
-				const sh::ColorSH& harmonics = render(iteration, texture_buffer, draw_call, x, y, z, vertex_position, node_instance);
-				memcpy(data_ptr + i * stride, harmonics.coeff.data(), stride * sizeof(float));
+			context_->driver.begin_render();
+			const sh::ColorSH& harmonics = render(iteration, texture_buffer, draw_call, x, y, z, vertex_position, node_instance);
+			memcpy(data_ptr + i * stride, harmonics.coeff.data(), stride * sizeof(float));
 
-				//show_gui(iteration, 0, i);
-				context_->driver.end_render();
-				context_->window_system.swap_buffers();
-			}
+			//show_gui(iteration, 0, i);
+			context_->driver.end_render();
+			context_->window_system.swap_buffers();
 		}
 
 		if (iteration >= 2)
@@ -691,7 +683,7 @@ private:
 			}
 		}
 
-		float factor = 4 * 0.25f * pi / weight_total;
+		float factor = 4 * pi * 0.5f / weight_total;
 		return res * factor;
 	}
 
@@ -733,10 +725,12 @@ class GameScene : public mhe::game::GameScene
 public:
 	bool init(mhe::game::Engine& engine, const mhe::game::GameSceneDesc& /*desc*/) override
 	{
+		use_baked_lighting_ = true;
 		init_render_data(engine);
 
 		mhe::NodeInstance& node = engine.scene().create_node();
 		mhe::load_node<mhe::GBufferFillMaterialSystem>(node, mhe::string("lighting-test-simple.bin"), engine.context(), engine.scene_context());
+		//mhe::load_node<mhe::GBufferFillMaterialSystem>(node, mhe::string("sponza.bin"), engine.context(), engine.scene_context());
 		node_ = &node;
 
 		node.mesh.gi_data.texture_buffer = engine.context().texture_buffer_pool.create();
@@ -774,7 +768,7 @@ public:
 		mhe::set_light_rotation(engine.scene_context(), light_instance.id, mhe::quatf(-mhe::pi_2 * 1.5f, -pi_2 * 0.5f, 0.0f));
 		light.set_type(mhe::Light::directional);
 		light.desc().cast_shadows = true;
-		light.desc().shadowmap_bias = 0.005f;
+		light.desc().shadowmap_bias = 0.0125f;
 		light_instance.enabled = true;
 
 		//renderer_ = static_cast<mhe::DeferredRenderer*>(engine.renderer());
@@ -797,6 +791,8 @@ public:
 			//engine.context().driver.begin_render();
 #ifdef BAKE_LIGHT
 			mesh_baker.bake(texture_buffer, node);
+#else
+			use_baked_lighting_ = false;
 #endif
 			//engine.context().driver.end_render();
 			//engine.context().window_system.swap_buffers();
@@ -807,6 +803,12 @@ public:
 
 	bool update(mhe::game::Engine& engine) override
 	{
+		if (engine.event_manager().keyboard()->is_key_pressed(mhe::KeyboardDevice::key_b))
+		{
+			use_baked_lighting_ ^= 1;
+			GBufferFillMaterialSystem* gbuffer_fill_material_system = engine.context().material_systems.get<GBufferFillMaterialSystem>();
+			gbuffer_fill_material_system->enable_baked_lighting(use_baked_lighting_);
+		}
 		return true;
 	}
 
@@ -900,6 +902,9 @@ private:
 
 	// baker
 	MeshBaker mesh_baker;
+
+	// options
+	bool use_baked_lighting_;
 };
 
 int main(int /*argc*/, char** /*argv*/)
@@ -934,7 +939,7 @@ int main(int /*argc*/, char** /*argv*/)
 	app.engine().scene().set_camera_controller(camera_controller);
 
 	//app.engine().renderer()->set_ambient_color(mhe::color_black);
-	app.engine().renderer()->set_ambient_color(mhe::color_white * 0.5f);
+	app.engine().renderer()->set_ambient_color(mhe::color_white * 0.6f);
 
 	return app.run();
 }

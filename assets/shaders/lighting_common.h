@@ -46,7 +46,7 @@ struct Light
 vec3 lambert(vec3 diffuse, vec3 material_diffuse, vec3 lightdir, vec3 normal)
 {
 	float ndotl = dot(lightdir, normal);
-	return diffuse * material_diffuse * saturate(ndotl);
+	return diffuse * material_diffuse * saturate(ndotl) / 3.14159265359f;
 }
 
 vec3 blinn(vec3 specular, vec3 material_specular, vec3 lightdir, vec3 normal, vec3 viewdir, float shininess, vec3 env_color)

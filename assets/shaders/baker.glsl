@@ -64,5 +64,5 @@ void main()
 	vec3 baked_irradiance = vec3(1, 1, 1);
 #endif
 	vec3 albedo = texture(diffuse_texture, vsoutput.tex).rgb;
-	color = vec4(albedo * baked_irradiance, 1);
+	color = vec4(gl_FrontFacing ? albedo * baked_irradiance : VEC3_ZERO, 1);
 }

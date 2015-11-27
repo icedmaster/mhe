@@ -27,7 +27,7 @@ uniform tonemap_parameters
 #define GAMMA(p) p.x
 
 [sampler2D main_texture 0]
-[sampler2D depth_texture 2]
+[sampler2D depth_texture 3]
 
 in VSOutput vsoutput;
 

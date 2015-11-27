@@ -3,6 +3,7 @@
 #include "core/assert.hpp"
 #include "render/context.hpp"
 #include "render/posteffect_material_system.hpp"
+#include "render/uniforms.hpp"
 
 namespace mhe {
 
@@ -85,6 +86,14 @@ void DeferredRenderer::debug_mode_changed(DebugMode mode, MaterialSystemId mater
 	{
 		debug_material_system->set_render_target(context().render_target_pool.get(gbuffer_fill_material_system_->render_target()));
 		debug_material_system->set_texture(2, gbuffer_light_material_system_->lighting_texture());
+		debug_material_system->enable();
+	}
+	else if (mode == Renderer::renderer_debug_mode_baked_irradiance)
+	{
+		RenderTarget& render_target = context().render_target_pool.get(gbuffer_fill_material_system_->render_target());
+		TextureInstance baked_irradiance_texture;
+		render_target.color_texture(baked_irradiance_texture, baked_light_texture_unit);
+		debug_material_system->set_texture(0, baked_irradiance_texture);
 		debug_material_system->enable();
 	}
 }

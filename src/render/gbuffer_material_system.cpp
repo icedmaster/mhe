@@ -12,7 +12,8 @@
 namespace mhe {
 
 GBufferFillMaterialSystem::GBufferFillMaterialSystem() :
-	profile_command_("gbuffer_fill")
+	profile_command_("gbuffer_fill"),
+	use_baked_lighting_(true)
 {
 	gbuffer_desc_.target = rt_readwrite;
 	gbuffer_desc_.width = gbuffer_desc_.height = 0;
@@ -124,7 +125,7 @@ void GBufferFillMaterialSystem::update(Context& context, SceneContext& /*scene_c
 		material.uniforms[perframe_data_unit] = render_context.main_camera.percamera_uniform;
 		size_t use_normalmap = material.textures[normal_texture_unit].id != Texture::invalid_id && global::use_normalmaps.value() ? 1 : 0;
 		size_t use_skinning = material.texture_buffers[animation_texture_unit] != TextureBuffer::invalid_id ? 1 : 0;
-		size_t use_baked_light = material.texture_buffers[baked_light_texture_unit] != TextureBuffer::invalid_id ? 1 : 0;
+		size_t use_baked_light = use_baked_lighting_ && material.texture_buffers[baked_light_texture_unit] != TextureBuffer::invalid_id ? 1 : 0;
 		index.set(normalmap_info, use_normalmap);
 		index.set(skinning_info, use_skinning);
 		index.set(baked_light_info, use_baked_light);
