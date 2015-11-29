@@ -54,6 +54,11 @@ public:
 	{
 		use_baked_lighting_ = enable;
 	}
+
+	void enable_normalmapping(bool enable)
+	{
+		use_normalmapping_ = enable;
+	}
 private:
 	void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
 	void update(Context& context, SceneContext& scene_context, RenderContext& render_context, MeshPartInstance* parts_instances, MeshPart* parts, size_t count);
@@ -66,6 +71,7 @@ private:
 	RenderTargetDesc gbuffer_desc_;
 	RenderTarget::IdType render_target_;
 	bool use_baked_lighting_;
+	bool use_normalmapping_;
 };
 
 class MHE_EXPORT GBufferDrawMaterialSystem : public AbstractGBufferUseMaterialSystem

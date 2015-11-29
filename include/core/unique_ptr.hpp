@@ -69,6 +69,13 @@ public:
 	{
 		return ptr_ != nullptr;
 	}
+
+#ifdef MHE_CPP11
+	bool operator!= (nullptr_t p) const
+	{
+		return ptr_ != p;
+	}
+#endif
 private:
 	unique_ptr(const unique_ptr&);
 	unique_ptr& operator= (const unique_ptr&);

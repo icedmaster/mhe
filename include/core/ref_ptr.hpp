@@ -88,6 +88,13 @@ public:
 		return ptr_ != ptr.ptr_;
 	}
 
+#ifdef MHE_CPP11
+	bool operator!= (std::nullptr_t p)
+	{
+		return ptr_ != p;
+	}
+#endif
+
 	operator bool() const
 	{
 		return ptr_ != nullptr;

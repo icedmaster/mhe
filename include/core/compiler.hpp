@@ -9,6 +9,7 @@
 #define MHE_EXPORT __declspec( dllexport )
 #if _MSC_VER > 1000
 #define MHE_CPP11
+#define MHE_COMPILER_HAS_NULLPTR
 #endif
 #else
 #define MHE_GCC

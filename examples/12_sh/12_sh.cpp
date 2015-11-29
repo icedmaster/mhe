@@ -683,7 +683,8 @@ private:
 			}
 		}
 
-		float factor = 4 * pi * 0.5f / weight_total;
+		float factor = 4 * pi * 0.833f / weight_total;
+		factor *= 0.5f;
 		return res * factor;
 	}
 
@@ -725,7 +726,11 @@ class GameScene : public mhe::game::GameScene
 public:
 	bool init(mhe::game::Engine& engine, const mhe::game::GameSceneDesc& /*desc*/) override
 	{
+		TextureInstance normalmap;
+		engine.context().texture_manager.get(normalmap, mhe::string("normalmaps/test-nm.tga"));
+
 		use_baked_lighting_ = true;
+		use_normalmapping_ = true;
 		init_render_data(engine);
 
 		mhe::NodeInstance& node = engine.scene().create_node();
@@ -756,6 +761,7 @@ public:
 		{
 			Material& material = engine.context().materials[node.mesh.instance_parts[i].material.material_system].get(node.mesh.instance_parts[i].material.id);
 			material.texture_buffers[mhe::baked_light_texture_unit] = texture_buffer.id();
+			material.textures[mhe::normal_texture_unit] = normalmap;
 		}
 #endif
 
@@ -808,6 +814,13 @@ public:
 			use_baked_lighting_ ^= 1;
 			GBufferFillMaterialSystem* gbuffer_fill_material_system = engine.context().material_systems.get<GBufferFillMaterialSystem>();
 			gbuffer_fill_material_system->enable_baked_lighting(use_baked_lighting_);
+		}
+
+		if (engine.event_manager().keyboard()->is_key_pressed(mhe::KeyboardDevice::key_n))
+		{
+			use_normalmapping_ ^= 1;
+			GBufferFillMaterialSystem* gbuffer_fill_material_system = engine.context().material_systems.get<GBufferFillMaterialSystem>();
+			gbuffer_fill_material_system->enable_normalmapping(use_normalmapping_);
 		}
 		return true;
 	}
@@ -905,6 +918,7 @@ private:
 
 	// options
 	bool use_baked_lighting_;
+	bool use_normalmapping_;
 };
 
 int main(int /*argc*/, char** /*argv*/)
