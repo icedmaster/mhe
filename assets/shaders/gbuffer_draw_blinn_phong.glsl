@@ -208,9 +208,11 @@ void main()
 
 	vec2 shadowmap_coord_offset = vec2(0.0f, 0.0f);
 	vec2 shadowmap_coord_scale = vec2(1.0f, 1.0f);
+	float bias_scale = 1.0f;
 	#ifdef DIRECTIONAL_CSM
 	int cascade = calculate_cascade(linearized_depth(depth, znear, zfar), light);
 	float fcascade = cascade;
+	bias_scale = fcascade + 1.0f;
 	vec4 shadowmap_pos = light.lightvp[cascade] * vec4(pos, 1.0f);
 	shadowmap_pos.xyz *= light.csm_scale[cascade].xyz;
 	shadowmap_pos.xyz += light.csm_offset[cascade].xyz;
@@ -232,7 +234,7 @@ void main()
 	else
 	{
 		float pixel_depth = shadowmap_clip_pos.z * 0.5f + 0.5f;
-		shadow_value = get_shadow_value(shadowmap_texture, pixel_depth, (shadowmap_clip_pos.xy * 0.5f + 0.5f) * shadowmap_coord_scale + shadowmap_coord_offset, light.shadowmap_params.x, sample_size);
+		shadow_value = get_shadow_value(shadowmap_texture, pixel_depth, (shadowmap_clip_pos.xy * 0.5f + 0.5f) * shadowmap_coord_scale + shadowmap_coord_offset, light.shadowmap_params.x * bias_scale, sample_size);
 	}
 #else
 	result = cascade_color[cascade];

@@ -95,9 +95,9 @@ public:
 
 	void set_euler(float xangle, float yangle, float zangle)
 	{
-		float ax = zangle;
+		float ax = xangle;
 		float ay = yangle;
-		float az = xangle;
+		float az = zangle;
 
 		const float cx = ::cos(ax * 0.5f);
 		const float sx = ::sin(ax * 0.5f); 
@@ -106,12 +106,16 @@ public:
 		const float cz = ::cos(az * 0.5f);
 		const float sz = ::sin(az * 0.5f);
 
-		quat<T> qx(sz, 0.0f, 0.0f, cz);
-		quat<T> qy(0.0f, sy, 0.0f, cy);
-		quat<T> qz(0.0f, 0.0f, sx, cx);
+		quat<T> qx(sx, 0.0f, 0.0f, cx); // pitch
+		quat<T> qy(0.0f, sy, 0.0f, cy); // yaw
+		quat<T> qz(0.0f, 0.0f, sz, cz); // roll
 
 		// TODO: optimize it
-		*this = qx * qy * qz;
+		//*this = qx * qy * qz;
+		q_[3] = cx * cy * cz + sx * sy * sz;
+		q_[0] = sx * cy * cz - cx * sy * sz;
+		q_[1] = cx * sy * cz + sx * cy * sz;
+		q_[2] = cx * cy * sz - sx * sy * cz;
 	}
 
 	void euler(float& xangle, float& yangle, float& zangle) const
@@ -222,10 +226,14 @@ public:
         T z2 = q_[2] * q_[2];
 
         M m;
-        m.set(1 - 2 * y2 - 2 * z2, 2 * x() * y() + 2 * w() * z(), 2 * x() * z() - 2 * w() * y(), 0,
+        /*m.set(1 - 2 * y2 - 2 * z2, 2 * x() * y() + 2 * w() * z(), 2 * x() * z() - 2 * w() * y(), 0,
               2 * x() * y() - 2 * w() * z(), 1 - 2 * x2 - 2 * z2, 2 * y() * z() + 2 * w() * x(), 0,
               2 * x() * z() + 2 * w() * y(), 2 * y() * z() - 2 * w() * x(), 1 - 2 * x2 - 2 * y2, 0,
-              0, 0, 0, 1);
+              0, 0, 0, 1);*/
+		m.set(1 - 2 * y2 - 2 * z2, 2 * x() * y() - 2 * w() * z(), 2 * x() * z() + 2 * w() * y(), 0,
+			2 * x() * y() + 2 * w() * z(), 1 - 2 * x2 - 2 * z2, 2 * y() * z() - 2 * w() * x(), 0,
+			2 * x() * z() - 2 * w() * y(), 2 * y() * z() + 2 * w() * x(), 1 - 2 * x2 - 2 * y2, 0,
+			0, 0, 0, 1);
         return m;
     }
 

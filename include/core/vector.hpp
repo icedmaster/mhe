@@ -54,7 +54,6 @@ public:
 
 	~vector()
 	{
-		clear();
 		free(begin_);
 	}
 

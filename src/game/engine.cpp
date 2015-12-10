@@ -133,6 +133,11 @@ void Engine::set_default_video_settings()
 	context_.driver.set_clear_color(color_black);
 }
 
+void Engine::reset_profiler()
+{
+	MainProfiler::instance().clear();
+}
+
 void Engine::run()
 {
 	process_ = true;

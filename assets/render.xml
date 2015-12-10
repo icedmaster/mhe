@@ -69,7 +69,7 @@
 	  <inputs>
 		<input index="0" node="" output="" material="gbuffer_fill" material_output="0" />
 		<input index="1" node="" output="" material="gbuffer_fill" material_output="1" />
-		<input index="2" node="" output="" material="gbuffer_fill" material_output="2" />
+		<input index="3" node="" output="" material="gbuffer_fill" material_output="3" />
 	  </inputs>
 	  <outputs>
 		<output index="0" scale="1.0" format="rgba" />

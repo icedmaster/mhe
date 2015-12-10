@@ -3,7 +3,9 @@
 //#define NSIGHT
 //#define DISABLE_DEPTH_TEST
 #define BAKE_LIGHT
-#define BOUNCES 1
+#define BOUNCES 2
+#define SINGLE_NORMALMAP
+const char* mesh_name = "test-scene-simple.bin";
 
 namespace sh
 {
@@ -363,6 +365,8 @@ public:
 
 		skybox_material_system_ = context.material_systems.get<mhe::SkyboxMaterialSystem>();
 		ASSERT(skybox_material_system_ != nullptr, "SkyboxMaterialSystem isn't found");
+
+		init_integration_data();
 		return true;
 	}
 
@@ -379,20 +383,32 @@ public:
 		vector<StandartGeometryLayout::Vertex> vertices(vbuffer.size() / sizeof(StandartGeometryLayout::Vertex));
 		vbuffer.data(reinterpret_cast<uint8_t*>(&vertices[0]), vertices.size() * sizeof(StandartGeometryLayout::Vertex));
 
+		mhe::vector<float> skybox_data(vertices.size() * sh::ColorSH::coefficients_number * sizeof(sh::ColorSH::datatype) / sizeof(float));
+
 		// Iteration 0 - skybox and depth rendering
-		render_iteration(texture_buffer, 0, vertices, node_instance);
+		render_iteration(texture_buffer, 0, vertices);
+		texture_buffer.data(reinterpret_cast<uint8_t*>(&skybox_data[0]), skybox_data.size() * sizeof(float));
 		// Iteration 1 - direction lights rendering
 		// Iteration 2 and next - bounces
 		//for (size_t i = 0; i < 1; ++i)
 		{
 			for (size_t i = 0; i < bounces; ++i)
 			{
-				render_iteration(texture_buffer, 2 + i, vertices, node_instance);
+				render_iteration(texture_buffer, 2 + i, vertices);
 			}
+		}
+
+		if (bounces > 0)
+		{
+			mhe::vector<float> prev_data(skybox_data.size());
+			texture_buffer.data(reinterpret_cast<uint8_t*>(&prev_data[0]), prev_data.size() * sizeof(float));
+			for (size_t i = 0, size = prev_data.size(); i < size; ++i)
+				prev_data[i] += skybox_data[i];
+			texture_buffer.update(reinterpret_cast<uint8_t*>(&prev_data[0]));
 		}
 	}
 private:
-	void render_iteration(TextureBuffer& texture_buffer, size_t iteration, const vector<StandartGeometryLayout::Vertex>& vertices, const mhe::NodeInstance& node_instance)
+	void render_iteration(TextureBuffer& texture_buffer, size_t iteration, const vector<StandartGeometryLayout::Vertex>& vertices)
 	{
 		std::cout << "Start iteration:" << iteration << std::endl;
 
@@ -413,15 +429,16 @@ private:
 			y = cross(z, x) * vertices[i].tng.w();
 
 			context_->driver.begin_render();
-			const sh::ColorSH& harmonics = render(iteration, texture_buffer, draw_call, x, y, z, vertex_position, node_instance);
+			const sh::ColorSH& harmonics = render(iteration, texture_buffer, draw_call, x, y, z, vertex_position);
 			memcpy(data_ptr + i * stride, harmonics.coeff.data(), stride * sizeof(float));
 
-			//show_gui(iteration, 0, i);
+			show_gui(iteration, 0, i);
 			context_->driver.end_render();
 			context_->window_system.swap_buffers();
+			engine_->reset_profiler();
 		}
 
-		if (iteration >= 2)
+		if (iteration >= 3)
 		{
 			mhe::vector<float> prev_data(vertices.size() * stride);
 			texture_buffer.data(reinterpret_cast<uint8_t*>(&prev_data[0]), prev_data.size() * sizeof(float));
@@ -432,7 +449,7 @@ private:
 		texture_buffer.update(reinterpret_cast<uint8_t*>(&baked_data[0]));
 	}
 
-	sh::ColorSH render(size_t iteration, TextureBuffer& texture_buffer, DrawCallExplicit& draw_call, const vec3& x, const vec3& y, const vec3& z, const vec3& pos, const mhe::NodeInstance& node_instance)
+	sh::ColorSH render(size_t iteration, TextureBuffer& texture_buffer, DrawCallExplicit& draw_call, const vec3& x, const vec3& y, const vec3& z, const vec3& pos)
 	{
 		mat4x4 proj;
 		proj.set_perspective(pi_2, 1.0f, 0.01f, 50.0f);
@@ -567,31 +584,31 @@ private:
 		{
 		case texture_posx:
 			view_fwd = x;
-			view_side = -z;
+			view_side = z;
 			view_up = y;
 			break;
 
 		case texture_negx:
 			view_fwd = -x;
-			view_side = z;
+			view_side = -z;
 			view_up = y;
 			break;
 
 		case texture_posy:
 			view_fwd = y;
-			view_side = -x;
+			view_side = x;
 			view_up = z;
 			break;
 			
 		case texture_negy:
 			view_fwd = -y;
-			view_side = x;
+			view_side = -x;
 			view_up = z;
 			break;
 
 		case texture_posz:
 			view_fwd = z;
-			view_side = x;
+			view_side = -x;
 			view_up = y;
 			break;
 		default:
@@ -647,7 +664,7 @@ private:
 		ts.set_column(1, y);
 		ts.set_column(2, z);
 
-		float weight_total = 0.0f;
+		//float weight_total = 0.0f;
 		vec4 data[texture_size * texture_size];
 		for (size_t i = 0; i < 5; ++i)
 		{
@@ -664,32 +681,49 @@ private:
 			{
 				for (size_t x = 0; x < texture_size; ++x)
 				{
-					float u = x / static_cast<float>(texture_size) * 2.0f - 1.0f;
-					float v = y / static_cast<float>(texture_size) * 2.0f - 1.0f;
-					vec3 dir_vs(u, v, -1.0f);
-					dir_vs.normalize();
-
-					vec3 dir_ws = dir_vs * view_to_world;
+					vec3 dir_ws = directions_[y * texture_size + x] * view_to_world;
 					vec3 dir_ts = dir_ws * ts;
 
-					float weight = 1.0f + u * u + v * v;
-					weight = 4.0f / (sqrt(weight) * weight);
-					weight_total += weight;
-
 					vec3 color = data[y * texture_size + x].rgb();
-					color *= weight;
+					color *= weights_[y * texture_size + x];
 					res += sh::project_sh9(dir_ts, color);
 				}
 			}
 		}
 
-		float factor = 4 * pi * 0.833f / weight_total;
+		float factor = total_weight_;
 		factor *= 0.5f;
 		return res * factor;
 	}
 
+	void init_integration_data()
+	{
+		total_weight_ = 0.0f;
+		for (size_t y = 0; y < texture_size; ++y)
+		{
+			for (size_t x = 0; x < texture_size; ++x)
+			{
+				float u = x / static_cast<float>(texture_size) * 2.0f - 1.0f;
+				float v = y / static_cast<float>(texture_size) * 2.0f - 1.0f;
+				vec3 dir_vs(u, v, -1.0f);
+				dir_vs.normalize();
+				directions_[y * texture_size + x] = dir_vs;
+
+				float weight = 1.0f + u * u + v * v;
+				weight = 4.0f / (sqrt(weight) * weight);
+				total_weight_ += weight;
+
+				weights_[y * texture_size + x] = weight;
+			}
+		}
+		total_weight_ *= 6.0f;
+		total_weight_ = 4 * pi / total_weight_;
+	}
+
 	void show_gui(size_t iteration, size_t mesh_index, size_t vertex_index)
 	{
+		return;
+
 		ImGuiHelper& imgui_helper = engine_->debug_views().imgui_helper();
 		engine_->render_context().fdelta = 0.01f; // just a small number because ImGUI requires some update delta
 		imgui_helper.update(*context_, engine_->render_context(), engine_->event_manager());
@@ -702,6 +736,10 @@ private:
 
 		imgui_helper.render(*context_, engine_->render_context());
 	}
+
+	mhe::array<float, texture_size * texture_size> weights_;
+	mhe::array<vec3, texture_size * texture_size> directions_;
+	float total_weight_;
 
 	mhe::Context* context_;
 	mhe::SceneContext* scene_context_;
@@ -734,8 +772,7 @@ public:
 		init_render_data(engine);
 
 		mhe::NodeInstance& node = engine.scene().create_node();
-		mhe::load_node<mhe::GBufferFillMaterialSystem>(node, mhe::string("lighting-test-simple.bin"), engine.context(), engine.scene_context());
-		//mhe::load_node<mhe::GBufferFillMaterialSystem>(node, mhe::string("sponza.bin"), engine.context(), engine.scene_context());
+		mhe::load_node<mhe::GBufferFillMaterialSystem>(node, mhe::string(mesh_name), engine.context(), engine.scene_context());
 		node_ = &node;
 
 		node.mesh.gi_data.texture_buffer = engine.context().texture_buffer_pool.create();
@@ -761,7 +798,9 @@ public:
 		{
 			Material& material = engine.context().materials[node.mesh.instance_parts[i].material.material_system].get(node.mesh.instance_parts[i].material.id);
 			material.texture_buffers[mhe::baked_light_texture_unit] = texture_buffer.id();
+#ifdef SINGLE_NORMALMAP
 			material.textures[mhe::normal_texture_unit] = normalmap;
+#endif
 		}
 #endif
 
@@ -770,17 +809,11 @@ public:
 		light.shading().diffuse = mhe::vec4(240.0f / 255.0f, 150.0f / 255.0f, 80.0f / 255.0f, 1.0f);
 		light.shading().specular = mhe::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 		light.shading().intensity = 5.0f;
-		mhe::set_light_position(engine.scene_context(), light_instance.id, mhe::vec3(0, 20.0f, 0.0f));
-		mhe::set_light_rotation(engine.scene_context(), light_instance.id, mhe::quatf(-mhe::pi_2 * 1.5f, -pi_2 * 0.5f, 0.0f));
+		mhe::set_light_rotation(engine.scene_context(), light_instance.id, mhe::quatf(0.0f, -mhe::pi_2 * 1.3f, mhe::pi_2 * 0.7f));
 		light.set_type(mhe::Light::directional);
 		light.desc().cast_shadows = true;
-		light.desc().shadowmap_bias = 0.0125f;
+		light.desc().shadowmap_bias = 0.05f;
 		light_instance.enabled = true;
-
-		//renderer_ = static_cast<mhe::DeferredRenderer*>(engine.renderer());
-		//renderer_->disable();
-		// update the renderer once to update all nodes' transformations
-		//renderer_->update(engine.scene_context());
 
 		if (!mesh_baker.init(engine.context(), engine.scene_context(), engine))
 		{
@@ -923,6 +956,9 @@ private:
 
 int main(int /*argc*/, char** /*argv*/)
 {
+	mhe::quatf q(0.0f, -mhe::pi_2, 0.0f);
+	mhe::mat4x4 m = q.to_matrix<mat4x4>();
+
 	mhe::app::Application app("12_sh");
 	mhe::app::ApplicationConfig config;
 	config.width = 1280;
@@ -936,6 +972,8 @@ int main(int /*argc*/, char** /*argv*/)
 #endif
 	config.render_config_filename = mhe::utils::path_join(config.assets_path, "render_without_postprocess.xml");
 	app.init(config);
+
+	app.engine().context().window_system.disable_vsync();
 
 	mhe::game::GameSceneDesc desc;
 	GameScene* game_scene = new GameScene;

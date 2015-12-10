@@ -5,6 +5,7 @@
 #include <cstring>	// for memcpy()
 #include <cmath>
 #include <cassert>
+#include <iomanip>
 #include "math_utils.hpp"
 #include "vector3.hpp"
 #include "vector4.hpp"
@@ -685,7 +686,7 @@ inline std::ostream& operator<< (std::ostream& stream, const matrix<T>& m)
 		stream << "{";
 		for (int j = 0; j < 4; ++j)
 		{
-			stream << m.get()[i * 4 + j];
+			stream << std::fixed << std::setw(8) << std::setprecision(4) << m.get()[i * 4 + j];
 			if (j != 3) stream << "\t";
 			else stream << "}\n";
 		}

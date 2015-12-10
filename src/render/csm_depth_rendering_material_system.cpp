@@ -134,11 +134,12 @@ void CSMDepthRenderingMaterialSystem::start_frame(Context& context, SceneContext
 
 	const vec3& light_direction = get_light_direction(scene_context, light_instance->id);
 	float max_extents = mhe::max(mhe::max(extents.x(), extents.y()), extents.z());
-	rayf r(center.xyz() - light_direction * max_extents, light_direction, max_extents);
+	rayf r(center.xyz() - mhe::mul(light_direction, extents.xyz()), light_direction, max_extents);
 	vec3 input = r.origin, output;
 	intersects(input, output, r, render_context.aabb);
 	vec3 light_position = input;
-	light_view.set_row(3, light_position * light_view.as_rotation_matrix());
+	light_view.set_row(3, vec3::zero());
+	light_view.multTranslate(-light_position);
 
 	mat4x4 proj[max_cascades_number];
 	mat4x4 view[max_cascades_number];
@@ -149,9 +150,10 @@ void CSMDepthRenderingMaterialSystem::start_frame(Context& context, SceneContext
 	for (size_t i = 0; i < cascades_number_; ++i)
 	{
 		zfar[i] = render_context.main_camera.zfar * percentage_[i];
-		znear[i] = i == 0 ? render_context.main_camera.znear : zfar[i - 1];
+		//znear[i] = i == 0 ? render_context.main_camera.znear : zfar[i - 1];
+		znear[i] = render_context.main_camera.znear;
 		view[i] = light_view;
-		calculate_projection(proj[i], view[i], aabb_points, render_context.main_camera, znear[i], zfar[i]);
+		calculate_projection(proj[i], view[i], aabb_points, render_context.main_camera, znear[i], zfar[i], light_direction);
 
 		TransformSimpleData transform_data;
 		transform_data.vp = view[i] * proj[i];
@@ -174,7 +176,8 @@ void CSMDepthRenderingMaterialSystem::start_frame(Context& context, SceneContext
 	light->set_shadow_info(&shadow_info_);
 }
 
-void CSMDepthRenderingMaterialSystem::calculate_projection(mat4x4& proj, mat4x4& view, const vec4* aabb, const CameraData& camera_data, float znear, float zfar) const
+void CSMDepthRenderingMaterialSystem::calculate_projection(mat4x4& proj, mat4x4& view, const vec4* aabb, const CameraData& camera_data, float znear, float zfar,
+	const vec3& lightdir) const
 {
 	vec3 viewspace_frustum_points[8];
 	const vec3& fwd = -vec3::forward();
@@ -203,9 +206,15 @@ void CSMDepthRenderingMaterialSystem::calculate_projection(mat4x4& proj, mat4x4&
 	for (int i = 0; i < 8; ++i)
 	{
 		frustum_points_ws[i] = vec4(viewspace_frustum_points[i], 1.0f) * camera_data.inv_v;
-		frustum_center_ws += frustum_points_ws[i].xyz();
 	}
-	frustum_center_ws /= 8.0f;
+	
+	vec3 near_diag_center_ws = (frustum_points_ws[0].xyz() + frustum_points_ws[3].xyz()) * 0.5f;
+	vec3 far_diag_center_ws = (frustum_points_ws[4].xyz() + frustum_points_ws[7].xyz()) * 0.5f;
+	frustum_center_ws = (near_diag_center_ws + far_diag_center_ws) * 0.5f;
+
+	//vec3 light_position = frustum_center_ws - lightdir * (frustum_points_ws[7].xyz() - frustum_points_ws[0].xyz()).magnitude() * 0.5f;
+	//view.set_row(3, vec3::zero());
+	//view.multTranslate(-light_position);
 
 	vec4 lightspace_aabb[8];
 	for (int i = 0; i < 8; ++i)

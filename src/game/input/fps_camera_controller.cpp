@@ -60,8 +60,8 @@ void FPSCameraController::update_impl(const RenderContext& render_context)
 	if (mouse->is_button_pressed(MouseEvent::right_button))
 	{
 		const vector2<int>& delta = mouse->delta();
-		xangle = deg_to_rad(static_cast<float>(delta.y())) * rotation_speed() * time_delta;
-		yangle = deg_to_rad(static_cast<float>(delta.x())) * rotation_speed() * time_delta;
+		xangle = deg_to_rad(static_cast<float>(-delta.y())) * rotation_speed() * time_delta;
+		yangle = deg_to_rad(static_cast<float>(-delta.x())) * rotation_speed() * time_delta;
 	}
 	quatf yaw;
 	quatf pitch;
@@ -71,7 +71,7 @@ void FPSCameraController::update_impl(const RenderContext& render_context)
 	pitch.set_rotation(vec3::right(), x);
 	yaw.set_rotation(vec3::up(), y);
 
-	rotation = pitch * yaw;
+	rotation = yaw * pitch;
 	
 	Transform& transform = transform_instance().transform;
 	transform.translate_by(velocity);

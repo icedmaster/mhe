@@ -305,6 +305,7 @@ private:
 
 	SSAOShaderData ssao_shader_data_;
 	UniformBuffer::IdType ssao_uniform_;
+	TextureInstance noise_texture_;
 };
 
 class CompositeMulMaterialSystem : public PosteffectMaterialSystemBase

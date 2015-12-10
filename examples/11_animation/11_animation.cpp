@@ -157,8 +157,8 @@ public:
 			if (found)
 			{
 				mhe::mat4x4 m = mhe::mat4x4::scaling_matrix(scale);
-				m *= rotation.to_matrix<mhe::mat4x4>();
-				m.set_row(3, position);
+				m *= rotation.conjugate().to_matrix<mhe::mat4x4>(); // TODO: apply conjugation during the export
+				m *= mhe::mat4x4::translation_matrix(position);
 				transforms_[frame.node_id] = m;
 			}
 			else
@@ -186,7 +186,7 @@ public:
 	{
 		mhe::NodeInstance& node = engine.scene().create_node();
 		mhe::load_node<mhe::GBufferFillMaterialSystem>(node, mhe::string("rainbow_dash.bin"), engine.context(), engine.scene_context());
-		engine.scene_context().transform_pool.get(node.transform_id).transform.rotate_by(mhe::quatf(mhe::pi_2, mhe::pi, 0.0f));
+		engine.scene_context().transform_pool.get(node.transform_id).transform.rotate_by(mhe::quatf(-mhe::pi_2, mhe::pi, 0.0f));
 		engine.scene_context().transform_pool.get(node.transform_id).transform.scale_by(mhe::vec3(1.0f, 1.0f, 1.0f));
 
 		engine.scene_context().aabb_pool.get(node.aabb_id).aabb.extents *= 1.0f;
@@ -208,7 +208,7 @@ public:
 		mhe::MaterialInitializationData material_initialization_data;
 		material_initialization_data.textures[0] = mhe::string("test.tga");
 		mhe::setup_node(plane, material_system, engine.context(), engine.scene_context(), material_initialization_data);
-		mhe::set_node_transform(engine.scene_context(), plane, mhe::vec3::zero(), mhe::quatf(-mhe::pi_2, 0.0f, 0.0f),
+		mhe::set_node_transform(engine.scene_context(), plane, mhe::vec3::zero(), mhe::quatf(mhe::pi_2, 0.0f, 0.0f),
 			mhe::vec3(5.0f, 5.0f, 5.0f));
 
 		mhe::LightInstance& light_instance = engine.scene().create_light();
@@ -217,7 +217,7 @@ public:
 		light.shading().specular = mhe::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 		light.shading().intensity = 5.0f;
 		mhe::set_light_position(engine.scene_context(), light_instance.id, mhe::vec3(0, 1.0f, 0));
-		mhe::set_light_rotation(engine.scene_context(), light_instance.id, mhe::quatf(-mhe::pi_2, 0.0f, 0.0f));
+		mhe::set_light_rotation(engine.scene_context(), light_instance.id, mhe::quatf(mhe::pi_2, 0.0f, 0.0f));
 		light.set_type(mhe::Light::directional);
 		light.desc().cast_shadows = true;
 		light.desc().shadowmap_bias = 0.05f;
@@ -248,23 +248,24 @@ private:
 		
 		for (size_t i = 0; i < size; ++i)
 		{
-			update_bone(matrices[i], i, skeleton, controller_.matrices(), i == 5);
+			update_bone(matrices[i], i, skeleton, controller_.matrices());
 			matrices[i] = skeleton.bones[i].inv_transform * matrices[i];
 			matrices[i] *= skeleton.root_transform;
 		}
 	}
 
-	void update_bone(mhe::mat4x4& m, size_t index, const mhe::Skeleton& skeleton, const mhe::mat4x4* xforms, bool log)
+	void update_bone(mhe::mat4x4& m, size_t index, const mhe::Skeleton& skeleton, const mhe::mat4x4* xforms)
 	{
 		const mhe::mat4x4& parent_transform = xforms[index];
 		m *= parent_transform;
 		if (skeleton.bones[index].parent_id != mhe::Bone::invalid_id)
-			update_bone(m, skeleton.bones[index].parent_id, skeleton, xforms, log);
+			update_bone(m, skeleton.bones[index].parent_id, skeleton, xforms);
 	}
 
 	void load_animation(mhe::game::Engine& engine)
 	{
 		mhe::FilePath path = mhe::utils::path_join(engine.context().mesh_manager.path(), mhe::FilePath("rainbow_dash-default.anim"));
+		//mhe::FilePath path = mhe::utils::path_join(engine.context().mesh_manager.path(), mhe::FilePath("hammer-joint2.anim"));
 		std::ifstream stream(path.c_str(), std::ios::binary);
 		if (!stream.is_open())
 			return;

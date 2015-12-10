@@ -342,7 +342,7 @@ bool SSRMaterialSystem::init(Context& context, const MaterialSystemContext& mate
 	default_material(context).uniforms[1] = uniform.id();
 
 	ssr_shader_data_.ssrdata[0] = vec4(10.0f, 1000.0f, 0.5f, 0.5f);
-	ssr_shader_data_.ssrdata[1] = vec4(10.0f, 1000.0f, 1.0f, 20.0f);
+	ssr_shader_data_.ssrdata[1] = vec4(10.0f, 1000.0f, 0.5f, 20.0f);
 	ssr_shader_data_.ssrdata[2] = vec4(0.9f, 0.0f, 0.0f, 0.0f);
 
 	return true;
@@ -609,7 +609,7 @@ bool SSAOMaterialSystem::init(Context& context, const MaterialSystemContext& mat
 	ssao_uniform_ = uniform.id();
 	default_material(context).uniforms[1] = uniform.id();
 
-	create_noise_texture(default_material(context).textures[noise_texture_unit], context);
+	create_noise_texture(noise_texture_, context);
 
 	ssao_shader_data_.ssaodata[0] = vec4(3.0f, 1.0f, 0.5f, 30.0f);
 	ssao_shader_data_.ssaodata[1] = vec4(700.0f, 1000.0f, 1.0f, 0.0f);
@@ -636,6 +636,8 @@ void SSAOMaterialSystem::update(Context& context, SceneContext& scene_context, R
 	uniform.update(ssao_shader_data_);
 
 	PosteffectMaterialSystemBase::update(context, scene_context, render_context);
+	// TODO: it's better to move the noise texture to inputs
+	default_material(context).textures[noise_texture_unit] = noise_texture_;
 }
 
 void SSAOMaterialSystem::create_noise_texture(TextureInstance& texture_instance, Context& context)

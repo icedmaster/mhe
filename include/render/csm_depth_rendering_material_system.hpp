@@ -30,7 +30,8 @@ public:
 	}
 private:
 	void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
-	void calculate_projection(mat4x4& proj, mat4x4& view, const vec4* aabb, const CameraData& camera_data, float znear, float zfar) const;
+	void calculate_projection(mat4x4& proj, mat4x4& view, const vec4* aabb, const CameraData& camera_data, float znear, float zfar, 
+		const vec3& lightdir) const;
 
 	vec2 texture_size_;
 	vec2 cascade_size_;

@@ -67,6 +67,7 @@ public:
 	void stop();
 	void update();
 	void render();
+	void reset_profiler();
 
 	void set_game_scene(GameScene* scene)
 	{

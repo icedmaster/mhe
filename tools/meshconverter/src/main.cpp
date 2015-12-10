@@ -504,7 +504,7 @@ void process_animations(const aiScene* assimp_scene, const char* out_filename, c
 		}
 
 		animation_data.frames_number = frames.size();
-		animation_data.frames = &frames[0];
+		animation_data.frames = frames.empty() ? nullptr : &frames[0];
 		write_animation(animation_data, out_filename, params);
 	}
 }
