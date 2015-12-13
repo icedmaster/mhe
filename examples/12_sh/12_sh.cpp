@@ -4,8 +4,8 @@
 //#define DISABLE_DEPTH_TEST
 #define BAKE_LIGHT
 #define BOUNCES 2
-#define SINGLE_NORMALMAP
-const char* mesh_name = "test-scene-simple.bin";
+//#define SINGLE_NORMALMAP
+const char* mesh_name = "test-scene-simple2.bin";
 
 namespace sh
 {
@@ -55,7 +55,7 @@ int double_factorial(int n)
 template <class T>
 T legendre(int l, int m, T x)
 {
-	// I do not include Condon-Shortley phase here. Shader code contains only position coefficients 
+	// I do not include Condon-Shortley phase here. Shader code contains only positive coefficients 
 	// as well as functions projecting directions onto SH space (for instance, project_sh9)
 	if (l == m)
 		return /*pow((T)-1, m) * */double_factorial(2 * m - 1) * pow(1 - x * x, m * (T)0.5);
@@ -664,7 +664,6 @@ private:
 		ts.set_column(1, y);
 		ts.set_column(2, z);
 
-		//float weight_total = 0.0f;
 		vec4 data[texture_size * texture_size];
 		for (size_t i = 0; i < 5; ++i)
 		{
@@ -778,8 +777,6 @@ public:
 		node.mesh.gi_data.texture_buffer = engine.context().texture_buffer_pool.create();
 		mhe::TextureBuffer& texture_buffer = engine.context().texture_buffer_pool.get(node.mesh.gi_data.texture_buffer);
 
-		//mhe::setup_node(node, engine.context().material_systems.get<mhe::GBufferFillMaterialSystem>(), engine.context(), engine.scene_context(), mhe::string("white.tga"));
-
 		sh::generate_random_samples(samples_.data(), test_samples_number);
 
 		mhe::VertexBuffer& vbuffer = engine.context().vertex_buffer_pool.get(node.mesh.mesh.vbuffer);
@@ -806,13 +803,13 @@ public:
 
 		mhe::LightInstance& light_instance = engine.scene().create_light();
 		mhe::Light& light = light_instance.light;
-		light.shading().diffuse = mhe::vec4(240.0f / 255.0f, 150.0f / 255.0f, 80.0f / 255.0f, 1.0f);
+		light.shading().diffuse = mhe::color_white;
 		light.shading().specular = mhe::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 		light.shading().intensity = 5.0f;
 		mhe::set_light_rotation(engine.scene_context(), light_instance.id, mhe::quatf(0.0f, -mhe::pi_2 * 1.3f, mhe::pi_2 * 0.7f));
 		light.set_type(mhe::Light::directional);
 		light.desc().cast_shadows = true;
-		light.desc().shadowmap_bias = 0.05f;
+		light.desc().shadowmap_bias = 0.01f;
 		light_instance.enabled = true;
 
 		if (!mesh_baker.init(engine.context(), engine.scene_context(), engine))
