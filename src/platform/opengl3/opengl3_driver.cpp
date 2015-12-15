@@ -83,17 +83,17 @@ void OpenGL3Driver::set_clear_color(const colorf& color)
     
 void OpenGL3Driver::enable_blending()
 {
-    glEnable(GL_BLEND);
+	glEnable(GL_BLEND);
 }
-    
+
 void OpenGL3Driver::disable_blending()
 {
-    glDisable(GL_BLEND);
+	glDisable(GL_BLEND);
 }
-    
+
 void OpenGL3Driver::set_viewport(int x, int y, int w, int h)
 {
-    glViewport(x, y, w, h);
+	glViewport(x, y, w, h);
 	state_.viewport.set(x, y, w, h);
 }
 
@@ -102,14 +102,14 @@ void OpenGL3Driver::flush()
 #ifndef PROFILER_ENABLED
 	glFlush();
 #else
-    glFinish();
+	glFinish();
 #endif
 }
 
 void OpenGL3Driver::set_state(const RenderState& state)
 {
 	const OpenGL3RenderState* active_state = static_cast<const OpenGL3RenderState*>(state.impl());
-    active_state->enable(state_);
+	active_state->enable(state_);
 	CHECK_GL_ERRORS();
 }
 
@@ -209,6 +209,19 @@ uint OpenGL3Driver::supported_versions(pair<uint, uint>* versions, uint size) co
 	for (uint i = 0; i < n; ++i)
 		versions[i] = versions_[i];
 	return n;
+}
+
+void OpenGL3Driver::set_image(const Texture& texture, size_t unit, int access)
+{
+	const OpenGL3Texture* opengl_texture = static_cast<const OpenGL3Texture*>(texture.impl());
+	OpenGLExtensions::instance().glBindImageTexture(unit, opengl_texture->id(), 0, GL_FALSE, 0, get_access(access), opengl_texture->image_format());
+	CHECK_GL_ERRORS();
+}
+
+void OpenGL3Driver::dispatch(size_t x, size_t y, size_t z)
+{
+	OpenGLExtensions::instance().glDispatchCompute(x, y, z);
+	CHECK_GL_ERRORS();
 }
 
 }}

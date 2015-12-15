@@ -22,18 +22,28 @@ struct UniformData
 	size_t index;
 };
 
+struct ImageData
+{
+	string name;
+	size_t index;
+};
+
 struct ShaderInitializationParams
 {
+	std::string vsdata;
+	std::string fsdata;
+	std::string csdata;
 	fixed_size_vector<SamplerData, 16> samplers;
 	fixed_size_vector<UniformData, 16> uniforms;
 	fixed_size_vector<SamplerData, 16> texture_buffers;
+	fixed_size_vector<ImageData, 16> images;
 };
 
 class ShaderProgramImpl
 {
 public:
 	virtual ~ShaderProgramImpl() {}
-	virtual bool init(const std::string& vsdata, const std::string& fsdata, const ShaderInitializationParams& params) = 0;
+	virtual bool init(const ShaderInitializationParams& params) = 0;
 	virtual void close() = 0;
 };
 
@@ -43,7 +53,7 @@ class MHE_EXPORT ShaderProgram
 	POOL_ELEMENT_METHODS(uint16_t);
 public:
 	ShaderProgram();
-	bool init(const std::string& vsdata, const std::string& fsdata, const ShaderInitializationParams& params);
+	bool init(const ShaderInitializationParams& params);
 	void close()
 	{
 		impl_->close();

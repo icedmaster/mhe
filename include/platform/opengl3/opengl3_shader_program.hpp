@@ -14,6 +14,7 @@ class OpenGL3ShaderProgram : public ShaderProgramImpl
 class Shader
 {
 public:
+	Shader() : id_(0) {}
 	bool init(GLenum type, const std::string& data);
 	void close();
 
@@ -28,8 +29,7 @@ private:
 };
 
 public:
-	
-	bool init(const std::string& vsdata, const std::string& fsdata, const ShaderInitializationParams& params);
+	bool init(const ShaderInitializationParams& params);
 	void close();
 
 	GLuint id() const
@@ -44,7 +44,7 @@ public:
 private:
 	bool attach_shaders();
 	bool check_status(GLenum param) const;
-	void init(const ShaderInitializationParams& params);
+	void init_params(const ShaderInitializationParams& params);
 
 	void print_uniforms();
 
@@ -53,6 +53,7 @@ private:
 	array<GLuint, 16> shader_bind_indexes_;
 	Shader vertex_shader_;
 	Shader fragment_shader_;
+	Shader compute_shader_;
 	GLuint id_;
 };
 

@@ -38,9 +38,20 @@ struct DrawCallExplicit
 	uint8_t priority;
 };
 
-inline void prepare_draw_call(DrawCallExplicit& draw_call)
+const size_t compute_call_images_number = 8;
+
+struct ComputeCallExplicit
 {
-	::memset(&draw_call, 0, sizeof(DrawCallExplicit));
+	ShaderProgram* shader_program;
+	Texture* images[compute_call_images_number];
+	int image_access[compute_call_images_number];
+	uivec3 workgroups_number;
+};
+
+template <class DC>
+inline void prepare_draw_call(DC& draw_call)
+{
+	::memset(&draw_call, 0, sizeof(DC));
 }
 
 }

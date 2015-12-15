@@ -74,6 +74,14 @@ inline GLenum get_format(int format)
 	return formats[format];
 }
 
+// Formats supported by glBindImageTexture()
+inline GLenum get_image_format(int format)
+{
+	ASSERT(format < format_max, "Invalid format");
+	GLenum formats[format_max] = {GL_RGBA8, GL_RGBA8, GL_RGBA32F, GL_R32F, GL_R32F, GL_R32F, GL_R16F, GL_RGB, GL_RG16F, GL_RGBA16F, GL_RGB32F};
+	return formats[format];
+}
+
 inline GLenum get_pixel_data_format(int format)
 {
 	ASSERT(format < format_max, "Invalid texture format");
@@ -184,6 +192,13 @@ inline GLenum get_query_target(int target)
 	ASSERT(target < query_max, "invalid target");
 	GLenum targets[query_max] = {GL_TIMESTAMP, GL_TIME_ELAPSED};
 	return targets[target];
+}
+
+inline GLenum get_access(int access)
+{
+	ASSERT(access < access_max, "invalid access");
+	GLenum gl_access[access_max] = {GL_READ_WRITE, GL_READ_ONLY, GL_WRITE_ONLY};
+	return gl_access[access];
 }
 
 }}

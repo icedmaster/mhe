@@ -19,6 +19,7 @@ struct RenderData;
 struct Node;
 struct DrawCall;
 struct DrawCallExplicit;
+struct ComputeCallExplicit;
 
 class Texture;
 class RenderState;
@@ -81,6 +82,9 @@ public:
 	virtual uint minor_version_need() const = 0;
 
 	virtual void flush() = 0;
+
+	virtual void set_image(const Texture& texture, size_t unit, int access) = 0;
+	virtual void dispatch(size_t x, size_t y, size_t z) = 0;
 };
 
 class MHE_EXPORT Driver
@@ -215,8 +219,10 @@ public:
 	void begin_render();
 	void end_render();
 
-    void render(const Context& context, const DrawCall* draw_calls, size_t count);
+	void render(const Context& context, const DrawCall* draw_calls, size_t count);
 	void render(const Context& context, const DrawCallExplicit* draw_calls, size_t count);
+
+	void execute(const Context& context, const ComputeCallExplicit* compute_calls, size_t count);
 
 	void set_window_size(const vector2<int>& size)
 	{
@@ -233,6 +239,7 @@ public:
 private:
 	void perform_draw_call(const Context& context, const DrawCall& draw_call);
 	void perform_draw_call(const Context& context, const DrawCallExplicit& draw_call);
+	void perform_compute_call(const Context& context, const ComputeCallExplicit& compute_call);
 
 	pair<uint, uint> versions_[8];
 	uint versions_number_;

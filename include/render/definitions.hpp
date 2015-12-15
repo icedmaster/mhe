@@ -44,6 +44,15 @@ enum
 	format_datatype_max
 };
 
+// access
+enum
+{
+	access_readwrite,
+	access_readonly,
+	access_writeonly,
+	access_max
+};
+
 }
 
 #endif

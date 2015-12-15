@@ -369,6 +369,7 @@ inline std::ostream& operator<< (std::ostream& s, const vector3<T>& v)
 	
 typedef vector3<float> v3d;
 typedef vector3<float> vec3;
+typedef vector3<size_t> uivec3;
 
 const v3d x_axis = v3d(1.0, 0.0, 0.0);
 const v3d y_axis = v3d(0.0, 1.0, 0.0);

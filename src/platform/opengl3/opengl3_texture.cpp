@@ -23,6 +23,7 @@ bool OpenGL3Texture::init(const TextureDesc& desc, const uint8_t* data, size_t s
 		glTexParameterf(target_, GL_TEXTURE_MAX_ANISOTROPY_EXT, desc.anisotropic_level);
 
 	format_ = get_format(desc.format);
+	image_format_ = get_image_format(desc.format);
 	width_ = desc.width;
 	height_ = desc.height;
 	datatype_ = desc.datatype == format_default ? get_datatype_by_format(desc.format) : get_datatype(desc.datatype);

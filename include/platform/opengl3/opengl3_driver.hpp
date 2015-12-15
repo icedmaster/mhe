@@ -81,6 +81,9 @@ private:
 	void draw(size_t elements_number, size_t vbuffer_offset, size_t ibuffer_offset, size_t indices_number, Primitive primitive) override;
 
 	void flush();
+
+	void set_image(const Texture& texture, size_t unit, int access) override;
+	void dispatch(size_t x, size_t y, size_t z) override;
 private:
 	void setup_caps(DriverRenderingCapabilities& caps);
 

@@ -18,7 +18,7 @@ bool OpenGL3ShaderProgram::Shader::init(GLenum type, const std::string& data)
 	GLint length = static_cast<GLint>(data.length());
 	OpenGLExtensions::instance().glShaderSource(id_, 1, &shader_data, &length);
 	OpenGLExtensions::instance().glCompileShader(id_);
-    return check_status(type, GL_COMPILE_STATUS);
+	return check_status(type, GL_COMPILE_STATUS);
 }
 
 bool OpenGL3ShaderProgram::Shader::check_status(GLenum type, GLenum param) const
@@ -30,25 +30,27 @@ bool OpenGL3ShaderProgram::Shader::check_status(GLenum type, GLenum param) const
 		GLchar buffer[1024];
 		GLint length = 0;
 		OpenGLExtensions::instance().glGetShaderInfoLog(id_, sizeof(buffer), &length, buffer);
-        ERROR_LOG("Shader " << id_ << " type:" << type << " check status error:" << buffer);
+		ERROR_LOG("Shader " << id_ << " type:" << type << " check status error:" << buffer);
 		return false;
 	}
 	return true;
 }
 
-bool OpenGL3ShaderProgram::init(const std::string& vsdata, const std::string& fsdata, const ShaderInitializationParams& params)
+bool OpenGL3ShaderProgram::init(const ShaderInitializationParams& params)
 {
-	if (!vertex_shader_.init(GL_VERTEX_SHADER, vsdata))
+	if (params.csdata.empty())
+	{
+		if (!vertex_shader_.init(GL_VERTEX_SHADER, params.vsdata))
+			return false;
+		if (!fragment_shader_.init(GL_FRAGMENT_SHADER, params.fsdata))
+			return false;
+	}
+	else
+	if (!compute_shader_.init(GL_COMPUTE_SHADER, params.csdata))
 		return false;
-	if (!fragment_shader_.init(GL_FRAGMENT_SHADER, fsdata))
-		return false;
-	
 	bool result = attach_shaders();
 	if (result)
-		init(params);
-#ifdef MHE_DEBUG
-	//print_uniforms();
-#endif
+		init_params(params);
 	return result;
 }
 
@@ -56,14 +58,20 @@ void OpenGL3ShaderProgram::close()
 {
 	vertex_shader_.close();
 	fragment_shader_.close();
+	compute_shader_.close();
 	OpenGLExtensions::instance().glDeleteProgram(id_);
 }
 
 bool OpenGL3ShaderProgram::attach_shaders()
 {
 	id_ = OpenGLExtensions::instance().glCreateProgram();
-	OpenGLExtensions::instance().glAttachShader(id_, vertex_shader_.id());
-	OpenGLExtensions::instance().glAttachShader(id_, fragment_shader_.id());
+	if (!compute_shader_.id())
+	{
+		OpenGLExtensions::instance().glAttachShader(id_, vertex_shader_.id());
+		OpenGLExtensions::instance().glAttachShader(id_, fragment_shader_.id());
+	}
+	else
+		OpenGLExtensions::instance().glAttachShader(id_, compute_shader_.id());
 	OpenGLExtensions::instance().glLinkProgram(id_);
 	return check_status(GL_LINK_STATUS); 
 }
@@ -86,6 +94,7 @@ bool OpenGL3ShaderProgram::check_status(GLenum param) const
 void OpenGL3ShaderProgram::set() const
 {
 	OpenGLExtensions::instance().glUseProgram(id_);
+	CHECK_GL_ERRORS();
 	for (size_t i = 0; i < 16; ++i)
 	{
 		if (texture_location_[i] == static_cast<GLuint>(-1)) continue;
@@ -93,7 +102,7 @@ void OpenGL3ShaderProgram::set() const
 	}
 }
 
-void OpenGL3ShaderProgram::init(const ShaderInitializationParams& params)
+void OpenGL3ShaderProgram::init_params(const ShaderInitializationParams& params)
 {
 	memset(&texture_location_[0], 0xff, sizeof(texture_location_));
 	memset(&texture_buffer_location_[0], 0xff, sizeof(texture_buffer_location_));

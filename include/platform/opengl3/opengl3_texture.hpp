@@ -25,6 +25,16 @@ public:
 
 	void copy_framebuffer() override;
 	void read(uint8_t* data, size_t size) override;
+
+	GLenum format() const
+	{
+		return format_;
+	}
+
+	GLenum image_format() const
+	{
+		return image_format_;
+	}
 private:
 	void init_cubemap(const TextureDesc& desc, const uint8_t* data, size_t size);
 
@@ -33,6 +43,7 @@ private:
 	GLsizei width_;
 	GLsizei height_;
 	GLenum format_;
+	GLenum image_format_;
 	GLenum pixel_data_format_;
 	GLenum datatype_;
 	mutable size_t unit_;

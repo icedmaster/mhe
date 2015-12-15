@@ -675,6 +675,24 @@ public:
 		::glGetBufferSubData(target, offset, size, data);
 #endif
 	}
+
+	void glDispatchCompute(GLuint num_groups_x, GLuint num_groups_y, GLuint num_groups_z)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glDispatchCompute_(num_groups_x, num_groups_y, num_groups_z);
+#else
+		::glDispatchCompute(num_groups_x, num_groups_y, num_groups_z);
+#endif
+	}
+
+	void glBindImageTexture(GLuint unit, GLuint texture, GLint level, GLboolean layered, GLint layer, GLenum access, GLenum format)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glBindImageTexture_(unit, texture, level, layered, layer, access, format);
+#else
+		::glBindImageTexture(unit, texture, level, layered, layer, access, format);
+#endif
+	}
 private:
 	OpenGLExtensions() {}
 	~OpenGLExtensions() {}
@@ -768,6 +786,8 @@ private:
 	PFNGLGETQUERYOBJECTUI64VPROC glGetQueryObjectui64v_;
 	PFNGLQUERYCOUNTERPROC glQueryCounter_;
 	PFNGLGETBUFFERSUBDATAPROC glGetBufferSubData_;
+	PFNGLDISPATCHCOMPUTEPROC glDispatchCompute_;
+	PFNGLBINDIMAGETEXTUREPROC glBindImageTexture_;
 #endif
 	std::map<std::string, bool> loaded_extensions_;
 };

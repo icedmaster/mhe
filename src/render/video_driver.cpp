@@ -291,6 +291,24 @@ void Driver::perform_draw_call(const Context& context, const DrawCall& draw_call
 		draw_call.command->execute(render_stage_after_submit);
 }
 
+void Driver::execute(const Context& context, const ComputeCallExplicit* compute_calls, size_t count)
+{
+	for (size_t i = 0; i < count; ++i)
+		perform_compute_call(context, compute_calls[i]);
+}
+
+void Driver::perform_compute_call(const Context& context, const ComputeCallExplicit& compute_call)
+{
+	ASSERT(compute_call.shader_program != nullptr, "Invalid shader program");
+	impl_->set_shader_program(*compute_call.shader_program);
+	for (size_t i = 0; i < compute_call_images_number; ++i)
+	{
+		if (compute_call.images[i] == nullptr) continue;
+		impl_->set_image(*compute_call.images[i], i, compute_call.image_access[i]);
+	}
+	impl_->dispatch(compute_call.workgroups_number.x(), compute_call.workgroups_number.y(), compute_call.workgroups_number.z());
+}
+
 void Driver::begin_render()
 {
 	impl_->set_default_render_target();

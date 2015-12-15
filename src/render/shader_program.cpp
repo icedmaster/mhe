@@ -9,9 +9,9 @@ ShaderProgram::ShaderProgram() :
 	impl_(SystemFactory::instance().create_shader_program())
 {}
 
-bool ShaderProgram::init(const std::string& vsdata, const std::string& fsdata, const ShaderInitializationParams& params)
+bool ShaderProgram::init(const ShaderInitializationParams& params)
 {
-	return impl_->init(vsdata, fsdata, params);
+	return impl_->init(params);
 }
 
 void UberShader::Index::set(const Info& info, size_t value)

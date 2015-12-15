@@ -11,6 +11,7 @@
 /10_imgui/build/*
 /11_animation/build/*
 /12_sh/build/*
+/13_compute/build/*
 
 !/build/CMakeLists.txt
 !/01_init/build/CMakeLists.txt
@@ -25,6 +26,8 @@
 !/10_imgui/build/CMakeLists.txt
 !/11_animation/build/CMakeLists.txt
 !/12_sh/build/CMakeLists.txt
+!/13_compute/build/CMakeLists.txt
+
 
 
 
