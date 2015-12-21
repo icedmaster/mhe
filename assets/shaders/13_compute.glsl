@@ -26,27 +26,13 @@ void main()
 	ivec2 pos = ivec2(gl_GlobalInvocationID.xy);
 	vec3 src_color = imageLoad(src, pos).rgb;
 	float luminance = calculate_luminance(src_color);
-	uint index = gl_LocalInvocationID.y * gl_WorkGroupSize.x + gl_LocalInvocationID.x;
-	group_luminance[index] = luminance;
-	memoryBarrierShared(); // now this data will be visible in other invocations
-	barrier(); // wait until all threads calculate the luminance
-	
-	if (index == 0)
-	{
-		float average_luminance = 0.0f;
-		for (int i = 0; i < 16 * 16; ++i)
-			average_luminance += group_luminance[i];
-		average_luminance /= (16 * 16);
-
-		uint global_index = gl_WorkGroupID.y * gl_NumWorkGroups.x + gl_WorkGroupID.x;
-		result_luminance[global_index] = average_luminance;
-	}
+	result_luminance[gl_LocalInvocationIndex] = luminance;
 }
 
 #else
 layout(std430, binding = 0) buffer shared_luminance
 {
-	float result_luminance[];
+	float result_luminance;
 };
 
 layout(binding = 1) writeonly uniform image2D dst;
@@ -66,7 +52,7 @@ void main()
 		{
 			ivec2 offset = ivec2(x, y);
 			vec4 src_color = imageLoad(src, pos + offset);
-			if (dot(src_color.rgb, vec3(0.33f, 0.33f, 0.33f)) > result_luminance[global_index])
+			if (dot(src_color.rgb, vec3(0.33f, 0.33f, 0.33f)) > result_luminance)
 			    src_color *= 1.5f;
 			clr += src_color;
 		}

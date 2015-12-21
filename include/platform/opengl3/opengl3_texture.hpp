@@ -35,6 +35,16 @@ public:
 	{
 		return image_format_;
 	}
+
+	size_t width() const override
+	{
+		return width_;
+	}
+
+	size_t height() const override
+	{
+		return height_;
+	}
 private:
 	void init_cubemap(const TextureDesc& desc, const uint8_t* data, size_t size);
 

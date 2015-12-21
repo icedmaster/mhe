@@ -94,6 +94,7 @@ public:
 	virtual ~ShaderStorageBufferImpl() {}
 	virtual bool init(const ShaderStorageBufferDesc& desc, const uint8_t* data, size_t size) = 0;
 	virtual void destroy() = 0;
+	virtual size_t size() const = 0;
 };
 
 class MHE_EXPORT RenderBuffer
@@ -366,6 +367,11 @@ public:
 	void destroy()
 	{
 		impl_->destroy();
+	}
+
+	size_t size() const
+	{
+		return impl_->size();
 	}
 
 	const ShaderStorageBufferImpl* impl() const

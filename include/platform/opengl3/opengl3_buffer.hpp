@@ -191,6 +191,11 @@ public:
 
 	void enable(size_t unit) const;
 	void disable() const;
+
+	size_t size() const override
+	{
+		return vbo_.size();
+	}
 private:
 	VBO vbo_;
 	GLenum format_;
