@@ -137,12 +137,12 @@ void OpenGL3Driver::set_index_buffer(const IndexBuffer& ibuffer)
 void OpenGL3Driver::set_uniform(const UniformBuffer& uniform, size_t unit)
 {
 	const OpenGL3UniformBuffer* buffer = static_cast<const OpenGL3UniformBuffer*>(uniform.impl());
-    if (state_.uniforms[unit] != uniform.id())
-    {
-        buffer->bind(unit);
-        state_.uniforms[unit] = uniform.id();
-    }
-    buffer->enable(current_shader_program_, unit);
+	if (state_.uniforms[unit] != uniform.id())
+	{
+		buffer->bind(unit);
+		state_.uniforms[unit] = uniform.id();
+	}
+	buffer->enable(current_shader_program_, unit);
 	CHECK_GL_ERRORS();
 }
 

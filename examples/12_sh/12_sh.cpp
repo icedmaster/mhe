@@ -3,9 +3,9 @@
 //#define NSIGHT
 //#define DISABLE_DEPTH_TEST
 #define BAKE_LIGHT
-#define BOUNCES 2
+#define BOUNCES 1
 //#define SINGLE_NORMALMAP
-const char* mesh_name = "test-scene-simple2.bin";
+const char* mesh_name = "lighting-test-simple.bin";
 
 namespace sh
 {
@@ -432,7 +432,7 @@ private:
 			const sh::ColorSH& harmonics = render(iteration, texture_buffer, draw_call, x, y, z, vertex_position);
 			memcpy(data_ptr + i * stride, harmonics.coeff.data(), stride * sizeof(float));
 
-			show_gui(iteration, 0, i);
+			show_gui(iteration, 0, i, size);
 			context_->driver.end_render();
 			context_->window_system.swap_buffers();
 			engine_->reset_profiler();
@@ -719,10 +719,8 @@ private:
 		total_weight_ = 4 * pi / total_weight_;
 	}
 
-	void show_gui(size_t iteration, size_t mesh_index, size_t vertex_index)
+	void show_gui(size_t iteration, size_t mesh_index, size_t vertex_index, size_t vertices_total)
 	{
-		return;
-
 		ImGuiHelper& imgui_helper = engine_->debug_views().imgui_helper();
 		engine_->render_context().fdelta = 0.01f; // just a small number because ImGUI requires some update delta
 		imgui_helper.update(*context_, engine_->render_context(), engine_->event_manager());
@@ -730,10 +728,12 @@ private:
 		ImGui::Begin("Baking stats:");
 		ImGui::LabelText("iteration:", "%u", iteration);
 		ImGui::LabelText("mesh:", "%u", mesh_index);
-		ImGui::LabelText("vertex:", "%u", vertex_index);
+		ImGui::LabelText("vertex:", "%u / %u", vertex_index, vertices_total);
 		ImGui::End();
 
 		imgui_helper.render(*context_, engine_->render_context());
+		engine_->context().driver.render(engine_->context(), engine_->render_context().explicit_draw_calls.data(), 1);
+		engine_->render_context().explicit_draw_calls.clear();
 	}
 
 	mhe::array<float, texture_size * texture_size> weights_;
