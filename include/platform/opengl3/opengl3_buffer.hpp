@@ -183,6 +183,19 @@ private:
 	size_t unit_;
 };
 
+class OpenGL3ShaderStorageBuffer : public ShaderStorageBufferImpl
+{
+public:
+	bool init(const ShaderStorageBufferDesc& desc, const uint8_t* data, size_t size) override;
+	void destroy() override;
+
+	void enable(size_t unit) const;
+	void disable() const;
+private:
+	VBO vbo_;
+	GLenum format_;
+};
+
 }}
 
 #endif

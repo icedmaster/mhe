@@ -53,6 +53,13 @@ enum
 	access_max
 };
 
+// barriers
+enum
+{
+	memory_barrier_storage_buffer,
+	memory_barrier_max
+};
+
 }
 
 #endif

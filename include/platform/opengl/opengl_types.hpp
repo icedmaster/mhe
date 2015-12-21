@@ -201,6 +201,15 @@ inline GLenum get_access(int access)
 	return gl_access[access];
 }
 
+inline GLbitfield get_barriers(uint32_t barriers)
+{
+	GLbitfield result = 0;
+	// TODO: need to optimize this method
+	if (barriers & memory_barrier_storage_buffer)
+		result |= GL_BUFFER_UPDATE_BARRIER_BIT;
+	return result;
+}
+
 }}
 
 #endif

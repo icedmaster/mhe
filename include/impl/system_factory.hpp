@@ -38,6 +38,8 @@ public:
 	RenderStateImpl* create_render_state() const;
 	RenderTargetImpl* create_render_target() const;
 	TextureBufferImpl* create_texture_buffer() const;
+	ShaderStorageBufferImpl* create_shader_storage_buffer() const;
+
 	QueryImpl* create_query() const;
 
 	// input devices

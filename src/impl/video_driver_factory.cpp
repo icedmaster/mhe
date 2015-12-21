@@ -97,4 +97,9 @@ QueryImpl* VideoDriverFactory::create_query() const
 	return current_driver_factory_->create_query();
 }
 
+ShaderStorageBufferImpl* VideoDriverFactory::create_shader_storage_buffer() const
+{
+	return current_driver_factory_->create_shader_storage_buffer();
+}
+
 }

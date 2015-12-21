@@ -12,7 +12,7 @@ namespace opengl {
 bool VAO::init()
 {
 	OpenGLExtensions::instance().glGenVertexArrays(1, &id_);
-    return true;
+	return true;
 }
 
 void VAO::close()
@@ -301,13 +301,13 @@ void OpenGL3UniformBuffer::update(const uint8_t* data, size_t offset, size_t siz
 
 void OpenGL3UniformBuffer::bind(size_t unit) const
 {
-    vbo_[current_].enable();
-    OpenGLExtensions::instance().glBindBufferBase(GL_UNIFORM_BUFFER, unit, vbo_[current_].id());
+	vbo_[current_].enable();
+	OpenGLExtensions::instance().glBindBufferBase(GL_UNIFORM_BUFFER, unit, vbo_[current_].id());
 }
 
 void OpenGL3UniformBuffer::enable(const OpenGL3ShaderProgram* program, size_t unit) const
 {
-    if (id_ != invalid_unit)
+	if (id_ != invalid_unit)
 		OpenGLExtensions::instance().glUniformBlockBinding(program->id(), id_, unit);
 	else
 		OpenGLExtensions::instance().glUniformBlockBinding(program->id(), program->uniform_location(unit), unit);
@@ -367,6 +367,35 @@ void OpenGL3TextureBuffer::data(uint8_t* ptr, size_t size) const
 {
 	vbo_.enable();
 	vbo_.data(ptr, size);
+	vbo_.disable();
+}
+
+bool OpenGL3ShaderStorageBuffer::init(const ShaderStorageBufferDesc& desc, const uint8_t* data, size_t size)
+{
+	ASSERT(size <= desc.size, "Invalid size for the storage buffer initialization");
+	if (!vbo_.init(GL_SHADER_STORAGE_BUFFER, desc.size, data, get_vbo_usage(desc.update_type)))
+	{
+		ERROR_LOG("Can't initialize a VBO for a OpenGL3ShaderStorageBuffer");
+		return false;
+	}
+	format_ = get_format(desc.format);
+	return true;
+}
+
+void OpenGL3ShaderStorageBuffer::destroy()
+{
+	vbo_.close();
+}
+
+void OpenGL3ShaderStorageBuffer::enable(size_t unit) const
+{
+	vbo_.enable();
+	OpenGLExtensions::instance().glBindBufferBase(GL_SHADER_STORAGE_BUFFER, unit, vbo_.id());
+	CHECK_GL_ERRORS();
+}
+
+void OpenGL3ShaderStorageBuffer::disable() const
+{
 	vbo_.disable();
 }
 

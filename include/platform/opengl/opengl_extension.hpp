@@ -693,6 +693,15 @@ public:
 		::glBindImageTexture(unit, texture, level, layered, layer, access, format);
 #endif
 	}
+
+	void glMemoryBarrier(GLbitfield barriers)
+	{
+#ifndef MHE_USE_NATIVE_OPENGL
+		glMemoryBarrier_(barriers);
+#else
+		::glMemoryBarrier(barriers);
+#endif
+	}
 private:
 	OpenGLExtensions() {}
 	~OpenGLExtensions() {}
@@ -734,11 +743,11 @@ private:
 	PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog_;
 	PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation_;
 	PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv_;
-    PFNGLUNIFORMMATRIX3FVPROC glUniformMatrix3fv_;
-    PFNGLUNIFORM3FVPROC glUniform3fv_;
-    PFNGLUNIFORM4FVPROC glUniform4fv_;
+	PFNGLUNIFORMMATRIX3FVPROC glUniformMatrix3fv_;
+	PFNGLUNIFORM3FVPROC glUniform3fv_;
+	PFNGLUNIFORM4FVPROC glUniform4fv_;
 	PFNGLUNIFORM1IPROC glUniform1i_;
-    PFNGLUNIFORM1FPROC glUniform1f_;
+	PFNGLUNIFORM1FPROC glUniform1f_;
 	PFNGLGETATTRIBLOCATIONPROC glGetAttribLocation_;
 	PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer_;
 	PFNGLVERTEXATTRIBIPOINTERPROC glVertexAttribIPointer_;
@@ -788,6 +797,7 @@ private:
 	PFNGLGETBUFFERSUBDATAPROC glGetBufferSubData_;
 	PFNGLDISPATCHCOMPUTEPROC glDispatchCompute_;
 	PFNGLBINDIMAGETEXTUREPROC glBindImageTexture_;
+	PFNGLMEMORYBARRIERPROC glMemoryBarrier_;
 #endif
 	std::map<std::string, bool> loaded_extensions_;
 };

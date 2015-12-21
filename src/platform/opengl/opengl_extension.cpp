@@ -85,6 +85,7 @@ void OpenGLExtensions::init_extensions()
 	glGetBufferSubData_ = load_extension<PFNGLGETBUFFERSUBDATAPROC>("glGetBufferSubData");
 	glDispatchCompute_ = load_extension<PFNGLDISPATCHCOMPUTEPROC>("glDispatchCompute");
 	glBindImageTexture_ = load_extension<PFNGLBINDIMAGETEXTUREPROC>("glBindImageTexture");
+	glMemoryBarrier_ = load_extension<PFNGLMEMORYBARRIERPROC>("glMemoryBarrier");
 #endif	// MHE_OPENGL_HAS_SHADERS
 
 	get_str_extensions();

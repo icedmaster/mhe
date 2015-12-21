@@ -87,6 +87,8 @@ const size_t initial_material_instances_number = 2048;
 
 const size_t max_trace_data_instances_number = 128;
 
+const size_t max_shader_storage_buffers_number = 128;
+
 const size_t max_material_systems_number = 128;
 const size_t max_render_targets_number = 128;
 const size_t max_simultaneous_render_targets_number = 4;

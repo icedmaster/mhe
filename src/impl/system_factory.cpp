@@ -15,7 +15,7 @@ RenderBufferImpl* SystemFactory::create_render_buffer() const
 
 IndexBufferImpl* SystemFactory::create_index_buffer() const
 {
-    return video_driver_factory_.create_index_buffer();
+	return video_driver_factory_.create_index_buffer();
 }
 
 LayoutImpl* SystemFactory::create_layout() const
@@ -53,6 +53,11 @@ TextureBufferImpl* SystemFactory::create_texture_buffer() const
 	return video_driver_factory_.create_texture_buffer();
 }
 
+ShaderStorageBufferImpl* SystemFactory::create_shader_storage_buffer() const
+{
+	return video_driver_factory_.create_shader_storage_buffer();
+}
+
 QueryImpl* SystemFactory::create_query() const
 {
 	return video_driver_factory_.create_query();
@@ -61,6 +66,6 @@ QueryImpl* SystemFactory::create_query() const
 WindowSystemImpl* SystemFactory::create_window_system() const
 {
 	return window_system_factory_.create_window_system();
-}	
+}
 
 }  // mhe

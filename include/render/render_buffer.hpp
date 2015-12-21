@@ -81,6 +81,21 @@ public:
 	virtual size_t size() const = 0;
 };
 
+struct ShaderStorageBufferDesc
+{
+	size_t size;
+	BufferUpdateType update_type;
+	int format;
+};
+
+class ShaderStorageBufferImpl
+{
+public:
+	virtual ~ShaderStorageBufferImpl() {}
+	virtual bool init(const ShaderStorageBufferDesc& desc, const uint8_t* data, size_t size) = 0;
+	virtual void destroy() = 0;
+};
+
 class MHE_EXPORT RenderBuffer
 {
 	friend class Driver;
@@ -194,7 +209,7 @@ struct LayoutDesc
 class MHE_EXPORT Layout
 {
 	friend class Driver;
-    POOL_ELEMENT_METHODS(uint16_t)
+	POOL_ELEMENT_METHODS(uint16_t)
 public:
 	Layout();
 	bool init(const LayoutDesc& desc)
@@ -335,6 +350,30 @@ public:
 	}
 private:
 	unique_ptr<TextureBufferImpl> impl_;
+};
+
+class MHE_EXPORT ShaderStorageBuffer
+{
+	POOL_ELEMENT_METHODS(uint16_t);
+public:
+	ShaderStorageBuffer();
+
+	bool init(const ShaderStorageBufferDesc& desc, const uint8_t* data, size_t size)
+	{
+		return impl_->init(desc, data, size);
+	}
+
+	void destroy()
+	{
+		impl_->destroy();
+	}
+
+	const ShaderStorageBufferImpl* impl() const
+	{
+		return impl_.get();
+	}
+private:
+	unique_ptr<ShaderStorageBufferImpl> impl_;
 };
 
 typedef RenderBuffer VertexBuffer;

@@ -39,12 +39,14 @@ struct DrawCallExplicit
 };
 
 const size_t compute_call_images_number = 8;
+const size_t compute_call_buffers_number = 4;
 
 struct ComputeCallExplicit
 {
 	ShaderProgram* shader_program;
 	Texture* images[compute_call_images_number];
 	int image_access[compute_call_images_number];
+	ShaderStorageBuffer* buffers[compute_call_buffers_number];
 	uivec3 workgroups_number;
 };
 

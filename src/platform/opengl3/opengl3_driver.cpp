@@ -218,9 +218,21 @@ void OpenGL3Driver::set_image(const Texture& texture, size_t unit, int access)
 	CHECK_GL_ERRORS();
 }
 
+void OpenGL3Driver::set_shader_storage_buffer(const ShaderStorageBuffer& buffer, size_t unit)
+{
+	const OpenGL3ShaderStorageBuffer* opengl_buffer = static_cast<const OpenGL3ShaderStorageBuffer*>(buffer.impl());
+	opengl_buffer->enable(unit);
+}
+
 void OpenGL3Driver::dispatch(size_t x, size_t y, size_t z)
 {
 	OpenGLExtensions::instance().glDispatchCompute(x, y, z);
+	CHECK_GL_ERRORS();
+}
+
+void OpenGL3Driver::memory_barrier(uint32_t barriers)
+{
+	OpenGLExtensions::instance().glMemoryBarrier(get_barriers(barriers));
 	CHECK_GL_ERRORS();
 }
 

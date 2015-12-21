@@ -30,6 +30,7 @@ class UniformBuffer;
 class Layout;
 class RenderTarget;
 class RenderCommand;
+class ShaderStorageBuffer;
 
 class DriverImpl
 {
@@ -84,7 +85,9 @@ public:
 	virtual void flush() = 0;
 
 	virtual void set_image(const Texture& texture, size_t unit, int access) = 0;
+	virtual void set_shader_storage_buffer(const ShaderStorageBuffer& buffer, size_t unit) = 0;
 	virtual void dispatch(size_t x, size_t y, size_t z) = 0;
+	virtual void memory_barrier(uint32_t barriers) = 0;
 };
 
 class MHE_EXPORT Driver
@@ -223,6 +226,7 @@ public:
 	void render(const Context& context, const DrawCallExplicit* draw_calls, size_t count);
 
 	void execute(const Context& context, const ComputeCallExplicit* compute_calls, size_t count);
+	void memory_barrier(uint32_t barriers);
 
 	void set_window_size(const vector2<int>& size)
 	{

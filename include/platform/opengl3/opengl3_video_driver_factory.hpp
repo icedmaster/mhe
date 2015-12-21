@@ -17,59 +17,64 @@ namespace opengl {
 class OpenGL3VideoDriverFactory : public AbstractVideoDriverFactory
 {
 public:
-	std::string name() const
+	const char* name() const override
 	{
 		return "opengl3";
 	}
 
-	DriverImpl* create_video_driver() const
+	DriverImpl* create_video_driver() const override
 	{
 		return new OpenGL3Driver;
 	}
 
-	RenderBufferImpl* create_render_buffer() const
+	RenderBufferImpl* create_render_buffer() const override
 	{
 		return new OpenGL3Buffer;
 	}
 
-	IndexBufferImpl* create_index_buffer() const
+	IndexBufferImpl* create_index_buffer() const override
 	{
 		return new OpenGL3IndexBuffer;
 	}
 
-	LayoutImpl* create_layout() const
+	LayoutImpl* create_layout() const override
 	{
 		return new OpenGL3Layout;
 	}
 
-	UniformBufferImpl* create_uniform_buffer() const
+	UniformBufferImpl* create_uniform_buffer() const override
 	{
 		return new OpenGL3UniformBuffer;
 	}
 
-	ShaderProgramImpl* create_shader_program() const
+	ShaderProgramImpl* create_shader_program() const override
 	{
 		return new OpenGL3ShaderProgram;
 	}
 
-	TextureImpl* create_texture() const
+	TextureImpl* create_texture() const override
 	{
 		return new OpenGL3Texture;
 	}
 
-	RenderStateImpl* create_render_state() const
+	RenderStateImpl* create_render_state() const override
 	{
 		return new OpenGL3RenderState;
 	}
 
-	RenderTargetImpl* create_render_target() const
+	RenderTargetImpl* create_render_target() const override
 	{
 		return new OpenGL3RenderTarget;
 	}
 
-	TextureBufferImpl* create_texture_buffer() const
+	TextureBufferImpl* create_texture_buffer() const override
 	{
 		return new OpenGL3TextureBuffer;
+	}
+
+	ShaderStorageBufferImpl* create_shader_storage_buffer() const override
+	{
+		return new OpenGL3ShaderStorageBuffer;
 	}
 
 	QueryImpl* create_query() const override

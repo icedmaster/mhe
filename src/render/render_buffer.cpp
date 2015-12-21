@@ -24,4 +24,8 @@ TextureBuffer::TextureBuffer() :
 	impl_(SystemFactory::instance().create_texture_buffer())
 {}
 
+ShaderStorageBuffer::ShaderStorageBuffer() :
+	impl_(SystemFactory::instance().create_shader_storage_buffer())
+{}
+
 }

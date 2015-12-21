@@ -297,6 +297,11 @@ void Driver::execute(const Context& context, const ComputeCallExplicit* compute_
 		perform_compute_call(context, compute_calls[i]);
 }
 
+void Driver::memory_barrier(uint32_t barriers)
+{
+
+}
+
 void Driver::perform_compute_call(const Context& context, const ComputeCallExplicit& compute_call)
 {
 	ASSERT(compute_call.shader_program != nullptr, "Invalid shader program");
@@ -305,6 +310,11 @@ void Driver::perform_compute_call(const Context& context, const ComputeCallExpli
 	{
 		if (compute_call.images[i] == nullptr) continue;
 		impl_->set_image(*compute_call.images[i], i, compute_call.image_access[i]);
+	}
+	for (size_t i = 0; i < compute_call_buffers_number; ++i)
+	{
+		if (compute_call.buffers[i] == nullptr) continue;
+		impl_->set_shader_storage_buffer(*compute_call.buffers[i], i);
 	}
 	impl_->dispatch(compute_call.workgroups_number.x(), compute_call.workgroups_number.y(), compute_call.workgroups_number.z());
 }

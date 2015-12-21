@@ -83,7 +83,9 @@ private:
 	void flush();
 
 	void set_image(const Texture& texture, size_t unit, int access) override;
+	void set_shader_storage_buffer(const ShaderStorageBuffer& buffer, size_t unit) override;
 	void dispatch(size_t x, size_t y, size_t z) override;
+	void memory_barrier(uint32_t barriers) override;
 private:
 	void setup_caps(DriverRenderingCapabilities& caps);
 
