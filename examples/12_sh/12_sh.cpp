@@ -5,7 +5,7 @@
 #define BAKE_LIGHT
 #define BOUNCES 1
 //#define SINGLE_NORMALMAP
-const char* mesh_name = "lighting-test-simple.bin";
+const char* mesh_name = "test-scene.bin";
 
 namespace sh
 {
@@ -427,6 +427,7 @@ private:
 			z = vertex_normal;
 			x = vertices[i].tng.xyz();
 			y = cross(z, x) * vertices[i].tng.w();
+			// x, y and z create a left-handed coordinate system
 
 			context_->driver.begin_render();
 			const sh::ColorSH& harmonics = render(iteration, texture_buffer, draw_call, x, y, z, vertex_position);
@@ -608,7 +609,7 @@ private:
 
 		case texture_posz:
 			view_fwd = z;
-			view_side = -x;
+			view_side = x;
 			view_up = y;
 			break;
 		default:

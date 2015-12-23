@@ -63,6 +63,7 @@ bool SkyboxMaterialSystem::init_mesh(Context& context, const MaterialSystemConte
 	render_state_desc.stencil.enabled = false;
 	render_state_desc.depth.test_enabled = false;
 	render_state_desc.depth.write_enabled = false;
+	render_state_desc.rasterizer.cull = cull_none;
 	skybox_mesh_.instance_parts[0].draw_call_data = context.draw_call_data_pool.create();
 	DrawCallData& draw_call_data = context.draw_call_data_pool.get(skybox_mesh_.instance_parts[0].draw_call_data);
 	draw_call_data.state = context.render_state_pool.create();

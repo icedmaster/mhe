@@ -78,6 +78,7 @@ bool PosteffectDebugMaterialSystem::init_mesh_instance(Context& context, MeshIns
 	}
 	desc.depth.test_enabled = false;
 	desc.depth.write_enabled = false;
+	desc.rasterizer.cull = cull_none;
 	render_state.init(desc);
 
 	mesh_instance.mesh.parts.resize(1);
@@ -232,6 +233,7 @@ bool PosteffectMaterialSystemBase::init_mesh(Context& context, const MaterialSys
 	desc.blend.dstmode = blend_src_inv_alpha;
 	desc.depth.test_enabled = false;
 	desc.depth.write_enabled = false;
+	desc.rasterizer.cull = cull_none;
 	render_state.init(desc);
 
 	// outputs

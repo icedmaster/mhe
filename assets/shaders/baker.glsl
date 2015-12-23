@@ -57,13 +57,13 @@ layout (location = 0) out vec4 color;
 
 void main()
 {
+	vec3 albedo = texture(diffuse_texture, vsoutput.tex).rgb;
 	vec3 nrm_ts = vec3(0, 0, 1);
 #if BOUNCE == 1
 	vec3 baked_irradiance = calculate_irradiance(nrm_ts, vsoutput.baked_radiance);
 #else
 	vec3 baked_irradiance = vec3(1, 1, 1);
 #endif
-	vec3 albedo = texture(diffuse_texture, vsoutput.tex).rgb;
 	color = vec4(gl_FrontFacing ? albedo * baked_irradiance : VEC3_ZERO, 1);
 	//color = vec4(albedo * baked_irradiance, 1);
 }

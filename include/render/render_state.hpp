@@ -102,7 +102,7 @@ struct RasterizerDesc
 
 	RasterizerDesc() :
 		// TODO: the default cull value should be cull_back
-		cull(cull_none), order(winding_ccw), color_write(true)
+		cull(cull_back), order(winding_ccw), color_write(true)
 	{}
 };
 
