@@ -169,6 +169,8 @@ bool ImGuiHelper::init_render_state(Context& context)
 	desc.depth.test_enabled = false;
 	desc.depth.write_enabled = false;
 
+	desc.rasterizer.cull = cull_none;
+
 	RenderState& render_state = create_and_get(context.render_state_pool);
 	render_state_id_ = render_state.id();
 	return render_state.init(desc);

@@ -25,5 +25,7 @@
 *xcuserdata*
 *.idea*
 *.patch
+*.editorconfig
+
 
 
