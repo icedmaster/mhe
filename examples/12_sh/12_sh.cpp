@@ -3,9 +3,10 @@
 //#define NSIGHT
 //#define DISABLE_DEPTH_TEST
 #define BAKE_LIGHT
-#define BOUNCES 0
+#define BOUNCES 1
 //#define SINGLE_NORMALMAP
 const char* mesh_name = "test-scene.bin";
+const float baker_zfar = 10.0f;
 
 namespace sh
 {
@@ -453,7 +454,7 @@ private:
     sh::ColorSH render(size_t iteration, TextureBuffer& texture_buffer, DrawCallExplicit& draw_call, const vec3& x, const vec3& y, const vec3& z, const vec3& pos)
     {
         mat4x4 proj;
-        proj.set_perspective(pi_2, 1.0f, 0.01f, 50.0f);
+        proj.set_perspective(pi_2, 1.0f, 0.01f, baker_zfar);
 
         NodeInstance* nodes = scene_context_->node_pool.all_objects();
         size_t nodes_number = scene_context_->node_pool.size();
@@ -614,7 +615,7 @@ private:
 
         case texture_posz:
             view_fwd = z;
-            view_side = x;
+            view_side = -x;
             view_up = y;
             break;
         default:
