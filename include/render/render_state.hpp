@@ -101,7 +101,6 @@ struct RasterizerDesc
 	bool color_write;
 
 	RasterizerDesc() :
-		// TODO: the default cull value should be cull_back
 		cull(cull_back), order(winding_ccw), color_write(true)
 	{}
 };

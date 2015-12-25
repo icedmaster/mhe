@@ -3,7 +3,7 @@
 //#define NSIGHT
 //#define DISABLE_DEPTH_TEST
 #define BAKE_LIGHT
-#define BOUNCES 1
+#define BOUNCES 2
 //#define SINGLE_NORMALMAP
 const char* mesh_name = "test-scene.bin";
 const float baker_zfar = 10.0f;

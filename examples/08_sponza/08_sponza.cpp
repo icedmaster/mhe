@@ -17,7 +17,8 @@ public:
 		init_lighting(engine);
 
 		mhe::BlurMaterialSystem* ssr_blur = engine.context().material_systems.get<mhe::BlurMaterialSystem>(mhe::string("ssr_blur"));
-		ssr_blur->settings().size = 2.0f;
+        if (ssr_blur != nullptr)
+            ssr_blur->settings().size = 2.0f;
 
 		return true;
 	}
