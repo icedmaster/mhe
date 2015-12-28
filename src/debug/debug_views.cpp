@@ -13,12 +13,12 @@ namespace mhe {
 
 void DebugViews::init(EventManager& event_manager)
 {
-	event_manager.add_bind("debug_main", keyboard_event_type, KeyboardEvent::key_down, KeyboardDevice::key_f1);
-	event_manager.add_bind("debug_shadow", keyboard_event_type, KeyboardEvent::key_down, KeyboardDevice::key_f2);
-	event_manager.add_bind("standart_stats", keyboard_event_type, KeyboardEvent::key_down, KeyboardDevice::key_f3);
-	event_manager.add_bind("debug_ssr", keyboard_event_type, KeyboardEvent::key_down, KeyboardDevice::key_f4);
-	event_manager.add_bind("debug_ssao", keyboard_event_type, KeyboardEvent::key_down, KeyboardDevice::key_f5);
-	event_manager.add_bind("debug_baked_irradiance", keyboard_event_type, KeyboardEvent::key_down, KeyboardDevice::key_f6);
+	event_manager.add_bind("debug_main", keyboard_event_type, KeyboardEvent::key_pressed, KeyboardDevice::key_f1);
+	event_manager.add_bind("debug_shadow", keyboard_event_type, KeyboardEvent::key_pressed, KeyboardDevice::key_f2);
+	event_manager.add_bind("standart_stats", keyboard_event_type, KeyboardEvent::key_pressed, KeyboardDevice::key_f3);
+	event_manager.add_bind("debug_ssr", keyboard_event_type, KeyboardEvent::key_pressed, KeyboardDevice::key_f4);
+	event_manager.add_bind("debug_ssao", keyboard_event_type, KeyboardEvent::key_pressed, KeyboardDevice::key_f5);
+	event_manager.add_bind("debug_baked_irradiance", keyboard_event_type, KeyboardEvent::key_pressed, KeyboardDevice::key_f6);
 
 	stats_enabled_ = false;
 

@@ -11,37 +11,46 @@ namespace mhe {
 class MHE_EXPORT Device : public ref_counter
 {
 protected:
-	static const size_t max_events_count = 10;
+    static const size_t max_events_count = 10;
 public:
-	typedef fixed_size_vector<event_ptr, max_events_count> events_vector;
+    typedef fixed_size_vector<event_ptr, max_events_count> events_vector;
 public:
-	Device(const std::string& name) :
-		name_(name)
-	{}
+    Device(const std::string& name) :
+        name_(name)
+    {}
 
-	virtual ~Device() {}
+    virtual ~Device() {}
 
-	const std::string& name() const
-	{
-		return name_;
-	}
+    const std::string& name() const
+    {
+        return name_;
+    }
 
-	events_vector check(const WindowSystem& ws);
+    events_vector check(const WindowSystem& ws);
+    bool is_event_active(bool current, uint32_t id) const
+    {
+        return is_event_active_impl(current, id);
+    }
 protected:
-	/// Initializing device events vector with events of concrete type
-	template <class EventType>
-	void init_events_with_type()
-	{
-		for (size_t i = 0; i < max_events_count; ++i)
+    /// Initializing device events vector with events of concrete type
+    template <class EventType>
+    void init_events_with_type()
+    {
+        for (size_t i = 0; i < max_events_count; ++i)
         {
-			events_[i] = ref_ptr<EventType>(new EventType);
+            events_[i] = ref_ptr<EventType>(new EventType);
         }
-	}
+    }
 private:
-	virtual void check_impl(events_vector& events, const WindowSystem&) = 0;
+    virtual void check_impl(events_vector& events, const WindowSystem&) = 0;
 
-	std::string name_;
-	events_vector events_;
+    virtual bool is_event_active_impl(bool current, uint32_t /*id*/) const
+    {
+        return current;
+    }
+
+    std::string name_;
+    events_vector events_;
 };
 
 }
