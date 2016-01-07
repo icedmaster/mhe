@@ -97,7 +97,7 @@ inline void add_field(S& dst, int n)
 }
 
 template <class S>
-inline void add_field(S& dst, size_t n)
+inline void add_field(S& dst, uint64_t n)
 {
     add_field<S>(dst, static_cast<int>(n));
 }
