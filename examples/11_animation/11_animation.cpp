@@ -244,7 +244,6 @@ private:
     void update_skeleton(mhe::mat4x4* matrices, const mhe::Skeleton& skeleton)
     {
         size_t size = skeleton.bones.size();
-        const mhe::mat4x4* transforms = controller_.matrices();
         
         for (size_t i = 0; i < size; ++i)
         {

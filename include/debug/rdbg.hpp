@@ -108,7 +108,7 @@ public:
 	T value(const char* name) const
 	{
 		NameToVectorMap::const_iterator it = names_indices_.find(string(name));
-		if (it == vars_.end()) return T();
+		if (it == names_indices_.end()) return T();
 		return types_cast<T>(vars_[it->value].value);
 	}
 

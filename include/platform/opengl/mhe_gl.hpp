@@ -25,7 +25,7 @@
 #endif
 
 #ifndef MHE_WIN
-	#define MHE_USE_NATIVE_OPENGL
+//#define MHE_USE_NATIVE_OPENGL
 #endif
 
 #define MHE_OPENGL_HAS_SHADERS

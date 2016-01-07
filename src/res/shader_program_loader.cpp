@@ -303,6 +303,9 @@ bool ShaderProgramLoader::load(type& res, const std::string& name, const context
         const std::vector<std::string>& vs_tmp = utils::split(params.vsdata, "\n", true);
         const std::vector<std::string>& fs_tmp = utils::split(params.fsdata, "\n", true);
         const std::vector<std::string>& cs_tmp = utils::split(params.csdata, "\n", true);
+        UNUSED(vs_tmp);
+        UNUSED(fs_tmp);
+        UNUSED(cs_tmp);
 
         detail::update_shader_data(params, context);
 

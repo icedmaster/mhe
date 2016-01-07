@@ -175,7 +175,7 @@ void CSMDepthRenderingMaterialSystem::start_frame(Context& context, SceneContext
     light->set_shadow_info(&shadow_info_);
 }
 
-void CSMDepthRenderingMaterialSystem::calculate_projection(mat4x4& proj, mat4x4& view, const vec4* aabb, const CameraData& camera_data, float znear, float zfar,
+void CSMDepthRenderingMaterialSystem::calculate_projection(mat4x4& proj, mat4x4& view, const vec4* /*aabb*/, const CameraData& camera_data, float znear, float zfar,
     const vec3& lightdir, const RenderContext& render_context) const
 {
     vec3 viewspace_frustum_points[8];
@@ -263,7 +263,7 @@ void CSMDepthRenderingMaterialSystem::calculate_projection(mat4x4& proj, mat4x4&
     proj.set_row(3, proj.row(3) + offset);
 }
 
-void CSMDepthRenderingMaterialSystem::update(Context& context, SceneContext& scene_context, RenderContext& render_context)
+void CSMDepthRenderingMaterialSystem::update(Context& context, SceneContext& /*scene_context*/, RenderContext& render_context)
 {
     context.materials[id()].clear();
     clear_command_.reset();

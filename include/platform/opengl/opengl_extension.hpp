@@ -591,7 +591,7 @@ public:
 #ifndef MHE_USE_NATIVE_OPENGL
 		glTexBuffer_(target, internalformat, buffer);
 #else
-		::glTexBuffer(taret, internalformat, buffer);
+		::glTexBuffer(target, internalformat, buffer);
 #endif
 	}
 

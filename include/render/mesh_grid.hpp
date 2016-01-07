@@ -23,6 +23,7 @@ struct MeshGridTriangle
 template <class Tri>
 class MeshGridBase : public grid<Tri, uint16_t>
 {
+    typedef grid<Tri, uint16_t> BaseGrid;
 public:
 	MeshGridBase(allocator* alloc) :
 		grid<Tri, uint16_t>(alloc)
@@ -43,7 +44,7 @@ public:
 		vector3<int> min_cell = ceil(min_value / cell_size);
 		vector3<int> max_cell = ceil(max_value / cell_size);
 		vector3<int> dimension = max_cell - min_cell + vector3<int>(1);
-		resize(dimension);
+        BaseGrid::resize(dimension);
 
 		min_cell_ = min_cell;
 		max_cell_ = max_cell;
@@ -75,7 +76,7 @@ private:
 				min_value = mhe::min(min_value, triangles[i].pos[j]);
 				max_value = mhe::max(max_value, triangles[i].pos[j]);
 			}
-			add(triangles[i], calculate_cell(min_value), calculate_cell(max_value));
+            BaseGrid::add(triangles[i], calculate_cell(min_value), calculate_cell(max_value));
 		}
 	}
 
@@ -111,7 +112,7 @@ private:
 typedef MeshGridBase<MeshGridTriangle> MeshGrid;
 
 template <class Vertices, class Indices>
-void create_grid(MeshGrid& grid, const Vertices& vertices, size_t vertices_number, const Indices& indices, size_t indices_number,
+void create_grid(MeshGrid& grid, const Vertices& vertices, size_t /*vertices_number*/, const Indices& indices, size_t indices_number,
 	allocator* alloc = default_allocator())
 {
 	ASSERT(indices_number % 3 == 0, "Only triangulated meshes are currently supported");

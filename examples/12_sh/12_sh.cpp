@@ -3,9 +3,9 @@
 //#define NSIGHT
 //#define DISABLE_DEPTH_TEST
 #define BAKE_LIGHT
-#define BOUNCES 2
+#define BOUNCES 0
 //#define SINGLE_NORMALMAP
-const char* mesh_name = "test-scene.bin";
+const char* mesh_name = "test-scene-simple.bin";
 const float baker_zfar = 10.0f;
 
 namespace sh
@@ -119,8 +119,8 @@ struct SH
         }
     }
 
-    template <class T, size_t B>
-    SH<T, B>& operator+= (const SH<T, B>& h)
+    template <class NT, size_t NB>
+    SH<T, B>& operator+= (const SH<NT, NB>& h)
     {
         for (size_t i = 0; i < coefficients_number; ++i)
             coeff[i] += h.coeff[i];
@@ -264,7 +264,7 @@ struct LightContext
     mhe::colorf color;
 };
 
-ColorSH process_vertex(mhe::vec3* colors, const TestSample* samples, size_t samples_number, const mhe::vec3& vertex_normal, const LightContext& light_context)
+ColorSH process_vertex(mhe::vec3* colors, const TestSample* samples, size_t samples_number, const mhe::vec3& /*vertex_normal*/, const LightContext& light_context)
 {
     for (size_t i = 0; i < samples_number; ++i)
         colors[i] = light_context.color.rgb() * mhe::saturate(mhe::dot(light_context.direction, samples[i].corth));
@@ -960,9 +960,6 @@ private:
 
 int main(int /*argc*/, char** /*argv*/)
 {
-    mhe::quatf q(0.0f, -mhe::pi_2, 0.0f);
-    mhe::mat4x4 m = q.to_matrix<mat4x4>();
-
     mhe::app::Application app("12_sh");
     mhe::app::ApplicationConfig config;
     config.width = 1280;
