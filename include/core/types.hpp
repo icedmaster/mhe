@@ -110,6 +110,7 @@ struct pair
 #define UNUSED(x) (void)x;
 
 #define NOT_IMPLEMENTED(x) (void)x;
+#define NOT_IMPLEMENTED_METHOD()
 
 #define ARRAY_SIZE(a) sizeof(a) / sizeof(a[0])
 

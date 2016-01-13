@@ -36,10 +36,12 @@
   <material name="ssao" shader="posteffect_ssao" priority="8" />
   <material name="comp_mul" shader="posteffect_composite_mul" priority="8" on_demand="1" />
   <material name="comp_add" shader="posteffect_composite_add" priority="8" on_demand="1" />
+  <material name="probes_accumulator" shader="probes_accumulator" priority="7" />
   </materials>
   <skybox name="skybox" />
   <shadowmap_depth_write name="depth_write" />
   <directional_shadowmap_depth_write name="csm_depth_write" />
+  <probes_accumulator name="probes_accumulator" />
   <fullscreen_debug name="posteffect_debug" />
   <gbuffer>
 	<fill name="gbuffer_fill" />
@@ -52,6 +54,8 @@
 		<input index="0" node="" output="" material="gbuffer_fill" material_output="0" />
 		<input index="1" node="" output="" material="gbuffer_fill" material_output="1" />
 		<input index="2" node="" output="" material="gbuffer_fill" material_output="2" />
+		<input index="4" node="" output="" material="posteffect_simple" material_output="0" />
+		<input index="5" node="" output="" material="probes_accumulator" material_output="0" />
 	  </inputs>
 	  <outputs>
 		<output index="0" scale="0.5" />

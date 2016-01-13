@@ -104,12 +104,21 @@ inline MeshPart& add_part(Mesh& mesh)
 
 struct MeshPartInstance
 {
+    enum
+    {
+        cast_shadow = 1 << 0,
+        receive_shadow = 1 << 1,
+        cast_reflection = 1 << 2
+    };
+
     MaterialInstance material;
     DrawCallData::IdType draw_call_data;
     AABBInstanceHandleType aabb_id;
+    uint16_t flags;
     bool visible : 1;
 
-    MeshPartInstance() : aabb_id(InvalidHandle<AABBInstanceHandleType>::id), visible(true) {}
+    MeshPartInstance() : aabb_id(InvalidHandle<AABBInstanceHandleType>::id), visible(true),
+        flags(cast_shadow | receive_shadow | cast_reflection) {}
 };
 
 struct MeshInstance

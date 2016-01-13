@@ -347,6 +347,8 @@ bool SSRMaterialSystem::init(Context& context, const MaterialSystemContext& mate
     ssr_shader_data_.ssrdata[1] = vec4(10.0f, 1000.0f, 0.5f, 20.0f);
     ssr_shader_data_.ssrdata[2] = vec4(0.9f, 0.0f, 0.0f, 0.0f);
 
+    probes_info_ = ubershader(context).info("PROBES");
+
     return true;
 }
 
@@ -371,6 +373,13 @@ void SSRMaterialSystem::update(Context& context, SceneContext& scene_context, Re
     uniform.update(ssr_shader_data_);
 
     PosteffectMaterialSystemBase::update(context, scene_context, render_context);
+    // TODO: need to rewrite it
+    if (settings_.use_probes && input(probes_texture_unit).id != Texture::invalid_id)
+    {
+        UberShader::Index index;
+        index.set(probes_info_, 1);
+        default_material(context).shader_program = ubershader(context).get(index);
+    }
 }
 
 bool BlurMaterialSystem::init(Context& context, const MaterialSystemContext& material_system_context)
@@ -379,8 +388,6 @@ bool BlurMaterialSystem::init(Context& context, const MaterialSystemContext& mat
         return false;
     pass_info_ = ubershader(context).info("PASS");
     quality_info_ = ubershader(context).info("QUALITY");
-
-    quality_ = quality_normal;
 
     UniformBuffer& uniform_buffer = create_and_get(context.uniform_pool);
     UniformBufferDesc uniform_buffer_desc;
@@ -441,7 +448,7 @@ void BlurMaterialSystem::update(Context& context, SceneContext& scene_context, R
     context.uniform_pool.get(uniform_).update(data);
 
     UberShader::Index ubershader_index;
-    ubershader_index.set(quality_info_, quality_);
+    ubershader_index.set(quality_info_, settings_.quality);
     context.materials[id()].get(mesh_instance().instance_parts[0].material.id).shader_program = 
         ubershader(context).get(ubershader_index);
 

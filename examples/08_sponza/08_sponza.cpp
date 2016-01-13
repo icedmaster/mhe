@@ -14,20 +14,45 @@ public:
         mhe::MaterialData& material = engine.context().material_manager.material_data(floor_id);
         material.render_data.glossiness = 1.0f;
 
+        node.mesh.instance_parts[4].flags &= ~mhe::MeshPartInstance::cast_reflection;
+
         init_lighting(engine);
 
         mhe::BlurMaterialSystem* ssr_blur = engine.context().material_systems.get<mhe::BlurMaterialSystem>(mhe::string("ssr_blur"));
         if (ssr_blur != nullptr)
+        {
+            ssr_blur->settings().quality = mhe::BlurMaterialSystem::quality_high;
             ssr_blur->settings().size = 2.0f;
+        }
         mhe::CSMDepthRenderingMaterialSystem* csm = engine.context().material_systems.get<mhe::CSMDepthRenderingMaterialSystem>();
         if (csm != nullptr)
             csm->settings().distance_calculation_mode = mhe::CSMDepthRenderingMaterialSystem::aabb_extents;
+
+        mhe::CubemapCreationMaterialSystem* cubemap_creation_material_system = new mhe::CubemapCreationMaterialSystem;
+        mhe::MaterialSystemContext material_system_context;
+        material_system_context.shader_name = "render_simple";
+        cubemap_creation_material_system->init(engine.context(), material_system_context);
+        engine.context().material_systems.add(cubemap_creation_material_system);
+        engine.context().materials[cubemap_creation_material_system->id()].resize(initial_material_instances_number);
+
+        engine.context().driver.begin_render();
+        cubemap_creation_material_system->render_cubemap(engine.context(), engine.scene_context(), engine.render_context(), mhe::vec3(0, 100, 0), 1000.0f);
+        engine.context().driver.end_render();
+        engine.context().window_system.swap_buffers();
+        engine.render_context().space_grid.set_global_cubemap(cubemap_creation_material_system->texture());
 
         return true;
     }
 
     bool update(mhe::game::Engine& engine)
     {
+        if (keyboard_->is_key_pressed(mhe::KeyboardDevice::key_p))
+        {
+            mhe::SSRMaterialSystem* ssr_material_system = engine.context().material_systems.get<mhe::SSRMaterialSystem>();
+            if (ssr_material_system != nullptr)
+                ssr_material_system->settings().use_probes ^= 1;
+        }
+
         if (keyboard_->is_key_pressed(mhe::KeyboardDevice::key_0))
             light_type_ = mhe::Light::spot;
         else if (keyboard_->is_key_pressed(mhe::KeyboardDevice::key_2))
@@ -159,7 +184,7 @@ int main(int /*argc*/, char** /*argv*/)
     camera_parameters.znear = 1.0f;
     camera_parameters.zfar = 3000.0f;
     mhe::game::FPSCameraController* camera_controller = new mhe::game::FPSCameraController(app.engine(), camera_parameters,
-        mhe::vec3(0, 10, 10), mhe::vec3(mhe::deg_to_rad(30.0f), mhe::pi_2, 0));
+        mhe::vec3(0, 10, 10), mhe::vec3(mhe::deg_to_rad(-30.0f), mhe::pi, 0));
     camera_controller->set_move_speed(500.0f);
     app.engine().scene().set_camera_controller(camera_controller);
     return app.run();
