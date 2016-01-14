@@ -24,9 +24,9 @@ uniform dofparams
 	vec4 coc; // x - diameter
 };
 
-[sampler2D main_texture 3]
-[sampler2D blur_texture 4]
-[sampler2D dof_texture 5]
+[sampler2D main_texture 4]
+[sampler2D blur_texture 5]
+[sampler2D dof_texture 6]
 
 in VSOutput vsoutput;
 

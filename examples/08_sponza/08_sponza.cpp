@@ -24,6 +24,14 @@ public:
             ssr_blur->settings().quality = mhe::BlurMaterialSystem::quality_high;
             ssr_blur->settings().size = 2.0f;
         }
+
+        ssr_blur = engine.context().material_systems.get<mhe::BlurMaterialSystem>(mhe::string("ssao_blur"));
+        if (ssr_blur != nullptr)
+        {
+            ssr_blur->settings().quality = mhe::BlurMaterialSystem::quality_high;
+            ssr_blur->settings().size = 2.0f;
+        }
+
         mhe::CSMDepthRenderingMaterialSystem* csm = engine.context().material_systems.get<mhe::CSMDepthRenderingMaterialSystem>();
         if (csm != nullptr)
             csm->settings().distance_calculation_mode = mhe::CSMDepthRenderingMaterialSystem::aabb_extents;

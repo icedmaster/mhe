@@ -621,7 +621,8 @@ bool SSAOMaterialSystem::init(Context& context, const MaterialSystemContext& mat
     create_noise_texture(noise_texture_, context);
 
     ssao_shader_data_.ssaodata[0] = vec4(3.0f, 1.0f, 0.5f, 30.0f);
-    ssao_shader_data_.ssaodata[1] = vec4(700.0f, 1000.0f, 1.0f, 0.0f);
+    ssao_shader_data_.ssaodata[1] = vec4(700.0f, 1000.0f, 1.0f, 8.0f);
+    ssao_shader_data_.ssaodata[2] = vec4::zero();
 
     return true;
 }
@@ -637,10 +638,13 @@ void SSAOMaterialSystem::init_debug_views(Context& context)
     view.add("fade start", 100.0f, 2000.0f, &ssao_shader_data_.ssaodata[1].x());
     view.add("fade distance", 100.0f, 2000.0f, &ssao_shader_data_.ssaodata[1].y());
     view.add("intensity", 0.0f, 10.0f, &ssao_shader_data_.ssaodata[1].z());
+    view.add("samples", 1.0f, 24.0f, &ssao_shader_data_.ssaodata[1].w());
+    view.add("rotation", 0.0f, 10.0f, &settings_.rotation_speed);
 }
 
 void SSAOMaterialSystem::update(Context& context, SceneContext& scene_context, RenderContext& render_context)
 {
+    ssao_shader_data_.ssaodata[2].x() += render_context.fdelta * settings_.rotation_speed;
     UniformBuffer& uniform = context.uniform_pool.get(ssao_uniform_);
     uniform.update(ssao_shader_data_);
 

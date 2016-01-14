@@ -12,7 +12,7 @@
 [uniform ssao_params 1 perframe]
 uniform ssao_params
 {
-	vec4 ssaodata[2]; // 0: x - radius, y - power, z - min_distance, z - max_distance 1: x - fade start distance, y - AO max distance, z - intensity
+	vec4 ssaodata[3]; // 0: x - radius, y - power, z - min_distance, z - max_distance 1: x - fade start distance, y - AO max distance, z - intensity, w - samples number 2: x - rotation
 };
 
 [sampler2D noise_texture 4]
@@ -43,10 +43,9 @@ mat3 create_tbn_matrix(vec3 normal, vec3 noise)
 }
 
 
-#define SSAO_SAMPLES 4
-
 struct SSAOParameters
 {
+    int samples;
 	float radius;
 	float power;
 	float occlusion_min_distance;
@@ -54,6 +53,7 @@ struct SSAOParameters
 	float fade_distance;
 	float max_distance;
 	float intensity;
+    float rotation;
 };
 
 float ssao_probe(vec3 position, vec3 direction, vec3 normal, SSAOParameters params)
@@ -84,7 +84,7 @@ float ssao_probe(vec3 position, vec3 direction, vec3 normal, SSAOParameters para
 
 float ssao(vec2 uv, vec3 position, vec3 normal, SSAOParameters params)
 {
-	int probes = SSAO_SAMPLES;
+	int probes = params.samples;
 	float res = 0.0f;
 	float weight = 1.0f / probes;
 
@@ -92,8 +92,14 @@ float ssao(vec2 uv, vec3 position, vec3 normal, SSAOParameters params)
 	vec2 uv_coeff = viewport / noise_texture_size;
 
 	// build a matrix to perform transition to the TBN space
-	vec3 noise = normalize(vec3(texture(noise_texture, uv * uv_coeff).rg, 0.0f));
-	mat3 tbn = create_tbn_matrix(normal, noise);
+	vec2 noise = texture(noise_texture, uv * uv_coeff).rg;
+    float s = sin(params.rotation);
+    float c = cos(params.rotation);
+    mat2 rotation_matrix = mat2(
+        s, c,
+        -c, s);
+    vec3 random_rotation = normalize(vec3(rotation_matrix * noise, 0.0f));
+	mat3 tbn = create_tbn_matrix(normal, random_rotation);
 
 	float depth_vs = -position.z;
 	float fade = saturate((params.max_distance - depth_vs) / (params.max_distance - params.fade_distance));
@@ -127,6 +133,8 @@ void main()
 	params.fade_distance = ssaodata[1].x;
 	params.max_distance = ssaodata[1].y;
 	params.intensity = ssaodata[1].z;
+    params.samples = int(ssaodata[1].w);
+    params.rotation = ssaodata[2].x;
 		
 	GBuffer gbuffer = gbuffer_unpack(vsoutput.tex);
 	float pixel_depth = gbuffer.depth;

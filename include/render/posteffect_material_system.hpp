@@ -269,9 +269,9 @@ class DOFMaterialSystem : public PosteffectMaterialSystemBase
 {
     SETUP_POSTEFFECT_MATERIAL(DOFMaterialSystem, "dof");
 
-    static const size_t input_texture_unit = 3;
-    static const size_t blur_texture_unit = 4;
-    static const size_t dof_texture_unit = 5;
+    static const size_t input_texture_unit = 4;
+    static const size_t blur_texture_unit = 5;
+    static const size_t dof_texture_unit = 6;
 
     struct DOFShaderData
     {
@@ -308,6 +308,15 @@ class SSAOMaterialSystem : public PosteffectMaterialSystemBase
 
     static const size_t noise_texture_unit = 4;
 public:
+    struct Settings
+    {
+        float rotation_speed;
+
+        Settings() :
+            rotation_speed(1.0f)
+        {}
+    };
+
     bool init(Context& context, const MaterialSystemContext& material_system_context) override;
     void init_debug_views(Context& context) override;
 private:
@@ -316,9 +325,10 @@ private:
 
     struct SSAOShaderData
     {
-        vec4 ssaodata[2];
+        vec4 ssaodata[3];
     };
 
+    Settings settings_;
     SSAOShaderData ssao_shader_data_;
     UniformBuffer::IdType ssao_uniform_;
     TextureInstance noise_texture_;
