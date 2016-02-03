@@ -115,7 +115,7 @@ private:
     {
         mhe::LightInstance& light_instance = engine.scene().create_light();
         mhe::Light& light = light_instance.light;
-        light.shading().diffuse = mhe::vec4(240.0f / 255.0f, 150.0f / 255.0f, 80.0f / 255.0f, 1.0f);
+        light.shading().diffuse = mhe::vec4(0.78f, 1.0f, 0.716f, 1.0f);
         light.shading().specular = mhe::vec4(1.0f, 1.0f, 1.0f, 1.0f);
         light.shading().intensity = 5.0f;
         mhe::set_light_position(engine.scene_context(), light_instance.id, mhe::vec3(0, 2000, 0));
@@ -192,7 +192,7 @@ int main(int /*argc*/, char** /*argv*/)
     camera_parameters.znear = 1.0f;
     camera_parameters.zfar = 3000.0f;
     mhe::game::FPSCameraController* camera_controller = new mhe::game::FPSCameraController(app.engine(), camera_parameters,
-        mhe::vec3(0, 10, 10), mhe::vec3(mhe::deg_to_rad(-30.0f), mhe::pi, 0));
+        mhe::vec3(0, 10, 10), mhe::vec3(mhe::deg_to_rad(-30.0f), mhe::pi_2, 0));
     camera_controller->set_move_speed(500.0f);
     app.engine().scene().set_camera_controller(camera_controller);
     return app.run();

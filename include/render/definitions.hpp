@@ -58,9 +58,11 @@ enum
 // barriers
 enum
 {
-    memory_barrier_storage_buffer,
+    memory_barrier_storage_buffer = 1,
     memory_barrier_max
 };
+
+const uint32_t memory_barrier_all = 0xffffffff;
 
 }
 

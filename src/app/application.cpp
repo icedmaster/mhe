@@ -241,7 +241,7 @@ void Application::init_posteffect_parameters(pugi::xml_node node, RendererParams
             {
                 PosteffectSystem::NodeOutput& output = posteffect_node.outputs.add();
                 pugi::xml_attribute attr = o.attribute("index");
-                ASSERT(attr, "Malformed posteffect node: output index attribute must exists");
+                ASSERT(attr, "Malformed posteffect node: output index attribute must exist");
                 output.index = attr.as_uint();
                 attr = o.attribute("scale");
                 if (attr) output.scale = attr.as_float();
@@ -249,6 +249,42 @@ void Application::init_posteffect_parameters(pugi::xml_node node, RendererParams
                 attr = o.attribute("format");
                 if (attr) output.format = get_format_by_name(attr.value());
                 else output.format = format_max;
+            }
+        }
+
+        pugi::xml_node buffers_node = n.child("buffers");
+        if (buffers_node)
+        {
+            for (pugi::xml_node b = buffers_node.child("buffer"); b; b = b.next_sibling("buffer"))
+            {
+                PosteffectSystem::Buffer& buffer = posteffect_node.buffers.add();
+                pugi::xml_attribute attr = b.attribute("index");
+                ASSERT(attr, "Malformed posteffect node. The index of a buffer must exist");
+                buffer.index = attr.as_uint();
+                attr = b.attribute("node");
+                ASSERT(attr, "Malformed posteffect node. The input node of a buffer must exist");
+                buffer.node = attr.value();
+                attr = b.attribute("buffer");
+                ASSERT(attr, "Malformed posteffect node. The buffer index of input node for a buffer must exist");
+                buffer.node_buffer = attr.as_uint();
+            }
+        }
+
+        pugi::xml_node uniforms_node = n.child("uniforms");
+        if (uniforms_node)
+        {
+            for (pugi::xml_node u = uniforms_node.child("uniform"); u; u = u.next_sibling("uniform"))
+            {
+                PosteffectSystem::Buffer& buffer = posteffect_node.uniforms.add();
+                pugi::xml_attribute attr = u.attribute("index");
+                ASSERT(attr, "Malformed posteffect node. The index of a uniform must exist");
+                buffer.index = attr.as_uint();
+                attr = u.attribute("node");
+                ASSERT(attr, "Malformed posteffect node. The input node of a uniform must exist");
+                buffer.node = attr.value();
+                attr = u.attribute("uniform");
+                ASSERT(attr, "Malformed posteffect node. The uniform index of input node for a uniform must exist");
+                buffer.node_buffer = attr.as_uint();
             }
         }
 

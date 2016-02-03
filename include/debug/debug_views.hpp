@@ -19,68 +19,69 @@ class Engine;
 
 class DebugViews
 {
-	struct DebugField : public ref_counter
-	{
-		virtual ~DebugField() {}
-		virtual void update() = 0;
-	};
+    struct DebugField : public ref_counter
+    {
+        virtual ~DebugField() {}
+        virtual void update() = 0;
+    };
 
-	struct FloatDebugField : public DebugField
-	{
-		string name;
-		float min_value;
-		float max_value;
-		float* value;
+    struct FloatDebugField : public DebugField
+    {
+        string name;
+        float min_value;
+        float max_value;
+        float* value;
 
-		void update() override;
-	};
+        void update() override;
+    };
 
 public:
-	class DebugView
-	{
-	public:
-		void set_name(const string& name)
-		{
-			name_ = name;
-		}
+    class DebugView
+    {
+    public:
+        void set_name(const string& name)
+        {
+            name_ = name;
+        }
 
-		void add(const string& name, float min_value, float max_value, float* value);
-		void update();
-	private:
-		string name_;
-		fixed_size_vector< ref_ptr<DebugField>, 16 > fields_;
-	};
+        void add(const string& name, float min_value, float max_value, float* value);
+        void update();
+    private:
+        string name_;
+        fixed_size_vector< ref_ptr<DebugField>, 16 > fields_;
+    };
 public:
-	DebugViews(game::Engine& engine) :
-		engine_(engine)
-	{}
+    DebugViews(game::Engine& engine) :
+        engine_(engine)
+    {}
 
-	void init(EventManager& event_maneger);
-	void destroy();
-	void update();
-	void render();
+    void init(EventManager& event_maneger);
+    void destroy();
+    void update();
+    void render();
 
-	size_t add_view(const string& name);
-	DebugView& get_view(size_t id);
+    size_t add_view(const string& name);
+    DebugView& get_view(size_t id);
 
-	ImGuiHelper& imgui_helper()
-	{
-		return imgui_;
-	}
+    ImGuiHelper& imgui_helper()
+    {
+        return imgui_;
+    }
 private:
-	enum
-	{
-		posteffect_ssr,
-		posteffect_ssao,
-		posteffect_max
-	};
+    enum
+    {
+        posteffect_ssr,
+        posteffect_ssao,
+        posteffect_bloom,
+        posteffect_max
+    };
 
-	game::Engine& engine_;
-	ImGuiHelper imgui_;
-	array<MaterialSystemId, posteffect_max> posteffect_id_;
-	int posteffect_debug_mode_;
-	fixed_size_vector<DebugView, 16> debug_views_;
-	bool stats_enabled_;
+    game::Engine& engine_;
+    ImGuiHelper imgui_;
+    array<MaterialSystemId, posteffect_max> posteffect_id_;
+    int posteffect_debug_mode_;
+    fixed_size_vector<DebugView, 16> debug_views_;
+    bool stats_enabled_;
 };
 
 }

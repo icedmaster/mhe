@@ -56,23 +56,23 @@ void Driver::reset()
     impl_.reset(SystemFactory::instance().create_driver());
 }
 
-void Driver::render(const Context& context, const DrawCall* draw_calls, size_t count)
+void Driver::render(Context& context, const DrawCall* draw_calls, size_t count)
 {
     ProfilerElement pe("driver.render");
     for (size_t i = 0; i < count; ++i)
         perform_draw_call(context, draw_calls[i]);
     if (state_.last_command != nullptr && state_.last_command->stages() & render_stage_end_priority)
-        state_.last_command->execute(render_stage_end_priority);
+        state_.last_command->execute(context, render_stage_end_priority);
 }
 
-void Driver::render(const Context& context, const DrawCallExplicit* draw_calls, size_t count)
+void Driver::render(Context& context, const DrawCallExplicit* draw_calls, size_t count)
 {
     ProfilerElement pe("driver.render_explicit");
     for (size_t i = 0; i < count; ++i)
         perform_draw_call(context, draw_calls[i]);
 }
 
-void Driver::perform_draw_call(const Context& /*context*/, const DrawCallExplicit& draw_call)
+void Driver::perform_draw_call(Context& context, const DrawCallExplicit& draw_call)
 {
     if (draw_call.render_target != nullptr)
     {
@@ -102,7 +102,7 @@ void Driver::perform_draw_call(const Context& /*context*/, const DrawCallExplici
 
     if (render_command_stages & render_stage_before_submit)
     {
-        if (!draw_call.render_command->execute(render_stage_before_submit))
+        if (!draw_call.render_command->execute(context, render_stage_before_submit))
             return;
     }
 
@@ -165,7 +165,7 @@ void Driver::perform_draw_call(const Context& /*context*/, const DrawCallExplici
     stats_.update(draw_call.elements_number);
 }
 
-void Driver::perform_draw_call(const Context& context, const DrawCall& draw_call)
+void Driver::perform_draw_call(Context& context, const DrawCall& draw_call)
 {
     uint8_t material_system_id = draw_call.material.material_system;
     uint8_t material_system_priority = context.material_systems.get(material_system_id)->priority();
@@ -175,15 +175,15 @@ void Driver::perform_draw_call(const Context& context, const DrawCall& draw_call
     if (material_system_priority != state_.priority)
     {
         if (state_.last_command != nullptr && state_.last_command->stages() & render_stage_end_priority)
-            state_.last_command->execute(render_stage_end_priority);
+            state_.last_command->execute(context, render_stage_end_priority);
         if (command_render_stages & render_stage_begin_priority)
-            draw_call.command->execute(render_stage_begin_priority);
+            draw_call.command->execute(context, render_stage_begin_priority);
         state_.priority = material_system_priority;
     }
     state_.last_command = draw_call.command;
 
     if (command_render_stages & render_stage_before_render_target_setup)
-        draw_call.command->execute(render_stage_before_render_target_setup);
+        draw_call.command->execute(context, render_stage_before_render_target_setup);
 
     if (context.draw_call_data_pool.is_valid(draw_call.draw_call_data))
     {
@@ -213,7 +213,7 @@ void Driver::perform_draw_call(const Context& context, const DrawCall& draw_call
 
         if (command_render_stages & render_stage_before_submit)
         {
-            if (!draw_call.command->execute(render_stage_before_submit))
+            if (!draw_call.command->execute(context, render_stage_before_submit))
                 return;
         }
     }
@@ -288,10 +288,10 @@ void Driver::perform_draw_call(const Context& context, const DrawCall& draw_call
     stats_.update(draw_call.render_data.elements_number);
 
     if (command_render_stages & render_stage_after_submit)
-        draw_call.command->execute(render_stage_after_submit);
+        draw_call.command->execute(context, render_stage_after_submit);
 }
 
-void Driver::execute(const Context& context, const ComputeCallExplicit* compute_calls, size_t count)
+void Driver::execute(Context& context, const ComputeCallExplicit* compute_calls, size_t count)
 {
     for (size_t i = 0; i < count; ++i)
         perform_compute_call(context, compute_calls[i]);
@@ -302,7 +302,7 @@ void Driver::memory_barrier(uint32_t barriers)
     impl_->memory_barrier(barriers);
 }
 
-void Driver::perform_compute_call(const Context& /*context*/, const ComputeCallExplicit& compute_call)
+void Driver::perform_compute_call(Context& /*context*/, const ComputeCallExplicit& compute_call)
 {
     ASSERT(compute_call.shader_program != nullptr, "Invalid shader program");
     impl_->set_shader_program(*compute_call.shader_program);
@@ -315,6 +315,11 @@ void Driver::perform_compute_call(const Context& /*context*/, const ComputeCallE
     {
         if (compute_call.buffers[i] == nullptr) continue;
         impl_->set_shader_storage_buffer(*compute_call.buffers[i], i);
+    }
+    for (size_t i = 0; i < compute_call_buffers_number; ++i)
+    {
+        if (compute_call.uniforms[i] == nullptr) continue;
+        impl_->bind_uniform(*compute_call.uniforms[i], i);
     }
     impl_->dispatch(compute_call.workgroups_number.x(), compute_call.workgroups_number.y(), compute_call.workgroups_number.z());
 }

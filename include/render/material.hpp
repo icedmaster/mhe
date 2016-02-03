@@ -22,26 +22,26 @@ const size_t material_texture_buffers_number = 3;
 // TODO: change ShaderProgram::IdType -> ShaderInstance
 struct Material
 {
-	POOL_STRUCT(uint16_t);
-	TextureInstance textures[material_textures_number];
-	UniformBuffer::IdType uniforms[material_uniforms_number];
-	TextureBuffer::IdType texture_buffers[material_texture_buffers_number];
-	ShaderProgram::IdType shader_program;
+    POOL_STRUCT(uint16_t);
+    TextureInstance textures[material_textures_number];
+    UniformBuffer::IdType uniforms[material_uniforms_number];
+    TextureBuffer::IdType texture_buffers[material_texture_buffers_number];
+    ShaderProgram::IdType shader_program;
 
-	Material() : shader_program(ShaderProgram::invalid_id)
-	{
-		::memset(uniforms, UniformBuffer::invalid_id, sizeof(uniforms));
-		::memset(textures, Texture::invalid_id, sizeof(textures));
-		::memset(texture_buffers, TextureBuffer::invalid_id, sizeof(texture_buffers));
-	}
+    Material() : shader_program(ShaderProgram::invalid_id)
+    {
+        ::memset(uniforms, UniformBuffer::invalid_id, sizeof(uniforms));
+        ::memset(textures, Texture::invalid_id, sizeof(textures));
+        ::memset(texture_buffers, TextureBuffer::invalid_id, sizeof(texture_buffers));
+    }
 };
 
 const uint8_t invalid_material_system_id = 255;
 
 struct MaterialInstance
 {
-	Material::IdType id;
-	uint8_t material_system;
+    Material::IdType id;
+    uint8_t material_system;
 
     MaterialInstance() : id(Material::invalid_id), material_system(invalid_material_system_id) {}
 };
@@ -51,30 +51,30 @@ const float default_glossiness = 0.0f;
 
 struct MaterialRenderData
 {
-	vec3 diffuse;
-	vec3 ambient;
-	vec3 specular;
-	vec3 emissive;
-	float specular_shininess;
-	float glossiness;
+    vec3 diffuse;
+    vec3 ambient;
+    vec3 specular;
+    vec3 emissive;
+    float specular_shininess;
+    float glossiness;
 
-	MaterialRenderData() : specular_shininess(default_shininess), glossiness(default_glossiness) {}
+    MaterialRenderData() : specular_shininess(default_shininess), glossiness(default_glossiness) {}
 };
 
 struct MaterialData
 {
-	FilePath name;
-	MaterialRenderData render_data;
-	TextureInstance textures[material_textures_number];
-	string lighting_model;
+    FilePath name;
+    MaterialRenderData render_data;
+    TextureInstance textures[material_textures_number];
+    string lighting_model;
 };
 
 struct MaterialInitializationData
 {
-	FilePath name;
-	MaterialRenderData render_data;
-	FilePath textures[material_textures_number];
-	string lighting_model;
+    FilePath name;
+    MaterialRenderData render_data;
+    FilePath textures[material_textures_number];
+    string lighting_model;
 };
 
 typedef uint16_t MaterialId;
@@ -82,32 +82,32 @@ typedef uint16_t MaterialId;
 class MHE_EXPORT MaterialManager
 {
 public:
-	MaterialId get(const MaterialInitializationData& data) const;
+    MaterialId get(const MaterialInitializationData& data) const;
 
-	bool get(MaterialData& material, MaterialId id) const
-	{
-		MaterialsMap::iterator it = materials_.find(id);
-		if (it == materials_.end()) return false;
-		material = it->value;
-		return true;
-	}
+    bool get(MaterialData& material, MaterialId id) const
+    {
+        MaterialsMap::iterator it = materials_.find(id);
+        if (it == materials_.end()) return false;
+        material = it->value;
+        return true;
+    }
 
-	MaterialData& material_data(MaterialId id)
-	{
-		ASSERT(materials_.find(id) != materials_.end(), "Invalid material id:" << id);
-		return materials_[id];
-	}
+    MaterialData& material_data(MaterialId id)
+    {
+        ASSERT(materials_.find(id) != materials_.end(), "Invalid material id:" << id);
+        return materials_[id];
+    }
 
-	bool id_by_name(MaterialId& id, const string& name) const;
+    bool id_by_name(MaterialId& id, const string& name) const;
 
-	void set_context(Context* context)
-	{
-		context_ = context;
-	}
+    void set_context(Context* context)
+    {
+        context_ = context;
+    }
 private:
-	typedef hashmap<MaterialId, MaterialData> MaterialsMap;
-	Context* context_;
-	mutable MaterialsMap materials_;
+    typedef hashmap<MaterialId, MaterialData> MaterialsMap;
+    Context* context_;
+    mutable MaterialsMap materials_;
 };
 
 }

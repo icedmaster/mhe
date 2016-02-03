@@ -20,10 +20,10 @@ void main()
 	uint global_index = gl_WorkGroupID.x * gl_WorkGroupSize.x + gl_LocalInvocationID.x;
 	workgroup_data[gl_LocalInvocationID.x] = input_data[global_index];
 	barrier(); // data now is visible in other invocations
-	memoryBarrierShared(); // wait until all threads reach this point of execution
 
 	if (gl_LocalInvocationID.x == 0)
 	{
+        memoryBarrierShared(); // wait until all threads reach this point of execution
 		float average_luminance = 0.0f;
 		for (int i = 0; i < THREADS_NUMBER; ++i)
 			average_luminance += workgroup_data[i];

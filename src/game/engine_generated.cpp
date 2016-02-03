@@ -29,6 +29,8 @@ void Engine::setup_generated()
     MaterialSystemFactory::instance().add<CompositeMulMaterialSystem>();
     MaterialSystemFactory::instance().add<CompositeAddMaterialSystem>();
     MaterialSystemFactory::instance().add<ProbesAccumulatorMaterialSystem>();
+    MaterialSystemFactory::instance().add<AverageLuminanceMaterialSystem>();
+    MaterialSystemFactory::instance().add<BloomMaterialSystem>();
 }
 
 }}

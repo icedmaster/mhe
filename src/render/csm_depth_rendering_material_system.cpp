@@ -72,7 +72,6 @@ bool CSMDepthRenderingMaterialSystem::init(Context& context, const MaterialSyste
         draw_call_data_id_.push_back(draw_call_data.id);
     }
 
-    clear_command_.set_driver(&context.driver);
     profile_command_.set_stages(render_stage_begin_priority | render_stage_end_priority);
     list_of_commands_.add_command(&clear_command_);
     list_of_commands_.add_command(&profile_command_);

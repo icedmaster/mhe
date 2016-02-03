@@ -38,7 +38,7 @@ bool SkyboxMaterialSystem::init_mesh(Context& context, const MaterialSystemConte
 		return false;
 	}
 
-	const std::string& texture_name = material_system_context.defs[0];
+	const string& texture_name = material_system_context.defs[0];
 	if (texture_name.empty())
 	{
 		ERROR_LOG("Can't initialize SkyboxMaterial - texture filename is empty");

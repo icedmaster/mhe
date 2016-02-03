@@ -16,6 +16,8 @@ const char* defs_tag = "[defs";
 const char* sampler_tag = "[sampler";
 const char* image_tag = "[image";
 const char* uniform_tag = "[uniform";
+const char* var_tag = "[var";
+const char* version_tag = "[version";
 const char* shader_extension = ".glsl";
 const char* texture_buffer_sampler = "samplerBuffer";
 
@@ -24,6 +26,7 @@ const char* tags[] = {vertex_shader_tag, fragment_shader_tag, compute_shader_tag
 struct LoadContext
 {
     std::string filename;
+    std::string version;
     size_t level;
     bool tag_found;
 };
@@ -44,6 +47,12 @@ const char* get_shader_header(const Context* context)
 const char* get_basic_version_header()
 {
     return "#version 330 core";
+}
+
+std::string get_version_header(const std::string& version)
+{
+    std::string header = "#version " + version + " core";
+    return header;
 }
 
 std::string parse_include(ShaderInitializationParams& params, const std::string& tag, const std::string& shadertag, LoadContext& load_context)
@@ -123,13 +132,38 @@ std::string parse_uniform(ShaderInitializationParams& params, const std::string&
     return "";
 }
 
+std::string parse_variable(ShaderInitializationParams& params, const std::string& tag)
+{
+    size_t first = tag.find('[');
+    ASSERT(first != std::string::npos, "Invalid shader source:" << tag);
+    size_t last = tag.find(']');
+    ASSERT(last != std::string::npos, "Invalid shader source:" << tag);
+    const std::vector<std::string>& data = utils::split(tag.substr(first + 1, last - first - 1), " ");
+    ASSERT(data.size() == 3 && data[0] == "var", "Invalid shader source:" << tag);
+    params.variables.add(string(data[1].c_str()), string(data[2].c_str()));
+    return "#define " + data[1] + " " + data[2];
+}
+
+std::string parse_version(ShaderInitializationParams& params, const std::string& tag)
+{
+    size_t first = tag.find('[');
+    ASSERT(first != std::string::npos, "Invalid shader source:" << tag);
+    size_t last = tag.find(']');
+    ASSERT(last != std::string::npos, "Invalid shader source:" << tag);
+    const std::vector<std::string>& data = utils::split(tag.substr(first + 1, last - first - 1), " ");
+    ASSERT(data.size() == 2 && data[0] == "version", "Invalid shader source:" << tag);
+    params.version = data[1];
+    return "";
+}
+
 void update_shader_data(ShaderInitializationParams& params, const Context* context)
 {
     if (!params.csdata.empty())
         params.csdata = get_shader_header(context) + std::string("\n") + params.csdata;
     else
     {
-        const std::string& header = get_basic_version_header() + std::string("\n");
+        const std::string& version = params.version.empty() ? get_basic_version_header() : get_version_header(params.version);
+        const std::string& header = version + std::string("\n");
         params.vsdata = header + params.vsdata;
         params.fsdata = header + params.fsdata;
     }
@@ -178,6 +212,18 @@ std::string load_shader_impl(ShaderInitializationParams& params, const std::vect
         if (s.find(image_tag) != std::string::npos)
         {
             actual_data += parse_image(params, s);
+            continue;
+        }
+
+        if (s.find(var_tag) != std::string::npos)
+        {
+            actual_data += parse_variable(params, s);
+            continue;
+        }
+
+        if (s.find(version_tag) != std::string::npos)
+        {
+            actual_data += parse_version(params, s);
             continue;
         }
 

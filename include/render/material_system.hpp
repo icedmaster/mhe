@@ -36,8 +36,8 @@ static const size_t max_material_definitions = 8;
 struct MaterialSystemContext
 {
     string instance_name;
-    std::string shader_name;
-    std::string defs[max_material_definitions];
+    string shader_name;
+    string defs[max_material_definitions];
     KeyValue<string, string> options;
     size_t material_instances_number;
     size_t priority;

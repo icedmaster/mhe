@@ -20,6 +20,7 @@ void DebugViews::init(EventManager& event_manager)
     event_manager.add_bind("debug_ssao", keyboard_event_type, KeyboardEvent::key_pressed, KeyboardDevice::key_f5);
     event_manager.add_bind("debug_baked_irradiance", keyboard_event_type, KeyboardEvent::key_pressed, KeyboardDevice::key_f6);
     event_manager.add_bind("debug_probes", keyboard_event_type, KeyboardEvent::key_pressed, KeyboardDevice::key_f7);
+    event_manager.add_bind("debug_bloom", keyboard_event_type, KeyboardEvent::key_pressed, KeyboardDevice::key_f8);
 
     stats_enabled_ = false;
 
@@ -31,6 +32,9 @@ void DebugViews::init(EventManager& event_manager)
     material_system = engine_.context().material_systems.get("ssao");
     if (material_system != nullptr)
         posteffect_id_[posteffect_ssao] = material_system->id();
+    material_system = engine_.context().material_systems.get("bloom");
+    if (material_system != nullptr)
+        posteffect_id_[posteffect_bloom] = material_system->id();
     posteffect_debug_mode_ = posteffect_max;
 }
 
@@ -46,6 +50,7 @@ void DebugViews::update()
     Renderer::DebugMode current_mode = renderer->debug_mode();
     Renderer::DebugMode new_mode = current_mode;
     MaterialSystemId material_system_id = InvalidHandle<MaterialSystemId>::id;
+    // TODO: need to rewrite it
     if (engine_.event_manager().check_bind("debug_main"))
     {
         if (current_mode == Renderer::renderer_debug_mode_main)
@@ -108,6 +113,20 @@ void DebugViews::update()
         else
         {
             new_mode = Renderer::renderer_debug_mode_probes;
+        }
+    }
+    else if (engine_.event_manager().check_bind("debug_bloom"))
+    {
+        if (current_mode == Renderer::renderer_debug_mode_posteffect && posteffect_debug_mode_ == posteffect_bloom)
+        {
+            new_mode = Renderer::renderer_debug_mode_none;
+            posteffect_debug_mode_ = posteffect_max;
+        }
+        else
+        {
+            new_mode = Renderer::renderer_debug_mode_posteffect;
+            posteffect_debug_mode_ = posteffect_bloom;
+            material_system_id = posteffect_id_[posteffect_bloom];
         }
     }
 

@@ -14,12 +14,12 @@
 #include <OpenGL/gl.h>
 #include "glext.h"
 #else
-	#define MHE_OPENGL3
-	#ifdef MHE_WIN
-		#include "platform/win/win_wrapper.hpp"
-	#else
-		#define GL_GLEXT_PROTOTYPES
-	#endif
+    #define MHE_OPENGL3
+    #ifdef MHE_WIN
+        #include "platform/win/win_wrapper.hpp"
+    #else
+        #define GL_GLEXT_PROTOTYPES
+    #endif
     #include <GL/gl.h>
     #include "glext.h"
 #endif
@@ -39,11 +39,11 @@
 #define PRINT_ERROR(m) WARN_LOG(FUNCTION_DESCRIPTION_MACRO << ":" << e);
 #endif
 
-#define CHECK_GL_ERRORS()						\
-	{											\
-		GLenum e = glGetError();					\
-		if (e != GL_NO_ERROR)						\
-			PRINT_ERROR(e);					\
-	}											
+#define CHECK_GL_ERRORS()                       \
+    {                                           \
+        GLenum e = glGetError();                    \
+        if (e != GL_NO_ERROR)                       \
+            PRINT_ERROR(e);                 \
+    }                                           
 
 #endif

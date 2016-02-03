@@ -59,8 +59,17 @@ public:
         int format;
     };
 
+    struct Buffer
+    {
+        size_t index;
+        string node;
+        size_t node_buffer;
+    };
+
     typedef fixed_capacity_vector<NodeInput, 8> Inputs;
     typedef fixed_capacity_vector<NodeOutput, 8> Outputs;
+    typedef fixed_capacity_vector<Buffer, 4> Buffers;
+    typedef fixed_capacity_vector<Buffer, 4> Uniforms;
 
     struct PosteffectNodeDesc
     {
@@ -70,6 +79,8 @@ public:
         size_t priority;
         Inputs inputs;
         Outputs outputs;
+        Buffers buffers;
+        Uniforms uniforms;
         bool instantiate;
     };
 
@@ -85,6 +96,8 @@ private:
     const PosteffectNode* find_node(const string& name) const;
     void init_inputs(PosteffectMaterialSystemBase* material_system, Context& context, const PosteffectNodeDesc& node_desc);
     void init_outputs(PosteffectMaterialSystemBase* material_system, Context& context, const PosteffectNodeDesc& node_desc);
+    void init_buffers(PosteffectMaterialSystemBase* material_system, Context& context, const PosteffectNodeDesc& node_desc);
+    void init_uniforms(PosteffectMaterialSystemBase* material_system, Context& context, const PosteffectNodeDesc& node_desc);
 
     typedef fixed_size_vector<PosteffectNode, 16> Posteffects;
     Posteffects posteffects_;

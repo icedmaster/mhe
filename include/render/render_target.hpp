@@ -83,6 +83,16 @@ public:
     size_t depth_texture(TextureInstance& id) const;
     size_t color_texture(TextureInstance& id, size_t index) const;
 
+    size_t width() const
+    {
+        return desc_.width;
+    }
+
+    size_t height() const
+    {
+        return desc_.height;
+    }
+
     // For cubemaps only!
     void set_texture_side(int side);
 private:

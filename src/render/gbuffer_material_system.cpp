@@ -35,7 +35,6 @@ bool GBufferFillMaterialSystem::init(Context& context, const MaterialSystemConte
 {
     set_layout(StandartGeometryLayout::handle);
 
-    clear_command_.set_driver(&context.driver);
     profile_command_.set_stages(render_stage_begin_priority | render_stage_end_priority);
     list_of_commands_.add_command(&clear_command_);
     list_of_commands_.add_command(&profile_command_);
@@ -211,7 +210,6 @@ bool GBufferDrawMaterialSystem::init(Context& context, const MaterialSystemConte
             return false;
     }
 
-    clear_command_.set_driver(&context.driver);
     profile_command_.set_stages(render_stage_begin_priority | render_stage_end_priority);
     list_of_commands_.add_command(&clear_command_);
     list_of_commands_.add_command(&profile_command_);
@@ -480,8 +478,6 @@ bool ProbesAccumulatorMaterialSystem::init(Context& context, const MaterialSyste
         close();
         return false;
     }
-
-    clear_command_.set_driver(&context.driver);
 
     return true;
 }

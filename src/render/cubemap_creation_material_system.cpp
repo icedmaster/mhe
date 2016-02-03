@@ -109,8 +109,6 @@ void CubemapCreationMaterialSystem::render_cubemap(Context& context, SceneContex
         uniform_buffer.update(perside_data);
     }
 
-    command_.set_driver(&context.driver);
-
     NodeInstance* nodes = scene_context.node_pool.all_objects();
 
     DrawCallData& draw_call_data = context.draw_call_data_pool.get(draw_call_data_id_);

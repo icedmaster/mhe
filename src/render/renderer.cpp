@@ -155,6 +155,9 @@ void PosteffectSystem::add(Context& context, const PosteffectSystem::PosteffectN
     if (!desc.outputs.empty())
         init_outputs(material_system, context, desc);
 
+    init_buffers(material_system, context, desc);
+    init_uniforms(material_system, context, desc);
+
     material_system->postinit(context);
 
     PosteffectNode node;
@@ -200,6 +203,40 @@ void PosteffectSystem::init_outputs(PosteffectMaterialSystemBase* material_syste
     {
         const NodeOutput& output = node_desc.outputs[i];
         material_system->create_output(context, output.index, output.scale, output.format);
+    }
+}
+
+void PosteffectSystem::init_buffers(PosteffectMaterialSystemBase* material_system, Context& context,
+    const PosteffectSystem::PosteffectNodeDesc& node_desc)
+{
+    for (size_t i = 0, size = node_desc.buffers.size(); i < size; ++i)
+    {
+        const Buffer& buffer_desc = node_desc.buffers[i];
+        const PosteffectNode* input_node = find_node(buffer_desc.node);
+        ASSERT(input_node != nullptr && input_node->material_system != nullptr, "Can't find a node with name:" << buffer_desc.node);
+        ShaderStorageBufferHandleType buffer_id = input_node->material_system->buffer(buffer_desc.node_buffer);
+        if (!is_handle_valid(buffer_id))
+        {
+            WARN_LOG("The buffer is not valid:" << buffer_desc.node << " " << buffer_desc.node_buffer);
+        }
+        material_system->set_buffer(buffer_desc.index, buffer_id);
+    }
+}
+
+void PosteffectSystem::init_uniforms(PosteffectMaterialSystemBase* material_system, Context& context,
+    const PosteffectSystem::PosteffectNodeDesc& node_desc)
+{
+    for (size_t i = 0, size = node_desc.uniforms.size(); i < size; ++i)
+    {
+        const Buffer& buffer_desc = node_desc.uniforms[i];
+        const PosteffectNode* input_node = find_node(buffer_desc.node);
+        ASSERT(input_node != nullptr && input_node->material_system != nullptr, "Can't find a node with name:" << buffer_desc.node);
+        UniformBufferHandleType buffer_id = input_node->material_system->uniform(buffer_desc.node_buffer);
+        if (!is_handle_valid(buffer_id))
+        {
+            WARN_LOG("The uniform is not valid:" << buffer_desc.node << " " << buffer_desc.node_buffer);
+        }
+        material_system->set_uniform(buffer_desc.index, buffer_id);
     }
 }
 
@@ -331,6 +368,8 @@ void Renderer::flush()
     render_context_.draw_calls.clear();
     render_context_.explicit_draw_calls.clear();
 
+    context_.render_target_manager.free_all_temp_render_targets();
+
     MainGPUProfiler::instance().update();
 }
 
@@ -356,6 +395,7 @@ void Renderer::set_fullscreen_debug_material_system(PosteffectDebugMaterialSyste
 {
     fullscreen_debug_material_system_ = material_system;
     fullscreen_debug_material_system_->set_priority(debug_material_system_priority);
+    fullscreen_debug_material_system_->disable();
 }
 
 void Renderer::debug_mode_changed(DebugMode mode, MaterialSystemId material_system_id)

@@ -37,6 +37,20 @@
   <material name="comp_mul" shader="posteffect_composite_mul" priority="8" on_demand="1" />
   <material name="comp_add" shader="posteffect_composite_add" priority="8" on_demand="1" />
   <material name="probes_accumulator" shader="probes_accumulator" priority="7" />
+  <material name="average_luminance" shader="average_luminance" priority="8" on_demand="1">
+    <options>
+      <reduction_shader>compute/reduction</reduction_shader>
+      <texture_to_buffer>compute/texture_to_buffer</texture_to_buffer>
+      <adaptation_shader>posteffect_adaptation</adaptation_shader>
+      <output_size>1024</output_size>
+    </options>
+  </material>
+  <material name="bloom" shader="posteffect_bloom" priority="8" on_demand="1">
+    <options>
+      <copy_shader>posteffect_copy</copy_shader>
+      <blur_shader>posteffect_blur</blur_shader>
+    </options>
+  </material>
   </materials>
   <skybox name="skybox" />
   <shadowmap_depth_write name="depth_write" />
@@ -49,6 +63,8 @@
 	<draw name="posteffect_simple" />
   </gbuffer>
   <posteffects>
+    <shaders>
+    </shaders>
 	<node name="ssr" material="ssr" priority="0">
 	  <inputs>
 		<input index="0" node="" output="" material="gbuffer_fill" material_output="0" />
@@ -105,17 +121,41 @@
 		<output index="0" scale="1.0" format="rgba16f" />
 	  </outputs>
 	</node>
-	<node name="tonemap" material="tonemap" priority="6">
+    <node name="average_luminance" material="average_luminance" priority="6" instantiate="1">
+      <inputs>
+        <input index="0" node="ssao_mul" output="0" />
+      </inputs>
+    </node>
+    <node name="bloom" material="bloom" priority="7" instantiate="1">
+      <inputs>
+        <input index="0" node="ssao_mul" output="0" />
+      </inputs>
+      <outputs>
+        <output index="0" scale="1.0f" format="rgba16f" />
+      </outputs>
+      <buffers>
+        <buffer index="0" node="average_luminance" buffer="0" />
+      </buffers>
+    </node>
+	<node name="tonemap" material="tonemap" priority="8">
 	  <inputs>
-		<input index="0" node="ssao_mul" material_output="0" />
+		<input index="0" node="ssao_mul" output="0" />
+        <input index="3" node="" output="" material="gbuffer_fill" material_output="3" />
+        <input index="4" node="bloom" output="0" />
 	  </inputs>
+      <buffers>
+        <buffer index="0" node="bloom" buffer="0" />
+      </buffers>
+      <uniforms>
+        <uniform index="1" node="bloom" uniform="1" />
+      </uniforms>
 	</node>
-	<node name="dof" material="dof" priority="7">
+	<node name="dof" material="dof" priority="9">
 	  <inputs>
 		<input index="3" node="" output="" material="gbuffer_fill" material_output="3" />
 		<input index="4" />
 	  </inputs>
 	</node>
-	<node name="fxaa" material="fxaa" src="" priority="8" />
+	<node name="fxaa" material="fxaa" src="" priority="10" />
   </posteffects>
 </mhe>

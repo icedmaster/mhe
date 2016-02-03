@@ -6,48 +6,49 @@
 namespace mhe {
 
 ShaderProgram::ShaderProgram() :
-	impl_(SystemFactory::instance().create_shader_program())
+    impl_(SystemFactory::instance().create_shader_program())
 {}
 
 bool ShaderProgram::init(const ShaderInitializationParams& params)
 {
-	return impl_->init(params);
+    vars_ = params.variables;
+    return impl_->init(params);
 }
 
 void UberShader::Index::set(const Info& info, size_t value)
 {
-	index_ += calculate_index(info, value);
+    index_ += calculate_index(info, value);
 }
 
 size_t UberShader::Index::calculate_index(const Info& info, size_t value)
 {
-	return info.offset * (value - info.low);
+    return info.offset * (value - info.low);
 }
 
 void UberShader::add(size_t value, ShaderProgram::IdType id)
 {
-	if (variants_.size() < value + 1 || variants_.empty())
-		variants_.resize(value + 1);
-	variants_[value] = id;
+    if (variants_.size() < value + 1 || variants_.empty())
+        variants_.resize(value + 1);
+    variants_[value] = id;
 }
 
 ShaderProgram::IdType UberShader::get(const Index& index) const
 {
-	size_t idx = index.index();
-	ASSERT(idx < variants_.size(), "Invalid index:" << idx);
-	return variants_[idx];
+    size_t idx = index.index();
+    ASSERT(idx < variants_.size(), "Invalid index:" << idx);
+    return variants_[idx];
 }
 
 const UberShader::Info& UberShader::info(const char* name) const
 {
-	for (size_t i = 0; i < infos_.size(); ++i)
-	{
-		if (infos_[i].name == name)
-			return infos_[i];
-	}
-	
-	static UberShader::Info default_info = Info::empty();
-	return default_info;
+    for (size_t i = 0; i < infos_.size(); ++i)
+    {
+        if (infos_[i].name == name)
+            return infos_[i];
+    }
+    
+    static UberShader::Info default_info = Info::empty();
+    return default_info;
 }
 
 }

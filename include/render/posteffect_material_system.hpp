@@ -8,6 +8,8 @@
 #include "texture.hpp"
 #include "mesh.hpp"
 #include "commands.hpp"
+#include "render_common.hpp"
+#include "draw_call.hpp"
 
 namespace mhe {
 
@@ -52,6 +54,7 @@ private:
 class PosteffectMaterialSystemBase : public MaterialSystem
 {
     static const size_t max_textures_number = 8;
+    static const size_t max_buffers = 4;
     static const size_t invalid_index = static_cast<size_t>(-1);
 public:
     PosteffectMaterialSystemBase(const char* name);
@@ -130,6 +133,27 @@ public:
     bool init_screen_input(Context& context, size_t index, uint8_t render_stage = render_stage_before_render_target_setup);
     bool create_output(Context& context, size_t index, float scale, int format);
 
+    // Currently, SSBOs and UBOs are stored separately but applied together (through Material.uniforms)
+    void set_buffer(size_t index, ShaderStorageBufferHandleType id)
+    {
+        buffers_[index] = id;
+    }
+
+    ShaderProgramHandleType buffer(size_t index) const
+    {
+        return buffers_[index];
+    }
+
+    void set_uniform(size_t index, UniformBufferHandleType id)
+    {
+        uniforms_[index] = id;
+    }
+
+    UniformBufferHandleType uniform(size_t index) const
+    {
+        return uniforms_[index];
+    }
+
     // This method will be called when PosteffectChain has initialized this material system
     virtual void postinit(Context& /*context*/) {}
 protected:
@@ -144,12 +168,15 @@ protected:
 
     virtual bool create_output(DrawCallData& draw_call_data, Context& context, size_t index, float scale, int format);
     void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
-    void prepare_draw_call(DrawCall& draw_call, Context& context, SceneContext& scene_context, RenderContext& render_context);
+    void prepare_draw_call(DrawCall& draw_call, Context& context, SceneContext& scene_context, const RenderContext& render_context);
+    RenderTargetHandleType default_render_target(Context& context) const;
 private:
     bool init_mesh(Context& context, const MaterialSystemContext& material_system_context);
 
     array<TextureInstance, max_textures_number> inputs_;
     array<TextureInstance, max_textures_number> outputs_;
+    array<ShaderProgramHandleType, max_buffers> buffers_;
+    array<UniformBufferHandleType, max_buffers> uniforms_;
     size_t inputs_number_;
     size_t outputs_number_;
     MeshInstance mesh_;
@@ -253,6 +280,14 @@ public:
     {
         settings_.quality = quality;
     }
+
+    void setup_draw_calls(Context& context, SceneContext& scene_context, DrawCall* draw_calls, size_t draw_calls_number,
+        const RenderContext& render_context);
+
+    RenderTarget::IdType render_target_id() const override
+    {
+        return output_rt_;
+    }
 private:
     bool create_output(DrawCallData& draw_call_data, Context& context, size_t index, float scale, int format) override;
     void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
@@ -263,6 +298,7 @@ private:
     UberShader::Info quality_info_;
     MeshInstance second_pass_mesh_;
     ClearCommand clear_command_;
+    RenderTargetHandleType output_rt_;
 };
 
 class DOFMaterialSystem : public PosteffectMaterialSystemBase
@@ -342,6 +378,117 @@ class CompositeMulMaterialSystem : public PosteffectMaterialSystemBase
 class CompositeAddMaterialSystem : public PosteffectMaterialSystemBase
 {
     SETUP_POSTEFFECT_MATERIAL(CompositeAddMaterialSystem, "comp_add");
+};
+
+class AverageLuminanceMaterialSystem : public PosteffectMaterialSystemBase
+{
+    SETUP_POSTEFFECT_MATERIAL(AverageLuminanceMaterialSystem, "average_luminance");
+
+    struct AdaptationShaderData
+    {
+        vec4 data;
+    };
+
+    static const size_t reduction_threads_number = 32;
+
+    struct ReductionContext
+    {
+        size_t input_size;
+        TextureInstance input;
+        ShaderProgramHandleType reduction_shader;
+        ShaderProgramHandleType texture_to_buffer_shader;
+        ShaderProgramHandleType buffer_to_texture_shader;
+        TextureInstance output;
+    };
+
+    class ReductionCommand : public RenderCommand
+    {
+    public:
+        ReductionCommand();
+
+        void set_parameters(ShaderStorageBufferHandleType* buffers, const ReductionContext& reduction_context, size_t threads_number);
+        void set_input(const TextureInstance& texture)
+        {
+            reduction_context_.input = texture;
+        }
+    private:
+        bool execute_impl(Context& context, RenderStage current_stage) override;
+
+        ReductionContext reduction_context_;
+        ComputeCallExplicit compute_call_;
+        ShaderStorageBufferHandleType buffers_[2];
+        size_t threads_number_;
+    };
+public:
+    struct Settings
+    {
+        float adaptation_rate;
+
+        Settings() : adaptation_rate(1.0f) {}
+    };
+
+    bool init(Context& context, const MaterialSystemContext& material_system_context) override;
+    void init_debug_views(Context& context) override;
+    void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
+
+    size_t default_instances_number() const override
+    {
+        return 2;
+    }
+
+    Settings& settings()
+    {
+        return settings_;
+    }
+private:
+    Settings settings_;
+    ShaderStorageBufferHandleType shader_storage_[2];
+    ShaderProgramHandleType reduction_shader_;
+    ShaderProgramHandleType texture_to_buffer_shader_;
+    ShaderProgramHandleType adaptation_shader_;
+    UniformBufferHandleType adaptation_uniform_;
+    ReductionCommand reduction_command_;
+    RenderTargetHandleType adaptation_render_target_[2];
+    MaterialHandleType adaptation_material_;
+    DrawCallDataHandleType adaptation_draw_call_data_;
+    uint8_t adaptation_rt_index_;
+};
+
+class BloomMaterialSystem : public PosteffectMaterialSystemBase
+{
+    SETUP_POSTEFFECT_MATERIAL(BloomMaterialSystem, "bloom");
+
+    static const size_t steps_number = 6;
+
+    struct ShaderData
+    {
+        vec4 settings;
+    };
+public:
+    struct Settings
+    {
+        float exposure_key;
+        float threshold;
+        float intensity;
+    };
+
+    bool init(Context& context, const MaterialSystemContext& material_system_context) override;
+    void init_debug_views(Context& context) override;
+
+    size_t default_instances_number() const override
+    {
+        return steps_number + 1;
+    }
+private:
+    void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
+    void copy(Context& context, DrawCall& draw_call, RenderTarget& dst, const RenderTarget& from, size_t pass);
+
+    Settings settings_;
+    UniformBufferHandleType uniform_;
+    DrawCallDataHandleType draw_calls_data_[steps_number];
+    MaterialHandleType materials_[steps_number];
+    BlurMaterialSystem* blur_material_system_;
+    ClearCommandSimple clear_command_simple_;
 };
 
 }
