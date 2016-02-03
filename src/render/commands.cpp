@@ -13,7 +13,7 @@ bool ClearCommand::execute_impl(RenderStage /*current_stage*/)
 {
 	if (executed_) return true;
 	ASSERT(driver_ != nullptr, "You must setup the driver first");
-	driver_->clear(clear_color_, clear_depth_, clear_stencil_, vec4(0.0, 0.0, 0.0, 0.0));
+    driver_->clear(clear_color_, clear_depth_, clear_stencil_, vec4(0.0, 0.0, 0.0, 1.0));
 	executed_ = true;
 	return true;
 }
@@ -33,7 +33,7 @@ void ClearCommand::reset()
 bool ClearCommandSimple::execute_impl(RenderStage /*current_stage*/)
 {
 	ASSERT(driver_ != nullptr, "You must setup the driver first");
-	driver_->clear(true, true, true, vec4(0.0, 0.0, 0.0, 0.0));
+    driver_->clear(true, true, true, vec4(0.0, 0.0, 0.0, 1.0));
 	return true;
 }
 

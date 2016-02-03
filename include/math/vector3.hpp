@@ -368,6 +368,12 @@ vector3<T> round(const vector3<T>& v)
 }
 
 template <class T>
+bool is_nan(const vector3<T>& v)
+{
+    return is_nan(v.x()) || is_nan(v.y()) || is_nan(v.z());
+}
+
+template <class T>
 inline std::ostream& operator<< (std::ostream& s, const vector3<T>& v)
 {
     return s << '(' << v.x() << ", " << v.y() << ", " << v.z() << ')';

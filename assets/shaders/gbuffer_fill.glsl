@@ -51,7 +51,7 @@ void main()
 #endif
 
 #if BAKED_LIGHT == 1
-	vsoutput.baked_radiance = fetch_sh9_color(gi_buffer, gl_VertexID);
+    vsoutput.baked_radiance = fetch_sh9_color(gi_buffer, gl_VertexID);
 #endif
 
 	gl_Position = vp * model * pos_os;
@@ -92,7 +92,7 @@ void main()
 
 #if BAKED_LIGHT == 1
 	vec3 baked_irradiance = calculate_irradiance(normal_tngspace, vsoutput.baked_radiance);
-	accumulator = vec4(baked_irradiance, 1);
+    accumulator = vec4(baked_irradiance, 1);
 #else
 	accumulator = vec4(ambient.rgb, 1);
 #endif

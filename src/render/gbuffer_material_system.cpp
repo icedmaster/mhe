@@ -329,7 +329,7 @@ void GBufferDrawMaterialSystem::update(Context& context, SceneContext& scene_con
 		int type = 0;
 		size_t use_shadowmap = 0;
 		TextureInstance shadowmap_texture;
-		UniformBuffer::IdType light_uniform;
+        UniformBuffer::IdType light_uniform = UniformBuffer::invalid_id;
 		// Update light data
 		LightData data;
 		const Light& light = render_context.lights[i].light;

@@ -5,6 +5,7 @@
 #define BAKE_LIGHT
 #define BOUNCES 0
 //#define SINGLE_NORMALMAP
+//const char* mesh_name = "sphere.bin";
 const char* mesh_name = "test-scene-simple.bin";
 const float baker_zfar = 10.0f;
 
@@ -135,6 +136,16 @@ SH<T, B> operator* (const SH<T, B>& h, U c)
     for (size_t i = 0; i < h.coeff.size(); ++i)
         res.coeff[i] = h.coeff[i] * c;
     return res;
+}
+
+template <class T, size_t B>
+bool is_nan(const SH<T, B>& h)
+{
+    for (size_t i = 0, size = h.coeff.size(); i < size; ++i)
+    {
+        if (is_nan(h.coeff[i])) return true;
+    }
+    return false;
 }
 
 template <class T>
@@ -284,6 +295,53 @@ class MeshBaker
     {
         mat4x4 vp;
     };
+
+    class ClearCommand : public RenderCommand
+    {
+    public:
+        bool init(Context &context)
+        {
+            context_ = &context;
+
+            set_stages(render_stage_after_render_target_setup);
+            color_ = depth_ = stencil_ = true;
+            executed_ = false;
+
+            RenderState& render_state = create_and_get(context.render_state_pool);
+            render_state_ = &render_state;
+            RenderStateDesc desc;
+
+            return render_state.init(desc);
+        }
+
+        void set_clear_mask(bool color, bool depth, bool stencil)
+        {
+            color_ = color;
+            depth_ = depth;
+            stencil_ = stencil;
+        }
+
+        void reset()
+        {
+            executed_ = false;
+        }
+    private:
+        bool execute_impl(RenderStage) override
+        {
+            if (executed_) return true;
+            context_->driver.set_render_state(*render_state_);
+            context_->driver.clear(color_, depth_, stencil_);
+            executed_ = true;
+            return true;
+        }
+
+        Context* context_;
+        RenderState* render_state_;
+        bool color_;
+        bool depth_;
+        bool stencil_;
+        bool executed_;
+    };
 public:
     bool init(mhe::Context& context, mhe::SceneContext& scene_context, mhe::game::Engine& engine)
     {
@@ -299,6 +357,7 @@ public:
         render_target_desc.color_targets = 1;
         render_target_desc.color_format[0] = mhe::format_rgba32f;
         render_target_desc.color_datatype[0] = mhe::format_default;
+        // Create 5 render targets for hemicube rendering
         for (size_t i = 0; i < 5; ++i)
         {
             mhe::RenderTarget& render_target = create_and_get(context.render_target_pool);
@@ -308,6 +367,9 @@ public:
                 return false;
             }
             render_target_[i] = &render_target;
+
+            context.driver.set_render_target(render_target);
+            context.driver.clear(true, true, true);
         }
 
         // shader programs
@@ -362,7 +424,9 @@ public:
         scene_context_ = &scene_context;
         engine_ = &engine;
 
-        clear_command_.set_driver(&context.driver);
+        res = clear_command_.init(context);
+        ASSERT(res, "ClearCommand initialization failed");
+        UNUSED(res);
 
         skybox_material_system_ = context.material_systems.get<mhe::SkyboxMaterialSystem>();
         ASSERT(skybox_material_system_ != nullptr, "SkyboxMaterialSystem isn't found");
@@ -393,7 +457,7 @@ public:
         // Iteration 2 and next - bounces
         //for (size_t i = 0; i < 1; ++i)
         {
-            for (size_t i = 0; i < bounces; ++i)
+            for (int i = 0; i < static_cast<int>(bounces); ++i)
             {
                 render_iteration(texture_buffer, 2 + i, vertices);
             }
@@ -469,7 +533,7 @@ private:
 
         RasterizerDesc rasterizer_state_depth_only;
         rasterizer_state_depth_only.color_write = false;
-        rasterizer_state_depth_only.cull = cull_none;
+        //rasterizer_state_depth_only.cull = cull_none;
 
         RasterizerDesc skybox_rasterizer_state;
         skybox_rasterizer_state.cull = cull_none;
@@ -512,6 +576,7 @@ private:
                 clear_command_.set_clear_mask(true, true, true);
             }
 
+            // Render depth only at the first iteration and use normal rendering for bounces
             for (size_t n = 0; n < nodes_number; ++n)
             {
                 NodeInstance& node = nodes[n];
@@ -529,10 +594,11 @@ private:
                 }
             }
 
+            // Render skybox at the first iteration
             if (iteration == 0)
             {
                 clear_command_.reset();
-                clear_command_.set_clear_mask(true, false, false);
+                clear_command_.set_clear_mask(true, false, false); // use filled depth buffer
 
                 mhe::RenderContext render_context;
                 render_context.main_camera.vp = vp;
@@ -691,8 +757,10 @@ private:
                     vec3 dir_ts = dir_ws * ts;
 
                     vec3 color = data[y * texture_size + x].rgb();
-                    color *= weights_[y * texture_size + x];
-                    res += sh::project_sh9(dir_ts, color);
+                    ASSERT(color.x() >= 0.0f && color.y() >= 0.0f && color.z() >= 0.0f, "Invalid color");
+                    vec3 weighted_color = color * weights_[y * texture_size + x];
+                    res += sh::project_sh9(dir_ts, weighted_color);
+                    ASSERT(!is_nan(weighted_color) && !is_nan(res), "Invalid SH data");
                 }
             }
         }
@@ -761,7 +829,7 @@ private:
 
     mhe::RenderState* render_state_;
 
-    mhe::ClearCommand clear_command_;
+    ClearCommand clear_command_;
 };
 
 class GameScene : public mhe::game::GameScene

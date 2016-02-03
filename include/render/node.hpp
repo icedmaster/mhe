@@ -12,7 +12,8 @@ enum RenderStage
 	render_stage_before_submit = 1 << 1,
 	render_stage_after_submit = 1 << 2,
 	render_stage_begin_priority = 1 << 3,
-	render_stage_end_priority = 1 << 4
+    render_stage_end_priority = 1 << 4,
+    render_stage_after_render_target_setup = 1 << 5
 };
 
 class RenderCommand

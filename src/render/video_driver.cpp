@@ -93,6 +93,9 @@ void Driver::perform_draw_call(const Context& /*context*/, const DrawCallExplici
 
     uint8_t render_command_stages = draw_call.render_command != nullptr ? draw_call.render_command->stages() : 0;
 
+    if (render_command_stages & render_stage_after_render_target_setup)
+        draw_call.render_command->execute(render_stage_after_render_target_setup);
+
     ASSERT(draw_call.render_state != nullptr, "Invalid RenderState");
     if (state_.state != draw_call.render_state->id())
     {
@@ -204,6 +207,9 @@ void Driver::perform_draw_call(const Context& context, const DrawCall& draw_call
                 impl_->set_default_render_target();
             }
         }
+
+        if (command_render_stages & render_stage_after_render_target_setup)
+            draw_call.command->execute(render_stage_after_render_target_setup);
 
         if (state_.state != draw_call_data.state)
         {
