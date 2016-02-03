@@ -13,12 +13,10 @@ namespace mhe {
 
 struct DrawCallData
 {
-    POOL_STRUCT_COPYABLE(DrawCallData, uint16_t);
     RenderState::IdType state;
     RenderTarget::IdType render_target;
 
     DrawCallData() :
-        id(invalid_id),
         state(RenderState::invalid_id),
         render_target(default_render_target)
     {}
@@ -112,7 +110,7 @@ struct MeshPartInstance
     };
 
     MaterialInstance material;
-    DrawCallData::IdType draw_call_data;
+    DrawCallData draw_call_data;
     AABBInstanceHandleType aabb_id;
     uint16_t flags;
     bool visible : 1;

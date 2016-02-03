@@ -19,7 +19,6 @@ bool DepthWriteMaterialSystem::init(Context& context, const MaterialSystemContex
     // It seems we can't pass a static member as a reference
     // (http://stackoverflow.com/questions/272900/vectorpush-back-odr-uses-the-value-causing-undefined-reference-to-static-clas?lq=1)
     uniforms_.fill(static_cast<UniformBuffer::IdType>(UniformBuffer::invalid_id));
-    draw_call_data_.fill(static_cast<DrawCallData::IdType>(DrawCallData::invalid_id));
     shadowmaps_.fill(TextureInstance());
     render_states_.fill(static_cast<RenderState::IdType>(RenderState::invalid_id));
     render_targets_.fill(static_cast<RenderTarget::IdType>(RenderTarget::invalid_id));
@@ -41,10 +40,9 @@ bool DepthWriteMaterialSystem::init_light_data(Context& context)
             return false;
     }
 
-    DrawCallData::IdType& next_draw_call_data = draw_call_data_.add();
-    if (next_draw_call_data == DrawCallData::invalid_id)
+    DrawCallData& next_draw_call_data = draw_call_data_.add();
+    if (!is_handle_valid(next_draw_call_data.state))
     {
-        next_draw_call_data = context.draw_call_data_pool.create();
         RenderState& render_state = create_and_get(context.render_state_pool);
         RenderStateDesc render_state_desc;
         render_state_desc.viewport.viewport.set(0, 0, shadowmap_default_width, shadowmap_default_height);
@@ -69,9 +67,8 @@ bool DepthWriteMaterialSystem::init_light_data(Context& context)
         render_target.depth_texture(shadowmap);
         shadowmaps_.push_back(shadowmap);
 
-        DrawCallData& draw_call_data = context.draw_call_data_pool.get(next_draw_call_data);
-        draw_call_data.render_target = render_target.id();
-        draw_call_data.state = render_state.id();
+        next_draw_call_data.render_target = render_target.id();
+        next_draw_call_data.state = render_state.id();
     }
 
     return true;

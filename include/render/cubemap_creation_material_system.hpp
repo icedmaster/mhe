@@ -31,7 +31,7 @@ private:
 
 	UniformBuffer::IdType uniforms_[6];
 	TextureInstance texture_;
-	DrawCallData::IdType draw_call_data_id_;
+	DrawCallData draw_call_data_;
 	ClearCommand command_;
 };
 

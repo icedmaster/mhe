@@ -58,7 +58,16 @@ bool PosteffectDebugMaterialSystem::init_mesh(Context& context, const MaterialSy
 
 bool PosteffectDebugMaterialSystem::init_mesh_instance(Context& context, MeshInstance& mesh_instance, const rect<int>& viewport, bool overdraw)
 {
-    DrawCallData& draw_call_data = create_and_get(context.draw_call_data_pool);
+    mesh_instance.mesh.parts.resize(1);
+    mesh_instance.instance_parts.resize(1);
+    if (!utils::create_fullscreen_quad(mesh_instance, context))
+    {
+        ERROR_LOG("Can't create fullscreen quad");
+        return false;
+    }
+    mesh_instance.mesh.parts[0].render_data.layout = layout();
+
+    DrawCallData& draw_call_data = mesh_instance.instance_parts[0].draw_call_data;
     RenderState& render_state = create_and_get(context.render_state_pool);
 
     draw_call_data.state = render_state.id();
@@ -79,17 +88,6 @@ bool PosteffectDebugMaterialSystem::init_mesh_instance(Context& context, MeshIns
     desc.depth.write_enabled = false;
     desc.rasterizer.cull = cull_none;
     render_state.init(desc);
-
-    mesh_instance.mesh.parts.resize(1);
-    mesh_instance.instance_parts.resize(1);
-    if (!utils::create_fullscreen_quad(mesh_instance, context))
-    {
-        ERROR_LOG("Can't create fullscreen quad");
-        return false;
-    }
-    mesh_instance.mesh.parts[0].render_data.layout = layout();
-
-    mesh_instance.instance_parts[0].draw_call_data = draw_call_data.id;
 
     Material& material = create_and_get(context.materials[id()]);
     material.shader_program = default_program(context).id();
@@ -193,7 +191,7 @@ void PosteffectMaterialSystemBase::prepare_draw_call(DrawCall& draw_call, Contex
         list_of_commands_.add_command(&copy_framebuffer_command_);
     }
 
-    DrawCallData& draw_call_data = context.draw_call_data_pool.get(mesh_.instance_parts[0].draw_call_data);
+    DrawCallData& draw_call_data = mesh_.instance_parts[0].draw_call_data;
     if (draw_call_data.render_target != mhe::default_render_target &&
         draw_call_data.render_target != RenderTarget::invalid_id)
         list_of_commands_.add_command(&clear_command_);
@@ -229,7 +227,16 @@ void PosteffectMaterialSystemBase::update(Context& context, SceneContext& scene_
 
 bool PosteffectMaterialSystemBase::init_mesh(Context& context, const MaterialSystemContext& material_system_context)
 {
-    DrawCallData& draw_call_data = create_and_get(context.draw_call_data_pool);
+    mesh_.mesh.parts.resize(1);
+    mesh_.instance_parts.resize(1);
+    if (!utils::create_fullscreen_quad(mesh_, context))
+    {
+        ERROR_LOG("Can't create fullscreen quad");
+        return false;
+    }
+    mesh_.mesh.parts[0].render_data.layout = layout();
+
+    DrawCallData& draw_call_data = mesh_.instance_parts[0].draw_call_data;
     RenderState& render_state = create_and_get(context.render_state_pool);
 
     bool use_blend = material_system_context.options.get<bool>(string("blend"));
@@ -252,17 +259,6 @@ bool PosteffectMaterialSystemBase::init_mesh(Context& context, const MaterialSys
     {
         create_output(draw_call_data, context, 0, types_cast<float>(outputs_scale[0]), format_rgba);
     }
-
-    mesh_.mesh.parts.resize(1);
-    mesh_.instance_parts.resize(1);
-    if (!utils::create_fullscreen_quad(mesh_, context))
-    {
-        ERROR_LOG("Can't create fullscreen quad");
-        return false;
-    }
-    mesh_.mesh.parts[0].render_data.layout = layout();
-
-    mesh_.instance_parts[0].draw_call_data =draw_call_data.id;
 
     Material& material = create_and_get(context.materials[id()]);
     material.shader_program = default_program(context).id();
@@ -287,7 +283,7 @@ bool PosteffectMaterialSystemBase::init_screen_input(Context& context, size_t in
 bool PosteffectMaterialSystemBase::create_output(Context& context, size_t index, float scale, int format)
 {
     ASSERT(output(index).id == Texture::invalid_id, "create_output() - trying to create a new output when old output still exists");
-    DrawCallData& draw_call_data = context.draw_call_data_pool.get(mesh_.instance_parts[0].draw_call_data);
+    DrawCallData& draw_call_data = mesh_.instance_parts[0].draw_call_data;
     ASSERT(draw_call_data.render_target == mhe::default_render_target || draw_call_data.render_target == RenderTarget::invalid_id,
         "RenderTarget has been set already");
     return create_output(draw_call_data, context, index, scale, format);
@@ -331,7 +327,7 @@ Material& PosteffectMaterialSystemBase::default_material(Context& context)
 
 RenderTargetHandleType PosteffectMaterialSystemBase::default_render_target(Context& context) const
 {
-    return context.draw_call_data_pool.get(mesh_.instance_parts[0].draw_call_data).render_target;
+    return mesh_.instance_parts[0].draw_call_data.render_target;
 }
 
 bool SSRMaterialSystem::init(Context& context, const MaterialSystemContext& material_system_context)
@@ -416,11 +412,10 @@ bool BlurMaterialSystem::init(Context& context, const MaterialSystemContext& mat
 
     MeshInstance& first_pass_mesh = mesh_instance();
     context.materials[id()].get(first_pass_mesh.instance_parts[0].material.id).uniforms[1] = uniform_;
-    DrawCallData& first_pass_draw_call_data = context.draw_call_data_pool.get(first_pass_mesh.instance_parts[0].draw_call_data);
+    DrawCallData& first_pass_draw_call_data = first_pass_mesh.instance_parts[0].draw_call_data;
     second_pass_mesh_ = first_pass_mesh;
-    DrawCallData& second_pass_draw_call_data = create_and_get(context.draw_call_data_pool);
+    DrawCallData& second_pass_draw_call_data = second_pass_mesh_.instance_parts[0].draw_call_data;
     second_pass_draw_call_data = first_pass_draw_call_data;
-    second_pass_mesh_.instance_parts[0].draw_call_data = second_pass_draw_call_data.id;
 
     Material& material = create_and_get(context.materials[id()]);
     second_pass_mesh_.instance_parts[0].material.id = material.id;
@@ -434,7 +429,7 @@ bool BlurMaterialSystem::create_output(DrawCallData& draw_call_data, Context& co
     if (!PosteffectMaterialSystemBase::create_output(draw_call_data, context, index, scale, format))
         return false;
 
-    DrawCallData& second_pass_draw_call_data = context.draw_call_data_pool.get(second_pass_mesh_.instance_parts[0].draw_call_data);
+    DrawCallData& second_pass_draw_call_data = second_pass_mesh_.instance_parts[0].draw_call_data;
 
     RenderTargetDesc render_target_desc;
     fill_render_target_desc(render_target_desc, format);
@@ -522,19 +517,17 @@ void DOFMaterialSystem::postinit(Context& context)
 {
     MeshInstance& blur_resolve_pass_mesh_instance = mesh_instance();
     Material& blur_resolve_pass_material = context.materials[id()].get(blur_resolve_pass_mesh_instance.instance_parts[0].material.id);
-    DrawCallData& blur_resolve_pass_draw_call_data = context.draw_call_data_pool.get(blur_resolve_pass_mesh_instance.instance_parts[0].draw_call_data);
+    DrawCallData& blur_resolve_pass_draw_call_data = blur_resolve_pass_mesh_instance.instance_parts[0].draw_call_data;
     RenderTarget::IdType composite_pass_rt_id = blur_resolve_pass_draw_call_data.render_target;
     blur_resolve_pass_material.uniforms[1] = dof_uniform_;
 
     dof_pass_mesh_instance_ = blur_resolve_pass_mesh_instance;
-    DrawCallData& dof_pass_pass_draw_call_data = create_and_get(context.draw_call_data_pool);
+    DrawCallData& dof_pass_pass_draw_call_data = dof_pass_mesh_instance_.instance_parts[0].draw_call_data;
     dof_pass_pass_draw_call_data = blur_resolve_pass_draw_call_data;
-    dof_pass_mesh_instance_.instance_parts[0].draw_call_data = dof_pass_pass_draw_call_data.id;
 
     composite_pass_mesh_instance_ = blur_resolve_pass_mesh_instance;
-    DrawCallData& composite_pass_draw_call_data = create_and_get(context.draw_call_data_pool);
+    DrawCallData& composite_pass_draw_call_data = composite_pass_mesh_instance_.instance_parts[0].draw_call_data;
     composite_pass_draw_call_data = blur_resolve_pass_draw_call_data;
-    composite_pass_mesh_instance_.instance_parts[0].draw_call_data = composite_pass_draw_call_data.id;
 
     // R16 for blur. I could've used R16G16 format for the pair depth-blur, but I hope I'll add
     // a depth linearization pass as a part of the rendering pipeline
@@ -699,7 +692,7 @@ void SSAOMaterialSystem::create_noise_texture(TextureInstance& texture_instance,
 
 AverageLuminanceMaterialSystem::ReductionCommand::ReductionCommand()
 {
-    set_stages(render_stage_after_submit);
+    set_stages(render_stage_after_submit | render_stage_before_submit);
     mhe::prepare_draw_call(compute_call_);
 }
 
@@ -712,37 +705,42 @@ void AverageLuminanceMaterialSystem::ReductionCommand::set_parameters(ShaderStor
     reduction_context_ = reduction_context;
 }
 
-bool AverageLuminanceMaterialSystem::ReductionCommand::execute_impl(Context& context, RenderStage /*current_stage*/)
+bool AverageLuminanceMaterialSystem::ReductionCommand::execute_impl(Context& context, RenderStage current_stage)
 {
-    GPU_PROFILE("cs_reduction");
-    ShaderStorageBuffer* buffers[2] = {&context.shader_storage_buffer_pool.get(buffers_[0]),
-                                       &context.shader_storage_buffer_pool.get(buffers_[1])};
-    // texture->buffer conversion
-    compute_call_.shader_program = &context.shader_pool.get(reduction_context_.texture_to_buffer_shader);
-    compute_call_.images[0] = &context.texture_pool.get(reduction_context_.input.id);
-    compute_call_.image_access[0] = access_readonly;
-    compute_call_.buffers[1] = buffers[0];
-    size_t threads_number = compute_call_.shader_program->variable_value<size_t>(string("THREADS_NUMBER"));
-    size_t workgroups_number = reduction_context_.input_size / threads_number;
-    compute_call_.workgroups_number.set(workgroups_number, workgroups_number, 1);
-    context.driver.execute(context, &compute_call_, 1);
-    context.driver.memory_barrier(memory_barrier_storage_buffer);
-
-    // actual reduction
-    compute_call_.shader_program = &context.shader_pool.get(reduction_context_.reduction_shader);
-    const size_t reduction_threads = threads_number_;
-    size_t input_size = buffers[0]->size() / sizeof(float);
-    size_t output_size = input_size;
-    size_t input_buffer_index = 0;
-    while (output_size > 1)
+    if (current_stage == render_stage_before_submit)
+        context.driver.clear(true, false, false);
+    else
     {
-        output_size /= reduction_threads;
-        compute_call_.buffers[0] = buffers[input_buffer_index];
-        input_buffer_index ^= 1;
-        compute_call_.buffers[1] = buffers[input_buffer_index];
-        compute_call_.workgroups_number.set(output_size, 1, 1);
+        GPU_PROFILE("cs_reduction");
+        ShaderStorageBuffer* buffers[2] = {&context.shader_storage_buffer_pool.get(buffers_[0]),
+            &context.shader_storage_buffer_pool.get(buffers_[1])};
+        // texture->buffer conversion
+        compute_call_.shader_program = &context.shader_pool.get(reduction_context_.texture_to_buffer_shader);
+        compute_call_.images[0] = &context.texture_pool.get(reduction_context_.input.id);
+        compute_call_.image_access[0] = access_readonly;
+        compute_call_.buffers[1] = buffers[0];
+        size_t threads_number = compute_call_.shader_program->variable_value<size_t>(string("THREADS_NUMBER"));
+        size_t workgroups_number = reduction_context_.input_size / threads_number;
+        compute_call_.workgroups_number.set(workgroups_number, workgroups_number, 1);
         context.driver.execute(context, &compute_call_, 1);
         context.driver.memory_barrier(memory_barrier_storage_buffer);
+
+        // actual reduction
+        compute_call_.shader_program = &context.shader_pool.get(reduction_context_.reduction_shader);
+        const size_t reduction_threads = threads_number_;
+        size_t input_size = buffers[0]->size() / sizeof(float);
+        size_t output_size = input_size;
+        size_t input_buffer_index = 0;
+        while (output_size > 1)
+        {
+            output_size /= reduction_threads;
+            compute_call_.buffers[0] = buffers[input_buffer_index];
+            input_buffer_index ^= 1;
+            compute_call_.buffers[1] = buffers[input_buffer_index];
+            compute_call_.workgroups_number.set(output_size, 1, 1);
+            context.driver.execute(context, &compute_call_, 1);
+            context.driver.memory_barrier(memory_barrier_storage_buffer);
+        }
     }
 
     return true;
@@ -824,14 +822,12 @@ bool AverageLuminanceMaterialSystem::init(Context& context, const MaterialSystem
     res = render_target.init(context, render_target_desc);
     ASSERT(res, "Can't initialize the output");
 
-    RenderTarget* output_render_target = nullptr;
     for (size_t i = 0; i < 2; ++i)
     {
         RenderTarget& adaptation_render_target = create_and_get(context.render_target_pool);
         res = adaptation_render_target.init(context, render_target_desc);
         ASSERT(res, "Can't initialize the adaptation RT " << i);
         adaptation_render_target_[i] = adaptation_render_target.id();
-        if (i == 1) output_render_target = &adaptation_render_target;
     }
     adaptation_rt_index_ = 2; // we need to skip the first iteration
 
@@ -841,16 +837,15 @@ bool AverageLuminanceMaterialSystem::init(Context& context, const MaterialSystem
     render_target.color_texture(material.textures[0], 0);
     adaptation_material_ = material.id;
     
-    DrawCallData& draw_call_data = context.draw_call_data_pool.get(mesh_instance().instance_parts[0].draw_call_data);
+    DrawCallData& draw_call_data = mesh_instance().instance_parts[0].draw_call_data;
     draw_call_data.render_target = render_target.id();
     RenderState& render_state = context.render_state_pool.get(draw_call_data.state);
     ViewportDesc viewport_desc;
     viewport_desc.viewport.set(0, 0, reduction_buffer_size, reduction_buffer_size);
     render_state.update_viewport(viewport_desc);
 
-    DrawCallData& adaptation_draw_call_data = create_and_get(context.draw_call_data_pool);
+    DrawCallData& adaptation_draw_call_data = adaptation_draw_call_data_;
     adaptation_draw_call_data.state = render_state.id();
-    adaptation_draw_call_data_ = adaptation_draw_call_data.id;
 
     ReductionContext reduction_context;
     reduction_context.input_size = reduction_buffer_size;
@@ -887,7 +882,6 @@ void AverageLuminanceMaterialSystem::update(Context& context, SceneContext& scen
         DrawCall& dc = render_context.draw_calls.add();
         dc = draw_call;
         dc.material.id = adaptation_material_;
-        dc.draw_call_data = adaptation_draw_call_data_;
         dc.pass = 1;
         dc.command = &reduction_command_;
 
@@ -898,14 +892,17 @@ void AverageLuminanceMaterialSystem::update(Context& context, SceneContext& scen
         {
             material.textures[1] = material.textures[0];
             adaptation_rt_index_ = 0;
+            adapted_luminance_index = 0;
         }
         else
         {
             RenderTarget& rt = context.render_target_pool.get(adaptation_render_target_[prev_luminance_index]);
             rt.color_texture(material.textures[1], 0);
         }
-        DrawCallData& draw_call_data = context.draw_call_data_pool.get(adaptation_draw_call_data_);
+        DrawCallData& draw_call_data = adaptation_draw_call_data_;
         draw_call_data.render_target = adaptation_render_target_[adapted_luminance_index];
+
+        dc.draw_call_data = adaptation_draw_call_data_;
 
         TextureInstance output_texture;
         context.render_target_pool.get(draw_call_data.render_target).color_texture(output_texture, 0);
@@ -950,7 +947,7 @@ bool BloomMaterialSystem::init(Context& context, const MaterialSystemContext& ma
 
     for (size_t i = 0; i < steps_number; ++i)
     {
-        DrawCallData& draw_call_data = create_and_get(context.draw_call_data_pool);
+        DrawCallData& draw_call_data = draw_calls_data_[i];
         RenderState& render_state = create_and_get(context.render_state_pool);
         RenderStateDesc render_state_desc;
         render_state_desc.blend.enabled = false;
@@ -963,7 +960,6 @@ bool BloomMaterialSystem::init(Context& context, const MaterialSystemContext& ma
             ERROR_LOG("Can't init a RenderState for bloom step " << i);
         }
         draw_call_data.state = render_state.id();
-        draw_calls_data_[i] = draw_call_data.id;
 
         // and init a new material
         Material& material = create_and_get(context.materials[id()]);
@@ -1063,13 +1059,13 @@ void BloomMaterialSystem::update(Context& context, SceneContext& scene_context, 
 
 void BloomMaterialSystem::copy(Context& context, DrawCall& draw_call, RenderTarget& dst, const RenderTarget& from, size_t pass)
 {
-    DrawCallData& draw_call_data = context.draw_call_data_pool.get(draw_calls_data_[pass]);
+    DrawCallData& draw_call_data = draw_calls_data_[pass];
     draw_call_data.render_target = dst.id();
     RenderState& render_state = context.render_state_pool.get(draw_call_data.state);
     ViewportDesc viewport_desc;
     viewport_desc.viewport.set(0, 0, dst.width(), dst.height());
     render_state.update_viewport(viewport_desc);
-    draw_call.draw_call_data = draw_call_data.id;
+    draw_call.draw_call_data = draw_call_data;
     draw_call.pass = pass + 1;
     draw_call.command = &clear_command_simple_;
     Material& material = context.materials[id()].get(materials_[pass]);

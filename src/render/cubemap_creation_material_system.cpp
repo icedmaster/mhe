@@ -43,8 +43,7 @@ bool CubemapCreationMaterialSystem::init_uniforms(Context& context)
 
 bool CubemapCreationMaterialSystem::init_texture(Context& context)
 {
-    draw_call_data_id_ = context.draw_call_data_pool.create();
-    DrawCallData& draw_call_data = context.draw_call_data_pool.get(draw_call_data_id_);
+    DrawCallData& draw_call_data = draw_call_data_;
     RenderState& render_state = create_and_get(context.render_state_pool);
     RenderStateDesc render_state_desc;
     render_state_desc.viewport.viewport.set(0, 0, cubemap_default_texture_size, cubemap_default_texture_size);
@@ -111,7 +110,7 @@ void CubemapCreationMaterialSystem::render_cubemap(Context& context, SceneContex
 
     NodeInstance* nodes = scene_context.node_pool.all_objects();
 
-    DrawCallData& draw_call_data = context.draw_call_data_pool.get(draw_call_data_id_);
+    DrawCallData& draw_call_data = draw_call_data_;
     RenderTarget& render_target = context.render_target_pool.get(draw_call_data.render_target);
     ASSERT(render_context.draw_calls.empty(), "The cubemap rendering should be called before the main render pass");
     for (size_t pass = 0; pass < 6; ++pass)
@@ -132,7 +131,7 @@ void CubemapCreationMaterialSystem::render_cubemap(Context& context, SceneContex
                     continue;
 
                 DrawCall& draw_call = render_context.draw_calls.add();
-                draw_call.draw_call_data = draw_call_data_id_;
+                draw_call.draw_call_data = draw_call_data_;
                 draw_call.render_data = mesh.parts[j].render_data;
                 
                 MaterialData material_data;

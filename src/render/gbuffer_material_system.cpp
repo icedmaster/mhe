@@ -62,7 +62,7 @@ void GBufferFillMaterialSystem::setup(Context& context, SceneContext& scene_cont
 
     for (size_t i = 0; i < count; ++i)
     {
-        DrawCallData& draw_call_data = context.draw_call_data_pool.get(instance_parts[i].draw_call_data);
+        DrawCallData& draw_call_data = instance_parts[i].draw_call_data;
         draw_call_data.render_target = render_target_;
         Material& material = context.materials[id()].get(instance_parts[i].material.id);
         size_t use_normalmap = material.textures[normal_texture_unit].id != Texture::invalid_id ? 1 : 0;
@@ -219,8 +219,7 @@ bool GBufferDrawMaterialSystem::init(Context& context, const MaterialSystemConte
 
 bool GBufferDrawMaterialSystem::init_meshes(Context &context)
 {
-    draw_call_data_ = context.draw_call_data_pool.create();
-    DrawCallData& draw_call_data = context.draw_call_data_pool.get(draw_call_data_);
+    DrawCallData& draw_call_data = draw_call_data_;
     draw_call_data.render_target = light_buffer_render_target_;
     draw_call_data.state = context.render_state_pool.create();
     RenderState& render_state = context.render_state_pool.get(draw_call_data.state);
@@ -503,7 +502,7 @@ bool ProbesAccumulatorMaterialSystem::init_fullscreen_quad(Context& context)
         return false;
     }
 
-    DrawCallData& draw_call_data = create_and_get(context.draw_call_data_pool);
+    DrawCallData& draw_call_data = quad_mesh_.instance_parts[0].draw_call_data;
     RenderState& render_state = create_and_get(context.render_state_pool);
     RenderStateDesc render_state_desc;
     render_state_desc.depth.test_enabled = false;
@@ -518,7 +517,6 @@ bool ProbesAccumulatorMaterialSystem::init_fullscreen_quad(Context& context)
     draw_call_data.render_target = render_target_;
 
     quad_mesh_.mesh.parts[0].render_data.layout = FullscreenLayout::handle;
-    quad_mesh_.instance_parts[0].draw_call_data = draw_call_data.id;
     return true;
 }
 

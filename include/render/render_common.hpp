@@ -9,7 +9,6 @@ typedef uint8_t MaterialSystemId;
 
 typedef uint16_t ShaderProgramHandleType;
 typedef uint16_t TextureHandleType;
-typedef uint16_t DrawCallDataHandleType;
 typedef uint16_t LayoutHandleType;
 typedef uint16_t RenderStateHandleType;
 typedef uint16_t UniformBufferHandleType;

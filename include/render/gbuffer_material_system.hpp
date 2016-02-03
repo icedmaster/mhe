@@ -138,7 +138,7 @@ private:
     TextureInstance depth_texture_;
     UniformBuffer::IdType light_uniform_[max_lights_number];
     UniformBuffer::IdType directional_light_uniform_[max_directional_lights_number];
-    DrawCallData::IdType draw_call_data_;
+    DrawCallData draw_call_data_;
 
     GlobalVar<bool> shadowmap_enabled_;
     GlobalVar<size_t> shadowmap_quality_;

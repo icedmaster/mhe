@@ -450,7 +450,7 @@ private:
     ReductionCommand reduction_command_;
     RenderTargetHandleType adaptation_render_target_[2];
     MaterialHandleType adaptation_material_;
-    DrawCallDataHandleType adaptation_draw_call_data_;
+    DrawCallData adaptation_draw_call_data_;
     uint8_t adaptation_rt_index_;
 };
 
@@ -485,7 +485,7 @@ private:
 
     Settings settings_;
     UniformBufferHandleType uniform_;
-    DrawCallDataHandleType draw_calls_data_[steps_number];
+    DrawCallData draw_calls_data_[steps_number];
     MaterialHandleType materials_[steps_number];
     BlurMaterialSystem* blur_material_system_;
     ClearCommandSimple clear_command_simple_;
