@@ -185,13 +185,12 @@ void Driver::perform_draw_call(Context& context, const DrawCall& draw_call)
     if (command_render_stages & render_stage_before_render_target_setup)
         draw_call.command->execute(context, render_stage_before_render_target_setup);
 
-    const DrawCallData& draw_call_data = draw_call.draw_call_data;
-    if (draw_call_data.render_target != default_render_target)
+    if (draw_call.render_target != default_render_target)
     {
-        if (state_.render_target != draw_call_data.render_target)
+        if (state_.render_target != draw_call.render_target)
         {
-            state_.render_target = draw_call_data.render_target;
-            impl_->set_render_target(context.render_target_pool.get(draw_call_data.render_target));
+            state_.render_target = draw_call.render_target;
+            impl_->set_render_target(context.render_target_pool.get(draw_call.render_target));
         }
     }
     else
@@ -203,10 +202,10 @@ void Driver::perform_draw_call(Context& context, const DrawCall& draw_call)
         }
     }
 
-    if (state_.state != draw_call_data.state)
+    if (state_.state != draw_call.render_state)
     {
-        impl_->set_state(context.render_state_pool.get(draw_call_data.state));
-        state_.state = draw_call_data.state;
+        impl_->set_state(context.render_state_pool.get(draw_call.render_state));
+        state_.state = draw_call.render_state;
     }
 
     if (command_render_stages & render_stage_before_submit)

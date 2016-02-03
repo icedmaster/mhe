@@ -166,10 +166,11 @@ protected:
 
     void fill_render_target_desc(RenderTargetDesc& desc, int format = format_rgba) const;
 
-    virtual bool create_output(DrawCallData& draw_call_data, Context& context, size_t index, float scale, int format);
+    virtual bool create_output(RenderStateHandleType render_state, Context& context, size_t index, float scale, int format);
     void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
-    void prepare_draw_call(DrawCall& draw_call, Context& context, SceneContext& scene_context, const RenderContext& render_context);
-    RenderTargetHandleType default_render_target(Context& context) const;
+    void prepare_draw_call(DrawCall& draw_call, Context& context, SceneContext& scene_context, const RenderContext& render_context,
+        RenderTargetHandleType render_target_id);
+    RenderTargetHandleType default_render_target() const;
 private:
     bool init_mesh(Context& context, const MaterialSystemContext& material_system_context);
 
@@ -177,6 +178,7 @@ private:
     array<TextureInstance, max_textures_number> outputs_;
     array<ShaderProgramHandleType, max_buffers> buffers_;
     array<UniformBufferHandleType, max_buffers> uniforms_;
+    RenderTargetHandleType default_render_target_;
     size_t inputs_number_;
     size_t outputs_number_;
     MeshInstance mesh_;
@@ -289,7 +291,7 @@ public:
         return output_rt_;
     }
 private:
-    bool create_output(DrawCallData& draw_call_data, Context& context, size_t index, float scale, int format) override;
+    bool create_output(RenderStateHandleType render_state_id, Context& context, size_t index, float scale, int format) override;
     void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
 
     Settings settings_;
@@ -336,6 +338,9 @@ private:
 
     DOFShaderData dof_shader_data_;
     UniformBuffer::IdType dof_uniform_;
+
+    RenderTargetHandleType blur_rt_;
+    RenderTargetHandleType dof_rt_;
 };
 
 class SSAOMaterialSystem : public PosteffectMaterialSystemBase
@@ -448,9 +453,9 @@ private:
     ShaderProgramHandleType adaptation_shader_;
     UniformBufferHandleType adaptation_uniform_;
     ReductionCommand reduction_command_;
+    RenderTargetHandleType render_target_;
     RenderTargetHandleType adaptation_render_target_[2];
     MaterialHandleType adaptation_material_;
-    DrawCallData adaptation_draw_call_data_;
     uint8_t adaptation_rt_index_;
 };
 
@@ -485,7 +490,7 @@ private:
 
     Settings settings_;
     UniformBufferHandleType uniform_;
-    DrawCallData draw_calls_data_[steps_number];
+    RenderStateHandleType render_states_[steps_number];
     MaterialHandleType materials_[steps_number];
     BlurMaterialSystem* blur_material_system_;
     ClearCommandSimple clear_command_simple_;

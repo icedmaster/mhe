@@ -40,14 +40,14 @@ bool DepthWriteMaterialSystem::init_light_data(Context& context)
             return false;
     }
 
-    DrawCallData& next_draw_call_data = draw_call_data_.add();
-    if (!is_handle_valid(next_draw_call_data.state))
+    RenderStateHandleType& next_render_state = render_states_.add();
+    if (!is_handle_valid(next_render_state))
     {
         RenderState& render_state = create_and_get(context.render_state_pool);
         RenderStateDesc render_state_desc;
         render_state_desc.viewport.viewport.set(0, 0, shadowmap_default_width, shadowmap_default_height);
         if (!render_state.init(render_state_desc)) return false;
-        render_states_.push_back(render_state.id());
+        next_render_state = render_state.id();
 
         RenderTarget& render_target = create_and_get(context.render_target_pool);
         RenderTargetDesc desc;
@@ -66,9 +66,6 @@ bool DepthWriteMaterialSystem::init_light_data(Context& context)
         TextureInstance shadowmap;
         render_target.depth_texture(shadowmap);
         shadowmaps_.push_back(shadowmap);
-
-        next_draw_call_data.render_target = render_target.id();
-        next_draw_call_data.state = render_state.id();
     }
 
     return true;
@@ -88,8 +85,8 @@ void DepthWriteMaterialSystem::update(Context& context, SceneContext& scene_cont
     // clear() resets only counter but doesn't really destroy the elements of the vector
     clear_commands_.clear();
     uniforms_.clear();
-    draw_call_data_.clear();
     shadow_info_.clear();
+    render_states_.clear();
 
     context.materials[id()].clear();
 
@@ -151,7 +148,8 @@ void DepthWriteMaterialSystem::update(Context& context, SceneContext& scene_cont
                 const Material& original_material = context.materials[original_material_instance.material_system].get(original_material_instance.id);
                 material.uniforms[1] = original_material.uniforms[1];
 
-                draw_call.draw_call_data = draw_call_data_[light_data_index];
+                draw_call.render_state = render_states_[light_data_index];
+                draw_call.render_target = render_targets_[light_data_index];
 
                 draw_call.command = &clear_commands_[light_data_index];
                 draw_call.pass = light_data_index;

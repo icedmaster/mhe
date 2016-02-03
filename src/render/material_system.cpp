@@ -8,10 +8,12 @@
 
 namespace mhe {
 
-void MaterialSystem::setup_draw_call(DrawCall& draw_call, const MeshPartInstance& instance_part, const MeshPart& part, RenderCommand* command) const
+void MaterialSystem::setup_draw_call(DrawCall& draw_call, const MeshPartInstance& instance_part, const MeshPart& part,
+    RenderTargetHandleType render_target, RenderCommand* command) const
 {
     draw_call.material = instance_part.material;
-    draw_call.draw_call_data = instance_part.draw_call_data;
+    draw_call.render_state = instance_part.render_state_id;
+    draw_call.render_target = render_target;
     draw_call.render_data = part.render_data;
     draw_call.command = command;
 
@@ -63,11 +65,10 @@ void MaterialSystem::standart_material_setup(Context& context, SceneContext& sce
         if (parts[i].render_data.layout == Layout::invalid_id)
             parts[i].render_data.layout = layout_id;
 
-        DrawCallData& draw_call_data = instance_parts[i].draw_call_data;
         RenderState& render_state = create_and_get(context.render_state_pool);
         RenderStateDesc desc;
         render_state.init(desc);
-        draw_call_data.state = render_state.id();
+        instance_parts[i].render_state_id = render_state.id();
     }
 }
 

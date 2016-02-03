@@ -11,7 +11,6 @@ void convert(DrawCallExplicit& dst, const DrawCall& src, const Context& context)
     prepare_draw_call(dst);
 
     Material& material = context.materials[src.material.material_system].get(src.material.id);
-    const DrawCallData& draw_call_data = src.draw_call_data;
 
     dst.elements_number = src.render_data.elements_number;
     dst.ibuffer = &context.index_buffer_pool.get(src.render_data.ibuffer);
@@ -22,9 +21,9 @@ void convert(DrawCallExplicit& dst, const DrawCall& src, const Context& context)
     dst.primitive = src.render_data.primitive;
     dst.priority = 0;
     dst.render_command = src.command;
-    dst.render_state = &context.render_state_pool.get(draw_call_data.state);
-    if (draw_call_data.render_target != default_render_target)
-        dst.render_target = &context.render_target_pool.get(draw_call_data.render_target);
+    dst.render_state = &context.render_state_pool.get(src.render_state);
+    if (src.render_target != default_render_target)
+        dst.render_target = &context.render_target_pool.get(src.render_target);
     dst.shader_program = &context.shader_pool.get(material.shader_program);
     for (size_t i = 0; i < material_texture_buffers_number; ++i)
     {

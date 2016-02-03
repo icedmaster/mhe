@@ -156,7 +156,8 @@ protected:
     UberShader& ubershader(const Context& context) const;
     ShaderProgram& default_program(const Context& context) const;
 
-    void setup_draw_call(DrawCall& draw_call, const MeshPartInstance& instance_part, const MeshPart& part, RenderCommand* command = nullptr) const;
+    void setup_draw_call(DrawCall& draw_call, const MeshPartInstance& instance_part, const MeshPart& part,
+        RenderTarget::IdType render_target, RenderCommand* command = nullptr) const;
 private:
     virtual const char* name_impl() const = 0;
     virtual void update(Context& context, SceneContext& scene_context, RenderContext& render_context) = 0;
@@ -174,7 +175,7 @@ typedef Factory<MaterialSystem> MaterialSystemFactory;
 
 #define SETUP_MATERIAL(mname) public: static const char* material_name() {return mname;} private: const char* name_impl() const { return mname; }
 
-#define MATERIAL_UPDATE_WITH_COMMAND(context, scene_context, render_context, update_method, command)    \
+#define MATERIAL_UPDATE_WITH_COMMAND(context, scene_context, render_context, update_method, render_target, command)    \
     for (size_t i = 0; i < render_context.nodes_number; ++i)                \
     {                                                                       \
         for (size_t j = 0; j < render_context.nodes[i].mesh.instance_parts.size(); ++j) \
@@ -184,12 +185,12 @@ typedef Factory<MaterialSystem> MaterialSystemFactory;
             if (part_instance.material.material_system != id() || !part_instance.visible)    \
                 continue;                                                                           \
             update_method(context, scene_context, render_context, &part_instance, &part, 1); \
-            setup_draw_call(render_context.draw_calls.add(), part_instance, render_context.nodes[i].mesh.mesh.parts[j], command);   \
+            setup_draw_call(render_context.draw_calls.add(), part_instance, render_context.nodes[i].mesh.mesh.parts[j], render_target, command);   \
         }   \
     }
 
 #define DEFAULT_MATERIAL_UPDATE(context, scene_context, render_context)     \
-    MATERIAL_UPDATE_WITH_COMMAND(context, scene_context, render_context, update, nullptr)
+    MATERIAL_UPDATE_WITH_COMMAND(context, scene_context, render_context, update, default_render_target, nullptr)
 
 }
 

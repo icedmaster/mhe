@@ -11,17 +11,6 @@
 
 namespace mhe {
 
-struct DrawCallData
-{
-    RenderState::IdType state;
-    RenderTarget::IdType render_target;
-
-    DrawCallData() :
-        state(RenderState::invalid_id),
-        render_target(default_render_target)
-    {}
-};
-
 struct RenderData
 {
     size_t elements_number; // the number of faces
@@ -110,12 +99,13 @@ struct MeshPartInstance
     };
 
     MaterialInstance material;
-    DrawCallData draw_call_data;
+    RenderStateHandleType render_state_id;
     AABBInstanceHandleType aabb_id;
     uint16_t flags;
     bool visible : 1;
 
-    MeshPartInstance() : aabb_id(InvalidHandle<AABBInstanceHandleType>::id), visible(true),
+    MeshPartInstance() : render_state_id(InvalidHandle<RenderStateHandleType>::id),
+        aabb_id(InvalidHandle<AABBInstanceHandleType>::id), visible(true),
         flags(cast_shadow | receive_shadow | cast_reflection) {}
 };
 

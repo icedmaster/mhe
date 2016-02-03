@@ -67,10 +67,9 @@ bool PosteffectDebugMaterialSystem::init_mesh_instance(Context& context, MeshIns
     }
     mesh_instance.mesh.parts[0].render_data.layout = layout();
 
-    DrawCallData& draw_call_data = mesh_instance.instance_parts[0].draw_call_data;
     RenderState& render_state = create_and_get(context.render_state_pool);
 
-    draw_call_data.state = render_state.id();
+    mesh_instance.instance_parts[0].render_state_id = render_state.id();
     RenderStateDesc desc;
     desc.blend.enabled = true;
     desc.viewport.viewport = viewport;
@@ -123,7 +122,7 @@ void PosteffectDebugMaterialSystem::update(Context& context, SceneContext& /*sce
         if (texture_type_mask_ & (1 << texture_index))
             material.shader_program = shader.get(ubershader_index);
         else material.shader_program = shader.get_default();
-        setup_draw_call(render_context.draw_calls.add(), fullscreen_mesh_.instance_parts[0], fullscreen_mesh_.mesh.parts[0], &clear_command_);
+        setup_draw_call(render_context.draw_calls.add(), fullscreen_mesh_.instance_parts[0], fullscreen_mesh_.mesh.parts[0], mhe::default_render_target, &clear_command_);
     }
     else
     {
@@ -136,7 +135,7 @@ void PosteffectDebugMaterialSystem::update(Context& context, SceneContext& /*sce
             if (texture_type_mask_ & (1 << j))
                 material.shader_program = shader.get(ubershader_index);
 
-            setup_draw_call(render_context.draw_calls.add(), mesh_[j].instance_parts[0], mesh_[j].mesh.parts[0], &clear_command_);
+            setup_draw_call(render_context.draw_calls.add(), mesh_[j].instance_parts[0], mesh_[j].mesh.parts[0], mhe::default_render_target, &clear_command_);
         }
     }
 }
@@ -152,7 +151,7 @@ void PosteffectDebugMaterialSystem::set_render_target(const RenderTarget& render
 }
 
 PosteffectMaterialSystemBase::PosteffectMaterialSystemBase(const char* name) :
-    inputs_number_(0), outputs_number_(0), profile_command_(name), framebuffer_input_(invalid_index)
+    inputs_number_(0), outputs_number_(0), profile_command_(name), framebuffer_input_(invalid_index), default_render_target_(mhe::default_render_target)
 {}
 
 bool PosteffectMaterialSystemBase::init(Context& context, const MaterialSystemContext& material_system_context)
@@ -181,7 +180,8 @@ void PosteffectMaterialSystemBase::setup(Context& context, SceneContext& scene_c
     empty_setup(context, scene_context, instance_parts, parts, model_contexts, count);
 }
 
-void PosteffectMaterialSystemBase::prepare_draw_call(DrawCall& draw_call, Context& context, SceneContext& /*scene_context*/, const RenderContext& render_context)
+void PosteffectMaterialSystemBase::prepare_draw_call(DrawCall& draw_call, Context& context, SceneContext& /*scene_context*/, const RenderContext& render_context,
+    RenderTargetHandleType render_target_id)
 {
     list_of_commands_.clear();
     clear_command_.reset();
@@ -191,9 +191,8 @@ void PosteffectMaterialSystemBase::prepare_draw_call(DrawCall& draw_call, Contex
         list_of_commands_.add_command(&copy_framebuffer_command_);
     }
 
-    DrawCallData& draw_call_data = mesh_.instance_parts[0].draw_call_data;
-    if (draw_call_data.render_target != mhe::default_render_target &&
-        draw_call_data.render_target != RenderTarget::invalid_id)
+    if (render_target_id != mhe::default_render_target &&
+        render_target_id != RenderTarget::invalid_id)
         list_of_commands_.add_command(&clear_command_);
 
     list_of_commands_.add_command(&profile_command_);
@@ -216,13 +215,13 @@ void PosteffectMaterialSystemBase::prepare_draw_call(DrawCall& draw_call, Contex
             material.uniforms[j] = uniforms_[j];
     }
     material.shader_program = shader.get(ubershader_index);
-    setup_draw_call(draw_call, mesh_.instance_parts[0], mesh_.mesh.parts[0], command);
+    setup_draw_call(draw_call, mesh_.instance_parts[0], mesh_.mesh.parts[0], render_target_id, command);
     draw_call.pass = 0;
 }
 
 void PosteffectMaterialSystemBase::update(Context& context, SceneContext& scene_context, RenderContext& render_context)
 {
-    prepare_draw_call(render_context.draw_calls.add(), context, scene_context, render_context);
+    prepare_draw_call(render_context.draw_calls.add(), context, scene_context, render_context, default_render_target_);
 }
 
 bool PosteffectMaterialSystemBase::init_mesh(Context& context, const MaterialSystemContext& material_system_context)
@@ -236,12 +235,11 @@ bool PosteffectMaterialSystemBase::init_mesh(Context& context, const MaterialSys
     }
     mesh_.mesh.parts[0].render_data.layout = layout();
 
-    DrawCallData& draw_call_data = mesh_.instance_parts[0].draw_call_data;
     RenderState& render_state = create_and_get(context.render_state_pool);
 
     bool use_blend = material_system_context.options.get<bool>(string("blend"));
 
-    draw_call_data.state = render_state.id();
+    mesh_.instance_parts[0].render_state_id = render_state.id();
     RenderStateDesc desc;
     desc.blend.enabled = use_blend;
     desc.blend.srcmode = blend_src_alpha;
@@ -257,7 +255,7 @@ bool PosteffectMaterialSystemBase::init_mesh(Context& context, const MaterialSys
     const std::vector<string>& outputs_scale = utils::split(outputs_str, string(","));
     if (!outputs_scale.empty())
     {
-        create_output(draw_call_data, context, 0, types_cast<float>(outputs_scale[0]), format_rgba);
+        create_output(render_state.id(), context, 0, types_cast<float>(outputs_scale[0]), format_rgba);
     }
 
     Material& material = create_and_get(context.materials[id()]);
@@ -283,10 +281,9 @@ bool PosteffectMaterialSystemBase::init_screen_input(Context& context, size_t in
 bool PosteffectMaterialSystemBase::create_output(Context& context, size_t index, float scale, int format)
 {
     ASSERT(output(index).id == Texture::invalid_id, "create_output() - trying to create a new output when old output still exists");
-    DrawCallData& draw_call_data = mesh_.instance_parts[0].draw_call_data;
-    ASSERT(draw_call_data.render_target == mhe::default_render_target || draw_call_data.render_target == RenderTarget::invalid_id,
+    ASSERT(default_render_target_ == mhe::default_render_target || default_render_target_ == RenderTarget::invalid_id,
         "RenderTarget has been set already");
-    return create_output(draw_call_data, context, index, scale, format);
+    return create_output(mesh_.instance_parts[0].render_state_id, context, index, scale, format);
 }
 
 void PosteffectMaterialSystemBase::fill_render_target_desc(RenderTargetDesc& desc, int format) const
@@ -299,19 +296,20 @@ void PosteffectMaterialSystemBase::fill_render_target_desc(RenderTargetDesc& des
     desc.color_format[0] = format != format_max ? format : format_rgba;
 }
 
-bool PosteffectMaterialSystemBase::create_output(DrawCallData& draw_call_data, Context& context, size_t index, float scale, int format)
+bool PosteffectMaterialSystemBase::create_output(RenderStateHandleType render_state_id, Context& context, size_t index, float scale, int format)
 {
     RenderTargetDesc render_target_desc;
     fill_render_target_desc(render_target_desc, format);
     RenderTarget& render_target = context.render_target_manager.create(context, render_target_desc, scale);
-    draw_call_data.render_target = render_target.id();
     const TextureInstance* ids = nullptr;
     render_target.color_textures(&ids);
     set_output(index, ids[0]);
 
+    default_render_target_ = render_target.id();
+
     if (scale != 1.0f)
     {
-        RenderState& render_state = context.render_state_pool.get(draw_call_data.state);
+        RenderState& render_state = context.render_state_pool.get(render_state_id);
         ViewportDesc desc;
         desc.viewport.set(0, 0, render_target_desc.width, render_target_desc.height);
         render_state.update_viewport(desc);
@@ -325,9 +323,9 @@ Material& PosteffectMaterialSystemBase::default_material(Context& context)
     return context.materials[id()].get(mesh_.instance_parts[0].material.id);
 }
 
-RenderTargetHandleType PosteffectMaterialSystemBase::default_render_target(Context& context) const
+RenderTargetHandleType PosteffectMaterialSystemBase::default_render_target() const
 {
-    return mesh_.instance_parts[0].draw_call_data.render_target;
+    return default_render_target_;
 }
 
 bool SSRMaterialSystem::init(Context& context, const MaterialSystemContext& material_system_context)
@@ -412,10 +410,7 @@ bool BlurMaterialSystem::init(Context& context, const MaterialSystemContext& mat
 
     MeshInstance& first_pass_mesh = mesh_instance();
     context.materials[id()].get(first_pass_mesh.instance_parts[0].material.id).uniforms[1] = uniform_;
-    DrawCallData& first_pass_draw_call_data = first_pass_mesh.instance_parts[0].draw_call_data;
     second_pass_mesh_ = first_pass_mesh;
-    DrawCallData& second_pass_draw_call_data = second_pass_mesh_.instance_parts[0].draw_call_data;
-    second_pass_draw_call_data = first_pass_draw_call_data;
 
     Material& material = create_and_get(context.materials[id()]);
     second_pass_mesh_.instance_parts[0].material.id = material.id;
@@ -424,17 +419,14 @@ bool BlurMaterialSystem::init(Context& context, const MaterialSystemContext& mat
     return true;
 }
 
-bool BlurMaterialSystem::create_output(DrawCallData& draw_call_data, Context& context, size_t index, float scale, int format)
+bool BlurMaterialSystem::create_output(RenderStateHandleType render_state_id, Context& context, size_t index, float scale, int format)
 {
-    if (!PosteffectMaterialSystemBase::create_output(draw_call_data, context, index, scale, format))
+    if (!PosteffectMaterialSystemBase::create_output(render_state_id, context, index, scale, format))
         return false;
-
-    DrawCallData& second_pass_draw_call_data = second_pass_mesh_.instance_parts[0].draw_call_data;
 
     RenderTargetDesc render_target_desc;
     fill_render_target_desc(render_target_desc, format);
     RenderTarget& render_target = context.render_target_manager.create(context, render_target_desc, scale);
-    second_pass_draw_call_data.render_target = render_target.id();
     output_rt_ = render_target.id();
 
     // current output (first pass) as input for second pass
@@ -468,7 +460,7 @@ void BlurMaterialSystem::setup_draw_calls(Context& context, SceneContext& scene_
     context.materials[id()].get(mesh_instance().instance_parts[0].material.id).shader_program = 
         ubershader(context).get(ubershader_index);
 
-    prepare_draw_call(draw_calls[0], context, scene_context, render_context);
+    prepare_draw_call(draw_calls[0], context, scene_context, render_context, default_render_target());
 
     Material& material = context.materials[id()].get(second_pass_mesh_.instance_parts[0].material.id);
 
@@ -477,7 +469,7 @@ void BlurMaterialSystem::setup_draw_calls(Context& context, SceneContext& scene_
     material.uniforms[0] = render_context.main_camera.percamera_uniform;
 
     clear_command_.reset();
-    setup_draw_call(draw_calls[1], second_pass_mesh_.instance_parts[0], second_pass_mesh_.mesh.parts[0], &clear_command_);
+    setup_draw_call(draw_calls[1], second_pass_mesh_.instance_parts[0], second_pass_mesh_.mesh.parts[0], output_rt_, &clear_command_);
 }
 
 bool DOFMaterialSystem::init(Context& context, const MaterialSystemContext& material_system_context)
@@ -517,17 +509,11 @@ void DOFMaterialSystem::postinit(Context& context)
 {
     MeshInstance& blur_resolve_pass_mesh_instance = mesh_instance();
     Material& blur_resolve_pass_material = context.materials[id()].get(blur_resolve_pass_mesh_instance.instance_parts[0].material.id);
-    DrawCallData& blur_resolve_pass_draw_call_data = blur_resolve_pass_mesh_instance.instance_parts[0].draw_call_data;
-    RenderTarget::IdType composite_pass_rt_id = blur_resolve_pass_draw_call_data.render_target;
+    RenderTarget::IdType composite_pass_rt_id = default_render_target();
     blur_resolve_pass_material.uniforms[1] = dof_uniform_;
 
     dof_pass_mesh_instance_ = blur_resolve_pass_mesh_instance;
-    DrawCallData& dof_pass_pass_draw_call_data = dof_pass_mesh_instance_.instance_parts[0].draw_call_data;
-    dof_pass_pass_draw_call_data = blur_resolve_pass_draw_call_data;
-
     composite_pass_mesh_instance_ = blur_resolve_pass_mesh_instance;
-    DrawCallData& composite_pass_draw_call_data = composite_pass_mesh_instance_.instance_parts[0].draw_call_data;
-    composite_pass_draw_call_data = blur_resolve_pass_draw_call_data;
 
     // R16 for blur. I could've used R16G16 format for the pair depth-blur, but I hope I'll add
     // a depth linearization pass as a part of the rendering pipeline
@@ -541,7 +527,7 @@ void DOFMaterialSystem::postinit(Context& context)
     rt_desc.use_stencil = false;
 
     RenderTarget& blur_rt = context.render_target_manager.create(context, rt_desc, blur_resolve_pass_scale_);
-    blur_resolve_pass_draw_call_data.render_target = blur_rt.id();
+    blur_rt_ = blur_rt.id();
 
     Material& dof_pass_material = create_and_get(context.materials[id()]);
     dof_pass_mesh_instance_.instance_parts[0].material.id = dof_pass_material.id;
@@ -549,11 +535,10 @@ void DOFMaterialSystem::postinit(Context& context)
     rt_desc.color_datatype[0] = format_ubyte;
     rt_desc.color_format[0] = format_rgba;
     RenderTarget& dof_rt = context.render_target_manager.create(context, rt_desc, 1.0f);
-    dof_pass_pass_draw_call_data.render_target = dof_rt.id();
+    dof_rt_ = dof_rt.id();
 
     Material& composite_material = create_and_get(context.materials[id()]);
     composite_pass_mesh_instance_.instance_parts[0].material.id = composite_material.id;
-    composite_pass_draw_call_data.render_target = composite_pass_rt_id;
 
     UberShader& shader = ubershader(context);
 
@@ -588,17 +573,17 @@ void DOFMaterialSystem::update(Context& context, SceneContext& scene_context, Re
     update_uniforms(context);
 
     DrawCall& dc1 = render_context.draw_calls.add();
-    PosteffectMaterialSystemBase::prepare_draw_call(dc1, context, scene_context, render_context);
+    PosteffectMaterialSystemBase::prepare_draw_call(dc1, context, scene_context, render_context, blur_rt_);
     dc1.pass = 0;
 
     DrawCall& dc2 = render_context.draw_calls.add();
     setup_draw_call(dc2,
-        dof_pass_mesh_instance_.instance_parts[0], dof_pass_mesh_instance_.mesh.parts[0], &clear_command_simple_);
+        dof_pass_mesh_instance_.instance_parts[0], dof_pass_mesh_instance_.mesh.parts[0], dof_rt_, &clear_command_simple_);
     dc2.pass = 1;
 
     DrawCall& dc3 = render_context.draw_calls.add();
     setup_draw_call(dc3,
-        composite_pass_mesh_instance_.instance_parts[0], composite_pass_mesh_instance_.mesh.parts[0], nullptr);
+        composite_pass_mesh_instance_.instance_parts[0], composite_pass_mesh_instance_.mesh.parts[0], default_render_target(), nullptr);
     dc3.pass = 2;
 }
 
@@ -837,15 +822,11 @@ bool AverageLuminanceMaterialSystem::init(Context& context, const MaterialSystem
     render_target.color_texture(material.textures[0], 0);
     adaptation_material_ = material.id;
     
-    DrawCallData& draw_call_data = mesh_instance().instance_parts[0].draw_call_data;
-    draw_call_data.render_target = render_target.id();
-    RenderState& render_state = context.render_state_pool.get(draw_call_data.state);
+    render_target_ = render_target.id();
+    RenderState& render_state = context.render_state_pool.get(mesh_instance().instance_parts[0].render_state_id);
     ViewportDesc viewport_desc;
     viewport_desc.viewport.set(0, 0, reduction_buffer_size, reduction_buffer_size);
     render_state.update_viewport(viewport_desc);
-
-    DrawCallData& adaptation_draw_call_data = adaptation_draw_call_data_;
-    adaptation_draw_call_data.state = render_state.id();
 
     ReductionContext reduction_context;
     reduction_context.input_size = reduction_buffer_size;
@@ -874,7 +855,7 @@ void AverageLuminanceMaterialSystem::update(Context& context, SceneContext& scen
 
     // The first draw call is to calculate per-pixel luminance
     DrawCall& draw_call = render_context.draw_calls.add();
-    prepare_draw_call(draw_call, context, scene_context, render_context);
+    prepare_draw_call(draw_call, context, scene_context, render_context, render_target_);
     draw_call.pass = 0;
     draw_call.command = nullptr;
     // And the second is to perform luminance adaptation, also per-pixel
@@ -899,13 +880,10 @@ void AverageLuminanceMaterialSystem::update(Context& context, SceneContext& scen
             RenderTarget& rt = context.render_target_pool.get(adaptation_render_target_[prev_luminance_index]);
             rt.color_texture(material.textures[1], 0);
         }
-        DrawCallData& draw_call_data = adaptation_draw_call_data_;
-        draw_call_data.render_target = adaptation_render_target_[adapted_luminance_index];
-
-        dc.draw_call_data = adaptation_draw_call_data_;
+        dc.render_target = adaptation_render_target_[adapted_luminance_index];
 
         TextureInstance output_texture;
-        context.render_target_pool.get(draw_call_data.render_target).color_texture(output_texture, 0);
+        context.render_target_pool.get(dc.render_target).color_texture(output_texture, 0);
         reduction_command_.set_input(output_texture);
 
         adaptation_rt_index_ ^= 1;
@@ -947,7 +925,6 @@ bool BloomMaterialSystem::init(Context& context, const MaterialSystemContext& ma
 
     for (size_t i = 0; i < steps_number; ++i)
     {
-        DrawCallData& draw_call_data = draw_calls_data_[i];
         RenderState& render_state = create_and_get(context.render_state_pool);
         RenderStateDesc render_state_desc;
         render_state_desc.blend.enabled = false;
@@ -959,7 +936,7 @@ bool BloomMaterialSystem::init(Context& context, const MaterialSystemContext& ma
         {
             ERROR_LOG("Can't init a RenderState for bloom step " << i);
         }
-        draw_call_data.state = render_state.id();
+        render_states_[i] = render_state.id();
 
         // and init a new material
         Material& material = create_and_get(context.materials[id()]);
@@ -1010,12 +987,12 @@ void BloomMaterialSystem::update(Context& context, SceneContext& scene_context, 
     shader_data.settings.set_z(settings_.intensity);
     uniform_buffer.update(shader_data);
 
-    RenderTargetHandleType original_render_target_id = default_render_target(context);
+    RenderTargetHandleType original_render_target_id = default_render_target();
     ASSERT(original_render_target_id != mhe::default_render_target, "Bloom must use a separate render target for the first pass");
     RenderTarget& original_render_target = context.render_target_pool.get(original_render_target_id);
     // 1) find the brightest pixels
     DrawCall& draw_call = render_context.draw_calls.add();
-    PosteffectMaterialSystemBase::prepare_draw_call(draw_call, context, scene_context, render_context);
+    PosteffectMaterialSystemBase::prepare_draw_call(draw_call, context, scene_context, render_context, original_render_target_id);
     draw_call.pass = 0;
     // 2) downsample to the 1/2
     RenderTarget& rt_1_2 = context.render_target_manager.get_temp_render_target(context, format_rgba16f, 0.5f);
@@ -1059,13 +1036,12 @@ void BloomMaterialSystem::update(Context& context, SceneContext& scene_context, 
 
 void BloomMaterialSystem::copy(Context& context, DrawCall& draw_call, RenderTarget& dst, const RenderTarget& from, size_t pass)
 {
-    DrawCallData& draw_call_data = draw_calls_data_[pass];
-    draw_call_data.render_target = dst.id();
-    RenderState& render_state = context.render_state_pool.get(draw_call_data.state);
+    draw_call.render_target = dst.id();
+    RenderState& render_state = context.render_state_pool.get(render_states_[pass]);
     ViewportDesc viewport_desc;
     viewport_desc.viewport.set(0, 0, dst.width(), dst.height());
     render_state.update_viewport(viewport_desc);
-    draw_call.draw_call_data = draw_call_data;
+    draw_call.render_state = render_states_[pass];
     draw_call.pass = pass + 1;
     draw_call.command = &clear_command_simple_;
     Material& material = context.materials[id()].get(materials_[pass]);

@@ -66,9 +66,7 @@ bool CSMDepthRenderingMaterialSystem::init(Context& context, const MaterialSyste
         render_state_desc.viewport.viewport.set(i * rt_width, 0, rt_width, rt_height);
         if (!render_state.init(render_state_desc)) return false;
 
-        DrawCallData& draw_call_data = draw_call_data_.add();
-        draw_call_data.render_target = render_target.id();
-        draw_call_data.state = render_state.id();
+        render_states_[i] = render_state.id();
     }
 
     profile_command_.set_stages(render_stage_begin_priority | render_stage_end_priority);
@@ -295,7 +293,8 @@ void CSMDepthRenderingMaterialSystem::update(Context& context, SceneContext& /*s
 
                 material.texture_buffers[1] = original_material.texture_buffers[1];
 
-                draw_call.draw_call_data = draw_call_data_[pass];
+                draw_call.render_target = render_target_id_;
+                draw_call.render_state = render_states_[pass];
 
                 draw_call.command = &list_of_commands_;
                 draw_call.pass = pass;

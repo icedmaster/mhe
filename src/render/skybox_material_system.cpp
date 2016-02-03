@@ -64,9 +64,11 @@ bool SkyboxMaterialSystem::init_mesh(Context& context, const MaterialSystemConte
     render_state_desc.depth.test_enabled = false;
     render_state_desc.depth.write_enabled = false;
     render_state_desc.rasterizer.cull = cull_none;
-    DrawCallData& draw_call_data = skybox_mesh_.instance_parts[0].draw_call_data;
-    draw_call_data.state = context.render_state_pool.create();
-    context.render_state_pool.get(draw_call_data.state).init(render_state_desc);
+
+    RenderState& render_state = create_and_get(context.render_state_pool);
+    render_state.init(render_state_desc);
+    skybox_mesh_.instance_parts[0].render_state_id = render_state.id();
+
     return true;
 }
 
@@ -91,7 +93,7 @@ void SkyboxMaterialSystem::update(Context& context, SceneContext& /*scene_contex
     uniform_buffer_desc.name = "transform";
     uniform.update(uniform_buffer_desc);
 
-    setup_draw_call(render_context.draw_calls.add(), skybox_mesh_.instance_parts[0], skybox_mesh_.mesh.parts[0]);
+    setup_draw_call(render_context.draw_calls.add(), skybox_mesh_.instance_parts[0], skybox_mesh_.mesh.parts[0], default_render_target);
 }
 
 }

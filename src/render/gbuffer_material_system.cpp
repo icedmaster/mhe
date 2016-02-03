@@ -62,8 +62,6 @@ void GBufferFillMaterialSystem::setup(Context& context, SceneContext& scene_cont
 
     for (size_t i = 0; i < count; ++i)
     {
-        DrawCallData& draw_call_data = instance_parts[i].draw_call_data;
-        draw_call_data.render_target = render_target_;
         Material& material = context.materials[id()].get(instance_parts[i].material.id);
         size_t use_normalmap = material.textures[normal_texture_unit].id != Texture::invalid_id ? 1 : 0;
         if (!global::use_normalmaps.value())
@@ -108,7 +106,7 @@ void GBufferFillMaterialSystem::setup(Context& context, SceneContext& scene_cont
 
 void GBufferFillMaterialSystem::update(Context& context, SceneContext& scene_context, RenderContext& render_context)
 {
-    MATERIAL_UPDATE_WITH_COMMAND(context, scene_context, render_context, update, &list_of_commands_);
+    MATERIAL_UPDATE_WITH_COMMAND(context, scene_context, render_context, update, render_target_, &list_of_commands_);
 }
 
 void GBufferFillMaterialSystem::update(Context& context, SceneContext& /*scene_context*/, RenderContext& render_context, MeshPartInstance* nodes, MeshPart* parts, size_t count)
@@ -219,10 +217,8 @@ bool GBufferDrawMaterialSystem::init(Context& context, const MaterialSystemConte
 
 bool GBufferDrawMaterialSystem::init_meshes(Context &context)
 {
-    DrawCallData& draw_call_data = draw_call_data_;
-    draw_call_data.render_target = light_buffer_render_target_;
-    draw_call_data.state = context.render_state_pool.create();
-    RenderState& render_state = context.render_state_pool.get(draw_call_data.state);
+    render_state_ = context.render_state_pool.create();
+    RenderState& render_state = context.render_state_pool.get(render_state_);
     RenderStateDesc desc;
     desc.depth.test_enabled = false;
     desc.depth.write_enabled = false;
@@ -252,7 +248,7 @@ bool GBufferDrawMaterialSystem::init_fullscreen_quad(Context& context)
     }
 
     quad_mesh_.mesh.parts[0].render_data.layout = FullscreenLayout::handle;
-    quad_mesh_.instance_parts[0].draw_call_data = draw_call_data_;
+    quad_mesh_.instance_parts[0].render_state_id = render_state_;
     return true;
 }
 
@@ -266,7 +262,7 @@ bool GBufferDrawMaterialSystem::init_sphere(Context& context)
         return false;
     }
 
-    sphere_mesh_.instance_parts[0].draw_call_data = draw_call_data_;
+    sphere_mesh_.instance_parts[0].render_state_id = render_state_;
 
     return true;
 }
@@ -281,7 +277,7 @@ bool GBufferDrawMaterialSystem::init_conus(Context& context)
         return false;
     }
 
-    conus_mesh_.instance_parts[0].draw_call_data = draw_call_data_;
+    conus_mesh_.instance_parts[0].render_state_id = render_state_;
 
     return true;
 }
@@ -387,7 +383,8 @@ void GBufferDrawMaterialSystem::update(Context& context, SceneContext& scene_con
         draw_call.material.material_system = id();
         draw_call.material.id = material.id;
 
-        draw_call.draw_call_data = draw_call_data_;
+        draw_call.render_state = render_state_;
+        draw_call.render_target = light_buffer_render_target_;
         draw_call.command = &list_of_commands_;
     }
 }
@@ -502,7 +499,6 @@ bool ProbesAccumulatorMaterialSystem::init_fullscreen_quad(Context& context)
         return false;
     }
 
-    DrawCallData& draw_call_data = quad_mesh_.instance_parts[0].draw_call_data;
     RenderState& render_state = create_and_get(context.render_state_pool);
     RenderStateDesc render_state_desc;
     render_state_desc.depth.test_enabled = false;
@@ -513,10 +509,9 @@ bool ProbesAccumulatorMaterialSystem::init_fullscreen_quad(Context& context)
         ERROR_LOG("Can't initialize a render state for ProbesAccumulator");
         return false;
     }
-    draw_call_data.state = render_state.id();
-    draw_call_data.render_target = render_target_;
 
     quad_mesh_.mesh.parts[0].render_data.layout = FullscreenLayout::handle;
+    quad_mesh_.instance_parts[0].render_state_id = render_state.id();
     return true;
 }
 
@@ -539,7 +534,7 @@ void ProbesAccumulatorMaterialSystem::update(Context& context, SceneContext& sce
     quad_mesh_.instance_parts[0].material.id = material.id;
     quad_mesh_.instance_parts[0].material.material_system = id();
 
-    setup_draw_call(render_context.draw_calls.add(), quad_mesh_.instance_parts[0], quad_mesh_.mesh.parts[0], &clear_command_);
+    setup_draw_call(render_context.draw_calls.add(), quad_mesh_.instance_parts[0], quad_mesh_.mesh.parts[0], render_target_, &clear_command_);
 }
 
 void ProbesAccumulatorMaterialSystem::set_gbuffer(const GBuffer& gbuffer)

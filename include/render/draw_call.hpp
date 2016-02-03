@@ -7,13 +7,15 @@ namespace mhe {
 
 struct DrawCall
 {
-    DrawCallData draw_call_data;
+    RenderStateHandleType render_state;
+    RenderTargetHandleType render_target;
     MaterialInstance material;
     RenderData render_data;
     RenderCommand* command;
     uint8_t pass;
 
-    DrawCall() : command(nullptr), pass(0) {}
+    DrawCall() : render_state(InvalidHandle<RenderStateHandleType>::id),
+        render_target(default_render_target), command(nullptr), pass(0) {}
 };
 
 // TODO: move Explicit draw calls to a separate header (can use forward declaration then)
