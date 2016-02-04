@@ -194,9 +194,15 @@ void OpenGL3Driver::set_default_render_target()
 
 void OpenGL3Driver::draw(const RenderData& data)
 {
+#ifdef MHE_OPENGL_USE_GL_DRAW_ELEMENTS_BASE_VERTEX
     OpenGLExtensions::instance().glDrawElementsBaseVertex(get_primitive_type(data.primitive), 
         data.indexes_number != 0 ? data.indexes_number : current_index_buffer_->size(), GL_UNSIGNED_INT,
         (void*)(data.ibuffer_offset * sizeof(uint32_t)), data.vbuffer_offset);
+#else
+    glDrawElements(get_primitive_type(data.primitive),
+        data.indexes_number != 0 ? data.indexes_number : current_index_buffer_->size(), GL_UNSIGNED_INT,
+        (void*)(data.ibuffer_offset * sizeof(uint32_t)));
+#endif
     CHECK_GL_ERRORS();
 }
 
@@ -205,9 +211,15 @@ void OpenGL3Driver::draw(size_t /*elements_number*/, size_t vbuffer_offset, size
     if (indices_number == 0)
         return;
 
+#ifdef MHE_OPENGL_USE_GL_DRAW_ELEMENTS_BASE_VERTEX
     OpenGLExtensions::instance().glDrawElementsBaseVertex(get_primitive_type(primitive), 
         indices_number != 0 ? indices_number : current_index_buffer_->size(), GL_UNSIGNED_INT,
         (void*)(ibuffer_offset * sizeof(uint32_t)), vbuffer_offset);
+#else
+    glDrawElements(get_primitive_type(primitive),
+        indices_number != 0 ? indices_number : current_index_buffer_->size(), GL_UNSIGNED_INT,
+        (void*)(ibuffer_offset * sizeof(uint32_t)));
+#endif
     CHECK_GL_ERRORS();  
 }
 

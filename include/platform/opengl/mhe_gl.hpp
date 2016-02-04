@@ -33,6 +33,10 @@
 //#define MHE_OPENGL_UBO_DOUBLEBUFFERING
 //#define MHE_OPENGL_USE_SRGB
 
+// Probably it would be better to use glDrawElementsBaseVertex, but some drivers
+// contain a bug with gl_VertexID that doesn't include the offset passed through this method.
+//#define MHE_OPENGL_USE_GL_DRAW_ELEMENTS_BASE_VERTEX
+
 #ifdef MHE_OPENGL_ABORT_ON_ERROR
 #define PRINT_ERROR(m) ASSERT(0, FUNCTION_DESCRIPTION_MACRO << ":" << e)
 #else

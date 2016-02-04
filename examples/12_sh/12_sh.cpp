@@ -3,7 +3,7 @@
 //#define NSIGHT
 //#define DISABLE_DEPTH_TEST
 #define BAKE_LIGHT
-#define BOUNCES 0
+#define BOUNCES 1
 //#define SINGLE_NORMALMAP
 const char* mesh_name = "test-scene-simple.bin";
 const float baker_zfar = 10.0f;
@@ -362,8 +362,6 @@ public:
         scene_context_ = &scene_context;
         engine_ = &engine;
 
-        clear_command_.set_driver(&context.driver);
-
         skybox_material_system_ = context.material_systems.get<mhe::SkyboxMaterialSystem>();
         ASSERT(skybox_material_system_ != nullptr, "SkyboxMaterialSystem isn't found");
 
@@ -565,7 +563,6 @@ private:
     void setup_draw_call(DrawCallExplicit& draw_call, const mhe::NodeInstance& node_instance, size_t part) const
     {
         mhe::Material& material = context_->materials[node_instance.mesh.instance_parts[part].material.material_system].get(node_instance.mesh.instance_parts[part].material.id);
-        mhe::DrawCallData& draw_call_data = context_->draw_call_data_pool.get(node_instance.mesh.instance_parts[part].draw_call_data);
 
         draw_call.elements_number = node_instance.mesh.mesh.parts[part].render_data.elements_number;
         draw_call.ibuffer = &context_->index_buffer_pool.get(node_instance.mesh.mesh.ibuffer);
@@ -575,7 +572,7 @@ private:
         draw_call.pass = 0;
         draw_call.primitive = mhe::triangle;
         draw_call.priority = 0;
-        draw_call.render_state = &context_->render_state_pool.get(draw_call_data.state);
+        draw_call.render_state = &context_->render_state_pool.get(node_instance.mesh.instance_parts[part].render_state_id);
         if (material.textures[mhe::albedo_texture_unit].id != Texture::invalid_id)
             draw_call.textures[0] = &context_->texture_pool.get(material.textures[mhe::albedo_texture_unit].id);
         draw_call.uniforms[1] = &context_->uniform_pool.get(material.uniforms[1]);
@@ -871,7 +868,6 @@ public:
         for (size_t i = 0, size = node_->mesh.instance_parts.size(); i < size; ++i)
         {
             mhe::Material& material = context.materials[node_->mesh.instance_parts[i].material.material_system].get(node_->mesh.instance_parts[i].material.id);
-            mhe::DrawCallData& draw_call_data = context.draw_call_data_pool.get(node_->mesh.instance_parts[i].draw_call_data);
 
             mhe::DrawCallExplicit draw_call;
             mhe::prepare_draw_call(draw_call);
@@ -884,7 +880,7 @@ public:
             draw_call.primitive = mhe::triangle;
             draw_call.priority = 0;
             draw_call.render_command = nullptr;
-            draw_call.render_state = &context.render_state_pool.get(draw_call_data.state);
+            draw_call.render_state = &context.render_state_pool.get(node_->mesh.instance_parts[i].render_state_id);
             draw_call.render_target = nullptr;
             draw_call.shader_program = default_program_;
             if (material.textures[mhe::albedo_texture_unit].id != Texture::invalid_id)

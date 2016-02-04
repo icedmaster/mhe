@@ -95,7 +95,7 @@ void VBO::unmap()
 
 void VBO::data(uint8_t* dst, size_t size) const
 {
-    ASSERT(size < size_, "Invalid size");
+    ASSERT(size <= size_, "Invalid size");
     OpenGLExtensions::instance().glGetBufferSubData(target_, 0, size, dst);
     CHECK_GL_ERRORS();
 }
