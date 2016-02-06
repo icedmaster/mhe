@@ -206,7 +206,7 @@ void PosteffectSystem::init_outputs(PosteffectMaterialSystemBase* material_syste
     }
 }
 
-void PosteffectSystem::init_buffers(PosteffectMaterialSystemBase* material_system, Context& context,
+void PosteffectSystem::init_buffers(PosteffectMaterialSystemBase* material_system, Context& /*context*/,
     const PosteffectSystem::PosteffectNodeDesc& node_desc)
 {
     for (size_t i = 0, size = node_desc.buffers.size(); i < size; ++i)
@@ -223,7 +223,7 @@ void PosteffectSystem::init_buffers(PosteffectMaterialSystemBase* material_syste
     }
 }
 
-void PosteffectSystem::init_uniforms(PosteffectMaterialSystemBase* material_system, Context& context,
+void PosteffectSystem::init_uniforms(PosteffectMaterialSystemBase* material_system, Context& /*context*/,
     const PosteffectSystem::PosteffectNodeDesc& node_desc)
 {
     for (size_t i = 0, size = node_desc.uniforms.size(); i < size; ++i)

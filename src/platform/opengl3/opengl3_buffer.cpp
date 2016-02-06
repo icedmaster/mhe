@@ -306,10 +306,9 @@ void OpenGL3UniformBuffer::bind(size_t unit) const
     CHECK_GL_ERRORS();
 }
 
-void OpenGL3UniformBuffer::bind(const OpenGL3ShaderProgram* program, size_t unit) const
+void OpenGL3UniformBuffer::bind(const OpenGL3ShaderProgram* /*program*/, size_t unit) const
 {
     bind(unit);
-    //OpenGLExtensions::instance().glUniformBlockBinding(program->id(), unit, unit);
     CHECK_GL_ERRORS();
 }
 

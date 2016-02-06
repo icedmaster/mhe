@@ -105,8 +105,10 @@ struct MeshPartInstance
     bool visible : 1;
 
     MeshPartInstance() : render_state_id(InvalidHandle<RenderStateHandleType>::id),
-        aabb_id(InvalidHandle<AABBInstanceHandleType>::id), visible(true),
-        flags(cast_shadow | receive_shadow | cast_reflection) {}
+        aabb_id(InvalidHandle<AABBInstanceHandleType>::id),
+        flags(cast_shadow | receive_shadow | cast_reflection),
+        visible(true)
+    {}
 };
 
 struct MeshInstance
