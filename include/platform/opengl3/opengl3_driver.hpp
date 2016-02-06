@@ -15,85 +15,90 @@ class OpenGL3RenderTarget;
 
 struct OpenGL3ContextState
 {
-	array<size_t, 16> uniforms;
-	vector2<int> window_size;
-	rect<int> viewport;
-	rect<int> scissor;
-	bool depth_test;
-	bool depth_write;
-	bool stencil;
-	bool blend;
-	bool scissor_test;
+    array<size_t, 16> uniforms;
+    vector2<int> window_size;
+    rect<int> viewport;
+    rect<int> scissor;
+    GLenum cull_mode;
+    GLenum cull_winding;
+    bool depth_test;
+    bool depth_write;
+    bool stencil;
+    bool blend;
+    bool scissor_test;
+    bool cull;
+    uint8_t color_mask;
 
-	OpenGL3ContextState();
+    OpenGL3ContextState();
 };
 
 class OpenGL3Driver : public DriverImpl
 {
 public:
-	OpenGL3Driver();
+    OpenGL3Driver();
 private:
     bool init(DriverRenderingCapabilities& caps);
-	void close();
+    void close();
 
-	void enable_blending();
-	void disable_blending();
+    void enable_blending();
+    void disable_blending();
 
-	void enable_depth() {}
-	void disable_depth() {}
+    void enable_depth() {}
+    void disable_depth() {}
 
-	void clear_depth();
-	void clear_color();
-	void clear_stencil();
+    void clear_depth();
+    void clear_color();
+    void clear_stencil();
 
-	void set_clear_color(const colorf&);
+    void set_clear_color(const colorf&);
 
-	void set_window_size(const vector2<int>& size)
-	{
-		state_.window_size = size;
-	}
+    void set_window_size(const vector2<int>& size)
+    {
+        state_.window_size = size;
+    }
 
-	void set_viewport(int x, int y, int w, int h);
+    void set_viewport(int x, int y, int w, int h);
 
-	uint major_version_need() const override
-	{
-		return 3;
-	}
+    uint major_version_need() const override
+    {
+        return 3;
+    }
 
-	uint minor_version_need() const override
-	{
-		return 3;
-	}
+    uint minor_version_need() const override
+    {
+        return 3;
+    }
 
-	uint supported_versions(pair<uint, uint>* versions, uint size) const override;
+    uint supported_versions(pair<uint, uint>* versions, uint size) const override;
 
-	void set_state(const RenderState& state);
-	void set_shader_program(const ShaderProgram& program);
-	void set_vertex_buffer(const RenderBuffer& vbuffer);
-	void set_index_buffer(const IndexBuffer& ibuffer);
+    void set_state(const RenderState& state);
+    void set_shader_program(const ShaderProgram& program);
+    void set_vertex_buffer(const RenderBuffer& vbuffer);
+    void set_index_buffer(const IndexBuffer& ibuffer);
     void set_uniform(const UniformBuffer& uniform, size_t unit);
-	void set_layout(const Layout& layout);
-	void set_texture(const Texture& texture, size_t unit);
-	void set_render_target(const RenderTarget& render_target);
-	void set_texture_buffer(const TextureBuffer& texture_buffer, size_t unit) override;
-	void set_default_render_target();
-	void draw(const RenderData& data);
-	void draw(size_t elements_number, size_t vbuffer_offset, size_t ibuffer_offset, size_t indices_number, Primitive primitive) override;
+    void bind_uniform(const UniformBuffer& uniform, size_t unit) override;
+    void set_layout(const Layout& layout);
+    void set_texture(const Texture& texture, size_t unit);
+    void set_render_target(const RenderTarget& render_target);
+    void set_texture_buffer(const TextureBuffer& texture_buffer, size_t unit) override;
+    void set_default_render_target();
+    void draw(const RenderData& data);
+    void draw(size_t elements_number, size_t vbuffer_offset, size_t ibuffer_offset, size_t indices_number, Primitive primitive) override;
 
-	void flush();
+    void flush();
 
-	void set_image(const Texture& texture, size_t unit, int access) override;
-	void set_shader_storage_buffer(const ShaderStorageBuffer& buffer, size_t unit) override;
-	void dispatch(size_t x, size_t y, size_t z) override;
-	void memory_barrier(uint32_t barriers) override;
+    void set_image(const Texture& texture, size_t unit, int access) override;
+    void set_shader_storage_buffer(const ShaderStorageBuffer& buffer, size_t unit) override;
+    void dispatch(size_t x, size_t y, size_t z) override;
+    void memory_barrier(uint32_t barriers) override;
 private:
-	void setup_caps(DriverRenderingCapabilities& caps);
+    void setup_caps(DriverRenderingCapabilities& caps);
 
-	pair<uint, uint> versions_[4];
-	OpenGL3ContextState state_;
-	const OpenGL3IndexBuffer* current_index_buffer_;
-	const OpenGL3ShaderProgram* current_shader_program_;
-	const OpenGL3RenderTarget* current_render_target_;
+    pair<uint, uint> versions_[4];
+    OpenGL3ContextState state_;
+    const OpenGL3IndexBuffer* current_index_buffer_;
+    const OpenGL3ShaderProgram* current_shader_program_;
+    const OpenGL3RenderTarget* current_render_target_;
 };
 
 }}

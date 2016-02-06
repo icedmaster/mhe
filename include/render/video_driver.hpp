@@ -69,6 +69,8 @@ public:
     virtual void set_vertex_buffer(const RenderBuffer& vbuffer) = 0;
     virtual void set_index_buffer(const IndexBuffer& ibuffer) = 0;
     virtual void set_uniform(const UniformBuffer& uniform, size_t unit) = 0;
+    // Bind directly to the unit (may be used if layout is set in the shader)
+    virtual void bind_uniform(const UniformBuffer& uniform, size_t unit) = 0;
     virtual void set_layout(const Layout& layout) = 0;
     virtual void set_texture(const Texture& texture, size_t unit) = 0;
     virtual void set_render_target(const RenderTarget& render_target) = 0;
@@ -222,10 +224,10 @@ public:
     void begin_render();
     void end_render();
 
-    void render(const Context& context, const DrawCall* draw_calls, size_t count);
-    void render(const Context& context, const DrawCallExplicit* draw_calls, size_t count);
+    void render(Context& context, const DrawCall* draw_calls, size_t count);
+    void render(Context& context, const DrawCallExplicit* draw_calls, size_t count);
 
-    void execute(const Context& context, const ComputeCallExplicit* compute_calls, size_t count);
+    void execute(Context& context, const ComputeCallExplicit* compute_calls, size_t count);
     void memory_barrier(uint32_t barriers);
 
     void set_window_size(const vector2<int>& size)
@@ -256,9 +258,9 @@ public:
         return caps_.max_anisotropic_level;
     }
 private:
-    void perform_draw_call(const Context& context, const DrawCall& draw_call);
-    void perform_draw_call(const Context& context, const DrawCallExplicit& draw_call);
-    void perform_compute_call(const Context& context, const ComputeCallExplicit& compute_call);
+    void perform_draw_call(Context& context, const DrawCall& draw_call);
+    void perform_draw_call(Context& context, const DrawCallExplicit& draw_call);
+    void perform_compute_call(Context& context, const ComputeCallExplicit& compute_call);
 
     pair<uint, uint> versions_[8];
     uint versions_number_;

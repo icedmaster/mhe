@@ -6,6 +6,8 @@
 
 namespace mhe {
 
+struct Context;
+
 enum RenderStage
 {
 	render_stage_before_render_target_setup = 1,
@@ -21,10 +23,10 @@ class RenderCommand
 public:
 	RenderCommand() : stages_(render_stage_before_submit) {}
 	virtual ~RenderCommand() {}
-	bool execute(RenderStage current_stage)
+	bool execute(Context& context, RenderStage current_stage)
 	{
 		ASSERT(stages_ & current_stage, "Trying to execute a command with invalid render stage");
-		return execute_impl(current_stage);
+		return execute_impl(context, current_stage);
 	}
 
 	uint8_t stages() const
@@ -42,7 +44,7 @@ public:
 		stages_ |= stage;
 	}
 private:
-	virtual bool execute_impl(RenderStage current_stage) = 0;
+	virtual bool execute_impl(Context& context, RenderStage current_stage) = 0;
 
 	uint8_t stages_;
 };

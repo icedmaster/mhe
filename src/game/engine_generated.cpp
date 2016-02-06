@@ -12,22 +12,25 @@ namespace game {
 
 void Engine::setup_generated()
 {
-	MaterialSystemFactory::instance().add<UnlitMaterialSystem>();
-	MaterialSystemFactory::instance().add<SkyboxMaterialSystem>();
-	MaterialSystemFactory::instance().add<GBufferFillMaterialSystem>();
-	MaterialSystemFactory::instance().add<GBufferDrawMaterialSystem>();
-	MaterialSystemFactory::instance().add<PosteffectSimpleMaterialSystem>();
-	MaterialSystemFactory::instance().add<PosteffectDebugMaterialSystem>();
-	MaterialSystemFactory::instance().add<TonemapMaterialSystem>();
-	MaterialSystemFactory::instance().add<DepthWriteMaterialSystem>();
-	MaterialSystemFactory::instance().add<CSMDepthRenderingMaterialSystem>();
-	MaterialSystemFactory::instance().add<FXAAMaterialSystem>();
-	MaterialSystemFactory::instance().add<SSRMaterialSystem>();
-	MaterialSystemFactory::instance().add<BlurMaterialSystem>();
-	MaterialSystemFactory::instance().add<DOFMaterialSystem>();
-	MaterialSystemFactory::instance().add<SSAOMaterialSystem>();
-	MaterialSystemFactory::instance().add<CompositeMulMaterialSystem>();
-	MaterialSystemFactory::instance().add<CompositeAddMaterialSystem>();
+    MaterialSystemFactory::instance().add<UnlitMaterialSystem>();
+    MaterialSystemFactory::instance().add<SkyboxMaterialSystem>();
+    MaterialSystemFactory::instance().add<GBufferFillMaterialSystem>();
+    MaterialSystemFactory::instance().add<GBufferDrawMaterialSystem>();
+    MaterialSystemFactory::instance().add<PosteffectSimpleMaterialSystem>();
+    MaterialSystemFactory::instance().add<PosteffectDebugMaterialSystem>();
+    MaterialSystemFactory::instance().add<TonemapMaterialSystem>();
+    MaterialSystemFactory::instance().add<DepthWriteMaterialSystem>();
+    MaterialSystemFactory::instance().add<CSMDepthRenderingMaterialSystem>();
+    MaterialSystemFactory::instance().add<FXAAMaterialSystem>();
+    MaterialSystemFactory::instance().add<SSRMaterialSystem>();
+    MaterialSystemFactory::instance().add<BlurMaterialSystem>();
+    MaterialSystemFactory::instance().add<DOFMaterialSystem>();
+    MaterialSystemFactory::instance().add<SSAOMaterialSystem>();
+    MaterialSystemFactory::instance().add<CompositeMulMaterialSystem>();
+    MaterialSystemFactory::instance().add<CompositeAddMaterialSystem>();
+    MaterialSystemFactory::instance().add<ProbesAccumulatorMaterialSystem>();
+    MaterialSystemFactory::instance().add<AverageLuminanceMaterialSystem>();
+    MaterialSystemFactory::instance().add<BloomMaterialSystem>();
 }
 
 }}

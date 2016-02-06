@@ -13,104 +13,89 @@ class GPUProfilerNode;
 class MHE_EXPORT ClearCommand : public RenderCommand
 {
 public:
-	ClearCommand();
+    ClearCommand();
 
-	void set_driver(Driver* driver)
-	{
-		driver_ = driver;
-	}
+    void set_clear_mask(bool color, bool depth, bool stencil);
 
-	void set_clear_mask(bool color, bool depth, bool stencil);
-
-	void reset();
+    void reset();
 private:
-	bool execute_impl(RenderStage current_stage) override;
-	Driver* driver_;
-	bool executed_;
-	bool clear_color_;
-	bool clear_depth_;
-	bool clear_stencil_;
+    bool execute_impl(Context& context, RenderStage current_stage) override;
+    bool executed_;
+    bool clear_color_;
+    bool clear_depth_;
+    bool clear_stencil_;
 };
 
 class MHE_EXPORT ClearCommandSimple : public RenderCommand
 {
-public:
-	void set_driver(Driver* driver)
-	{
-		driver_ = driver;
-	}
 private:
-	bool execute_impl(RenderStage current_stage) override;
-
-	Driver* driver_;
+    bool execute_impl(Context& context, RenderStage current_stage) override;
 };
 
 class MHE_EXPORT SetRenderTargetTextureSideCommand : public RenderCommand
 {
 public:
-	void setup(Driver* driver, RenderTarget* render_target, int side)
-	{
-		driver_ = driver;
-		render_target_ = render_target;
-		side_ = side;
-		executed_ = false;
-	}
+    void setup(RenderTarget* render_target, int side)
+    {
+        render_target_ = render_target;
+        side_ = side;
+        executed_ = false;
+    }
 private:
-	bool execute_impl(RenderStage current_stage) override;
+    bool execute_impl(Context& context, RenderStage current_stage) override;
 
-	Driver* driver_;
-	RenderTarget* render_target_;
-	int side_;
-	bool executed_;
+    RenderTarget* render_target_;
+    int side_;
+    bool executed_;
 };
 
 class MHE_EXPORT CopyFramebufferCommand : public RenderCommand
 {
 public:
-	CopyFramebufferCommand();
+    CopyFramebufferCommand();
 
-	void set_texture(Texture* texture)
-	{
-		texture_ = texture;
-	}
+    void set_texture(Texture* texture)
+    {
+        texture_ = texture;
+    }
 private:
-	bool execute_impl(RenderStage current_stage) override;
+    bool execute_impl(Context& context, RenderStage current_stage) override;
 
-	Texture* texture_;
+    Texture* texture_;
 };
 
 class MHE_EXPORT ListOfCommands : public RenderCommand
 {
 public:
-	void add_command(RenderCommand* command)
-	{
-		commands_.push_back(command);
-		set_stages(stages() | command->stages());
-	}
+    void add_command(RenderCommand* command)
+    {
+        commands_.push_back(command);
+        set_stages(stages() | command->stages());
+    }
 
-	void clear()
-	{
-		commands_.clear();
-	}
+    void clear()
+    {
+        commands_.clear();
+    }
 
-	bool empty() const
-	{
-		return commands_.empty();
-	}
+    bool empty() const
+    {
+        return commands_.empty();
+    }
 private:
-	bool execute_impl(RenderStage current_stage) override;
+    bool execute_impl(Context& context, RenderStage current_stage) override;
 
-	fixed_capacity_vector<RenderCommand*, 4> commands_;
+    fixed_capacity_vector<RenderCommand*, 4> commands_;
 };
 
 class MHE_EXPORT GPUProfileCommand : public RenderCommand
 {
 public:
-	GPUProfileCommand(const char* name);
+    GPUProfileCommand(const char* name);
 private:
-	bool execute_impl(RenderStage current_stage) override;
+    bool execute_impl(Context& context, RenderStage current_stage) override;
 
-	GPUProfilerNode& node_;
+    GPUProfilerNode& node_;
 };
 
 }

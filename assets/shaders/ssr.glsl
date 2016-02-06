@@ -1,3 +1,5 @@
+[defs PROBES 0 1]
+
 #define EARLY_EXIT
 //#define VIEWSPACE
 
@@ -13,6 +15,12 @@ uniform ssr_params
 {
 	vec4 ssr_data[3];
 };
+
+[sampler2D lit_texture 4]
+
+#if PROBES == 1
+[sampler2D probes_texture 5]
+#endif
 
 in VSOutput vsoutput;
 
@@ -92,7 +100,16 @@ vec4 ssr(vec3 ray_origin, vec3 ray_dir, GBuffer gbuffer, int samples, float init
 		probe_distance = probe_distance + err * sign;
 	}
 
-	return vec4(gbuffer_albedo(res_pos) * weight * gbuffer.glossiness * params.intensity * distance_weight * view_weight, weight);
+	vec3 lit = texture(lit_texture, res_pos).rgb;
+
+#if PROBES == 1
+	vec3 probe_data = texture(probes_texture, gbuffer.pixel_pos).rgb;
+	lit = mix(probe_data * 0.25f, lit, weight * view_weight) * view_weight;
+#else
+	lit *= weight * view_weight;
+#endif
+
+	return vec4(lit * gbuffer.glossiness * params.intensity * distance_weight, weight);
 }
 
 void main()

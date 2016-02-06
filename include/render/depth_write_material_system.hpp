@@ -32,7 +32,6 @@ private:
 
 	fixed_size_vector<ClearCommand, default_number_of_shadowcasters> clear_commands_;
 	fixed_size_vector<UniformBuffer::IdType, default_number_of_shadowcasters> uniforms_;
-	fixed_size_vector<DrawCallData::IdType, default_number_of_shadowcasters> draw_call_data_;
 	fixed_size_vector<TextureInstance, default_number_of_shadowcasters> shadowmaps_;
 	fixed_size_vector<RenderState::IdType, default_number_of_shadowcasters> render_states_;
 	fixed_size_vector<RenderTarget::IdType, default_number_of_shadowcasters> render_targets_;

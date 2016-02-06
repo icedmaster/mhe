@@ -11,6 +11,7 @@ struct GBuffer
 	float depth;
 	float glossiness;
 	float shininess;
+	vec2 pixel_pos; // for convinience
 };
 
 GBuffer gbuffer_unpack(vec2 tex)
@@ -25,6 +26,7 @@ GBuffer gbuffer_unpack(vec2 tex)
 	gbuffer.glossiness = layer0.a;
 	gbuffer.shininess = layer1.a;
 	gbuffer.depth = texture(depth_texture, tex).r;
+	gbuffer.pixel_pos = tex;
 
 	return gbuffer;
 }

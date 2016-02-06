@@ -11,19 +11,6 @@
 
 namespace mhe {
 
-struct DrawCallData
-{
-    POOL_STRUCT_COPYABLE(DrawCallData, uint16_t);
-    RenderState::IdType state;
-    RenderTarget::IdType render_target;
-
-    DrawCallData() :
-        id(invalid_id),
-        state(RenderState::invalid_id),
-        render_target(default_render_target)
-    {}
-};
-
 struct RenderData
 {
     size_t elements_number; // the number of faces
@@ -104,12 +91,22 @@ inline MeshPart& add_part(Mesh& mesh)
 
 struct MeshPartInstance
 {
+    enum
+    {
+        cast_shadow = 1 << 0,
+        receive_shadow = 1 << 1,
+        cast_reflection = 1 << 2
+    };
+
     MaterialInstance material;
-    DrawCallData::IdType draw_call_data;
+    RenderStateHandleType render_state_id;
     AABBInstanceHandleType aabb_id;
+    uint16_t flags;
     bool visible : 1;
 
-    MeshPartInstance() : aabb_id(InvalidHandle<AABBInstanceHandleType>::id), visible(true) {}
+    MeshPartInstance() : render_state_id(InvalidHandle<RenderStateHandleType>::id),
+        aabb_id(InvalidHandle<AABBInstanceHandleType>::id), visible(true),
+        flags(cast_shadow | receive_shadow | cast_reflection) {}
 };
 
 struct MeshInstance

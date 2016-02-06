@@ -64,7 +64,7 @@ private:
     ClearCommand clear_command_;
     GPUProfileCommand profile_command_;
     ListOfCommands list_of_commands_;
-    fixed_size_vector<DrawCallData::IdType, max_cascades_number> draw_call_data_id_;
+    fixed_size_vector<RenderStateHandleType, max_cascades_number> render_states_;
     fixed_size_vector<UniformBuffer::IdType, max_cascades_number> transform_uniform_id_;
     TextureInstance shadowmap_;
     RenderTarget::IdType render_target_id_;
