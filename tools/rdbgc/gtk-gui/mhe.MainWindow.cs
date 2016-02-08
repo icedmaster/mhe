@@ -4,7 +4,19 @@ namespace mhe
 {
 	public partial class MainWindow
 	{
+		private global::Gtk.UIManager UIManager;
+		
+		private global::Gtk.Action FileAction;
+		
+		private global::Gtk.Action quitAction;
+		
+		private global::Gtk.Action ContentAction;
+		
+		private global::Gtk.Action ImportAction;
+		
 		private global::Gtk.VBox vbox2;
+		
+		private global::Gtk.MenuBar menubar2;
 		
 		private global::Gtk.Frame frame4;
 		
@@ -40,6 +52,22 @@ namespace mhe
 		{
 			global::Stetic.Gui.Initialize (this);
 			// Widget mhe.MainWindow
+			this.UIManager = new global::Gtk.UIManager ();
+			global::Gtk.ActionGroup w1 = new global::Gtk.ActionGroup ("Default");
+			this.FileAction = new global::Gtk.Action ("FileAction", global::Mono.Unix.Catalog.GetString ("File"), null, null);
+			this.FileAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("File");
+			w1.Add (this.FileAction, null);
+			this.quitAction = new global::Gtk.Action ("quitAction", global::Mono.Unix.Catalog.GetString ("Exit"), null, "gtk-quit");
+			this.quitAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Exit");
+			w1.Add (this.quitAction, null);
+			this.ContentAction = new global::Gtk.Action ("ContentAction", global::Mono.Unix.Catalog.GetString ("Content"), null, null);
+			this.ContentAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Content");
+			w1.Add (this.ContentAction, null);
+			this.ImportAction = new global::Gtk.Action ("ImportAction", global::Mono.Unix.Catalog.GetString ("Import"), null, null);
+			this.ImportAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Import");
+			w1.Add (this.ImportAction, null);
+			this.UIManager.InsertActionGroup (w1, 0);
+			this.AddAccelGroup (this.UIManager.AccelGroup);
 			this.Name = "mhe.MainWindow";
 			this.Title = global::Mono.Unix.Catalog.GetString ("MainWindow");
 			this.WindowPosition = ((global::Gtk.WindowPosition)(4));
@@ -47,6 +75,18 @@ namespace mhe
 			this.vbox2 = new global::Gtk.VBox ();
 			this.vbox2.Name = "vbox2";
 			this.vbox2.Spacing = 6;
+			// Container child vbox2.Gtk.Box+BoxChild
+			this.UIManager.AddUiFromString ("<ui><menubar name=\'menubar2\'><menu name=\'FileAction\' action=\'FileAction\'><menuite" +
+			"m name=\'quitAction\' action=\'quitAction\'/></menu><menu name=\'ContentAction\' actio" +
+			"n=\'ContentAction\'><menuitem name=\'ImportAction\' action=\'ImportAction\'/></menu></" +
+			"menubar></ui>");
+			this.menubar2 = ((global::Gtk.MenuBar)(this.UIManager.GetWidget ("/menubar2")));
+			this.menubar2.Name = "menubar2";
+			this.vbox2.Add (this.menubar2);
+			global::Gtk.Box.BoxChild w2 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.menubar2]));
+			w2.Position = 0;
+			w2.Expand = false;
+			w2.Fill = false;
 			// Container child vbox2.Gtk.Box+BoxChild
 			this.frame4 = new global::Gtk.Frame ();
 			this.frame4.Name = "frame4";
@@ -76,8 +116,8 @@ namespace mhe
 			this.statTextView.AcceptsTab = false;
 			this.GtkScrolledWindow.Add (this.statTextView);
 			this.vbox1.Add (this.GtkScrolledWindow);
-			global::Gtk.Box.BoxChild w2 = ((global::Gtk.Box.BoxChild)(this.vbox1 [this.GtkScrolledWindow]));
-			w2.Position = 0;
+			global::Gtk.Box.BoxChild w4 = ((global::Gtk.Box.BoxChild)(this.vbox1 [this.GtkScrolledWindow]));
+			w4.Position = 0;
 			// Container child vbox1.Gtk.Box+BoxChild
 			this.GtkScrolledWindow1 = new global::Gtk.ScrolledWindow ();
 			this.GtkScrolledWindow1.Name = "GtkScrolledWindow1";
@@ -90,8 +130,8 @@ namespace mhe
 			this.profilerTextView.AcceptsTab = false;
 			this.GtkScrolledWindow1.Add (this.profilerTextView);
 			this.vbox1.Add (this.GtkScrolledWindow1);
-			global::Gtk.Box.BoxChild w4 = ((global::Gtk.Box.BoxChild)(this.vbox1 [this.GtkScrolledWindow1]));
-			w4.Position = 1;
+			global::Gtk.Box.BoxChild w6 = ((global::Gtk.Box.BoxChild)(this.vbox1 [this.GtkScrolledWindow1]));
+			w6.Position = 1;
 			// Container child vbox1.Gtk.Box+BoxChild
 			this.GtkScrolledWindow2 = new global::Gtk.ScrolledWindow ();
 			this.GtkScrolledWindow2.Name = "GtkScrolledWindow2";
@@ -102,13 +142,13 @@ namespace mhe
 			this.GPUProfilerTextView.Name = "GPUProfilerTextView";
 			this.GtkScrolledWindow2.Add (this.GPUProfilerTextView);
 			this.vbox1.Add (this.GtkScrolledWindow2);
-			global::Gtk.Box.BoxChild w6 = ((global::Gtk.Box.BoxChild)(this.vbox1 [this.GtkScrolledWindow2]));
-			w6.Position = 2;
+			global::Gtk.Box.BoxChild w8 = ((global::Gtk.Box.BoxChild)(this.vbox1 [this.GtkScrolledWindow2]));
+			w8.Position = 2;
 			this.hbox1.Add (this.vbox1);
-			global::Gtk.Box.BoxChild w7 = ((global::Gtk.Box.BoxChild)(this.hbox1 [this.vbox1]));
-			w7.Position = 1;
-			w7.Expand = false;
-			w7.Fill = false;
+			global::Gtk.Box.BoxChild w9 = ((global::Gtk.Box.BoxChild)(this.hbox1 [this.vbox1]));
+			w9.Position = 1;
+			w9.Expand = false;
+			w9.Fill = false;
 			this.GtkAlignment.Add (this.hbox1);
 			this.frame4.Add (this.GtkAlignment);
 			this.GtkLabel = new global::Gtk.Label ();
@@ -117,17 +157,17 @@ namespace mhe
 			this.GtkLabel.UseMarkup = true;
 			this.frame4.LabelWidget = this.GtkLabel;
 			this.vbox2.Add (this.frame4);
-			global::Gtk.Box.BoxChild w10 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.frame4]));
-			w10.Position = 0;
+			global::Gtk.Box.BoxChild w12 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.frame4]));
+			w12.Position = 1;
 			// Container child vbox2.Gtk.Box+BoxChild
 			this.label1 = new global::Gtk.Label ();
 			this.label1.Name = "label1";
 			this.label1.LabelProp = global::Mono.Unix.Catalog.GetString ("label1");
 			this.vbox2.Add (this.label1);
-			global::Gtk.Box.BoxChild w11 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.label1]));
-			w11.Position = 1;
-			w11.Expand = false;
-			w11.Fill = false;
+			global::Gtk.Box.BoxChild w13 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.label1]));
+			w13.Position = 2;
+			w13.Expand = false;
+			w13.Fill = false;
 			// Container child vbox2.Gtk.Box+BoxChild
 			this.entry5 = new global::Gtk.Entry ();
 			this.entry5.CanFocus = true;
@@ -135,10 +175,10 @@ namespace mhe
 			this.entry5.IsEditable = true;
 			this.entry5.InvisibleChar = '●';
 			this.vbox2.Add (this.entry5);
-			global::Gtk.Box.BoxChild w12 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.entry5]));
-			w12.Position = 2;
-			w12.Expand = false;
-			w12.Fill = false;
+			global::Gtk.Box.BoxChild w14 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.entry5]));
+			w14.Position = 3;
+			w14.Expand = false;
+			w14.Fill = false;
 			// Container child vbox2.Gtk.Box+BoxChild
 			this.statusbar1 = new global::Gtk.Statusbar ();
 			this.statusbar1.Name = "statusbar1";
@@ -148,15 +188,15 @@ namespace mhe
 			this.connectionStatusLabel.Name = "connectionStatusLabel";
 			this.connectionStatusLabel.LabelProp = global::Mono.Unix.Catalog.GetString ("Disconnected");
 			this.statusbar1.Add (this.connectionStatusLabel);
-			global::Gtk.Box.BoxChild w13 = ((global::Gtk.Box.BoxChild)(this.statusbar1 [this.connectionStatusLabel]));
-			w13.Position = 2;
-			w13.Expand = false;
-			w13.Fill = false;
+			global::Gtk.Box.BoxChild w15 = ((global::Gtk.Box.BoxChild)(this.statusbar1 [this.connectionStatusLabel]));
+			w15.Position = 2;
+			w15.Expand = false;
+			w15.Fill = false;
 			this.vbox2.Add (this.statusbar1);
-			global::Gtk.Box.BoxChild w14 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.statusbar1]));
-			w14.Position = 3;
-			w14.Expand = false;
-			w14.Fill = false;
+			global::Gtk.Box.BoxChild w16 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.statusbar1]));
+			w16.Position = 4;
+			w16.Expand = false;
+			w16.Fill = false;
 			this.Add (this.vbox2);
 			if ((this.Child != null)) {
 				this.Child.ShowAll ();
@@ -164,6 +204,8 @@ namespace mhe
 			this.DefaultWidth = 1064;
 			this.DefaultHeight = 736;
 			this.Show ();
+			this.quitAction.Activated += new global::System.EventHandler (this.OnExitActivated);
+			this.ImportAction.Activated += new global::System.EventHandler (this.OnImportActivated);
 			this.entry5.KeyPressEvent += new global::Gtk.KeyPressEventHandler (this.OnConsoleKeyPressEvent);
 			this.entry5.Activated += new global::System.EventHandler (this.OnConsoleEntryActivated);
 		}

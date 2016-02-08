@@ -96,8 +96,11 @@ namespace mhe
 					dataModel = new DataModel(s);
 				});
 			}
-			RequestStats();
-			RequestProfilerData();
+			else
+			{
+				RequestStats();
+				RequestProfilerData();
+			}
 		}
 
 		private void RequestStats()
@@ -142,6 +145,20 @@ namespace mhe
 				connectionStatusLabel.Text = "Disconnected";
 		}
 
+		protected void OnImportActivated(object sender, EventArgs e)
+		{
+			Gtk.FileChooserDialog fileChooser = new Gtk.FileChooserDialog("Select file for import...", this, Gtk.FileChooserAction.Open,
+				"Cancel", Gtk.ResponseType.Cancel, "Open", Gtk.ResponseType.Accept);
+			fileChooser.Run();
+			string fileToImport = fileChooser.Filename;
+			fileChooser.Destroy();
+		}
+
+		protected void OnExitActivated(object sender, EventArgs e)
+		{
+			this.Destroy();
+		}
+
 		private DataModel dataModel;
 		private Protocol protocol;
 		private List<string> history = new List<string>();
@@ -149,7 +166,7 @@ namespace mhe
 		private Timer pollTimer;
 		private Profiler profiler = new Profiler();
 		private Profiler gpuProfiler = new Profiler();
-		private Settings settings;
+		private Settings settings;
 	}
 }
 

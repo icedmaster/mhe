@@ -31,6 +31,10 @@ namespace rdbgc
 
 			MainWindow main = new MainWindow(null, protocol, settings);
 			main.DeleteEvent += OnDelete;
+			main.DestroyEvent += (object o, DestroyEventArgs args) =>
+			{
+				Application.Quit();
+			};
 			main.Show();
 
 			Application.Run();
