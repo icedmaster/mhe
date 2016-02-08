@@ -105,6 +105,7 @@ class MHE_EXPORT RenderBuffer
     POOL_ELEMENT_METHODS(uint16_t)
 public:
     RenderBuffer();
+    ~RenderBuffer();
     bool init(BufferUpdateType type, const uint8_t* data, size_t size, size_t element_size)
     {
         return impl_->init(type, data, size, element_size);
@@ -144,10 +145,10 @@ public:
 
     const RenderBufferImpl* impl() const
     {
-        return impl_.get();
+        return impl_;
     }
 private:
-    unique_ptr<RenderBufferImpl> impl_;
+    RenderBufferImpl* impl_;
 };
 
 class MHE_EXPORT IndexBuffer
@@ -156,6 +157,7 @@ class MHE_EXPORT IndexBuffer
     POOL_ELEMENT_METHODS(uint16_t)
 public:
     IndexBuffer();
+    ~IndexBuffer();
 
     bool init(const RenderBuffer& render_buffer, const uint32_t* indices, size_t size)
     {
@@ -189,10 +191,10 @@ public:
 
     const IndexBufferImpl* impl() const
     {
-        return impl_.get();
+        return impl_;
     }
 private:
-    unique_ptr<IndexBufferImpl> impl_;
+    IndexBufferImpl* impl_;
 };
 
 struct LayoutElement
@@ -215,6 +217,7 @@ class MHE_EXPORT Layout
     POOL_ELEMENT_METHODS(uint16_t)
 public:
     Layout();
+    ~Layout();
     bool init(const LayoutDesc& desc)
     {
         return impl_->init(desc);
@@ -227,10 +230,10 @@ public:
 
     const LayoutImpl* impl() const
     {
-        return impl_.get();
+        return impl_;
     }
 private:
-    unique_ptr<LayoutImpl> impl_;
+    LayoutImpl* impl_;
 };
 
 enum UniformBufferUpdate
@@ -277,6 +280,7 @@ class MHE_EXPORT UniformBuffer
     POOL_ELEMENT_METHODS(uint16_t)
 public:
     UniformBuffer();
+    ~UniformBuffer();
     bool init(const UniformBufferDesc& desc)
     {
         return impl_->init(desc);
@@ -310,10 +314,10 @@ public:
 
     const UniformBufferImpl* impl() const
     {
-        return impl_.get();
+        return impl_;
     }
 private:
-    unique_ptr<UniformBufferImpl> impl_;
+    UniformBufferImpl* impl_;
 };
 
 class MHE_EXPORT TextureBuffer
@@ -321,6 +325,7 @@ class MHE_EXPORT TextureBuffer
     POOL_ELEMENT_METHODS(TextureBufferHandleType);
 public:
     TextureBuffer();
+    ~TextureBuffer();
 
     bool init(const TextureBufferDesc& desc, size_t size, const uint8_t* data)
     {
@@ -349,10 +354,10 @@ public:
 
     const TextureBufferImpl* impl() const
     {
-        return impl_.get();
+        return impl_;
     }
 private:
-    unique_ptr<TextureBufferImpl> impl_;
+    TextureBufferImpl* impl_;
 };
 
 class MHE_EXPORT ShaderStorageBuffer
@@ -360,6 +365,7 @@ class MHE_EXPORT ShaderStorageBuffer
     POOL_ELEMENT_METHODS(ShaderStorageBufferHandleType);
 public:
     ShaderStorageBuffer();
+    ~ShaderStorageBuffer();
 
     bool init(const ShaderStorageBufferDesc& desc, const uint8_t* data, size_t size)
     {
@@ -383,10 +389,10 @@ public:
 
     const ShaderStorageBufferImpl* impl() const
     {
-        return impl_.get();
+        return impl_;
     }
 private:
-    unique_ptr<ShaderStorageBufferImpl> impl_;
+    ShaderStorageBufferImpl* impl_;
 };
 
 typedef RenderBuffer VertexBuffer;

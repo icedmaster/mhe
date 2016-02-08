@@ -14,7 +14,7 @@ class MHE_EXPORT CubemapCreationMaterialSystem : public MaterialSystem
     SETUP_MATERIAL("cubemap_creation");
 public:
     bool init(Context& context, const MaterialSystemContext& material_system_context) override;
-    void close() override;
+    void destroy(Context&) override;
 
     void setup(Context& context, SceneContext& scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count) override;
     const TextureInstance& texture() const

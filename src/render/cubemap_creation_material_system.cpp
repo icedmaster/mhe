@@ -34,6 +34,7 @@ bool CubemapCreationMaterialSystem::init_uniforms(Context& context)
         if (!uniform_buffer.init(uniform_buffer_desc))
         {
             ERROR_LOG("Couldn't initialize a uniform buffer");
+            destroy(context);
             return false;
         }
         uniforms_[i] = uniform_buffer.id();
@@ -49,6 +50,7 @@ bool CubemapCreationMaterialSystem::init_texture(Context& context)
     if (!render_state.init(render_state_desc))
     {
         ERROR_LOG("Couldn't initialize a render state");
+        destroy(context);
         return false;
     }
     RenderTargetDesc render_target_desc;
@@ -68,6 +70,7 @@ bool CubemapCreationMaterialSystem::init_texture(Context& context)
     if (!render_target.init(context, render_target_desc))
     {
         ERROR_LOG("Couldn't initialize a render target");
+        destroy(context);
         return false;
     }
     render_target.color_texture(texture_, 0);
@@ -76,8 +79,13 @@ bool CubemapCreationMaterialSystem::init_texture(Context& context)
     return true;
 }
 
-void CubemapCreationMaterialSystem::close()
-{}
+void CubemapCreationMaterialSystem::destroy(Context& context)
+{
+    destroy_pool_object(context.render_target_pool, render_target_);
+    destroy_pool_object(context.render_state_pool, render_state_);
+    for (size_t i = 0; i < 6; ++i)
+        destroy_pool_object(context.uniform_pool, uniforms_[i]);
+}
 
 void CubemapCreationMaterialSystem::setup(Context& context, SceneContext& scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count)
 {

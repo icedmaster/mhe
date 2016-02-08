@@ -96,7 +96,7 @@ bool PosteffectDebugMaterialSystem::init_mesh_instance(Context& context, MeshIns
     return true;
 }
 
-void PosteffectDebugMaterialSystem::close()
+void PosteffectDebugMaterialSystem::destroy(Context&)
 {
 }
 
@@ -172,7 +172,7 @@ bool PosteffectMaterialSystemBase::init(Context& context, const MaterialSystemCo
     return init_mesh(context, material_system_context);
 }
 
-void PosteffectMaterialSystemBase::close()
+void PosteffectMaterialSystemBase::destroy(Context&)
 {}
 
 void PosteffectMaterialSystemBase::setup(Context& context, SceneContext& scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count)
@@ -908,7 +908,7 @@ bool BloomMaterialSystem::init(Context& context, const MaterialSystemContext& ma
     if (!uniform_buffer.init(uniform_buffer_desc))
     {
         ERROR_LOG("Can't initialize a UniformBuffer for BloomMaterialSystem");
-        close();
+        destroy(context);
         return false;
     }
 
@@ -958,7 +958,7 @@ bool BloomMaterialSystem::init(Context& context, const MaterialSystemContext& ma
     if (!blur_material_system_->init(context, blur_material_system_context))
     {
         ERROR_LOG("Can't initialize a BlurMaterialSystem for bloom");
-        close();
+        destroy(context);
         return false;
     }
     blur_material_system_->PosteffectMaterialSystemBase::create_output(context, 0, 0.25f, format_rgba16f);

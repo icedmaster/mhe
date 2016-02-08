@@ -11,10 +11,10 @@ namespace mhe {
 
 class MHE_EXPORT SkyboxMaterialSystem : public MaterialSystem
 {
-	SETUP_MATERIAL("skybox");
+    SETUP_MATERIAL("skybox");
 public:
-	bool init(Context& context, const MaterialSystemContext& material_system_context) override;
-	void close() override;
+    bool init(Context& context, const MaterialSystemContext& material_system_context) override;
+    void destroy(Context&) override;
 
     void setup(Context& context, SceneContext& scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count) override;
 private:
@@ -22,8 +22,8 @@ private:
     bool init_mesh(Context& context, const MaterialSystemContext& material_system_context);
 
     MeshInstance skybox_mesh_;
-	UniformBuffer::IdType transform_uniform_;
-	TextureInstance skybox_texture_;
+    UniformBuffer::IdType transform_uniform_;
+    TextureInstance skybox_texture_;
 };
 
 }

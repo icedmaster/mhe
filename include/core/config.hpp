@@ -77,6 +77,8 @@
 #define MHE_SYSTEM_NEW_DELETE
 #endif
 
+//#define MHE_SYSTEM_NEW_DELETE
+
 /**
 * Rendering configuration
 */

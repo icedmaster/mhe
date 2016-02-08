@@ -5,7 +5,12 @@
 namespace mhe {
 
 RenderState::RenderState() :
-	impl_(SystemFactory::instance().create_render_state())
+    impl_(SystemFactory::instance().create_render_state())
 {}
+
+RenderState::~RenderState()
+{
+    SystemFactory::instance().destroy_object(impl_);
+}
 
 }

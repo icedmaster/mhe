@@ -14,8 +14,8 @@ namespace utils {
 
 enum
 {
-	mesh_creation_flag_none = 0,
-	mesh_creation_flag_trace_data = 1
+    mesh_creation_flag_none = 0,
+    mesh_creation_flag_trace_data = 1
 };
 
 bool MHE_EXPORT create_plane(MeshInstance& mesh, const Context& context, uint32_t flags = mesh_creation_flag_none);

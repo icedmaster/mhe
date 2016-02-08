@@ -120,6 +120,15 @@ struct MeshInstance
     MeshInstance() : shared_uniform(UniformBuffer::invalid_id) {}
 };
 
+// TODO:
+bool create_mesh(Mesh& mesh, const uint8_t* vertices, size_t vertices_size, const uint32_t* indices, size_t indices_size,
+    size_t parts_number, Context& context);
+void destroy_mesh(Mesh& mesh, Context& context);
+
+bool create_mesh_instance(MeshInstance& mesh, const uint8_t* vertices, size_t vertices_size, const uint32_t* indices, size_t indices_size,
+    size_t parts_number, Context& context);
+void destroy_mesh_instance(MeshInstance& mesh, Context& context);
+
 inline MeshPartInstance& add_part(MeshInstance& mesh)
 {
     add_part(mesh.mesh);

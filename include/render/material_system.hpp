@@ -49,7 +49,7 @@ public:
     virtual ~MaterialSystem() {}
     
     virtual bool init(Context& context, const MaterialSystemContext& material_system_context) = 0;
-    virtual void close() = 0;
+    virtual void destroy(Context& context) = 0;
 
     virtual void setup(Context &context, SceneContext &scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count) = 0;
 

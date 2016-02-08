@@ -20,7 +20,7 @@ private:
     static const size_t max_textures_number = 4;
 public:
     bool init(Context& context, const MaterialSystemContext& material_system_context) override;
-    void close() override;
+    void destroy(Context& context) override;
 
     void setup(Context& context, SceneContext& scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count) override;
 
@@ -60,7 +60,7 @@ public:
     PosteffectMaterialSystemBase(const char* name);
 
     bool init(Context& context, const MaterialSystemContext& material_system_context) override;
-    void close() override;
+    void destroy(Context& context) override;
 
     void setup(Context& context, SceneContext& scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count) override;
 

@@ -65,17 +65,15 @@ class MHE_EXPORT RenderTarget
     POOL_ELEMENT_METHODS(uint16_t)
 public:
     RenderTarget();
+    ~RenderTarget();
 
     bool init(Context& context, const RenderTargetDesc& desc);
 
-    void close()
-    {
-        impl_->close();
-    }
+    void close();
 
     const RenderTargetImpl* impl() const
     {
-        return impl_.get();
+        return impl_;
     }
 
     size_t color_textures(const TextureInstance** ids) const;
@@ -96,10 +94,11 @@ public:
     // For cubemaps only!
     void set_texture_side(int side);
 private:
+    Context* context_; // it shouldn't change
     RenderTargetDesc desc_;
     TextureInstance rt_[max_simultaneous_render_targets_number];
     TextureInstance ds_;
-    unique_ptr<RenderTargetImpl> impl_;
+    RenderTargetImpl* impl_;
 };
 
 static const RenderTarget::IdType default_render_target = RenderTarget::invalid_id - 1;

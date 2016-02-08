@@ -40,6 +40,12 @@ private:
 public:
     typedef vector_type Values;
 
+    void clear(Context& context)
+    {
+        for (size_t i = 0, size = systems_.size(); i < size; ++i)
+            systems_[i]->destroy(context);
+    }
+
     void add(MaterialSystem* material_system, uint8_t priority = 128)
     {
         ASSERT(material_system != nullptr, "Invalid material_system");
@@ -139,6 +145,8 @@ public:
 
     RenderTarget& create(Context& context, RenderTargetDesc& desc, float scale);
     TextureInstance& create(Context& context, TextureDesc& desc, float scale);
+
+    void destroy(RenderTargetHandleType id, Context& context);
 
     RenderTarget& get_temp_render_target(Context& context, int format, float scale);
     void free_temp_render_target(RenderTargetHandleType id);

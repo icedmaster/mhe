@@ -2,6 +2,7 @@
 #define __RENDER_COMMON_HPP__
 
 #include "core/types.hpp"
+#include "core/pool.hpp"
 
 namespace mhe {
 
@@ -22,18 +23,6 @@ typedef uint16_t MaterialHandleType;
 typedef uint16_t AABBInstanceHandleType;
 typedef uint16_t MeshTraceDataHandleType;
 typedef uint16_t MeshRawDataHandleType;
-
-template <class T>
-struct InvalidHandle
-{
-    static const T id = static_cast<T>(-1);
-};
-
-template <class T>
-bool is_handle_valid(T h)
-{
-    return h != InvalidHandle<T>::id;
-}
 
 enum Primitive
 {

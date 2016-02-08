@@ -82,6 +82,7 @@ class MHE_EXPORT Texture
     POOL_ELEMENT_METHODS(uint16_t);
 public:
     Texture();
+    ~Texture();
 
     bool init(const TextureDesc& desc, const uint8_t* data, size_t size)
     {
@@ -95,7 +96,7 @@ public:
 
     const TextureImpl* impl() const
     {
-        return impl_.get();
+        return impl_;
     }
 
     void update(const uint8_t* data)
@@ -123,7 +124,7 @@ public:
         return impl_->height();
     }
 private:
-    unique_ptr<TextureImpl> impl_;
+    TextureImpl* impl_;
 };
 
 struct TextureInstance

@@ -468,8 +468,19 @@ void destroy_pool_elements(Pool& pool)
         p[i].close();
 }
 
+// TODO: looks like crap. I'll have to rename all methods from close() to destroy()
+template <class Pool>
+void destroy_pool_elements_destroy(Pool& pool)
+{
+    typename Pool::type* p = pool.all_objects();
+    size_t size = pool.size();
+    for (size_t i = 0; i < size; ++i)
+        p[i].destroy();
+}
+
 void destroy_render(Context& context)
 {
+    context.material_systems.clear(context);
     // tear down the context
     destroy_pool_elements(context.vertex_buffer_pool);
     destroy_pool_elements(context.index_buffer_pool);
@@ -477,6 +488,8 @@ void destroy_render(Context& context)
     destroy_pool_elements(context.shader_pool);
     destroy_pool_elements(context.texture_pool);
     destroy_pool_elements(context.render_target_pool);
+    destroy_pool_elements_destroy(context.shader_storage_buffer_pool);
+    destroy_pool_elements_destroy(context.texture_buffer_pool);
 }
 
 }

@@ -72,8 +72,11 @@ bool SkyboxMaterialSystem::init_mesh(Context& context, const MaterialSystemConte
     return true;
 }
 
-void SkyboxMaterialSystem::close()
+void SkyboxMaterialSystem::destroy(Context& context)
 {
+    destroy_mesh_instance(skybox_mesh_, context);
+    destroy_pool_object(context.render_state_pool, skybox_mesh_.instance_parts[0].render_state_id);
+    destroy_pool_object(context.uniform_pool, transform_uniform_);
 }
 
 void SkyboxMaterialSystem::setup(Context& context, SceneContext& scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count)

@@ -8,7 +8,7 @@ namespace mhe {
 struct Mesh;
 struct Context;
 
-bool mhe_binary_mesh_load(Mesh& mesh, std::istream& stream, const Context* context);
+bool mhe_binary_mesh_load(Mesh& mesh, std::istream& stream, Context* context);
 
 }
 

@@ -22,6 +22,11 @@ bool UnlitMaterialSystem::init(Context& context, const MaterialSystemContext& ma
 	return uniform.init(uniform_buffer_desc);
 }
 
+void UnlitMaterialSystem::destroy(Context& context)
+{
+    destroy_pool_object(context.uniform_pool, transform_uniform_);
+}
+
 void UnlitMaterialSystem::setup(Context& context, SceneContext& scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count)
 {
     standart_material_setup(context, scene_context, instance_parts, parts, model_contexts, count);

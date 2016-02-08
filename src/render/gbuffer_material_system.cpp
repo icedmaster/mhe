@@ -46,11 +46,18 @@ bool GBufferFillMaterialSystem::init(Context& context, const MaterialSystemConte
     RenderTarget& render_target = context.render_target_pool.get(render_target_);
     if (!gbuffer_desc_.width) gbuffer_desc_.width = context.window_system.width();
     if (!gbuffer_desc_.height) gbuffer_desc_.height = context.window_system.height();
-    return render_target.init(context, gbuffer_desc_);
+    if (!render_target.init(context, gbuffer_desc_))
+    {
+        destroy(context);
+        return false;
+    }
+    return true;
 }
 
-void GBufferFillMaterialSystem::close()
-{}
+void GBufferFillMaterialSystem::destroy(Context& context)
+{
+    destroy_pool_object(context.render_target_pool, render_target_);
+}
 
 void GBufferFillMaterialSystem::setup(Context& context, SceneContext& scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count)
 {
@@ -82,14 +89,16 @@ void GBufferFillMaterialSystem::setup(Context& context, SceneContext& scene_cont
         uniform_buffer_desc.unit = material_data_unit;
         uniform_buffer_desc.update_type = uniform_buffer_static;
         uniform_buffer_desc.size = sizeof(PhongMaterialData);
-        UniformBuffer& uniform = create_and_get(context.uniform_pool);
+
+        pool_initializer<UniformPool> uniform_wr(context.uniform_pool);
+        UniformBuffer& uniform = uniform_wr.object();
         if (!uniform.init(uniform_buffer_desc))
         {
             WARN_LOG("Can't initialize material uniform");
         }
         else
         {
-            material.uniforms[material_data_unit] = uniform.id();
+            material.uniforms[material_data_unit] = uniform_wr.take();
             MaterialData material_data;
             if (!context.material_manager.get(material_data, parts[i].material_id))
             {
@@ -171,7 +180,10 @@ bool GBufferDrawMaterialSystem::init(Context& context, const MaterialSystemConte
     light_buffer_render_target_ = context.render_target_pool.create();
     RenderTarget& light_render_target = context.render_target_pool.get(light_buffer_render_target_);
     if (!light_render_target.init(context, light_buffer_desc))
+    {
+        destroy(context);
         return false;
+    }
 
     const TextureInstance* light_texture;
     light_render_target.color_textures(&light_texture);
@@ -189,7 +201,10 @@ bool GBufferDrawMaterialSystem::init(Context& context, const MaterialSystemConte
         uniform_buffer_desc.name = "lights";
         uniform_buffer_desc.program = &default_program(context);
         if (!uniform.init(uniform_buffer_desc))
+        {
+            destroy(context);
             return false;
+        }
     }
 
     UberShader::Index index;
@@ -205,14 +220,22 @@ bool GBufferDrawMaterialSystem::init(Context& context, const MaterialSystemConte
         uniform_buffer_desc.name = "lights";
         uniform_buffer_desc.program = &directional_shader_program;
         if (!uniform.init(uniform_buffer_desc))
+        {
+            destroy(context);
             return false;
+        }
     }
 
     profile_command_.set_stages(render_stage_begin_priority | render_stage_end_priority);
     list_of_commands_.add_command(&clear_command_);
     list_of_commands_.add_command(&profile_command_);
 
-    return init_meshes(context);
+    if (!init_meshes(context))
+    {
+        destroy(context);
+        return false;
+    }
+    return true;
 }
 
 bool GBufferDrawMaterialSystem::init_meshes(Context &context)
@@ -289,7 +312,7 @@ void GBufferDrawMaterialSystem::set_render_target(Context& context, RenderTarget
     const TextureInstance* textures = nullptr;
     size_t number = render_target.color_textures(&textures);
     ASSERT(number != 0, "Invalid render target");
-        albedo_texture_ = textures[0];
+    albedo_texture_ = textures[0];
     normal_texture_ = textures[1];
     TextureInstance depth_texture;
     number = render_target.depth_texture(depth_texture);
@@ -297,8 +320,19 @@ void GBufferDrawMaterialSystem::set_render_target(Context& context, RenderTarget
     depth_texture_ = depth_texture;
 }
 
-void GBufferDrawMaterialSystem::close()
+void GBufferDrawMaterialSystem::destroy(Context& context)
 {
+    destroy_mesh_instance(quad_mesh_, context);
+    destroy_mesh_instance(sphere_mesh_, context);
+    destroy_mesh_instance(conus_mesh_, context);
+
+    for (size_t i = 0; i < max_directional_lights_number; ++i)
+        destroy_pool_object(context.uniform_pool, directional_light_uniform_[i]);
+
+    for (size_t i = 0; i < max_lights_number; ++i)
+        destroy_pool_object(context.uniform_pool, light_uniform_[i]);
+
+    destroy_pool_object(context.render_state_pool, render_state_);
 }
 
 void GBufferDrawMaterialSystem::setup(Context& context, SceneContext& scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count)
@@ -471,16 +505,19 @@ bool ProbesAccumulatorMaterialSystem::init(Context& context, const MaterialSyste
 
     if (!init_fullscreen_quad(context))
     {
-        close();
+        destroy(context);
         return false;
     }
 
     return true;
 }
 
-void ProbesAccumulatorMaterialSystem::close()
+void ProbesAccumulatorMaterialSystem::destroy(Context& context)
 {
-    NOT_IMPLEMENTED_METHOD();
+    destroy_pool_object(context.render_state_pool, quad_mesh_.instance_parts[0].render_state_id);
+    destroy_mesh_instance(quad_mesh_, context);
+
+    context.render_target_manager.destroy(render_target_, context);
 }
 
 void ProbesAccumulatorMaterialSystem::setup(Context& context, SceneContext& scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count)

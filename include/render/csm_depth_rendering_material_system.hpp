@@ -39,7 +39,7 @@ public:
     CSMDepthRenderingMaterialSystem();
 
     bool init(Context& context, const MaterialSystemContext& material_system_context) override;
-    void close() override;
+    void destroy(Context&) override;
 
     void setup(Context& context, SceneContext& scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count) override;
     void start_frame(Context&, SceneContext&, RenderContext&) override;

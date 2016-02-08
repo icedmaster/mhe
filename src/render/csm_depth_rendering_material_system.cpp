@@ -30,7 +30,8 @@ bool CSMDepthRenderingMaterialSystem::init(Context& context, const MaterialSyste
     for (size_t i = 0; i < cascades_number; ++i)
         percentage_.push_back(types_cast<float>(utils::trim_copy(percentage[i])) / 100.0f);
 
-    RenderTarget& render_target = create_and_get(context.render_target_pool);
+    pool_initializer<RenderTargetPool> render_target_wr(context.render_target_pool);
+    RenderTarget& render_target = render_target_wr.object();
     RenderTargetDesc desc;
     desc.target = rt_readwrite;
     desc.color_targets = 0;
@@ -47,8 +48,6 @@ bool CSMDepthRenderingMaterialSystem::init(Context& context, const MaterialSyste
     texture_size_.set(desc.width, desc.height);
     cascade_size_.set(rt_width, rt_height);
 
-    render_target_id_ = render_target.id();
-
     render_target.depth_texture(shadowmap_);
 
     for (size_t i = 0; i < cascades_number; ++i)
@@ -58,16 +57,25 @@ bool CSMDepthRenderingMaterialSystem::init(Context& context, const MaterialSyste
         uniform_desc.name = "transform";
         uniform_desc.program = &(default_program(context));
         if (!uniform_buffer.init(uniform_desc))
+        {
+            destroy(context);
             return false;
+        }
         transform_uniform_id_.push_back(uniform_buffer.id());
 
         RenderState& render_state = create_and_get(context.render_state_pool);
         RenderStateDesc render_state_desc;
         render_state_desc.viewport.viewport.set(i * rt_width, 0, rt_width, rt_height);
-        if (!render_state.init(render_state_desc)) return false;
+        if (!render_state.init(render_state_desc))
+        {
+            destroy(context);
+            return false;
+        }
 
         render_states_[i] = render_state.id();
     }
+
+    render_target_id_ = render_target_wr.take();
 
     profile_command_.set_stages(render_stage_begin_priority | render_stage_end_priority);
     list_of_commands_.add_command(&clear_command_);
@@ -83,7 +91,15 @@ bool CSMDepthRenderingMaterialSystem::init(Context& context, const MaterialSyste
     return true;
 }
 
-void CSMDepthRenderingMaterialSystem::close() {}
+void CSMDepthRenderingMaterialSystem::destroy(Context& context)
+{
+    destroy_pool_object(context.render_target_pool, render_target_id_);
+    for (size_t i = 0, cascades_number = cascades_number_; i < cascades_number; ++i)
+    {
+        destroy_pool_object(context.render_state_pool, render_states_[i]);
+        destroy_pool_object(context.uniform_pool, transform_uniform_id_[i]);
+    }
+}
 
 void CSMDepthRenderingMaterialSystem::setup(Context& context, SceneContext& scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count)
 {

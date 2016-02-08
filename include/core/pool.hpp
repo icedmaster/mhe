@@ -23,6 +23,9 @@ struct StructTypePolicy
     {
         return obj.id;
     }
+
+    static void destroy(T&)
+    {}
 };
 
 template <class T, class I>
@@ -37,22 +40,30 @@ struct ClassTypePolicy
     {
         return obj.id();
     }
+
+    static void destroy(T& obj)
+    {
+        obj.close();
+    }
 };
 
+// IMPORTANT: Ideally this class should be used with structures. However it's possible to
+// create a pool with T that equals to some class with a restriction that this classes must not contain virtual functions.
 template < class T, size_t C = 0, class I = uint16_t, class Policy = ClassTypePolicy<T, I> >
 class Pool
 {
     struct Index
     {
-        I id;           // index in indexes array
+        I id;       // index in indexes array
         I index;    // index of element in element's array
         I next;
     };
-
-    static const I invalid_id = static_cast<I>(-1);
 public:
     typedef T type;
     typedef I index_type;
+    typedef Policy TypeTraits;
+
+    static const I invalid_id = static_cast<I>(-1);
 
     Pool(allocator* alloc = default_allocator()) : objects_(nullptr), indexes_(nullptr), size_(0), capacity_(0), allocator_(alloc)
     {
@@ -102,12 +113,18 @@ public:
         assert(ind.index != invalid_id);
         // swap with the last object
         T& obj = objects_[ind.index];
-        obj = objects_[--size_];
+        T& last = objects_[--size_];
+        T tmp = obj;
+        obj = last;
+        last = tmp;
         indexes_[Policy::get(obj)].index = ind.index;
 
         ind.index = invalid_id;
         indexes_[last_].next = id;
         last_ = id;
+
+        // Bad idea, but it helps me to prevent destructor's possible side effects
+        memset(&tmp, 0, sizeof(T));
     }
 
     void make_invalid(I& id)
@@ -167,6 +184,96 @@ private:
     size_t capacity_;
     allocator* allocator_;
 };
+
+template <class T>
+struct InvalidHandle
+{
+    static const T id = static_cast<T>(-1);
+};
+
+template <class T>
+bool is_handle_valid(T h)
+{
+    return h != InvalidHandle<T>::id;
+}
+
+template <class P>
+class pool_initializer
+{
+public:
+    typedef P Pool;
+    typedef typename Pool::type Type;
+    typedef typename Pool::index_type Index;
+    typedef typename Pool::TypeTraits DestroyerTraits;
+
+    explicit pool_initializer(Pool& pool) :
+        pool_(pool)
+    {
+        index_ = pool.create();
+    }
+
+    explicit pool_initializer(const pool_initializer& other) :
+        pool_(other.pool_),
+        index_(other.index_)
+    {
+        other.take();
+    }
+
+    ~pool_initializer()
+    {
+        if (index_ != Pool::invalid_id)
+        {
+            DestroyerTraits::destroy(pool_.get(index_));
+            pool_.remove(index_);
+            index_ = Pool::invalid_id;
+        }
+    }
+
+    Index take()
+    {
+        ASSERT(index_ != Pool::invalid_id, "Trying to take the index from the invalid pool_initializer");
+        Index result = index_;
+        index_ = Pool::invalid_id;
+        return result;
+    }
+
+    Index get() const
+    {
+        ASSERT(index_ != Pool::invalid_id, "Trying to get the index from the invalid pool_initializer");
+        return index_;
+    }
+
+    Type& object() const
+    {
+        ASSERT(index_ != Pool::invalid_id, "Trying to get the object from the invalid pool_initializer");
+        return pool_.get(index_);
+    }
+
+    Pool& pool() const
+    {
+        return pool_;
+    }
+private:
+    pool_initializer& operator= (const pool_initializer&);
+
+    mutable Index index_;
+    mutable Pool& pool_;
+};
+
+template <class P>
+pool_initializer<P> create_from_pool(P& pool)
+{
+    return pool_initializer<P>(pool);
+}
+
+template <class P>
+void destroy_pool_object(P& pool, typename P::index_type& id)
+{
+    if (id == P::invalid_id) return;
+    pool.get(id).close();
+    pool.remove(id);
+    pool.make_invalid(id);
+}
 
 }
 

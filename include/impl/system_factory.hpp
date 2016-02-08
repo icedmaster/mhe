@@ -72,6 +72,13 @@ public:
 	{
 		return window_system_factory_;
 	}
+
+    template <class T>
+    void destroy_object(T*& obj)
+    {
+        delete obj;
+        obj = nullptr;
+    }
 private:
 	SystemFactory() {}
 	SystemFactory(const SystemFactory&) {}

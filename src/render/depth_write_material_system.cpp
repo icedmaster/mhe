@@ -71,7 +71,7 @@ bool DepthWriteMaterialSystem::init_light_data(Context& context)
     return true;
 }
 
-void DepthWriteMaterialSystem::close()
+void DepthWriteMaterialSystem::destroy(Context&)
 {
 }
 

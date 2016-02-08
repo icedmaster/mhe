@@ -34,6 +34,19 @@ TextureInstance& RenderTargetManager::create(Context& context, TextureDesc& desc
     return textures_.back().texture;
 }
 
+void RenderTargetManager::destroy(RenderTargetHandleType id, Context& context)
+{
+    for (RenderTargetsVector::iterator it = render_targets_.begin(), end = render_targets_.end(); it != end; ++it)
+    {
+        if (it->render_target_id == id)
+        {
+            destroy_pool_object(context.render_target_pool, id);
+            render_targets_.erase(it);
+            return;
+        }
+    }
+}
+
 RenderTarget& RenderTargetManager::get_temp_render_target(Context& context, int format, float scale)
 {
     for (size_t i = 0, size = temporary_render_targets_.size(); i < size; ++i)

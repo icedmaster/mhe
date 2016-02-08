@@ -49,7 +49,7 @@ class MHE_EXPORT GBufferFillMaterialSystem : public AbstractGBufferFillMaterialS
 public:
     GBufferFillMaterialSystem();
     bool init(Context& context, const MaterialSystemContext& material_system_context) override;
-    void close() override;
+    void destroy(Context& context) override;
 
     void setup(Context& context, SceneContext& scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count) override;
 
@@ -111,7 +111,7 @@ public:
     }
 
     bool init(Context& context, const MaterialSystemContext& material_system_context) override;
-    void close() override;
+    void destroy(Context& context) override;
 
     void setup(Context& context, SceneContext& scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count) override;
 private:
@@ -149,7 +149,7 @@ class ProbesAccumulatorMaterialSystem : public MaterialSystem
     SETUP_MATERIAL("probes_accumulator");
 public:
     bool init(Context& context, const MaterialSystemContext& material_system_context) override;
-    void close() override;
+    void destroy(Context& context) override;
 
     void setup(Context& context, SceneContext& scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count) override;
     void set_gbuffer(const GBuffer& gbuffer);

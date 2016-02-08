@@ -9,4 +9,9 @@ Texture::Texture() :
 	impl_(SystemFactory::instance().create_texture())
 {}
 
+Texture::~Texture()
+{
+    SystemFactory::instance().destroy_object(impl_);
+}
+
 }
