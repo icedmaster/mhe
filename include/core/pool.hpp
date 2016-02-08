@@ -260,7 +260,7 @@ private:
     pool_initializer& operator= (const pool_initializer&);
 
     mutable Index index_;
-    mutable Pool& pool_;
+    Pool& pool_;
 };
 
 template <class P>

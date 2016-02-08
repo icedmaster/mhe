@@ -501,7 +501,7 @@ bool DOFMaterialSystem::init(Context& context, const MaterialSystemContext& mate
     }
     dof_uniform_ = dof_uniform.id();
 
-    dof_shader_data_.planes = vec4(300.0f, 100.0f, 500.0f, 1.0f);
+    dof_shader_data_.planes = vec4(300.0f, 100.0f, 500.0f, 0.0f);
     dof_shader_data_.coc = vec4(4.0f, 0.0f, 0.0f, 0.0f);
 
     return true;
