@@ -237,6 +237,21 @@ public:
 
     void reset_state();
 
+    void set_default_render_target()
+    {
+        impl_->set_default_render_target();
+    }
+
+    void set_render_target(const RenderTarget& render_target)
+    {
+        impl_->set_render_target(render_target);
+    }
+
+    void set_render_state(const RenderState& render_state)
+    {
+        impl_->set_state(render_state);
+    }
+
     // capabilities
     float max_anisotropic_level() const
     {

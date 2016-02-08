@@ -2,10 +2,19 @@
 
 (require racket/path)
 
-(define mhe_working_directory "../bin/Debug/")
-(define exporter_cmdline "\"../../tools/meshconverter/build/Debug/meshconverter.exe\" ~a ~a")
+(define mhe_working_directory "../bin/")
+(define exporter_cmdline "\"../tools/meshconverter/build/meshconverter\" ~a ~a")
 (define binary_extension "bin")
-(define mhe_meshes_directory "../../assets/meshes/")
+(define mhe_meshes_directory "../assets/meshes/")
+
+(let ([os (system-type 'os)])
+  (printf "OS is ~a\n" os)
+  (cond
+   [(equal? os 'windows)
+	(set! mhe_working_directory "../../bin/")
+	(set! exporter_cmdline "\"../../tools/meshconverter/build/Debug/meshconverter.exe\" ~a ~a")
+	(set! mhe_meshes_directory "../../assets/meshes/")]
+   [(not (equal? os 'unix)) (printf "Unsupported OS\n")]))
 
 ;; Put in the same directory with the same name but the extension changed to .bin
 (define (build-output-name src)
@@ -23,7 +32,7 @@
 )
 
 (define (copy-file-verbose src dst)
-  (printf "copy ~a -> ~a" src dst)
+  (printf "copy ~a -> ~a\n" src dst)
   (copy-file src dst #t)
 )
 

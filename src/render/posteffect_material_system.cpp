@@ -151,7 +151,9 @@ void PosteffectDebugMaterialSystem::set_render_target(const RenderTarget& render
 }
 
 PosteffectMaterialSystemBase::PosteffectMaterialSystemBase(const char* name) :
-    inputs_number_(0), outputs_number_(0), profile_command_(name), framebuffer_input_(invalid_index), default_render_target_(mhe::default_render_target)
+    default_render_target_(mhe::default_render_target),
+    inputs_number_(0), outputs_number_(0), profile_command_(name),
+    framebuffer_input_(invalid_index)
 {}
 
 bool PosteffectMaterialSystemBase::init(Context& context, const MaterialSystemContext& material_system_context)
@@ -509,7 +511,6 @@ void DOFMaterialSystem::postinit(Context& context)
 {
     MeshInstance& blur_resolve_pass_mesh_instance = mesh_instance();
     Material& blur_resolve_pass_material = context.materials[id()].get(blur_resolve_pass_mesh_instance.instance_parts[0].material.id);
-    RenderTarget::IdType composite_pass_rt_id = default_render_target();
     blur_resolve_pass_material.uniforms[1] = dof_uniform_;
 
     dof_pass_mesh_instance_ = blur_resolve_pass_mesh_instance;

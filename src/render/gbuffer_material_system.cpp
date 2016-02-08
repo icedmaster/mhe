@@ -552,7 +552,7 @@ bool ProbesAccumulatorMaterialSystem::init_fullscreen_quad(Context& context)
     return true;
 }
 
-void ProbesAccumulatorMaterialSystem::update(Context& context, SceneContext& scene_context, RenderContext& render_context)
+void ProbesAccumulatorMaterialSystem::update(Context& context, SceneContext& /*scene_context*/, RenderContext& render_context)
 {
     // currenty only one cubemap is supported
     if (render_context.space_grid.global_cubemap().id == Texture::invalid_id)

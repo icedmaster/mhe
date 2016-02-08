@@ -32,6 +32,7 @@
 #define MHE_OPENGL_ABORT_ON_ERROR
 //#define MHE_OPENGL_UBO_DOUBLEBUFFERING
 //#define MHE_OPENGL_USE_SRGB
+//#define MHE_OPENGL_USE_DRAW_BASE_VERTEX_OFFSET
 
 // Probably it would be better to use glDrawElementsBaseVertex, but some drivers
 // contain a bug with gl_VertexID that doesn't include the offset passed through this method.

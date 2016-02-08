@@ -73,6 +73,16 @@ inline T round(const T& v)
     return ::ceil(v - (T)0.5);
 }
 
+inline bool is_nan(float f)
+{
+    // little-endian version
+#if 0
+    uint32_t n = *reinterpret_cast<uint32_t*>(&f);
+    return (n & 0x7fffffff) > 0x7f8;
+#endif
+    return f != f;
+}
+
 };
 
 #endif

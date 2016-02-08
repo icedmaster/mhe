@@ -206,7 +206,7 @@ void OpenGL3Driver::draw(const RenderData& data)
     CHECK_GL_ERRORS();
 }
 
-void OpenGL3Driver::draw(size_t /*elements_number*/, size_t vbuffer_offset, size_t ibuffer_offset, size_t indices_number, Primitive primitive)
+void OpenGL3Driver::draw(size_t /*elements_number*/, size_t /*vbuffer_offset*/, size_t ibuffer_offset, size_t indices_number, Primitive primitive)
 {
     if (indices_number == 0)
         return;

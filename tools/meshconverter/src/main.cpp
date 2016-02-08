@@ -243,7 +243,7 @@ void fill_skinned_vertices(std::vector<mhe::SkinnedGeometryLayout::Vertex> &out_
         out_vertices[i].tex = vertices[i].tex;
     }
 
-    for (mhe::hashmap<size_t, std::vector<ExportBone> >::iterator it = skinning_context.vertices_to_bones.begin(),
+    for (mhe::hashmap<uint32_t, std::vector<ExportBone> >::iterator it = skinning_context.vertices_to_bones.begin(),
         end = skinning_context.vertices_to_bones.end(); it != end; ++it)
     {
         mhe::SkinnedGeometryLayout::Vertex& v = out_vertices[it->key];

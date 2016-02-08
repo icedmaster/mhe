@@ -66,7 +66,7 @@ public:
     class Iterator
     {
 #ifndef MHE_VS
-        friend class Container;
+        friend class hashmap<K, V, Buckets, BucketSize, IsFixedSize>;
 #else
         friend class this_type;
 #endif

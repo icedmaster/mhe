@@ -5,7 +5,7 @@
 #include <iostream>
 #include "compiler.hpp"
 
-#ifdef MHE_DEBUG
+#ifndef MHE_DEPLOY
 #define ASSERT(condition, text)                     \
 {															  \
 	if (!(condition)) {										  \
@@ -15,7 +15,7 @@
 
 #define NOT_IMPLEMENTED_ASSERT(condition, feature)	ASSERT(condition, "Feature:" << feature << " has not been implemented yet")
 #else
-#define ASSERT(condition, text)
+#define ASSERT(condition, text) (void)(condition)
 #define NOT_IMPLEMENTED_ASSERT(condition, feature)
 #endif 
 

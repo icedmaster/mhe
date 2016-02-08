@@ -77,7 +77,7 @@ public:
 		return true;
 	}
 
-	bool update(mhe::game::Engine& engine) override
+    bool update(mhe::game::Engine& /*engine*/) override
 	{
 		return true;
 	}
