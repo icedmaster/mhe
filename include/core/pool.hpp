@@ -188,8 +188,11 @@ private:
 template <class T>
 struct InvalidHandle
 {
-    static const T id = static_cast<T>(-1);
+    static const T id;
 };
+
+template <class T>
+const T InvalidHandle<T>::id = static_cast<T>(-1);
 
 template <class T>
 bool is_handle_valid(T h)
