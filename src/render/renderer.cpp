@@ -316,6 +316,9 @@ void Renderer::before_update(SceneContext& scene_context)
     render_context_.render_view_requests.reset();
     if (directional_shadowmap_depth_write_material_system_ != nullptr)
         directional_shadowmap_depth_write_material_system_->start_frame(context_, scene_context, render_context_);
+
+    for (size_t i = 0, size = material_systems_.size(); i < size; ++i)
+        material_systems_[i]->start_frame(context_, scene_context, render_context_);
 }
 
 void Renderer::render(SceneContext& scene_context)
@@ -327,6 +330,9 @@ void Renderer::render(SceneContext& scene_context)
     if (shadowmap_depth_write_material_system_ != nullptr)
         shadowmap_depth_write_material_system_->setup_draw_calls(context_, scene_context, render_context_);
     render_impl(context_, render_context_, scene_context);
+
+    for (size_t i = 0, size = material_systems_.size(); i < size; ++i)
+        material_systems_[i]->setup_draw_calls(context_, scene_context, render_context_);
 
     posteffect_system_.process(context_, render_context_, scene_context);
 

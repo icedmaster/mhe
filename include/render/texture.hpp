@@ -11,7 +11,8 @@ namespace mhe {
 enum
 {
     texture_2d,
-    texture_cube
+    texture_cube,
+    texture_3d
 };
 
 // filter type
@@ -46,8 +47,9 @@ enum
 struct TextureDesc
 {
     int type;
-    uint width;
-    uint height;
+    size_t width;
+    size_t height;
+    size_t depth;
     int mag_filter;
     int min_filter;
     int address_mode_t;

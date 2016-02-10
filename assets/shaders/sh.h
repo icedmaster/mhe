@@ -8,6 +8,21 @@ struct ColorSH9
 	vec3 c[9];
 };
 
+struct SH4
+{
+    float c[4];
+};
+
+struct ColorSH4
+{
+    vec3 c[4];
+};
+
+struct RGBSH4
+{
+    vec4 rgb[3];
+};
+
 [include "common.h"]
 
 #define COS_A0 PI
@@ -47,6 +62,32 @@ SH9 sh_cosine_lobe(in vec3 dir)
     sh.c[8] = 0.546274f * (dir.x * dir.x - dir.y * dir.y) * COS_A2;
 
 	return sh;
+}
+
+SH4 sh_cosine_lobe_sh4(in vec3 dir)
+{
+	SH4 sh;
+
+    // Band 0
+    sh.c[0] = 0.282095f * COS_A0;
+
+    // Band 1
+    sh.c[1] = 0.488603f * dir.y * COS_A1;
+    sh.c[2] = 0.488603f * dir.z * COS_A1;
+    sh.c[3] = 0.488603f * dir.x * COS_A1;
+
+    return sh;
+}
+
+RGBSH4 mul(SH4 sh, vec3 c)
+{
+    RGBSH4 res;
+    vec4 shv = vec4(sh.c[0], sh.c[1], sh.c[2], sh.c[3]);
+    res.rgb[0] = shv * c.x;
+    res.rgb[1] = shv * c.y;
+    res.rgb[2] = shv * c.z;
+
+    return res;
 }
 
 vec3 calculate_irradiance(in vec3 nrm, in ColorSH9 radiance)

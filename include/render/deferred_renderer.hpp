@@ -9,6 +9,8 @@ namespace mhe {
 class MHE_EXPORT DeferredRenderer : public Renderer
 {
 public:
+    static const uint8_t deferred_renderer_base_priority = 16;
+public:
     DeferredRenderer(Context& context) :
         Renderer(context)
     {}

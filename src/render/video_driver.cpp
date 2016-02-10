@@ -226,6 +226,7 @@ void Driver::perform_draw_call(Context& context, const DrawCall& draw_call)
 
     bool shader_program_changed = false;
     bool layout_changed = false;
+    bool gpu_generated_data = draw_call.render_data.primitive == gpu_generated;
     if (state_.shader_program != material.shader_program)
     {
         impl_->set_shader_program(context.shader_pool.get(material.shader_program));
@@ -234,21 +235,21 @@ void Driver::perform_draw_call(Context& context, const DrawCall& draw_call)
         layout_changed = true;
     }
 
-    if (state_.vertex_buffer != draw_call.render_data.vbuffer)
+    if (state_.vertex_buffer != draw_call.render_data.vbuffer && !gpu_generated_data)
     {
         impl_->set_vertex_buffer(context.vertex_buffer_pool.get(draw_call.render_data.vbuffer));
         state_.vertex_buffer = draw_call.render_data.vbuffer;
         layout_changed = true;
     }
 
-    if (state_.index_buffer != draw_call.render_data.ibuffer)
+    if (state_.index_buffer != draw_call.render_data.ibuffer && !gpu_generated_data)
     {
         impl_->set_index_buffer(context.index_buffer_pool.get(draw_call.render_data.ibuffer));
         state_.index_buffer = draw_call.render_data.ibuffer;
         layout_changed = true;
     }
 
-    if (state_.layout != draw_call.render_data.layout || layout_changed)
+    if ((state_.layout != draw_call.render_data.layout || layout_changed) && !gpu_generated_data)
     {
         impl_->set_layout(context.layout_pool.get(draw_call.render_data.layout));
         state_.layout = draw_call.render_data.layout;

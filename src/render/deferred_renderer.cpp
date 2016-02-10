@@ -50,7 +50,7 @@ void DeferredRenderer::set_probes_accumulator_material_system(ProbesAccumulatorM
     probes_accumulator_material_system_ = material_system;
     if (probes_accumulator_material_system_ != nullptr)
     {
-        probes_accumulator_material_system_->set_priority(7);
+        probes_accumulator_material_system_->set_priority(deferred_renderer_base_priority + 3);
         probes_accumulator_material_system_->set_gbuffer(gbuffer_);
     }
 }
@@ -79,11 +79,11 @@ void DeferredRenderer::disable()
 
 void DeferredRenderer::init_priorities()
 {
-    gbuffer_fill_material_system_->set_priority(4);
+    gbuffer_fill_material_system_->set_priority(deferred_renderer_base_priority);
     if (gbuffer_light_material_system_ != nullptr)
-        gbuffer_light_material_system_->set_priority(5);
+        gbuffer_light_material_system_->set_priority(deferred_renderer_base_priority + 1);
     if (draw_material_system_ != nullptr)
-        draw_material_system_->set_priority(6);
+        draw_material_system_->set_priority(deferred_renderer_base_priority + 2);
 }
 
 void DeferredRenderer::render_impl(Context& context, RenderContext& render_context, SceneContext& scene_context)

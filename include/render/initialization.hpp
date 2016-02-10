@@ -24,7 +24,7 @@ private:
 	hashmap<string, MaterialSystemContext> material_systems;
 };
 
-MaterialSystem* create(Context& context, const string& name, const string& instance_name);
+MHE_EXPORT MaterialSystem* create(Context& context, const string& name, const string& instance_name);
 
 template <class T>
 T* create(Context& context, const string& name, const string& instance_name)

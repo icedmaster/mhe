@@ -1,3 +1,4 @@
+#ifndef CUSTOM_PERCAMERA_UNIFORM
 [uniform percamera 0 perframe]
 uniform percamera
 {
@@ -13,6 +14,7 @@ uniform percamera
 	vec2 viewport; 
 	vec2 inv_viewport;
 };
+#endif
 
 float linearized_depth(float d, float znear, float zfar)
 {

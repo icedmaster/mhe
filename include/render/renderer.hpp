@@ -136,6 +136,11 @@ public:
     void set_directional_shadowmap_depth_write_material_system(MaterialSystem* material_system);
     void set_fullscreen_debug_material_system(PosteffectDebugMaterialSystem* material_system);
 
+    void set_material_system_to_process(MaterialSystem* material_system)
+    {
+        material_systems_.push_back(material_system);
+    }
+
     void set_ambient_color(const colorf& color)
     {
         ambient_color_ = color;
@@ -185,6 +190,8 @@ private:
     MaterialSystem* particles_material_system_;
 
     PosteffectDebugMaterialSystem* fullscreen_debug_material_system_;
+
+    fixed_size_vector<MaterialSystem*, 16> material_systems_;
 
     colorf ambient_color_;
     DebugMode debug_mode_;

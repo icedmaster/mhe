@@ -83,7 +83,7 @@ bool create_axes(MeshInstance& mesh_instance, const Context& context)
     mesh.parts[0].render_data.ibuffer = context.index_buffer_pool.create();
 
     mesh.parts[0].render_data.elements_number = 2;
-    mesh.parts[0].render_data.primitive = lines;
+    mesh.parts[0].render_data.primitive = line;
 
     VertexBuffer& vbuffer = context.vertex_buffer_pool.get(mesh.parts[0].render_data.vbuffer);
     if (!vbuffer.init(buffer_update_type_static,

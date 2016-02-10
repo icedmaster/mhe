@@ -14,15 +14,19 @@ bool OpenGL3RenderTarget::init(const RenderTargetDesc& desc, Texture** color_tex
 {
     side_offset_ = 0;
     is_cubemap_ = desc.texture_type == texture_cube;
+    is_3d_ = desc.texture_type == texture_3d;
     target_ = get_framebuffer_format(desc.target);
     targets_number_ = desc.color_targets;
     OpenGLExtensions::instance().glGenFramebuffers(1, &id_);
     OpenGLExtensions::instance().glBindFramebuffer(target_, id_);
 
+    CHECK_GL_ERRORS();
+
     TextureDesc texture_desc;
     texture_desc.type = desc.texture_type;
     texture_desc.width = desc.width;
     texture_desc.height = desc.height;
+    texture_desc.depth = desc.depth;
     texture_desc.mips = 0;
     for (size_t i = 0; i < desc.color_targets; ++i)
     {

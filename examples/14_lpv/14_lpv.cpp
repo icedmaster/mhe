@@ -1,6 +1,10 @@
 #include "mhe.hpp"
+#include "render/rsm_material_system.hpp"
+#include "render/lpv_material_system.hpp"
 
 const char* mesh_name = "test-scene-simple.bin";
+
+using namespace mhe;
 
 class GameScene : public mhe::game::GameScene
 {
@@ -20,6 +24,34 @@ public:
 
         mhe::NodeInstance& node = engine.scene().create_node();
         mhe::load_node<mhe::GBufferFillMaterialSystem>(node, mhe::string(mesh_name), engine.context(), engine.scene_context());
+
+        for (size_t i = 0, size = node.mesh.mesh.parts.size(); i < size; ++i)
+        {
+            engine.context().material_manager.material_data(node.mesh.mesh.parts[i].material_id).render_data.glossiness = 0.5f;
+        }
+
+        const string rsm_name("rsm");
+        MaterialSystemContext material_system_context;
+        material_system_context.priority = DeferredRenderer::deferred_renderer_base_priority - 2;
+        material_system_context.shader_name = rsm_name;
+        material_system_context.instance_name = rsm_name;
+        material_system_context.material_instances_number = 0;
+        engine.context().initialization_parameters.add(rsm_name, material_system_context);
+
+        RSMMaterialSystem* rsm_material_system = static_cast<RSMMaterialSystem*>(create(engine.context(), rsm_name, rsm_name));
+        engine.renderer()->set_material_system_to_process(rsm_material_system);
+
+        const string lpv_name("lpv");
+        material_system_context.priority = DeferredRenderer::deferred_renderer_base_priority - 1;
+        material_system_context.shader_name = lpv_name;
+        material_system_context.instance_name = lpv_name;
+        material_system_context.material_instances_number = 0;
+        material_system_context.options.add(string("injection_shader"), lpv_name);
+        engine.context().initialization_parameters.add(lpv_name, material_system_context);
+
+        LPVMaterialSystem* lpv_material_system = static_cast<LPVMaterialSystem*>(create(engine.context(), lpv_name, lpv_name));
+        engine.renderer()->set_material_system_to_process(lpv_material_system);
+        lpv_material_system->set_gbuffer(rsm_material_system->gbuffer());
 
         return true;
     }
