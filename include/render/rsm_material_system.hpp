@@ -5,6 +5,7 @@
 #define __RSM_MATERIAL_SYSTEM_HPP__
 
 #include "gbuffer_material_system.hpp"
+#include "rsm_common.hpp"
 
 namespace mhe {
 
@@ -40,6 +41,11 @@ public:
     const GBuffer& gbuffer() const
     {
         return gbuffer_;
+    }
+
+    void rsm_data(RSMData& data) const
+    {
+        data.vp = light_vp_;
     }
 private:
     void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;

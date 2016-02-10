@@ -196,7 +196,7 @@ void OpenGL3Driver::draw(const RenderData& data)
 {
     if (data.primitive == gpu_generated)
     {
-        glDrawArrays(GL_TRIANGLES, 0, data.elements_number);
+        glDrawArrays(GL_POINTS, 0, data.elements_number);
         return;
     }
 #ifdef MHE_OPENGL_USE_GL_DRAW_ELEMENTS_BASE_VERTEX
@@ -215,7 +215,7 @@ void OpenGL3Driver::draw(size_t elements_number, size_t /*vbuffer_offset*/, size
 {
     if (primitive == gpu_generated)
     {
-        glDrawArrays(GL_TRIANGLES, 0, elements_number);
+        glDrawArrays(GL_POINTS, 0, elements_number);
         return;
     }
     if (indices_number == 0)

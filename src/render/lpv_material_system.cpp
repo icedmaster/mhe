@@ -89,11 +89,17 @@ void LPVMaterialSystem::update(Context& context, SceneContext& scene_context, Re
     Texture& texture = context.texture_pool.get(gbuffer_.accumulator.id);
     size_t vpl_number = texture.width() * texture.height();
 
-    injection(render_context.draw_calls.add(), context, vpl_number);
+    injection(render_context.draw_calls.add(), context, render_context, vpl_number);
 }
 
-void LPVMaterialSystem::injection(DrawCall& draw_call, Context& context, size_t vpl_number)
+void LPVMaterialSystem::injection(DrawCall& draw_call, Context& context, RenderContext& render_context, size_t vpl_number)
 {
+    UniformBuffer& uniform = context.uniform_pool.get(injection_uniform_);
+    InjectionShaderData shader_data;
+    shader_data.settings.set_x(settings_.size);
+    shader_data.rsm_to_vs = rsm_data_.vp.inverted() * render_context.main_camera.view;
+    uniform.update(shader_data);
+
     Material& material = context.materials[id()].get(injection_material_);
     material.textures[0] = gbuffer_.normal;
     material.textures[1] = gbuffer_.accumulator;

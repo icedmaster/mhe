@@ -2,6 +2,7 @@
 #define __LPV_MATERIAL_SYSTEM_HPP__
 
 #include "gbuffer_material_system.hpp"
+#include "rsm_common.hpp"
 
 namespace mhe {
 
@@ -12,6 +13,7 @@ class LPVMaterialSystem : public MaterialSystem
     struct InjectionShaderData
     {
         vec4 settings;
+        mat4x4 rsm_to_vs;
     };
 public:
     struct Settings
@@ -32,10 +34,15 @@ public:
     {
         gbuffer_ = gbuffer;
     }
+
+    void set_rsm_data(const RSMData& data)
+    {
+        rsm_data_ = data;
+    }
 private:
     void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
 
-    void injection(DrawCall& draw_call, Context& context, size_t vpl_number);
+    void injection(DrawCall& draw_call, Context& context, RenderContext& render_context, size_t vpl_number);
 
     Settings settings_;
     GBuffer gbuffer_;
@@ -44,6 +51,8 @@ private:
     MaterialHandleType injection_material_;
     RenderStateHandleType injection_render_state_;
     UniformBufferHandleType injection_uniform_;
+
+    RSMData rsm_data_;
 };
 
 }

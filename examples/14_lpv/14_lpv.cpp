@@ -38,8 +38,8 @@ public:
         material_system_context.material_instances_number = 0;
         engine.context().initialization_parameters.add(rsm_name, material_system_context);
 
-        RSMMaterialSystem* rsm_material_system = static_cast<RSMMaterialSystem*>(create(engine.context(), rsm_name, rsm_name));
-        engine.renderer()->set_material_system_to_process(rsm_material_system);
+        rsm_material_system_ = static_cast<RSMMaterialSystem*>(create(engine.context(), rsm_name, rsm_name));
+        engine.renderer()->set_material_system_to_process(rsm_material_system_);
 
         const string lpv_name("lpv");
         material_system_context.priority = DeferredRenderer::deferred_renderer_base_priority - 1;
@@ -49,9 +49,9 @@ public:
         material_system_context.options.add(string("injection_shader"), lpv_name);
         engine.context().initialization_parameters.add(lpv_name, material_system_context);
 
-        LPVMaterialSystem* lpv_material_system = static_cast<LPVMaterialSystem*>(create(engine.context(), lpv_name, lpv_name));
-        engine.renderer()->set_material_system_to_process(lpv_material_system);
-        lpv_material_system->set_gbuffer(rsm_material_system->gbuffer());
+        lpv_material_system_ = static_cast<LPVMaterialSystem*>(create(engine.context(), lpv_name, lpv_name));
+        engine.renderer()->set_material_system_to_process(lpv_material_system_);
+        lpv_material_system_->set_gbuffer(rsm_material_system_->gbuffer());
 
         return true;
     }
@@ -60,6 +60,17 @@ public:
     {
         return true;
     }
+
+    void before_draw(game::Engine& engine) override
+    {
+        // RSM data has been updated
+        RSMData data;
+        rsm_material_system_->rsm_data(data);
+        lpv_material_system_->set_rsm_data(data);
+    }
+private:
+    RSMMaterialSystem* rsm_material_system_;
+    LPVMaterialSystem* lpv_material_system_;
 };
 
 int main(int /*argc*/, char** /*argv*/)

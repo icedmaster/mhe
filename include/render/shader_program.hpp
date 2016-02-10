@@ -32,6 +32,7 @@ struct ImageData
 struct ShaderInitializationParams
 {
     std::string vsdata;
+    std::string gsdata;
     std::string fsdata;
     std::string csdata;
     std::string version;
