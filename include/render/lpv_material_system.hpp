@@ -13,7 +13,8 @@ class LPVMaterialSystem : public MaterialSystem
     struct InjectionShaderData
     {
         vec4 settings;
-        mat4x4 rsm_to_vs;
+        mat4x4 rsm_to_ws;
+        mat4x4 ws_to_lpv;
     };
 public:
     struct Settings
@@ -43,6 +44,7 @@ private:
     void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
 
     void injection(DrawCall& draw_call, Context& context, RenderContext& render_context, size_t vpl_number);
+    mat4x4 calculate_lpv_transform(const RenderContext& render_context);
 
     Settings settings_;
     GBuffer gbuffer_;

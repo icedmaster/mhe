@@ -28,18 +28,23 @@ void main()
 
     ivec2 texsize = textureSize(normal_texture, 0);
     int index = gl_VertexID;
-    vec2 texcoord = vec2(index % texsize.x, index / texsize.x);
-    vec3 normal = texture(normal_texture, texcoord).xyz;
-    vec3 flux = texture(flux_texture, texcoord).rgb;
-    float depth = texture(depth_texture, texcoord).x;
+    vec2 texcoord = vec2(float(index % texsize.x) / float(texsize.x), float(index / texsize.x) / texsize.x);
+    vec3 normal = textureLod(normal_texture, texcoord, 0.0f).xyz;
+    vec3 flux = textureLod(flux_texture, texcoord, 0.0f).rgb;
+    float depth = textureLod(depth_texture, texcoord, 0.0f).x;
 
     vec3 position_ws = position_from_depth(texcoord, depth, rsm_to_world);
-    position_ws.z *= cell_size;
+    vec3 position_lpv = (world_to_lpv * vec4(position_ws, 1.0f)).xyz;
+
+    if (dot(normal, normal) < 0.001f) // cull the vertex
+        position_lpv.z = -1.0f;
+
+    position_lpv.z *= cell_size;
 
     vsoutput.normal = normal;
     vsoutput.flux = flux;
 
-    gl_Position = vec4(position_ws, 1.0f);
+    gl_Position = vec4(position_lpv, 1.0f);
 }
 
 [geometry]
@@ -56,7 +61,10 @@ void main()
     gsoutput = vsoutput[0];
     gl_Layer = int(gl_in[0].gl_Position.z);
     gl_Position = gl_in[0].gl_Position;
-    gl_Position.z = 0.5f;
+    if (gl_Position.z >= 0.0f)
+        gl_Position.z = 0.5f;
+    EmitVertex();
+    EndPrimitive();
 }
 
 [fragment]

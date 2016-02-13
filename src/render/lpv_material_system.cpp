@@ -40,6 +40,14 @@ bool LPVMaterialSystem::init(Context& context, const MaterialSystemContext& mate
     render_state_desc.depth.write_enabled = false;
     render_state_desc.rasterizer.cull = cull_none;
     render_state_desc.viewport.viewport.set(0, 0, settings_.size, settings_.size);
+
+    render_state_desc.blend.enabled = true;
+    render_state_desc.blend.func = blend_add;
+    render_state_desc.blend.func_alpha = blend_add;
+    render_state_desc.blend.srcmode = blend_one;
+    render_state_desc.blend.srcmode_alpha = blend_one;
+    render_state_desc.blend.dstmode = blend_one;
+    render_state_desc.blend.dstmode_alpha = blend_one;
     if (!injection_render_state_wr.object().init(render_state_desc))
     {
         ERROR_LOG("Can't initialize a render state for LPV");
@@ -92,12 +100,14 @@ void LPVMaterialSystem::update(Context& context, SceneContext& scene_context, Re
     injection(render_context.draw_calls.add(), context, render_context, vpl_number);
 }
 
-void LPVMaterialSystem::injection(DrawCall& draw_call, Context& context, RenderContext& render_context, size_t vpl_number)
+void LPVMaterialSystem::injection(DrawCall& draw_call, Context& context, RenderContext& render_context,
+                                  size_t vpl_number)
 {
     UniformBuffer& uniform = context.uniform_pool.get(injection_uniform_);
     InjectionShaderData shader_data;
     shader_data.settings.set_x(settings_.size);
-    shader_data.rsm_to_vs = rsm_data_.vp.inverted() * render_context.main_camera.view;
+    shader_data.rsm_to_ws = rsm_data_.vp.inverted();
+    shader_data.ws_to_lpv = calculate_lpv_transform(render_context);
     uniform.update(shader_data);
 
     Material& material = context.materials[id()].get(injection_material_);
@@ -116,6 +126,16 @@ void LPVMaterialSystem::injection(DrawCall& draw_call, Context& context, RenderC
     draw_call.render_target = render_target_grid_;
 
     draw_call.pass = 0;
+}
+
+mat4x4 LPVMaterialSystem::calculate_lpv_transform(const RenderContext& render_context)
+{
+    vec3 scene_min, scene_max;
+    render_context.aabb.min_max(scene_min, scene_max);
+    float diagonal_length = (scene_max - scene_min).length();
+    mat4x4 lpv_transform = mat4x4::scaling_matrix(1.0f / diagonal_length);
+    lpv_transform.set_row(3, -scene_min);
+    return lpv_transform;
 }
 
 }

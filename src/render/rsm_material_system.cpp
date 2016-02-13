@@ -21,8 +21,8 @@ bool RSMMaterialSystem::init(Context& context, const MaterialSystemContext& mate
     pool_initializer<RenderTargetPool> rt_wr(context.render_target_pool);
     RenderTargetDesc rt_desc;
     rt_desc.color_targets = 2;
-    rt_desc.color_format[0] = format_rgba16f; // normals
-    rt_desc.color_format[1] = format_rgba16f; // accumulator
+    rt_desc.color_format[0] = format_rgb16f; // normals
+    rt_desc.color_format[1] = format_rgb16f; // accumulator
     rt_desc.color_datatype[0] = format_default;
     rt_desc.color_datatype[1] = format_default;
     rt_desc.texture_type = texture_2d;
