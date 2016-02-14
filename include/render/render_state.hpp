@@ -51,7 +51,11 @@ struct StencilDesc
 
 enum BlendFunc
 {
-    blend_add
+    blend_add,
+    blend_mul,
+    blend_min,
+    blend_max,
+    blend_func_max
 };
 
 enum BlendMode

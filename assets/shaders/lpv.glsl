@@ -34,10 +34,12 @@ void main()
     float depth = textureLod(depth_texture, texcoord, 0.0f).x;
 
     vec3 position_ws = position_from_depth(texcoord, depth, rsm_to_world);
+    position_ws += normal * 0.5f;
+
     vec3 position_lpv = (world_to_lpv * vec4(position_ws, 1.0f)).xyz;
 
-    if (dot(normal, normal) < 0.001f) // cull the vertex
-        position_lpv.z = -1.0f;
+    if (dot(normal, normal) < 0.001f)
+        flux = vec3(0.0f, 0.0f, 0.0f);
 
     position_lpv.z *= cell_size;
 
@@ -61,8 +63,7 @@ void main()
     gsoutput = vsoutput[0];
     gl_Layer = int(gl_in[0].gl_Position.z);
     gl_Position = gl_in[0].gl_Position;
-    if (gl_Position.z >= 0.0f)
-        gl_Position.z = 0.5f;
+    gl_Position.z = 0.5f;
     EmitVertex();
     EndPrimitive();
 }

@@ -41,6 +41,15 @@ bool RSMMaterialSystem::init(Context& context, const MaterialSystemContext& mate
         return false;
     }
 
+    pool_initializer<RenderStatePool> render_state_wr(context.render_state_pool);
+    RenderStateDesc render_state_desc;
+    render_state_desc.viewport.viewport.set(0, 0, settings_.size, settings_.size);
+    if (!render_state_wr.object().init(render_state_desc))
+    {
+        ERROR_LOG("Can't initialize a render state for RSMMaterialSystem");
+        return false;
+    }
+
     pool_initializer<UniformPool> uniform_wr(context.uniform_pool);
     UniformBufferDesc uniform_desc;
     uniform_desc.unit = 0;
@@ -54,6 +63,7 @@ bool RSMMaterialSystem::init(Context& context, const MaterialSystemContext& mate
 
     transform_uniform_ = uniform_wr.take();
     render_target_ = rt_wr.take();
+    render_state_ = render_state_wr.take();
 
     TextureInstance gbuffer_textures[2];
     render_target.color_textures(gbuffer_textures);
@@ -66,6 +76,7 @@ bool RSMMaterialSystem::init(Context& context, const MaterialSystemContext& mate
 
 void RSMMaterialSystem::destroy(Context& context)
 {
+    destroy_pool_object(context.render_state_pool, render_state_);
     destroy_pool_object(context.uniform_pool, transform_uniform_);
     destroy_pool_object(context.render_target_pool, render_target_);
 }
@@ -151,7 +162,7 @@ void RSMMaterialSystem::update(Context& context, SceneContext& scene_context, Re
             draw_call.material.material_system = id();
             draw_call.pass = 0;
             draw_call.render_data = nodes[i].mesh.mesh.parts[j].render_data;
-            draw_call.render_state = mesh_part.render_state_id;
+            draw_call.render_state = render_state_;
             draw_call.render_target = render_target_;
             draw_call.command = &clear_command_;
         }

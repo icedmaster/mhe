@@ -53,6 +53,7 @@ private:
     MaterialHandleType injection_material_;
     RenderStateHandleType injection_render_state_;
     UniformBufferHandleType injection_uniform_;
+    ClearCommand clear_command_;
 
     RSMData rsm_data_;
 };

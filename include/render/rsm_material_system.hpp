@@ -23,7 +23,7 @@ public:
     {
         size_t size;
 
-        Settings() : size(1024) {}
+        Settings() : size(256) {}
     };
 public:
     bool init(Context& context, const MaterialSystemContext& material_system_context) override;
@@ -54,6 +54,7 @@ private:
     GBuffer gbuffer_;
     RenderTargetHandleType render_target_;
     UniformBufferHandleType transform_uniform_;
+    RenderStateHandleType render_state_;
     mat4x4 light_view_;
     mat4x4 light_proj_;
     mat4x4 light_vp_;

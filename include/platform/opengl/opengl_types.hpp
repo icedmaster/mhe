@@ -114,8 +114,8 @@ inline GLenum get_framebuffer_format(int format)
 
 inline GLenum get_blend_operation(BlendFunc func)
 {
-    ASSERT(func < 1, "Invalid blend func");
-    GLenum funcs[1] = {GL_FUNC_ADD};
+    ASSERT(func < blend_func_max, "Invalid blend func");
+    GLenum funcs[blend_func_max] = {GL_FUNC_ADD, GL_MULT, GL_MIN, GL_MAX};
     return funcs[func];
 }
 
