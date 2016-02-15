@@ -34,13 +34,14 @@ void main()
     float depth = textureLod(depth_texture, texcoord, 0.0f).x;
 
     vec3 position_ws = position_from_depth(texcoord, depth, rsm_to_world);
-    position_ws += normal * 0.5f;
 
     vec3 position_lpv = (world_to_lpv * vec4(position_ws, 1.0f)).xyz;
 
     if (dot(normal, normal) < 0.001f)
         flux = vec3(0.0f, 0.0f, 0.0f);
 
+    position_lpv += normal * 0.5f / cell_size;
+    position_lpv.xy = position_lpv.xy * 2.0f - 1.0f;
     position_lpv.z *= cell_size;
 
     vsoutput.normal = normal;

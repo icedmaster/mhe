@@ -350,6 +350,7 @@ class fixed_capacity_vector
 public:
     typedef T* iterator;
     typedef const T* const_iterator;
+    typedef T type;
 public:
     fixed_capacity_vector() : size_(0) {}
 

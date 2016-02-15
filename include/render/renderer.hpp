@@ -59,17 +59,21 @@ public:
         int format;
     };
 
+    template <class BufferHandleType>
     struct Buffer
     {
         size_t index;
         string node;
         size_t node_buffer;
+        BufferHandleType explicit_handle;
+
+        Buffer() : explicit_handle(InvalidHandle<BufferHandleType>::id) {}
     };
 
     typedef fixed_capacity_vector<NodeInput, 8> Inputs;
     typedef fixed_capacity_vector<NodeOutput, 8> Outputs;
-    typedef fixed_capacity_vector<Buffer, 4> Buffers;
-    typedef fixed_capacity_vector<Buffer, 4> Uniforms;
+    typedef fixed_capacity_vector<Buffer<ShaderStorageBufferHandleType>, 4> Buffers;
+    typedef fixed_capacity_vector<Buffer<UniformBufferHandleType>, 4> Uniforms;
 
     struct PosteffectNodeDesc
     {
@@ -84,7 +88,7 @@ public:
         bool instantiate;
     };
 
-    void add(Context& context, const PosteffectNodeDesc& node_desc);
+    MHE_EXPORT void add(Context& context, const PosteffectNodeDesc& node_desc);
     void process(Context& context, RenderContext& render_context, SceneContext& scene_context);
 private:
     struct PosteffectNode
@@ -126,6 +130,7 @@ public:
     virtual ~Renderer() {}
 
     bool init();
+    void destroy();
 
     virtual void before_update(SceneContext& scene_context);
     virtual void update(SceneContext& scene_context);

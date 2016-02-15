@@ -140,4 +140,10 @@ mat4x4 LPVMaterialSystem::calculate_lpv_transform(const RenderContext& render_co
     return lpv_transform;
 }
 
+void LPVMaterialSystem::output(Context& context, size_t unit, TextureInstance& texture) const
+{
+    RenderTarget& rt = context.render_target_pool.get(render_target_grid_);
+    rt.color_texture(texture, unit);
+}
+
 }

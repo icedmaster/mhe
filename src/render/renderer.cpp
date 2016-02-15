@@ -211,13 +211,17 @@ void PosteffectSystem::init_buffers(PosteffectMaterialSystemBase* material_syste
 {
     for (size_t i = 0, size = node_desc.buffers.size(); i < size; ++i)
     {
-        const Buffer& buffer_desc = node_desc.buffers[i];
-        const PosteffectNode* input_node = find_node(buffer_desc.node);
-        ASSERT(input_node != nullptr && input_node->material_system != nullptr, "Can't find a node with name:" << buffer_desc.node);
-        ShaderStorageBufferHandleType buffer_id = input_node->material_system->buffer(buffer_desc.node_buffer);
-        if (!is_handle_valid(buffer_id))
+        const Buffers::type& buffer_desc = node_desc.buffers[i];
+        ShaderStorageBufferHandleType buffer_id = buffer_desc.explicit_handle;
+        if (!is_handle_valid(buffer_desc.explicit_handle))
         {
-            WARN_LOG("The buffer is not valid:" << buffer_desc.node << " " << buffer_desc.node_buffer);
+            const PosteffectNode* input_node = find_node(buffer_desc.node);
+            ASSERT(input_node != nullptr && input_node->material_system != nullptr, "Can't find a node with name:" << buffer_desc.node);
+            buffer_id = input_node->material_system->buffer(buffer_desc.node_buffer);
+            if (!is_handle_valid(buffer_id))
+            {
+                WARN_LOG("The buffer is not valid:" << buffer_desc.node << " " << buffer_desc.node_buffer);
+            }
         }
         material_system->set_buffer(buffer_desc.index, buffer_id);
     }
@@ -228,13 +232,17 @@ void PosteffectSystem::init_uniforms(PosteffectMaterialSystemBase* material_syst
 {
     for (size_t i = 0, size = node_desc.uniforms.size(); i < size; ++i)
     {
-        const Buffer& buffer_desc = node_desc.uniforms[i];
-        const PosteffectNode* input_node = find_node(buffer_desc.node);
-        ASSERT(input_node != nullptr && input_node->material_system != nullptr, "Can't find a node with name:" << buffer_desc.node);
-        UniformBufferHandleType buffer_id = input_node->material_system->uniform(buffer_desc.node_buffer);
+        const Uniforms::type& buffer_desc = node_desc.uniforms[i];
+        UniformBufferHandleType buffer_id = buffer_desc.explicit_handle;
         if (!is_handle_valid(buffer_id))
         {
-            WARN_LOG("The uniform is not valid:" << buffer_desc.node << " " << buffer_desc.node_buffer);
+            const PosteffectNode* input_node = find_node(buffer_desc.node);
+            ASSERT(input_node != nullptr && input_node->material_system != nullptr, "Can't find a node with name:" << buffer_desc.node);
+            UniformBufferHandleType buffer_id = input_node->material_system->uniform(buffer_desc.node_buffer);
+            if (!is_handle_valid(buffer_id))
+            {
+                WARN_LOG("The uniform is not valid:" << buffer_desc.node << " " << buffer_desc.node_buffer);
+            }
         }
         material_system->set_uniform(buffer_desc.index, buffer_id);
     }
@@ -273,7 +281,18 @@ Renderer::Renderer(Context& context) :
 
 bool Renderer::init()
 {
+    UniformBuffer& buffer = create_and_get(context_.uniform_pool);
+    render_context_.main_camera.percamera_uniform = buffer.id();
+    UniformBufferDesc desc;
+    desc.unit = perframe_data_unit;
+    desc.size = sizeof(PerCameraData);
+    buffer.init(desc);
     return true;
+}
+
+void Renderer::destroy()
+{
+    destroy_pool_object(context_.uniform_pool, render_context_.main_camera.percamera_uniform);
 }
 
 void Renderer::update(SceneContext& scene_context)
@@ -293,15 +312,6 @@ void Renderer::update(SceneContext& scene_context)
     data.inv_viewport = vec2(1.0f / context_.window_system.width(), 1.0f / context_.window_system.height());
     data.viewport = context_.window_system.screen_size();
 
-    if (render_context_.main_camera.percamera_uniform == UniformBuffer::invalid_id)
-    {
-        UniformBuffer& buffer = create_and_get(context_.uniform_pool);
-        render_context_.main_camera.percamera_uniform = buffer.id();
-        UniformBufferDesc desc;
-        desc.unit = perframe_data_unit;
-        desc.size = sizeof(PerCameraData);
-        buffer.init(desc);
-    }
     UniformBuffer& buffer = context_.uniform_pool.get(render_context_.main_camera.percamera_uniform);
     buffer.update(data);
 

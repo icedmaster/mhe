@@ -42,16 +42,66 @@ public:
         engine.renderer()->set_material_system_to_process(rsm_material_system_);
 
         const string lpv_name("lpv");
+        const string propagation_shader_name("propagation");
         material_system_context.priority = DeferredRenderer::deferred_renderer_base_priority - 1;
         material_system_context.shader_name = lpv_name;
         material_system_context.instance_name = lpv_name;
         material_system_context.material_instances_number = 0;
         material_system_context.options.add(string("injection_shader"), lpv_name);
+        material_system_context.options.add(string("propagation_shader"), propagation_shader_name);
         engine.context().initialization_parameters.add(lpv_name, material_system_context);
 
         lpv_material_system_ = static_cast<LPVMaterialSystem*>(create(engine.context(), lpv_name, lpv_name));
         engine.renderer()->set_material_system_to_process(lpv_material_system_);
         lpv_material_system_->set_gbuffer(rsm_material_system_->gbuffer());
+
+        const string lpv_resolve_name("lpv_resolve");
+        material_system_context.priority = posteffect_material_priority_base;
+        material_system_context.shader_name = lpv_resolve_name;
+        material_system_context.instance_name = lpv_resolve_name;
+        material_system_context.material_instances_number = 0;
+        engine.context().initialization_parameters.add(lpv_resolve_name, material_system_context);
+
+        PosteffectSystem::PosteffectNodeDesc posteffect_node_desc;
+        posteffect_node_desc.name = lpv_resolve_name;
+        posteffect_node_desc.material = lpv_resolve_name;
+        posteffect_node_desc.priority = 0;
+        // use GBuffer's depth and normal...
+        PosteffectSystem::NodeInput& input0 = posteffect_node_desc.inputs.add();
+        input0.index = 0;
+        input0.material = string("gbuffer_fill");
+        input0.material_output = 1;
+        PosteffectSystem::NodeInput& input1 = posteffect_node_desc.inputs.add();
+        input1.index = 1;
+        input1.material = string("gbuffer_fill");
+        input1.material_output = gbuffer_depth_render_target_index;
+        // ...and 3 channels of LPV RT
+        PosteffectSystem::NodeInput& input2 = posteffect_node_desc.inputs.add();
+        input2.index = 2;
+        input2.material = lpv_name;
+        input2.material_output = 0;
+        PosteffectSystem::NodeInput& input3 = posteffect_node_desc.inputs.add();
+        input3.index = 3;
+        input3.material = lpv_name;
+        input3.material_output = 1;
+        PosteffectSystem::NodeInput& input4 = posteffect_node_desc.inputs.add();
+        input4.index = 4;
+        input4.material = lpv_name;
+        input4.material_output = 2;
+        // resolve-to buffer
+        PosteffectSystem::NodeOutput& output0 = posteffect_node_desc.outputs.add();
+        output0.format = format_rgb16f;
+        output0.index = 0;
+        output0.scale = 1.0f;
+        // we also need a couple of uniforms
+        PosteffectSystem::Uniforms::type& uniform0 = posteffect_node_desc.uniforms.add();
+        uniform0.index = 0;
+        uniform0.explicit_handle = engine.render_context().main_camera.percamera_uniform;
+        PosteffectSystem::Uniforms::type& uniform1 = posteffect_node_desc.uniforms.add();
+        uniform1.index = 1;
+        uniform1.explicit_handle = lpv_material_system_->injection_settings_uniform();
+
+        engine.renderer()->posteffect_system().add(engine.context(), posteffect_node_desc);
 
         return true;
     }

@@ -35,6 +35,7 @@ void Engine::setup_generated()
     MaterialSystemFactory::instance().add<BloomMaterialSystem>();
     MaterialSystemFactory::instance().add<RSMMaterialSystem>();
     MaterialSystemFactory::instance().add<LPVMaterialSystem>();
+    MaterialSystemFactory::instance().add<LPVResolveMaterialSystem>();
 }
 
 }}

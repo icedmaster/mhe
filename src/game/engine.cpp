@@ -97,6 +97,7 @@ void Engine::destroy()
 #ifdef RDBG_ENABLED
     rdbg_engine_->stop();
 #endif
+    renderer_->destroy();
     debug_views_.destroy();
 
     MainGPUProfiler::destroy_singleton();

@@ -92,7 +92,7 @@ bool Application::mhe_app_init(const ApplicationConfig& config)
 void Application::mhe_app_close()
 {
     mhe::impl::stop_platform();
-}   
+}
 
 int Application::run_impl()
 {
@@ -257,7 +257,7 @@ void Application::init_posteffect_parameters(pugi::xml_node node, RendererParams
         {
             for (pugi::xml_node b = buffers_node.child("buffer"); b; b = b.next_sibling("buffer"))
             {
-                PosteffectSystem::Buffer& buffer = posteffect_node.buffers.add();
+                PosteffectSystem::Buffers::type& buffer = posteffect_node.buffers.add();
                 pugi::xml_attribute attr = b.attribute("index");
                 ASSERT(attr, "Malformed posteffect node. The index of a buffer must exist");
                 buffer.index = attr.as_uint();
@@ -275,7 +275,7 @@ void Application::init_posteffect_parameters(pugi::xml_node node, RendererParams
         {
             for (pugi::xml_node u = uniforms_node.child("uniform"); u; u = u.next_sibling("uniform"))
             {
-                PosteffectSystem::Buffer& buffer = posteffect_node.uniforms.add();
+                PosteffectSystem::Uniforms::type& buffer = posteffect_node.uniforms.add();
                 pugi::xml_attribute attr = u.attribute("index");
                 ASSERT(attr, "Malformed posteffect node. The index of a uniform must exist");
                 buffer.index = attr.as_uint();

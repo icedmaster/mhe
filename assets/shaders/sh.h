@@ -99,3 +99,14 @@ vec3 calculate_irradiance(in vec3 nrm, in ColorSH9 radiance)
 	return res / PI;
 }
 
+vec3 calculate_irradiance(in vec3 nrm, in RGBSH4 rgb_sh)
+{
+    vec3 res = VEC3_ZERO;
+    SH4 cos_lobe = sh_cosine_lobe_sh4(nrm);
+    vec4 cos_lobe_v = vec4(cos_lobe.c[0], cos_lobe.c[1], cos_lobe.c[2], cos_lobe.c[3]);
+    res.r = dot(cos_lobe_v, rgb_sh.rgb[0]);
+    res.g = dot(cos_lobe_v, rgb_sh.rgb[1]);
+    res.b = dot(cos_lobe_v, rgb_sh.rgb[2]);
+    return res / PI;
+}
+

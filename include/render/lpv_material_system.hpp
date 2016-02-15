@@ -2,6 +2,7 @@
 #define __LPV_MATERIAL_SYSTEM_HPP__
 
 #include "gbuffer_material_system.hpp"
+#include "posteffect_material_system.hpp"
 #include "rsm_common.hpp"
 
 namespace mhe {
@@ -31,6 +32,8 @@ public:
 
     void setup(Context &context, SceneContext &scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count) override;
 
+    void output(Context&, size_t unit, TextureInstance& texture) const override;
+
     void set_gbuffer(const GBuffer& gbuffer)
     {
         gbuffer_ = gbuffer;
@@ -39,6 +42,11 @@ public:
     void set_rsm_data(const RSMData& data)
     {
         rsm_data_ = data;
+    }
+
+    UniformBufferHandleType injection_settings_uniform() const
+    {
+        return injection_uniform_;
     }
 private:
     void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
@@ -56,6 +64,11 @@ private:
     ClearCommand clear_command_;
 
     RSMData rsm_data_;
+};
+
+class LPVResolveMaterialSystem : public PosteffectMaterialSystemBase
+{
+    SETUP_POSTEFFECT_MATERIAL(LPVResolveMaterialSystem, "lpv_resolve");
 };
 
 }
