@@ -90,6 +90,15 @@ RGBSH4 mul(SH4 sh, vec3 c)
     return res;
 }
 
+RGBSH4 add(RGBSH4 sh1, RGBSH4 sh2)
+{
+    RGBSH4 res;
+    res.rgb[0] = sh1.rgb[0] + sh2.rgb[0];
+    res.rgb[1] = sh1.rgb[1] + sh2.rgb[1];
+    res.rgb[2] = sh1.rgb[2] + sh2.rgb[2];
+    return res;
+}
+
 vec3 calculate_irradiance(in vec3 nrm, in ColorSH9 radiance)
 {
 	vec3 res = VEC3_ZERO;
@@ -108,5 +117,14 @@ vec3 calculate_irradiance(in vec3 nrm, in RGBSH4 rgb_sh)
     res.g = dot(cos_lobe_v, rgb_sh.rgb[1]);
     res.b = dot(cos_lobe_v, rgb_sh.rgb[2]);
     return res / PI;
+}
+
+RGBSH4 empty_rgbsh4()
+{
+    RGBSH4 res;
+    res.rgb[0] = VEC4_ZERO;
+    res.rgb[1] = VEC4_ZERO;
+    res.rgb[2] = VEC4_ZERO;
+    return res;
 }
 

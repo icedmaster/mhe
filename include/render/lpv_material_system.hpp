@@ -21,9 +21,11 @@ public:
     struct Settings
     {
         size_t size;
+        size_t propagation_steps;
 
         Settings() :
-            size(32)
+            size(32),
+            propagation_steps(1)
         {}
     };
 public:
@@ -52,6 +54,7 @@ private:
     void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
 
     void injection(DrawCall& draw_call, Context& context, RenderContext& render_context, size_t vpl_number);
+    void propagation(Context& context, RenderContext& render_context);
     mat4x4 calculate_lpv_transform(const RenderContext& render_context);
 
     Settings settings_;
@@ -61,7 +64,13 @@ private:
     MaterialHandleType injection_material_;
     RenderStateHandleType injection_render_state_;
     UniformBufferHandleType injection_uniform_;
-    ClearCommand clear_command_;
+    ClearCommandSimple clear_command_;
+
+    ShaderProgramHandleType propagation_shader_;
+    RenderTargetHandleType propagation_render_target_;
+    MaterialHandleType propagation_material_[2];
+
+    RenderTargetHandleType output_render_target_;
 
     RSMData rsm_data_;
 };

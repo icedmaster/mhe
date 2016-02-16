@@ -27,6 +27,9 @@ void DebugViews::init(EventManager& event_manager)
 
     imgui_.init(&engine_);
 
+    for (size_t i = 0; i < posteffect_max; ++i)
+        posteffect_id_[i] = MaterialSystem::invalid_id;
+
     MaterialSystem* material_system = engine_.context().material_systems.get("ssr");
     if (material_system != nullptr)
         posteffect_id_[posteffect_ssr] = material_system->id();
@@ -53,7 +56,7 @@ void DebugViews::update()
 
     Renderer::DebugMode current_mode = renderer->debug_mode();
     Renderer::DebugMode new_mode = current_mode;
-    MaterialSystemId material_system_id = InvalidHandle<MaterialSystemId>::id;
+    MaterialSystemId material_system_id = MaterialSystem::invalid_id;
     // TODO: need to rewrite it
     if (engine_.event_manager().check_bind("debug_main"))
     {
@@ -146,6 +149,13 @@ void DebugViews::update()
             posteffect_debug_mode_ = posteffect_lpv;
             material_system_id = posteffect_id_[posteffect_lpv];
         }
+    }
+
+    if (posteffect_debug_mode_ == Renderer::renderer_debug_mode_posteffect &&
+        material_system_id == MaterialSystem::invalid_id)
+    {
+        posteffect_debug_mode_ = Renderer::renderer_debug_mode_none;
+        new_mode = Renderer::renderer_debug_mode_none;
     }
 
     if (engine_.event_manager().check_bind("standart_stats"))

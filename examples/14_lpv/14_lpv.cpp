@@ -11,6 +11,8 @@ class GameScene : public mhe::game::GameScene
 public:
     bool init(mhe::game::Engine& engine, const mhe::game::GameSceneDesc& /*desc*/) override
     {
+        debug_mode_on_ = false;
+
         mhe::LightInstance& light_instance = engine.scene().create_light();
         mhe::Light& light = light_instance.light;
         light.shading().diffuse = mhe::color_white;
@@ -42,7 +44,7 @@ public:
         engine.renderer()->set_material_system_to_process(rsm_material_system_);
 
         const string lpv_name("lpv");
-        const string propagation_shader_name("propagation");
+        const string propagation_shader_name("lpv_propagation");
         material_system_context.priority = DeferredRenderer::deferred_renderer_base_priority - 1;
         material_system_context.shader_name = lpv_name;
         material_system_context.instance_name = lpv_name;
@@ -106,8 +108,14 @@ public:
         return true;
     }
 
-    bool update(mhe::game::Engine& /*engine*/) override
+    bool update(mhe::game::Engine& engine) override
     {
+        if (engine.event_manager().check_bind("debug_lpv"))
+        {
+            debug_mode_on_ ^= 1;
+            engine.renderer()->set_debug_mode(debug_mode_on_ ? Renderer::renderer_debug_mode_posteffect : Renderer::renderer_debug_mode_none,
+                engine.context().material_systems.get<LPVResolveMaterialSystem>()->id());
+        }
         return true;
     }
 
@@ -121,6 +129,7 @@ public:
 private:
     RSMMaterialSystem* rsm_material_system_;
     LPVMaterialSystem* lpv_material_system_;
+    bool debug_mode_on_;
 };
 
 int main(int /*argc*/, char** /*argv*/)

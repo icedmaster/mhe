@@ -112,7 +112,7 @@ class MHE_EXPORT Renderer : public ref_counter
 public:
     static const uint8_t skybox_material_system_priority = 2;
     static const uint8_t shadowmap_depth_write_material_system_priority = 3;
-    static const uint8_t debug_material_system_priority = 32;
+    static const uint8_t debug_material_system_priority = 250;
 
     enum DebugMode
     {
