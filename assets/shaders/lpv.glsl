@@ -18,6 +18,7 @@ uniform InjectionSettings
     vec4 injection_settings;
     mat4 rsm_to_world;
     mat4 world_to_lpv;
+    vec4 light_parameters;
 };
 
 out VSOutput vsoutput;
@@ -28,24 +29,28 @@ void main()
 
     ivec2 texsize = textureSize(normal_texture, 0);
     int index = gl_VertexID;
-    vec2 texcoord = vec2(float(index % texsize.x) / float(texsize.x), float(index / texsize.x) / texsize.x);
+    int x = index % texsize.x;
+    int y = index / texsize.x;
+    vec2 texcoord = vec2(float(x) / float(texsize.x), float(y) / texsize.x);
     vec3 normal = textureLod(normal_texture, texcoord, 0.0f).xyz;
     vec3 flux = textureLod(flux_texture, texcoord, 0.0f).rgb;
     float depth = textureLod(depth_texture, texcoord, 0.0f).x;
 
     vec3 position_ws = position_from_depth(texcoord, depth, rsm_to_world);
 
-    vec3 position_lpv = (world_to_lpv * vec4(position_ws, 1.0f)).xyz;
+    vec3 position_lpv = (world_to_lpv * vec4(position_ws, 1.0f)).xyz; // xyz in the [0, 1] interval
 
     if (dot(normal, normal) < 0.001f)
         flux = vec3(0.0f, 0.0f, 0.0f);
 
+    float diffuse_term = max(dot(light_parameters.xyz, normal), 0.0f);
+
     position_lpv += normal * 0.5f / cell_size;
-    position_lpv.xy = position_lpv.xy * 2.0f - 1.0f;
+    position_lpv.xy = position_lpv.xy * 2.0f - 1.0f; // move to the clip space
     position_lpv.z *= cell_size;
 
     vsoutput.normal = normal;
-    vsoutput.flux = flux;
+    vsoutput.flux = flux * diffuse_term;
 
     gl_Position = vec4(position_lpv, 1.0f);
 }

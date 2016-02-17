@@ -22,8 +22,9 @@ public:
     struct Settings
     {
         size_t size;
+        float flux_intensity;
 
-        Settings() : size(256) {}
+        Settings() : size(256), flux_intensity(0.01f) {}
     };
 public:
     bool init(Context& context, const MaterialSystemContext& material_system_context) override;
@@ -46,7 +47,10 @@ public:
     void rsm_data(RSMData& data) const
     {
         data.vp = light_vp_;
+        data.light_direction = light_direction_;
     }
+
+    void init_debug_views(Context& context) override;
 private:
     void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
 
@@ -60,6 +64,7 @@ private:
     mat4x4 light_vp_;
     ClearCommand clear_command_;
     ShaderData shader_data_;
+    vec3 light_direction_;
 };
 
 }

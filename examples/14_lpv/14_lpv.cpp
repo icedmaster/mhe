@@ -3,6 +3,7 @@
 #include "render/lpv_material_system.hpp"
 
 const char* mesh_name = "test-scene-simple.bin";
+//const char* mesh_name = "sponza.bin";
 
 using namespace mhe;
 
@@ -42,6 +43,7 @@ public:
 
         rsm_material_system_ = static_cast<RSMMaterialSystem*>(create(engine.context(), rsm_name, rsm_name));
         engine.renderer()->set_material_system_to_process(rsm_material_system_);
+        rsm_material_system_->init_debug_views(engine.context());
 
         const string lpv_name("lpv");
         const string propagation_shader_name("lpv_propagation");
@@ -156,7 +158,7 @@ int main(int /*argc*/, char** /*argv*/)
     mhe::PerspectiveCameraParameters camera_parameters;
     camera_parameters.fov = 60.0f;
     camera_parameters.znear = 0.5f;
-    camera_parameters.zfar = 50.0f;
+    camera_parameters.zfar = 3000.0f;
     mhe::game::FPSCameraController* camera_controller = new mhe::game::FPSCameraController(app.engine(), camera_parameters,
         mhe::vec3(0, 1, 5), mhe::vec3(0.0f, mhe::pi, 0));
     camera_controller->set_move_speed(75.0f);

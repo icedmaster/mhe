@@ -142,6 +142,7 @@ void LPVMaterialSystem::injection(DrawCall& draw_call, Context& context, RenderC
     shader_data.settings.set_x(static_cast<float>(settings_.size));
     shader_data.rsm_to_ws = rsm_data_.vp.inverted();
     shader_data.ws_to_lpv = calculate_lpv_transform(render_context);
+    shader_data.light_parameters = vec4(-rsm_data_.light_direction, 0.0f);
     uniform.update(shader_data);
 
     Material& material = context.materials[id()].get(injection_material_);

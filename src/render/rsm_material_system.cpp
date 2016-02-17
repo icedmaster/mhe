@@ -6,6 +6,7 @@
 #include "render/light_instance_methods.hpp"
 #include "render/uniforms.hpp"
 #include "utils/global_log.hpp"
+#include "debug/debug_views.hpp"
 
 namespace mhe {
 
@@ -102,8 +103,10 @@ void RSMMaterialSystem::start_frame(Context& context, SceneContext& scene_contex
 
     if (light_instance == nullptr) return;
 
+    light_direction_ = get_light_direction(scene_context, light_instance->id);
+
     float radius = render_context.aabb.extents.magnitude();
-    vec3 light_position = render_context.aabb.center - get_light_direction(scene_context, light_instance->id) * radius;
+    vec3 light_position = render_context.aabb.center - light_direction_ * radius;
     light_view_ = get_light_view_matrix(scene_context, light_instance->id);
     light_view_.set_row(3, vec3::zero());
     light_view_.multTranslate(-light_position);
@@ -117,7 +120,7 @@ void RSMMaterialSystem::start_frame(Context& context, SceneContext& scene_contex
     render_context.render_view_requests.register_request(additional_view0, frustum_culling_request);
 
     shader_data_.vp = light_vp_;
-    shader_data_.settings.set_x(light_instance->light.shading().intensity);
+    shader_data_.settings.set_x(light_instance->light.shading().intensity * settings_.flux_intensity);
 }
 
 void RSMMaterialSystem::update(Context& context, SceneContext& scene_context, RenderContext& render_context)
@@ -167,6 +170,13 @@ void RSMMaterialSystem::update(Context& context, SceneContext& scene_context, Re
             draw_call.command = &clear_command_;
         }
     }
+}
+
+void RSMMaterialSystem::init_debug_views(Context& context)
+{
+    size_t view_id = context.debug_views->add_view("RSM");
+    DebugViews::DebugView& view = context.debug_views->get_view(view_id);
+    view.add("flux_coeff", 0.0f, 2.0f, &settings_.flux_intensity);
 }
 
 }

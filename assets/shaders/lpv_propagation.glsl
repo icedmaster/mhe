@@ -4,6 +4,7 @@ uniform InjectionSettings
     vec4 injection_settings;
     mat4 rsm_to_world;
     mat4 world_to_lpv;
+    vec4 light_parameters;
 };
 
 struct VSOutput
@@ -59,22 +60,34 @@ layout (location = 2) out vec4 out_b;
 
 flat in VSOutput gsoutput;
 
-/*RGBSH4 propagate_dir(vec3 cell_pos, vec3 dir)
+RGBSH4 fetch_data(ivec3 pos)
 {
-}*/
+    RGBSH4 res;
+    res.rgb[0] = texelFetch(sh_r_texture, pos, 0);
+    res.rgb[1] = texelFetch(sh_g_texture, pos, 0);
+    res.rgb[2] = texelFetch(sh_b_texture, pos, 0);
+    return res;
+}
+
+RGBSH4 propagate_dir(ivec3 cell_pos, ivec3 dir)
+{
+    RGBSH4 adjacent_cell_stored_radiance = fetch_data(cell_pos + dir);
+    // calculate incoming radiance
+    vec3 normal = dir;
+    vec3 irradiance = max(calculate_irradiance(-normal, adjacent_cell_stored_radiance), 0.0f);
+    // back to SH
+    SH4 sh_coeff = sh_cosine_lobe_sh4(-normal);
+    return mul(sh_coeff, irradiance);
+}
 
 void main()
 {
-    RGBSH4 res = empty_rgbsh4();
-    /*res = add(res, propagate_dir(vsoutput.pos, vec3(-1, 0, 0)));
-    res = add(res, propagate_dir(vsoutput.pos, vec3(1, 0, 0)));
-    res = add(res, propagate_dir(vsoutput.pos, vec3(0, -1, 0)));
-    res = add(res, propagate_dir(vsoutput.pos, vec3(0, 1, 0)));
-    res = add(res, propagate_dir(vsoutput.pos, vec3(0, 0, -1)));
-    res = add(res, propagate_dir(vsoutput.pos, vec3(0, 0, 1)));*/
-    res.rgb[0] = texelFetch(sh_r_texture, gsoutput.pos, 0);
-    res.rgb[1] = texelFetch(sh_g_texture, gsoutput.pos, 0);
-    res.rgb[2] = texelFetch(sh_b_texture, gsoutput.pos, 0);
+    RGBSH4 res = propagate_dir(gsoutput.pos, ivec3(-1, 0, 0));
+    res = add(res, propagate_dir(gsoutput.pos, ivec3(1, 0, 0)));
+    res = add(res, propagate_dir(gsoutput.pos, ivec3(0, -1, 0)));
+    res = add(res, propagate_dir(gsoutput.pos, ivec3(0, 1, 0)));
+    res = add(res, propagate_dir(gsoutput.pos, ivec3(0, 0, -1)));
+    res = add(res, propagate_dir(gsoutput.pos, ivec3(0, 0, 1)));
 
     out_r = res.rgb[0];
     out_g = res.rgb[1];

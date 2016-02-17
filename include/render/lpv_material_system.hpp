@@ -16,6 +16,7 @@ class LPVMaterialSystem : public MaterialSystem
         vec4 settings;
         mat4x4 rsm_to_ws;
         mat4x4 ws_to_lpv;
+        vec4 light_parameters;
     };
 public:
     struct Settings
@@ -25,7 +26,7 @@ public:
 
         Settings() :
             size(32),
-            propagation_steps(1)
+            propagation_steps(8)
         {}
     };
 public:

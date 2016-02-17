@@ -14,6 +14,7 @@ uniform InjectionSettings
     vec4 injection_settings;
     mat4 rsm_to_world;
     mat4 world_to_lpv;
+    vec4 light_settings;
 };
 
 [sampler2D scene_normal_texture 0]
