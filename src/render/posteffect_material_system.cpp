@@ -858,7 +858,7 @@ void AverageLuminanceMaterialSystem::update(Context& context, SceneContext& scen
     DrawCall& draw_call = render_context.draw_calls.add();
     prepare_draw_call(draw_call, context, scene_context, render_context, render_target_);
     draw_call.pass = 0;
-    draw_call.command = nullptr;
+    draw_call.command = &clear_command_;
     // And the second is to perform luminance adaptation, also per-pixel
     {
         DrawCall& dc = render_context.draw_calls.add();

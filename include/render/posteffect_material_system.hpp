@@ -156,6 +156,12 @@ public:
 
     // This method will be called when PosteffectChain has initialized this material system
     virtual void postinit(Context& /*context*/) {}
+
+    void set_render_target(RenderTargetHandleType render_target_id)
+    {
+        default_render_target_ = render_target_id;
+        // TODO: need to setup outputs
+    }
 protected:
     MeshInstance& mesh_instance()
     {
@@ -453,6 +459,7 @@ private:
     ShaderProgramHandleType adaptation_shader_;
     UniformBufferHandleType adaptation_uniform_;
     ReductionCommand reduction_command_;
+    ClearCommandSimple clear_command_;
     RenderTargetHandleType render_target_;
     RenderTargetHandleType adaptation_render_target_[2];
     MaterialHandleType adaptation_material_;

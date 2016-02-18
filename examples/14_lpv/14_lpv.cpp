@@ -105,7 +105,11 @@ public:
         uniform1.index = 1;
         uniform1.explicit_handle = lpv_material_system_->injection_settings_uniform();
 
-        engine.renderer()->posteffect_system().add(engine.context(), posteffect_node_desc);
+        lpv_resolve_material_system_ = static_cast<LPVResolveMaterialSystem*>(
+            engine.renderer()->posteffect_system().create(engine.context(), posteffect_node_desc));
+
+        DeferredRenderer* deferred_renderer = static_cast<DeferredRenderer*>(engine.renderer());
+        deferred_renderer->set_gi_modifier_material_system(engine.context(), lpv_resolve_material_system_, 0);
 
         return true;
     }
@@ -116,7 +120,7 @@ public:
         {
             debug_mode_on_ ^= 1;
             engine.renderer()->set_debug_mode(debug_mode_on_ ? Renderer::renderer_debug_mode_posteffect : Renderer::renderer_debug_mode_none,
-                engine.context().material_systems.get<LPVResolveMaterialSystem>()->id());
+                lpv_resolve_material_system_->id());
         }
         return true;
     }
@@ -131,6 +135,7 @@ public:
 private:
     RSMMaterialSystem* rsm_material_system_;
     LPVMaterialSystem* lpv_material_system_;
+    LPVResolveMaterialSystem* lpv_resolve_material_system_;
     bool debug_mode_on_;
 };
 
@@ -158,7 +163,7 @@ int main(int /*argc*/, char** /*argv*/)
     mhe::PerspectiveCameraParameters camera_parameters;
     camera_parameters.fov = 60.0f;
     camera_parameters.znear = 0.5f;
-    camera_parameters.zfar = 3000.0f;
+    camera_parameters.zfar = 40.0f;
     mhe::game::FPSCameraController* camera_controller = new mhe::game::FPSCameraController(app.engine(), camera_parameters,
         mhe::vec3(0, 1, 5), mhe::vec3(0.0f, mhe::pi, 0));
     camera_controller->set_move_speed(75.0f);

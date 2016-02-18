@@ -108,6 +108,17 @@ void setup_node(NodeInstance& node, MaterialSystem* material_system, Context& co
 
 void PosteffectSystem::add(Context& context, const PosteffectSystem::PosteffectNodeDesc& desc)
 {
+    PosteffectMaterialSystemBase* material_system = create(context, desc);
+    ASSERT(material_system != nullptr, "Couldn't create a material system");
+    PosteffectNode node;
+    node.name = desc.name;
+    node.material_system = material_system;
+
+    posteffects_.push_back(node);
+}
+
+PosteffectMaterialSystemBase* PosteffectSystem::create(Context& context, const PosteffectNodeDesc& desc)
+{
     PosteffectNode* prev_node = nullptr;
 
     if (!desc.prev_node.empty())
@@ -122,13 +133,13 @@ void PosteffectSystem::add(Context& context, const PosteffectSystem::PosteffectN
         }
         ASSERT(prev_node != nullptr, "Previous node name is set but the node isn't found:" << desc.prev_node);
     }
-    
+
     PosteffectMaterialSystemBase* material_system = nullptr;
     if (!desc.instantiate)
         material_system = context.material_systems.get<PosteffectMaterialSystemBase>(desc.material.c_str());
     else
     {
-        material_system = create<PosteffectMaterialSystemBase>(context, desc.material, desc.name);
+        material_system = mhe::create<PosteffectMaterialSystemBase>(context, desc.material, desc.name);
     }
     ASSERT(material_system != nullptr, "Can't find material system with name:" << desc.material);
     material_system->set_priority(posteffect_material_priority_base + desc.priority);
@@ -159,12 +170,7 @@ void PosteffectSystem::add(Context& context, const PosteffectSystem::PosteffectN
     init_uniforms(material_system, context, desc);
 
     material_system->postinit(context);
-
-    PosteffectNode node;
-    node.name = desc.name;
-    node.material_system = material_system;
-
-    posteffects_.push_back(node);
+    return material_system;
 }
 
 void PosteffectSystem::init_inputs(PosteffectMaterialSystemBase* material_system, Context& context, 
@@ -238,7 +244,7 @@ void PosteffectSystem::init_uniforms(PosteffectMaterialSystemBase* material_syst
         {
             const PosteffectNode* input_node = find_node(buffer_desc.node);
             ASSERT(input_node != nullptr && input_node->material_system != nullptr, "Can't find a node with name:" << buffer_desc.node);
-            UniformBufferHandleType buffer_id = input_node->material_system->uniform(buffer_desc.node_buffer);
+            buffer_id = input_node->material_system->uniform(buffer_desc.node_buffer);
             if (!is_handle_valid(buffer_id))
             {
                 WARN_LOG("The uniform is not valid:" << buffer_desc.node << " " << buffer_desc.node_buffer);

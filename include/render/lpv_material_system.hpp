@@ -26,7 +26,7 @@ public:
 
         Settings() :
             size(32),
-            propagation_steps(8)
+            propagation_steps(16)
         {}
     };
 public:

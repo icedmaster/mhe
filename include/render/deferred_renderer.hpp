@@ -10,9 +10,12 @@ class MHE_EXPORT DeferredRenderer : public Renderer
 {
 public:
     static const uint8_t deferred_renderer_base_priority = 16;
+    static const uint8_t deferred_renderer_gbuffer_modifier_priority = 20;
+    static const uint8_t deferred_renderer_draw_priority = 32;
 public:
     DeferredRenderer(Context& context) :
-        Renderer(context)
+        Renderer(context),
+        gi_modifier_material_system_(nullptr)
     {}
 
     void init(AbstractGBufferFillMaterialSystem* fill, AbstractGBufferUseMaterialSystem* light, PosteffectMaterialSystemBase* draw);
@@ -20,6 +23,7 @@ public:
     void disable();
 
     void set_probes_accumulator_material_system(ProbesAccumulatorMaterialSystem* material_system);
+    void set_gi_modifier_material_system(Context& context, MaterialSystem* material_system, size_t priority);
 private:
     void init_priorities();
 
@@ -32,6 +36,7 @@ private:
     AbstractGBufferUseMaterialSystem* gbuffer_light_material_system_;
     PosteffectMaterialSystemBase* draw_material_system_;
     ProbesAccumulatorMaterialSystem* probes_accumulator_material_system_;
+    MaterialSystem* gi_modifier_material_system_;
 };
 
 }
