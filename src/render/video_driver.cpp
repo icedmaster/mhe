@@ -271,6 +271,14 @@ void Driver::perform_draw_call(Context& context, const DrawCall& draw_call)
         impl_->set_uniform(uniform, j);
         state_.uniforms[j] = material.uniforms[j];
     }
+    for (size_t j = 0; j < material_uniforms_number; ++j)
+    {
+        // TODO: add shader storage buffers to the state structure
+        if (material.shader_storage_buffers[j] == ShaderStorageBuffer::invalid_id)
+            continue;
+        const ShaderStorageBuffer& ssb = context.shader_storage_buffer_pool.get(material.shader_storage_buffers[j]);
+        impl_->set_shader_storage_buffer(ssb, j);
+    }
     for (size_t j = 0; j < material_texture_buffers_number; ++j)
     {
         if ((material.texture_buffers[j] == TextureBuffer::invalid_id) || (material.texture_buffers[j] == state_.texture_buffers[j] && !shader_program_changed))

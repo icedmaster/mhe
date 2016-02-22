@@ -75,7 +75,7 @@ RGBSH4 propagate_dir(ivec3 cell_pos, ivec3 dir)
     // calculate incoming radiance
     vec3 normal = dir;
     vec3 irradiance = max(calculate_irradiance(-normal, adjacent_cell_stored_radiance), 0.0f);
-    // back to SH
+    // back to SH space using the direction of propagation
     SH4 sh_coeff = sh_cosine_lobe_sh4(-normal);
     return mul(sh_coeff, irradiance);
 }

@@ -121,6 +121,7 @@ void RSMMaterialSystem::start_frame(Context& context, SceneContext& scene_contex
 
     shader_data_.vp = light_vp_;
     shader_data_.settings.set_x(light_instance->light.shading().intensity * settings_.flux_intensity);
+    shader_data_.light_diffuse_color = light_instance->light.shading().diffuse;
 }
 
 void RSMMaterialSystem::update(Context& context, SceneContext& scene_context, RenderContext& render_context)

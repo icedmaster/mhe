@@ -202,6 +202,11 @@ public:
     {
         vbo_.data(ptr, size);
     }
+
+    void update(const uint8_t* data, size_t size) override
+    {
+        vbo_.update(size, 0, data);
+    }
 private:
     VBO vbo_;
     GLenum format_;

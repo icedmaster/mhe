@@ -3,6 +3,7 @@
 #include "render/lpv_material_system.hpp"
 
 const char* mesh_name = "test-scene-simple.bin";
+//const char* mesh_name = "lighting-test-simple.bin";
 //const char* mesh_name = "sponza.bin";
 
 using namespace mhe;
@@ -18,7 +19,7 @@ public:
         mhe::Light& light = light_instance.light;
         light.shading().diffuse = mhe::color_white;
         light.shading().specular = mhe::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-        light.shading().intensity = 5.0f;
+        light.shading().intensity = 3.0f;
         mhe::set_light_rotation(engine.scene_context(), light_instance.id, mhe::quatf(0.0f, -mhe::pi_2 * 1.3f, mhe::pi_2 * 0.7f));
         light.set_type(mhe::Light::directional);
         light.desc().cast_shadows = true;
@@ -28,10 +29,16 @@ public:
         mhe::NodeInstance& node = engine.scene().create_node();
         mhe::load_node<mhe::GBufferFillMaterialSystem>(node, mhe::string(mesh_name), engine.context(), engine.scene_context());
 
+        // The glossiness coefficient will be used for calculating the initial intensity of VPL
         for (size_t i = 0, size = node.mesh.mesh.parts.size(); i < size; ++i)
         {
             engine.context().material_manager.material_data(node.mesh.mesh.parts[i].material_id).render_data.glossiness = 0.5f;
         }
+
+        // This is a small hack, because I don't include the skybox contribution during the average luminance calculation
+        // and the results on the test scene where skybox may cover a big part of screen may be incorrect
+        AverageLuminanceMaterialSystem* average_luminance_material_system = engine.context().material_systems.get<AverageLuminanceMaterialSystem>();
+        average_luminance_material_system->settings().mode = AverageLuminanceMaterialSystem::fixed_luminance_mode;
 
         const string rsm_name("rsm");
         MaterialSystemContext material_system_context;

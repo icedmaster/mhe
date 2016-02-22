@@ -19,6 +19,7 @@ uniform ShaderData
 {
     mat4 vp;
     vec4 settings;
+    vec4 light_diffuse_color;
 };
 
 [vertex]
@@ -55,6 +56,7 @@ void main()
 [fragment]
 
 [include "material_common.h"]
+[include "common.h"]
 
 [sampler2D diffuse_texture 0]
 #if NORMALMAP == 1
@@ -88,5 +90,5 @@ void main()
 
     // output values
     out_normal = normal_wspace;
-    out_accumulator = color * reflected_flux;
+    out_accumulator = color * light_diffuse_color.rgb * reflected_flux / PI;
 }

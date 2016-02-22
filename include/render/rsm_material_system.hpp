@@ -17,6 +17,7 @@ class RSMMaterialSystem : public MaterialSystem
     {
         mat4x4 vp;
         vec4 settings;
+        vec4 light_diffuse_color;
     };
 public:
     struct Settings
