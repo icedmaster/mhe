@@ -10,7 +10,7 @@ struct ColorSH9
 
 struct SH4
 {
-    float c[4];
+    vec4 c;
 };
 
 struct ColorSH4
@@ -82,10 +82,9 @@ SH4 sh_cosine_lobe_sh4(in vec3 dir)
 RGBSH4 mul(SH4 sh, vec3 c)
 {
     RGBSH4 res;
-    vec4 shv = vec4(sh.c[0], sh.c[1], sh.c[2], sh.c[3]);
-    res.rgb[0] = shv * c.x;
-    res.rgb[1] = shv * c.y;
-    res.rgb[2] = shv * c.z;
+    res.rgb[0] = sh.c * c.x;
+    res.rgb[1] = sh.c * c.y;
+    res.rgb[2] = sh.c * c.z;
 
     return res;
 }
@@ -112,10 +111,9 @@ vec3 calculate_irradiance(in vec3 nrm, in RGBSH4 rgb_sh)
 {
     vec3 res = VEC3_ZERO;
     SH4 cos_lobe = sh_cosine_lobe_sh4(nrm);
-    vec4 cos_lobe_v = vec4(cos_lobe.c[0], cos_lobe.c[1], cos_lobe.c[2], cos_lobe.c[3]);
-    res.r = dot(cos_lobe_v, rgb_sh.rgb[0]);
-    res.g = dot(cos_lobe_v, rgb_sh.rgb[1]);
-    res.b = dot(cos_lobe_v, rgb_sh.rgb[2]);
+    res.r = dot(cos_lobe.c, rgb_sh.rgb[0]);
+    res.g = dot(cos_lobe.c, rgb_sh.rgb[1]);
+    res.b = dot(cos_lobe.c, rgb_sh.rgb[2]);
     return res / PI;
 }
 

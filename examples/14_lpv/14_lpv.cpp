@@ -54,17 +54,20 @@ public:
 
         const string lpv_name("lpv");
         const string propagation_shader_name("lpv_propagation");
+        const string geometry_injection_shader_name("lpv_geometry_injection");
         material_system_context.priority = DeferredRenderer::deferred_renderer_base_priority - 1;
         material_system_context.shader_name = lpv_name;
         material_system_context.instance_name = lpv_name;
         material_system_context.material_instances_number = 0;
         material_system_context.options.add(string("injection_shader"), lpv_name);
         material_system_context.options.add(string("propagation_shader"), propagation_shader_name);
+        material_system_context.options.add(string("geometry_injection_shader"), geometry_injection_shader_name);
         engine.context().initialization_parameters.add(lpv_name, material_system_context);
 
         lpv_material_system_ = static_cast<LPVMaterialSystem*>(create(engine.context(), lpv_name, lpv_name));
         engine.renderer()->set_material_system_to_process(lpv_material_system_);
         lpv_material_system_->set_gbuffer(rsm_material_system_->gbuffer());
+        lpv_material_system_->init_debug_views(engine.context());
 
         const string lpv_resolve_name("lpv_resolve");
         material_system_context.priority = posteffect_material_priority_base;
@@ -129,6 +132,10 @@ public:
             engine.renderer()->set_debug_mode(debug_mode_on_ ? Renderer::renderer_debug_mode_posteffect : Renderer::renderer_debug_mode_none,
                 lpv_resolve_material_system_->id());
         }
+
+        const KeyboardDevice* keyboard = engine.event_manager().keyboard();
+        if (keyboard->is_key_pressed(KeyboardDevice::key_o))
+            lpv_material_system_->settings().use_occlusion ^= 1;
         return true;
     }
 

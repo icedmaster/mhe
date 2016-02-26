@@ -1,3 +1,5 @@
+[defs OCCLUSION 0 1]
+
 [uniform InjectionSettings 0 permodel]
 uniform InjectionSettings
 {
@@ -54,6 +56,10 @@ void main()
 [sampler3D sh_g_texture 1]
 [sampler3D sh_b_texture 2]
 
+#if OCCLUSION == 1
+[sampler3D sh_occlusion_texture 3]
+#endif
+
 layout (location = 0) out vec4 out_r;
 layout (location = 1) out vec4 out_g;
 layout (location = 2) out vec4 out_b;
@@ -75,6 +81,12 @@ RGBSH4 propagate_dir(ivec3 cell_pos, ivec3 dir)
     // calculate incoming radiance
     vec3 normal = dir;
     vec3 irradiance = max(calculate_irradiance(-normal, adjacent_cell_stored_radiance), 0.0f);
+#if OCCLUSION == 1
+    vec4 stored_occlusion_sh = texelFetch(sh_occlusion_texture, cell_pos, 0);
+    SH4 occlusion_sh_coeff = sh_cosine_lobe_sh4(normal);
+    float occlusion = dot(stored_occlusion_sh, occlusion_sh_coeff.c);
+    irradiance *= saturate(1.0f - occlusion);
+#endif
     // back to SH space using the direction of propagation
     SH4 sh_coeff = sh_cosine_lobe_sh4(-normal);
     return mul(sh_coeff, irradiance);

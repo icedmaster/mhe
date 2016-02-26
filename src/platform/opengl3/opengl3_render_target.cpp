@@ -34,7 +34,7 @@ bool OpenGL3RenderTarget::init(const RenderTargetDesc& desc, Texture** color_tex
         texture_desc.datatype = desc.color_datatype[i];
         texture_desc.mag_filter = texture_desc.min_filter = desc.color_filter[i];
         texture_desc.anisotropic_level = desc.color_anisotropy[i];
-        texture_desc.address_mode_s = texture_desc.address_mode_t = desc.color_address_mode[i];
+        texture_desc.address_mode_s = texture_desc.address_mode_t = texture_desc.address_mode_r = desc.color_address_mode[i];
         if (!color_textures[i]->init(texture_desc, nullptr, 0))
             return false;
         const OpenGL3Texture* texture = static_cast<const OpenGL3Texture*>(color_textures[i]->impl());

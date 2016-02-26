@@ -62,8 +62,8 @@ inline GLenum get_texture_filter(int filter)
 
 inline GLenum get_texture_address_mode(int mode)
 {
-    ASSERT(mode < 3, "Invalid texture address mode");
-    GLenum modes[3] = {GL_REPEAT, GL_CLAMP, GL_CLAMP_TO_EDGE};
+    ASSERT(mode < 4, "Invalid texture address mode");
+    GLenum modes[4] = {GL_REPEAT, GL_CLAMP, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_BORDER};
     return modes[mode];
 }
 

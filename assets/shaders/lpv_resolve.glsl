@@ -45,5 +45,5 @@ void main()
     rgb_sh.rgb[0] = r;
     rgb_sh.rgb[1] = g;
     rgb_sh.rgb[2] = b;
-    out_color = calculate_irradiance(normal_ws, rgb_sh);
+    out_color = calculate_irradiance(-normal_ws, rgb_sh);
 }

@@ -23,10 +23,14 @@ public:
     {
         size_t size;
         size_t propagation_steps;
+        float occlusion_coeff;
+        bool use_occlusion;
 
         Settings() :
             size(32),
-            propagation_steps(16)
+            propagation_steps(16),
+            occlusion_coeff(1.0f),
+            use_occlusion(true)
         {}
     };
 public:
@@ -36,6 +40,8 @@ public:
     void setup(Context &context, SceneContext &scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count) override;
 
     void output(Context&, size_t unit, TextureInstance& texture) const override;
+
+    void init_debug_views(Context& context) override;
 
     void set_gbuffer(const GBuffer& gbuffer)
     {
@@ -51,10 +57,16 @@ public:
     {
         return injection_uniform_;
     }
+
+    Settings& settings()
+    {
+        return settings_;
+    }
 private:
     void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
 
     void injection(DrawCall& draw_call, Context& context, RenderContext& render_context, size_t vpl_number);
+    void geometry_injection(DrawCall& draw_call, Context& context, RenderContext& render_context, size_t vpl_number);
     void propagation(Context& context, RenderContext& render_context);
     mat4x4 calculate_lpv_transform(const RenderContext& render_context);
 
@@ -68,8 +80,13 @@ private:
     ClearCommandSimple clear_command_;
 
     ShaderProgramHandleType propagation_shader_;
+    ShaderProgramHandleType propagation_shader_with_occlusion_;
     RenderTargetHandleType propagation_render_target_;
     MaterialHandleType propagation_material_[2];
+
+    RenderTargetHandleType occlusion_render_target_;
+    MaterialHandleType geometry_injection_material_;
+    ShaderProgramHandleType geometry_injection_shader_;
 
     RenderTargetHandleType output_render_target_;
 

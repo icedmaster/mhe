@@ -177,7 +177,7 @@ void RSMMaterialSystem::init_debug_views(Context& context)
 {
     size_t view_id = context.debug_views->add_view("RSM");
     DebugViews::DebugView& view = context.debug_views->get_view(view_id);
-    view.add("flux_coeff", 0.0f, 2.0f, &settings_.flux_intensity);
+    view.add("flux_coeff", 0.0f, 0.05f, &settings_.flux_intensity);
 }
 
 }

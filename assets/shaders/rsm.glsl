@@ -85,8 +85,8 @@ void main()
     normal_wspace = normalize(normal_wspace);
 #endif
 
-    float radiance = settings.x;
-    float reflected_flux = radiance * PHONG_MATERIAL_GLOSSINESS(material_data);
+    float flux_reflectance_coeff = settings.x;
+    float reflected_flux = flux_reflectance_coeff * PHONG_MATERIAL_GLOSSINESS(material_data);
 
     // output values
     out_normal = normal_wspace;
