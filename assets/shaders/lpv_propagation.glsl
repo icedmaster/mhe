@@ -75,31 +75,57 @@ RGBSH4 fetch_data(ivec3 pos)
     return res;
 }
 
-RGBSH4 propagate_dir(ivec3 cell_pos, ivec3 dir)
+RGBSH4 propagate_dir(ivec3 cell_pos, ivec3 dir, float amp)
 {
     RGBSH4 adjacent_cell_stored_radiance = fetch_data(cell_pos + dir);
-    // calculate incoming radiance
-    vec3 normal = dir;
-    vec3 irradiance = max(calculate_irradiance(-normal, adjacent_cell_stored_radiance), 0.0f);
+
+    vec3 offset[6] = vec3[6](vec3(-1, 0, 0), vec3(1, 0, 0), vec3(0, -1, 0), vec3(0, 1, 0),
+                             vec3(0, 0, -1), vec3(0, 0, 1));
+
+    vec3 adjancent_cell_center = cell_pos + dir;
+    vec3 irradiance = VEC3_ZERO;
+    RGBSH4 res = empty_rgbsh4();
+    for (int f = 0; f < 6; ++f)
+    {
+        vec3 face_pos = offset[f] * 0.5f;
+        vec3 face_dir = dir - face_pos;
+        float len = length(face_dir);
+        face_dir /= len;
+        // calculate the solid angle
+        float solid_angle = 0.0f;
+        if (len > 0.5f)
+            solid_angle = len >= 1.5f ? 22.95668f / (4.0f * 180.0f) : 24.26083f / (4.0f * 180.0f);
+        SH4 face_dir_sh = sh4(face_dir);
+
 #if OCCLUSION == 1
-    vec4 stored_occlusion_sh = texelFetch(sh_occlusion_texture, cell_pos, 0);
-    SH4 occlusion_sh_coeff = sh_cosine_lobe_sh4(normal);
-    float occlusion = dot(stored_occlusion_sh, occlusion_sh_coeff.c);
-    irradiance *= saturate(1.0f - occlusion);
+        vec4 stored_occlusion_sh = texelFetch(sh_occlusion_texture, cell_pos + dir, 0);
+        float occlusion = saturate(1.0f - dot(stored_occlusion_sh, face_dir_sh.c));
+#else
+        float occlusion = 1.0f;
 #endif
-    // back to SH space using the direction of propagation
-    SH4 sh_coeff = sh_cosine_lobe_sh4(-normal);
-    return mul(sh_coeff, irradiance);
+
+        SH4 offset_cosine_lobe = sh_cosine_lobe_sh4(offset[f]);
+        // calculate the amount of lighting in that direction
+        vec3 radiance_at_dir = solid_angle * occlusion * max(VEC3_ZERO, shdot(face_dir_sh, adjacent_cell_stored_radiance));
+        // and back to SH
+        RGBSH4 radiance_at_dir_sh = mul(offset_cosine_lobe, radiance_at_dir);
+        radiance_at_dir_sh.rgb[0] = radiance_at_dir_sh.rgb[0] * amp;
+        radiance_at_dir_sh.rgb[1] = radiance_at_dir_sh.rgb[1] * amp;
+        radiance_at_dir_sh.rgb[2] = radiance_at_dir_sh.rgb[2] * amp;
+        res = add(res, radiance_at_dir_sh);
+    }
+    return res;
 }
 
 void main()
 {
-    RGBSH4 res = propagate_dir(gsoutput.pos, ivec3(-1, 0, 0));
-    res = add(res, propagate_dir(gsoutput.pos, ivec3(1, 0, 0)));
-    res = add(res, propagate_dir(gsoutput.pos, ivec3(0, -1, 0)));
-    res = add(res, propagate_dir(gsoutput.pos, ivec3(0, 1, 0)));
-    res = add(res, propagate_dir(gsoutput.pos, ivec3(0, 0, -1)));
-    res = add(res, propagate_dir(gsoutput.pos, ivec3(0, 0, 1)));
+    float amp = injection_settings.w;
+    RGBSH4 res = propagate_dir(gsoutput.pos, ivec3(-1, 0, 0), amp);
+    res = add(res, propagate_dir(gsoutput.pos, ivec3(1, 0, 0), amp));
+    res = add(res, propagate_dir(gsoutput.pos, ivec3(0, -1, 0), amp));
+    res = add(res, propagate_dir(gsoutput.pos, ivec3(0, 1, 0), amp));
+    res = add(res, propagate_dir(gsoutput.pos, ivec3(0, 0, -1), amp));
+    res = add(res, propagate_dir(gsoutput.pos, ivec3(0, 0, 1), amp));
 
     out_r = res.rgb[0];
     out_g = res.rgb[1];

@@ -24,12 +24,14 @@ public:
         size_t size;
         size_t propagation_steps;
         float occlusion_coeff;
+        float propagation_amp;
         bool use_occlusion;
 
         Settings() :
             size(32),
             propagation_steps(16),
             occlusion_coeff(1.0f),
+            propagation_amp(4.0f),
             use_occlusion(true)
         {}
     };

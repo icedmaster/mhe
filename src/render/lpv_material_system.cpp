@@ -180,6 +180,7 @@ void LPVMaterialSystem::injection(DrawCall& draw_call,
     shader_data.ws_to_lpv = calculate_lpv_transform(render_context);
     shader_data.settings.set_y(shader_data.ws_to_lpv.element(0, 0));
     shader_data.settings.set_z(settings_.occlusion_coeff);
+    shader_data.settings.set_w(settings_.propagation_amp);
     shader_data.light_parameters = vec4(-rsm_data_.light_direction, 0.0f);
     uniform.update(shader_data);
 
@@ -284,6 +285,7 @@ void LPVMaterialSystem::init_debug_views(Context& context)
     size_t debug_view_id = context.debug_views->add_view(string("LPV"));
     DebugViews::DebugView& view = context.debug_views->get_view(debug_view_id);
     view.add(string("occlusion"), 0.0f, 2.0f, &settings_.occlusion_coeff);
+    view.add(string("amp"), 0.0f, 5.0f, &settings_.propagation_amp);
 }
 
 }

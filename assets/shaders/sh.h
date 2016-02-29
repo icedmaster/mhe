@@ -79,6 +79,21 @@ SH4 sh_cosine_lobe_sh4(in vec3 dir)
     return sh;
 }
 
+SH4 sh4(in vec3 dir)
+{
+	SH4 sh;
+
+    // Band 0
+    sh.c[0] = 0.282095f;
+
+    // Band 1
+    sh.c[1] = 0.488603f * dir.y;
+    sh.c[2] = 0.488603f * dir.z;
+    sh.c[3] = 0.488603f * dir.x;
+
+    return sh;
+}
+
 RGBSH4 mul(SH4 sh, vec3 c)
 {
     RGBSH4 res;
@@ -87,6 +102,11 @@ RGBSH4 mul(SH4 sh, vec3 c)
     res.rgb[2] = sh.c * c.z;
 
     return res;
+}
+
+vec3 shdot(SH4 sh, RGBSH4 rgb_sh)
+{
+    return vec3(dot(sh.c, rgb_sh.rgb[0]), dot(sh.c, rgb_sh.rgb[1]), dot(sh.c, rgb_sh.rgb[2]));
 }
 
 RGBSH4 add(RGBSH4 sh1, RGBSH4 sh2)
