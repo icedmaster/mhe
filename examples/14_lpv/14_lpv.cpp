@@ -2,9 +2,14 @@
 #include "render/rsm_material_system.hpp"
 #include "render/lpv_material_system.hpp"
 
-const char* mesh_name = "test-scene-simple.bin";
+#define SPONZA
+
+#ifndef SPONZA
+//const char* mesh_name = "test-scene-simple.bin";
 //const char* mesh_name = "lighting-test-simple.bin";
-//const char* mesh_name = "sponza.bin";
+#else
+const char* mesh_name = "sponza.bin";
+#endif
 
 using namespace mhe;
 
@@ -20,7 +25,11 @@ public:
         light.shading().diffuse = mhe::color_white;
         light.shading().specular = mhe::vec4(1.0f, 1.0f, 1.0f, 1.0f);
         light.shading().intensity = 3.0f;
+#ifndef SPONZA
         mhe::set_light_rotation(engine.scene_context(), light_instance.id, mhe::quatf(0.0f, -mhe::pi_2 * 1.3f, mhe::pi_2 * 0.7f));
+#else
+        mhe::set_light_rotation(engine.scene_context(), light_instance.id, mhe::quatf(mhe::pi_2 * 0.75f, mhe::deg_to_rad(15.0f), 0.0f));
+#endif
         light.set_type(mhe::Light::directional);
         light.desc().cast_shadows = true;
         light.desc().shadowmap_bias = 0.01f;
@@ -177,7 +186,11 @@ int main(int /*argc*/, char** /*argv*/)
     mhe::PerspectiveCameraParameters camera_parameters;
     camera_parameters.fov = 60.0f;
     camera_parameters.znear = 0.5f;
+#ifndef SPONZA
     camera_parameters.zfar = 40.0f;
+#else
+    camera_parameters.zfar = 3000.0f;
+#endif
     mhe::game::FPSCameraController* camera_controller = new mhe::game::FPSCameraController(app.engine(), camera_parameters,
         mhe::vec3(0, 1, 5), mhe::vec3(0.0f, mhe::pi, 0));
     camera_controller->set_move_speed(75.0f);

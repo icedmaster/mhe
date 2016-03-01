@@ -29,7 +29,7 @@ public:
 
         Settings() :
             size(32),
-            propagation_steps(16),
+            propagation_steps(8),
             occlusion_coeff(1.0f),
             propagation_amp(4.0f),
             use_occlusion(true)
@@ -70,7 +70,6 @@ private:
     void injection(DrawCall& draw_call, Context& context, RenderContext& render_context, size_t vpl_number);
     void geometry_injection(DrawCall& draw_call, Context& context, RenderContext& render_context, size_t vpl_number);
     void propagation(Context& context, RenderContext& render_context);
-    mat4x4 calculate_lpv_transform(const RenderContext& render_context);
 
     Settings settings_;
     GBuffer gbuffer_;

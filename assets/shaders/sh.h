@@ -109,12 +109,30 @@ vec3 shdot(SH4 sh, RGBSH4 rgb_sh)
     return vec3(dot(sh.c, rgb_sh.rgb[0]), dot(sh.c, rgb_sh.rgb[1]), dot(sh.c, rgb_sh.rgb[2]));
 }
 
+RGBSH4 shabs(RGBSH4 sh)
+{
+    RGBSH4 res;
+    res.rgb[0] = abs(sh.rgb[0]);
+    res.rgb[1] = abs(sh.rgb[1]);
+    res.rgb[2] = abs(sh.rgb[2]);
+    return res;
+}
+
 RGBSH4 add(RGBSH4 sh1, RGBSH4 sh2)
 {
     RGBSH4 res;
     res.rgb[0] = sh1.rgb[0] + sh2.rgb[0];
     res.rgb[1] = sh1.rgb[1] + sh2.rgb[1];
     res.rgb[2] = sh1.rgb[2] + sh2.rgb[2];
+    return res;
+}
+
+RGBSH4 sub(RGBSH4 sh1, RGBSH4 sh2)
+{
+    RGBSH4 res;
+    res.rgb[0] = sh1.rgb[0] - sh2.rgb[0];
+    res.rgb[1] = sh1.rgb[1] - sh2.rgb[1];
+    res.rgb[2] = sh1.rgb[2] - sh2.rgb[2];
     return res;
 }
 

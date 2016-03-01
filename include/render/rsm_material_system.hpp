@@ -25,7 +25,7 @@ public:
         size_t size;
         float flux_intensity;
 
-        Settings() : size(256), flux_intensity(0.2f) {}
+        Settings() : size(256), flux_intensity(1.0f) {}
     };
 public:
     bool init(Context& context, const MaterialSystemContext& material_system_context) override;

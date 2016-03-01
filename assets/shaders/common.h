@@ -34,6 +34,11 @@ float random(vec2 pos, float seed)
 	return fract( sin(t) * 43758.5453 );
 }
 
+float max3(vec3 v)
+{
+    return max(v.x, max(v.y, v.z));
+}
+
 
 #define VEC2_ZERO vec2(0.0f, 0.0f)
 #define VEC3_ZERO vec3(0.0f, 0.0f, 0.0f)

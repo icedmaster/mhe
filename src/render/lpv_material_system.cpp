@@ -173,12 +173,18 @@ void LPVMaterialSystem::injection(DrawCall& draw_call,
                                   Context& context, RenderContext& render_context,
                                   size_t vpl_number)
 {
+    vec3 scene_min, scene_max;
+    render_context.aabb.min_max(scene_min, scene_max);
+    float diagonal_length = (scene_max - scene_min).length();
+    mat4x4 lpv_transform = mat4x4::translation_matrix(-scene_min) * mat4x4::scaling_matrix(1.0f / diagonal_length);
+    float cell_size = diagonal_length / settings_.size;
+
     UniformBuffer& uniform = context.uniform_pool.get(injection_uniform_);
     InjectionShaderData shader_data;
     shader_data.settings.set_x(static_cast<float>(settings_.size));
     shader_data.rsm_to_ws = rsm_data_.vp.inverted();
-    shader_data.ws_to_lpv = calculate_lpv_transform(render_context);
-    shader_data.settings.set_y(shader_data.ws_to_lpv.element(0, 0));
+    shader_data.ws_to_lpv = lpv_transform;
+    shader_data.settings.set_y(cell_size);
     shader_data.settings.set_z(settings_.occlusion_coeff);
     shader_data.settings.set_w(settings_.propagation_amp);
     shader_data.light_parameters = vec4(-rsm_data_.light_direction, 0.0f);
@@ -265,15 +271,6 @@ void LPVMaterialSystem::propagation(Context& context, RenderContext& render_cont
     }
 }
 
-mat4x4 LPVMaterialSystem::calculate_lpv_transform(const RenderContext& render_context)
-{
-    vec3 scene_min, scene_max;
-    render_context.aabb.min_max(scene_min, scene_max);
-    float diagonal_length = (scene_max - scene_min).length();
-    mat4x4 lpv_transform = mat4x4::translation_matrix(-scene_min) * mat4x4::scaling_matrix(1.0f / diagonal_length);
-    return lpv_transform;
-}
-
 void LPVMaterialSystem::output(Context& context, size_t unit, TextureInstance& texture) const
 {
     RenderTarget& rt = context.render_target_pool.get(output_render_target_);
@@ -284,7 +281,7 @@ void LPVMaterialSystem::init_debug_views(Context& context)
 {
     size_t debug_view_id = context.debug_views->add_view(string("LPV"));
     DebugViews::DebugView& view = context.debug_views->get_view(debug_view_id);
-    view.add(string("occlusion"), 0.0f, 2.0f, &settings_.occlusion_coeff);
+    view.add(string("occlusion"), 0.0f, 20.0f, &settings_.occlusion_coeff);
     view.add(string("amp"), 0.0f, 5.0f, &settings_.propagation_amp);
 }
 

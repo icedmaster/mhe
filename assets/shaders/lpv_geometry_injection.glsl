@@ -49,7 +49,6 @@ void main()
     vsoutput.normal = normal;
     vsoutput.surfel_area = surfel_area / (cell_size * cell_size) * occlusion_coeff;
 
-    //position_lpv += normal * 0.5f / grid_size;
     position_lpv.xy = position_lpv.xy * 2.0f - 1.0f; // move to the clip space
     position_lpv.z *= grid_size;
 
