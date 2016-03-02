@@ -1,5 +1,6 @@
+[defs DAMP 0 1]
+
 #define EARLY_EXIT
-//#define LPV_DAMP
 
 [include "posteffect_vs_common.h"]
 
@@ -41,6 +42,24 @@ RGBSH4 load_sh(vec3 pos)
     return res;
 }
 
+vec4 SHCNormalize(in vec4 res)
+{
+    // extract direction
+    float l = dot(res.gba, res.gba);
+    res.gba /= max(0.05f, sqrt(l));
+    res.r = 1.0;
+    return res;
+}
+
+RGBSH4 shnormalize(RGBSH4 sh)
+{
+    RGBSH4 res;
+    res.rgb[0] = SHCNormalize(sh.rgb[0]);
+    res.rgb[1] = SHCNormalize(sh.rgb[1]);
+    res.rgb[2] = SHCNormalize(sh.rgb[2]);
+    return res;
+}
+
 void main()
 {
     vec3 normal_ws = texture(scene_normal_texture, vsoutput.tex).xyz;
@@ -55,9 +74,8 @@ void main()
     vec3 position_ws = position_from_depth(vsoutput.tex, depth, inv_vp);
     vec3 position_lpv = (world_to_lpv * vec4(position_ws, 1.0f)).xyz;
     RGBSH4 rgb_sh = load_sh(position_lpv);
-    vec3 irradiance = calculate_irradiance(-normal_ws, rgb_sh);
 
-#ifdef LPV_DAMP
+#if DAMP == 1
     float cell_size = injection_settings.y;
     vec3 shifted_pos = position_ws + normal_ws * cell_size * 0.2f;
     vec3 shifted_position_lpv = (world_to_lpv * vec4(shifted_pos, 1.0f)).xyz;
@@ -66,12 +84,18 @@ void main()
         shifted_rgb_sh = empty_rgbsh4();
     else
         shifted_rgb_sh = load_sh(shifted_position_lpv);
-    vec3 shifted_irradiance = calculate_irradiance(-normal_ws, shifted_rgb_sh);
-    vec3 irradiance_diff = saturate(shifted_irradiance - irradiance);
-    float demp = max3(irradiance_diff);
-    demp = max(pow(demp, 0.1f), 0.5f);
-    irradiance *= demp;
+    RGBSH4 diff_sh = sub(shifted_rgb_sh, rgb_sh);
+    RGBSH4 rgb_sh_norm = shnormalize(rgb_sh);
+    RGBSH4 diff_sh_norm = shnormalize(diff_sh);
+    vec3 atten = vec3(saturate(dot(rgb_sh_norm.rgb[0], diff_sh_norm.rgb[0])),
+                      saturate(dot(rgb_sh_norm.rgb[1], diff_sh_norm.rgb[1])),
+                      saturate(dot(rgb_sh_norm.rgb[2], diff_sh_norm.rgb[2])));
+    float demp = pow(max3(atten), 0.2f);
+    rgb_sh.rgb[0] *= demp;
+    rgb_sh.rgb[1] *= demp;
+    rgb_sh.rgb[2] *= demp;
 #endif
 
+    vec3 irradiance = calculate_irradiance(-normal_ws, rgb_sh);
     out_color = irradiance;
 }

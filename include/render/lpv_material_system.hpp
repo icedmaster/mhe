@@ -97,6 +97,25 @@ private:
 class LPVResolveMaterialSystem : public PosteffectMaterialSystemBase
 {
     SETUP_POSTEFFECT_MATERIAL(LPVResolveMaterialSystem, "lpv_resolve");
+public:
+    struct Settings
+    {
+        bool damping;
+
+        Settings() : damping(true) {}
+    };
+
+    bool init(Context& context, const MaterialSystemContext& material_system_context) override;
+
+    Settings& settings()
+    {
+        return settings_;
+    }
+private:
+    void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
+
+    UberShader::Info damp_info_;
+    Settings settings_;
 };
 
 }

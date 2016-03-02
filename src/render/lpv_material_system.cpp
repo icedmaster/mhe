@@ -175,7 +175,7 @@ void LPVMaterialSystem::injection(DrawCall& draw_call,
 {
     vec3 scene_min, scene_max;
     render_context.aabb.min_max(scene_min, scene_max);
-    float diagonal_length = (scene_max - scene_min).length();
+    float diagonal_length = (scene_max - scene_min).length() * 1.2f;
     mat4x4 lpv_transform = mat4x4::translation_matrix(-scene_min) * mat4x4::scaling_matrix(1.0f / diagonal_length);
     float cell_size = diagonal_length / settings_.size;
 
@@ -283,6 +283,23 @@ void LPVMaterialSystem::init_debug_views(Context& context)
     DebugViews::DebugView& view = context.debug_views->get_view(debug_view_id);
     view.add(string("occlusion"), 0.0f, 20.0f, &settings_.occlusion_coeff);
     view.add(string("amp"), 0.0f, 5.0f, &settings_.propagation_amp);
+}
+
+bool LPVResolveMaterialSystem::init(Context& context, const MaterialSystemContext& material_system_context)
+{
+    if (!PosteffectMaterialSystemBase::init(context, material_system_context))
+        return false;
+    UberShader& default_ubershader = ubershader(context);
+    damp_info_ = default_ubershader.info("DAMP");
+    return true;
+}
+
+void LPVResolveMaterialSystem::update(Context& context, SceneContext& scene_context, RenderContext& render_context)
+{
+    PosteffectMaterialSystemBase::update(context, scene_context, render_context);
+    UberShader::Index ubershader_index;
+    ubershader_index.set(damp_info_, settings_.damping ? 1 : 0);
+    default_material(context).shader_program = ubershader(context).get(ubershader_index);
 }
 
 }

@@ -72,9 +72,9 @@ SH4 sh_cosine_lobe_sh4(in vec3 dir)
     sh.c[0] = 0.282095f * COS_A0;
 
     // Band 1
-    sh.c[1] = 0.488603f * dir.y * COS_A1;
+    sh.c[1] = -0.488603f * dir.y * COS_A1;
     sh.c[2] = 0.488603f * dir.z * COS_A1;
-    sh.c[3] = 0.488603f * dir.x * COS_A1;
+    sh.c[3] = -0.488603f * dir.x * COS_A1;
 
     return sh;
 }
@@ -87,9 +87,9 @@ SH4 sh4(in vec3 dir)
     sh.c[0] = 0.282095f;
 
     // Band 1
-    sh.c[1] = 0.488603f * dir.y;
+    sh.c[1] = -0.488603f * dir.y;
     sh.c[2] = 0.488603f * dir.z;
-    sh.c[3] = 0.488603f * dir.x;
+    sh.c[3] = -0.488603f * dir.x;
 
     return sh;
 }

@@ -5,7 +5,7 @@
 #define SPONZA
 
 #ifndef SPONZA
-//const char* mesh_name = "test-scene-simple.bin";
+const char* mesh_name = "test-scene-simple.bin";
 //const char* mesh_name = "lighting-test-simple.bin";
 #else
 const char* mesh_name = "sponza.bin";
@@ -145,6 +145,8 @@ public:
         const KeyboardDevice* keyboard = engine.event_manager().keyboard();
         if (keyboard->is_key_pressed(KeyboardDevice::key_o))
             lpv_material_system_->settings().use_occlusion ^= 1;
+        if (keyboard->is_key_pressed(KeyboardDevice::key_l))
+            lpv_resolve_material_system_->settings().damping ^= 1;
         return true;
     }
 
