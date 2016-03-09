@@ -9,6 +9,7 @@ struct RSMData
 {
     mat4x4 vp;
     vec3 light_direction;
+    AABBf aabb;
 };
 
 }

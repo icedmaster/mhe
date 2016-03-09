@@ -2,7 +2,7 @@
 #include "render/rsm_material_system.hpp"
 #include "render/lpv_material_system.hpp"
 
-#define SPONZA
+//#define SPONZA
 
 #ifndef SPONZA
 const char* mesh_name = "test-scene-simple.bin";
@@ -60,6 +60,8 @@ public:
         rsm_material_system_ = static_cast<RSMMaterialSystem*>(create(engine.context(), rsm_name, rsm_name));
         engine.renderer()->set_material_system_to_process(rsm_material_system_);
         rsm_material_system_->init_debug_views(engine.context());
+        rsm_material_system_->settings().mode = RSMMaterialSystem::mode_volume;
+        rsm_material_system_->settings().volume_aabb = AABBf(vec3(0.0f, 2.0f, 0.0f), vec3(5.0f, 2.0f, 5.0f));
 
         const string lpv_name("lpv");
         const string propagation_shader_name("lpv_propagation");
@@ -77,6 +79,7 @@ public:
         engine.renderer()->set_material_system_to_process(lpv_material_system_);
         lpv_material_system_->set_gbuffer(rsm_material_system_->gbuffer());
         lpv_material_system_->init_debug_views(engine.context());
+        lpv_material_system_->settings().mode = LPVMaterialSystem::mode_rsm;
 
         const string lpv_resolve_name("lpv_resolve");
         material_system_context.priority = posteffect_material_priority_base;

@@ -20,12 +20,20 @@ class RSMMaterialSystem : public MaterialSystem
         vec4 light_diffuse_color;
     };
 public:
+    enum
+    {
+        mode_scene,
+        mode_volume
+    };
+
     struct Settings
     {
+        int mode;
         size_t size;
         float flux_intensity;
+        AABBf volume_aabb;
 
-        Settings() : size(256), flux_intensity(1.0f) {}
+        Settings() : mode(mode_scene), size(256), flux_intensity(1.0f) {}
     };
 public:
     bool init(Context& context, const MaterialSystemContext& material_system_context) override;
@@ -49,6 +57,7 @@ public:
     {
         data.vp = light_vp_;
         data.light_direction = light_direction_;
+        data.aabb = current_volume_;
     }
 
     void init_debug_views(Context& context) override;
@@ -66,6 +75,7 @@ private:
     ClearCommand clear_command_;
     ShaderData shader_data_;
     vec3 light_direction_;
+    AABBf current_volume_;
 };
 
 }

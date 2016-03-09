@@ -19,19 +19,31 @@ class LPVMaterialSystem : public MaterialSystem
         vec4 light_parameters;
     };
 public:
+    enum
+    {
+        mode_scene,
+        mode_volume,
+        mode_rsm
+    };
+
     struct Settings
     {
+        int mode;
         size_t size;
         size_t propagation_steps;
         float occlusion_coeff;
         float propagation_amp;
+        float aabb_multiplier;
+        AABBf volume;
         bool use_occlusion;
 
         Settings() :
+            mode(mode_scene),
             size(32),
             propagation_steps(8),
             occlusion_coeff(1.0f),
             propagation_amp(4.0f),
+            aabb_multiplier(1.0f),
             use_occlusion(true)
         {}
     };
@@ -102,7 +114,7 @@ public:
     {
         bool damping;
 
-        Settings() : damping(true) {}
+        Settings() : damping(false) {}
     };
 
     bool init(Context& context, const MaterialSystemContext& material_system_context) override;

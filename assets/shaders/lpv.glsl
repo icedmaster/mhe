@@ -2,6 +2,7 @@ struct VSOutput
 {
     vec3 normal;
     vec3 flux;
+    float layer;
 };
 
 [include "sh.h"]
@@ -48,11 +49,12 @@ void main()
     float diffuse_term = max(dot(light_parameters.xyz, normal), 0.0f);
 
     position_lpv += normal * 0.5f / cell_size;
-    position_lpv.xy = position_lpv.xy * 2.0f - 1.0f; // move to the clip space
-    position_lpv.z *= cell_size;
 
     vsoutput.normal = normal;
     vsoutput.flux = flux * diffuse_term;
+    vsoutput.layer = position_lpv.z * cell_size;
+
+    position_lpv = position_lpv * 2.0f - 1.0f;
 
     gl_Position = vec4(position_lpv, 1.0f);
 }
@@ -66,12 +68,16 @@ out VSOutput gsoutput;
 layout(points) in;
 layout(points, max_vertices = 1) out;
 
+bool is_outside(vec3 pos)
+{
+    return pos.x > 1.0f || pos.y > 1.0f || pos.z > 32.0f || pos.x < -1.0f || pos.y < -1.0f || pos.z < 0.0f;
+}
+
 void main()
 {
     gsoutput = vsoutput[0];
-    gl_Layer = int(gl_in[0].gl_Position.z);
+    gl_Layer = int(vsoutput[0].layer);
     gl_Position = gl_in[0].gl_Position;
-    gl_Position.z = 0.5f;
     EmitVertex();
     EndPrimitive();
 }

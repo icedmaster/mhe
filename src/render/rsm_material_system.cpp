@@ -105,8 +105,11 @@ void RSMMaterialSystem::start_frame(Context& context, SceneContext& scene_contex
 
     light_direction_ = get_light_direction(scene_context, light_instance->id);
 
-    float radius = render_context.aabb.extents.magnitude();
-    vec3 light_position = render_context.aabb.center - light_direction_ * radius;
+    const AABBf& aabb = settings_.mode == mode_scene ? render_context.aabb : settings_.volume_aabb;
+    current_volume_ = aabb;
+
+    float radius = aabb.extents.magnitude();
+    vec3 light_position = aabb.center - light_direction_ * radius;
     light_view_ = get_light_view_matrix(scene_context, light_instance->id);
     light_view_.set_row(3, vec3::zero());
     light_view_.multTranslate(-light_position);
