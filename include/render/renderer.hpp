@@ -21,6 +21,10 @@ struct MaterialInitializationData;
 class MaterialSystem;
 class PosteffectMaterialSystemBase;
 class PosteffectDebugMaterialSystem;
+class LPVMaterialSystem;
+class RSMMaterialSystem;
+class LPVResolveMaterialSystem;
+class Renderer;
 
 bool init_node(NodeInstance& node, Context& context);
 void update_nodes(Context& context, RenderContext& render_context, SceneContext& scene_context);
@@ -49,6 +53,7 @@ public:
         size_t node_output;
         string material;
         size_t material_output;
+        TextureInstance explicit_texture;
         bool copy_current_framebuffer;
     };
 
@@ -106,6 +111,31 @@ private:
 
     typedef fixed_size_vector<PosteffectNode, 16> Posteffects;
     Posteffects posteffects_;
+};
+
+class GISystem
+{
+public:
+    struct LPVParams
+    {
+        size_t base_priority;
+        int output_texture_format;
+        float output_texture_scale;
+
+        LPVParams() : output_texture_format(format_rgb16f), output_texture_scale(1.0f) {}
+    };
+
+    GISystem();
+
+    void add_lpv(Context& context, Renderer& renderer, const LPVParams& params);
+    void apply(Renderer& renderer);
+
+    void before_render(Context& context, SceneContext& scene_context, RenderContext& render_context);
+    void render(Context& context, SceneContext& scene_context, RenderContext& render_context);
+private:
+    RSMMaterialSystem* rsm_material_system_;
+    LPVMaterialSystem* lpv_material_system_;
+    LPVResolveMaterialSystem* lpv_resolve_material_system_;
 };
 
 class MHE_EXPORT Renderer : public ref_counter
@@ -170,9 +200,27 @@ public:
         return posteffect_system_;
     }
 
+    GISystem& gi_system()
+    {
+        return gi_system_;
+    }
+
     RenderContext& render_context()
     {
         return render_context_;
+    }
+
+    virtual void set_gi_modifier_material_system(MaterialSystem*, size_t)
+    {}
+
+    virtual TextureInstance scene_normals_buffer() const
+    {
+        return TextureInstance();
+    }
+
+    virtual TextureInstance scene_depth_buffer() const
+    {
+        return TextureInstance();
     }
 protected:
     Context& context()
@@ -203,6 +251,7 @@ private:
     DebugMode debug_mode_;
 
     PosteffectSystem posteffect_system_;
+    GISystem gi_system_;
 
     RenderContext render_context_;
 };

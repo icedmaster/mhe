@@ -8,6 +8,12 @@
 
 namespace mhe {
 
+LPVMaterialSystem::LPVMaterialSystem() :
+    injection_profile_command_("lpv_injection"),
+    geometry_injection_profile_command_("lpv_geom_injection"),
+    propagation_profile_command_("lpv_propagation")
+{}
+
 bool LPVMaterialSystem::init(Context& context, const MaterialSystemContext& material_system_context)
 {
     const string& injection_shader_name = material_system_context.options.get<string>("injection_shader");
@@ -139,6 +145,16 @@ bool LPVMaterialSystem::init(Context& context, const MaterialSystemContext& mate
         index ^= 1;
     output_render_target_ = render_targets[index];
 
+    injection_list_of_commands_.add_command(&clear_command_);
+    injection_list_of_commands_.add_command(&injection_profile_command_);
+
+    geometry_injection_list_of_commands_.add_command(&clear_command_);
+    geometry_injection_list_of_commands_.add_command(&geometry_injection_profile_command_);
+
+    propagation_list_of_commands_.add_command(&clear_command_);
+    propagation_list_of_commands_.add_command(&propagation_profile_command_);
+    propagation_profile_command_.set_hits_number(settings_.propagation_steps);
+
     return true;
 }
 
@@ -218,7 +234,7 @@ void LPVMaterialSystem::injection(DrawCall& draw_call,
     draw_call.render_target = render_target_grid_;
 
     draw_call.pass = 0;
-    draw_call.command = &clear_command_;
+    draw_call.command = &injection_list_of_commands_;
 }
 
 void LPVMaterialSystem::geometry_injection(DrawCall& draw_call, Context& context, RenderContext& render_context, size_t vpl_number)
@@ -239,7 +255,7 @@ void LPVMaterialSystem::geometry_injection(DrawCall& draw_call, Context& context
     draw_call.render_target = occlusion_render_target_;
 
     draw_call.pass = 1;
-    draw_call.command = &clear_command_;
+    draw_call.command = &geometry_injection_list_of_commands_;
 }
 
 void LPVMaterialSystem::propagation(Context& context, RenderContext& render_context)
@@ -277,7 +293,7 @@ void LPVMaterialSystem::propagation(Context& context, RenderContext& render_cont
         draw_call.render_target = render_targets[render_target_index];
 
         draw_call.pass = 2 + i;
-        draw_call.command = &clear_command_;
+        draw_call.command = &propagation_list_of_commands_;
 
         render_target_index ^= 1;
     }

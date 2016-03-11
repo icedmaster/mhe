@@ -131,7 +131,7 @@ public:
             engine.renderer()->posteffect_system().create(engine.context(), posteffect_node_desc));
 
         DeferredRenderer* deferred_renderer = static_cast<DeferredRenderer*>(engine.renderer());
-        deferred_renderer->set_gi_modifier_material_system(engine.context(), lpv_resolve_material_system_, 0);
+        deferred_renderer->set_gi_modifier_material_system(lpv_resolve_material_system_, 0);
 
         return true;
     }

@@ -10,6 +10,10 @@
 
 namespace mhe {
 
+RSMMaterialSystem::RSMMaterialSystem() :
+    profiler_command_("rsm")
+{}
+
 bool RSMMaterialSystem::init(Context& context, const MaterialSystemContext& material_system_context)
 {
     if (!MaterialSystem::init_default(context, material_system_context))
@@ -71,6 +75,10 @@ bool RSMMaterialSystem::init(Context& context, const MaterialSystemContext& mate
     gbuffer_.normal = gbuffer_textures[0];
     gbuffer_.accumulator = gbuffer_textures[1];
     render_target.depth_texture(gbuffer_.depth);
+
+    list_of_commands_.add_command(&clear_command_);
+    list_of_commands_.add_command(&profiler_command_);
+    profiler_command_.set_stages(render_stage_begin_priority | render_stage_end_priority);
 
     return true;
 }
@@ -171,7 +179,7 @@ void RSMMaterialSystem::update(Context& context, SceneContext& scene_context, Re
             draw_call.render_data = nodes[i].mesh.mesh.parts[j].render_data;
             draw_call.render_state = render_state_;
             draw_call.render_target = render_target_;
-            draw_call.command = &clear_command_;
+            draw_call.command = &list_of_commands_;
         }
     }
 }

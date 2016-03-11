@@ -33,6 +33,16 @@ struct RendererParams
     PosteffectParams posteffect_params;
 };
 
+struct GIParams
+{
+    GISystem::LPVParams lpv_params;
+    bool use_lpv;
+
+    GIParams() :
+        use_lpv(false)
+    {}
+};
+
 Application::Application(const char* name) :
     name_(name)
 {
@@ -184,7 +194,9 @@ void Application::init_render(const ApplicationConfig& config)
     pugi::xml_node probes_accumulator_node = mhe_node.child("probes_accumulator");
     if (probes_accumulator_node) renderer_params.probes_accumulator = probes_accumulator_node.attribute("name").value();
 
+    GIParams gi_params;
     init_posteffect_parameters(mhe_node.child("posteffects"), renderer_params);
+    init_gi_params(mhe_node.child("gi"), gi_params);
     
     pugi::xml_node gbuffer_node = mhe_node.child("gbuffer");
     if (gbuffer_node)
@@ -192,6 +204,7 @@ void Application::init_render(const ApplicationConfig& config)
     else
         engine_->set_renderer(new NullRenderer(engine_->context()));
     init_posteffects(renderer_params);
+    init_gi(gi_params);
 }
 
 void Application::init_posteffect_parameters(pugi::xml_node node, RendererParams& params) const
@@ -377,6 +390,20 @@ void Application::init_posteffects(const RendererParams& params)
         const PosteffectSystem::PosteffectNodeDesc& node = params.posteffect_params.nodes[i];
         posteffect_system.add(context, node);
     }
+}
+
+void Application::init_gi_params(pugi::xml_node node, GIParams& params) const
+{
+    if (!node) return;
+    params.use_lpv = node.child("lpv") != 0;
+    params.lpv_params.base_priority = DeferredRenderer::deferred_renderer_base_priority;
+}
+
+void Application::init_gi(const GIParams& params)
+{
+    if (params.use_lpv)
+        engine_->renderer()->gi_system().add_lpv(engine_->context(), *engine_->renderer(), params.lpv_params);
+    engine_->renderer()->gi_system().apply(*engine_->renderer());
 }
 
 }}

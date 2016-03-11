@@ -48,6 +48,8 @@ public:
         {}
     };
 public:
+    LPVMaterialSystem();
+
     bool init(Context& context, const MaterialSystemContext& material_system_context) override;
     void destroy(Context& context) override;
 
@@ -91,6 +93,12 @@ private:
     RenderStateHandleType injection_render_state_;
     UniformBufferHandleType injection_uniform_;
     ClearCommandSimple clear_command_;
+    GPUProfileCommand injection_profile_command_;
+    GPUProfileCommand geometry_injection_profile_command_;
+    GPUProfileCommand propagation_profile_command_;
+    ListOfCommands injection_list_of_commands_;
+    ListOfCommands geometry_injection_list_of_commands_;
+    ListOfCommands propagation_list_of_commands_;
 
     ShaderProgramHandleType propagation_shader_;
     ShaderProgramHandleType propagation_shader_with_occlusion_;

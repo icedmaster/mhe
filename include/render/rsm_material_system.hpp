@@ -36,6 +36,8 @@ public:
         Settings() : mode(mode_scene), size(256), flux_intensity(1.0f) {}
     };
 public:
+    RSMMaterialSystem();
+
     bool init(Context& context, const MaterialSystemContext& material_system_context) override;
     void destroy(Context& context) override;
 
@@ -73,6 +75,8 @@ private:
     mat4x4 light_proj_;
     mat4x4 light_vp_;
     ClearCommand clear_command_;
+    GPUProfileCommand profiler_command_;
+    ListOfCommands list_of_commands_;
     ShaderData shader_data_;
     vec3 light_direction_;
     AABBf current_volume_;

@@ -152,6 +152,7 @@ void DebugViews::update()
     }
 
     if (posteffect_debug_mode_ == Renderer::renderer_debug_mode_posteffect &&
+        current_mode != new_mode &&
         material_system_id == MaterialSystem::invalid_id)
     {
         posteffect_debug_mode_ = Renderer::renderer_debug_mode_none;

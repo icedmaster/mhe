@@ -14,6 +14,11 @@ public:
         mhe::MaterialData& material = engine.context().material_manager.material_data(floor_id);
         material.render_data.glossiness = 1.0f;
 
+        for (size_t i = 0, size = node.mesh.mesh.parts.size(); i < size; ++i)
+        {
+            engine.context().material_manager.material_data(node.mesh.mesh.parts[i].material_id).render_data.glossiness = 0.5f;
+        }
+
         node.mesh.instance_parts[4].flags &= ~mhe::MeshPartInstance::cast_reflection;
 
         init_lighting(engine);
@@ -119,7 +124,8 @@ private:
         light.shading().specular = mhe::vec4(1.0f, 1.0f, 1.0f, 1.0f);
         light.shading().intensity = 5.0f;
         mhe::set_light_position(engine.scene_context(), light_instance.id, mhe::vec3(0, 2000, 0));
-        mhe::set_light_rotation(engine.scene_context(), light_instance.id, mhe::quatf(mhe::pi_2, 0.0f, 0.0f));
+        //mhe::set_light_rotation(engine.scene_context(), light_instance.id, mhe::quatf(mhe::pi_2, 0.0f, 0.0f));
+        mhe::set_light_rotation(engine.scene_context(), light_instance.id, mhe::quatf(mhe::pi_2 * 0.75f, mhe::deg_to_rad(15.0f), 0.0f));
         light.set_type(mhe::Light::directional);
         light.desc().directional.directional_shadowmap_projection_znear = 10.0f;
         light.desc().directional.directional_shadowmap_projection_zfar = 2200.0f;
@@ -179,8 +185,7 @@ int main(int /*argc*/, char** /*argv*/)
     config.render_config_filename = mhe::utils::path_join(config.assets_path, "render.xml");
     app.init(config);
 
-    app.engine().renderer()->set_ambient_color(mhe::color_white * 0.35f);
-    //mhe::game::get_global_vars().set("use_normalmaps", false);
+    app.engine().renderer()->set_ambient_color(mhe::color_white * 0.3f);
 
     mhe::game::GameSceneDesc desc;
     GameScene* game_scene = new GameScene;

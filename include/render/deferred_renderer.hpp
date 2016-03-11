@@ -23,7 +23,17 @@ public:
     void disable();
 
     void set_probes_accumulator_material_system(ProbesAccumulatorMaterialSystem* material_system);
-    void set_gi_modifier_material_system(Context& context, MaterialSystem* material_system, size_t priority);
+    void set_gi_modifier_material_system(MaterialSystem* material_system, size_t priority) override;
+
+    TextureInstance scene_normals_buffer() const override
+    {
+        return gbuffer_.normal;
+    }
+
+    TextureInstance scene_depth_buffer() const override
+    {
+        return gbuffer_.depth;
+    }
 private:
     void init_priorities();
 

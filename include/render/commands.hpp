@@ -92,10 +92,17 @@ class MHE_EXPORT GPUProfileCommand : public RenderCommand
 {
 public:
     GPUProfileCommand(const char* name);
+
+    void set_hits_number(size_t hits)
+    {
+        hits_ = hits;
+    }
 private:
     bool execute_impl(Context& context, RenderStage current_stage) override;
 
     GPUProfilerNode& node_;
+    size_t hits_;
+    size_t hit_;
 };
 
 }

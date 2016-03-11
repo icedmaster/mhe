@@ -55,13 +55,13 @@ void DeferredRenderer::set_probes_accumulator_material_system(ProbesAccumulatorM
     }
 }
 
-void DeferredRenderer::set_gi_modifier_material_system(Context& context, MaterialSystem* material_system, size_t priority)
+void DeferredRenderer::set_gi_modifier_material_system(MaterialSystem* material_system, size_t priority)
 {
     gi_modifier_material_system_ = material_system;
     if (material_system != nullptr)
     {
         TextureInstance accumulator_texture;
-        material_system->output(context, 0, accumulator_texture);
+        material_system->output(context(), 0, accumulator_texture);
         draw_material_system_->set_input(2, accumulator_texture);
         material_system->set_priority(deferred_renderer_gbuffer_modifier_priority + priority);
     }

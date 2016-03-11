@@ -8,6 +8,8 @@
 #include "render/material_system.hpp"
 #include "render/layouts.hpp"
 #include "render/posteffect_material_system.hpp"
+#include "render/rsm_material_system.hpp"
+#include "render/lpv_material_system.hpp"
 #include "debug/profiler.hpp"
 #include "res/resource_manager.hpp"
 
@@ -179,7 +181,9 @@ void PosteffectSystem::init_inputs(PosteffectMaterialSystemBase* material_system
     for (size_t i = 0, size = node_desc.inputs.size(); i < size; ++i)
     {
         const NodeInput& input = node_desc.inputs[i];
-        if (!input.node.empty())
+        if (is_handle_valid(input.explicit_texture.id))
+            material_system->set_input(input.index, input.explicit_texture);
+        else if (!input.node.empty())
         {
             const PosteffectNode* node = find_node(input.node);
             ASSERT(node != nullptr && node->material_system != nullptr, "Can't find input node or node is invalid:" << input.node);
@@ -273,6 +277,99 @@ const PosteffectSystem::PosteffectNode* PosteffectSystem::find_node(const string
     return nullptr;
 }
 
+GISystem::GISystem() :
+    rsm_material_system_(nullptr),
+    lpv_material_system_(nullptr),
+    lpv_resolve_material_system_(nullptr)
+{}
+
+void GISystem::add_lpv(Context& context, Renderer& renderer, const LPVParams& params)
+{
+    const string rsm_name(RSMMaterialSystem::material_name());
+
+    rsm_material_system_ = static_cast<RSMMaterialSystem*>(create(context, rsm_name, rsm_name));
+    ASSERT(rsm_material_system_ != nullptr, "RSMMaterialSystem initialization failed."
+        "Probably, you forgot to add its description to the configuration file");
+    rsm_material_system_->set_priority(params.base_priority - 2);
+
+    const string lpv_name(LPVMaterialSystem::material_name());
+
+    lpv_material_system_ = static_cast<LPVMaterialSystem*>(create(context, lpv_name, lpv_name));
+    lpv_material_system_->set_gbuffer(rsm_material_system_->gbuffer());
+    lpv_material_system_->settings().mode = LPVMaterialSystem::mode_rsm;
+    lpv_material_system_->set_priority(params.base_priority - 1);
+    ASSERT(lpv_material_system_ != nullptr, "LPVMaterialSystem initialization failed."
+        "Probably, you forgot to add its description to the configuration file");
+
+    const string lpv_resolve_name(LPVResolveMaterialSystem::material_name());
+    PosteffectSystem::PosteffectNodeDesc posteffect_node_desc;
+    posteffect_node_desc.name = lpv_resolve_name;
+    posteffect_node_desc.material = lpv_resolve_name;
+    posteffect_node_desc.priority = 0;
+    // input 0 - normals
+    PosteffectSystem::NodeInput& input0 = posteffect_node_desc.inputs.add();
+    input0.index = 0;
+    input0.explicit_texture = renderer.scene_normals_buffer();
+    // input 1 - depth
+    PosteffectSystem::NodeInput& input1 = posteffect_node_desc.inputs.add();
+    input1.index = 1;
+    input1.explicit_texture = renderer.scene_depth_buffer();
+    // ...and 3 channels of LPV RT
+    PosteffectSystem::NodeInput& input2 = posteffect_node_desc.inputs.add();
+    input2.index = 2;
+    input2.material = lpv_name;
+    input2.material_output = 0;
+    PosteffectSystem::NodeInput& input3 = posteffect_node_desc.inputs.add();
+    input3.index = 3;
+    input3.material = lpv_name;
+    input3.material_output = 1;
+    PosteffectSystem::NodeInput& input4 = posteffect_node_desc.inputs.add();
+    input4.index = 4;
+    input4.material = lpv_name;
+    input4.material_output = 2;
+    // resolve-to buffer
+    PosteffectSystem::NodeOutput& output0 = posteffect_node_desc.outputs.add();
+    output0.format = params.output_texture_format;
+    output0.index = 0;
+    output0.scale = params.output_texture_scale;
+    // we also need a couple of uniforms
+    PosteffectSystem::Uniforms::type& uniform0 = posteffect_node_desc.uniforms.add();
+    uniform0.index = 0;
+    uniform0.explicit_handle = renderer.render_context().main_camera.percamera_uniform;
+    PosteffectSystem::Uniforms::type& uniform1 = posteffect_node_desc.uniforms.add();
+    uniform1.index = 1;
+    uniform1.explicit_handle = lpv_material_system_->injection_settings_uniform();
+
+    lpv_resolve_material_system_ = static_cast<LPVResolveMaterialSystem*>(
+        renderer.posteffect_system().create(context, posteffect_node_desc));
+    ASSERT(lpv_resolve_material_system_ != nullptr, "LPVResolveMaterialSystem initialization failed."
+        "Probably, you forgot to add its description to the configuration file");
+}
+
+void GISystem::apply(Renderer& renderer)
+{
+    renderer.set_gi_modifier_material_system(lpv_resolve_material_system_, 0);
+}
+
+void GISystem::before_render(Context& context, SceneContext& scene_context, RenderContext& render_context)
+{
+    if (rsm_material_system_ != nullptr)
+        rsm_material_system_->start_frame(context, scene_context, render_context);
+}
+
+void GISystem::render(Context& context, SceneContext& scene_context, RenderContext& render_context)
+{
+    if (rsm_material_system_ != nullptr && lpv_material_system_ != nullptr)
+    {
+        RSMData data;
+        rsm_material_system_->rsm_data(data);
+        lpv_material_system_->set_rsm_data(data);
+
+        rsm_material_system_->setup_draw_calls(context, scene_context, render_context);
+        lpv_material_system_->setup_draw_calls(context, scene_context, render_context);
+    }
+}
+
 Renderer::Renderer(Context& context) :
     context_(context),
     skybox_material_system_(nullptr),
@@ -335,6 +432,8 @@ void Renderer::before_update(SceneContext& scene_context)
 
     for (size_t i = 0, size = material_systems_.size(); i < size; ++i)
         material_systems_[i]->start_frame(context_, scene_context, render_context_);
+
+    gi_system_.before_render(context_, scene_context, render_context_);
 }
 
 void Renderer::render(SceneContext& scene_context)
@@ -349,6 +448,8 @@ void Renderer::render(SceneContext& scene_context)
 
     for (size_t i = 0, size = material_systems_.size(); i < size; ++i)
         material_systems_[i]->setup_draw_calls(context_, scene_context, render_context_);
+
+    gi_system_.render(context_, scene_context, render_context_);
 
     posteffect_system_.process(context_, render_context_, scene_context);
 
