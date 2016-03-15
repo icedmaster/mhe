@@ -20,7 +20,9 @@ struct ColorSH4
 
 struct RGBSH4
 {
-    vec4 rgb[3];
+    vec4 r;
+    vec4 g;
+    vec4 b;
 };
 
 [include "common.h"]
@@ -97,42 +99,42 @@ SH4 sh4(in vec3 dir)
 RGBSH4 mul(SH4 sh, vec3 c)
 {
     RGBSH4 res;
-    res.rgb[0] = sh.c * c.x;
-    res.rgb[1] = sh.c * c.y;
-    res.rgb[2] = sh.c * c.z;
+    res.r = sh.c * c.x;
+    res.g = sh.c * c.y;
+    res.b = sh.c * c.z;
 
     return res;
 }
 
 vec3 shdot(SH4 sh, RGBSH4 rgb_sh)
 {
-    return vec3(dot(sh.c, rgb_sh.rgb[0]), dot(sh.c, rgb_sh.rgb[1]), dot(sh.c, rgb_sh.rgb[2]));
+    return vec3(dot(sh.c, rgb_sh.r), dot(sh.c, rgb_sh.g), dot(sh.c, rgb_sh.b));
 }
 
 RGBSH4 shabs(RGBSH4 sh)
 {
     RGBSH4 res;
-    res.rgb[0] = abs(sh.rgb[0]);
-    res.rgb[1] = abs(sh.rgb[1]);
-    res.rgb[2] = abs(sh.rgb[2]);
+    res.r = abs(sh.r);
+    res.g = abs(sh.g);
+    res.b = abs(sh.b);
     return res;
 }
 
 RGBSH4 add(RGBSH4 sh1, RGBSH4 sh2)
 {
     RGBSH4 res;
-    res.rgb[0] = sh1.rgb[0] + sh2.rgb[0];
-    res.rgb[1] = sh1.rgb[1] + sh2.rgb[1];
-    res.rgb[2] = sh1.rgb[2] + sh2.rgb[2];
+    res.r = sh1.r + sh2.r;
+    res.g = sh1.g + sh2.g;
+    res.b = sh1.b + sh2.b;
     return res;
 }
 
 RGBSH4 sub(RGBSH4 sh1, RGBSH4 sh2)
 {
     RGBSH4 res;
-    res.rgb[0] = sh1.rgb[0] - sh2.rgb[0];
-    res.rgb[1] = sh1.rgb[1] - sh2.rgb[1];
-    res.rgb[2] = sh1.rgb[2] - sh2.rgb[2];
+    res.r = sh1.r - sh2.r;
+    res.g = sh1.g - sh2.g;
+    res.b = sh1.b - sh2.b;
     return res;
 }
 
@@ -149,18 +151,18 @@ vec3 calculate_irradiance(in vec3 nrm, in RGBSH4 rgb_sh)
 {
     vec3 res = VEC3_ZERO;
     SH4 cos_lobe = sh_cosine_lobe_sh4(nrm);
-    res.r = dot(cos_lobe.c, rgb_sh.rgb[0]);
-    res.g = dot(cos_lobe.c, rgb_sh.rgb[1]);
-    res.b = dot(cos_lobe.c, rgb_sh.rgb[2]);
+    res.r = dot(cos_lobe.c, rgb_sh.r);
+    res.g = dot(cos_lobe.c, rgb_sh.g);
+    res.b = dot(cos_lobe.c, rgb_sh.b);
     return res / PI;
 }
 
 RGBSH4 empty_rgbsh4()
 {
     RGBSH4 res;
-    res.rgb[0] = VEC4_ZERO;
-    res.rgb[1] = VEC4_ZERO;
-    res.rgb[2] = VEC4_ZERO;
+    res.r = VEC4_ZERO;
+    res.g = VEC4_ZERO;
+    res.b = VEC4_ZERO;
     return res;
 }
 

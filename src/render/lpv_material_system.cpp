@@ -53,7 +53,7 @@ bool LPVMaterialSystem::init(Context& context, const MaterialSystemContext& mate
         rt_desc.color_format[i] = format_rgba16f;
         rt_desc.color_datatype[i] = format_default;
         rt_desc.color_filter[i] = texture_filter_linear;
-        rt_desc.color_address_mode[i] = texture_border;
+        rt_desc.color_address_mode[i] = texture_clamp;
     }
     if (!rt_wr.object().init(context, rt_desc))
     {
@@ -203,7 +203,7 @@ void LPVMaterialSystem::injection(DrawCall& draw_call,
         settings_.volume.min_max(scene_min, scene_max);
         aabb_multiplier = 1.0f;
     }
-    float diagonal_length = (scene_max - scene_min).length() * aabb_multiplier;
+    float diagonal_length = (scene_max - scene_min).length();
     mat4x4 lpv_transform = mat4x4::translation_matrix(-scene_min) * mat4x4::scaling_matrix(1.0f / diagonal_length);
     float cell_size = diagonal_length / settings_.size;
 

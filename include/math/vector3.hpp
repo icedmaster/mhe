@@ -374,6 +374,12 @@ bool is_nan(const vector3<T>& v)
 }
 
 template <class T>
+T max3(const vector3<T>& v)
+{
+    return mhe::max(v.x(), mhe::max(v.y(), v.z()));
+}
+
+template <class T>
 inline std::ostream& operator<< (std::ostream& s, const vector3<T>& v)
 {
     return s << '(' << v.x() << ", " << v.y() << ", " << v.z() << ')';

@@ -69,9 +69,9 @@ flat in VSOutput gsoutput;
 RGBSH4 fetch_data(ivec3 pos)
 {
     RGBSH4 res;
-    res.rgb[0] = texelFetch(sh_r_texture, pos, 0);
-    res.rgb[1] = texelFetch(sh_g_texture, pos, 0);
-    res.rgb[2] = texelFetch(sh_b_texture, pos, 0);
+    res.r = texelFetch(sh_r_texture, pos, 0);
+    res.g = texelFetch(sh_g_texture, pos, 0);
+    res.b = texelFetch(sh_b_texture, pos, 0);
     return res;
 }
 
@@ -97,6 +97,7 @@ RGBSH4 propagate_dir(ivec3 cell_pos, ivec3 dir, float amp)
             solid_angle = len >= 1.5f ? 22.95668f / (4.0f * 180.0f) : 24.26083f / (4.0f * 180.0f);
         SH4 face_dir_sh = sh4(face_dir);
 
+        // TODO: Ideally, we should take 4 occlusion samples from the vertexes of the grid
 #if OCCLUSION == 1
         vec4 stored_occlusion_sh = texelFetch(sh_occlusion_texture, cell_pos + dir, 0);
         float occlusion = saturate(1.0f - dot(stored_occlusion_sh, face_dir_sh.c));
@@ -109,9 +110,9 @@ RGBSH4 propagate_dir(ivec3 cell_pos, ivec3 dir, float amp)
         vec3 radiance_at_dir = solid_angle * occlusion * max(VEC3_ZERO, shdot(face_dir_sh, adjacent_cell_stored_radiance));
         // and back to SH
         RGBSH4 radiance_at_dir_sh = mul(offset_cosine_lobe, radiance_at_dir);
-        radiance_at_dir_sh.rgb[0] = radiance_at_dir_sh.rgb[0] * amp;
-        radiance_at_dir_sh.rgb[1] = radiance_at_dir_sh.rgb[1] * amp;
-        radiance_at_dir_sh.rgb[2] = radiance_at_dir_sh.rgb[2] * amp;
+        radiance_at_dir_sh.r = radiance_at_dir_sh.r * amp;
+        radiance_at_dir_sh.g = radiance_at_dir_sh.g * amp;
+        radiance_at_dir_sh.b = radiance_at_dir_sh.b * amp;
         res = add(res, radiance_at_dir_sh);
     }
     return res;
@@ -127,7 +128,7 @@ void main()
     res = add(res, propagate_dir(gsoutput.pos, ivec3(0, 0, -1), amp));
     res = add(res, propagate_dir(gsoutput.pos, ivec3(0, 0, 1), amp));
 
-    out_r = res.rgb[0];
-    out_g = res.rgb[1];
-    out_b = res.rgb[2];
+    out_r = res.r;
+    out_g = res.g;
+    out_b = res.b;
 }

@@ -96,7 +96,7 @@ void main()
     SH4 sh = sh_cosine_lobe_sh4(normal);
     
     RGBSH4 color = mul(sh, gsoutput.flux);
-    out_r = color.rgb[0];
-    out_g = color.rgb[1];
-    out_b = color.rgb[2];
+    out_r = color.r;
+    out_g = color.g;
+    out_b = color.b;
 }

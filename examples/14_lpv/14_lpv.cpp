@@ -61,7 +61,7 @@ public:
         engine.renderer()->set_material_system_to_process(rsm_material_system_);
         rsm_material_system_->init_debug_views(engine.context());
         rsm_material_system_->settings().mode = RSMMaterialSystem::mode_volume;
-        rsm_material_system_->settings().volume_aabb = AABBf(vec3(0.0f, 2.0f, 0.0f), vec3(5.0f, 2.0f, 5.0f));
+        rsm_material_system_->settings().volume_aabb = AABBf(vec3(0.0f, 2.0f, 0.0f), vec3(6.0f, 2.49f, 6.0f));
 
         const string lpv_name("lpv");
         const string propagation_shader_name("lpv_propagation");

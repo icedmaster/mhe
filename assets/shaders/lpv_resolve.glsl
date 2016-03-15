@@ -35,13 +35,16 @@ bool is_outside(vec3 pos)
 
 RGBSH4 load_sh(vec3 pos)
 {
+    if (is_outside(pos))
+        return empty_rgbsh4();
     RGBSH4 res;
-    res.rgb[0] = texture(sh_r_texture, pos);
-    res.rgb[1] = texture(sh_g_texture, pos);
-    res.rgb[2] = texture(sh_b_texture, pos);
+    res.r = texture(sh_r_texture, pos);
+    res.g = texture(sh_g_texture, pos);
+    res.b = texture(sh_b_texture, pos);
     return res;
 }
 
+// next two functions are taken from the NVIDIA's GI sample
 vec4 SHCNormalize(in vec4 res)
 {
     // extract direction
@@ -54,9 +57,9 @@ vec4 SHCNormalize(in vec4 res)
 RGBSH4 shnormalize(RGBSH4 sh)
 {
     RGBSH4 res;
-    res.rgb[0] = SHCNormalize(sh.rgb[0]);
-    res.rgb[1] = SHCNormalize(sh.rgb[1]);
-    res.rgb[2] = SHCNormalize(sh.rgb[2]);
+    res.r = SHCNormalize(sh.r);
+    res.g = SHCNormalize(sh.g);
+    res.b = SHCNormalize(sh.b);
     return res;
 }
 
@@ -87,13 +90,13 @@ void main()
     RGBSH4 diff_sh = sub(shifted_rgb_sh, rgb_sh);
     RGBSH4 rgb_sh_norm = shnormalize(rgb_sh);
     RGBSH4 diff_sh_norm = shnormalize(diff_sh);
-    vec3 atten = vec3(saturate(dot(rgb_sh_norm.rgb[0], diff_sh_norm.rgb[0])),
-                      saturate(dot(rgb_sh_norm.rgb[1], diff_sh_norm.rgb[1])),
-                      saturate(dot(rgb_sh_norm.rgb[2], diff_sh_norm.rgb[2])));
+    vec3 atten = vec3(saturate(dot(rgb_sh_norm.r, diff_sh_norm.r)),
+                      saturate(dot(rgb_sh_norm.g, diff_sh_norm.g)),
+                      saturate(dot(rgb_sh_norm.b, diff_sh_norm.b)));
     float demp = pow(max3(atten), 0.2f);
-    rgb_sh.rgb[0] *= demp;
-    rgb_sh.rgb[1] *= demp;
-    rgb_sh.rgb[2] *= demp;
+    rgb_sh.r *= demp;
+    rgb_sh.g *= demp;
+    rgb_sh.b *= demp;
 #endif
 
     vec3 irradiance = calculate_irradiance(-normal_ws, rgb_sh);
