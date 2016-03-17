@@ -417,17 +417,17 @@ public:
 
     vector3<T> side_vector() const
     {
-            return column(0).as_v3d();
+        return row(0).as_v3d();
     }
 
     vector3<T> up_vector() const
     {
-            return column(1).as_v3d();
+        return row(1).as_v3d();
     }
 
     vector3<T> forward_vector() const
     {
-            return column(2).as_v3d();
+        return row(2).as_v3d();
     }
 
     float determinant() const
@@ -614,7 +614,7 @@ public:
     {
         return vector3<T>(m_[0][0] * v.x() + m_[0][1] * v.y() + m_[0][2] * v.z() + m_[0][3],
                           m_[1][0] * v.x() + m_[1][1] * v.y() + m_[1][2] * v.z() + m_[1][3],
-                          m_[2][0] * v.x() + m_[2][1] * v.y() + m_[2][2] * v.z() + m_[2][3]);       
+                          m_[2][0] * v.x() + m_[2][1] * v.y() + m_[2][2] * v.z() + m_[2][3]);
     }
 
     vector4<T> premult(const vector4<T>& v) const
