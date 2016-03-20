@@ -41,11 +41,15 @@ this conversion more convenient you should also install racket.
 After all additional packets are installed do the following:
 
 cd build
+
 cmake . -DCMAKE_BUILD_TYPE=Debug
+
 make
 
 After that you can build the examples:
+
 cmake . -DCMAKE_BUILD_TYPE=Debug -DBUILD_EXAMPLES=True
+
 make
 
 All output files will be placed in the mhe/bin directory.
@@ -60,9 +64,13 @@ I tested the engine with Visual Studio 10 and 13. All third-party libraries, suc
 Do the following steps (change the version of the Visual Studio to the one you have installed):
 
 cd build
+
 cmake . -DCMAKE_BUILD_TYPE=Debug -G "Visual Studio 10"
+
 Open the solution and build the library. Then you need to run cmake again in order to build the examples:
+
 cmake . -DCMAKE_BUILD_TYPE=Debug -DBUILD_EXAMPLES=True
+
 Build the example you want to check out then in the Project's Properties choose the Debug tab and change the working
 directory to the mhe/bin/Debug.
 
