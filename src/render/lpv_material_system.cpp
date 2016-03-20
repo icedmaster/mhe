@@ -172,7 +172,7 @@ void LPVMaterialSystem::setup(Context &context, SceneContext &scene_context, Mes
     empty_setup(context, scene_context, instance_parts, parts, model_contexts, count);
 }
 
-void LPVMaterialSystem::update(Context& context, SceneContext& scene_context, RenderContext& render_context)
+void LPVMaterialSystem::update(Context& context, SceneContext& /*scene_context*/, RenderContext& render_context)
 {
     ASSERT(is_handle_valid(gbuffer_.accumulator.id) && is_handle_valid(gbuffer_.normal.id) &&
            is_handle_valid(gbuffer_.depth.id), "Invalid GBuffer");
@@ -203,7 +203,7 @@ void LPVMaterialSystem::injection(DrawCall& draw_call,
         settings_.volume.min_max(scene_min, scene_max);
         aabb_multiplier = 1.0f;
     }
-    float diagonal_length = (scene_max - scene_min).length();
+    float diagonal_length = (scene_max - scene_min).length() * aabb_multiplier;
     mat4x4 lpv_transform = mat4x4::translation_matrix(-scene_min) * mat4x4::scaling_matrix(1.0f / diagonal_length);
     float cell_size = diagonal_length / settings_.size;
 
@@ -237,7 +237,8 @@ void LPVMaterialSystem::injection(DrawCall& draw_call,
     draw_call.command = &injection_list_of_commands_;
 }
 
-void LPVMaterialSystem::geometry_injection(DrawCall& draw_call, Context& context, RenderContext& render_context, size_t vpl_number)
+void LPVMaterialSystem::geometry_injection(DrawCall& draw_call, Context& context, RenderContext& /*render_context*/,
+                                           size_t vpl_number)
 {
     Material& material = context.materials[id()].get(geometry_injection_material_);
     material.textures[0] = gbuffer_.normal;

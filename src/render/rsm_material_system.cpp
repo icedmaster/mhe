@@ -95,7 +95,7 @@ void RSMMaterialSystem::setup(Context &context, SceneContext &scene_context, Mes
     empty_setup(context, scene_context, instance_parts, parts, model_contexts, count);
 }
 
-void RSMMaterialSystem::start_frame(Context& context, SceneContext& scene_context, RenderContext& render_context)
+void RSMMaterialSystem::start_frame(Context& /*context*/, SceneContext& scene_context, RenderContext& render_context)
 {
     // Currently, we're working with the first directional light
     LightInstance* light_instance = nullptr;
@@ -135,7 +135,7 @@ void RSMMaterialSystem::start_frame(Context& context, SceneContext& scene_contex
     shader_data_.light_diffuse_color = light_instance->light.shading().diffuse;
 }
 
-void RSMMaterialSystem::update(Context& context, SceneContext& scene_context, RenderContext& render_context)
+void RSMMaterialSystem::update(Context& context, SceneContext& /*scene_context*/, RenderContext& render_context)
 {
     context.uniform_pool.get(transform_uniform_).update(shader_data_);
 

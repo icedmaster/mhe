@@ -92,6 +92,7 @@ public:
         posteffect_node_desc.name = lpv_resolve_name;
         posteffect_node_desc.material = lpv_resolve_name;
         posteffect_node_desc.priority = 0;
+        posteffect_node_desc.instantiate = true;
         // use GBuffer's depth and normal...
         PosteffectSystem::NodeInput& input0 = posteffect_node_desc.inputs.add();
         input0.index = 0;
@@ -153,7 +154,7 @@ public:
         return true;
     }
 
-    void before_draw(game::Engine& engine) override
+    void before_draw(game::Engine& /*engine*/) override
     {
         // RSM data has been updated
         RSMData data;
