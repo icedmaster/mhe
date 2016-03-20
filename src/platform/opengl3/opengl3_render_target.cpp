@@ -14,15 +14,19 @@ bool OpenGL3RenderTarget::init(const RenderTargetDesc& desc, Texture** color_tex
 {
     side_offset_ = 0;
     is_cubemap_ = desc.texture_type == texture_cube;
+    is_3d_ = desc.texture_type == texture_3d;
     target_ = get_framebuffer_format(desc.target);
     targets_number_ = desc.color_targets;
     OpenGLExtensions::instance().glGenFramebuffers(1, &id_);
     OpenGLExtensions::instance().glBindFramebuffer(target_, id_);
 
+    CHECK_GL_ERRORS();
+
     TextureDesc texture_desc;
     texture_desc.type = desc.texture_type;
     texture_desc.width = desc.width;
     texture_desc.height = desc.height;
+    texture_desc.depth = desc.depth;
     texture_desc.mips = 0;
     for (size_t i = 0; i < desc.color_targets; ++i)
     {
@@ -30,7 +34,7 @@ bool OpenGL3RenderTarget::init(const RenderTargetDesc& desc, Texture** color_tex
         texture_desc.datatype = desc.color_datatype[i];
         texture_desc.mag_filter = texture_desc.min_filter = desc.color_filter[i];
         texture_desc.anisotropic_level = desc.color_anisotropy[i];
-        texture_desc.address_mode_s = texture_desc.address_mode_t = desc.color_address_mode[i];
+        texture_desc.address_mode_s = texture_desc.address_mode_t = texture_desc.address_mode_r = desc.color_address_mode[i];
         if (!color_textures[i]->init(texture_desc, nullptr, 0))
             return false;
         const OpenGL3Texture* texture = static_cast<const OpenGL3Texture*>(color_textures[i]->impl());

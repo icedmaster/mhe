@@ -133,7 +133,6 @@ public:
     bool init_screen_input(Context& context, size_t index, uint8_t render_stage = render_stage_before_render_target_setup);
     bool create_output(Context& context, size_t index, float scale, int format);
 
-    // Currently, SSBOs and UBOs are stored separately but applied together (through Material.uniforms)
     void set_buffer(size_t index, ShaderStorageBufferHandleType id)
     {
         buffers_[index] = id;
@@ -156,6 +155,12 @@ public:
 
     // This method will be called when PosteffectChain has initialized this material system
     virtual void postinit(Context& /*context*/) {}
+
+    void set_render_target(RenderTargetHandleType render_target_id)
+    {
+        default_render_target_ = render_target_id;
+        // TODO: need to setup outputs
+    }
 protected:
     MeshInstance& mesh_instance()
     {
@@ -425,11 +430,19 @@ class AverageLuminanceMaterialSystem : public PosteffectMaterialSystemBase
         size_t threads_number_;
     };
 public:
+    enum
+    {
+        adaptation_mode,
+        fixed_luminance_mode
+    };
+
     struct Settings
     {
+        int mode;
         float adaptation_rate;
+        float fixed_luminance_value;
 
-        Settings() : adaptation_rate(1.0f) {}
+        Settings() : mode(adaptation_mode), adaptation_rate(1.0f), fixed_luminance_value(0.4f) {}
     };
 
     bool init(Context& context, const MaterialSystemContext& material_system_context) override;
@@ -453,6 +466,7 @@ private:
     ShaderProgramHandleType adaptation_shader_;
     UniformBufferHandleType adaptation_uniform_;
     ReductionCommand reduction_command_;
+    ClearCommandSimple clear_command_;
     RenderTargetHandleType render_target_;
     RenderTargetHandleType adaptation_render_target_[2];
     MaterialHandleType adaptation_material_;

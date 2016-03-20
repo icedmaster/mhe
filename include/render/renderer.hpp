@@ -21,6 +21,10 @@ struct MaterialInitializationData;
 class MaterialSystem;
 class PosteffectMaterialSystemBase;
 class PosteffectDebugMaterialSystem;
+class LPVMaterialSystem;
+class RSMMaterialSystem;
+class LPVResolveMaterialSystem;
+class Renderer;
 
 bool init_node(NodeInstance& node, Context& context);
 void update_nodes(Context& context, RenderContext& render_context, SceneContext& scene_context);
@@ -49,6 +53,7 @@ public:
         size_t node_output;
         string material;
         size_t material_output;
+        TextureInstance explicit_texture;
         bool copy_current_framebuffer;
     };
 
@@ -59,17 +64,21 @@ public:
         int format;
     };
 
+    template <class BufferHandleType>
     struct Buffer
     {
         size_t index;
         string node;
         size_t node_buffer;
+        BufferHandleType explicit_handle;
+
+        Buffer() : explicit_handle(InvalidHandle<BufferHandleType>::id) {}
     };
 
     typedef fixed_capacity_vector<NodeInput, 8> Inputs;
     typedef fixed_capacity_vector<NodeOutput, 8> Outputs;
-    typedef fixed_capacity_vector<Buffer, 4> Buffers;
-    typedef fixed_capacity_vector<Buffer, 4> Uniforms;
+    typedef fixed_capacity_vector<Buffer<ShaderStorageBufferHandleType>, 4> Buffers;
+    typedef fixed_capacity_vector<Buffer<UniformBufferHandleType>, 4> Uniforms;
 
     struct PosteffectNodeDesc
     {
@@ -84,7 +93,8 @@ public:
         bool instantiate;
     };
 
-    void add(Context& context, const PosteffectNodeDesc& node_desc);
+    MHE_EXPORT void add(Context& context, const PosteffectNodeDesc& node_desc);
+    MHE_EXPORT PosteffectMaterialSystemBase* create(Context& context, const PosteffectNodeDesc& node_desc);
     void process(Context& context, RenderContext& render_context, SceneContext& scene_context);
 private:
     struct PosteffectNode
@@ -103,12 +113,37 @@ private:
     Posteffects posteffects_;
 };
 
+class GISystem
+{
+public:
+    struct LPVParams
+    {
+        size_t base_priority;
+        int output_texture_format;
+        float output_texture_scale;
+
+        LPVParams() : output_texture_format(format_rgb16f), output_texture_scale(1.0f) {}
+    };
+
+    GISystem();
+
+    void add_lpv(Context& context, Renderer& renderer, const LPVParams& params);
+    void apply(Renderer& renderer);
+
+    void before_render(Context& context, SceneContext& scene_context, RenderContext& render_context);
+    void render(Context& context, SceneContext& scene_context, RenderContext& render_context);
+private:
+    RSMMaterialSystem* rsm_material_system_;
+    LPVMaterialSystem* lpv_material_system_;
+    LPVResolveMaterialSystem* lpv_resolve_material_system_;
+};
+
 class MHE_EXPORT Renderer : public ref_counter
 {
 public:
     static const uint8_t skybox_material_system_priority = 2;
     static const uint8_t shadowmap_depth_write_material_system_priority = 3;
-    static const uint8_t debug_material_system_priority = 32;
+    static const uint8_t debug_material_system_priority = 250;
 
     enum DebugMode
     {
@@ -126,6 +161,7 @@ public:
     virtual ~Renderer() {}
 
     bool init();
+    void destroy();
 
     virtual void before_update(SceneContext& scene_context);
     virtual void update(SceneContext& scene_context);
@@ -135,6 +171,11 @@ public:
     void set_shadowmap_depth_write_material_system(MaterialSystem* material_system);
     void set_directional_shadowmap_depth_write_material_system(MaterialSystem* material_system);
     void set_fullscreen_debug_material_system(PosteffectDebugMaterialSystem* material_system);
+
+    void set_material_system_to_process(MaterialSystem* material_system)
+    {
+        material_systems_.push_back(material_system);
+    }
 
     void set_ambient_color(const colorf& color)
     {
@@ -159,9 +200,27 @@ public:
         return posteffect_system_;
     }
 
+    GISystem& gi_system()
+    {
+        return gi_system_;
+    }
+
     RenderContext& render_context()
     {
         return render_context_;
+    }
+
+    virtual void set_gi_modifier_material_system(MaterialSystem*, size_t)
+    {}
+
+    virtual TextureInstance scene_normals_buffer() const
+    {
+        return TextureInstance();
+    }
+
+    virtual TextureInstance scene_depth_buffer() const
+    {
+        return TextureInstance();
     }
 protected:
     Context& context()
@@ -186,10 +245,13 @@ private:
 
     PosteffectDebugMaterialSystem* fullscreen_debug_material_system_;
 
+    fixed_size_vector<MaterialSystem*, 16> material_systems_;
+
     colorf ambient_color_;
     DebugMode debug_mode_;
 
     PosteffectSystem posteffect_system_;
+    GISystem gi_system_;
 
     RenderContext render_context_;
 };

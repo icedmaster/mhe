@@ -214,7 +214,7 @@ void PosteffectMaterialSystemBase::prepare_draw_call(DrawCall& draw_call, Contex
         if (uniforms_[j] != UniformBuffer::invalid_id)
             material.uniforms[j] = uniforms_[j];
         if (buffers_[j] != InvalidHandle<ShaderStorageBufferHandleType>::id)
-            material.uniforms[j] = uniforms_[j];
+            material.shader_storage_buffers[j] = buffers_[j];
     }
     material.shader_program = shader.get(ubershader_index);
     setup_draw_call(draw_call, mesh_.instance_parts[0], mesh_.mesh.parts[0], render_target_id, command);
@@ -845,49 +845,62 @@ void AverageLuminanceMaterialSystem::init_debug_views(Context& context)
     size_t debug_view_id = context.debug_views->add_view("Adaptation");
     DebugViews::DebugView& view = context.debug_views->get_view(debug_view_id);
     view.add(string("rate"), 0.1f, 10.0f, &settings_.adaptation_rate);
+    view.add(string("fixed lum"), 0.0f, 2.0f, &settings_.fixed_luminance_value);
 }
 
 void AverageLuminanceMaterialSystem::update(Context& context, SceneContext& scene_context, RenderContext& render_context)
 {
-    AdaptationShaderData shader_data;
-    shader_data.data.set(settings_.adaptation_rate, render_context.fdelta, 0.0f, 0.0f);
-    UniformBuffer& uniform_buffer = context.uniform_pool.get(adaptation_uniform_);
-    uniform_buffer.update(shader_data);
-
-    // The first draw call is to calculate per-pixel luminance
-    DrawCall& draw_call = render_context.draw_calls.add();
-    prepare_draw_call(draw_call, context, scene_context, render_context, render_target_);
-    draw_call.pass = 0;
-    draw_call.command = nullptr;
-    // And the second is to perform luminance adaptation, also per-pixel
+    if (settings_.mode == adaptation_mode)
     {
-        DrawCall& dc = render_context.draw_calls.add();
-        dc = draw_call;
-        dc.material.id = adaptation_material_;
-        dc.pass = 1;
-        dc.command = &reduction_command_;
+        AdaptationShaderData shader_data;
+        shader_data.data.set(settings_.adaptation_rate, render_context.fdelta, 0.0f, 0.0f);
+        UniformBuffer& uniform_buffer = context.uniform_pool.get(adaptation_uniform_);
+        uniform_buffer.update(shader_data);
 
-        uint8_t adapted_luminance_index = adaptation_rt_index_;
-        uint8_t prev_luminance_index = adaptation_rt_index_ ^ 1;
-        Material& material = context.materials[id()].get(adaptation_material_);
-        if (adaptation_rt_index_ == 2)
+        // The first draw call is to calculate per-pixel luminance
+        DrawCall& draw_call = render_context.draw_calls.add();
+        prepare_draw_call(draw_call, context, scene_context, render_context, render_target_);
+        draw_call.pass = 0;
+        draw_call.command = &clear_command_;
+        // And the second is to perform luminance adaptation, also per-pixel
         {
-            material.textures[1] = material.textures[0];
-            adaptation_rt_index_ = 0;
-            adapted_luminance_index = 0;
-        }
-        else
-        {
-            RenderTarget& rt = context.render_target_pool.get(adaptation_render_target_[prev_luminance_index]);
-            rt.color_texture(material.textures[1], 0);
-        }
-        dc.render_target = adaptation_render_target_[adapted_luminance_index];
+            DrawCall& dc = render_context.draw_calls.add();
+            dc = draw_call;
+            dc.material.id = adaptation_material_;
+            dc.pass = 1;
+            dc.command = &reduction_command_;
 
-        TextureInstance output_texture;
-        context.render_target_pool.get(dc.render_target).color_texture(output_texture, 0);
-        reduction_command_.set_input(output_texture);
+            uint8_t adapted_luminance_index = adaptation_rt_index_;
+            uint8_t prev_luminance_index = adaptation_rt_index_ ^ 1;
+            Material& material = context.materials[id()].get(adaptation_material_);
+            if (adaptation_rt_index_ == 2)
+            {
+                material.textures[1] = material.textures[0];
+                adaptation_rt_index_ = 0;
+                adapted_luminance_index = 0;
+            }
+            else
+            {
+                RenderTarget& rt = context.render_target_pool.get(adaptation_render_target_[prev_luminance_index]);
+                rt.color_texture(material.textures[1], 0);
+            }
+            dc.render_target = adaptation_render_target_[adapted_luminance_index];
 
-        adaptation_rt_index_ ^= 1;
+            TextureInstance output_texture;
+            context.render_target_pool.get(dc.render_target).color_texture(output_texture, 0);
+            reduction_command_.set_input(output_texture);
+
+            adaptation_rt_index_ ^= 1;
+        }
+    }
+    else if (settings_.mode == fixed_luminance_mode)
+    {
+        ShaderStorageBuffer& shader_storage_buffer = context.shader_storage_buffer_pool.get(buffer(0));
+        shader_storage_buffer.update(reinterpret_cast<const uint8_t*>(&settings_.fixed_luminance_value), sizeof(float));
+    }
+    else
+    {
+        ASSERT(0, "Invalid Adaptation mode");
     }
 }
 

@@ -9,6 +9,7 @@ namespace mhe {
 namespace detail {
 
 const char* vertex_shader_tag = "[vertex]";
+const char* geometry_shader_tag = "[geometry]";
 const char* fragment_shader_tag = "[fragment]";
 const char* compute_shader_tag = "[compute]";
 const char* include_tag = "[include";
@@ -21,7 +22,7 @@ const char* version_tag = "[version";
 const char* shader_extension = ".glsl";
 const char* texture_buffer_sampler = "samplerBuffer";
 
-const char* tags[] = {vertex_shader_tag, fragment_shader_tag, compute_shader_tag};
+const char* tags[] = {vertex_shader_tag, geometry_shader_tag, fragment_shader_tag, compute_shader_tag};
 
 struct LoadContext
 {
@@ -166,6 +167,8 @@ void update_shader_data(ShaderInitializationParams& params, const Context* conte
         const std::string& header = version + std::string("\n");
         params.vsdata = header + params.vsdata;
         params.fsdata = header + params.fsdata;
+        if (!params.gsdata.empty())
+            params.gsdata = header + params.gsdata;
     }
 }
 
@@ -231,7 +234,7 @@ std::string load_shader_impl(ShaderInitializationParams& params, const std::vect
             state = state_found;
         else
         {
-            for (size_t j = 0; j < 2; ++j)
+            for (size_t j = 0; j < 4; ++j)
             {
                 if (s == tags[j])
                 {
@@ -341,17 +344,23 @@ bool ShaderProgramLoader::load(type& res, const std::string& name, const context
         params.csdata = detail::load_shader_impl(params, data, detail::compute_shader_tag, load_context);
         if (params.csdata.empty())
         {
+            load_context.tag_found = false;
             params.vsdata = detail::load_shader_impl(params, data, detail::vertex_shader_tag, load_context);
+            load_context.tag_found = false;
             params.fsdata = detail::load_shader_impl(params, data, detail::fragment_shader_tag, load_context);
+            load_context.tag_found = false;
+            params.gsdata = detail::load_shader_impl(params, data, detail::geometry_shader_tag, load_context);
         }
         // TODO: parse GLSL errors to find the correct line with error
         
         const std::vector<std::string>& vs_tmp = utils::split(params.vsdata, "\n", true);
         const std::vector<std::string>& fs_tmp = utils::split(params.fsdata, "\n", true);
         const std::vector<std::string>& cs_tmp = utils::split(params.csdata, "\n", true);
+        const std::vector<std::string>& gs_tmp = utils::split(params.gsdata, "\n", true);
         UNUSED(vs_tmp);
         UNUSED(fs_tmp);
         UNUSED(cs_tmp);
+        UNUSED(gs_tmp);
 
         detail::update_shader_data(params, context);
 

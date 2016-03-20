@@ -11,7 +11,7 @@
   (printf "OS is ~a\n" os)
   (cond
    [(equal? os 'windows)
-	(set! mhe_working_directory "../../bin/")
+	(set! mhe_working_directory "../bin/Debug/")
 	(set! exporter_cmdline "\"../../tools/meshconverter/build/Debug/meshconverter.exe\" ~a ~a")
 	(set! mhe_meshes_directory "../../assets/meshes/")]
    [(not (equal? os 'unix)) (printf "Unsupported OS\n")]))

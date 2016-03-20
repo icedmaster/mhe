@@ -26,6 +26,7 @@ struct Material
     TextureInstance textures[material_textures_number];
     UniformBuffer::IdType uniforms[material_uniforms_number];
     TextureBuffer::IdType texture_buffers[material_texture_buffers_number];
+    ShaderStorageBufferHandleType shader_storage_buffers[material_uniforms_number];
     ShaderProgram::IdType shader_program;
 
     Material() : shader_program(ShaderProgram::invalid_id)
@@ -33,6 +34,7 @@ struct Material
         ::memset(uniforms, UniformBuffer::invalid_id, sizeof(uniforms));
         ::memset(textures, Texture::invalid_id, sizeof(textures));
         ::memset(texture_buffers, TextureBuffer::invalid_id, sizeof(texture_buffers));
+        ::memset(shader_storage_buffers, InvalidHandle<ShaderStorageBufferHandleType>(), sizeof(shader_storage_buffers));
     }
 };
 

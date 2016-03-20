@@ -8,6 +8,8 @@
 #include "render/material_system.hpp"
 #include "render/layouts.hpp"
 #include "render/posteffect_material_system.hpp"
+#include "render/rsm_material_system.hpp"
+#include "render/lpv_material_system.hpp"
 #include "debug/profiler.hpp"
 #include "res/resource_manager.hpp"
 
@@ -108,6 +110,17 @@ void setup_node(NodeInstance& node, MaterialSystem* material_system, Context& co
 
 void PosteffectSystem::add(Context& context, const PosteffectSystem::PosteffectNodeDesc& desc)
 {
+    PosteffectMaterialSystemBase* material_system = create(context, desc);
+    ASSERT(material_system != nullptr, "Couldn't create a material system");
+    PosteffectNode node;
+    node.name = desc.name;
+    node.material_system = material_system;
+
+    posteffects_.push_back(node);
+}
+
+PosteffectMaterialSystemBase* PosteffectSystem::create(Context& context, const PosteffectNodeDesc& desc)
+{
     PosteffectNode* prev_node = nullptr;
 
     if (!desc.prev_node.empty())
@@ -122,13 +135,13 @@ void PosteffectSystem::add(Context& context, const PosteffectSystem::PosteffectN
         }
         ASSERT(prev_node != nullptr, "Previous node name is set but the node isn't found:" << desc.prev_node);
     }
-    
+
     PosteffectMaterialSystemBase* material_system = nullptr;
     if (!desc.instantiate)
         material_system = context.material_systems.get<PosteffectMaterialSystemBase>(desc.material.c_str());
     else
     {
-        material_system = create<PosteffectMaterialSystemBase>(context, desc.material, desc.name);
+        material_system = mhe::create<PosteffectMaterialSystemBase>(context, desc.material, desc.name);
     }
     ASSERT(material_system != nullptr, "Can't find material system with name:" << desc.material);
     material_system->set_priority(posteffect_material_priority_base + desc.priority);
@@ -159,12 +172,7 @@ void PosteffectSystem::add(Context& context, const PosteffectSystem::PosteffectN
     init_uniforms(material_system, context, desc);
 
     material_system->postinit(context);
-
-    PosteffectNode node;
-    node.name = desc.name;
-    node.material_system = material_system;
-
-    posteffects_.push_back(node);
+    return material_system;
 }
 
 void PosteffectSystem::init_inputs(PosteffectMaterialSystemBase* material_system, Context& context, 
@@ -173,7 +181,9 @@ void PosteffectSystem::init_inputs(PosteffectMaterialSystemBase* material_system
     for (size_t i = 0, size = node_desc.inputs.size(); i < size; ++i)
     {
         const NodeInput& input = node_desc.inputs[i];
-        if (!input.node.empty())
+        if (is_handle_valid(input.explicit_texture.id))
+            material_system->set_input(input.index, input.explicit_texture);
+        else if (!input.node.empty())
         {
             const PosteffectNode* node = find_node(input.node);
             ASSERT(node != nullptr && node->material_system != nullptr, "Can't find input node or node is invalid:" << input.node);
@@ -211,13 +221,17 @@ void PosteffectSystem::init_buffers(PosteffectMaterialSystemBase* material_syste
 {
     for (size_t i = 0, size = node_desc.buffers.size(); i < size; ++i)
     {
-        const Buffer& buffer_desc = node_desc.buffers[i];
-        const PosteffectNode* input_node = find_node(buffer_desc.node);
-        ASSERT(input_node != nullptr && input_node->material_system != nullptr, "Can't find a node with name:" << buffer_desc.node);
-        ShaderStorageBufferHandleType buffer_id = input_node->material_system->buffer(buffer_desc.node_buffer);
-        if (!is_handle_valid(buffer_id))
+        const Buffers::type& buffer_desc = node_desc.buffers[i];
+        ShaderStorageBufferHandleType buffer_id = buffer_desc.explicit_handle;
+        if (!is_handle_valid(buffer_desc.explicit_handle))
         {
-            WARN_LOG("The buffer is not valid:" << buffer_desc.node << " " << buffer_desc.node_buffer);
+            const PosteffectNode* input_node = find_node(buffer_desc.node);
+            ASSERT(input_node != nullptr && input_node->material_system != nullptr, "Can't find a node with name:" << buffer_desc.node);
+            buffer_id = input_node->material_system->buffer(buffer_desc.node_buffer);
+            if (!is_handle_valid(buffer_id))
+            {
+                WARN_LOG("The buffer is not valid:" << buffer_desc.node << " " << buffer_desc.node_buffer);
+            }
         }
         material_system->set_buffer(buffer_desc.index, buffer_id);
     }
@@ -228,13 +242,17 @@ void PosteffectSystem::init_uniforms(PosteffectMaterialSystemBase* material_syst
 {
     for (size_t i = 0, size = node_desc.uniforms.size(); i < size; ++i)
     {
-        const Buffer& buffer_desc = node_desc.uniforms[i];
-        const PosteffectNode* input_node = find_node(buffer_desc.node);
-        ASSERT(input_node != nullptr && input_node->material_system != nullptr, "Can't find a node with name:" << buffer_desc.node);
-        UniformBufferHandleType buffer_id = input_node->material_system->uniform(buffer_desc.node_buffer);
+        const Uniforms::type& buffer_desc = node_desc.uniforms[i];
+        UniformBufferHandleType buffer_id = buffer_desc.explicit_handle;
         if (!is_handle_valid(buffer_id))
         {
-            WARN_LOG("The uniform is not valid:" << buffer_desc.node << " " << buffer_desc.node_buffer);
+            const PosteffectNode* input_node = find_node(buffer_desc.node);
+            ASSERT(input_node != nullptr && input_node->material_system != nullptr, "Can't find a node with name:" << buffer_desc.node);
+            buffer_id = input_node->material_system->uniform(buffer_desc.node_buffer);
+            if (!is_handle_valid(buffer_id))
+            {
+                WARN_LOG("The uniform is not valid:" << buffer_desc.node << " " << buffer_desc.node_buffer);
+            }
         }
         material_system->set_uniform(buffer_desc.index, buffer_id);
     }
@@ -259,6 +277,99 @@ const PosteffectSystem::PosteffectNode* PosteffectSystem::find_node(const string
     return nullptr;
 }
 
+GISystem::GISystem() :
+    rsm_material_system_(nullptr),
+    lpv_material_system_(nullptr),
+    lpv_resolve_material_system_(nullptr)
+{}
+
+void GISystem::add_lpv(Context& context, Renderer& renderer, const LPVParams& params)
+{
+    const string rsm_name(RSMMaterialSystem::material_name());
+
+    rsm_material_system_ = static_cast<RSMMaterialSystem*>(create(context, rsm_name, rsm_name));
+    ASSERT(rsm_material_system_ != nullptr, "RSMMaterialSystem initialization failed."
+        "Probably, you forgot to add its description to the configuration file");
+    rsm_material_system_->set_priority(params.base_priority - 2);
+
+    const string lpv_name(LPVMaterialSystem::material_name());
+
+    lpv_material_system_ = static_cast<LPVMaterialSystem*>(create(context, lpv_name, lpv_name));
+    lpv_material_system_->set_gbuffer(rsm_material_system_->gbuffer());
+    lpv_material_system_->settings().mode = LPVMaterialSystem::mode_rsm;
+    lpv_material_system_->set_priority(params.base_priority - 1);
+    ASSERT(lpv_material_system_ != nullptr, "LPVMaterialSystem initialization failed."
+        "Probably, you forgot to add its description to the configuration file");
+
+    const string lpv_resolve_name(LPVResolveMaterialSystem::material_name());
+    PosteffectSystem::PosteffectNodeDesc posteffect_node_desc;
+    posteffect_node_desc.name = lpv_resolve_name;
+    posteffect_node_desc.material = lpv_resolve_name;
+    posteffect_node_desc.priority = 0;
+    // input 0 - normals
+    PosteffectSystem::NodeInput& input0 = posteffect_node_desc.inputs.add();
+    input0.index = 0;
+    input0.explicit_texture = renderer.scene_normals_buffer();
+    // input 1 - depth
+    PosteffectSystem::NodeInput& input1 = posteffect_node_desc.inputs.add();
+    input1.index = 1;
+    input1.explicit_texture = renderer.scene_depth_buffer();
+    // ...and 3 channels of LPV RT
+    PosteffectSystem::NodeInput& input2 = posteffect_node_desc.inputs.add();
+    input2.index = 2;
+    input2.material = lpv_name;
+    input2.material_output = 0;
+    PosteffectSystem::NodeInput& input3 = posteffect_node_desc.inputs.add();
+    input3.index = 3;
+    input3.material = lpv_name;
+    input3.material_output = 1;
+    PosteffectSystem::NodeInput& input4 = posteffect_node_desc.inputs.add();
+    input4.index = 4;
+    input4.material = lpv_name;
+    input4.material_output = 2;
+    // resolve-to buffer
+    PosteffectSystem::NodeOutput& output0 = posteffect_node_desc.outputs.add();
+    output0.format = params.output_texture_format;
+    output0.index = 0;
+    output0.scale = params.output_texture_scale;
+    // we also need a couple of uniforms
+    PosteffectSystem::Uniforms::type& uniform0 = posteffect_node_desc.uniforms.add();
+    uniform0.index = 0;
+    uniform0.explicit_handle = renderer.render_context().main_camera.percamera_uniform;
+    PosteffectSystem::Uniforms::type& uniform1 = posteffect_node_desc.uniforms.add();
+    uniform1.index = 1;
+    uniform1.explicit_handle = lpv_material_system_->injection_settings_uniform();
+
+    lpv_resolve_material_system_ = static_cast<LPVResolveMaterialSystem*>(
+        renderer.posteffect_system().create(context, posteffect_node_desc));
+    ASSERT(lpv_resolve_material_system_ != nullptr, "LPVResolveMaterialSystem initialization failed."
+        "Probably, you forgot to add its description to the configuration file");
+}
+
+void GISystem::apply(Renderer& renderer)
+{
+    renderer.set_gi_modifier_material_system(lpv_resolve_material_system_, 0);
+}
+
+void GISystem::before_render(Context& context, SceneContext& scene_context, RenderContext& render_context)
+{
+    if (rsm_material_system_ != nullptr)
+        rsm_material_system_->start_frame(context, scene_context, render_context);
+}
+
+void GISystem::render(Context& context, SceneContext& scene_context, RenderContext& render_context)
+{
+    if (rsm_material_system_ != nullptr && lpv_material_system_ != nullptr)
+    {
+        RSMData data;
+        rsm_material_system_->rsm_data(data);
+        lpv_material_system_->set_rsm_data(data);
+
+        rsm_material_system_->setup_draw_calls(context, scene_context, render_context);
+        lpv_material_system_->setup_draw_calls(context, scene_context, render_context);
+    }
+}
+
 Renderer::Renderer(Context& context) :
     context_(context),
     skybox_material_system_(nullptr),
@@ -273,7 +384,18 @@ Renderer::Renderer(Context& context) :
 
 bool Renderer::init()
 {
+    UniformBuffer& buffer = create_and_get(context_.uniform_pool);
+    render_context_.main_camera.percamera_uniform = buffer.id();
+    UniformBufferDesc desc;
+    desc.unit = perframe_data_unit;
+    desc.size = sizeof(PerCameraData);
+    buffer.init(desc);
     return true;
+}
+
+void Renderer::destroy()
+{
+    destroy_pool_object(context_.uniform_pool, render_context_.main_camera.percamera_uniform);
 }
 
 void Renderer::update(SceneContext& scene_context)
@@ -293,15 +415,6 @@ void Renderer::update(SceneContext& scene_context)
     data.inv_viewport = vec2(1.0f / context_.window_system.width(), 1.0f / context_.window_system.height());
     data.viewport = context_.window_system.screen_size();
 
-    if (render_context_.main_camera.percamera_uniform == UniformBuffer::invalid_id)
-    {
-        UniformBuffer& buffer = create_and_get(context_.uniform_pool);
-        render_context_.main_camera.percamera_uniform = buffer.id();
-        UniformBufferDesc desc;
-        desc.unit = perframe_data_unit;
-        desc.size = sizeof(PerCameraData);
-        buffer.init(desc);
-    }
     UniformBuffer& buffer = context_.uniform_pool.get(render_context_.main_camera.percamera_uniform);
     buffer.update(data);
 
@@ -316,6 +429,11 @@ void Renderer::before_update(SceneContext& scene_context)
     render_context_.render_view_requests.reset();
     if (directional_shadowmap_depth_write_material_system_ != nullptr)
         directional_shadowmap_depth_write_material_system_->start_frame(context_, scene_context, render_context_);
+
+    for (size_t i = 0, size = material_systems_.size(); i < size; ++i)
+        material_systems_[i]->start_frame(context_, scene_context, render_context_);
+
+    gi_system_.before_render(context_, scene_context, render_context_);
 }
 
 void Renderer::render(SceneContext& scene_context)
@@ -327,6 +445,11 @@ void Renderer::render(SceneContext& scene_context)
     if (shadowmap_depth_write_material_system_ != nullptr)
         shadowmap_depth_write_material_system_->setup_draw_calls(context_, scene_context, render_context_);
     render_impl(context_, render_context_, scene_context);
+
+    for (size_t i = 0, size = material_systems_.size(); i < size; ++i)
+        material_systems_[i]->setup_draw_calls(context_, scene_context, render_context_);
+
+    gi_system_.render(context_, scene_context, render_context_);
 
     posteffect_system_.process(context_, render_context_, scene_context);
 

@@ -11,7 +11,8 @@ namespace mhe {
 enum
 {
     texture_2d,
-    texture_cube
+    texture_cube,
+    texture_3d
 };
 
 // filter type
@@ -30,7 +31,8 @@ enum
 {
     texture_wrap,
     texture_clamp,
-    texture_clamp_to_edge
+    texture_clamp_to_edge,
+    texture_border
 };
 
 enum
@@ -46,12 +48,14 @@ enum
 struct TextureDesc
 {
     int type;
-    uint width;
-    uint height;
+    size_t width;
+    size_t height;
+    size_t depth;
     int mag_filter;
     int min_filter;
     int address_mode_t;
     int address_mode_s;
+    int address_mode_r;
     float anisotropic_level;
     int format;
     int datatype;
@@ -59,7 +63,7 @@ struct TextureDesc
 
     TextureDesc() :
         type(texture_2d), mag_filter(texture_filter_linear), min_filter(texture_filter_linear),
-        address_mode_t(texture_wrap), address_mode_s(texture_wrap), anisotropic_level(1.0f),
+        address_mode_t(texture_wrap), address_mode_s(texture_wrap), address_mode_r(texture_wrap), anisotropic_level(1.0f),
         format(format_rgba), datatype(format_ubyte), mips(0)
     {}
 };

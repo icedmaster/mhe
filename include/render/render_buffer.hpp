@@ -97,6 +97,7 @@ public:
     virtual void destroy() = 0;
     virtual size_t size() const = 0;
     virtual void data(uint8_t* ptr, size_t size) const = 0;
+    virtual void update(const uint8_t* data, size_t size) = 0;
 };
 
 class MHE_EXPORT RenderBuffer
@@ -385,6 +386,11 @@ public:
     void data(uint8_t* ptr, size_t size) const
     {
         impl_->data(ptr, size);
+    }
+
+    void update(const uint8_t* data, size_t size)
+    {
+        impl_->update(data, size);
     }
 
     const ShaderStorageBufferImpl* impl() const

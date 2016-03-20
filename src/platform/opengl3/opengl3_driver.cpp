@@ -194,6 +194,11 @@ void OpenGL3Driver::set_default_render_target()
 
 void OpenGL3Driver::draw(const RenderData& data)
 {
+    if (data.primitive == gpu_generated)
+    {
+        glDrawArrays(GL_POINTS, 0, data.elements_number);
+        return;
+    }
 #ifdef MHE_OPENGL_USE_GL_DRAW_ELEMENTS_BASE_VERTEX
     OpenGLExtensions::instance().glDrawElementsBaseVertex(get_primitive_type(data.primitive), 
         data.indexes_number != 0 ? data.indexes_number : current_index_buffer_->size(), GL_UNSIGNED_INT,
@@ -206,8 +211,13 @@ void OpenGL3Driver::draw(const RenderData& data)
     CHECK_GL_ERRORS();
 }
 
-void OpenGL3Driver::draw(size_t /*elements_number*/, size_t /*vbuffer_offset*/, size_t ibuffer_offset, size_t indices_number, Primitive primitive)
+void OpenGL3Driver::draw(size_t elements_number, size_t /*vbuffer_offset*/, size_t ibuffer_offset, size_t indices_number, Primitive primitive)
 {
+    if (primitive == gpu_generated)
+    {
+        glDrawArrays(GL_POINTS, 0, elements_number);
+        return;
+    }
     if (indices_number == 0)
         return;
 

@@ -27,7 +27,10 @@ typedef uint16_t MeshRawDataHandleType;
 enum Primitive
 {
     triangle = 0,
-    lines = 1
+    line = 1,
+    point = 2,
+    gpu_generated = 3,
+    primitive_max
 };
 
 }

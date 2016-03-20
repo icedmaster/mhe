@@ -6,6 +6,8 @@
 #include "render/posteffect_material_system.hpp"
 #include "render/depth_write_material_system.hpp"
 #include "render/csm_depth_rendering_material_system.hpp"
+#include "render/rsm_material_system.hpp"
+#include "render/lpv_material_system.hpp"
 
 namespace mhe {
 namespace game {
@@ -31,6 +33,9 @@ void Engine::setup_generated()
     MaterialSystemFactory::instance().add<ProbesAccumulatorMaterialSystem>();
     MaterialSystemFactory::instance().add<AverageLuminanceMaterialSystem>();
     MaterialSystemFactory::instance().add<BloomMaterialSystem>();
+    MaterialSystemFactory::instance().add<RSMMaterialSystem>();
+    MaterialSystemFactory::instance().add<LPVMaterialSystem>();
+    MaterialSystemFactory::instance().add<LPVResolveMaterialSystem>();
 }
 
 }}

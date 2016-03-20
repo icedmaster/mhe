@@ -5,7 +5,6 @@ namespace mhe {
 bool create_mesh(Mesh& mesh, const uint8_t* vertices, size_t vertices_size, const uint32_t* indices, size_t indices_size,
     size_t parts_number, Context& context)
 {
-    NOT_IMPLEMENTED_METHOD();
     UNUSED(mesh);
     UNUSED(vertices);
     UNUSED(vertices_size);
@@ -18,7 +17,6 @@ bool create_mesh(Mesh& mesh, const uint8_t* vertices, size_t vertices_size, cons
 
 void destroy_mesh(Mesh& mesh, Context& context)
 {
-    NOT_IMPLEMENTED_METHOD();
     UNUSED(mesh);
     UNUSED(context);
 }
@@ -26,7 +24,6 @@ void destroy_mesh(Mesh& mesh, Context& context)
 bool create_mesh_instance(MeshInstance& mesh, const uint8_t* vertices, size_t vertices_size, const uint32_t* indices, size_t indices_size,
     size_t parts_number, Context& context)
 {
-    NOT_IMPLEMENTED_METHOD();
     UNUSED(mesh);
     UNUSED(vertices);
     UNUSED(vertices_size);
@@ -39,7 +36,6 @@ bool create_mesh_instance(MeshInstance& mesh, const uint8_t* vertices, size_t ve
 
 void destroy_mesh_instance(MeshInstance& mesh, Context& context)
 {
-    NOT_IMPLEMENTED_METHOD();
     UNUSED(mesh);
     UNUSED(context);
 }

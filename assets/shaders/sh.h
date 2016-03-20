@@ -8,6 +8,23 @@ struct ColorSH9
 	vec3 c[9];
 };
 
+struct SH4
+{
+    vec4 c;
+};
+
+struct ColorSH4
+{
+    vec3 c[4];
+};
+
+struct RGBSH4
+{
+    vec4 r;
+    vec4 g;
+    vec4 b;
+};
+
 [include "common.h"]
 
 #define COS_A0 PI
@@ -49,6 +66,78 @@ SH9 sh_cosine_lobe(in vec3 dir)
 	return sh;
 }
 
+SH4 sh_cosine_lobe_sh4(in vec3 dir)
+{
+	SH4 sh;
+
+    // Band 0
+    sh.c[0] = 0.282095f * COS_A0;
+
+    // Band 1
+    sh.c[1] = -0.488603f * dir.y * COS_A1;
+    sh.c[2] = 0.488603f * dir.z * COS_A1;
+    sh.c[3] = -0.488603f * dir.x * COS_A1;
+
+    return sh;
+}
+
+SH4 sh4(in vec3 dir)
+{
+	SH4 sh;
+
+    // Band 0
+    sh.c[0] = 0.282095f;
+
+    // Band 1
+    sh.c[1] = -0.488603f * dir.y;
+    sh.c[2] = 0.488603f * dir.z;
+    sh.c[3] = -0.488603f * dir.x;
+
+    return sh;
+}
+
+RGBSH4 mul(SH4 sh, vec3 c)
+{
+    RGBSH4 res;
+    res.r = sh.c * c.x;
+    res.g = sh.c * c.y;
+    res.b = sh.c * c.z;
+
+    return res;
+}
+
+vec3 shdot(SH4 sh, RGBSH4 rgb_sh)
+{
+    return vec3(dot(sh.c, rgb_sh.r), dot(sh.c, rgb_sh.g), dot(sh.c, rgb_sh.b));
+}
+
+RGBSH4 shabs(RGBSH4 sh)
+{
+    RGBSH4 res;
+    res.r = abs(sh.r);
+    res.g = abs(sh.g);
+    res.b = abs(sh.b);
+    return res;
+}
+
+RGBSH4 add(RGBSH4 sh1, RGBSH4 sh2)
+{
+    RGBSH4 res;
+    res.r = sh1.r + sh2.r;
+    res.g = sh1.g + sh2.g;
+    res.b = sh1.b + sh2.b;
+    return res;
+}
+
+RGBSH4 sub(RGBSH4 sh1, RGBSH4 sh2)
+{
+    RGBSH4 res;
+    res.r = sh1.r - sh2.r;
+    res.g = sh1.g - sh2.g;
+    res.b = sh1.b - sh2.b;
+    return res;
+}
+
 vec3 calculate_irradiance(in vec3 nrm, in ColorSH9 radiance)
 {
 	vec3 res = VEC3_ZERO;
@@ -56,5 +145,24 @@ vec3 calculate_irradiance(in vec3 nrm, in ColorSH9 radiance)
 	for (int i = 0; i < 9; ++i)
 		res += cos_lobe.c[i] * radiance.c[i];
 	return res / PI;
+}
+
+vec3 calculate_irradiance(in vec3 nrm, in RGBSH4 rgb_sh)
+{
+    vec3 res = VEC3_ZERO;
+    SH4 cos_lobe = sh_cosine_lobe_sh4(nrm);
+    res.r = dot(cos_lobe.c, rgb_sh.r);
+    res.g = dot(cos_lobe.c, rgb_sh.g);
+    res.b = dot(cos_lobe.c, rgb_sh.b);
+    return res / PI;
+}
+
+RGBSH4 empty_rgbsh4()
+{
+    RGBSH4 res;
+    res.r = VEC4_ZERO;
+    res.g = VEC4_ZERO;
+    res.b = VEC4_ZERO;
+    return res;
 }
 

@@ -73,6 +73,7 @@ private:
         posteffect_ssr,
         posteffect_ssao,
         posteffect_bloom,
+        posteffect_lpv,
         posteffect_max
     };
 

@@ -58,6 +58,11 @@ public:
         return render_target_;
     }
 
+    RenderTarget::IdType render_target_id() const override
+    {
+        return render_target_;
+    }
+
     void output(Context& context, size_t unit, TextureInstance& texture) const override;
 
     void enable_baked_lighting( bool enable )

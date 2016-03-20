@@ -46,6 +46,8 @@ struct MaterialSystemContext
 class MHE_EXPORT MaterialSystem : public ref_counter
 {
 public:
+    static const uint8_t invalid_id = static_cast<uint8_t>(-1);
+
     virtual ~MaterialSystem() {}
     
     virtual bool init(Context& context, const MaterialSystemContext& material_system_context) = 0;

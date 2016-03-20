@@ -67,7 +67,8 @@ bool ListOfCommands::execute_impl(Context& context, RenderStage current_stage)
 }
 
 GPUProfileCommand::GPUProfileCommand(const char* name) :
-    node_(MainGPUProfiler::instance().create(name))
+    node_(MainGPUProfiler::instance().create(name)),
+    hits_(1), hit_(0)
 {
     set_stages(render_stage_before_submit | render_stage_after_submit);
 }
@@ -89,7 +90,7 @@ bool GPUProfileCommand::execute_impl(Context& /*context*/, RenderStage current_s
         MainGPUProfiler::instance().begin(node_);
         node_.begin();
     }
-    else if (current_stage == end_stage)
+    else if (current_stage == end_stage && ++hit_ >= hits_)
     {
         node_.end();
         MainGPUProfiler::instance().end(node_);

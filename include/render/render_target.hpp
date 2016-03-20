@@ -23,6 +23,7 @@ struct RenderTargetDesc
     // TODO: make different widths and heights for each render target
     size_t width;
     size_t height;
+    size_t depth;
     int target;
     int texture_type;
     int color_format[max_simultaneous_render_targets_number];

@@ -189,6 +189,11 @@ template <class T>
 struct InvalidHandle
 {
     static const T id;
+
+    operator T()
+    {
+        return id;
+    }
 };
 
 template <class T>

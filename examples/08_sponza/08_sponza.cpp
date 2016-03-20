@@ -176,11 +176,10 @@ int main(int /*argc*/, char** /*argv*/)
 #else
     config.assets_path = "../../assets/";
 #endif
-    config.render_config_filename = mhe::utils::path_join(config.assets_path, "render.xml");
+    config.render_config_filename = mhe::utils::path_join(config.assets_path, "render_gi.xml");
     app.init(config);
 
-    app.engine().renderer()->set_ambient_color(mhe::color_white * 0.35f);
-    //mhe::game::get_global_vars().set("use_normalmaps", false);
+    app.engine().renderer()->set_ambient_color(mhe::color_white * 0.3f);
 
     mhe::game::GameSceneDesc desc;
     GameScene* game_scene = new GameScene;
