@@ -103,10 +103,9 @@ public:
 	{
 		static quatf zaxis_rotation(0.0f, pi, 0.0f);
 		mat4x4 res =  transform_;
-		res.set_row(3, vec3::zero());
-		res *= zaxis_rotation.to_matrix<mat4x4>();
-		res.multTranslate(-position_);
-		return res;
+		res = zaxis_rotation.to_matrix<mat4x4>() * res;
+		//res.multTranslate(-position_);
+		return res.inverted();
 	}
 
 	mat4x4 inverse_transform() const
