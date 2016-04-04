@@ -5,7 +5,6 @@
 #include "app/application_asset_path.hpp"
 #include "core/memory.hpp"
 #include "core/string.hpp"
-#include "events/delegate_event_listener.hpp"
 #include "events/system_event.hpp"
 #include "events/system_device.hpp"
 #include "events/keyboard_device.hpp"
@@ -17,6 +16,29 @@
 
 namespace mhe {
 namespace app {
+
+class ApplicationSystemEventListener : public EventListener
+{
+public:
+    ApplicationSystemEventListener(Application* app) : app_(app) {}
+
+    EventType type() const override
+    {
+        return system_event_type;
+    }
+
+    int arg() const override
+    {
+        return Event::any_event;
+    }
+
+    bool handle(const Event* event)
+    {
+        return app_->on_system_event(event);
+    }
+private:
+    Application* app_;
+};
 
 struct PosteffectParams
 {
@@ -135,18 +157,10 @@ void Application::init_assets_path(const std::string& config_assets_path)
 
 void Application::add_delegates()
 {
-    class ApplicationEventListener : public DelegateEventListener
-    {
-    public:
-        ApplicationEventListener(Application* app) :
-            DelegateEventListener(system_event_type, 0, 0, create_delegate(app, &Application::on_system_event))
-        {}
-    };
-
     engine_->event_manager().add_device(new SystemDevice("sys"));
     engine_->event_manager().add_keyboard(new KeyboardDevice("kbd"));
     engine_->event_manager().add_mouse(new MouseDevice("mouse"));
-    engine_->event_manager().add_listener(new ApplicationEventListener(this));
+    engine_->event_manager().add_listener(new ApplicationSystemEventListener(this));
 }
 
 bool Application::on_system_event(const Event* event)

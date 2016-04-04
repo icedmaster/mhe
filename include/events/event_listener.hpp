@@ -9,17 +9,17 @@ namespace mhe {
 class EventListener : public ref_counter
 {
 public:
-	virtual ~EventListener() {}
+    virtual ~EventListener() {}
 
-	virtual int id() const
-	{
-		return Event::create_event_id(type(), arg(), optarg());
-	}
+    virtual int id() const
+    {
+        return Event::create_event_id(type(), arg(), optarg());
+    }
 
-	virtual EventType type() const = 0;
-	virtual int arg() const = 0;
-	virtual int optarg() const { return Event::any_event; }
-	virtual bool handle(const Event* event) = 0;
+    virtual EventType type() const = 0;
+    virtual int arg() const = 0;
+    virtual int optarg() const { return Event::any_event; }
+    virtual bool handle(const Event* event) = 0;
 };
 
 }

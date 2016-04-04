@@ -3,10 +3,10 @@
 #ifndef __MHE_GAME__
 #define __MHE_GAME__
 
-#include "game/game_scene.hpp"
 #include "game/base_view_events_handler.hpp"
-#include "game/game_context.hpp"
 #include "game/engine.hpp"
+#include "game/game_context.hpp"
+#include "game/game_scene.hpp"
 
 #include "game/input/fps_camera_controller.hpp"
 
