@@ -13,7 +13,11 @@ class Engine;
 class RDBGProcessor;
 
 void register_light_type(RDBGProcessor& rdbg_processor);
-void register_light(game::Engine& engine, size_t id, const std::string& name);
+
+bool light_set_data(game::Engine& engine, const uint8_t* data, size_t size, size_t offset);
+bool light_get_data(game::Engine& engine, uint8_t* data, size_t& size, size_t offset);
+bool light_set_object_data(game::Engine& engine, size_t objectid, const uint8_t* data, size_t size, size_t offset);
+bool light_get_object_data(game::Engine& engine, size_t objectid, uint8_t* data, size_t& size, size_t offset);
 
 bool set_diffuse_color(game::Engine& engine, size_t id, const colorf& color);
 bool get_diffuse_color(game::Engine& engine, size_t id, colorf& color);

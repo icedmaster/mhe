@@ -50,6 +50,7 @@ struct NodeInstance
 struct LightInstance
 {
     POOL_STRUCT(uint16_t);
+
     Light light;
     TransformInstance::IdType transform_id;
     AABBInstance::IdType aabb_id;

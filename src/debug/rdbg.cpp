@@ -19,6 +19,7 @@ namespace detail {
 namespace {
 const char* error_unknown_command = "Unknown command";
 const char* error_not_implemented = "Not implemented";
+const char* error_invalid_type = "Invalid type";
 
 enum Commands
 {
@@ -65,7 +66,6 @@ vec4 convert(const std::string* args, size_t argc)
         types_cast<float>(args[2]), types_cast<float>(args[3]));
 }
 
-template <class S>
 string decode_string(ByteStream& stream)
 {
     uint32_t len = construct(stream.read(4));
@@ -188,10 +188,18 @@ bool RDBGProcessor::process_var(RDBGData& result, const RDBGData& cmd)
     return false;
 }
 
+bool RDBGProcessor::process_command(RDBGData& result, const RDBGData& cmd)
+{
+    if (cmd.cmd == command_get)
+        return process_get_command(result, cmd);
+    result = make_error(error_not_implemented);
+    return false;
+}
+
 bool RDBGProcessor::set_var(RDBGData& result, const RDBGData& cmd)
 {
     ByteStream stream(cmd.data.data(), cmd.data.size());
-    const string& varname = decode_string<string>(stream);
+    const string& varname = decode_string(stream);
     GlobalVars::instance().set(varname, stream);
     result.cmd = result_ok;
     return true;
@@ -229,14 +237,33 @@ RDBGData RDBGProcessor::process_stats_command(const RDBGData&)
     return res;
 }
 
-/*void RDBGProcessor::process_get_data(std::string& result, const Data& data) const
+bool RDBGProcessor::process_get_command(RDBGData& result, const RDBGData& cmd)
 {
-    add_field(result, types_cast<std::string>(data.children.size()));
-    for (size_t i = 0; i < data.children.size(); ++i)
+    // read type
+    ByteStream stream(cmd.data.data(), cmd.data.size());
+    const string& type = decode_string(stream);
+    TypesMap::iterator it = types_.find(type);
+    if (it == types_.end())
     {
-        add_field(result, data.children[i].name);
+        result = make_error(error_invalid_type);
+        return false;
     }
-}*/
+    if (stream.has_reached_end())
+    {
+        ASSERT(it->value.get_data_func != nullptr, "Invalid type info for RDBG, type:" << type);
+        size_t size = result.data.capacity();
+        bool res = it->value.get_data_func(engine_, reinterpret_cast<uint8_t*>(&result.data[0]), size, 0);
+        if (!res)
+            result = make_error(error_invalid_type);
+        else
+        {
+            result.cmd = result_ok;
+            result.data.resize(size);
+        }
+    }
+
+    return result.cmd == result_ok;
+}
 
 RDBGData RDBGProcessor::make_error(const char* message) const
 {
@@ -245,61 +272,6 @@ RDBGData RDBGProcessor::make_error(const char* message) const
     res.data.insert(res.data.end(), message, message + strlen(message));
     return res;
 }
-
-/*RDBGData RDBGProcessor::set_data(RDBGProcessor::Data& data, size_t id, const std::vector<std::string>& subtypes, const std::string* args, size_t argc)
-{
-    const Data* field_data = find_data(data, subtypes);
-    if (field_data == nullptr) return make_error("");
-    bool result = false;
-    switch (field_data->type)
-    {
-    case None:
-        return make_error(error_invalid_argument);
-    case Int:
-        result = set(*field_data, id, convert<int>(args, argc));
-        break;
-    case Vector4:
-        result = set(*field_data, id, convert<vec4>(args, argc));
-        break;
-    }
-    if (result)
-        return message_ok;
-    return make_error(error_not_implemented);
-}*/
-
-/*RDBGData RDBGProcessor::get_data(Data& data, size_t id, const std::vector<std::string>& subtypes)
-{
-    NOT_IMPLEMENTED(data);
-    NOT_IMPLEMENTED(id);
-    NOT_IMPLEMENTED(subtypes);
-    return make_error("");
-}*/
-
-/*const RDBGProcessor::Data* RDBGProcessor::find_data(const Data& root, const std::vector<std::string>& names) const
-{
-    if (names.empty()) return nullptr;
-    if (names.size() == 1) return &root;
-    bool process = true;
-    const Data* parent = &root;
-    size_t index = 1;
-    while (process)
-    {
-        size_t i = 0;
-        for (; i < parent->children.size(); ++i)
-        {
-            if (parent->children[i].name == names[index])
-            {
-                parent = &(parent->children[i]);
-                if (++index == names.size())
-                    return parent;
-                break;
-            }
-        }
-        if (i == parent->children.size())
-            process = false;
-    }
-    return nullptr;
-}*/
 
 void RDBGProcessor::update_profiler_data()
 {

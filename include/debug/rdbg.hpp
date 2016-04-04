@@ -40,361 +40,303 @@ typedef bool (*GetFuncVector4)(game::Engine& engine, size_t id, vec4& value);
 
 union SetFunc
 {
-	SetFuncInt set_int;
-	SetFuncFloat set_float;
-	SetFuncString set_string;
-	SetFuncVector3 set_vec3;
-	SetFuncVector4 set_vec4;
+    SetFuncInt set_int;
+    SetFuncFloat set_float;
+    SetFuncString set_string;
+    SetFuncVector3 set_vec3;
+    SetFuncVector4 set_vec4;
 };
 
 union GetFunc
 {
-	GetFuncInt get_int;
-	GetFuncFloat get_float;
-	GetFuncString get_string;
-	GetFuncVector3 get_vec3;
-	GetFuncVector4 get_vec4;
+    GetFuncInt get_int;
+    GetFuncFloat get_float;
+    GetFuncString get_string;
+    GetFuncVector3 get_vec3;
+    GetFuncVector4 get_vec4;
+};
+
+typedef bool (*SetDataFunc)(game::Engine& engine, const uint8_t* data, size_t size, size_t offset);
+typedef bool (*GetDataFunc)(game::Engine& engine, uint8_t* data, size_t& size, size_t offset);
+typedef bool (*SetObjectDataFunc)(game::Engine& engine, size_t objectid, const uint8_t* data, size_t size, size_t offset);
+typedef bool (*GetObjectDataFunc)(game::Engine& engine, size_t objectid, uint8_t* data, size_t& size, size_t offset);
+
+struct TypeRegistrationInfo
+{
+    string type_name;
+    SetDataFunc set_data_func;
+    GetDataFunc get_data_func;
+    SetObjectDataFunc set_object_data_func;
+    GetObjectDataFunc get_object_data_func;
 };
 
 typedef fixed_size_vector<char, 1024> rdbgvector;
 
 struct RDBGData
 {
-	rdbgvector data;
-	uint8_t cmd;
+    rdbgvector data;
+    uint8_t cmd;
 
-	RDBGData() {}
-	RDBGData(uint8_t res) : cmd(res) {}
+    RDBGData() {}
+    RDBGData(uint8_t res) : cmd(res) {}
 };
 
 class ByteStream
 {
 public:
-	ByteStream(const char* data, size_t size) : data_(data), size_(size), pos_(0) {}
+    ByteStream(const char* data, size_t size) : data_(data), size_(size), pos_(0) {}
 
-	const char* read(size_t n)
-	{
-		const char* res = data_ + pos_;
-		pos_ += n;
-		return res;
-	}
+    const char* read(size_t n)
+    {
+        const char* res = data_ + pos_;
+        pos_ += n;
+        return res;
+    }
+
+    bool has_reached_end() const
+    {
+        return pos_ >= size_;
+    }
 private:
-	const char* data_;
-	size_t size_;
-	size_t pos_;
+    const char* data_;
+    size_t size_;
+    size_t pos_;
 };
 
 class GlobalVars : public Singleton<GlobalVars>
 {
-	friend class Singleton<GlobalVars>;
+    friend class Singleton<GlobalVars>;
 public:
-	struct Data
-	{
-		const char* name;
-		int type;
-		string value;
-		bool changed;
-	};
+    struct Data
+    {
+        const char* name;
+        int type;
+        string value;
+        bool changed;
+    };
 public:
-	template <class T>
-	size_t add(const char* name, const T& value)
-	{
-		size_t index = vars_.size();
-		set(name, value);
-		return index;
-	}
+    template <class T>
+    size_t add(const char* name, const T& value)
+    {
+        size_t index = vars_.size();
+        set(name, value);
+        return index;
+    }
 
-	template <class T>
-	T value(const char* name) const
-	{
-		NameToVectorMap::const_iterator it = names_indices_.find(string(name));
-		if (it == names_indices_.end()) return T();
-		return types_cast<T>(vars_[it->value].value);
-	}
+    template <class T>
+    T value(const char* name) const
+    {
+        NameToVectorMap::const_iterator it = names_indices_.find(string(name));
+        if (it == names_indices_.end()) return T();
+        return types_cast<T>(vars_[it->value].value);
+    }
 
-	template <class T>
-	T value(size_t index) const
-	{
-		return types_cast<T>(vars_[index].value);
-	}
+    template <class T>
+    T value(size_t index) const
+    {
+        return types_cast<T>(vars_[index].value);
+    }
 
-	template <class T>
-	void set(const char* name, const T& value)
-	{
-		NameToVectorMap::iterator it = names_indices_.find(string(name));
-		if (it != names_indices_.end())
-		{
-			Data& data = vars_[it->value];
-			data.value = types_cast<string>(value);
-		}
-		else
-		{
-			size_t index = vars_.size();
-			Data data;
-			data.name = name;
-			data.type = TypeHelper<T>::type;
-			data.value = types_cast<string>(value);
-			data.changed = true;
-			vars_.push_back(data);
-			names_indices_[string(name)] = index;
-		}
-	}
+    template <class T>
+    void set(const char* name, const T& value)
+    {
+        NameToVectorMap::iterator it = names_indices_.find(string(name));
+        if (it != names_indices_.end())
+        {
+            Data& data = vars_[it->value];
+            data.value = types_cast<string>(value);
+        }
+        else
+        {
+            size_t index = vars_.size();
+            Data data;
+            data.name = name;
+            data.type = TypeHelper<T>::type;
+            data.value = types_cast<string>(value);
+            data.changed = true;
+            vars_.push_back(data);
+            names_indices_[string(name)] = index;
+        }
+    }
 
-	template <class T>
-	void set(size_t index, const T& value)
-	{
-		vars_[index] = types_cast<string>(value);
-	}
+    template <class T>
+    void set(size_t index, const T& value)
+    {
+        vars_[index] = types_cast<string>(value);
+    }
 
-	void set(const string& name, ByteStream& stream);
+    void set(const string& name, ByteStream& stream);
 
-	bool has(const char* name) const
-	{
-		return names_indices_.find(string(name)) != names_indices_.end();
-	}
+    bool has(const char* name) const
+    {
+        return names_indices_.find(string(name)) != names_indices_.end();
+    }
 
-	bool reset_if_changed(const char* name)
-	{
-		NameToVectorMap::iterator it = names_indices_.find(string(name));
-		if (it == names_indices_.end()) return false;
-		return reset_if_changed(it->value);
-	}
+    bool reset_if_changed(const char* name)
+    {
+        NameToVectorMap::iterator it = names_indices_.find(string(name));
+        if (it == names_indices_.end()) return false;
+        return reset_if_changed(it->value);
+    }
 
-	bool reset_if_changed(size_t index)
-	{
-		Data& data = vars_[index];
-		bool changed = data.changed;
-		data.changed = false;
-		return changed;
-	}
+    bool reset_if_changed(size_t index)
+    {
+        Data& data = vars_[index];
+        bool changed = data.changed;
+        data.changed = false;
+        return changed;
+    }
 
-	const vector<Data>& data() const;
+    const vector<Data>& data() const;
 
-	void update_data(size_t index, const string& data)
-	{
-		vars_[index].value = data;
-		vars_[index].changed = true;
-	}
+    void update_data(size_t index, const string& data)
+    {
+        vars_[index].value = data;
+        vars_[index].changed = true;
+    }
 private:
-	GlobalVars() {}
-	~GlobalVars() {}
+    GlobalVars() {}
+    ~GlobalVars() {}
 
-	typedef vector<Data> VarsVector;
-	typedef hashmap<string, size_t> NameToVectorMap;
-	VarsVector vars_;
-	NameToVectorMap names_indices_;
+    typedef vector<Data> VarsVector;
+    typedef hashmap<string, size_t> NameToVectorMap;
+    VarsVector vars_;
+    NameToVectorMap names_indices_;
 };
 
 class RDBGProcessor
 {
 public:
-	struct Data
-	{
-		std::vector<Data> children;
-		std::string name;
-		SetFunc set;
-		GetFunc get;
-		int type;
+    RDBGProcessor(game::Engine& engine) :
+        engine_(engine)
+    {}
 
-		Data() :
-			type(None)
-		{}
+    bool init();
 
-		Data(const char* data_name) :
-			name(data_name),
-			type(None)
-		{}
+    void register_type(const TypeRegistrationInfo& info)
+    {
+        types_[info.type_name] = info;
+    }
 
-		template <class SF, class GF>
-		Data& attach(const char* name, int type, SF set_func, GF get_func)
-		{
-			Data child;
-			child.name = name;
-			child.type = type;
-			update_func(child, set_func, get_func);
-			children.push_back(child);
-			return children.back();
-		}
+    RDBGData process_command(const RDBGData& cmd);
 
-		void update_func(Data& child, SetFuncInt set_func, GetFuncInt get_func)
-		{
-			child.set.set_int = set_func;
-			child.get.get_int = get_func;
-		}
-
-		void update_func(Data& child, SetFuncFloat set_func, GetFuncFloat get_func)
-		{
-			child.set.set_float = set_func;
-			child.get.get_float = get_func;
-		}
-
-		void update_func(Data& child, SetFuncString set_func, GetFuncString get_func)
-		{
-			child.set.set_string = set_func;
-			child.get.get_string = get_func;
-		}
-
-		void update_func(Data& child, SetFuncVector3 set_func, GetFuncVector3 get_func)
-		{
-			child.set.set_vec3 = set_func;
-			child.get.get_vec3 = get_func;
-		}
-
-		void update_func(Data& child, SetFuncVector4 set_func, GetFuncVector4 get_func)
-		{
-			child.set.set_vec4 = set_func;
-			child.get.get_vec4 = get_func;
-		}
-	};
-public:
-	RDBGProcessor(game::Engine& engine) :
-		engine_(engine)
-	{}
-
-	bool init();
-
-	void register_type(const Data& data)
-	{
-		data_[hash(data.name)] = data;
-	}
-
-	bool type_registrated(const std::string& name) const
-	{
-		return data_.find(hash(name)) != data_.end();
-	}
-
-	RDBGData process_command(const RDBGData& cmd);
-
-	void update();
+    void update();
 private:
-	RDBGData make_error(const char* message) const;
+    RDBGData make_error(const char* message) const;
 
-	//RDBGData set_data(Data& data, size_t id, const std::vector<std::string>& subtypes, const std::string* args, size_t argc);
-	//RDBGData get_data(Data& data, size_t id, const std::vector<std::string>& subtypes);
+    bool process_default_command(RDBGData& result, const RDBGData& data);
+    bool process_var(RDBGData& result, const RDBGData& cmd);
+    bool process_command(RDBGData& result, const RDBGData& cmd);
+    RDBGData process_get_all_command(const RDBGData& data);
+    RDBGData process_profiler_result_command(const RDBGData& data);
+    RDBGData process_stats_command(const RDBGData& data);
 
-	bool set(const Data& data, size_t id, int value)
-	{
-		return data.set.set_int(engine_, id, value);
-	}
+    bool process_get_command(RDBGData& result, const RDBGData& cmd);
 
-	bool set(const Data& data, size_t id, const vec4& value)
-	{
-		return data.set.set_vec4(engine_, id, value);
-	}
+    bool set_var(RDBGData& result, const RDBGData& cmd);
+    bool get_var(RDBGData& result, const RDBGData& cmd);
 
-	bool process_default_command(RDBGData& result, const RDBGData& data);
-	bool process_var(RDBGData& result, const RDBGData& cmd);
-	RDBGData process_get_all_command(const RDBGData& data);
-	RDBGData process_profiler_result_command(const RDBGData& data);
-	RDBGData process_stats_command(const RDBGData& data);
-	//void process_get_data(std::string& result, const Data& data) const;
+    void update_variables_data();
+    void update_profiler_data();
+    void update_gpu_profiler_data();
+    void update_stats_data();
 
-	//const Data* find_data(const Data& root, const std::vector<std::string>& names) const;
-
-	bool set_var(RDBGData& result, const RDBGData& cmd);
-	bool get_var(RDBGData& result, const RDBGData& cmd);
-
-	void update_variables_data();
-	void update_profiler_data();
-	void update_gpu_profiler_data();
-	void update_stats_data();
-
-	typedef std::map<hash_type, Data> DataMap;
-	DataMap data_;
-	game::Engine& engine_;
-	vector<GlobalVars::Data> global_vars_copy_;
-	rdbgvector all_variables_;
-	rdbgvector profiler_data_;
-	rdbgvector gpu_profiler_data_;
-	rdbgvector stats_data_;
-	mutex mutex_;
+    typedef hashmap<string, TypeRegistrationInfo> TypesMap;
+    TypesMap types_;
+    game::Engine& engine_;
+    vector<GlobalVars::Data> global_vars_copy_;
+    rdbgvector all_variables_;
+    rdbgvector profiler_data_;
+    rdbgvector gpu_profiler_data_;
+    rdbgvector stats_data_;
+    mutex mutex_;
 };
 
 class RDBGThread : public thread
 {
 public:
-	RDBGThread(RDBGProcessor& processor) :
-			processor_(processor)
-	{}
+    RDBGThread(RDBGProcessor& processor) :
+            processor_(processor)
+    {}
 private:
-	bool start_impl();
-	void process_impl();
+    bool start_impl();
+    void process_impl();
 
-	RDBGProcessor& processor_;
-	net::tcp_socket server_socket_;
+    RDBGProcessor& processor_;
+    net::tcp_socket server_socket_;
 };
 
 class RDBGEngine
 {
 public:
-	RDBGEngine(game::Engine& engine) :
-			processor_(engine),
-			thread_(processor_)
-	{}
+    RDBGEngine(game::Engine& engine) :
+            processor_(engine),
+            thread_(processor_)
+    {}
 
-	RDBGProcessor& processor()
-	{
-		return processor_;
-	}
+    RDBGProcessor& processor()
+    {
+        return processor_;
+    }
 
-	bool start();
-	void stop();
+    bool start();
+    void stop();
 
-	void update();
+    void update();
 private:
-	RDBGProcessor processor_;
-	RDBGThread thread_;
+    RDBGProcessor processor_;
+    RDBGThread thread_;
 };
 
 template <class T>
 class GlobalVar
 {
 public:
-	GlobalVar() {}
+    GlobalVar() {}
 
-	GlobalVar(const char* name, const T& val) :
-		name_(name)
-	{
-		ASSERT(GlobalVars::instance().has(name) == false, "Attempt to add global variable twice");
-		index_ = GlobalVars::instance().add(name, val);
-	}
+    GlobalVar(const char* name, const T& val) :
+        name_(name)
+    {
+        ASSERT(GlobalVars::instance().has(name) == false, "Attempt to add global variable twice");
+        index_ = GlobalVars::instance().add(name, val);
+    }
 
-	GlobalVar(const char* name) :
-		name_(name)
-	{
-		if (!GlobalVars::instance().has(name))
-			index_ = GlobalVars::instance().add(name, T());
-	}
+    GlobalVar(const char* name) :
+        name_(name)
+    {
+        if (!GlobalVars::instance().has(name))
+            index_ = GlobalVars::instance().add(name, T());
+    }
 
-	T value() const
-	{
-		return GlobalVars::instance().value<T>(index_);
-	}
+    T value() const
+    {
+        return GlobalVars::instance().value<T>(index_);
+    }
 
-	operator T()
-	{
-		return value();
-	}
+    operator T()
+    {
+        return value();
+    }
 
-	GlobalVar& operator= (const T& val)
-	{
-		GlobalVars::instance().set(index_, val);
-	}
+    GlobalVar& operator= (const T& val)
+    {
+        GlobalVars::instance().set(index_, val);
+    }
 
-	GlobalVar& operator= (const GlobalVar& other)
-	{
-		name_ = other.name_;
-		index_ = other.index_;
-		return *this;
-	}
+    GlobalVar& operator= (const GlobalVar& other)
+    {
+        name_ = other.name_;
+        index_ = other.index_;
+        return *this;
+    }
 
-	bool reset_if_changed()
-	{
-		return GlobalVars::instance().reset_if_changed(index_);
-	}
+    bool reset_if_changed()
+    {
+        return GlobalVars::instance().reset_if_changed(index_);
+    }
 private:
-	const char* name_;
-	size_t index_;
+    const char* name_;
+    size_t index_;
 };
 
 }

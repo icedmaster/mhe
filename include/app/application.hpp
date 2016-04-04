@@ -16,8 +16,11 @@ namespace app {
 struct RendererParams;
 struct GIParams;
 
+class ApplicationSystemEventListener;
+
 class MHE_EXPORT Application : public ref_counter
 {
+    friend class ApplicationSystemEventListener;
 public:
     Application(const char* name = "");
     virtual ~Application();
