@@ -138,6 +138,15 @@ RGBSH4 sub(RGBSH4 sh1, RGBSH4 sh2)
     return res;
 }
 
+RGBSH4 mul(RGBSH4 sh, float f)
+{
+    RGBSH4 res;
+    res.r = sh.r * f;
+    res.g = sh.g * f;
+    res.b = sh.b * f;
+    return res;
+}
+
 vec3 calculate_irradiance(in vec3 nrm, in ColorSH9 radiance)
 {
 	vec3 res = VEC3_ZERO;
