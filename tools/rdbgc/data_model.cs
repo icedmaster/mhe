@@ -91,6 +91,35 @@ namespace mhe
 			return res;
 		}
 
+		public void FillTransformationsData(byte[] data)
+		{
+			var stream = new ByteStream(data);
+			int count = Protocol.ParseInt(stream);
+			for (int i = 0; i < count; ++i)
+			{
+				Transform transform = Transform.Deserialize(stream);
+				xforms.Add(transform.id, transform);
+			}
+		}
+
+		public void FillLightData(byte[] data)
+		{
+			var stream = new ByteStream(data);
+			int count = Protocol.ParseInt(stream);
+			for (int i = 0; i < count; ++i)
+			{
+				var light = Light.Deserialize(this, stream);
+				lights.Add(light.id, light);
+			}
+		}
+
+		public Transform GetTransform(UInt16 id)
+		{
+			if (!xforms.ContainsKey(id))
+				return null;
+			return xforms[id];
+		}
+
 		private void FillGlobalVars(byte[] data)
 		{
 			ByteStream stream = new ByteStream(data);
@@ -103,6 +132,9 @@ namespace mhe
 		}
 
 		private Dictionary<string, GlobalVar> globalVars = new Dictionary<string, GlobalVar>();
+
+		private Dictionary<UInt16, Transform> xforms = new Dictionary<UInt16, Transform>();
+		private Dictionary<UInt16, Light> lights = new Dictionary<UInt16, Light>();
 	}
 }
 

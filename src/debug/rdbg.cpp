@@ -164,6 +164,9 @@ RDBGData RDBGProcessor::process_command(const RDBGData& cmd)
     if (process_var(result, cmd))
         return result;
 
+    if (process_command(result, cmd))
+        return result;
+
     return make_error(error_not_implemented);
 }
 

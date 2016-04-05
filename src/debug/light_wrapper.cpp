@@ -20,13 +20,14 @@ void serialize_light_instance(uint8_t* stream, const LightInstance& light_instan
     serialize(stream, light_instance.transform_id);
     serialize(stream, light_instance.aabb_id);
     serialize(stream, light_instance.enabled);
+    serialize(stream, light_instance.light.type());
     serialize(stream, light_instance.light.settings());
 }
 
 size_t light_instance_serialization_data_size()
 {
     return sizeof(LightInstance::IdType) + sizeof(TransformInstance::IdType) +
-        sizeof(AABBInstanceHandleType) + sizeof(bool) + sizeof(Light::Settings);
+        sizeof(AABBInstanceHandleType) + sizeof(bool) + sizeof(int) + sizeof(Light::Settings);
 }
 
 }
@@ -53,10 +54,12 @@ bool light_set_data(game::Engine& engine, const uint8_t* data, size_t size, size
 bool light_get_data(game::Engine& engine, uint8_t* data, size_t& size, size_t offset)
 {
     LightInstance* light_instances = engine.scene_context().light_pool.all_objects();
-    size_t objects_number = engine.scene_context().light_pool.size();
+    uint32_t objects_number = engine.scene_context().light_pool.size();
 
-    ASSERT(size > objects_number * light_instance_serialization_data_size(), "Invalid buffer size");
-    size = objects_number * light_instance_serialization_data_size();
+    ASSERT(size > objects_number * light_instance_serialization_data_size() + sizeof(uint32_t), "Invalid buffer size");
+    size = objects_number * light_instance_serialization_data_size() + sizeof(uint32_t);
+
+    serialize(data, objects_number);
 
     for (size_t i = 0; i < objects_number; ++i)
     {

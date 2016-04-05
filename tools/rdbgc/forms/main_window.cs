@@ -94,6 +94,7 @@ namespace mhe
 				protocol.SendGetAllCommand((s) =>
 				{
 					dataModel = new DataModel(s);
+					RequestTypesInfo();
 				});
 			}
 			else
@@ -134,6 +135,19 @@ namespace mhe
 					gpuProfiler.UpdateData(nodes);
 					GPUProfilerTextView.Buffer.Text = gpuProfiler.GetTextData();
 				});
+			});
+		}
+
+		private void RequestTypesInfo()
+		{
+			protocol.SendGetAllTypesDataCommand("transform", (answer) =>
+			{
+				dataModel.FillTransformationsData(answer);
+			});
+
+			protocol.SendGetAllTypesDataCommand("light", (answer) =>
+			{
+				dataModel.FillLightData(answer);
 			});
 		}
 

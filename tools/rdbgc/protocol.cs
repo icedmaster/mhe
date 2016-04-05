@@ -68,6 +68,11 @@ namespace mhe
 
 		public delegate void OnAnswer(byte[] data);
 
+		public static bool ParseBool(ByteStream stream)
+		{
+			return stream.ReadBytes(1)[0] != 0;
+		}
+
 		public static string ParseString(ByteStream stream)
 		{
 			byte[] len = stream.ReadBytes(4);
@@ -83,6 +88,41 @@ namespace mhe
 		{
 			byte[] b = stream.ReadBytes(4);
 			return System.BitConverter.ToSingle(b, 0);
+		}
+
+		public static UInt16 ParseUint16(ByteStream stream)
+		{
+			byte[] b = stream.ReadBytes(2);
+			return System.BitConverter.ToUInt16(b, 0);
+		}
+
+		public static Vector3 ParseVector3(ByteStream stream)
+		{
+			Vector3 v = new Vector3();
+			v.X = ParseFloat(stream);
+			v.Y = ParseFloat(stream);
+			v.Z = ParseFloat(stream);
+			return v;
+		}
+
+		public static Quat ParseQuat(ByteStream stream)
+		{
+			float x = ParseFloat(stream);
+			float y = ParseFloat(stream);
+			float z = ParseFloat(stream);
+			float w = ParseFloat(stream);
+
+			return new Quat(x, y, z, w);
+		}
+
+		public static Color ParseColor(ByteStream stream)
+		{
+			float r = ParseFloat(stream);
+			float g = ParseFloat(stream);
+			float b = ParseFloat(stream);
+			float a = ParseFloat(stream);
+
+			return new Color(r, g, b, a);
 		}
 
 		public static byte[] EncodeString(string s)
@@ -147,6 +187,12 @@ namespace mhe
 		public void SendSetVarCommand(byte[] varData, OnAnswer onAnswer)
 		{
 			SendCommand(Command.SET_VAR, varData, onAnswer);
+		}
+
+		public void SendGetAllTypesDataCommand(string type, OnAnswer onAnswer)
+		{
+			byte[] data = EncodeString(type);
+			SendCommand(Command.GET, data, onAnswer);
 		}
 
 		public void SendCommand(Command cmd, byte[] args, OnAnswer onAnswer)

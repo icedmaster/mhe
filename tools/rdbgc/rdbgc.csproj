@@ -44,6 +44,9 @@
     <Compile Include="log.cs" />
     <Compile Include="protocol_helper.cs" />
     <Compile Include="profiler.cs" />
+    <Compile Include="Math.cs" />
+    <Compile Include="common_types.cs" />
+    <Compile Include="render_types.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
