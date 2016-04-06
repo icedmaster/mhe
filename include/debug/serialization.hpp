@@ -23,6 +23,17 @@ inline size_t serialize(uint8_t*& stream, const uint32_t& data)
     return 4;
 }
 
+template <>
+inline size_t serialize(uint8_t*& stream, const int32_t& data)
+{
+    stream[0] = (data >> 24) & 0xff;
+    stream[1] = (data >> 16) & 0xff;
+    stream[2] = (data >> 8) & 0xff;
+    stream[3] = data & 0xff;
+    stream += 4;
+    return 4;
+}
+
 }
 
 #endif

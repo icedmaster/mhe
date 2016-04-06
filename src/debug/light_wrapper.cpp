@@ -14,6 +14,26 @@ namespace mhe {
 
 namespace {
 
+void serialize_light_settings(uint8_t*& stream, const Light::Settings& settings)
+{
+    serialize(stream, settings.light_desc.directional.directional_unused1);
+    serialize(stream, settings.light_desc.directional.directional_unused2);
+    serialize(stream, settings.light_desc.directional.directional_unused3);
+    serialize(stream, settings.light_desc.directional.directional_unused4);
+    serialize(stream, settings.light_desc.directional.directional_shadowmap_projection_width);
+    serialize(stream, settings.light_desc.directional.directional_shadowmap_projection_height);
+    serialize(stream, settings.light_desc.directional.directional_shadowmap_projection_znear);
+    serialize(stream, settings.light_desc.directional.directional_shadowmap_projection_zfar);
+    serialize(stream, settings.light_desc.shadowmap_bias);
+    serialize(stream, settings.light_desc.cast_shadows);
+    serialize(stream, settings.light_desc.auto_shadow_configuration);
+
+    serialize(stream, settings.shading_settings.diffuse);
+    serialize(stream, settings.shading_settings.specular);
+    serialize(stream, settings.shading_settings.intensity);
+    serialize(stream, settings.shading_settings.specular_intensity);
+}
+
 void serialize_light_instance(uint8_t* stream, const LightInstance& light_instance)
 {
     serialize(stream, light_instance.id);
@@ -21,13 +41,19 @@ void serialize_light_instance(uint8_t* stream, const LightInstance& light_instan
     serialize(stream, light_instance.aabb_id);
     serialize(stream, light_instance.enabled);
     serialize(stream, light_instance.light.type());
-    serialize(stream, light_instance.light.settings());
+    serialize_light_settings(stream, light_instance.light.settings());
+}
+
+size_t light_settings_serialization_data_size()
+{
+    return sizeof(float) * 9 + sizeof(bool) * 2 +
+           sizeof(vec4) * 2 + sizeof(float) * 2;
 }
 
 size_t light_instance_serialization_data_size()
 {
     return sizeof(LightInstance::IdType) + sizeof(TransformInstance::IdType) +
-        sizeof(AABBInstanceHandleType) + sizeof(bool) + sizeof(int) + sizeof(Light::Settings);
+        sizeof(AABBInstanceHandleType) + sizeof(bool) + sizeof(int) + light_settings_serialization_data_size();
 }
 
 }
