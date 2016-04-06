@@ -71,6 +71,11 @@ namespace mhe
 
 	public class DataModel
 	{
+        public Dictionary<UInt16, Light>.ValueCollection Lights
+        {
+            get { return lights.Values; }
+        }
+
 		public DataModel(byte[] data)
 		{
 			FillGlobalVars(data);

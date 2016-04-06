@@ -16,6 +16,8 @@ namespace mhe
 			pollTimer = new Timer(2000);
 			pollTimer.Elapsed += OnTimer;
 			pollTimer.Enabled = true;
+
+            renderObjectsTreeView.AppendColumn("Objects", new Gtk.CellRendererText(), "text", 0);
 		}
 
 		protected void OnConsoleKeyPressEvent(object o, Gtk.KeyPressEventArgs args)
@@ -148,6 +150,10 @@ namespace mhe
 			protocol.SendGetAllTypesDataCommand("light", (answer) =>
 			{
 				dataModel.FillLightData(answer);
+                Gtk.Application.Invoke(delegate
+                {
+                    RebuildRenderObjectsTreeView();     
+                });
 			});
 		}
 
@@ -158,6 +164,26 @@ namespace mhe
 			else
 				connectionStatusLabel.Text = "Disconnected";
 		}
+
+        private enum RenderObjectType
+        {
+            LIGHT = 0
+        }
+
+        private void RebuildRenderObjectsTreeView()
+        {
+            renderObjectsTreeStore = new Gtk.TreeStore(typeof(Light));
+            // lights
+            Gtk.TreeIter lightsRoot = renderObjectsTreeStore.AppendValues("lights");
+            var lights = dataModel.Lights;
+            foreach (var light in lights)
+            {
+                renderObjectsTreeStore.AppendValues(lightsRoot, light);
+            }
+
+            renderObjectsTreeView.Model = renderObjectsTreeStore;
+            renderObjectsTreeView.Selection.Changed += OnRenderTreeViewSelectionChanged;
+        }
 
 		protected void OnImportActivated(object sender, EventArgs e)
 		{
@@ -173,6 +199,33 @@ namespace mhe
 			this.Destroy();
 		}
 
+        private void OnRenderTreeViewSelectionChanged(object sender, EventArgs e)
+        {
+            Gtk.TreeIter iter;
+            if (renderObjectsTreeView.Selection.GetSelected(out iter) == false)
+                return;
+            var indices = renderObjectsTreeView.Selection.GetSelectedRows()[0].Indices;
+            if (indices.Length != 2)
+                return;
+            if (indices[0] == (int)RenderObjectType.LIGHT)
+            {
+                var obj = (Light)renderObjectsTreeView.Model.GetValue(iter, 0);
+            }
+        }
+
+        private void BuildTreeElementGUI<T>(T obj)
+        {
+            var customAttributes = System.Attribute.GetCustomAttributes(typeof(T));
+            foreach (var attr in customAttributes)
+            {
+                if (attr is WidgetType)
+                {
+                    WidgetType widgetType = attr as WidgetType;
+                    var wrapperType = widgetType.WrapperType;
+                }
+            }
+        }
+
 		private DataModel dataModel;
 		private Protocol protocol;
 		private List<string> history = new List<string>();
@@ -180,7 +233,9 @@ namespace mhe
 		private Timer pollTimer;
 		private Profiler profiler = new Profiler();
 		private Profiler gpuProfiler = new Profiler();
-		private Settings settings;
+		private Settings settings;
+
+        private Gtk.TreeStore renderObjectsTreeStore;
 	}
 }
 

@@ -36,10 +36,8 @@
   <ItemGroup>
     <Compile Include="protocol.cs" />
     <Compile Include="gtk-gui\generated.cs" />
-    <Compile Include="gtk-gui\mhe.MainWindow.cs" />
     <Compile Include="rdbgc.cs" />
     <Compile Include="data_model.cs" />
-    <Compile Include="forms\main_window.cs" />
     <Compile Include="console_parser.cs" />
     <Compile Include="log.cs" />
     <Compile Include="protocol_helper.cs" />
@@ -47,6 +45,14 @@
     <Compile Include="Math.cs" />
     <Compile Include="common_types.cs" />
     <Compile Include="render_types.cs" />
+    <Compile Include="forms\main_window.cs" />
+    <Compile Include="gtk-gui\mhe.MainWindow.cs" />
+    <Compile Include="widgets\Vec3Widget.cs" />
+    <Compile Include="gtk-gui\mhe.Vec3Widget.cs" />
+    <Compile Include="widgets\TransformWidget.cs" />
+    <Compile Include="gtk-gui\mhe.TransformWidget.cs" />
+    <Compile Include="attributes.cs" />
+    <Compile Include="type_to_widget_wrappers.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -58,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="forms\" />
+    <Folder Include="widgets\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="gtk-gui\gui.stetic">

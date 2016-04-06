@@ -62,8 +62,13 @@ namespace mhe
         }
 
         public UInt16 id;
+
+        [WidgetType(WidgetType.Type.TRANSFORM)]
         public TransformInstance transform;
+
         public AABBInstance aabb;
+
+        [WidgetType(WidgetType.Type.CHECKBOX)]
         public bool enabled;
 
         public Type type;
