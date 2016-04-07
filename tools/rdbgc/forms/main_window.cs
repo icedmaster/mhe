@@ -172,17 +172,43 @@ namespace mhe
 
         private void RebuildRenderObjectsTreeView()
         {
-            renderObjectsTreeStore = new Gtk.TreeStore(typeof(Light));
+            renderObjectsTreeStore = new Gtk.TreeStore(typeof(object));
             // lights
-            Gtk.TreeIter lightsRoot = renderObjectsTreeStore.AppendValues("lights");
+            Gtk.TreeIter lightsRoot = renderObjectsTreeStore.AppendValues();
             var lights = dataModel.Lights;
             foreach (var light in lights)
             {
                 renderObjectsTreeStore.AppendValues(lightsRoot, light);
             }
 
+            Gtk.TreeViewColumn column = renderObjectsTreeView.GetColumn(0);
+
+            column.Title = "Objects";
+            var renderer = new Gtk.CellRendererText();
+            column.PackStart(renderer, true);
+            column.SetCellDataFunc(renderer, RenderTreeViewObject);
+
             renderObjectsTreeView.Model = renderObjectsTreeStore;
             renderObjectsTreeView.Selection.Changed += OnRenderTreeViewSelectionChanged;
+        }
+
+        private void RenderTreeViewObject(Gtk.TreeViewColumn column, Gtk.CellRenderer cell, Gtk.TreeModel model, Gtk.TreeIter iter)
+        {
+            Gtk.CellRendererText cellRenderer = cell as Gtk.CellRendererText;
+            var path = model.GetPath(iter);
+            if (path.Depth == 1)
+            {
+                if (path.Indices[0] == (int)RenderObjectType.LIGHT)
+                    cellRenderer.Text = "lights";
+            }
+            else
+            {
+                if (path.Indices[0] == (int)RenderObjectType.LIGHT)
+                {
+                    Light light = (Light)model.GetValue(iter, 0);
+                    cellRenderer.Text = light.id.ToString();
+                }
+            }
         }
 
 		protected void OnImportActivated(object sender, EventArgs e)
@@ -210,20 +236,32 @@ namespace mhe
             if (indices[0] == (int)RenderObjectType.LIGHT)
             {
                 var obj = (Light)renderObjectsTreeView.Model.GetValue(iter, 0);
+                BuildTreeElementGUI(obj);
             }
         }
 
         private void BuildTreeElementGUI<T>(T obj)
         {
-            var customAttributes = System.Attribute.GetCustomAttributes(typeof(T));
-            foreach (var attr in customAttributes)
+            foreach (var wrapper in currentProperties)
+                propertiesContainer.Remove(wrapper.Widget);
+            currentProperties.Clear();
+            var fields = typeof(T).GetFields();
+            foreach (var field in fields)
             {
-                if (attr is WidgetType)
+                var attributes = field.GetCustomAttributes(false);
+                foreach (var attr in attributes)
                 {
-                    WidgetType widgetType = attr as WidgetType;
-                    var wrapperType = widgetType.WrapperType;
+                    if (attr is WidgetType)
+                    {
+                        WidgetType widgetType = attr as WidgetType;
+                        var wrapperType = widgetType.WrapperType;
+                        var val = field.GetValue(obj);
+                        var wrapper = WrapperCreator.Create(wrapperType, propertiesContainer, field.Name, val);
+                        if (wrapper != null)
+                            currentProperties.Add(wrapper);
+                    }
                 }
-            }
+            }               
         }
 
 		private DataModel dataModel;
@@ -236,6 +274,7 @@ namespace mhe
 		private Settings settings;
 
         private Gtk.TreeStore renderObjectsTreeStore;
+        private List<WrapperBase> currentProperties = new List<WrapperBase>();
 	}
 }
 
