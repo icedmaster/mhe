@@ -141,6 +141,11 @@ namespace mhe
 			return ConvertToBytes(res);
 		}
 
+        public static byte[] EncodeBool(bool b)
+        {
+            return new byte[] { b == true ? (byte)1 : (byte)0 };
+        }
+
 		public bool IsConnected
 		{
 			get { return client.Connected; }
@@ -194,6 +199,17 @@ namespace mhe
 			byte[] data = EncodeString(type);
 			SendCommand(Command.GET, data, onAnswer);
 		}
+
+        public void SendSetFieldCommand(string type, int id, int fieldId, byte[] data, OnAnswer onAnswer)
+        {
+            byte[] typeData = EncodeString(type);
+            byte[] dataToSend = new byte[typeData.Length + 2 * 4 + data.Length];
+            Array.Copy(typeData, 0, dataToSend, 0, typeData.Length);
+            Array.Copy(ConvertToBytes((int)id), 0, dataToSend, typeData.Length, 4);
+            Array.Copy(ConvertToBytes((int)fieldId), 0, dataToSend, typeData.Length + 4, 4);
+            Array.Copy(data, 0, dataToSend, typeData.Length + 8, data.Length);
+            SendCommand(Command.SET, dataToSend, onAnswer);
+        }
 
 		public void SendCommand(Command cmd, byte[] args, OnAnswer onAnswer)
 		{

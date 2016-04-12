@@ -61,12 +61,13 @@ bool transform_get_data(game::Engine& engine, uint8_t* data, size_t& size, size_
     return true;
 }
 
-bool transform_set_object_data(game::Engine& engine, size_t objectid, const uint8_t* data, size_t size, size_t offset)
+bool transform_set_object_data(game::Engine& engine, uint32_t objectid, const uint8_t* data, size_t size, uint32_t field_index)
 {
+    TransformInstance& transform_instance = engine.scene_context().transform_pool.get(objectid);
     return false;
 }
 
-bool transform_get_object_data(game::Engine& engine, size_t objectid, uint8_t* data, size_t& size, size_t offset)
+bool transform_get_object_data(game::Engine& engine, uint32_t objectid, uint8_t* data, size_t& size, uint32_t field_index)
 {
     return false;
 }

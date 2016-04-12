@@ -58,8 +58,10 @@ union GetFunc
 
 typedef bool (*SetDataFunc)(game::Engine& engine, const uint8_t* data, size_t size, size_t offset);
 typedef bool (*GetDataFunc)(game::Engine& engine, uint8_t* data, size_t& size, size_t offset);
-typedef bool (*SetObjectDataFunc)(game::Engine& engine, size_t objectid, const uint8_t* data, size_t size, size_t offset);
-typedef bool (*GetObjectDataFunc)(game::Engine& engine, size_t objectid, uint8_t* data, size_t& size, size_t offset);
+typedef bool (*SetObjectDataFunc)(game::Engine& engine, uint32_t objectid, const uint8_t* data, size_t size, uint32_t offset);
+typedef bool (*GetObjectDataFunc)(game::Engine& engine, uint32_t objectid, uint8_t* data, size_t& size, uint32_t offset);
+
+typedef bool (*SetObjectFieldDataFunc)(game::Engine& engine, uint32_t objectid, const uint8_t* data, size_t size);
 
 struct TypeRegistrationInfo
 {
@@ -96,6 +98,16 @@ public:
     bool has_reached_end() const
     {
         return pos_ >= size_;
+    }
+
+    const char* data() const
+    {
+        return data_ + pos_;
+    }
+
+    size_t remains() const
+    {
+        return size_ - pos_;
     }
 private:
     const char* data_;
@@ -232,6 +244,7 @@ private:
     RDBGData process_stats_command(const RDBGData& data);
 
     bool process_get_command(RDBGData& result, const RDBGData& cmd);
+    bool process_set_command(RDBGData& result, const RDBGData& cmd);
 
     bool set_var(RDBGData& result, const RDBGData& cmd);
     bool get_var(RDBGData& result, const RDBGData& cmd);

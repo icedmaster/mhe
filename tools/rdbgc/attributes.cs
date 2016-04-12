@@ -27,5 +27,21 @@ namespace mhe
 
         private Type type = Type.NONE;
     }
+
+    [System.AttributeUsage(System.AttributeTargets.Field)]
+    public class FieldProtocolId : System.Attribute
+    {
+        public int FieldId
+        {
+            get { return fieldId; }
+        }
+
+        public FieldProtocolId(int id)
+        {
+            this.fieldId = id;
+        }
+
+        private int fieldId = -1;
+    }
 }
 

@@ -124,9 +124,10 @@ namespace mhe
 			this.notebook2.CurrentPage = 0;
 			// Container child notebook2.Gtk.Notebook+NotebookChild
 			this.hpaned1 = new global::Gtk.HPaned ();
+			this.hpaned1.WidthRequest = 64;
 			this.hpaned1.CanFocus = true;
 			this.hpaned1.Name = "hpaned1";
-			this.hpaned1.Position = 1;
+			this.hpaned1.Position = 61;
 			// Container child hpaned1.Gtk.Paned+PanedChild
 			this.GtkScrolledWindow3 = new global::Gtk.ScrolledWindow ();
 			this.GtkScrolledWindow3.Name = "GtkScrolledWindow3";
@@ -140,6 +141,7 @@ namespace mhe
 			this.hpaned1.Add (this.GtkScrolledWindow3);
 			global::Gtk.Paned.PanedChild w4 = ((global::Gtk.Paned.PanedChild)(this.hpaned1 [this.GtkScrolledWindow3]));
 			w4.Resize = false;
+			w4.Shrink = false;
 			// Container child hpaned1.Gtk.Paned+PanedChild
 			this.frame = new global::Gtk.Frame ();
 			this.frame.Name = "frame";

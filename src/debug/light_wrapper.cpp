@@ -94,12 +94,16 @@ bool light_get_data(game::Engine& engine, uint8_t* data, size_t& size, size_t of
     return true;
 }
 
-bool light_set_object_data(game::Engine& engine, size_t objectid, const uint8_t* data, size_t size, size_t offset)
+bool light_set_object_data(game::Engine& engine, uint32_t objectid, const uint8_t* data, size_t size, uint32_t field)
 {
-    return false;
+    ASSERT(field < 4, "Invalid field index");
+    SetObjectFieldDataFunc funcs[4] = {nullptr, nullptr, nullptr, light_set_enabled_flag};
+    SetObjectFieldDataFunc current_func = funcs[field];
+    if (current_func == nullptr) return true;
+    return current_func(engine, objectid, data, size);
 }
 
-bool light_get_object_data(game::Engine& engine, size_t objectid, uint8_t* data, size_t& size, size_t offset)
+bool light_get_object_data(game::Engine& engine, uint32_t objectid, uint8_t* data, size_t& size, size_t offset)
 {
     return false;
 }
@@ -133,6 +137,14 @@ bool get_specular_color(game::Engine& engine, size_t id, colorf& color)
     if (!engine.scene_context().light_pool.is_valid(id))
         return false;
     color = engine.scene_context().light_pool.get(id).light.shading().specular;
+    return true;
+}
+
+bool light_set_enabled_flag(game::Engine& engine, size_t id, const uint8_t* data, size_t size)
+{
+    if (!engine.scene_context().light_pool.is_valid(id))
+        return false;
+    engine.scene_context().light_pool.get(id).enabled = deserialize<bool>(data, size);
     return true;
 }
 

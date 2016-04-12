@@ -1,6 +1,8 @@
 #ifndef __SERIALIZATION_HPP__
 #define __SERIALIZATION_HPP__
 
+#include "core/assert.hpp"
+
 namespace mhe {
 
 template <class T>
@@ -32,6 +34,13 @@ inline size_t serialize(uint8_t*& stream, const int32_t& data)
     stream[3] = data & 0xff;
     stream += 4;
     return 4;
+}
+
+template <class T>
+inline T deserialize(const uint8_t* data, size_t size)
+{
+    ASSERT(size == sizeof(T), "Invalid size");
+    return *(reinterpret_cast<const T*>(data));
 }
 
 }

@@ -17,6 +17,10 @@ namespace mhe
 			pollTimer.Elapsed += OnTimer;
 			pollTimer.Enabled = true;
 
+            prorertyChangesTimer = new Timer(500);
+            prorertyChangesTimer.Elapsed += OnPropertyChangesTimer;
+            prorertyChangesTimer.Enabled = true;
+
             renderObjectsTreeView.AppendColumn("Objects", new Gtk.CellRendererText(), "text", 0);
 		}
 
@@ -236,11 +240,11 @@ namespace mhe
             if (indices[0] == (int)RenderObjectType.LIGHT)
             {
                 var obj = (Light)renderObjectsTreeView.Model.GetValue(iter, 0);
-                BuildTreeElementGUI(obj);
+                BuildTreeElementGUI(obj, Light.TypeName, obj.id);
             }
         }
 
-        private void BuildTreeElementGUI<T>(T obj)
+        private void BuildTreeElementGUI<T>(T obj, string type, int objectId)
         {
             foreach (var wrapper in currentProperties)
                 propertiesContainer.Remove(wrapper.Widget);
@@ -258,10 +262,36 @@ namespace mhe
                         var val = field.GetValue(obj);
                         var wrapper = WrapperCreator.Create(wrapperType, propertiesContainer, field.Name, val);
                         if (wrapper != null)
+                        {
+                            wrapper.ObjectId = objectId;
+                            wrapper.ObjectType = type;
+                            foreach (var fieldAttr in attributes)
+                            {
+                                FieldProtocolId fieldId = fieldAttr as FieldProtocolId;
+                                if (fieldId != null)
+                                {
+                                    wrapper.FieldId = fieldId.FieldId;
+                                    break;
+                                }
+                            }
                             currentProperties.Add(wrapper);
+                        }
+                        break;
                     }
                 }
             }               
+        }
+
+        private void OnPropertyChangesTimer(Object o, ElapsedEventArgs e)
+        {
+            foreach (var wrapper in currentProperties)
+            {
+                if (wrapper.IsChanged)
+                {
+                    protocol.SendSetFieldCommand(wrapper.ObjectType, wrapper.ObjectId, wrapper.FieldId, wrapper.Serialize(), null);
+                    wrapper.Apply();
+                }
+            }
         }
 
 		private DataModel dataModel;
@@ -275,6 +305,7 @@ namespace mhe
 
         private Gtk.TreeStore renderObjectsTreeStore;
         private List<WrapperBase> currentProperties = new List<WrapperBase>();
+        private Timer prorertyChangesTimer;
 	}
 }
 

@@ -61,6 +61,8 @@ namespace mhe
             DIRECTIONAL
         }
 
+        public static string TypeName = "light";
+
         public UInt16 id;
 
         [WidgetType(WidgetType.Type.TRANSFORM)]
@@ -69,6 +71,7 @@ namespace mhe
         public AABBInstance aabb;
 
         [WidgetType(WidgetType.Type.CHECKBOX)]
+        [FieldProtocolId(3)]
         public bool enabled;
 
         public Type type;

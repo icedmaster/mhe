@@ -81,8 +81,9 @@
                         <child>
                           <widget class="Gtk.HPaned" id="hpaned1">
                             <property name="MemberName" />
+                            <property name="WidthRequest">64</property>
                             <property name="CanFocus">True</property>
-                            <property name="Position">1</property>
+                            <property name="Position">61</property>
                             <child>
                               <widget class="Gtk.ScrolledWindow" id="GtkScrolledWindow3">
                                 <property name="MemberName" />
@@ -98,6 +99,7 @@
                               </widget>
                               <packing>
                                 <property name="Resize">False</property>
+                                <property name="Shrink">False</property>
                               </packing>
                             </child>
                             <child>

@@ -195,6 +195,8 @@ bool RDBGProcessor::process_command(RDBGData& result, const RDBGData& cmd)
 {
     if (cmd.cmd == command_get)
         return process_get_command(result, cmd);
+    else if (cmd.cmd == command_set)
+        return process_set_command(result, cmd);
     result = make_error(error_not_implemented);
     return false;
 }
@@ -266,6 +268,27 @@ bool RDBGProcessor::process_get_command(RDBGData& result, const RDBGData& cmd)
     }
 
     return result.cmd == result_ok;
+}
+
+bool RDBGProcessor::process_set_command(RDBGData& result, const RDBGData& cmd)
+{
+    ByteStream stream(cmd.data.data(), cmd.data.size());
+    const string& type = decode_string(stream);
+    TypesMap::iterator it = types_.find(type);
+    if (it == types_.end())
+    {
+        result = make_error(error_invalid_type);
+        return false;
+    }
+    ASSERT(!stream.has_reached_end(), "Set command for all objects is not supported");
+    // object id
+    uint32_t id = construct(stream.read(4));
+    uint32_t field = construct(stream.read(4));
+    bool res = it->value.set_object_data_func(engine_, id, reinterpret_cast<const uint8_t*>(stream.data()), stream.remains(), field);
+    if (!res)
+        result = make_error(error_invalid_type);
+    else result.cmd = result_ok;
+    return res;
 }
 
 RDBGData RDBGProcessor::make_error(const char* message) const
