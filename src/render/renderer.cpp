@@ -611,7 +611,7 @@ void destroy_render(Context& context)
     destroy_pool_elements(context.shader_pool);
     destroy_pool_elements(context.texture_pool);
     destroy_pool_elements(context.render_target_pool);
-    destroy_pool_elements_destroy(context.shader_storage_buffer_pool);
+    destroy_pool_elements(context.shader_storage_buffer_pool);
     destroy_pool_elements_destroy(context.texture_buffer_pool);
 }
 

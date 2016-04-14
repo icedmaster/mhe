@@ -96,8 +96,11 @@ bool PosteffectDebugMaterialSystem::init_mesh_instance(Context& context, MeshIns
     return true;
 }
 
-void PosteffectDebugMaterialSystem::destroy(Context&)
+void PosteffectDebugMaterialSystem::destroy(Context& context)
 {
+    destroy_mesh_instance(fullscreen_mesh_, context);
+    for (size_t i = 0; i < max_textures_number; ++i)
+        destroy_mesh_instance(mesh_[i], context);
 }
 
 void PosteffectDebugMaterialSystem::setup(Context& context, SceneContext& scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count)
@@ -174,8 +177,10 @@ bool PosteffectMaterialSystemBase::init(Context& context, const MaterialSystemCo
     return init_mesh(context, material_system_context);
 }
 
-void PosteffectMaterialSystemBase::destroy(Context&)
-{}
+void PosteffectMaterialSystemBase::destroy(Context& context)
+{
+    destroy_mesh_instance(mesh_, context);
+}
 
 void PosteffectMaterialSystemBase::setup(Context& context, SceneContext& scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count)
 {
@@ -361,6 +366,12 @@ bool SSRMaterialSystem::init(Context& context, const MaterialSystemContext& mate
     return true;
 }
 
+void SSRMaterialSystem::destroy(Context& context)
+{
+    destroy_pool_object(context.uniform_pool, ssr_uniform_);
+    PosteffectMaterialSystemBase::destroy(context);
+}
+
 void SSRMaterialSystem::init_debug_views(Context& context)
 {
     size_t debug_view_id = context.debug_views->add_view("SSR");
@@ -419,6 +430,13 @@ bool BlurMaterialSystem::init(Context& context, const MaterialSystemContext& mat
     material.uniforms[1] = uniform_;
 
     return true;
+}
+
+void BlurMaterialSystem::destroy(Context& context)
+{
+    destroy_pool_object(context.uniform_pool, uniform_);
+    context.render_target_manager.destroy(output_rt_, context);
+    PosteffectMaterialSystemBase::destroy(context);
 }
 
 bool BlurMaterialSystem::create_output(RenderStateHandleType render_state_id, Context& context, size_t index, float scale, int format)
@@ -559,6 +577,14 @@ void DOFMaterialSystem::postinit(Context& context)
     composite_material.uniforms[1] = dof_uniform_;
 }
 
+void DOFMaterialSystem::destroy(Context& context)
+{
+    context.render_target_manager.destroy(dof_rt_, context);
+    context.render_target_manager.destroy(blur_rt_, context);
+    destroy_pool_object(context.uniform_pool, dof_uniform_);
+    PosteffectMaterialSystemBase::destroy(context);
+}
+
 void DOFMaterialSystem::init_debug_views(Context& context)
 {
     size_t debug_view_id = context.debug_views->add_view("Depth of field");
@@ -623,6 +649,13 @@ bool SSAOMaterialSystem::init(Context& context, const MaterialSystemContext& mat
     ssao_shader_data_.ssaodata[2] = vec4::zero();
 
     return true;
+}
+
+void SSAOMaterialSystem::destroy(Context& context)
+{
+    destroy_pool_object(context.texture_pool, noise_texture_.id);
+    destroy_pool_object(context.uniform_pool, ssao_uniform_);
+    PosteffectMaterialSystemBase::destroy(context);
 }
 
 void SSAOMaterialSystem::init_debug_views(Context& context)
@@ -838,6 +871,17 @@ bool AverageLuminanceMaterialSystem::init(Context& context, const MaterialSystem
     return true;
 }
 
+void AverageLuminanceMaterialSystem::destroy(Context& context)
+{
+    destroy_pool_object(context.shader_storage_buffer_pool, shader_storage_[0]);
+    destroy_pool_object(context.shader_storage_buffer_pool, shader_storage_[1]);
+    destroy_pool_object(context.uniform_pool, adaptation_uniform_);
+    destroy_pool_object(context.render_target_pool, render_target_);
+    destroy_pool_object(context.render_target_pool, adaptation_render_target_[0]);
+    destroy_pool_object(context.render_target_pool, adaptation_render_target_[1]);
+    PosteffectMaterialSystemBase::destroy(context);
+}
+
 void AverageLuminanceMaterialSystem::init_debug_views(Context& context)
 {
     settings_.adaptation_rate = 6.0f;
@@ -978,6 +1022,14 @@ bool BloomMaterialSystem::init(Context& context, const MaterialSystemContext& ma
     blur_material_system_->PosteffectMaterialSystemBase::create_output(context, 0, 0.25f, format_rgba16f);
 
     return true;
+}
+
+void BloomMaterialSystem::destroy(Context& context)
+{
+    destroy_pool_object(context.uniform_pool, uniform_);
+    for (size_t i = 0; i < steps_number; ++i)
+        destroy_pool_object(context.render_state_pool, render_states_[i]);
+    PosteffectMaterialSystemBase::destroy(context);
 }
 
 void BloomMaterialSystem::init_debug_views(Context& context)
