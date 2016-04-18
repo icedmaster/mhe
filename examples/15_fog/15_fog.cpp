@@ -49,7 +49,8 @@ public:
         engine.renderer()->posteffect_system().add(engine.context(), posteffect_node_desc);
         HeightFogMaterialSystem* fog_material_system = engine.context().material_systems.get<HeightFogMaterialSystem>();
         fog_material_system->settings().start = 100.0f;
-        fog_material_system->settings().density = 0.002f;
+        fog_material_system->settings().density = 0.5f;
+        fog_material_system->settings().falloff = 0.02f;
         fog_material_system->settings().color.set(0.5f, 0.6f, 0.7f, 0.0f);
 
         return true;

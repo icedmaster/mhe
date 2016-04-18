@@ -20,6 +20,7 @@ public:
     {
         float start;
         float density;
+        float falloff;
         colorf color;
     };
 public:

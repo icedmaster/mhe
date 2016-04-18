@@ -58,7 +58,7 @@ void HeightFogMaterialSystem::destroy(Context& context)
 void HeightFogMaterialSystem::update(Context& context, SceneContext& scene_context, RenderContext& render_context)
 {
     ShaderData shader_data;
-    shader_data.param1 = vec4(settings_.start, settings_.density, 0.0f, 0.0f);
+    shader_data.param1 = vec4(settings_.start, settings_.density, settings_.falloff, 0.0f);
     shader_data.fog_color = settings_.color;
     UniformBuffer& uniform = context.uniform_pool.get(uniform_buffer_id_);
     uniform.update(shader_data);
