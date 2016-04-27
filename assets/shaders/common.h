@@ -1,5 +1,11 @@
 #define saturate(x) clamp(x, 0.0f, 1.0f)
 
+float linearized_depth(float d, float znear, float zfar)
+{
+	d = d * 2.0f - 1.0f;
+	return (2 * znear * zfar) / (zfar + znear - d * (zfar - znear));
+}
+
 vec3 position_from_depth(vec2 screenspace_pos, float depth, mat4 inv_vp)
 {
 	vec4 pos = vec4(screenspace_pos * 2.0f - 1.0f, depth * 2.0f - 1.0f, 1.0f);

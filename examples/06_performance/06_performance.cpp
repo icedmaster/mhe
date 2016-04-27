@@ -38,7 +38,7 @@ private:
 	{
 		for (size_t i = 0; i < lights_number; ++i)
 		{
-            mhe::LightInstance& light_instance = engine.scene().create_light();
+            mhe::LightInstance& light_instance = engine.scene().create_light(mhe::Light::omni);
 			mhe::Light& light = light_instance.light;
 			light.shading().diffuse = mhe::color_green;
 			light.shading().specular = mhe::color_white;

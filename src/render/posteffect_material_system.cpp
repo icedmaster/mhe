@@ -335,6 +335,22 @@ RenderTargetHandleType PosteffectMaterialSystemBase::default_render_target() con
     return default_render_target_;
 }
 
+void PosteffectMaterialSystemBase::set_render_target(RenderTargetHandleType render_target_id, Context& context)
+{
+    default_render_target_ = render_target_id;
+    RenderTarget& render_target = context.render_target_pool.get(render_target_id);
+    const TextureInstance* color_textures = nullptr;
+    size_t outputs_number = render_target.color_textures(&color_textures);
+    if (outputs_number == 0) return;
+    for (size_t i = 0; i < outputs_number; ++i)
+        set_output(i, color_textures[i]);
+    // TODO: also add render target's depth
+    RenderState& render_state = context.render_state_pool.get(mesh_instance().instance_parts[0].render_state_id);
+    ViewportDesc viewport_desc;
+    viewport_desc.viewport.set(0, 0, render_target.width(), render_target.height());
+    render_state.update_viewport(viewport_desc);
+}
+
 bool SSRMaterialSystem::init(Context& context, const MaterialSystemContext& material_system_context)
 {
     if (!PosteffectMaterialSystemBase::init(context, material_system_context))

@@ -871,7 +871,7 @@ public:
         }
 #endif
 
-        mhe::LightInstance& light_instance = engine.scene().create_light();
+        mhe::LightInstance& light_instance = engine.scene().create_light(mhe::Light::directional);
         mhe::Light& light = light_instance.light;
         light.shading().diffuse = mhe::color_white;
         light.shading().specular = mhe::vec4(1.0f, 1.0f, 1.0f, 1.0f);

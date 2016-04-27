@@ -156,11 +156,7 @@ public:
     // This method will be called when PosteffectChain has initialized this material system
     virtual void postinit(Context& /*context*/) {}
 
-    void set_render_target(RenderTargetHandleType render_target_id)
-    {
-        default_render_target_ = render_target_id;
-        // TODO: need to setup outputs
-    }
+    void set_render_target(RenderTargetHandleType render_target_id, Context& context);
 protected:
     MeshInstance& mesh_instance()
     {

@@ -130,12 +130,16 @@ bool create_fullscreen_quad(MeshInstance& mesh, const Context& context)
 
     uint32_t indexes[3] = {0, 1, 2};
 
+    mesh.mesh.parts.resize(1);
+    mesh.instance_parts.resize(1);
+
     MeshPart& part = mesh.mesh.parts[0];
 
     part.render_data.vbuffer = context.vertex_buffer_pool.create();
     part.render_data.ibuffer = context.index_buffer_pool.create();
 
     part.render_data.elements_number = 1;
+    part.render_data.layout = FullscreenLayout::handle;
 
     VertexBuffer& vbuffer = context.vertex_buffer_pool.get(part.render_data.vbuffer);
     if (!vbuffer.init(buffer_update_type_static,

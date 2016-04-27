@@ -16,12 +16,6 @@ uniform percamera
 };
 #endif
 
-float linearized_depth(float d, float znear, float zfar)
-{
-	d = d * 2.0f - 1.0f;
-	return (2 * znear * zfar) / (zfar + znear - d * (zfar - znear));
-}
-
 [vertex]
 
 [uniform permodel 1 permodel]

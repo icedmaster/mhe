@@ -10,6 +10,7 @@
 #include "render/posteffect_material_system.hpp"
 #include "render/rsm_material_system.hpp"
 #include "render/lpv_material_system.hpp"
+#include "render/light_instance_methods.hpp"
 #include "debug/profiler.hpp"
 #include "res/resource_manager.hpp"
 
@@ -73,6 +74,12 @@ void update_nodes(Context& context, RenderContext& render_context, SceneContext&
         data.normal.set_row(3, vec4::zero());
         uniform.update(data);
     }
+}
+
+void update_lights(Context& context, RenderContext& render_context, SceneContext& scene_context)
+{
+    for (size_t i = 0; i < render_context.lights_number; ++i)
+        update_light_uniform(context, scene_context, render_context.lights[i]);
 }
 
 void sort_draw_calls(const Context& context, RenderContext& render_context)
@@ -390,6 +397,8 @@ bool Renderer::init()
     desc.unit = perframe_data_unit;
     desc.size = sizeof(PerCameraData);
     buffer.init(desc);
+
+    context_.renderer = this;
     return true;
 }
 
@@ -419,6 +428,7 @@ void Renderer::update(SceneContext& scene_context)
     buffer.update(data);
 
     update_nodes(context_, render_context_, scene_context);
+    update_lights(context_, render_context_, scene_context);
     update_impl(context_, render_context_, scene_context);
 }
 

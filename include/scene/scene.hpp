@@ -101,7 +101,7 @@ public:
 	void update(RenderContext& render_context);
 	void process_requests(RenderContext& render_context);
 
-	LightInstance& create_light() const;
+	LightInstance& create_light(int type) const;
 
 	size_t nodes(NodeInstance*& nodes, size_t& offset, size_t material_system) const;
 	size_t nodes(NodeInstance*& nodes) const;

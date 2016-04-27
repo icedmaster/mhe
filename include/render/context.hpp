@@ -18,6 +18,7 @@
 namespace mhe {
 
 class DebugViews;
+class Renderer;
 
 typedef Pool<VertexBuffer, 4096, uint16_t> VertexBufferPool;
 typedef Pool<IndexBuffer, 4096, uint16_t> IndexBufferPool;
@@ -209,8 +210,9 @@ struct Context
     RenderTargetManager render_target_manager;
 
     DebugViews* debug_views;
+    Renderer* renderer;
 
-    Context() : debug_views(nullptr) {}
+    Context() : debug_views(nullptr), renderer(nullptr) {}
 };
 
 }

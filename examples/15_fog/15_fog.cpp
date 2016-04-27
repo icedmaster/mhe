@@ -9,7 +9,7 @@ class GameScene : public mhe::game::GameScene
 public:
     bool init(mhe::game::Engine& engine, const mhe::game::GameSceneDesc& /*desc*/) override
     {
-        mhe::LightInstance& light_instance = engine.scene().create_light();
+        mhe::LightInstance& light_instance = engine.scene().create_light(Light::directional);
         mhe::Light& light = light_instance.light;
         light.shading().diffuse = mhe::color_white;
         light.shading().specular = mhe::vec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -52,6 +52,18 @@ public:
         fog_material_system->settings().density = 0.5f;
         fog_material_system->settings().falloff = 0.02f;
         fog_material_system->settings().color.set(0.5f, 0.6f, 0.7f, 0.0f);
+
+        // volumetric fog
+        // step 1 - ESM
+        const string esm_name("esm");
+        material_system_context.shader_name = esm_name;
+        material_system_context.instance_name = esm_name;
+        material_system_context.options.add(string("downsample_shader"), string("compute/esm_downsample"));
+        material_system_context.options.add(string("size"), 256);
+        engine.context().initialization_parameters.add(string("esm"), material_system_context);
+        ExponentialShadowMap* esm_material_system = create<ExponentialShadowMap>(engine.context(), esm_name, esm_name);
+        ASSERT(esm_material_system != nullptr, "Couldn't create ExponentialShadowMap material system");
+        engine.renderer()->set_material_system_to_process(esm_material_system);
 
         return true;
     }

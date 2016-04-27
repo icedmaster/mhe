@@ -211,7 +211,7 @@ public:
         mhe::set_node_transform(engine.scene_context(), plane, mhe::vec3::zero(), mhe::quatf(mhe::pi_2, 0.0f, 0.0f),
             mhe::vec3(5.0f, 5.0f, 5.0f));
 
-        mhe::LightInstance& light_instance = engine.scene().create_light();
+        mhe::LightInstance& light_instance = engine.scene().create_light(mhe::Light::directional);
         mhe::Light& light = light_instance.light;
         light.shading().diffuse = mhe::vec4(240.0f / 255.0f, 150.0f / 255.0f, 80.0f / 255.0f, 1.0f);
         light.shading().specular = mhe::vec4(1.0f, 1.0f, 1.0f, 1.0f);
