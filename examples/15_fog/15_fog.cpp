@@ -60,10 +60,28 @@ public:
         material_system_context.instance_name = esm_name;
         material_system_context.options.add(string("downsample_shader"), string("compute/esm_downsample"));
         material_system_context.options.add(string("size"), 256);
-        engine.context().initialization_parameters.add(string("esm"), material_system_context);
+        engine.context().initialization_parameters.add(esm_name, material_system_context);
         ExponentialShadowMap* esm_material_system = create<ExponentialShadowMap>(engine.context(), esm_name, esm_name);
         ASSERT(esm_material_system != nullptr, "Couldn't create ExponentialShadowMap material system");
         engine.renderer()->set_material_system_to_process(esm_material_system);
+
+        // step 2 - volumetric fog itself
+        const string volumetric_fog_shader_name("compute/volumetric_fog");
+        const string volumetric_fog_name("volumetric_fog");
+        material_system_context.shader_name = volumetric_fog_shader_name;
+        material_system_context.instance_name = volumetric_fog_name;
+        material_system_context.options.clear();
+        material_system_context.options.add(string("volume_width"), 128);
+        material_system_context.options.add(string("volume_height"), 90);
+        material_system_context.options.add(string("volume_depth"), 70);
+        engine.context().initialization_parameters.add(volumetric_fog_name, material_system_context);
+        VolumetricFogMaterialSystem* volumetric_fog_material_system =
+            create<VolumetricFogMaterialSystem>(engine.context(), volumetric_fog_name, volumetric_fog_name);
+        ASSERT(volumetric_fog_material_system != nullptr, "Couldn't create VolumetricFogMaterialSystem");
+        engine.renderer()->set_material_system_to_process(volumetric_fog_material_system);
+
+        volumetric_fog_material_system_ = volumetric_fog_material_system;
+        esm_material_system_ = esm_material_system;
 
         return true;
     }
@@ -73,9 +91,14 @@ public:
         return true;
     }
 
-    void before_draw(game::Engine& /*engine*/) override
+    void before_draw(game::Engine& engine) override
     {
+        volumetric_fog_material_system_->set_light_instance(esm_material_system_->light_instance_id(),
+            esm_material_system_->shadow_texture(engine.context()));
     }
+
+    VolumetricFogMaterialSystem* volumetric_fog_material_system_;
+    ExponentialShadowMap* esm_material_system_;
 };
 
 int main(int /*argc*/, char** /*argv*/)

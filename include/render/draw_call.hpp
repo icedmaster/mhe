@@ -49,10 +49,12 @@ struct ComputeCallExplicit
 {
     ShaderProgram* shader_program;
     Texture* images[compute_call_images_number];
+    Texture* textures[compute_call_images_number];
     int image_access[compute_call_images_number];
     ShaderStorageBuffer* buffers[compute_call_buffers_number];
     UniformBuffer* uniforms[compute_call_buffers_number];
     uivec3 workgroups_number;
+    int barrier;
 };
 
 template <class DC>

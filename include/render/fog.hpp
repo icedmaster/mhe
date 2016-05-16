@@ -88,6 +88,12 @@ public:
     {
         return settings_;
     }
+
+    MHE_EXPORT TextureInstance shadow_texture(Context& context) const;
+    MHE_EXPORT LightInstanceIdType light_instance_id() const
+    {
+        return light_instance_id_;
+    }
 private:
     void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
 
@@ -104,6 +110,55 @@ private:
     UniformBufferHandleType uniform_id_;
     PosteffectSimpleMaterialSystem* depth_copy_material_system_;
     RenderTargetHandleType shadowmap_;
+    LightInstanceIdType light_instance_id_;
+};
+
+class VolumetricFogMaterialSystem : public MaterialSystem
+{
+    SETUP_MATERIAL("volumetric_fog")
+private:
+    struct ShaderData
+    {
+        vec4 volume_size;
+        vec4 fog_color;
+    };
+public:
+    struct Settings
+    {
+        colorf color;
+        float range;
+
+        Settings() :
+            color(0.5f, 0.6f, 0.7f, 0.5f),
+            range(150.0f)
+        {}
+    };
+public:
+    bool init(Context& context, const MaterialSystemContext& material_system_context) override;
+    void destroy(Context& context) override;
+
+    void setup(Context &context, SceneContext &scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count) override;
+
+    void set_light_instance(LightInstanceIdType instance_id, const TextureInstance& shadow_texture)
+    {
+        light_instance_id_ = instance_id;
+        shadow_texture_ = shadow_texture;
+    }
+
+    Settings& settings()
+    {
+        return settings_;
+    }
+private:
+    void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
+
+    Settings settings_;
+    uivec3 volume_size_;
+    LightInstanceIdType light_instance_id_;
+    TextureInstance volume_textures_[2];
+    TextureInstance shadow_texture_;
+    UniformBufferHandleType uniform_id_;
+    ComputeCallCommand compute_call_command_;
 };
 
 }

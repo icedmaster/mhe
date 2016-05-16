@@ -2,6 +2,7 @@
 #define __COMMANDS_HPP__
 
 #include "node.hpp"
+#include "draw_call.hpp"
 
 namespace mhe {
 
@@ -103,6 +104,21 @@ private:
     GPUProfilerNode& node_;
     size_t hits_;
     size_t hit_;
+};
+
+class MHE_EXPORT ComputeCallCommand : public RenderCommand
+{
+public:
+    ComputeCallCommand();
+
+    ComputeCallExplicit& compute_call()
+    {
+        return compute_call_;
+    }
+private:
+    bool execute_impl(Context& context, RenderStage current_stage) override;
+
+    ComputeCallExplicit compute_call_;
 };
 
 }

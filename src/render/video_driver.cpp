@@ -186,7 +186,10 @@ void Driver::perform_draw_call(Context& context, const DrawCall& draw_call)
     state_.last_command = draw_call.command;
 
     if (command_render_stages & render_stage_before_render_target_setup)
-        draw_call.command->execute(context, render_stage_before_render_target_setup);
+    {
+        if (!draw_call.command->execute(context, render_stage_before_render_target_setup))
+            return;
+    }
 
     if (draw_call.render_target != default_render_target)
     {
@@ -206,7 +209,10 @@ void Driver::perform_draw_call(Context& context, const DrawCall& draw_call)
     }
 
     if (command_render_stages & render_stage_after_render_target_setup)
-        draw_call.command->execute(context, render_stage_after_render_target_setup);
+    {
+        if (!draw_call.command->execute(context, render_stage_after_render_target_setup))
+            return;
+    }
 
     if (state_.state != draw_call.render_state)
     {
@@ -314,6 +320,11 @@ void Driver::perform_compute_call(Context& /*context*/, const ComputeCallExplici
         if (compute_call.images[i] == nullptr) continue;
         impl_->set_image(*compute_call.images[i], i, compute_call.image_access[i]);
     }
+    for (size_t i = 0; i < compute_call_images_number; ++i)
+    {
+        if (compute_call.textures[i] == nullptr) continue;
+        impl_->set_texture(*compute_call.textures[i], i);
+    }
     for (size_t i = 0; i < compute_call_buffers_number; ++i)
     {
         if (compute_call.buffers[i] == nullptr) continue;
@@ -325,6 +336,8 @@ void Driver::perform_compute_call(Context& /*context*/, const ComputeCallExplici
         impl_->bind_uniform(*compute_call.uniforms[i], i);
     }
     impl_->dispatch(compute_call.workgroups_number.x(), compute_call.workgroups_number.y(), compute_call.workgroups_number.z());
+    if (compute_call.barrier != memory_barrier_none)
+        memory_barrier(compute_call.barrier);
 }
 
 void Driver::begin_render()

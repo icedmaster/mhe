@@ -24,6 +24,8 @@ typedef uint16_t AABBInstanceHandleType;
 typedef uint16_t MeshTraceDataHandleType;
 typedef uint16_t MeshRawDataHandleType;
 
+typedef uint16_t LightInstanceIdType;
+
 enum Primitive
 {
     triangle = 0,

@@ -39,6 +39,7 @@ void Engine::setup_generated()
     MaterialSystemFactory::instance().add<LPVResolveMaterialSystem>();
     MaterialSystemFactory::instance().add<HeightFogMaterialSystem>();
     MaterialSystemFactory::instance().add<ExponentialShadowMap>();
+    MaterialSystemFactory::instance().add<VolumetricFogMaterialSystem>();
 }
 
 }}

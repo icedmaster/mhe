@@ -6,6 +6,7 @@
 #include "render/instances.hpp"
 #include "render/renderer.hpp"
 #include "render/utils/simple_meshes.hpp"
+#include "render/scene_context.hpp"
 #include "utils/global_log.hpp"
 
 namespace mhe {
@@ -167,6 +168,8 @@ bool ExponentialShadowMap::init(Context& context, const MaterialSystemContext& m
     ASSERT(res, "render state initialization failed");
     mesh_instance_.instance_parts[0].render_state_id = render_state.id();
 
+    light_instance_id_ = LightInstance::invalid_id;
+
     return true;
 }
 
@@ -198,6 +201,8 @@ void ExponentialShadowMap::update(Context& context, SceneContext& scene_context,
 
     if (directional_light_instance == nullptr)
         return;
+
+    light_instance_id_ = directional_light_instance->id;
 
     const ShadowInfo* shadow_info = directional_light_instance->light.shadow_info();
     if (shadow_info == nullptr) return;
@@ -275,6 +280,118 @@ void ExponentialShadowMap::init_downsampling(Context& context, const ShadowInfo*
     settings.uniform = uniform_id_;
     settings.threads_number = uivec3(texture_desc.width / cs_threads_number_, texture_desc.height / cs_threads_number_, 1);
     downsample_command_.init(settings);
+}
+
+TextureInstance ExponentialShadowMap::shadow_texture(Context& context) const
+{
+    TextureInstance texture;
+    size_t size = context.render_target_pool.get(resolved_shadow_rt_).color_texture(texture, 0);
+    ASSERT(size == 1, "Invalid render target");
+    return texture;
+}
+
+bool VolumetricFogMaterialSystem::init(Context& context, const MaterialSystemContext& material_system_context)
+{
+    if (!init_default(context, material_system_context))
+    {
+        ERROR_LOG("VolumetricFogMaterialSystem initialization failed");
+        return false;
+    }
+
+    volume_size_.x() = material_system_context.options.get<size_t>("volume_width");
+    volume_size_.y() = material_system_context.options.get<size_t>("volume_height");
+    volume_size_.z() = material_system_context.options.get<size_t>("volume_depth");
+
+    TextureDesc texture_desc;
+    texture_desc.address_mode_r = texture_clamp;
+    texture_desc.address_mode_s = texture_clamp;
+    texture_desc.address_mode_t = texture_clamp;
+    texture_desc.anisotropic_level = 0.0f;
+    texture_desc.datatype = format_default;
+    texture_desc.depth = volume_size_.z();
+    texture_desc.format = format_rgba;
+    texture_desc.height = volume_size_.y();
+    texture_desc.mag_filter = texture_filter_linear;
+    texture_desc.min_filter = texture_filter_linear;
+    texture_desc.mips = 0;
+    texture_desc.type = texture_3d;
+    texture_desc.width = volume_size_.x();
+
+    for (int i = 0; i < 2; ++i)
+    {
+        Texture& texture = create_and_get(context.texture_pool);
+        if (!texture.init(texture_desc, nullptr, 0))
+        {
+            ERROR_LOG("Couldn't create a volume texture");
+            destroy(context);
+            return false;
+        }
+        volume_textures_[i].id = texture.id();
+    }
+
+    UniformBuffer& uniform_buffer = create_and_get(context.uniform_pool);
+    UniformBufferDesc uniform_buffer_desc;
+    uniform_buffer_desc.size = sizeof(ShaderData);
+    uniform_buffer_desc.unit = 1;
+    uniform_buffer_desc.update_type = uniform_buffer_normal;
+    if (!uniform_buffer.init(uniform_buffer_desc))
+    {
+        ERROR_LOG("Couldn't create a uniform buffer");
+        destroy(context);
+        return false;
+    }
+
+    uniform_id_ = uniform_buffer.id();
+    return true;
+}
+
+void VolumetricFogMaterialSystem::destroy(Context& context)
+{
+    destroy_pool_object(context.uniform_pool, uniform_id_);
+    destroy_pool_object(context.texture_pool, volume_textures_[0].id);
+    destroy_pool_object(context.texture_pool, volume_textures_[1].id);
+}
+
+void VolumetricFogMaterialSystem::setup(Context &context, SceneContext &scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count)
+{
+    empty_setup(context, scene_context, instance_parts, parts, model_contexts, count);
+}
+
+void VolumetricFogMaterialSystem::update(Context& context, SceneContext& scene_context, RenderContext& render_context)
+{
+    // can initialize this uniform here
+    ShaderData shader_data;
+    shader_data.volume_size.set(static_cast<float>(volume_size_.x()),
+                                static_cast<float>(volume_size_.y()),
+                                static_cast<float>(volume_size_.z()), settings_.range);
+    shader_data.fog_color = settings_.color;
+    UniformBuffer& uniform_buffer = context.uniform_pool.get(uniform_id_);
+    uniform_buffer.update(shader_data);
+
+    if (!is_handle_valid(light_instance_id_))
+        return;
+    LightInstance& light_instance = scene_context.light_pool.get(light_instance_id_);
+
+    ComputeCallExplicit& compute_call = compute_call_command_.compute_call();
+    prepare_draw_call(compute_call);
+    compute_call.images[0] = nullptr;
+    compute_call.images[1] = nullptr;
+    compute_call.images[2] = &context.texture_pool.get(volume_textures_[0].id);
+    compute_call.textures[1] = &context.texture_pool.get(shadow_texture_.id);
+    compute_call.image_access[0] = access_readonly;
+    compute_call.image_access[1] = access_readonly;
+    compute_call.image_access[2] = access_writeonly;
+    compute_call.uniforms[0] = &context.uniform_pool.get(render_context.main_camera.percamera_uniform);
+    compute_call.uniforms[1] = &uniform_buffer;
+    compute_call.uniforms[2] = &context.uniform_pool.get(light_instance.uniform_id);
+    compute_call.shader_program = &context.shader_pool.get(ubershader(context).get_default());
+    size_t threads_number = compute_call.shader_program->variable_value<size_t>(string("THREADS_NUMBER"));
+    compute_call.workgroups_number = volume_size_ / threads_number;
+    compute_call.barrier = memory_barrier_image_fetch;
+
+    DrawCall& draw_call = render_context.draw_calls.add();
+    draw_call.material.material_system = id();
+    draw_call.command = &compute_call_command_;
 }
 
 }

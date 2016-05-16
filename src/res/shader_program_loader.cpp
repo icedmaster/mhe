@@ -66,7 +66,11 @@ std::string parse_include(ShaderInitializationParams& params, const std::string&
 
     std::string fullname = utils::path_join(utils::get_file_path(load_context.filename), filename);
     std::ifstream f(fullname.c_str());
-    if (!f.is_open()) return std::string();
+    if (!f.is_open())
+    {
+        ASSERT(0, "Couldn't open an include file:" << fullname);
+        return std::string();
+    }
     const std::vector<std::string>& content = utils::read_lines(f);
     f.close();
     return load_shader_impl(params, content, shadertag, load_context);
