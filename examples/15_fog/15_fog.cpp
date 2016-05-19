@@ -74,6 +74,7 @@ public:
         material_system_context.options.add(string("volume_width"), 128);
         material_system_context.options.add(string("volume_height"), 90);
         material_system_context.options.add(string("volume_depth"), 70);
+        material_system_context.options.add(string("propagation_shader"), string("compute/volumetric_fog_propagation"));
         engine.context().initialization_parameters.add(volumetric_fog_name, material_system_context);
         VolumetricFogMaterialSystem* volumetric_fog_material_system =
             create<VolumetricFogMaterialSystem>(engine.context(), volumetric_fog_name, volumetric_fog_name);

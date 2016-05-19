@@ -40,6 +40,13 @@ public:
         v_[2] = 0;
     }
 
+    vector3(const vector2<T>& v, T z)
+    {
+        v_[0] = v.x();
+        v_[1] = v.y();
+        v_[2] = z;
+    }
+
     template <class U>
     vector3(U x, U y, U z)
     {

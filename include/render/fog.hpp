@@ -159,6 +159,9 @@ private:
     TextureInstance shadow_texture_;
     UniformBufferHandleType uniform_id_;
     ComputeCallCommand compute_call_command_;
+    ComputeCallCommand propagation_command_;
+    ListOfCommands list_of_commands_;
+    ShaderProgramHandleType propagation_shader_;
 };
 
 }

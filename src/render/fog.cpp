@@ -301,6 +301,11 @@ bool VolumetricFogMaterialSystem::init(Context& context, const MaterialSystemCon
     volume_size_.x() = material_system_context.options.get<size_t>("volume_width");
     volume_size_.y() = material_system_context.options.get<size_t>("volume_height");
     volume_size_.z() = material_system_context.options.get<size_t>("volume_depth");
+    const string& propagation_shader_name = material_system_context.options.get<string>("propagation_shader");
+    ASSERT(!propagation_shader_name.empty(), "Propagation shader name must not be empty");
+    Shader propagation_ubershader;
+    context.shader_manager.get(propagation_ubershader, propagation_shader_name);
+    propagation_shader_ = context.ubershader_pool.get(propagation_ubershader.shader_program_handle).get_default();
 
     TextureDesc texture_desc;
     texture_desc.address_mode_r = texture_clamp;
@@ -342,6 +347,10 @@ bool VolumetricFogMaterialSystem::init(Context& context, const MaterialSystemCon
     }
 
     uniform_id_ = uniform_buffer.id();
+
+    list_of_commands_.add_command(&compute_call_command_);
+    list_of_commands_.add_command(&propagation_command_);
+
     return true;
 }
 
@@ -372,6 +381,7 @@ void VolumetricFogMaterialSystem::update(Context& context, SceneContext& scene_c
         return;
     LightInstance& light_instance = scene_context.light_pool.get(light_instance_id_);
 
+    // fog initialization
     ComputeCallExplicit& compute_call = compute_call_command_.compute_call();
     prepare_draw_call(compute_call);
     compute_call.images[0] = nullptr;
@@ -389,9 +399,22 @@ void VolumetricFogMaterialSystem::update(Context& context, SceneContext& scene_c
     compute_call.workgroups_number = volume_size_ / threads_number;
     compute_call.barrier = memory_barrier_image_fetch;
 
+    // fog propagation
+    ComputeCallExplicit& propagation_compute_call = propagation_command_.compute_call();
+    prepare_draw_call(propagation_compute_call);
+    propagation_compute_call.images[0] = compute_call.images[2];
+    propagation_compute_call.images[1] = &context.texture_pool.get(volume_textures_[1].id);
+    propagation_compute_call.image_access[0] = access_readonly;
+    propagation_compute_call.image_access[1] = access_writeonly;
+    propagation_compute_call.uniforms[1] = compute_call.uniforms[1];
+    propagation_compute_call.shader_program = &context.shader_pool.get(propagation_shader_);
+    threads_number = propagation_compute_call.shader_program->variable_value<size_t>(string("THREADS_NUMBER"));
+    propagation_compute_call.workgroups_number = uivec3(volume_size_.xy() / threads_number, 1);
+    propagation_compute_call.barrier = memory_barrier_image_fetch;
+
     DrawCall& draw_call = render_context.draw_calls.add();
     draw_call.material.material_system = id();
-    draw_call.command = &compute_call_command_;
+    draw_call.command = &list_of_commands_;
 }
 
 }

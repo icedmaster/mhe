@@ -210,7 +210,7 @@ inline GLbitfield get_barriers(uint32_t barriers)
     if (barriers & memory_barrier_storage_buffer)
         result |= GL_SHADER_STORAGE_BARRIER_BIT;
     if (barriers & memory_barrier_image_fetch)
-        result |= GL_TEXTURE_FETCH_BARRIER_BIT;
+        result |= GL_SHADER_IMAGE_ACCESS_BARRIER_BIT;
     return result;
 }
 

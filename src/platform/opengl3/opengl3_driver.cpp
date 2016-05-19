@@ -244,7 +244,8 @@ uint OpenGL3Driver::supported_versions(pair<uint, uint>* versions, uint size) co
 void OpenGL3Driver::set_image(const Texture& texture, size_t unit, int access)
 {
     const OpenGL3Texture* opengl_texture = static_cast<const OpenGL3Texture*>(texture.impl());
-    OpenGLExtensions::instance().glBindImageTexture(unit, opengl_texture->id(), 0, GL_FALSE, 0, get_access(access), opengl_texture->image_format());
+    OpenGLExtensions::instance().glBindImageTexture(unit, opengl_texture->id(), 0, opengl_texture->is_layered() ? GL_TRUE : GL_FALSE,
+        0, get_access(access), opengl_texture->image_format());
     CHECK_GL_ERRORS();
 }
 

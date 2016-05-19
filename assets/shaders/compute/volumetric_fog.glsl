@@ -21,9 +21,9 @@ layout(binding = 2) uniform LightData
     Light light;
 };
 
-float calculate_density(vec3 pos_ws)
+float calculate_density(vec3 pos_vs)
 {
-    return 0.5f;
+    return 0.05f;
 }
 
 vec3 invocation_id_to_01(uvec3 pos)
@@ -38,9 +38,9 @@ void main()
 {
     uvec3 volume_pos = gl_GlobalInvocationID.xyz;
     vec3 pos_ndc = invocation_id_to_01(volume_pos);
-    vec3 pos_ws = position_from_depth(pos_ndc.xy, pos_ndc.z, inv_vp);
+    vec3 pos_vs = position_from_depth(pos_ndc.xy, pos_ndc.z, inv_proj);
     
-    float fog_density = calculate_density(pos_ws);
+    float fog_density = calculate_density(pos_vs);
     // lighting
     float shadow = texture(shadow_texture, pos_ndc.xy).x;
     vec3 directional_light_radiance = light.diffuse.rgb * shadow;
