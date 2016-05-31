@@ -40,6 +40,7 @@ void Engine::setup_generated()
     MaterialSystemFactory::instance().add<HeightFogMaterialSystem>();
     MaterialSystemFactory::instance().add<ExponentialShadowMap>();
     MaterialSystemFactory::instance().add<VolumetricFogMaterialSystem>();
+    MaterialSystemFactory::instance().add<VolumetricFogResolveMaterialSystem>();
 }
 
 }}

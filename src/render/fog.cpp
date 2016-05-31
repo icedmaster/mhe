@@ -170,6 +170,22 @@ bool ExponentialShadowMap::init(Context& context, const MaterialSystemContext& m
 
     light_instance_id_ = LightInstance::invalid_id;
 
+    // blur
+    blur_material_system_ = new BlurMaterialSystem;
+    MaterialSystemContext blur_material_system_context;
+    blur_material_system_context.instance_name = "esm_blur";
+    blur_material_system_context.priority = material_system_context.priority;
+    blur_material_system_context.material_instances_number = 2;
+    blur_material_system_context.shader_name = material_system_context.options.get<string>("blur_shader");
+    context.material_systems.add(blur_material_system_);
+    context.materials[blur_material_system_->id()].resize(2);
+    if (!blur_material_system_->init(context, blur_material_system_context))
+    {
+        ERROR_LOG("Can't initialize a BlurMaterialSystem for ESM");
+        destroy(context);
+        return false;
+    }
+
     return true;
 }
 
@@ -223,6 +239,9 @@ void ExponentialShadowMap::update(Context& context, SceneContext& scene_context,
     material.uniforms[2] = uniform_id_;
     material.textures[0] = downsampled_texture_;
     material.textures[3] = context.renderer->scene_depth_buffer();
+
+    // blur
+
 
     DrawCall& draw_call = render_context.draw_calls.add();
     setup_draw_call(draw_call, mesh_instance_.instance_parts[0], mesh_instance_.mesh.parts[0], resolved_shadow_rt_, &downsample_command_);
@@ -314,7 +333,7 @@ bool VolumetricFogMaterialSystem::init(Context& context, const MaterialSystemCon
     texture_desc.anisotropic_level = 0.0f;
     texture_desc.datatype = format_default;
     texture_desc.depth = volume_size_.z();
-    texture_desc.format = format_rgba;
+    texture_desc.format = format_rgba16f;
     texture_desc.height = volume_size_.y();
     texture_desc.mag_filter = texture_filter_linear;
     texture_desc.min_filter = texture_filter_linear;
@@ -374,6 +393,7 @@ void VolumetricFogMaterialSystem::update(Context& context, SceneContext& scene_c
                                 static_cast<float>(volume_size_.y()),
                                 static_cast<float>(volume_size_.z()), settings_.range);
     shader_data.fog_color = settings_.color;
+    shader_data.fog_settings.set(settings_.density, settings_.falloff, 0.0f, 0.0f);
     UniformBuffer& uniform_buffer = context.uniform_pool.get(uniform_id_);
     uniform_buffer.update(shader_data);
 
@@ -394,10 +414,11 @@ void VolumetricFogMaterialSystem::update(Context& context, SceneContext& scene_c
     compute_call.uniforms[0] = &context.uniform_pool.get(render_context.main_camera.percamera_uniform);
     compute_call.uniforms[1] = &uniform_buffer;
     compute_call.uniforms[2] = &context.uniform_pool.get(light_instance.uniform_id);
+    compute_call.uniforms[3] = &context.uniform_pool.get(esm_uniform_id_);
     compute_call.shader_program = &context.shader_pool.get(ubershader(context).get_default());
     size_t threads_number = compute_call.shader_program->variable_value<size_t>(string("THREADS_NUMBER"));
     compute_call.workgroups_number = volume_size_ / threads_number;
-    compute_call.barrier = memory_barrier_image_fetch;
+    compute_call.barrier = memory_barrier_all;
 
     // fog propagation
     ComputeCallExplicit& propagation_compute_call = propagation_command_.compute_call();
@@ -410,7 +431,7 @@ void VolumetricFogMaterialSystem::update(Context& context, SceneContext& scene_c
     propagation_compute_call.shader_program = &context.shader_pool.get(propagation_shader_);
     threads_number = propagation_compute_call.shader_program->variable_value<size_t>(string("THREADS_NUMBER"));
     propagation_compute_call.workgroups_number = uivec3(volume_size_.xy() / threads_number, 1);
-    propagation_compute_call.barrier = memory_barrier_image_fetch;
+    propagation_compute_call.barrier = memory_barrier_all;
 
     DrawCall& draw_call = render_context.draw_calls.add();
     draw_call.material.material_system = id();

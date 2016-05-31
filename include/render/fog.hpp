@@ -76,7 +76,7 @@ public:
     {
         float exponent;
 
-        Settings() : exponent(10.0f) {}
+        Settings() : exponent(30.0f) {}
     };
 public:
     bool init(Context& context, const MaterialSystemContext& material_system_context) override;
@@ -93,6 +93,16 @@ public:
     MHE_EXPORT LightInstanceIdType light_instance_id() const
     {
         return light_instance_id_;
+    }
+
+    MHE_EXPORT TextureInstance shadowmap_texture() const
+    {
+        return downsampled_texture_;
+    }
+
+    MHE_EXPORT UniformBufferHandleType settings_uniform_id() const
+    {
+        return uniform_id_;
     }
 private:
     void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
@@ -111,6 +121,7 @@ private:
     PosteffectSimpleMaterialSystem* depth_copy_material_system_;
     RenderTargetHandleType shadowmap_;
     LightInstanceIdType light_instance_id_;
+    BlurMaterialSystem* blur_material_system_;
 };
 
 class VolumetricFogMaterialSystem : public MaterialSystem
@@ -121,16 +132,21 @@ private:
     {
         vec4 volume_size;
         vec4 fog_color;
+        vec4 fog_settings;
     };
 public:
     struct Settings
     {
         colorf color;
         float range;
+        float falloff;
+        float density;
 
         Settings() :
             color(0.5f, 0.6f, 0.7f, 0.5f),
-            range(150.0f)
+            range(150.0f),
+            falloff(0.02f),
+            density(0.5f)
         {}
     };
 public:
@@ -139,15 +155,21 @@ public:
 
     void setup(Context &context, SceneContext &scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count) override;
 
-    void set_light_instance(LightInstanceIdType instance_id, const TextureInstance& shadow_texture)
+    void set_light_instance(LightInstanceIdType instance_id, const TextureInstance& shadow_texture, UniformBufferHandleType esm_settings_uniform)
     {
         light_instance_id_ = instance_id;
         shadow_texture_ = shadow_texture;
+        esm_uniform_id_ = esm_settings_uniform;
     }
 
     Settings& settings()
     {
         return settings_;
+    }
+
+    void output(Context&, size_t /*unit*/, TextureInstance& texture) const override
+    {
+        texture = volume_textures_[1];
     }
 private:
     void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
@@ -158,10 +180,16 @@ private:
     TextureInstance volume_textures_[2];
     TextureInstance shadow_texture_;
     UniformBufferHandleType uniform_id_;
+    UniformBufferHandleType esm_uniform_id_;
     ComputeCallCommand compute_call_command_;
     ComputeCallCommand propagation_command_;
     ListOfCommands list_of_commands_;
     ShaderProgramHandleType propagation_shader_;
+};
+
+class VolumetricFogResolveMaterialSystem : public PosteffectMaterialSystemBase
+{
+    SETUP_POSTEFFECT_MATERIAL(VolumetricFogResolveMaterialSystem, "volumetric_fog_resolve");
 };
 
 }

@@ -4,6 +4,8 @@
 
 using namespace mhe;
 
+#define USE_VOLUMETRIC_FOG
+
 class GameScene : public mhe::game::GameScene
 {
 public:
@@ -46,12 +48,16 @@ public:
         uniform0.index = 0;
         uniform0.explicit_handle = engine.render_context().main_camera.percamera_uniform;
 
+#ifndef USE_VOLUMETRIC_FOG
         engine.renderer()->posteffect_system().add(engine.context(), posteffect_node_desc);
         HeightFogMaterialSystem* fog_material_system = engine.context().material_systems.get<HeightFogMaterialSystem>();
         fog_material_system->settings().start = 100.0f;
         fog_material_system->settings().density = 0.5f;
         fog_material_system->settings().falloff = 0.02f;
         fog_material_system->settings().color.set(0.5f, 0.6f, 0.7f, 0.0f);
+
+        volumetric_fog_material_system_ = nullptr;
+#else
 
         // volumetric fog
         // step 1 - ESM
@@ -60,6 +66,7 @@ public:
         material_system_context.instance_name = esm_name;
         material_system_context.options.add(string("downsample_shader"), string("compute/esm_downsample"));
         material_system_context.options.add(string("size"), 256);
+        material_system_context.options.add(string("blur_shader"), string("posteffect_blur"));
         engine.context().initialization_parameters.add(esm_name, material_system_context);
         ExponentialShadowMap* esm_material_system = create<ExponentialShadowMap>(engine.context(), esm_name, esm_name);
         ASSERT(esm_material_system != nullptr, "Couldn't create ExponentialShadowMap material system");
@@ -72,8 +79,8 @@ public:
         material_system_context.instance_name = volumetric_fog_name;
         material_system_context.options.clear();
         material_system_context.options.add(string("volume_width"), 128);
-        material_system_context.options.add(string("volume_height"), 90);
-        material_system_context.options.add(string("volume_depth"), 70);
+        material_system_context.options.add(string("volume_height"), 88);
+        material_system_context.options.add(string("volume_depth"), 72);
         material_system_context.options.add(string("propagation_shader"), string("compute/volumetric_fog_propagation"));
         engine.context().initialization_parameters.add(volumetric_fog_name, material_system_context);
         VolumetricFogMaterialSystem* volumetric_fog_material_system =
@@ -81,8 +88,45 @@ public:
         ASSERT(volumetric_fog_material_system != nullptr, "Couldn't create VolumetricFogMaterialSystem");
         engine.renderer()->set_material_system_to_process(volumetric_fog_material_system);
 
+        // step 3 - resolve to the separate fog texture
+        const string resolve_fog_name("volumetric_fog_resolve");
+        const string resolve_fog_shader_name("posteffect_volumetric_fog_resolve");
+
+        material_system_context.shader_name = resolve_fog_shader_name;
+        material_system_context.instance_name = resolve_fog_name;
+        material_system_context.options.clear();
+        material_system_context.options.add(string("blend"), true);
+        engine.context().initialization_parameters.add(resolve_fog_name, material_system_context);
+
+        posteffect_node_desc.name = resolve_fog_name;
+        posteffect_node_desc.material = resolve_fog_name;
+        posteffect_node_desc.priority = 24;
+        posteffect_node_desc.instantiate = true;
+
+        {
+            posteffect_node_desc.inputs.clear();
+            posteffect_node_desc.outputs.clear();
+            // use GBuffer's depth
+            PosteffectSystem::NodeInput& input0 = posteffect_node_desc.inputs.add();
+            input0.index = 3;
+            input0.material = string("gbuffer_fill");
+            input0.material_output = gbuffer_depth_render_target_index;
+            // fog texture
+            PosteffectSystem::NodeInput& input1 = posteffect_node_desc.inputs.add();
+            input1.index = 4;
+            input1.material = volumetric_fog_name;
+            input1.material_output = 0;
+            // uniform
+            posteffect_node_desc.uniforms.clear();
+            PosteffectSystem::Uniforms::type& uniform0 = posteffect_node_desc.uniforms.add();
+            uniform0.index = 0;
+            uniform0.explicit_handle = engine.render_context().main_camera.percamera_uniform;
+        }
+        engine.renderer()->posteffect_system().add(engine.context(), posteffect_node_desc);
+
         volumetric_fog_material_system_ = volumetric_fog_material_system;
         esm_material_system_ = esm_material_system;
+#endif
 
         return true;
     }
@@ -94,8 +138,9 @@ public:
 
     void before_draw(game::Engine& engine) override
     {
-        volumetric_fog_material_system_->set_light_instance(esm_material_system_->light_instance_id(),
-            esm_material_system_->shadow_texture(engine.context()));
+        if (volumetric_fog_material_system_ != nullptr)
+            volumetric_fog_material_system_->set_light_instance(esm_material_system_->light_instance_id(),
+                esm_material_system_->shadowmap_texture(), esm_material_system_->settings_uniform_id());
     }
 
     VolumetricFogMaterialSystem* volumetric_fog_material_system_;
