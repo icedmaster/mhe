@@ -95,10 +95,7 @@ public:
         return light_instance_id_;
     }
 
-    MHE_EXPORT TextureInstance shadowmap_texture() const
-    {
-        return downsampled_texture_;
-    }
+    MHE_EXPORT TextureInstance shadowmap_texture() const;
 
     MHE_EXPORT UniformBufferHandleType settings_uniform_id() const
     {
@@ -141,12 +138,14 @@ public:
         float range;
         float falloff;
         float density;
+        float scattering_coeff;
 
         Settings() :
             color(0.5f, 0.6f, 0.7f, 0.5f),
             range(150.0f),
             falloff(0.02f),
-            density(0.5f)
+            density(0.5f),
+            scattering_coeff(1.0f)
         {}
     };
 public:

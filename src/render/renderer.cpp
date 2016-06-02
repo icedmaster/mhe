@@ -115,7 +115,7 @@ void setup_node(NodeInstance& node, MaterialSystem* material_system, Context& co
     material_system->setup(context, scene_context, &node.mesh.instance_parts[0], &node.mesh.mesh.parts[0], &model_context, 1);
 }
 
-void PosteffectSystem::add(Context& context, const PosteffectSystem::PosteffectNodeDesc& desc)
+PosteffectMaterialSystemBase* PosteffectSystem::add(Context& context, const PosteffectSystem::PosteffectNodeDesc& desc)
 {
     PosteffectMaterialSystemBase* material_system = create(context, desc);
     ASSERT(material_system != nullptr, "Couldn't create a material system");
@@ -124,6 +124,8 @@ void PosteffectSystem::add(Context& context, const PosteffectSystem::PosteffectN
     node.material_system = material_system;
 
     posteffects_.push_back(node);
+
+    return material_system;
 }
 
 PosteffectMaterialSystemBase* PosteffectSystem::create(Context& context, const PosteffectNodeDesc& desc)

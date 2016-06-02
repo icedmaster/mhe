@@ -93,7 +93,7 @@ public:
         bool instantiate;
     };
 
-    MHE_EXPORT void add(Context& context, const PosteffectNodeDesc& node_desc);
+    MHE_EXPORT PosteffectMaterialSystemBase* add(Context& context, const PosteffectNodeDesc& node_desc);
     MHE_EXPORT PosteffectMaterialSystemBase* create(Context& context, const PosteffectNodeDesc& node_desc);
     void process(Context& context, RenderContext& render_context, SceneContext& scene_context);
 private:

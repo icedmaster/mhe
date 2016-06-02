@@ -74,6 +74,7 @@ void HeightFogMaterialSystem::update(Context& context, SceneContext& scene_conte
 
 bool ExponentialShadowMap::DownsampleCommand::init(const Settings& settings)
 {
+    set_stages(render_stage_before_render_target_setup);
     settings_ = settings;
     return true;
 }
@@ -90,7 +91,7 @@ bool ExponentialShadowMap::DownsampleCommand::execute_impl(Context& context, Ren
     compute_call.image_access[1] = access_writeonly;
     compute_call.workgroups_number = settings_.threads_number;
     context.driver.execute(context, &compute_call, 1);
-    context.driver.memory_barrier(memory_barrier_image_fetch);
+    context.driver.memory_barrier(memory_barrier_all);
 
     return true;
 }
@@ -185,6 +186,7 @@ bool ExponentialShadowMap::init(Context& context, const MaterialSystemContext& m
         destroy(context);
         return false;
     }
+    blur_material_system_->settings().quality = BlurMaterialSystem::quality_ultra;
 
     return true;
 }
@@ -241,10 +243,21 @@ void ExponentialShadowMap::update(Context& context, SceneContext& scene_context,
     material.textures[3] = context.renderer->scene_depth_buffer();
 
     // blur
+    DrawCall& dc = render_context.draw_calls.add();
+    DrawCall& dc2 = render_context.draw_calls.add();
+    blur_material_system_->setup_draw_calls(context, scene_context, &dc, 2, render_context);
+    dc.command = &downsample_command_;
+    dc.pass = 0;
+    dc2.pass = 1;
 
+    //DrawCall& draw_call = render_context.draw_calls.add();
+    //setup_draw_call(draw_call, mesh_instance_.instance_parts[0], mesh_instance_.mesh.parts[0], resolved_shadow_rt_, &downsample_command_);
+}
 
-    DrawCall& draw_call = render_context.draw_calls.add();
-    setup_draw_call(draw_call, mesh_instance_.instance_parts[0], mesh_instance_.mesh.parts[0], resolved_shadow_rt_, &downsample_command_);
+TextureInstance ExponentialShadowMap::shadowmap_texture() const
+{
+    return blur_material_system_->output(0);
+    //return downsampled_texture_;
 }
 
 void ExponentialShadowMap::init_downsampling(Context& context, const ShadowInfo* shadow_info)
@@ -299,6 +312,9 @@ void ExponentialShadowMap::init_downsampling(Context& context, const ShadowInfo*
     settings.uniform = uniform_id_;
     settings.threads_number = uivec3(texture_desc.width / cs_threads_number_, texture_desc.height / cs_threads_number_, 1);
     downsample_command_.init(settings);
+
+    blur_material_system_->PosteffectMaterialSystemBase::create_output(context, 0, texture_desc.width, texture_desc.height, format_r32f);
+    blur_material_system_->set_input(0, downsampled_texture_);
 }
 
 TextureInstance ExponentialShadowMap::shadow_texture(Context& context) const
@@ -393,7 +409,7 @@ void VolumetricFogMaterialSystem::update(Context& context, SceneContext& scene_c
                                 static_cast<float>(volume_size_.y()),
                                 static_cast<float>(volume_size_.z()), settings_.range);
     shader_data.fog_color = settings_.color;
-    shader_data.fog_settings.set(settings_.density, settings_.falloff, 0.0f, 0.0f);
+    shader_data.fog_settings.set(settings_.density, settings_.falloff, settings_.scattering_coeff, 0.0f);
     UniformBuffer& uniform_buffer = context.uniform_pool.get(uniform_id_);
     uniform_buffer.update(shader_data);
 

@@ -31,7 +31,7 @@ void main()
     {
         ivec3 next_coord = ivec3(gl_GlobalInvocationID.xy, i);   
         vec4 next = scattering(current_color, next_coord);
-        imageStore(output_texture, next_coord, vec4(next.rgb, saturate(exp(-next.a))));
+        imageStore(output_texture, next_coord, vec4(next.rgb, exp(-next.a)));
         current_color = next; // accumulate
     }
 }

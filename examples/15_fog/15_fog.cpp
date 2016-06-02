@@ -77,6 +77,7 @@ public:
         const string volumetric_fog_name("volumetric_fog");
         material_system_context.shader_name = volumetric_fog_shader_name;
         material_system_context.instance_name = volumetric_fog_name;
+        ++material_system_context.priority;
         material_system_context.options.clear();
         material_system_context.options.add(string("volume_width"), 128);
         material_system_context.options.add(string("volume_height"), 88);
@@ -87,6 +88,8 @@ public:
             create<VolumetricFogMaterialSystem>(engine.context(), volumetric_fog_name, volumetric_fog_name);
         ASSERT(volumetric_fog_material_system != nullptr, "Couldn't create VolumetricFogMaterialSystem");
         engine.renderer()->set_material_system_to_process(volumetric_fog_material_system);
+        volumetric_fog_material_system->settings().density = 0.2f;
+        volumetric_fog_material_system->settings().color.set(0.1f, 0.2f, 0.3f, 0.0f);
 
         // step 3 - resolve to the separate fog texture
         const string resolve_fog_name("volumetric_fog_resolve");
@@ -95,34 +98,57 @@ public:
         material_system_context.shader_name = resolve_fog_shader_name;
         material_system_context.instance_name = resolve_fog_name;
         material_system_context.options.clear();
-        material_system_context.options.add(string("blend"), true);
         engine.context().initialization_parameters.add(resolve_fog_name, material_system_context);
+
+        // get materials systems which will be touched by the volumetric fog material system
+        TonemapMaterialSystem* tonemap_material_system = engine.context().material_systems.get<TonemapMaterialSystem>();
+        ASSERT(tonemap_material_system != nullptr, "Couldn't find TonemapMaterialSystem");
+        AverageLuminanceMaterialSystem* average_luminance_material_system = 
+            engine.context().material_systems.get<AverageLuminanceMaterialSystem>();
+        ASSERT(average_luminance_material_system != nullptr, "Couldn't find AverageLuminanceMaterialSystem");
+        BloomMaterialSystem* bloom_material_system = 
+            engine.context().material_systems.get<BloomMaterialSystem>();
+        ASSERT(bloom_material_system != nullptr, "Couldn't find BloomMaterialSystem");
 
         posteffect_node_desc.name = resolve_fog_name;
         posteffect_node_desc.material = resolve_fog_name;
-        posteffect_node_desc.priority = 24;
+        posteffect_node_desc.priority = 2;
         posteffect_node_desc.instantiate = true;
 
         {
             posteffect_node_desc.inputs.clear();
             posteffect_node_desc.outputs.clear();
-            // use GBuffer's depth
+            // use tonemapper's input as fog resolving input
             PosteffectSystem::NodeInput& input0 = posteffect_node_desc.inputs.add();
-            input0.index = 3;
-            input0.material = string("gbuffer_fill");
-            input0.material_output = gbuffer_depth_render_target_index;
-            // fog texture
+            input0.index = 0;
+            input0.explicit_texture = tonemap_material_system->input(0);
+            // use GBuffer's depth
             PosteffectSystem::NodeInput& input1 = posteffect_node_desc.inputs.add();
-            input1.index = 4;
-            input1.material = volumetric_fog_name;
-            input1.material_output = 0;
+            input1.index = 3;
+            input1.material = string("gbuffer_fill");
+            input1.material_output = gbuffer_depth_render_target_index;
+            // fog texture
+            PosteffectSystem::NodeInput& input2 = posteffect_node_desc.inputs.add();
+            input2.index = 4;
+            input2.material = volumetric_fog_name;
+            input2.material_output = 0;
             // uniform
             posteffect_node_desc.uniforms.clear();
             PosteffectSystem::Uniforms::type& uniform0 = posteffect_node_desc.uniforms.add();
             uniform0.index = 0;
             uniform0.explicit_handle = engine.render_context().main_camera.percamera_uniform;
+            // output
+            PosteffectSystem::NodeOutput& output = posteffect_node_desc.outputs.add();
+            output.index = 0;
+            output.scale = 1.0f;
+            output.format = format_rgb16f;
         }
-        engine.renderer()->posteffect_system().add(engine.context(), posteffect_node_desc);
+        VolumetricFogResolveMaterialSystem* volumetric_fog_resolve_material_system = 
+            static_cast<VolumetricFogResolveMaterialSystem*>(engine.renderer()->posteffect_system().add(engine.context(), posteffect_node_desc));
+
+        average_luminance_material_system->set_input(0, volumetric_fog_resolve_material_system->output(0));
+        bloom_material_system->set_input(0, volumetric_fog_resolve_material_system->output(0));
+        tonemap_material_system->set_input(0, volumetric_fog_resolve_material_system->output(0));
 
         volumetric_fog_material_system_ = volumetric_fog_material_system;
         esm_material_system_ = esm_material_system;
@@ -141,6 +167,8 @@ public:
         if (volumetric_fog_material_system_ != nullptr)
             volumetric_fog_material_system_->set_light_instance(esm_material_system_->light_instance_id(),
                 esm_material_system_->shadowmap_texture(), esm_material_system_->settings_uniform_id());
+
+        //engine.scene().camera_controller()->camera().rotate_by(quatf(0.0f, 0.2f, 0.0f));
     }
 
     VolumetricFogMaterialSystem* volumetric_fog_material_system_;

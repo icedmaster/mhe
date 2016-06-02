@@ -4,8 +4,8 @@ namespace mhe {
 
 RenderTarget& RenderTargetManager::create(Context& context, RenderTargetDesc& desc, float scale)
 {
-    desc.width = static_cast<size_t>(context.window_system.width() * scale);
-    desc.height = static_cast<size_t>(context.window_system.height() * scale);
+    desc.width = scale > 0.0f ? static_cast<size_t>(context.window_system.width() * scale) : desc.width;
+    desc.height = scale > 0.0f ? static_cast<size_t>(context.window_system.height() * scale) : desc.height;
     RenderTarget& rt = create_and_get(context.render_target_pool);
     rt.init(context, desc);
     RenderTargetData rt_data;

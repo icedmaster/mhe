@@ -262,7 +262,7 @@ bool PosteffectMaterialSystemBase::init_mesh(Context& context, const MaterialSys
     const std::vector<string>& outputs_scale = utils::split(outputs_str, string(","));
     if (!outputs_scale.empty())
     {
-        create_output(render_state.id(), context, 0, types_cast<float>(outputs_scale[0]), format_rgba);
+        create_output(render_state.id(), context, 0, 0, 0, types_cast<float>(outputs_scale[0]), format_rgba);
     }
 
     Material& material = create_and_get(context.materials[id()]);
@@ -290,10 +290,18 @@ bool PosteffectMaterialSystemBase::create_output(Context& context, size_t index,
     ASSERT(output(index).id == Texture::invalid_id, "create_output() - trying to create a new output when old output still exists");
     ASSERT(default_render_target_ == mhe::default_render_target || default_render_target_ == RenderTarget::invalid_id,
         "RenderTarget has been set already");
-    return create_output(mesh_.instance_parts[0].render_state_id, context, index, scale, format);
+    return create_output(mesh_.instance_parts[0].render_state_id, context, index, 0, 0, scale, format);
 }
 
-void PosteffectMaterialSystemBase::fill_render_target_desc(RenderTargetDesc& desc, int format) const
+bool PosteffectMaterialSystemBase::create_output(Context& context, size_t index, size_t width, size_t height, int format)
+{
+    ASSERT(output(index).id == Texture::invalid_id, "create_output() - trying to create a new output when old output still exists");
+    ASSERT(default_render_target_ == mhe::default_render_target || default_render_target_ == RenderTarget::invalid_id,
+        "RenderTarget has been set already");
+    return create_output(mesh_.instance_parts[0].render_state_id, context, index, width, height, 0.0f, format);
+}
+
+void PosteffectMaterialSystemBase::fill_render_target_desc(RenderTargetDesc& desc, size_t width, size_t height, int format) const
 {
     desc.target = rt_readwrite;
     desc.use_depth = false;
@@ -301,12 +309,15 @@ void PosteffectMaterialSystemBase::fill_render_target_desc(RenderTargetDesc& des
     desc.color_targets = 1;
     desc.color_datatype[0] = format_default;
     desc.color_format[0] = format != format_max ? format : format_rgba;
+    desc.width = width;
+    desc.height = height;
 }
 
-bool PosteffectMaterialSystemBase::create_output(RenderStateHandleType render_state_id, Context& context, size_t index, float scale, int format)
+bool PosteffectMaterialSystemBase::create_output(RenderStateHandleType render_state_id, Context& context, size_t index,
+    size_t width, size_t height, float scale, int format)
 {
     RenderTargetDesc render_target_desc;
-    fill_render_target_desc(render_target_desc, format);
+    fill_render_target_desc(render_target_desc, width, height, format);
     RenderTarget& render_target = context.render_target_manager.create(context, render_target_desc, scale);
     const TextureInstance* ids = nullptr;
     render_target.color_textures(&ids);
@@ -455,13 +466,14 @@ void BlurMaterialSystem::destroy(Context& context)
     PosteffectMaterialSystemBase::destroy(context);
 }
 
-bool BlurMaterialSystem::create_output(RenderStateHandleType render_state_id, Context& context, size_t index, float scale, int format)
+bool BlurMaterialSystem::create_output(RenderStateHandleType render_state_id, Context& context, size_t index,
+    size_t width, size_t height, float scale, int format)
 {
-    if (!PosteffectMaterialSystemBase::create_output(render_state_id, context, index, scale, format))
+    if (!PosteffectMaterialSystemBase::create_output(render_state_id, context, index, width, height, scale, format))
         return false;
 
     RenderTargetDesc render_target_desc;
-    fill_render_target_desc(render_target_desc, format);
+    fill_render_target_desc(render_target_desc, width, height, format);
     RenderTarget& render_target = context.render_target_manager.create(context, render_target_desc, scale);
     output_rt_ = render_target.id();
 

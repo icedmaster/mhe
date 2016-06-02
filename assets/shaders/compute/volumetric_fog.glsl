@@ -43,7 +43,7 @@ float calculate_shadow_esm(vec3 pos_ws, float linear_depth)
     vec2 scale = vec2(1.0f / cascades_number, 1.0f);
     vec2 offset = vec2(cascade * scale.x, 0.0f);
 
-    float receiver = exp((pos_hcs.z * 0.5f + 0.5f) * exponent);
+	float receiver = max(exp((pos_hcs.z * 0.5f + 0.5f) * exponent), 0.001f);
     float occluder = texture(shadowmap_texture, (pos_hcs.xy * 0.5f + 0.5f) * scale + offset).x;
 
     return saturate(occluder / receiver); 
@@ -53,12 +53,13 @@ float calculate_density(vec3 pos_ws)
 {
     float density = fog_settings.x;
     float falloff = fog_settings.y;
+	float scattering_coeff = fog_settings.z;
     vec3 viewdir = pos_ws - viewpos.xyz;
     float dist = length(viewdir);
     viewdir /= dist;
 	float ry = abs(viewdir.y) < 0.001f ? 0.001f : viewdir.y;
     float height_based_amount = density * saturate(exp(-viewpos.y * falloff) * (1.0f - exp(-dist * ry * falloff)) / (falloff * ry));
-    return height_based_amount;
+    return height_based_amount * scattering_coeff;
 }
 
 vec3 invocation_id_to_01(uvec3 pos)
@@ -66,6 +67,11 @@ vec3 invocation_id_to_01(uvec3 pos)
     return vec3(pos.x / volume_size.x,
                 pos.y / volume_size.y,
                 pos.z / volume_size.z);
+}
+
+vec3 ldr_light(vec3 hdr_light_value)
+{
+	return hdr_light_value / (hdr_light_value + vec3(1.0f));
 }
 
 layout(local_size_x = THREADS_NUMBER, local_size_y = THREADS_NUMBER, local_size_z = THREADS_NUMBER) in;
@@ -77,11 +83,11 @@ void main()
     float linear_depth = pos_ndc.z * zfar;
     vec3 pos_ws = viewpos.xyz + viewray * linear_depth;
     
-    float fog_density = calculate_density(pos_ws);
+	float fog_density = calculate_density(pos_ws);
     // lighting
-    vec3 directional_light_radiance = light.diffuse.rgb * calculate_shadow_esm(pos_ws, linear_depth);
+vec3 directional_light_radiance = light.diffuse.rgb * calculate_shadow_esm(pos_ws, linear_depth);
 
-	vec4 output_color = vec4((directional_light_radiance * fog_color.rgb + vec3(0.2f)) * fog_density, fog_density);
+	vec4 output_color = vec4((directional_light_radiance + ambient.rgb) * fog_color.rgb * fog_density, fog_density);
 
     imageStore(output_texture, ivec3(volume_pos), output_color);
 }
