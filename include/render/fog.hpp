@@ -139,13 +139,15 @@ public:
         float falloff;
         float density;
         float scattering_coeff;
+        float light_brightness;
 
         Settings() :
             color(0.5f, 0.6f, 0.7f, 0.5f),
-            range(150.0f),
+            range(3000.0f),
             falloff(0.02f),
             density(0.5f),
-            scattering_coeff(1.0f)
+            scattering_coeff(1.0f),
+            light_brightness(0.5f)
         {}
     };
 public:
@@ -169,6 +171,13 @@ public:
     void output(Context&, size_t /*unit*/, TextureInstance& texture) const override
     {
         texture = volume_textures_[1];
+    }
+
+    void init_debug_views(Context& context) override;
+
+    UniformBufferHandleType settings_uniform_id() const
+    {
+        return uniform_id_;
     }
 private:
     void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;

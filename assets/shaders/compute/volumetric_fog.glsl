@@ -6,19 +6,13 @@
 [include "../common.h"]
 [include "../geometry_common.h"]
 [include "../lighting_common.h"]
+[include "../volumetric_fog_common.h"]
 
 [var THREADS_NUMBER 4]
 
 layout(rgba16f, binding = 0) readonly uniform image2D noise_texture;
 layout(binding = 1) uniform sampler2D shadowmap_texture;
 layout(rgba16f, binding = 2) writeonly uniform image3D output_texture;
-
-layout(binding = 1) uniform Settings
-{
-    vec4 volume_size;
-    vec4 fog_color;
-    vec4 fog_settings;
-};
 
 layout(binding = 2) uniform LightData
 {
@@ -80,12 +74,13 @@ void main()
     uvec3 volume_pos = gl_GlobalInvocationID.xyz;
     vec3 pos_ndc = invocation_id_to_01(volume_pos);
     vec3 viewray = (inv_vp * vec4(pos_ndc.xy * 2.0f - 1.0f, 1.0f, 1.0f)).xyz;
-    float linear_depth = pos_ndc.z * zfar;
+	float linear_depth = pos_ndc.z * get_fog_range();
     vec3 pos_ws = viewpos.xyz + viewray * linear_depth;
     
 	float fog_density = calculate_density(pos_ws);
     // lighting
-vec3 directional_light_radiance = light.diffuse.rgb * calculate_shadow_esm(pos_ws, linear_depth);
+	float light_brightness = fog_settings.w;
+	vec3 directional_light_radiance = light.diffuse.rgb * calculate_shadow_esm(pos_ws, linear_depth) * light_brightness;
 
 	vec4 output_color = vec4((directional_light_radiance + ambient.rgb) * fog_color.rgb * fog_density, fog_density);
 

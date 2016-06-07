@@ -8,6 +8,7 @@
 #include "render/utils/simple_meshes.hpp"
 #include "render/scene_context.hpp"
 #include "utils/global_log.hpp"
+#include "debug/debug_views.hpp"
 
 namespace mhe {
 
@@ -249,15 +250,11 @@ void ExponentialShadowMap::update(Context& context, SceneContext& scene_context,
     dc.command = &downsample_command_;
     dc.pass = 0;
     dc2.pass = 1;
-
-    //DrawCall& draw_call = render_context.draw_calls.add();
-    //setup_draw_call(draw_call, mesh_instance_.instance_parts[0], mesh_instance_.mesh.parts[0], resolved_shadow_rt_, &downsample_command_);
 }
 
 TextureInstance ExponentialShadowMap::shadowmap_texture() const
 {
     return blur_material_system_->output(0);
-    //return downsampled_texture_;
 }
 
 void ExponentialShadowMap::init_downsampling(Context& context, const ShadowInfo* shadow_info)
@@ -343,9 +340,9 @@ bool VolumetricFogMaterialSystem::init(Context& context, const MaterialSystemCon
     propagation_shader_ = context.ubershader_pool.get(propagation_ubershader.shader_program_handle).get_default();
 
     TextureDesc texture_desc;
-    texture_desc.address_mode_r = texture_clamp;
-    texture_desc.address_mode_s = texture_clamp;
-    texture_desc.address_mode_t = texture_clamp;
+    texture_desc.address_mode_r = texture_clamp_to_edge;
+    texture_desc.address_mode_s = texture_clamp_to_edge;
+    texture_desc.address_mode_t = texture_clamp_to_edge;
     texture_desc.anisotropic_level = 0.0f;
     texture_desc.datatype = format_default;
     texture_desc.depth = volume_size_.z();
@@ -409,7 +406,7 @@ void VolumetricFogMaterialSystem::update(Context& context, SceneContext& scene_c
                                 static_cast<float>(volume_size_.y()),
                                 static_cast<float>(volume_size_.z()), settings_.range);
     shader_data.fog_color = settings_.color;
-    shader_data.fog_settings.set(settings_.density, settings_.falloff, settings_.scattering_coeff, 0.0f);
+    shader_data.fog_settings.set(settings_.density, settings_.falloff, settings_.scattering_coeff, settings_.light_brightness);
     UniformBuffer& uniform_buffer = context.uniform_pool.get(uniform_id_);
     uniform_buffer.update(shader_data);
 
@@ -433,6 +430,8 @@ void VolumetricFogMaterialSystem::update(Context& context, SceneContext& scene_c
     compute_call.uniforms[3] = &context.uniform_pool.get(esm_uniform_id_);
     compute_call.shader_program = &context.shader_pool.get(ubershader(context).get_default());
     size_t threads_number = compute_call.shader_program->variable_value<size_t>(string("THREADS_NUMBER"));
+    ASSERT(volume_size_.x() % threads_number == 0 && volume_size_.y() % threads_number == 0 &&
+           volume_size_.z() % threads_number == 0, "Volume size must be a multiplier of " << threads_number);
     compute_call.workgroups_number = volume_size_ / threads_number;
     compute_call.barrier = memory_barrier_all;
 
@@ -446,12 +445,25 @@ void VolumetricFogMaterialSystem::update(Context& context, SceneContext& scene_c
     propagation_compute_call.uniforms[1] = compute_call.uniforms[1];
     propagation_compute_call.shader_program = &context.shader_pool.get(propagation_shader_);
     threads_number = propagation_compute_call.shader_program->variable_value<size_t>(string("THREADS_NUMBER"));
+    ASSERT(volume_size_.x() % threads_number == 0 && volume_size_.y() % threads_number == 0,
+           "Volume size must be a multiplier of " << threads_number);
     propagation_compute_call.workgroups_number = uivec3(volume_size_.xy() / threads_number, 1);
     propagation_compute_call.barrier = memory_barrier_all;
 
     DrawCall& draw_call = render_context.draw_calls.add();
     draw_call.material.material_system = id();
     draw_call.command = &list_of_commands_;
+}
+
+void VolumetricFogMaterialSystem::init_debug_views(Context& context)
+{
+    size_t view_id = context.debug_views->add_view(string("Fog"));
+    DebugViews::DebugView& view = context.debug_views->get_view(view_id);
+    view.add(string("density"), 0.0f, 5.0f, &settings_.density);
+    view.add(string("scattering"), 0.0f, 1.0f, &settings_.scattering_coeff);
+    view.add(string("falloff"), 0.0f, 1.0f, &settings_.falloff);
+    view.add(string("range"), 50.0f, 5000.0f, &settings_.range);
+    view.add(string("light_brightness"), 0.0f, 1.0f, &settings_.light_brightness);
 }
 
 }

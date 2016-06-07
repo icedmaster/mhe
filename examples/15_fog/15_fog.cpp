@@ -90,6 +90,7 @@ public:
         engine.renderer()->set_material_system_to_process(volumetric_fog_material_system);
         volumetric_fog_material_system->settings().density = 0.2f;
         volumetric_fog_material_system->settings().color.set(0.1f, 0.2f, 0.3f, 0.0f);
+        volumetric_fog_material_system->init_debug_views(engine.context());
 
         // step 3 - resolve to the separate fog texture
         const string resolve_fog_name("volumetric_fog_resolve");
@@ -137,6 +138,9 @@ public:
             PosteffectSystem::Uniforms::type& uniform0 = posteffect_node_desc.uniforms.add();
             uniform0.index = 0;
             uniform0.explicit_handle = engine.render_context().main_camera.percamera_uniform;
+            PosteffectSystem::Uniforms::type& uniform1 = posteffect_node_desc.uniforms.add();
+            uniform1.index = 1;
+            uniform1.explicit_handle = volumetric_fog_material_system->settings_uniform_id();
             // output
             PosteffectSystem::NodeOutput& output = posteffect_node_desc.outputs.add();
             output.index = 0;
@@ -167,8 +171,6 @@ public:
         if (volumetric_fog_material_system_ != nullptr)
             volumetric_fog_material_system_->set_light_instance(esm_material_system_->light_instance_id(),
                 esm_material_system_->shadowmap_texture(), esm_material_system_->settings_uniform_id());
-
-        //engine.scene().camera_controller()->camera().rotate_by(quatf(0.0f, 0.2f, 0.0f));
     }
 
     VolumetricFogMaterialSystem* volumetric_fog_material_system_;
