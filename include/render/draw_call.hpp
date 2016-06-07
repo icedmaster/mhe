@@ -44,6 +44,7 @@ struct DrawCallExplicit
 
 const size_t compute_call_images_number = 8;
 const size_t compute_call_buffers_number = 4;
+const size_t compute_call_uniforms_number = 5;
 
 struct ComputeCallExplicit
 {
@@ -52,7 +53,7 @@ struct ComputeCallExplicit
     Texture* textures[compute_call_images_number];
     int image_access[compute_call_images_number];
     ShaderStorageBuffer* buffers[compute_call_buffers_number];
-    UniformBuffer* uniforms[compute_call_buffers_number];
+    UniformBuffer* uniforms[compute_call_uniforms_number];
     uivec3 workgroups_number;
     int barrier;
 };

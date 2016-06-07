@@ -1,15 +1,10 @@
 [compute]
 
 [include "../common.h"]
+[include "../volumetric_fog_common.h"]
 
 layout(rgba16f, binding = 0) readonly uniform image3D input_texture;
 layout(rgba16f, binding = 1) writeonly uniform image3D output_texture;
-
-layout(binding = 1) uniform Settings
-{
-    vec4 volume_size;
-    vec4 fog_color;
-};
 
 [var THREADS_NUMBER 4]
 

@@ -44,6 +44,16 @@
       <blur_shader>posteffect_blur</blur_shader>
     </options>
   </material>
+  <material name="rsm" shader="rsm" priority="0" on_demand="1">
+  </material>
+  <material name="lpv" shader="lpv" priority="0" on_demand="1">
+    <options>
+      <injection_shader>lpv</injection_shader>
+      <propagation_shader>lpv_propagation</propagation_shader>
+      <geometry_injection_shader>lpv_geometry_injection</geometry_injection_shader>
+    </options>
+  </material>
+  <material name="lpv_resolve" shader="lpv_resolve" priority="0" on_demand="1" />
   </materials>
   <skybox name="skybox" />
   <shadowmap_depth_write name="depth_write" />
@@ -54,6 +64,10 @@
 	<use name="gbuffer_draw" />
 	<draw name="posteffect_simple" />
   </gbuffer>
+  <gi>
+    <lpv>
+    </lpv>
+  </gi>
   <posteffects>
     <node name="average_luminance" material="average_luminance" priority="4" instantiate="1">
       <inputs>

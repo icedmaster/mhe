@@ -31,13 +31,13 @@ struct RGBSH4
 #define COS_A1 (2.0f * PI) / 3.0f
 #define COS_A2 PI * 0.25f
 
-ColorSH9 fetch_sh9_color(samplerBuffer buffer, int vertex)
+ColorSH9 fetch_sh9_color(samplerBuffer buf, int vertex)
 {
 	int stride = 9;
 	ColorSH9 res;
 	for (int i = 0; i < 9; ++i)
 	{
-		vec3 c = texelFetch(buffer, vertex * stride + i).rgb;
+		vec3 c = texelFetch(buf, vertex * stride + i).rgb;
 		res.c[i] = c;
 	}
 

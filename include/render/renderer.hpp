@@ -132,6 +132,11 @@ public:
 
     void before_render(Context& context, SceneContext& scene_context, RenderContext& render_context);
     void render(Context& context, SceneContext& scene_context, RenderContext& render_context);
+
+    LPVMaterialSystem* lpv_material_system() const
+    {
+        return lpv_material_system_;
+    }
 private:
     RSMMaterialSystem* rsm_material_system_;
     LPVMaterialSystem* lpv_material_system_;

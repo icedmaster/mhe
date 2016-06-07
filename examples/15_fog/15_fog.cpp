@@ -25,6 +25,11 @@ public:
         mhe::NodeInstance& node = engine.scene().create_node();
         mhe::load_node<mhe::GBufferFillMaterialSystem>(node, mhe::string("sponza.bin"), engine.context(), engine.scene_context());
 
+        for (size_t i = 0, size = node.mesh.mesh.parts.size(); i < size; ++i)
+        {
+            engine.context().material_manager.material_data(node.mesh.mesh.parts[i].material_id).render_data.glossiness = 0.5f;
+        }
+
         MaterialSystemContext material_system_context;
         const string fog_material_name("height_fog");
         material_system_context.priority = posteffect_material_priority_base;
@@ -89,7 +94,7 @@ public:
         ASSERT(volumetric_fog_material_system != nullptr, "Couldn't create VolumetricFogMaterialSystem");
         engine.renderer()->set_material_system_to_process(volumetric_fog_material_system);
         volumetric_fog_material_system->settings().density = 0.2f;
-        volumetric_fog_material_system->settings().color.set(0.1f, 0.2f, 0.3f, 0.0f);
+        volumetric_fog_material_system->settings().color.set(0.1f, 0.1f, 0.1f, 0.0f);
         volumetric_fog_material_system->init_debug_views(engine.context());
 
         // step 3 - resolve to the separate fog texture
@@ -190,7 +195,7 @@ int main(int /*argc*/, char** /*argv*/)
 #else
     config.assets_path = "../../assets/";
 #endif
-    config.render_config_filename = mhe::utils::path_join(config.assets_path, "render_without_postprocess.xml");
+    config.render_config_filename = mhe::utils::path_join(config.assets_path, "render_volumetric_fog.xml");
     app.init(config);
 
     mhe::game::GameSceneDesc desc;

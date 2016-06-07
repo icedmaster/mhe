@@ -7,6 +7,7 @@
 #include "render/renderer.hpp"
 #include "render/utils/simple_meshes.hpp"
 #include "render/scene_context.hpp"
+#include "render/lpv_material_system.hpp"
 #include "utils/global_log.hpp"
 #include "debug/debug_views.hpp"
 
@@ -428,10 +429,31 @@ void VolumetricFogMaterialSystem::update(Context& context, SceneContext& scene_c
     compute_call.uniforms[1] = &uniform_buffer;
     compute_call.uniforms[2] = &context.uniform_pool.get(light_instance.uniform_id);
     compute_call.uniforms[3] = &context.uniform_pool.get(esm_uniform_id_);
-    compute_call.shader_program = &context.shader_pool.get(ubershader(context).get_default());
+
+    LPVMaterialSystem* lpv_material_system = context.renderer->gi_system().lpv_material_system();
+    if (lpv_material_system != nullptr)
+    {
+        for (int i = 0; i < 3; ++i)
+        {
+            TextureInstance gi_texture;
+            lpv_material_system->output(context, i, gi_texture);
+            ASSERT(is_handle_valid(gi_texture.id), "Invalid GI texture");
+            compute_call.textures[3 + i] = &context.texture_pool.get(gi_texture.id);
+            compute_call.image_access[3 + i] = access_readonly;
+        }
+        UniformBuffer::IdType gi_uniform = lpv_material_system->injection_settings_uniform();
+        ASSERT(is_handle_valid(gi_uniform), "Invalid GI uniform");
+        compute_call.uniforms[4] = &context.uniform_pool.get(gi_uniform);
+    }
+
+    UberShader& uber_shader = ubershader(context);
+    UberShader::Index ubershader_index;
+    ubershader_index.set(uber_shader.info("LPV"), lpv_material_system != nullptr ? 1 : 0);
+    compute_call.shader_program = &context.shader_pool.get(uber_shader.get(ubershader_index));
+
     size_t threads_number = compute_call.shader_program->variable_value<size_t>(string("THREADS_NUMBER"));
     ASSERT(volume_size_.x() % threads_number == 0 && volume_size_.y() % threads_number == 0 &&
-           volume_size_.z() % threads_number == 0, "Volume size must be a multiplier of " << threads_number);
+        volume_size_.z() % threads_number == 0, "Volume size must be a multiplier of " << threads_number);
     compute_call.workgroups_number = volume_size_ / threads_number;
     compute_call.barrier = memory_barrier_all;
 

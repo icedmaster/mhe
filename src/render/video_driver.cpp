@@ -330,7 +330,7 @@ void Driver::perform_compute_call(Context& /*context*/, const ComputeCallExplici
         if (compute_call.buffers[i] == nullptr) continue;
         impl_->set_shader_storage_buffer(*compute_call.buffers[i], i);
     }
-    for (size_t i = 0; i < compute_call_buffers_number; ++i)
+    for (size_t i = 0; i < compute_call_uniforms_number; ++i)
     {
         if (compute_call.uniforms[i] == nullptr) continue;
         impl_->bind_uniform(*compute_call.uniforms[i], i);

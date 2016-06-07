@@ -1,9 +1,11 @@
+[defs LPV 0 1]
+
 [compute]
 
 #define LIGHT_TYPE DIRECTIONAL_LIGHT
 #define CASCADED_SHADOWMAP
 
-[include "../common.h"]
+[include "../sh.h"]
 [include "../geometry_common.h"]
 [include "../lighting_common.h"]
 [include "../volumetric_fog_common.h"]
@@ -14,6 +16,10 @@ layout(rgba16f, binding = 0) readonly uniform image2D noise_texture;
 layout(binding = 1) uniform sampler2D shadowmap_texture;
 layout(rgba16f, binding = 2) writeonly uniform image3D output_texture;
 
+layout(binding = 3) uniform sampler3D sh_r_texture;
+layout(binding = 4) uniform sampler3D sh_g_texture;
+layout(binding = 5) uniform sampler3D sh_b_texture;
+
 layout(binding = 2) uniform LightData
 {
     Light light;
@@ -23,6 +29,50 @@ layout(binding = 3) uniform ESMSettings
 {
     vec4 esm_settings;
 };
+
+layout(binding = 4) uniform InjectionSettings
+{
+    vec4 injection_settings;
+    mat4 rsm_to_world;
+    mat4 world_to_lpv;
+    vec4 light_settings;
+};
+
+bool is_outside(vec3 pos)
+{
+    return pos.x > 1.0f || pos.y > 1.0f || pos.z > 1.0f ||
+           pos.x < 0.0f || pos.y < 0.0f || pos.z < 0.0f;
+}
+
+RGBSH4 load_sh(vec3 pos)
+{
+    if (is_outside(pos))
+        return empty_rgbsh4();
+    RGBSH4 res;
+    res.r = texture(sh_r_texture, pos);
+    res.g = texture(sh_g_texture, pos);
+    res.b = texture(sh_b_texture, pos);
+    return res;
+}
+
+vec3 calculate_gi(vec3 pos_ws, vec3 dir)
+{
+	vec4 pos_lpv = world_to_lpv * vec4(pos_ws, 1.0f);
+	RGBSH4 rgbsh = load_sh(pos_lpv.xyz);
+	return calculate_irradiance(dir, rgbsh);
+}
+
+vec3 calculate_ambient(vec3 pos_ws)
+{
+#if LPV == 0
+	return ambient.rgb;
+#else
+	vec3 dir = pos_ws - viewpos.xyz;
+	float len = length(dir);
+	vec3 dir_nrm = len < 0.0001 ? VEC3_ZERO : dir / len;
+	return calculate_gi(pos_ws, dir_nrm);
+#endif
+}
 
 float calculate_shadow_esm(vec3 pos_ws, float linear_depth)
 {
@@ -82,7 +132,7 @@ void main()
 	float light_brightness = fog_settings.w;
 	vec3 directional_light_radiance = light.diffuse.rgb * calculate_shadow_esm(pos_ws, linear_depth) * light_brightness;
 
-	vec4 output_color = vec4((directional_light_radiance + ambient.rgb) * fog_color.rgb * fog_density, fog_density);
+    vec4 output_color = vec4((directional_light_radiance + calculate_ambient(pos_ws)) * fog_color.rgb * fog_density, fog_density);
 
     imageStore(output_texture, ivec3(volume_pos), output_color);
 }
