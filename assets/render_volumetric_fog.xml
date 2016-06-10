@@ -54,6 +54,19 @@
     </options>
   </material>
   <material name="lpv_resolve" shader="lpv_resolve" priority="0" on_demand="1" />
+  <material name="volumetric_fog_system" priority="33">
+    <options>
+      <esm_downsample_shader>compute/esm_downsample</esm_downsample_shader>
+      <esm_size>256</esm_size>
+      <esm_blur_shader>posteffect_blur</esm_blur_shader>
+      <volume_width>128</volume_width>
+      <volume_height>88</volume_height>
+      <volume_depth>72</volume_depth>
+      <volumetric_fog_shader>compute/volumetric_fog</volumetric_fog_shader>
+      <propagation_shader>compute/volumetric_fog_propagation</propagation_shader>
+    </options>
+  </material>
+  <material name="volumetric_fog_resolve" shader="posteffect_volumetric_fog_resolve" on_demand="1" />
   </materials>
   <skybox name="skybox" />
   <shadowmap_depth_write name="depth_write" />
@@ -68,15 +81,32 @@
     <lpv>
     </lpv>
   </gi>
+  <materials_to_process>
+    <material name="volumetric_fog_system" />
+  </materials_to_process>
   <posteffects>
-    <node name="average_luminance" material="average_luminance" priority="4" instantiate="1">
+    <node name="volumetric_fog_resolve" material="volumetric_fog_resolve" priority="3" instantiate="1">
       <inputs>
         <input index="0" material="posteffect_simple" material_output="0" />
+        <input index="3" material="gbuffer_fill" material_output="3" />
+        <input index="4" material="volumetric_fog_system" material_output="0" />
+      </inputs>
+      <outputs>
+        <output index="0" scale="1" format="rgb16f" />
+      </outputs>
+      <uniforms>
+        <uniform index="0" node="" system="main_camera" uniform="0" />
+        <uniform index="1" node="" material="volumetric_fog_system" uniform="1" />
+      </uniforms>
+    </node>
+    <node name="average_luminance" material="average_luminance" priority="4" instantiate="1">
+      <inputs>
+        <input index="0" node="volumetric_fog_resolve" output="0" />
       </inputs>
     </node>
     <node name="bloom" material="bloom" priority="5" instantiate="1">
       <inputs>
-        <input index="0" material="posteffect_simple" material_output="0" />
+        <input index="0" node="volumetric_fog_resolve" output="0" />
       </inputs>
       <outputs>
         <output index="0" scale="1.0f" format="rgba16f" />
@@ -87,7 +117,7 @@
     </node>
 	<node name="tonemap" material="tonemap" priority="6">
 	  <inputs>
-		<input index="0" material="posteffect_simple" material_output="0" />
+		<input index="0" node="volumetric_fog_resolve" output="0" />
         <input index="3" node="" output="" material="gbuffer_fill" material_output="3" />
         <input index="4" node="bloom" output="0" />
 	  </inputs>

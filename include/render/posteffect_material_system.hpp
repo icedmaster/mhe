@@ -149,7 +149,7 @@ public:
         uniforms_[index] = id;
     }
 
-    UniformBufferHandleType uniform(size_t index) const
+    virtual UniformBufferHandleType uniform(size_t index) const override
     {
         return uniforms_[index];
     }

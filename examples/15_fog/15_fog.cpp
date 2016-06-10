@@ -5,6 +5,11 @@
 using namespace mhe;
 
 #define USE_VOLUMETRIC_FOG
+#define USE_VOLUMETRIC_FOG_CONFIG
+
+#ifndef USE_VOLUMETRIC_FOG
+#undef USE_VOLUMETRIC_FOG_CONFIG
+#endif
 
 class GameScene : public mhe::game::GameScene
 {
@@ -27,7 +32,7 @@ public:
 
         for (size_t i = 0, size = node.mesh.mesh.parts.size(); i < size; ++i)
         {
-            engine.context().material_manager.material_data(node.mesh.mesh.parts[i].material_id).render_data.glossiness = 0.5f;
+            engine.context().material_manager.material_data(node.mesh.mesh.parts[i].material_id).render_data.glossiness = 1.0f;
         }
 
         MaterialSystemContext material_system_context;
@@ -62,16 +67,16 @@ public:
         fog_material_system->settings().color.set(0.5f, 0.6f, 0.7f, 0.0f);
 
         volumetric_fog_material_system_ = nullptr;
-#else
+#elif !defined(USE_VOLUMETRIC_FOG_CONFIG)
 
         // volumetric fog
         // step 1 - ESM
         const string esm_name("esm");
         material_system_context.shader_name = esm_name;
         material_system_context.instance_name = esm_name;
-        material_system_context.options.add(string("downsample_shader"), string("compute/esm_downsample"));
-        material_system_context.options.add(string("size"), 256);
-        material_system_context.options.add(string("blur_shader"), string("posteffect_blur"));
+        material_system_context.options.add(string("esm_downsample_shader"), string("compute/esm_downsample"));
+        material_system_context.options.add(string("esm_size"), 256);
+        material_system_context.options.add(string("esm_blur_shader"), string("posteffect_blur"));
         engine.context().initialization_parameters.add(esm_name, material_system_context);
         ExponentialShadowMap* esm_material_system = create<ExponentialShadowMap>(engine.context(), esm_name, esm_name);
         ASSERT(esm_material_system != nullptr, "Couldn't create ExponentialShadowMap material system");
@@ -173,9 +178,11 @@ public:
 
     void before_draw(game::Engine& engine) override
     {
+#ifndef USE_VOLUMETRIC_FOG_CONFIG
         if (volumetric_fog_material_system_ != nullptr)
             volumetric_fog_material_system_->set_light_instance(esm_material_system_->light_instance_id(),
                 esm_material_system_->shadowmap_texture(), esm_material_system_->settings_uniform_id());
+#endif
     }
 
     VolumetricFogMaterialSystem* volumetric_fog_material_system_;
@@ -195,7 +202,12 @@ int main(int /*argc*/, char** /*argv*/)
 #else
     config.assets_path = "../../assets/";
 #endif
+
+#ifndef USE_VOLUMETRIC_FOG_CONFIG
+    config.render_config_filename = mhe::utils::path_join(config.assets_path, "render_without_postprocess.xml");
+#else
     config.render_config_filename = mhe::utils::path_join(config.assets_path, "render_volumetric_fog.xml");
+#endif
     app.init(config);
 
     mhe::game::GameSceneDesc desc;

@@ -205,6 +205,7 @@ void Application::init_render(const ApplicationConfig& config)
         engine_->set_renderer(new NullRenderer(engine_->context()));
     init_posteffects(renderer_params);
     init_gi(gi_params);
+    init_materials_to_process(mhe_node.child("materials_to_process"));
 }
 
 void Application::init_posteffect_parameters(pugi::xml_node node, RendererParams& params) const
@@ -298,6 +299,8 @@ void Application::init_posteffect_parameters(pugi::xml_node node, RendererParams
                 attr = u.attribute("uniform");
                 ASSERT(attr, "Malformed posteffect node. The uniform index of input node for a uniform must exist");
                 buffer.node_buffer = attr.as_uint();
+                buffer.material = u.attribute("material").value();
+                buffer.systemwide_name = u.attribute("system").value();
             }
         }
 
@@ -404,6 +407,18 @@ void Application::init_gi(const GIParams& params)
     if (params.use_lpv)
         engine_->renderer()->gi_system().add_lpv(engine_->context(), *engine_->renderer(), params.lpv_params);
     engine_->renderer()->gi_system().apply(*engine_->renderer());
+}
+
+void Application::init_materials_to_process(pugi::xml_node node)
+{
+    if (!node) return;
+    for (pugi::xml_node n = node.child("material"); n; n = n.next_sibling("material"))
+    {
+        const char* name = n.attribute("name").value();
+        MaterialSystem* material_system = engine_->context().material_systems.get(name);
+        ASSERT(material_system != nullptr, "Invalid material system name:" << name);
+        engine_->renderer()->set_material_system_to_process(material_system);
+    }
 }
 
 }}

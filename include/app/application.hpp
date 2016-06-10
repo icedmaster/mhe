@@ -71,6 +71,7 @@ private:
     void init_posteffects(const RendererParams& params);
     void init_gi_params(pugi::xml_node node, GIParams& params) const;
     void init_gi(const GIParams& params);
+    void init_materials_to_process(pugi::xml_node node);
 
     void add_delegates();
     bool on_system_event(const Event* event);

@@ -246,7 +246,7 @@ void PosteffectSystem::init_buffers(PosteffectMaterialSystemBase* material_syste
     }
 }
 
-void PosteffectSystem::init_uniforms(PosteffectMaterialSystemBase* material_system, Context& /*context*/,
+void PosteffectSystem::init_uniforms(PosteffectMaterialSystemBase* material_system, Context& context,
     const PosteffectSystem::PosteffectNodeDesc& node_desc)
 {
     for (size_t i = 0, size = node_desc.uniforms.size(); i < size; ++i)
@@ -255,12 +255,30 @@ void PosteffectSystem::init_uniforms(PosteffectMaterialSystemBase* material_syst
         UniformBufferHandleType buffer_id = buffer_desc.explicit_handle;
         if (!is_handle_valid(buffer_id))
         {
-            const PosteffectNode* input_node = find_node(buffer_desc.node);
-            ASSERT(input_node != nullptr && input_node->material_system != nullptr, "Can't find a node with name:" << buffer_desc.node);
-            buffer_id = input_node->material_system->uniform(buffer_desc.node_buffer);
-            if (!is_handle_valid(buffer_id))
+            if (!buffer_desc.systemwide_name.empty())
             {
-                WARN_LOG("The uniform is not valid:" << buffer_desc.node << " " << buffer_desc.node_buffer);
+                buffer_id = context.renderer->system_wide_uniform(buffer_desc.systemwide_name);
+                ASSERT(is_handle_valid(buffer_id), "Invalid system-wide uniform name:" << buffer_desc.systemwide_name);
+            }
+            else if (!buffer_desc.node.empty())
+            {
+                const PosteffectNode* input_node = find_node(buffer_desc.node);
+                ASSERT(input_node != nullptr && input_node->material_system != nullptr, "Can't find a node with name:" << buffer_desc.node);
+                buffer_id = input_node->material_system->uniform(buffer_desc.node_buffer);
+                if (!is_handle_valid(buffer_id))
+                {
+                    WARN_LOG("The uniform is not valid:" << buffer_desc.node << " " << buffer_desc.node_buffer);
+                }
+            }
+            else if (!buffer_desc.material.empty())
+            {
+                MaterialSystem* material_system = context.material_systems.get(buffer_desc.material);
+                ASSERT(material_system != nullptr, "Invalid material with name:" << buffer_desc.material);
+                buffer_id = material_system->uniform(buffer_desc.node_buffer);
+                if (!is_handle_valid(buffer_id))
+                {
+                    WARN_LOG("The uniform is not valid:" << buffer_desc.material << " " << buffer_desc.node_buffer);
+                }
             }
         }
         material_system->set_uniform(buffer_desc.index, buffer_id);
@@ -552,6 +570,13 @@ void Renderer::debug_mode_changed(DebugMode mode, MaterialSystemId material_syst
         fullscreen_debug_material_system_->set_viewports_number(posteffect_material_system->outputs_number());
         fullscreen_debug_material_system_->enable();
     }
+}
+
+UniformBufferHandleType Renderer::system_wide_uniform(const string& name) const
+{
+    if (name == "main_camera")
+        return render_context_.main_camera.percamera_uniform;
+    return InvalidHandle<UniformBufferHandleType>::id;
 }
 
 bool load_node(NodeInstance& node, const string& name, const char* material_system_name, Context& context, SceneContext& scene_context)

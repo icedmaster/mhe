@@ -200,6 +200,36 @@ class VolumetricFogResolveMaterialSystem : public PosteffectMaterialSystemBase
     SETUP_POSTEFFECT_MATERIAL(VolumetricFogResolveMaterialSystem, "volumetric_fog_resolve");
 };
 
+class VolumetricFogSystem : public MaterialSystem
+{
+    SETUP_MATERIAL("volumetric_fog_system")
+public:
+    bool init(Context& context, const MaterialSystemContext& material_system_context) override;
+    void destroy(Context& context) override;
+
+    void setup(Context &context, SceneContext &scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count) override;
+
+    void init_debug_views(Context& context) override;
+
+    UniformBufferHandleType uniform(size_t index) const override;
+    void output(Context& context, size_t unit, TextureInstance& texture) const override;
+
+    ExponentialShadowMap* esm_material_system() const
+    {
+        return esm_material_system_;
+    }
+
+    VolumetricFogMaterialSystem* volumetric_fog_material_system() const
+    {
+        return volumetric_fog_material_system_;
+    }
+private:
+    void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
+
+    ExponentialShadowMap* esm_material_system_;
+    VolumetricFogMaterialSystem* volumetric_fog_material_system_;
+};
+
 }
 
 #endif

@@ -107,9 +107,9 @@ bool ExponentialShadowMap::init(Context& context, const MaterialSystemContext& m
         return false;
     }
 
-    const string& downsample_shader = material_system_context.options.get<string>("downsample_shader");
+    const string& downsample_shader = material_system_context.options.get<string>("esm_downsample_shader");
     ASSERT(!downsample_shader.empty(), "Downsample shader name must not be empty");
-    esm_size_ = material_system_context.options.get<size_t>("size");
+    esm_size_ = material_system_context.options.get<size_t>("esm_size");
     // render target
     RenderTargetDesc render_target_desc;
     render_target_desc.color_address_mode[0] = texture_clamp;
@@ -179,7 +179,7 @@ bool ExponentialShadowMap::init(Context& context, const MaterialSystemContext& m
     blur_material_system_context.instance_name = "esm_blur";
     blur_material_system_context.priority = material_system_context.priority;
     blur_material_system_context.material_instances_number = 2;
-    blur_material_system_context.shader_name = material_system_context.options.get<string>("blur_shader");
+    blur_material_system_context.shader_name = material_system_context.options.get<string>("esm_blur_shader");
     context.material_systems.add(blur_material_system_);
     context.materials[blur_material_system_->id()].resize(2);
     if (!blur_material_system_->init(context, blur_material_system_context))
@@ -188,6 +188,8 @@ bool ExponentialShadowMap::init(Context& context, const MaterialSystemContext& m
         destroy(context);
         return false;
     }
+    // TODO: somewhere the blur's priority becomes equal to posteffect_material_priority_base
+    blur_material_system_->set_priority(material_system_context.priority);
     blur_material_system_->settings().quality = BlurMaterialSystem::quality_ultra;
 
     return true;
@@ -486,6 +488,65 @@ void VolumetricFogMaterialSystem::init_debug_views(Context& context)
     view.add(string("falloff"), 0.0f, 1.0f, &settings_.falloff);
     view.add(string("range"), 50.0f, 5000.0f, &settings_.range);
     view.add(string("light_brightness"), 0.0f, 1.0f, &settings_.light_brightness);
+}
+
+bool VolumetricFogSystem::init(Context& context, const MaterialSystemContext& system_context)
+{
+    // step 1 - ESM
+    MaterialSystemContext material_system_context;
+    material_system_context.material_instances_number = 0;
+    material_system_context.priority = system_context.priority;
+    const string esm_name(ExponentialShadowMap::material_name());
+    material_system_context.shader_name = esm_name;
+    material_system_context.instance_name = esm_name;
+    material_system_context.options = system_context.options;
+    context.initialization_parameters.add(esm_name, material_system_context);
+    esm_material_system_ = create<ExponentialShadowMap>(context, esm_name, esm_name);
+    ASSERT(esm_material_system_ != nullptr, "Couldn't create ExponentialShadowMap material system");
+
+    // step 2 - volumetric fog itself
+    const string volumetric_fog_name(VolumetricFogMaterialSystem::material_name());
+    material_system_context.shader_name = material_system_context.options.get<string>("volumetric_fog_shader");
+    material_system_context.instance_name = volumetric_fog_name;
+    ++material_system_context.priority;
+    context.initialization_parameters.add(volumetric_fog_name, material_system_context);
+    volumetric_fog_material_system_ = create<VolumetricFogMaterialSystem>(context, volumetric_fog_name, volumetric_fog_name);
+    ASSERT(volumetric_fog_material_system_ != nullptr, "Couldn't create VolumetricFogMaterialSystem");
+
+    return true;
+}
+
+void VolumetricFogSystem::destroy(Context& context)
+{
+}
+
+void VolumetricFogSystem::setup(Context &context, SceneContext &scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count)
+{
+    empty_setup(context, scene_context, instance_parts, parts, model_contexts, count);
+}
+
+void VolumetricFogSystem::init_debug_views(Context& context)
+{
+    volumetric_fog_material_system_->init_debug_views(context);
+}
+
+UniformBufferHandleType VolumetricFogSystem::uniform(size_t index) const
+{
+    if (index == 1) return volumetric_fog_material_system_->settings_uniform_id();
+    return UniformBuffer::invalid_id;
+}
+
+void VolumetricFogSystem::output(Context& context, size_t unit, TextureInstance& texture) const
+{
+    volumetric_fog_material_system_->output(context, unit, texture);
+}
+
+void VolumetricFogSystem::update(Context& context, SceneContext& scene_context, RenderContext& render_context)
+{
+    volumetric_fog_material_system_->set_light_instance(esm_material_system_->light_instance_id(),
+        esm_material_system_->shadowmap_texture(), esm_material_system_->settings_uniform_id());
+    esm_material_system_->setup_draw_calls(context, scene_context, render_context);
+    volumetric_fog_material_system_->setup_draw_calls(context, scene_context, render_context);
 }
 
 }

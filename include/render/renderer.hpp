@@ -71,6 +71,8 @@ public:
         string node;
         size_t node_buffer;
         BufferHandleType explicit_handle;
+        string systemwide_name;
+        string material;
 
         Buffer() : explicit_handle(InvalidHandle<BufferHandleType>::id) {}
     };
@@ -214,6 +216,8 @@ public:
     {
         return render_context_;
     }
+
+    UniformBufferHandleType system_wide_uniform(const string& name) const;
 
     virtual void set_gi_modifier_material_system(MaterialSystem*, size_t)
     {}
