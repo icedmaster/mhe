@@ -83,6 +83,10 @@ const size_t shadowmap_texture_unit = 5;
 const size_t env_cubemap_texture_unit = 6;
 const size_t baked_light_texture_unit = 2;
 
+// PBR
+const size_t roughness_texture_unit = 3;
+const size_t specular_texture_unit = 4;
+
 }
 
 #endif

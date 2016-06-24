@@ -33,6 +33,8 @@ typedef Pool< MeshTraceDataInstance, max_trace_data_instances_number,
               MeshTraceDataInstance::IdType, StructTypePolicy<MeshTraceDataInstance, MeshTraceDataInstance::IdType> > MeshTraceDataPool;
 typedef Pool<TextureBuffer, 4096, TextureBuffer::IdType> TextureBufferPool;
 typedef Pool<ShaderStorageBuffer, max_shader_storage_buffers_number, ShaderStorageBuffer::IdType> ShaderStorageBufferPool;
+typedef Pool<MaterialData, max_material_data_library_size, MaterialData::IdType,
+    StructTypePolicy<MaterialData, MaterialData::IdType> > MaterialDataPool;
 
 class MaterialSystems
 {
@@ -200,6 +202,7 @@ struct Context
     TexturePool texture_pool;
     TextureBufferPool texture_buffer_pool;
     ShaderStorageBufferPool shader_storage_buffer_pool;
+    MaterialDataPool material_data_pool;
 
     MaterialSystems material_systems;
     MaterialPool materials[max_material_systems_number];

@@ -65,51 +65,10 @@ struct MaterialRenderData
 
 struct MaterialData
 {
-    FilePath name;
+    POOL_STRUCT(MaterialDataIdType);
     MaterialRenderData render_data;
     TextureInstance textures[material_textures_number];
     string lighting_model;
-};
-
-struct MaterialInitializationData
-{
-    FilePath name;
-    MaterialRenderData render_data;
-    FilePath textures[material_textures_number];
-    string lighting_model;
-};
-
-typedef uint16_t MaterialId;
-
-class MHE_EXPORT MaterialManager
-{
-public:
-    MaterialId get(const MaterialInitializationData& data) const;
-
-    bool get(MaterialData& material, MaterialId id) const
-    {
-        MaterialsMap::iterator it = materials_.find(id);
-        if (it == materials_.end()) return false;
-        material = it->value;
-        return true;
-    }
-
-    MaterialData& material_data(MaterialId id)
-    {
-        ASSERT(materials_.find(id) != materials_.end(), "Invalid material id:" << id);
-        return materials_[id];
-    }
-
-    bool id_by_name(MaterialId& id, const string& name) const;
-
-    void set_context(Context* context)
-    {
-        context_ = context;
-    }
-private:
-    typedef hashmap<MaterialId, MaterialData> MaterialsMap;
-    Context* context_;
-    mutable MaterialsMap materials_;
 };
 
 }

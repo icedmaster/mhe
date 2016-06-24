@@ -8,12 +8,12 @@
 
 namespace mhe {
 
-bool MeshLoader::load(type& res, const std::string& name, context_type* context)
+bool MeshLoader::load(type& res, const FilePath& name, context_type* context)
 {
     std::ifstream f(name.c_str(), std::ios::in | std::ios::binary);
     if (!f.is_open())
         return false;
-    bool result = mhe_binary_mesh_load(res, f, context);
+    bool result = mhe_binary_mesh_load(res, name.c_str(), context);
     f.close();
     return result;
 }

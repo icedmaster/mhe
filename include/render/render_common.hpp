@@ -26,6 +26,8 @@ typedef uint16_t MeshRawDataHandleType;
 
 typedef uint16_t LightInstanceIdType;
 
+typedef uint16_t MaterialDataIdType;
+
 enum Primitive
 {
     triangle = 0,

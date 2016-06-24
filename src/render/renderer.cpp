@@ -91,24 +91,22 @@ void sort_draw_calls(const Context& context, RenderContext& render_context)
 }
 
 void setup_node(NodeInstance& node, MaterialSystem* material_system, Context& context, SceneContext& scene_context,
-                const string& albedo_texture_name, const string& normalmap_texture_name)
+                const FilePath& material_name,
+                const FilePath& albedo_texture_name, const FilePath& normalmap_texture_name)
 {
-    static const string material_name_prefix = string("mat_");
-
-    MaterialInitializationData initialization_data;
-    initialization_data.name = material_name_prefix + albedo_texture_name + normalmap_texture_name;
-    initialization_data.textures[albedo_texture_unit] = albedo_texture_name;
-    initialization_data.textures[normal_texture_unit] = normalmap_texture_name;
-    initialization_data.render_data.specular_shininess = default_shininess;
-    initialization_data.render_data.glossiness = default_glossiness;
-
-    setup_node(node, material_system, context, scene_context, initialization_data);
+    MaterialData& material_data = create_and_get(context.material_data_pool);
+    material_data.render_data.glossiness = default_glossiness;
+    material_data.render_data.specular_shininess = default_shininess;
+    context.texture_manager.get(material_data.textures[albedo_texture_unit], albedo_texture_name);
+    if (!normalmap_texture_name.empty())
+        context.texture_manager.get(material_data.textures[normal_texture_unit], normalmap_texture_name);
+    context.material_manager.add(material_data.id, material_name);
+    setup_node(node, material_system, context, scene_context, material_data.id);
 }
 
-void setup_node(NodeInstance& node, MaterialSystem* material_system, Context& context, SceneContext& scene_context,
-    const MaterialInitializationData& material_initialization_data)
+void setup_node(NodeInstance& node, MaterialSystem* material_system, Context& context, SceneContext& scene_context, MaterialDataIdType material_id)
 {
-    node.mesh.mesh.parts[0].material_id = context.material_manager.get(material_initialization_data);
+    node.mesh.mesh.parts[0].material_id = material_id;
     ModelContext model_context;
     model_context.transform_uniform = node.mesh.shared_uniform;
     model_context.animation_texture_buffer = node.mesh.skeleton_instance.texture_buffer;

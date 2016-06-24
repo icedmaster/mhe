@@ -1,8 +1,6 @@
 #ifndef __RESOURCE_MANAGER_HPP__
 #define __RESOURCE_MANAGER_HPP__
 
-#include <map>
-#include <string>
 #include "core/hashmap.hpp"
 #include "core/ref_counter.hpp"
 #include "core/string.hpp"
@@ -41,12 +39,12 @@ public:
         context_ = context;
     }
 
-    bool load(const std::string& name, bool absolute_path = false)
+    bool load(const string& name, bool absolute_path = false)
     {
         return get(name, absolute_path);
     }
 
-    bool unload(const std::string& name)
+    bool unload(const string& name)
     {
         typename resmap::iterator it = resources_.find(utils::get_file_name(name));
         if (it == resources_.end()) return false;
@@ -54,9 +52,9 @@ public:
         return true;
     }
 
-    bool get(res_type& res, const std::string& name, bool absolute_path = false) const
+    bool get(res_type& res, const FilePath& name, bool absolute_path = false) const
     {
-        return get_impl(res, name, absolute_path);  
+        return get_impl(res, name, absolute_path);
     }
 
     bool get(res_type& res, const string& name, bool absolute_path = false) const
@@ -86,12 +84,13 @@ public:
     {
         return path_;
     }
-protected:
-    bool get_impl(res_type& res, const std::string& name, bool absolute_path) const
-    {
-        return get_impl(res, FilePath(name.c_str()), absolute_path);
-    }
 
+    void add(const res_type& res, const FilePath& name)
+    {
+        Info& info = resources_[name];
+        info.res = res;
+    }
+protected:
     virtual bool get_impl(res_type& res, const FilePath& name, bool absolute_path) const
     {
         typename resmap::iterator it = resources_.find(name);

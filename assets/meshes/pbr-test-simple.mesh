@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<mhe>
+	<mesh>
+		<binary ref="pbr-test-simple.bin" />
+		<aabb>
+			<center>
+				<x value="0" />
+				<y value="-282.185" />
+				<z value="415.601" />
+			</center>
+			<extents>
+				<x value="5.52481" />
+				<y value="282.368" />
+				<z value="419.971" />
+			</extents>
+		</aabb>
+		<parts>
+			<size value="3" />
+			<item>
+				<material ref="lambert1" />
+			</item>
+			<item>
+				<material ref="pasted__M_MaterialSphere_Plain1" />
+			</item>
+			<item>
+				<material ref="pasted__M_MaterialSphere1" />
+			</item>
+		</parts>
+	</mesh>
+</mhe>

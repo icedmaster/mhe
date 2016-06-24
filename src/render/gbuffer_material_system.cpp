@@ -99,11 +99,7 @@ void GBufferFillMaterialSystem::setup(Context& context, SceneContext& scene_cont
         else
         {
             material.uniforms[material_data_unit] = uniform_wr.take();
-            MaterialData material_data;
-            if (!context.material_manager.get(material_data, parts[i].material_id))
-            {
-                WARN_LOG("Can't find a material with id:" << parts[i].material_id);
-            }
+            MaterialData& material_data = context.material_data_pool.get(parts[i].material_id);
             PhongMaterialData shader_material_data;
             shader_material_data.diffuse = vec4(material_data.render_data.diffuse, 1.0f);
             shader_material_data.specular = vec4(material_data.render_data.specular, material_data.render_data.specular_shininess);
@@ -139,7 +135,7 @@ void GBufferFillMaterialSystem::update(Context& context, SceneContext& /*scene_c
         material.shader_program = shader.get(index);
 
 #ifdef MHE_UPDATE_MATERIAL
-        MaterialData& material_data = context.material_manager.material_data(parts[i].material_id);
+        MaterialData& material_data = context.material_data_pool.get(parts[i].material_id);
         PhongMaterialData shader_material_data;
         shader_material_data.diffuse = vec4(material_data.render_data.diffuse, 1.0f);
         shader_material_data.specular = vec4(material_data.render_data.specular, material_data.render_data.specular_shininess);

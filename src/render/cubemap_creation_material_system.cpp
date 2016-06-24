@@ -141,8 +141,7 @@ void CubemapCreationMaterialSystem::render_cubemap(Context& context, SceneContex
                 draw_call.render_state = render_state_;
                 draw_call.render_data = mesh.parts[j].render_data;
                 
-                MaterialData material_data;
-                context.material_manager.get(material_data, mesh.parts[j].material_id);
+                MaterialData& material_data = context.material_data_pool.get(mesh.parts[j].material_id);
                 Material& material = create_and_get(context.materials[id()]);
                 material.shader_program = default_program(context).id();
                 material.textures[0] = material_data.textures[albedo_texture_unit];

@@ -122,15 +122,16 @@ void Application::stop_impl()
     else main_loop->stop();
 }
 
-void Application::init_assets_path(const std::string& config_assets_path)
+void Application::init_assets_path(const string& config_assets_path)
 {   
-    std::string base_path = utils::path_join(application_base_path(),
+    string base_path = utils::path_join(application_base_path(),
         config_assets_path.empty() ? assets_base_path : config_assets_path);
     INFO_LOG("Application::init_assets_path with base path:" << base_path);
 
     engine_->context().shader_manager.set_path(utils::path_join(base_path, shader_path));
     engine_->context().mesh_manager.set_path(utils::path_join(base_path, mesh_path));
     engine_->context().texture_manager.set_path(utils::path_join(base_path, texture_path));
+    engine_->context().material_manager.set_path(utils::path_join(base_path, material_path));
 }
 
 void Application::add_delegates()

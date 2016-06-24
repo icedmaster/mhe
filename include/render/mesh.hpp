@@ -62,7 +62,7 @@ struct MeshPart
 {
     RenderData render_data;
     AABBf aabb;
-    MaterialId material_id;
+    MaterialDataIdType material_id;
 };
 
 struct Mesh
