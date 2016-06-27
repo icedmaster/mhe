@@ -67,6 +67,14 @@ public:
     virtual bool read(const char* field, FilePath& value) = 0;
     virtual void begin_field(const char* field) = 0;
     virtual void end_field() = 0;
+    virtual void next_field(const char* field) = 0;
+
+    virtual bool read(uint8_t& value) = 0;
+    virtual bool read(uint16_t& value) = 0;
+    virtual bool read(uint32_t& value) = 0;
+    virtual bool read(float& value) = 0;
+    virtual bool read(string& value) = 0;
+    virtual bool read(FilePath& value) = 0;
 
     template <class T>
     bool read(const char* field, T& value)
@@ -78,6 +86,12 @@ public:
     }
 
     template <class T>
+    bool read(T& value)
+    {
+        return value.read(*this);
+    }
+
+    template <class T>
     bool read(const char* field, vector<T>& value)
     {
         begin_field(field);
@@ -86,7 +100,8 @@ public:
         value.resize(size);
         for (size_t i = 0, size = value.size(); i < size; ++i)
         {
-            if (!read("item", value[i]))
+            next_field("item");
+            if (!read(value[i]))
                 return false;
         }
         end_field();
@@ -143,8 +158,17 @@ public:
     bool read(const char* field, float& value) override;
     bool read(const char* field, string& value) override;
     bool read(const char* field, FilePath& value) override;
+
+    bool read(uint8_t& value) override;
+    bool read(uint16_t& value) override;
+    bool read(uint32_t& value) override;
+    bool read(float& value) override;
+    bool read(string& value) override;
+    bool read(FilePath& value) override;
+
     void begin_field(const char* field) override;
     void end_field() override;
+    void next_field(const char* field) override;
 
     bool is_valid() const
     {

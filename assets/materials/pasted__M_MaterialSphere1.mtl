@@ -2,10 +2,10 @@
 <mhe>
 	<material>
 		<albedo>
-			<ref ref="textures/crystal.tga" />
+			<ref ref="crystal.tga" />
 		</albedo>
 		<normalmap>
-			<ref ref="textures/test-nm.tga" />
+			<ref ref="normalmaps/test-nm.tga" />
 		</normalmap>
 	</material>
 </mhe>

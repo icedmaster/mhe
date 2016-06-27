@@ -5,13 +5,13 @@
 		<aabb>
 			<center>
 				<x value="0" />
-				<y value="-282.185" />
-				<z value="415.601" />
+				<y value="134.91" />
+				<z value="0" />
 			</center>
 			<extents>
-				<x value="5.52481" />
-				<y value="282.368" />
-				<z value="419.971" />
+				<x value="552.481" />
+				<y value="153.233" />
+				<z value="472.869" />
 			</extents>
 		</aabb>
 		<parts>

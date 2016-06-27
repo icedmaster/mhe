@@ -134,6 +134,54 @@ bool XMLDeserializer::read(const char* field, FilePath& value)
     return true;
 }
 
+bool XMLDeserializer::read(uint8_t& value)
+{
+    uint32_t t;
+    if (!read(t)) return false;
+    value = t;
+    return true;
+}
+
+bool XMLDeserializer::read(uint16_t& value)
+{
+    uint32_t t;
+    if (!read(t)) return false;
+    value = t;
+    return true;
+}
+
+bool XMLDeserializer::read(uint32_t& value)
+{
+    pugi::xml_attribute attr = current_node_.attribute("value");
+    if (!attr) return false;
+    value = attr.as_uint();
+    return true;
+}
+
+bool XMLDeserializer::read(float& value)
+{
+    pugi::xml_attribute attr = current_node_.attribute("value");
+    if (!attr) return false;
+    value = attr.as_float();
+    return true;
+}
+
+bool XMLDeserializer::read(string& value)
+{
+    pugi::xml_attribute attr = current_node_.attribute("value");
+    if (!attr) return false;
+    value = attr.value();
+    return true;
+}
+
+bool XMLDeserializer::read(FilePath& value)
+{
+    pugi::xml_attribute attr = current_node_.attribute("ref");
+    if (!attr) return false;
+    value = attr.value();
+    return true;
+}
+
 void XMLDeserializer::begin_field(const char* field)
 {
     current_node_ = current_node_.child(field);
@@ -142,6 +190,14 @@ void XMLDeserializer::begin_field(const char* field)
 void XMLDeserializer::end_field()
 {
     current_node_ = current_node_.parent();
+}
+
+void XMLDeserializer::next_field(const char* field)
+{
+    pugi::xml_node prev_node = current_node_;
+    current_node_ = current_node_.next_sibling(field);
+    if (!current_node_) current_node_ = prev_node.child(field);
+    if (!current_node_) current_node_ = prev_node;
 }
 
 }}

@@ -2,10 +2,10 @@
 <mhe>
 	<material>
 		<albedo>
-			<ref ref="" />
+			<ref ref="metal.tga" />
 		</albedo>
 		<normalmap>
-			<ref ref="" />
+			<ref ref="normalmaps/test-nm.tga" />
 		</normalmap>
 	</material>
 </mhe>
