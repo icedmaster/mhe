@@ -30,6 +30,7 @@ struct LoadContext
     std::string filename;
     std::string version;
     size_t level;
+    hashmap<std::string, bool> includes;
     bool tag_found;
 };
 
@@ -66,6 +67,11 @@ std::string parse_include(ShaderInitializationParams& params, const std::string&
     const std::string& filename = tag.substr(first + 1, last - first - 1);
 
     std::string fullname = utils::path_join(utils::get_file_path(load_context.current_filename), filename);
+
+    if (load_context.includes.contains(fullname))
+        return "";
+    load_context.includes[fullname] = true;
+
     std::ifstream f(fullname.c_str());
     if (!f.is_open())
     {
@@ -351,14 +357,18 @@ bool ShaderProgramLoader::load(type& res, const std::string& name, const context
         load_context.current_filename = filename_with_extension;
         load_context.level = 0;
         load_context.tag_found = false;
+        load_context.includes.clear();
         params.csdata = detail::load_shader_impl(params, data, detail::compute_shader_tag, load_context);
         if (params.csdata.empty())
         {
             load_context.tag_found = false;
+            load_context.includes.clear();
             params.vsdata = detail::load_shader_impl(params, data, detail::vertex_shader_tag, load_context);
             load_context.tag_found = false;
+            load_context.includes.clear();
             params.fsdata = detail::load_shader_impl(params, data, detail::fragment_shader_tag, load_context);
             load_context.tag_found = false;
+            load_context.includes.clear();
             params.gsdata = detail::load_shader_impl(params, data, detail::geometry_shader_tag, load_context);
         }
 

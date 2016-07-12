@@ -79,6 +79,8 @@ private:
     void update(Context& context, SceneContext& scene_context, RenderContext& render_context, MeshPartInstance* parts_instances, MeshPart* parts, size_t count);
     void setup_uniforms(Material& material, Context& context, SceneContext& scene_context, const MeshPartInstance& part, const ModelContext& model_context) override;
 
+    UniformBufferHandleType create_material_uniform(Context& context, const MaterialData& material_data) const;
+
     ClearCommand clear_command_;
     GPUProfileCommand profile_command_;
     ListOfCommands list_of_commands_;
@@ -137,6 +139,7 @@ private:
     TextureInstance light_buffer_texture_;
     TextureInstance albedo_texture_;
     TextureInstance normal_texture_;
+    TextureInstance accumnulator_texture_;
     TextureInstance depth_texture_;
     RenderStateHandleType render_state_;
 

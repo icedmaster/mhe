@@ -502,6 +502,11 @@ public:
     {
         return steps_number + 1;
     }
+
+    Settings& settings()
+    {
+        return settings_;
+    }
 private:
     void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
     void copy(Context& context, DrawCall& draw_call, RenderTarget& dst, const RenderTarget& from, size_t pass);

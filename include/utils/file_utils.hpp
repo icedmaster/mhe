@@ -27,7 +27,7 @@ MHE_EXPORT FilePath convert_slashes(const FilePath& fullpath);
 // path utils
 inline std::string path_join(const std::string& path1, const std::string& path2)
 {
-	return path1 + path2;
+    return path1 + path2;
 }
 
 template <size_t N1, size_t N2>

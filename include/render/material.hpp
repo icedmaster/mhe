@@ -63,12 +63,20 @@ struct MaterialRenderData
     MaterialRenderData() : specular_shininess(default_shininess), glossiness(default_glossiness) {}
 };
 
+enum LightingModel
+{
+    material_type_blinn_phong,
+    material_type_ggx
+};
+
 struct MaterialData
 {
     POOL_STRUCT(MaterialDataIdType);
     MaterialRenderData render_data;
     TextureInstance textures[material_textures_number];
-    string lighting_model;
+    LightingModel lighting_model;
+
+    MaterialData() : lighting_model(material_type_ggx) {}
 };
 
 }

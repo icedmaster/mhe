@@ -218,6 +218,11 @@ public:
         h %= buckets_.capacity();
         return find_in_bucket(h, k);
     }
+
+    bool contains(const K& k) const
+    {
+        return find(k) != end();
+    }
 private:
     iterator insert_impl(const K& k, const V& v)
     {

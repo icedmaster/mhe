@@ -85,21 +85,20 @@ void GBufferFillMaterialSystem::setup(Context& context, SceneContext& scene_cont
         index.set(skinning_info, use_skinning);
         material.shader_program = shader.get(index);
 
-        UniformBufferDesc uniform_buffer_desc;
-        uniform_buffer_desc.unit = material_data_unit;
-        uniform_buffer_desc.update_type = uniform_buffer_static;
-        uniform_buffer_desc.size = sizeof(PhongMaterialData);
+        MaterialData& material_data = context.material_data_pool.get(parts[i].material_id);
+        UniformBuffer::IdType material_uniform_id = create_material_uniform(context, material_data);
 
-        pool_initializer<UniformPool> uniform_wr(context.uniform_pool);
-        UniformBuffer& uniform = uniform_wr.object();
-        if (!uniform.init(uniform_buffer_desc))
+        if (is_handle_valid(material_uniform_id))
         {
-            WARN_LOG("Can't initialize material uniform");
-        }
-        else
-        {
-            material.uniforms[material_data_unit] = uniform_wr.take();
-            MaterialData& material_data = context.material_data_pool.get(parts[i].material_id);
+            UniformBufferDesc uniform_buffer_desc;
+            uniform_buffer_desc.unit = material_data_unit;
+            uniform_buffer_desc.update_type = uniform_buffer_static;
+            uniform_buffer_desc.size = sizeof(PhongMaterialData);
+
+            UniformBuffer& uniform = context.uniform_pool.get(material_uniform_id);
+            bool res = uniform.init(uniform_buffer_desc);
+            ASSERT(res, "Can't initialize material uniform");
+            material.uniforms[material_data_unit] = material_uniform_id;
             PhongMaterialData shader_material_data;
             shader_material_data.diffuse = vec4(material_data.render_data.diffuse, 1.0f);
             shader_material_data.specular = vec4(material_data.render_data.specular, material_data.render_data.specular_shininess);
@@ -135,14 +134,17 @@ void GBufferFillMaterialSystem::update(Context& context, SceneContext& /*scene_c
         material.shader_program = shader.get(index);
 
 #ifdef MHE_UPDATE_MATERIAL
-        MaterialData& material_data = context.material_data_pool.get(parts[i].material_id);
-        PhongMaterialData shader_material_data;
-        shader_material_data.diffuse = vec4(material_data.render_data.diffuse, 1.0f);
-        shader_material_data.specular = vec4(material_data.render_data.specular, material_data.render_data.specular_shininess);
-        shader_material_data.params = vec4(material_data.render_data.glossiness, 0.0f, 0.0f, 0.0f);
+        if (is_handle_valid(material.uniforms[material_data_unit]))
+        {
+            MaterialData& material_data = context.material_data_pool.get(parts[i].material_id);
+            PhongMaterialData shader_material_data;
+            shader_material_data.diffuse = vec4(material_data.render_data.diffuse, 1.0f);
+            shader_material_data.specular = vec4(material_data.render_data.specular, material_data.render_data.specular_shininess);
+            shader_material_data.params = vec4(material_data.render_data.glossiness, 0.0f, 0.0f, 0.0f);
 
-        UniformBuffer& uniform = context.uniform_pool.get(material.uniforms[material_data_unit]);
-        uniform.update(shader_material_data);
+            UniformBuffer& uniform = context.uniform_pool.get(material.uniforms[material_data_unit]);
+            uniform.update(shader_material_data);
+        }
 #endif
     }
 }
@@ -160,6 +162,17 @@ void GBufferFillMaterialSystem::output(Context& context, size_t unit, TextureIns
         render_target.depth_texture(texture);
     else
         render_target.color_texture(texture, unit);
+}
+
+UniformBufferHandleType GBufferFillMaterialSystem::create_material_uniform(Context& context, const MaterialData& material_data) const
+{
+    switch (material_data.lighting_model)
+    {
+    case material_type_blinn_phong:
+        return context.uniform_pool.create();
+    default:
+        return UniformBuffer::invalid_id;
+    }
 }
 
 bool GBufferDrawMaterialSystem::init(Context& context, const MaterialSystemContext& material_system_context)
@@ -283,6 +296,7 @@ void GBufferDrawMaterialSystem::set_render_target(Context& context, RenderTarget
     ASSERT(number != 0, "Invalid render target");
     albedo_texture_ = textures[0];
     normal_texture_ = textures[1];
+    accumnulator_texture_ = textures[2];
     TextureInstance depth_texture;
     number = render_target.depth_texture(depth_texture);
     ASSERT(number != 0, "Invalid depth texture");
@@ -355,9 +369,9 @@ void GBufferDrawMaterialSystem::update(Context& context, SceneContext& scene_con
         material.shader_program = shader_program_id;
         material.textures[0] = albedo_texture_;
         material.textures[1] = normal_texture_;
-        material.textures[2] = depth_texture_;
+        material.textures[2] = accumnulator_texture_;
+        material.textures[3] = depth_texture_;
         material.textures[shadowmap_texture_unit] = shadowmap_texture;
-        material.textures[env_cubemap_texture_unit] = cubemap_texture;
         material.uniforms[0] = render_context.main_camera.percamera_uniform;
         material.uniforms[2] = light_uniform;
         draw_call.material.material_system = id();

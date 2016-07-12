@@ -21,6 +21,9 @@ public:
         mhe::NodeInstance& node = engine.scene().create_node();
         mhe::load_node<mhe::GBufferFillMaterialSystem>(node, mhe::string("pbr-test-simple.mesh"), engine.context(), engine.scene_context());
 
+        BloomMaterialSystem* bloom_material_system = engine.context().material_systems.get<BloomMaterialSystem>();
+        bloom_material_system->settings().intensity = 0.0f;
+
         return true;
     }
 
@@ -44,7 +47,7 @@ int main(int /*argc*/, char** /*argv*/)
     config.assets_path = "../../assets/";
 #endif
 
-    config.render_config_filename = mhe::utils::path_join(config.assets_path, "render_without_postprocess.xml");
+    config.render_config_filename = mhe::utils::path_join(config.assets_path, "render_without_postprocess_pbr.xml");
     app.init(config);
 
     mhe::game::GameSceneDesc desc;
