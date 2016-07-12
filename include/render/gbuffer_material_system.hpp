@@ -79,7 +79,8 @@ private:
     void update(Context& context, SceneContext& scene_context, RenderContext& render_context, MeshPartInstance* parts_instances, MeshPart* parts, size_t count);
     void setup_uniforms(Material& material, Context& context, SceneContext& scene_context, const MeshPartInstance& part, const ModelContext& model_context) override;
 
-    UniformBufferHandleType create_material_uniform(Context& context, const MaterialData& material_data) const;
+    UniformBufferHandleType create_material_uniform(Context& context, const MaterialData& material_data);
+    void update_material_data(UniformBuffer& uniform_buffer, const MaterialData& material_data);
 
     ClearCommand clear_command_;
     GPUProfileCommand profile_command_;

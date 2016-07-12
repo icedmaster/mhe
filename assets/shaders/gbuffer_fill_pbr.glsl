@@ -79,6 +79,12 @@ void main()
 [sampler2D metalness_texture 4]
 #endif
 
+[uniform Material 2 permodel]
+uniform Material
+{
+    PBRMaterial pbr_material;
+};
+
 in VSOutput vsoutput;
 
 void main()
@@ -89,13 +95,13 @@ void main()
 #if ROUGHNESS_MAP == 1
 	gbuffer.roughness = texture(roughness_texture, vsoutput.tex).x;
 #else
-	gbuffer.roughness = 1.0f;
+	gbuffer.roughness = pbr_material.parameters.x;
 #endif
 
 #if METALNESS_MAP == 1
 	gbuffer.metalness = texture(metalness_texture, vsoutput.tex).x;
 #else
-	gbuffer.metalness = 0.0f;
+	gbuffer.metalness = pbr_material.parameters.y;
 #endif
 
 #if NORMALMAP == 0

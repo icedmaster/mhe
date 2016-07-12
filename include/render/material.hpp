@@ -50,6 +50,8 @@ struct MaterialInstance
 
 const float default_shininess = 50.0f;
 const float default_glossiness = 0.0f;
+const float default_roughness = 0.5f;
+const float default_metalness = 0.0f;
 
 struct MaterialRenderData
 {
@@ -59,8 +61,11 @@ struct MaterialRenderData
     vec3 emissive;
     float specular_shininess;
     float glossiness;
+    float roughness;
+    float metalness;
 
-    MaterialRenderData() : specular_shininess(default_shininess), glossiness(default_glossiness) {}
+    MaterialRenderData() : specular_shininess(default_shininess), glossiness(default_glossiness),
+        roughness(default_roughness), metalness(default_metalness) {}
 };
 
 enum LightingModel

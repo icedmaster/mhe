@@ -136,14 +136,8 @@ void GBufferFillMaterialSystem::update(Context& context, SceneContext& /*scene_c
 #ifdef MHE_UPDATE_MATERIAL
         if (is_handle_valid(material.uniforms[material_data_unit]))
         {
-            MaterialData& material_data = context.material_data_pool.get(parts[i].material_id);
-            PhongMaterialData shader_material_data;
-            shader_material_data.diffuse = vec4(material_data.render_data.diffuse, 1.0f);
-            shader_material_data.specular = vec4(material_data.render_data.specular, material_data.render_data.specular_shininess);
-            shader_material_data.params = vec4(material_data.render_data.glossiness, 0.0f, 0.0f, 0.0f);
-
-            UniformBuffer& uniform = context.uniform_pool.get(material.uniforms[material_data_unit]);
-            uniform.update(shader_material_data);
+            const MaterialData& material_data = context.material_data_pool.get(parts[i].material_id);
+            update_material_data(context.uniform_pool.get(material.uniforms[material_data_unit]), material_data);
         }
 #endif
     }
@@ -164,14 +158,59 @@ void GBufferFillMaterialSystem::output(Context& context, size_t unit, TextureIns
         render_target.color_texture(texture, unit);
 }
 
-UniformBufferHandleType GBufferFillMaterialSystem::create_material_uniform(Context& context, const MaterialData& material_data) const
+UniformBufferHandleType GBufferFillMaterialSystem::create_material_uniform(Context& context, const MaterialData& material_data)
+{
+    UniformBufferHandleType uniform_id = UniformBuffer::invalid_id;
+    size_t uniform_data_size = 0;
+    switch (material_data.lighting_model)
+    {
+    case material_type_blinn_phong:
+        uniform_data_size = sizeof(PhongMaterialData);
+        uniform_id = context.uniform_pool.create();
+        break;
+    case material_type_ggx:
+        uniform_data_size = sizeof(PBRMaterialData);
+        uniform_id = context.uniform_pool.create();
+        break;
+    default:
+        return UniformBuffer::invalid_id;
+    }
+
+    UniformBuffer& uniform_buffer = context.uniform_pool.get(uniform_id);
+    UniformBufferDesc uniform_buffer_desc;
+    uniform_buffer_desc.unit = material_data_unit;
+    uniform_buffer_desc.update_type = uniform_buffer_static;
+    uniform_buffer_desc.size = uniform_data_size;
+
+    bool res = uniform_buffer.init(uniform_buffer_desc);
+    ASSERT(res, "Can't initialize material uniform");
+    update_material_data(uniform_buffer, material_data);
+
+    return uniform_id;
+}
+
+void GBufferFillMaterialSystem::update_material_data(UniformBuffer& uniform_buffer, const MaterialData& material_data)
 {
     switch (material_data.lighting_model)
     {
     case material_type_blinn_phong:
-        return context.uniform_pool.create();
-    default:
-        return UniformBuffer::invalid_id;
+        {
+            PhongMaterialData shader_material_data;
+            shader_material_data.diffuse = vec4(material_data.render_data.diffuse, 1.0f);
+            shader_material_data.specular = vec4(material_data.render_data.specular, material_data.render_data.specular_shininess);
+            shader_material_data.params = vec4(material_data.render_data.glossiness, 0.0f, 0.0f, 0.0f);
+            uniform_buffer.update(shader_material_data);
+        }
+        break;
+
+    case material_type_ggx:
+        {
+            PBRMaterialData shader_material_data;
+            shader_material_data.parameters.set(material_data.render_data.roughness, material_data.render_data.metalness, 0.0f, 0.0f);
+            uniform_buffer.update(shader_material_data);
+        }
+        break;
+    default: break;
     }
 }
 

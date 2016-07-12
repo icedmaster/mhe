@@ -71,6 +71,11 @@ struct PhongMaterialData
     vec4 params;
 };
 
+struct PBRMaterialData
+{
+    vec4 parameters;
+};
+
 const size_t perframe_data_unit = 0;
 const size_t permodel_data_unit = 1;
 const size_t material_data_unit = 2;
