@@ -119,6 +119,11 @@ vec3 light_direction(vec3 pos_ws, Light light)
     return lightdir;
 }
 
+float light_shadowmap_bias(Light light)
+{
+    return light.shadowmap_params.x;
+}
+
 // shadowmap functions
 #ifdef DIRECTIONAL_CSM
 int calculate_cascade(float pixel_depth, Light light)

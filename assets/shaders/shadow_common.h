@@ -22,6 +22,7 @@ layout (binding = 5) uniform sampler2D shadowmap_texture;
 
 [include "pcf_kernels.h"]
 [include "poisson_disc_kernel.h"]
+[include "lighting_common.h"]
 
 #pragma optionNV (unroll all)
 
@@ -80,5 +81,45 @@ float get_shadow_value(sampler2D tex, float pixel_depth, vec2 texcoord, float bi
 	return pixel_depth < texture(tex, texcoord).r + bias ? 1.0f : 0.0f;
 #endif
 }
-
 #endif
+
+float get_shadow_value(vec3 pos_01, vec3 pos_ws, float linear_depth, Light light)
+{
+#if SHADOWMAP == 0
+    return 1.0f;
+#else
+	vec2 sample_size = 1.0f / textureSize(shadowmap_texture, 0);
+#ifndef DIRECTIONAL_CSM
+	vec4 shadowmap_pos_cs = light.lightvp * vec4(pos_ws, 1.0f);
+    shadowmap_pos_cs.xyz = shadowmap_pos_cs.xyz / shadowmap_pos_cs.w;
+#else
+	vec2 shadowmap_coord_offset = vec2(0.0f, 0.0f);
+	vec2 shadowmap_coord_scale = vec2(1.0f, 1.0f);
+	int cascade = calculate_cascade(linear_depth, light);
+	float fcascade = cascade;
+	float bias_scale = fcascade + 1.0f;
+	vec4 shadowmap_pos_cs = light.lightvp[cascade] * vec4(pos_ws, 1.0f);
+	shadowmap_pos_cs.xyz *= light.csm_scale[cascade].xyz;
+	shadowmap_pos_cs.xyz += light.csm_offset[cascade].xyz;
+	shadowmap_coord_offset.x += fcascade / light.cascades_number;
+	shadowmap_coord_scale.x *= (1.0f / light.cascades_number);
+
+	sample_size *= (1.0f / (fcascade + 1.0f));
+#endif
+
+	if (shadowmap_pos_cs.x < -0.999f || shadowmap_pos_cs.y < -0.999f ||
+		shadowmap_pos_cs.x > 0.999f || shadowmap_pos_cs.y > 0.999f)
+		return 1.0f;
+	else
+	{
+        vec3 shadowmap_pos_01 = shadowmap_pos_cs.xyz * 0.5f + 0.5f;
+#ifndef DIRECTIONAL_CSM
+        return get_shadow_value(shadowmap_texture, shadowmap_pos_01.z, shadowmap_pos_01.xy, light_shadowmap_bias(light), sample_size);
+#else
+		return get_shadow_value(shadowmap_texture, shadowmap_pos_01.z, shadowmap_pos_01.xy * shadowmap_coord_scale + shadowmap_coord_offset,
+                                light_shadowmap_bias(light) * bias_scale, sample_size);
+#endif
+	}
+#endif // SHADOWMAP
+}
+

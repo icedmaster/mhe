@@ -75,12 +75,5 @@ int main(int /*argc*/, char** /*argv*/)
     camera_controller->set_rotation_speed(50.0f);
     app.engine().scene().set_camera_controller(camera_controller);
 
-    // serialization test
-    mhe::res::Mesh res_mesh;
-    res_mesh.binary = "aaa/bbb";
-    mhe::res::XMLSerializer serializer("f:/txt", "mesh");
-    res_mesh.write(serializer);
-    //
-
     return app.run();
 }

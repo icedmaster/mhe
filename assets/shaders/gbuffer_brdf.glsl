@@ -64,6 +64,7 @@ void main()
 
 [include "gbuffer_pbr_common.h"]
 [include "brdf.h"]
+[include "shadow_common.h"]
 
 in VSOutput vsoutput;
 
@@ -97,6 +98,8 @@ void main()
     float ndoth = saturate(dot(N, H));
 
 	vec3 result = BRDF_lambert_ggx(gbuffer, light.diffuse.rgb, light.specular.rgb, ndotl, ndotv, ndoth, ldoth);
+    
+    float shadow = get_shadow_value(vec3(tex, gbuffer.depth), pos_ws, linearized_depth(gbuffer.depth, znear, zfar), light);
 
-	out_color = result;
+	out_color = result * shadow;
 }
