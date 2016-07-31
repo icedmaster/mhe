@@ -55,7 +55,7 @@ public:
     }
 private:
     void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
-    void calculate_projection(mat4x4& proj, mat4x4& view, const vec4* aabb, const CameraData& camera_data, float znear, float zfar, 
+    void calculate_projection(mat4x4& proj, mat4x4& view, vec4& params, const vec4* aabb, const CameraData& camera_data, float znear, float zfar, 
         const vec3& lightdir, const RenderContext& render_context) const;
 
     Settings settings_;

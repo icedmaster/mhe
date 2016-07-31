@@ -8,6 +8,12 @@
 
 #define MAX_CASCADES_NUMBER 8
 
+struct IndirectLighting
+{
+    vec3 diffuse;
+    vec3 specular;
+};
+
 #if LIGHT_TYPE == DIRECTIONAL_LIGHT && defined(CASCADED_SHADOWMAP)
 
 #define DIRECTIONAL_CSM
@@ -22,6 +28,7 @@ struct Light
 	vec4 csm_offset[MAX_CASCADES_NUMBER];
 	float cascade_znear[MAX_CASCADES_NUMBER];
 	float cascade_zfar[MAX_CASCADES_NUMBER];
+    vec4 scsm_params[MAX_CASCADES_NUMBER];
 	vec4 shadowmap_params;	// x - shadowmap bias
 	int cascades_number;
 };

@@ -59,6 +59,7 @@ struct DirectionalLightData
     vec4 csm_offset[max_shadowmap_cascades_number];
     float cascade_znear[max_shadowmap_cascades_number];
     float cascade_zfar[max_shadowmap_cascades_number];
+    vec4 scsm_params[max_shadowmap_cascades_number];
     vec4 shadowmap_params;
     uint32_t cascades_number;
     uint32_t padding[3];

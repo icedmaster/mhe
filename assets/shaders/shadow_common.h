@@ -69,6 +69,20 @@ float disc_filter(sampler2D tex, float pixel_depth, vec2 texcoord, float bias)
 	return shadow_value / weight;
 }
 
+#ifdef DIRECTIONAL_CSM
+int calculate_cascade_scsm(vec3 pos_ws, Light light)
+{
+    for (int i = 0; i < light.cascades_number; ++i)
+    {
+        vec3 dir = pos_ws - light.scsm_params[i].xyz;
+        float dist_sq = dot(dir, dir);
+        if (dist_sq < light.scsm_params[i].w)
+            return i;
+    }
+    return light.cascades_number;
+}
+#endif
+
 float get_shadow_value(sampler2D tex, float pixel_depth, vec2 texcoord, float bias, vec2 sample_size)
 {
 #if SHADOWMAP_QUALITY != 0
@@ -95,7 +109,8 @@ float get_shadow_value(vec3 pos_01, vec3 pos_ws, float linear_depth, Light light
 #else
 	vec2 shadowmap_coord_offset = vec2(0.0f, 0.0f);
 	vec2 shadowmap_coord_scale = vec2(1.0f, 1.0f);
-	int cascade = calculate_cascade(linear_depth, light);
+	int cascade = calculate_cascade_scsm(pos_ws, light);
+	if (cascade == light.cascades_number) return 1.0f;
 	float fcascade = cascade;
 	float bias_scale = fcascade + 1.0f;
 	vec4 shadowmap_pos_cs = light.lightvp[cascade] * vec4(pos_ws, 1.0f);
@@ -122,4 +137,5 @@ float get_shadow_value(vec3 pos_01, vec3 pos_ws, float linear_depth, Light light
 	}
 #endif // SHADOWMAP
 }
+
 

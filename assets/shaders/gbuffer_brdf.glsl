@@ -97,9 +97,12 @@ void main()
     float ldoth = saturate(dot(L, H));
     float ndoth = saturate(dot(N, H));
 
-	vec3 result = BRDF_lambert_ggx(gbuffer, light.diffuse.rgb, light.specular.rgb, ndotl, ndotv, ndoth, ldoth);
-    
-    float shadow = get_shadow_value(vec3(tex, gbuffer.depth), pos_ws, linearized_depth(gbuffer.depth, znear, zfar), light);
+    IndirectLighting indirect_lighting;
+    indirect_lighting.diffuse = ambient.rgb;
+    indirect_lighting.specular = VEC3_ZERO;
 
-	out_color = result * shadow;
+    float shadow = get_shadow_value(vec3(tex, gbuffer.depth), pos_ws, linearized_depth(gbuffer.depth, znear, zfar), light);
+	vec3 result = BRDF_lambert_ggx(gbuffer, indirect_lighting, light.diffuse.rgb * shadow, light.specular.rgb * shadow, ndotl, ndotv, ndoth, ldoth);
+
+	out_color = result;
 }

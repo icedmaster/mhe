@@ -33,10 +33,9 @@ public:
         MaterialData* materials = engine.context().material_data_pool.all_objects();
         for (size_t i = 0, size = engine.context().material_data_pool.size(); i < size; ++i)
         {
-            MaterialData& material_data = materials[i];
             ImGui::LabelText("", "%u", i);
-            ImGui::SliderFloat("R", &material_data.render_data.roughness, 0.0f, 1.0f);
-            ImGui::SliderFloat("M", &material_data.render_data.metalness, 0.0f, 1.0f);
+            ImGui::SliderFloat("R", &materials[i].render_data.roughness, 0.0f, 1.0f);
+            ImGui::SliderFloat("M", &materials[i].render_data.metalness, 0.0f, 1.0f);
         }
         ImGui::End();
         return true;

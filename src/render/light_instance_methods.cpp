@@ -148,6 +148,7 @@ void update_light_uniform(Context& context, SceneContext& scene_context, LightIn
                 light_data.cascade_znear[i] = shadow_info->znear[i];
                 light_data.cascade_zfar[i] = shadow_info->zfar[i];
                 light_data.lightvp[i] = shadow_info->lightview[i];
+                light_data.scsm_params[i] = shadow_info->scsm_params[i];
             }
         }
 
