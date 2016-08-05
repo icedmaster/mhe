@@ -8,6 +8,7 @@ namespace mhe {
 
 typedef uint8_t MaterialSystemId;
 
+typedef uint16_t UbershaderHandleType;
 typedef uint16_t ShaderProgramHandleType;
 typedef uint16_t TextureHandleType;
 typedef uint16_t LayoutHandleType;

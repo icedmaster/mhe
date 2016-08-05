@@ -7,6 +7,7 @@
 #include "core/fixed_size_vector.hpp"
 #include "math/vector4.hpp"
 #include "render_context.hpp"
+#include "gi.hpp"
 
 #include "debug/gpu_profiler.hpp"
 
@@ -24,6 +25,7 @@ class PosteffectDebugMaterialSystem;
 class LPVMaterialSystem;
 class RSMMaterialSystem;
 class LPVResolveMaterialSystem;
+class SkyboxMaterialSystem;
 class Renderer;
 
 bool init_node(NodeInstance& node, Context& context);
@@ -130,6 +132,8 @@ public:
     GISystem();
 
     void add_lpv(Context& context, Renderer& renderer, const LPVParams& params);
+    void add_skybox(Context& context, const SkyboxMaterialSystem* skybox_material_system, const CubemapIntegrator::Settings& integrator_settings);
+
     void apply(Renderer& renderer);
 
     void before_render(Context& context, SceneContext& scene_context, RenderContext& render_context);
@@ -143,6 +147,10 @@ private:
     RSMMaterialSystem* rsm_material_system_;
     LPVMaterialSystem* lpv_material_system_;
     LPVResolveMaterialSystem* lpv_resolve_material_system_;
+    const SkyboxMaterialSystem* skybox_material_system_;
+
+    ShaderStorageBufferHandleType ambient_sh_buffer_id_;
+    CubemapIntegrator cubemap_integrator_;
 };
 
 class MHE_EXPORT Renderer : public ref_counter

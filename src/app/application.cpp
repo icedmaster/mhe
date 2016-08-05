@@ -14,6 +14,7 @@
 // TODO: move render initialization out of this file
 #include "render/deferred_renderer.hpp"
 #include "render/posteffect_material_system.hpp"
+#include "render/skybox_material_system.hpp"
 
 namespace mhe {
 namespace app {
@@ -36,10 +37,14 @@ struct RendererParams
 struct GIParams
 {
     GISystem::LPVParams lpv_params;
+    string skybox_material;
+    CubemapIntegrator::Settings integrator_settings;
     bool use_lpv;
+    bool use_skybox_ambient;
 
     GIParams() :
-        use_lpv(false)
+        use_lpv(false),
+        use_skybox_ambient(false)
     {}
 };
 
@@ -401,12 +406,23 @@ void Application::init_gi_params(pugi::xml_node node, GIParams& params) const
     if (!node) return;
     params.use_lpv = node.child("lpv") != 0;
     params.lpv_params.base_priority = DeferredRenderer::deferred_renderer_base_priority;
+    
+    pugi::xml_node n = node.child("skybox");
+    if (n)
+    {
+        params.skybox_material = n.attribute("material").value();
+        params.integrator_settings.shader_name = n.attribute("integrator_shader_name").value();
+        params.use_skybox_ambient = true;
+    }
 }
 
 void Application::init_gi(const GIParams& params)
 {
     if (params.use_lpv)
         engine_->renderer()->gi_system().add_lpv(engine_->context(), *engine_->renderer(), params.lpv_params);
+    if (params.use_skybox_ambient)
+        engine_->renderer()->gi_system().add_skybox(engine_->context(),
+            engine_->context().material_systems.get<SkyboxMaterialSystem>(params.skybox_material), params.integrator_settings);
     engine_->renderer()->gi_system().apply(*engine_->renderer());
 }
 

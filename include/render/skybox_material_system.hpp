@@ -17,6 +17,11 @@ public:
     void destroy(Context&) override;
 
     void setup(Context& context, SceneContext& scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count) override;
+
+    const TextureInstance& skybox_texture() const
+    {
+        return skybox_texture_;
+    }
 private:
     void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
     bool init_mesh(Context& context, const MaterialSystemContext& material_system_context);

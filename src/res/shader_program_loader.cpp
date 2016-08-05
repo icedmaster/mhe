@@ -157,7 +157,7 @@ std::string parse_variable(ShaderInitializationParams& params, const std::string
     const std::vector<std::string>& data = utils::split(tag.substr(first + 1, last - first - 1), " ");
     ASSERT(data.size() == 3 && data[0] == "var", "Invalid shader source:" << tag);
     params.variables.add(string(data[1].c_str()), string(data[2].c_str()));
-    return "#define " + data[1] + " " + data[2];
+    return "#define " + data[1] + " " + data[2] + "\n";
 }
 
 std::string parse_version(ShaderInitializationParams& params, const std::string& tag)

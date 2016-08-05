@@ -10,9 +10,11 @@
 #include "render/posteffect_material_system.hpp"
 #include "render/rsm_material_system.hpp"
 #include "render/lpv_material_system.hpp"
+#include "render/skybox_material_system.hpp"
 #include "render/light_instance_methods.hpp"
 #include "debug/profiler.hpp"
 #include "res/resource_manager.hpp"
+#include "math/sh.h"
 
 namespace mhe {
 
@@ -305,7 +307,8 @@ const PosteffectSystem::PosteffectNode* PosteffectSystem::find_node(const string
 GISystem::GISystem() :
     rsm_material_system_(nullptr),
     lpv_material_system_(nullptr),
-    lpv_resolve_material_system_(nullptr)
+    lpv_resolve_material_system_(nullptr),
+    skybox_material_system_(nullptr)
 {}
 
 void GISystem::add_lpv(Context& context, Renderer& renderer, const LPVParams& params)
@@ -376,6 +379,25 @@ void GISystem::apply(Renderer& renderer)
     renderer.set_gi_modifier_material_system(lpv_resolve_material_system_, 0);
 }
 
+void GISystem::add_skybox(Context& context, const SkyboxMaterialSystem* skybox_material_system, const CubemapIntegrator::Settings& integrator_settings)
+{
+    skybox_material_system_ = skybox_material_system;
+    cubemap_integrator_.init(context, integrator_settings);
+    if (skybox_material_system_ != nullptr)
+    {
+        ShaderStorageBuffer& buffer = create_and_get(context.shader_storage_buffer_pool);
+        ShaderStorageBufferDesc desc;
+        desc.format = format_float;
+        desc.size = sizeof(SH<vec3, 3>);
+        desc.update_type = buffer_update_type_dynamic;
+        if (!buffer.init(desc, nullptr, 0))
+        {
+            ERROR_LOG("Can't initialize a ShaderStorageBuffer");
+        }
+        ambient_sh_buffer_id_ = buffer.id();
+    }
+}
+
 void GISystem::before_render(Context& context, SceneContext& scene_context, RenderContext& render_context)
 {
     if (rsm_material_system_ != nullptr)
@@ -384,6 +406,10 @@ void GISystem::before_render(Context& context, SceneContext& scene_context, Rend
 
 void GISystem::render(Context& context, SceneContext& scene_context, RenderContext& render_context)
 {
+    if (skybox_material_system_ != nullptr)
+        cubemap_integrator_.integrate(context.shader_storage_buffer_pool.get(ambient_sh_buffer_id_),
+            context, context.texture_pool.get(skybox_material_system_->skybox_texture().id));
+
     if (rsm_material_system_ != nullptr && lpv_material_system_ != nullptr)
     {
         RSMData data;
