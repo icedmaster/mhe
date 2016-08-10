@@ -44,5 +44,10 @@ GBuffer gbuffer_unpack(vec2 tex)
 
     return gbuffer;
 }
+
+vec3 gbuffer_normal_ws(vec2 tex)
+{
+    return texture(gbuffer_layer1_texture, tex).xyz;
+}
 #endif
 

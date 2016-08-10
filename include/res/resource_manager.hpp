@@ -70,6 +70,11 @@ public:
         return Loader::setup_instance(instance, context_);
     }
 
+    bool has(const FilePath& name) const
+    {
+        return resources_.find(name) != resources_.end();
+    }
+
     void clear()
     {
         resources_.clear();

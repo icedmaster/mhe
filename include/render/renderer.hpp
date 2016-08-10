@@ -26,6 +26,7 @@ class LPVMaterialSystem;
 class RSMMaterialSystem;
 class LPVResolveMaterialSystem;
 class SkyboxMaterialSystem;
+class IndirectLightingResolveMaterialSystem;
 class Renderer;
 
 bool init_node(NodeInstance& node, Context& context);
@@ -129,7 +130,15 @@ public:
         LPVParams() : output_texture_format(format_rgb16f), output_texture_scale(1.0f) {}
     };
 
+    struct Settings
+    {
+        string diffuse_resolve_shader_name;
+    };
+
     GISystem();
+
+    bool init(Context& context, const Settings& settings);
+    void destroy(Context& context);
 
     void add_lpv(Context& context, Renderer& renderer, const LPVParams& params);
     void add_skybox(Context& context, const SkyboxMaterialSystem* skybox_material_system, const CubemapIntegrator::Settings& integrator_settings);
@@ -151,6 +160,9 @@ private:
 
     ShaderStorageBufferHandleType ambient_sh_buffer_id_;
     CubemapIntegrator cubemap_integrator_;
+
+    IndirectLightingResolveMaterialSystem* diffuse_lighting_resolve_material_system_;
+
 };
 
 class MHE_EXPORT Renderer : public ref_counter
@@ -172,10 +184,15 @@ public:
         renderer_debug_mode_probes
     };
 public:
+    struct Settings
+    {
+        GISystem::Settings gi_settings;
+    };
+
     Renderer(Context& context);
     virtual ~Renderer() {}
 
-    bool init();
+    bool init(const Settings& settings);
     void destroy();
 
     virtual void before_update(SceneContext& scene_context);
@@ -186,6 +203,16 @@ public:
     void set_shadowmap_depth_write_material_system(MaterialSystem* material_system);
     void set_directional_shadowmap_depth_write_material_system(MaterialSystem* material_system);
     void set_fullscreen_debug_material_system(PosteffectDebugMaterialSystem* material_system);
+
+    void set_indirect_diffuse_lighting_texture(const TextureInstance& texture)
+    {
+        gi_diffuse_texture_ = texture;
+    }
+
+    const TextureInstance& indirect_diffuse_lighting_texture() const
+    {
+        return gi_diffuse_texture_;
+    }
 
     void set_material_system_to_process(MaterialSystem* material_system)
     {
@@ -226,6 +253,7 @@ public:
     }
 
     UniformBufferHandleType system_wide_uniform(const string& name) const;
+    UniformBufferHandleType main_camera_uniform() const;
 
     virtual void set_gi_modifier_material_system(MaterialSystem*, size_t)
     {}
@@ -238,6 +266,10 @@ public:
     virtual TextureInstance scene_depth_buffer() const
     {
         return TextureInstance();
+    }
+
+    virtual void setup_common_pass(Material& /*material*/) const
+    {
     }
 protected:
     Context& context()
@@ -259,6 +291,8 @@ private:
     // To implement
     MaterialSystem* transparent_objects_material_system_;
     MaterialSystem* particles_material_system_;
+
+    TextureInstance gi_diffuse_texture_;
 
     PosteffectDebugMaterialSystem* fullscreen_debug_material_system_;
 

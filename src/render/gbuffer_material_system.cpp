@@ -8,6 +8,7 @@
 #include "render/light_instance_methods.hpp"
 #include "render/utils/simple_meshes.hpp"
 #include "render/render_globals.hpp"
+#include "render/renderer.hpp"
 
 namespace mhe {
 
@@ -410,6 +411,7 @@ void GBufferDrawMaterialSystem::update(Context& context, SceneContext& scene_con
         material.textures[1] = normal_texture_;
         material.textures[2] = accumnulator_texture_;
         material.textures[3] = depth_texture_;
+        material.textures[6] = context.renderer->indirect_diffuse_lighting_texture();
         material.textures[shadowmap_texture_unit] = shadowmap_texture;
         material.uniforms[0] = render_context.main_camera.percamera_uniform;
         material.uniforms[2] = light_uniform;

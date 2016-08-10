@@ -31,6 +31,8 @@ bool MHE_EXPORT create_sphere(NodeInstance& node, const Context& context, int su
 bool MHE_EXPORT create_conus(NodeInstance& node, const Context& context, float radius, float height, int subdivision);
 bool MHE_EXPORT create_cube(NodeInstance& node, const Context& context, uint32_t flags = mesh_creation_flag_none);
 
+bool MHE_EXPORT create_fullscreen_quad_shared(MeshInstance& mesh_instance, Context& context);
+
 }}
 
 #endif

@@ -9,6 +9,7 @@
 #include "render/rsm_material_system.hpp"
 #include "render/lpv_material_system.hpp"
 #include "render/fog.hpp"
+#include "render/gi.hpp"
 
 namespace mhe {
 namespace game {
@@ -42,6 +43,7 @@ void Engine::setup_generated()
     MaterialSystemFactory::instance().add<VolumetricFogMaterialSystem>();
     MaterialSystemFactory::instance().add<VolumetricFogResolveMaterialSystem>();
     MaterialSystemFactory::instance().add<VolumetricFogSystem>();
+    MaterialSystemFactory::instance().add<IndirectLightingResolveMaterialSystem>();
 }
 
 }}

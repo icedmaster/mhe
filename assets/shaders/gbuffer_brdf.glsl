@@ -68,7 +68,17 @@ void main()
 
 in VSOutput vsoutput;
 
+[sampler2D gi_diffuse_texture 6]
+
 out vec3 out_color;
+
+IndirectLighting get_indirect_lighting(vec2 tex)
+{
+    IndirectLighting indirect_lighting;
+    indirect_lighting.diffuse = texture(gi_diffuse_texture, tex).rgb;
+    indirect_lighting.specular = VEC3_ZERO;
+    return indirect_lighting;
+}
 
 void main()
 {
@@ -97,9 +107,7 @@ void main()
     float ldoth = saturate(dot(L, H));
     float ndoth = saturate(dot(N, H));
 
-    IndirectLighting indirect_lighting;
-    indirect_lighting.diffuse = ambient.rgb;
-    indirect_lighting.specular = VEC3_ZERO;
+    IndirectLighting indirect_lighting = get_indirect_lighting(tex);
 
     float shadow = get_shadow_value(vec3(tex, gbuffer.depth), pos_ws, linearized_depth(gbuffer.depth, znear, zfar), light);
 	vec3 result = BRDF_lambert_ggx(gbuffer, indirect_lighting, light.diffuse.rgb * shadow, light.specular.rgb * shadow, ndotl, ndotv, ndoth, ldoth);

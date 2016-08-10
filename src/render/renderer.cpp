@@ -12,6 +12,7 @@
 #include "render/lpv_material_system.hpp"
 #include "render/skybox_material_system.hpp"
 #include "render/light_instance_methods.hpp"
+#include "render/deferred_renderer.hpp"
 #include "debug/profiler.hpp"
 #include "res/resource_manager.hpp"
 #include "math/sh.h"
@@ -308,8 +309,37 @@ GISystem::GISystem() :
     rsm_material_system_(nullptr),
     lpv_material_system_(nullptr),
     lpv_resolve_material_system_(nullptr),
-    skybox_material_system_(nullptr)
+    skybox_material_system_(nullptr),
+    diffuse_lighting_resolve_material_system_(nullptr)
 {}
+
+bool GISystem::init(Context& context, const Settings& settings)
+{
+    const string diffuse_resolve_name = IndirectLightingResolveMaterialSystem::material_name();
+
+    MaterialSystemContext material_system_context;
+    material_system_context.material_instances_number = 1;
+    material_system_context.shader_name = settings.diffuse_resolve_shader_name;
+    material_system_context.priority = DeferredRenderer::deferred_renderer_gbuffer_modifier_priority;
+    material_system_context.instance_name = diffuse_resolve_name;
+
+    context.initialization_parameters.add(diffuse_resolve_name, material_system_context);
+    diffuse_lighting_resolve_material_system_ =
+        create<IndirectLightingResolveMaterialSystem>(context, diffuse_resolve_name, diffuse_resolve_name);
+
+    const RenderTarget& rt = context.render_target_pool.get(diffuse_lighting_resolve_material_system_->render_target_id());
+
+    TextureInstance texture;
+    rt.color_texture(texture, 0);
+    context.renderer->set_indirect_diffuse_lighting_texture(texture);
+
+    return true;
+}
+
+void GISystem::destroy(Context& context)
+{
+    UNUSED(context);
+}
 
 void GISystem::add_lpv(Context& context, Renderer& renderer, const LPVParams& params)
 {
@@ -377,6 +407,8 @@ void GISystem::add_lpv(Context& context, Renderer& renderer, const LPVParams& pa
 void GISystem::apply(Renderer& renderer)
 {
     renderer.set_gi_modifier_material_system(lpv_resolve_material_system_, 0);
+    ASSERT(diffuse_lighting_resolve_material_system_ != nullptr, "Invalid diffuse GI material system");
+    diffuse_lighting_resolve_material_system_->set_global_ambient_sh_buffer(ambient_sh_buffer_id_);
 }
 
 void GISystem::add_skybox(Context& context, const SkyboxMaterialSystem* skybox_material_system, const CubemapIntegrator::Settings& integrator_settings)
@@ -410,6 +442,8 @@ void GISystem::render(Context& context, SceneContext& scene_context, RenderConte
         cubemap_integrator_.integrate(context.shader_storage_buffer_pool.get(ambient_sh_buffer_id_),
             context, context.texture_pool.get(skybox_material_system_->skybox_texture().id));
 
+    diffuse_lighting_resolve_material_system_->setup_draw_calls(context, scene_context, render_context);
+
     if (rsm_material_system_ != nullptr && lpv_material_system_ != nullptr)
     {
         RSMData data;
@@ -433,7 +467,7 @@ Renderer::Renderer(Context& context) :
     debug_mode_(renderer_debug_mode_none)
 {}
 
-bool Renderer::init()
+bool Renderer::init(const Settings& settings)
 {
     UniformBuffer& buffer = create_and_get(context_.uniform_pool);
     render_context_.main_camera.percamera_uniform = buffer.id();
@@ -443,11 +477,14 @@ bool Renderer::init()
     buffer.init(desc);
 
     context_.renderer = this;
+
+    gi_system_.init(context_, settings.gi_settings);
     return true;
 }
 
 void Renderer::destroy()
 {
+    gi_system_.destroy(context_);
     destroy_pool_object(context_.uniform_pool, render_context_.main_camera.percamera_uniform);
 }
 
@@ -601,6 +638,11 @@ UniformBufferHandleType Renderer::system_wide_uniform(const string& name) const
     if (name == "main_camera")
         return render_context_.main_camera.percamera_uniform;
     return InvalidHandle<UniformBufferHandleType>::id;
+}
+
+UniformBufferHandleType Renderer::main_camera_uniform() const
+{
+    return render_context_.main_camera.percamera_uniform;
 }
 
 bool load_node(NodeInstance& node, const string& name, const char* material_system_name, Context& context, SceneContext& scene_context)

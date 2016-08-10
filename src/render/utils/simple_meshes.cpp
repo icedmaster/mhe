@@ -316,6 +316,21 @@ bool create_cube(MeshInstance& mesh_instance, const Context& context, uint32_t f
     return ibuffer.init(vbuffer, &indices[0], indices.size());
 }
 
+bool create_fullscreen_quad_shared(MeshInstance& mesh_instance, Context& context)
+{
+    const FilePath name = "__mhe_fullscreen_quad";
+    if (!context.mesh_manager.has(name))
+    {
+        if (create_fullscreen_quad(mesh_instance, context))
+        {
+            context.mesh_manager.add(mesh_instance.mesh, name);
+            return true;
+        }
+        return false;
+    }
+    else return context.mesh_manager.get_instance(mesh_instance, name);
+}
+
 bool create_plane(NodeInstance& node, const Context& context, uint32_t flags)
 {
     add_part(node.mesh);

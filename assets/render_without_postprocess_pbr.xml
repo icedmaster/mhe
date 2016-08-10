@@ -46,6 +46,9 @@
   </material>
   </materials>
   <gi>
+    <settings>
+      <diffuse_resolve_shader>gi_diffuse_resolve</diffuse_resolve_shader>
+    </settings>
     <skybox material="skybox" integrator_shader_name="compute/cubemap_integration" />
   </gi>
   <skybox name="skybox" />

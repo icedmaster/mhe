@@ -7,9 +7,10 @@
 
 namespace mhe {
 
-void DeferredRenderer::init(AbstractGBufferFillMaterialSystem* fill, AbstractGBufferUseMaterialSystem* light, PosteffectMaterialSystemBase* draw)
+void DeferredRenderer::init(AbstractGBufferFillMaterialSystem* fill, AbstractGBufferUseMaterialSystem* light,
+    PosteffectMaterialSystemBase* draw, const Renderer::Settings& settings)
 {
-    Renderer::init();
+    Renderer::init(settings);
     ASSERT(fill != nullptr, "DeferredRenderer requires fill material system");
     gbuffer_fill_material_system_ = fill;
     gbuffer_light_material_system_ = light;
@@ -67,6 +68,15 @@ void DeferredRenderer::set_gi_modifier_material_system(MaterialSystem* material_
     }
 }
 
+void DeferredRenderer::setup_common_pass(Material& material) const
+{
+    material.textures[0] = gbuffer_.albedo;
+    material.textures[1] = gbuffer_.normal;
+    material.textures[2] = gbuffer_.accumulator;
+    material.textures[3] = gbuffer_.depth;
+    material.uniforms[0] = main_camera_uniform();
+}
+
 void DeferredRenderer::enable()
 {
     gbuffer_fill_material_system_->enable();
@@ -97,9 +107,9 @@ void DeferredRenderer::init_priorities()
 {
     gbuffer_fill_material_system_->set_priority(deferred_renderer_base_priority);
     if (gbuffer_light_material_system_ != nullptr)
-        gbuffer_light_material_system_->set_priority(deferred_renderer_base_priority + 1);
+        gbuffer_light_material_system_->set_priority(deferred_renderer_draw_priority);
     if (draw_material_system_ != nullptr)
-        draw_material_system_->set_priority(deferred_renderer_draw_priority); // reserve priorities for GBuffer modificators
+        draw_material_system_->set_priority(deferred_renderer_draw_priority + 1); // reserve priorities for GBuffer modificators
 }
 
 void DeferredRenderer::render_impl(Context& context, RenderContext& render_context, SceneContext& scene_context)

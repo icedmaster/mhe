@@ -15,6 +15,7 @@
 #include "render/deferred_renderer.hpp"
 #include "render/posteffect_material_system.hpp"
 #include "render/skybox_material_system.hpp"
+#include "render/renderer.hpp"
 
 namespace mhe {
 namespace app {
@@ -22,6 +23,21 @@ namespace app {
 struct PosteffectParams
 {
     fixed_size_vector<PosteffectSystem::PosteffectNodeDesc, 16> nodes;
+};
+
+struct GIParams
+{
+    GISystem::LPVParams lpv_params;
+    GISystem::Settings gi_settings;
+    string skybox_material;
+    CubemapIntegrator::Settings integrator_settings;
+    bool use_lpv;
+    bool use_skybox_ambient;
+
+    GIParams() :
+    use_lpv(false),
+        use_skybox_ambient(false)
+    {}
 };
 
 struct RendererParams
@@ -32,20 +48,7 @@ struct RendererParams
     string fullscreen_debug;
     string probes_accumulator;
     PosteffectParams posteffect_params;
-};
-
-struct GIParams
-{
-    GISystem::LPVParams lpv_params;
-    string skybox_material;
-    CubemapIntegrator::Settings integrator_settings;
-    bool use_lpv;
-    bool use_skybox_ambient;
-
-    GIParams() :
-        use_lpv(false),
-        use_skybox_ambient(false)
-    {}
+    GIParams gi_params;
 };
 
 Application::Application(const char* name) :
@@ -202,7 +205,7 @@ void Application::init_render(const ApplicationConfig& config)
 
     GIParams gi_params;
     init_posteffect_parameters(mhe_node.child("posteffects"), renderer_params);
-    init_gi_params(mhe_node.child("gi"), gi_params);
+    init_gi_params(mhe_node.child("gi"), renderer_params.gi_params);
     
     pugi::xml_node gbuffer_node = mhe_node.child("gbuffer");
     if (gbuffer_node)
@@ -210,7 +213,7 @@ void Application::init_render(const ApplicationConfig& config)
     else
         engine_->set_renderer(new NullRenderer(engine_->context()));
     init_posteffects(renderer_params);
-    init_gi(gi_params);
+    init_gi(renderer_params.gi_params);
     init_materials_to_process(mhe_node.child("materials_to_process"));
 }
 
@@ -379,6 +382,9 @@ void Application::init_gbuffer(pugi::xml_node gbuffer_node, const RendererParams
     MaterialSystem* directional_depth_write_material_system = context.material_systems.get(params.directional_depth_write);
     PosteffectDebugMaterialSystem* fullscreen_debug_material_system = context.material_systems.get<PosteffectDebugMaterialSystem>(params.fullscreen_debug);
     ProbesAccumulatorMaterialSystem* probes_accumulator_material_system = context.material_systems.get<ProbesAccumulatorMaterialSystem>(params.probes_accumulator);
+
+    Renderer::Settings renderer_settings;
+    renderer_settings.gi_settings = params.gi_params.gi_settings;
     
     DeferredRenderer* renderer = new DeferredRenderer(context);
     renderer->set_skybox_material_system(skybox_material_system);
@@ -386,7 +392,7 @@ void Application::init_gbuffer(pugi::xml_node gbuffer_node, const RendererParams
     renderer->set_directional_shadowmap_depth_write_material_system(directional_depth_write_material_system);
     renderer->set_fullscreen_debug_material_system(fullscreen_debug_material_system);
     renderer->set_probes_accumulator_material_system(probes_accumulator_material_system);
-    renderer->init(fill_material_system, use_material_system, draw_material_system);
+    renderer->init(fill_material_system, use_material_system, draw_material_system, renderer_settings);
     engine_->set_renderer(renderer);
 }
 
@@ -413,6 +419,14 @@ void Application::init_gi_params(pugi::xml_node node, GIParams& params) const
         params.skybox_material = n.attribute("material").value();
         params.integrator_settings.shader_name = n.attribute("integrator_shader_name").value();
         params.use_skybox_ambient = true;
+    }
+
+    n = node.child("settings");
+    if (n)
+    {
+        pugi::xml_node diffuse_resolve_node = n.child("diffuse_resolve_shader");
+        if (diffuse_resolve_node)
+            params.gi_settings.diffuse_resolve_shader_name = diffuse_resolve_node.child_value();
     }
 }
 
