@@ -284,6 +284,8 @@ private:
     virtual void update_impl(Context& /*context*/, RenderContext& /*render_context*/, SceneContext& /*scene_context*/) {}
     virtual void render_impl(Context& context, RenderContext& render_context, SceneContext& scene_context) = 0;
 
+    void flush_pass();
+
     Context& context_;
     MaterialSystem* skybox_material_system_;
     MaterialSystem* shadowmap_depth_write_material_system_;

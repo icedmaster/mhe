@@ -73,6 +73,12 @@ inline T round(const T& v)
     return ::ceil(v - (T)0.5);
 }
 
+template <class T>
+inline T iceil(T x, T y)
+{
+    return (x + y - 1) / y;
+}
+
 inline bool is_nan(float f)
 {
     // little-endian version

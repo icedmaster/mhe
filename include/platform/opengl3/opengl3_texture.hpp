@@ -48,7 +48,7 @@ public:
 
     bool is_layered() const
     {
-        return target_ == GL_TEXTURE_3D;
+        return target_ == GL_TEXTURE_3D || target_ == GL_TEXTURE_CUBE_MAP;
     }
 private:
     void init_cubemap(const TextureDesc& desc, const uint8_t* data, size_t size);

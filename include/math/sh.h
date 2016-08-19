@@ -52,10 +52,12 @@ SH<T, B> operator* (const SH<T, B>& h, U c)
 inline float sh9_calculate_cubemap_projection_weight(size_t width, size_t height)
 {
     float weight = 0.0f;
-    for (size_t u = 0; u < width; ++u)
+    for (size_t x = 0; x < width; ++x)
     {
-        for (size_t v = 0; v < height; ++v)
+        for (size_t y = 0; y < height; ++y)
         {
+            float u = static_cast<float>( x ) / width * 2.0f - 1.0f;
+            float v = static_cast<float>( y ) / height * 2.0f - 1.0f;
             float w = 1.0f + u * u + v * v;
             w = 4.0f / (sqrt(w) * w);
             weight += w;
