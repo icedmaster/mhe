@@ -106,7 +106,7 @@ ComputeCallCommand::ComputeCallCommand()
     set_stages(render_stage_before_render_target_setup);
 }
 
-bool ComputeCallCommand::execute_impl(Context& context, RenderStage current_stage)
+bool ComputeCallCommand::execute_impl(Context& context, RenderStage /*current_stage*/)
 {
     context.driver.execute(context, &compute_call_, 1);
     return false;

@@ -81,7 +81,7 @@ bool ExponentialShadowMap::DownsampleCommand::init(const Settings& settings)
     return true;
 }
 
-bool ExponentialShadowMap::DownsampleCommand::execute_impl(Context& context, RenderStage current_stage)
+bool ExponentialShadowMap::DownsampleCommand::execute_impl(Context& context, RenderStage /*current_stage*/)
 {
     ComputeCallExplicit compute_call;
     prepare_draw_call(compute_call);
@@ -266,9 +266,6 @@ void ExponentialShadowMap::init_downsampling(Context& context, const ShadowInfo*
     size_t width = shadowmap_texture.width();
     size_t height = shadowmap_texture.height();
 
-    size_t downsampled_height = esm_size_;
-    size_t downsampled_width = esm_size_ * shadow_info->cascades_number;
-
     TextureDesc texture_desc;
     texture_desc.address_mode_r = texture_clamp;
     texture_desc.address_mode_t = texture_clamp;
@@ -279,7 +276,6 @@ void ExponentialShadowMap::init_downsampling(Context& context, const ShadowInfo*
     texture_desc.min_filter = texture_filter_linear;
     texture_desc.type = texture_2d;
 
-    size_t steps = 0;
     texture_desc.height = static_cast<size_t>(height * 0.25f);
     texture_desc.width = static_cast<size_t>(width * 0.25f);
     Texture& texture = create_and_get(context.texture_pool);
@@ -516,7 +512,7 @@ bool VolumetricFogSystem::init(Context& context, const MaterialSystemContext& sy
     return true;
 }
 
-void VolumetricFogSystem::destroy(Context& context)
+void VolumetricFogSystem::destroy(Context& /*context*/)
 {
 }
 

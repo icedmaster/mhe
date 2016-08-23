@@ -157,7 +157,7 @@ void IndirectLightingResolveMaterialSystem::setup(Context &context, SceneContext
     empty_setup(context, scene_context, instance_parts, parts, model_contexts, count);
 }
 
-void IndirectLightingResolveMaterialSystem::update(Context& context, SceneContext& scene_context, RenderContext& render_context)
+void IndirectLightingResolveMaterialSystem::update(Context& context, SceneContext& /*scene_context*/, RenderContext& render_context)
 {
     UberShader& ushader = ubershader(context);
     UberShader::Index index;

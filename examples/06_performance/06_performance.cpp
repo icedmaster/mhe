@@ -22,7 +22,7 @@ public:
             aabb.aabb.center = pos;
             aabb.aabb.extents = mhe::vec3(0.5f, 0.5f, 0.5f);
 
-            mhe::setup_node(node, material_system, engine.context(), engine.scene_context(), mhe::string("test.tga"));
+            //mhe::setup_node(node, material_system, engine.context(), engine.scene_context(), mhe::string("test.tga"));
 		}
 
 		init_lighting(engine);

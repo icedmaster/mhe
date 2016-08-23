@@ -9,10 +9,10 @@ public:
         
         mhe::NodeInstance& node = engine.scene().create_node();
         mhe::load_node<mhe::GBufferFillMaterialSystem>(node, mhe::string("sponza.bin"), engine.context(), engine.scene_context());
-        mhe::MaterialId floor_id;
-        engine.context().material_manager.id_by_name(floor_id, mhe::string("floor"));
-        mhe::MaterialData& material = engine.context().material_manager.material_data(floor_id);
-        material.render_data.glossiness = 1.0f;
+        //mhe::MaterialId floor_id;
+        //engine.context().material_manager.id_by_name(floor_id, mhe::string("floor"));
+        //mhe::MaterialData& material = engine.context().material_manager.material_data(floor_id);
+        //material.render_data.glossiness = 1.0f;
 
         node.mesh.instance_parts[4].flags &= ~mhe::MeshPartInstance::cast_reflection;
 

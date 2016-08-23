@@ -20,13 +20,12 @@ void serialize_light_instance(uint8_t* stream, const LightInstance& light_instan
     serialize(stream, light_instance.transform_id);
     serialize(stream, light_instance.aabb_id);
     serialize(stream, light_instance.enabled);
-    serialize(stream, light_instance.light.settings());
 }
 
 size_t light_instance_serialization_data_size()
 {
     return sizeof(LightInstance::IdType) + sizeof(TransformInstance::IdType) +
-        sizeof(AABBInstanceHandleType) + sizeof(bool) + sizeof(Light::Settings);
+        sizeof(AABBInstanceHandleType) + sizeof(bool);
 }
 
 }

@@ -3,6 +3,7 @@
 
 #include "core/types.hpp"
 #include <cfloat>
+#include <cmath>
 
 namespace mhe
 {

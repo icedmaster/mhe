@@ -12,7 +12,7 @@ public:
 
 		mhe::GBufferFillMaterialSystem* material_system = engine.context().material_systems.get<mhe::GBufferFillMaterialSystem>();
 
-        mhe::setup_node(node, material_system, engine.context(), engine.scene_context(), mhe::string("test.tga"));
+        //mhe::setup_node(node, material_system, engine.context(), engine.scene_context(), mhe::string("test.tga"));
 
 		return true;
 	}

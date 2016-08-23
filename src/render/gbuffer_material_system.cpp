@@ -245,8 +245,6 @@ bool GBufferDrawMaterialSystem::init(Context& context, const MaterialSystemConte
     UberShader::Index index;
     const UberShader::Info& info = ubershader(context).info("LIGHT_TYPE");
     index.set(info, Light::directional);
-    ShaderProgram::IdType directional_shader_program_id = ubershader(context).get(index);
-    ShaderProgram& directional_shader_program = context.shader_pool.get(directional_shader_program_id);
 
     profile_command_.set_stages(render_stage_begin_priority | render_stage_end_priority);
     list_of_commands_.add_command(&clear_command_);
@@ -357,7 +355,7 @@ void GBufferDrawMaterialSystem::setup(Context& context, SceneContext& scene_cont
     empty_setup(context, scene_context, instance_parts, parts, model_contexts, count);
 }
 
-void GBufferDrawMaterialSystem::update(Context& context, SceneContext& scene_context, RenderContext& render_context)
+void GBufferDrawMaterialSystem::update(Context& context, SceneContext& /*scene_context*/, RenderContext& render_context)
 {
     context.materials[id()].clear();
     clear_command_.reset();
@@ -367,7 +365,6 @@ void GBufferDrawMaterialSystem::update(Context& context, SceneContext& scene_con
     if (cubemap_texture.id != Texture::invalid_id)
         use_cubemap = 1;
 
-    size_t directional_light_index = 0;
     for (size_t i = 0; i < render_context.lights_number; ++i)
     {
         int type = 0;

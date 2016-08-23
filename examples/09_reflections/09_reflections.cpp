@@ -38,7 +38,7 @@ public:
         rotating_sphere.receive_shadow = true;
         rotating_sphere.cast_shadow = true;
 
-        mhe::MaterialInitializationData glossy_material;
+        /*mhe::MaterialInitializationData glossy_material;
         glossy_material.name = "glossy";
         glossy_material.textures[mhe::albedo_texture_unit] = "metal.tga";
         glossy_material.render_data.specular_shininess = 5.0f;
@@ -48,7 +48,7 @@ public:
         mhe::setup_node(node, material_system, engine.context(), engine.scene_context(), glossy_material);
         mhe::setup_node(plane, material_system, engine.context(), engine.scene_context(), glossy_material);
         mhe::setup_node(floor, material_system, engine.context(), engine.scene_context(), mhe::string("test.tga"));
-        mhe::setup_node(rotating_sphere, material_system, engine.context(), engine.scene_context(), mhe::string("test.tga"));
+        mhe::setup_node(rotating_sphere, material_system, engine.context(), engine.scene_context(), mhe::string("test.tga"));*/
 
         init_lighting(engine);
 

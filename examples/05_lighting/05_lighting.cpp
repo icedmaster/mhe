@@ -19,8 +19,8 @@ public:
 		plane_transform.translate_by(mhe::vec3(0, 0, -15));
 
 		mhe::GBufferFillMaterialSystem* material_system = engine.context().material_systems.get<mhe::GBufferFillMaterialSystem>();
-        mhe::setup_node(node, material_system, engine.context(), engine.scene_context(), mhe::string("test.tga"));
-        mhe::setup_node(plane, material_system, engine.context(), engine.scene_context(), mhe::string("test.tga"));
+        //mhe::setup_node(node, material_system, engine.context(), engine.scene_context(), mhe::string("test.tga"));
+        //mhe::setup_node(plane, material_system, engine.context(), engine.scene_context(), mhe::string("test.tga"));
 
 		init_lighting(engine);
 		return true;

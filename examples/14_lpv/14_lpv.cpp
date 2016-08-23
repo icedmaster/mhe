@@ -39,10 +39,10 @@ public:
         mhe::load_node<mhe::GBufferFillMaterialSystem>(node, mhe::string(mesh_name), engine.context(), engine.scene_context());
 
         // The glossiness coefficient will be used for calculating the initial intensity of VPL
-        for (size_t i = 0, size = node.mesh.mesh.parts.size(); i < size; ++i)
+        /*for (size_t i = 0, size = node.mesh.mesh.parts.size(); i < size; ++i)
         {
             engine.context().material_manager.material_data(node.mesh.mesh.parts[i].material_id).render_data.glossiness = 0.5f;
-        }
+        }*/
 
         // This is a small hack, because I don't include the skybox contribution during the average luminance calculation
         // and the results on the test scene where skybox may cover a big part of screen may be incorrect

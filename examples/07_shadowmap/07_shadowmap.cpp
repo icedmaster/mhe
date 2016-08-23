@@ -29,9 +29,9 @@ public:
         floor.receive_shadow = true;
 
 		mhe::GBufferFillMaterialSystem* material_system = engine.context().material_systems.get<mhe::GBufferFillMaterialSystem>();
-        mhe::setup_node(node, material_system, engine.context(), engine.scene_context(), mhe::string("test.tga"));
-        mhe::setup_node(plane, material_system, engine.context(), engine.scene_context(), mhe::string("test.tga"));
-		mhe::setup_node(floor, material_system, engine.context(), engine.scene_context(), mhe::string("test.tga"));
+        //mhe::setup_node(node, material_system, engine.context(), engine.scene_context(), mhe::string("test.tga"));
+        //mhe::setup_node(plane, material_system, engine.context(), engine.scene_context(), mhe::string("test.tga"));
+        //mhe::setup_node(floor, material_system, engine.context(), engine.scene_context(), mhe::string("test.tga"));
 
 		init_lighting(engine);
 		return true;
