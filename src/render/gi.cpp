@@ -85,6 +85,7 @@ bool CubemapIntegrator::integrate(ShaderStorageBuffer& dst, Context& context, Te
 
     context.driver.execute(context, &compute_call, 1);
 
+    tmp_buffer.close();
     context.shader_storage_buffer_pool.remove(tmp_buffer.id());
 
     return true;
