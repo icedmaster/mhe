@@ -18,6 +18,11 @@ public:
 
     void setup(Context& context, SceneContext& scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count) override;
 
+    void set_texture(const TextureInstance& texture) override
+    {
+        skybox_texture_ = texture;
+    }
+
     const TextureInstance& skybox_texture() const
     {
         return skybox_texture_;

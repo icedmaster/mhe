@@ -427,7 +427,17 @@ void GISystem::add_skybox(Context& context, const SkyboxMaterialSystem* skybox_m
             ERROR_LOG("Can't initialize a ShaderStorageBuffer");
         }
         ambient_sh_buffer_id_ = buffer.id();
+
+        cubemap_integrator_.integrate(context.shader_storage_buffer_pool.get(ambient_sh_buffer_id_),
+            context, context.texture_pool.get(skybox_material_system_->skybox_texture().id));
     }
+}
+
+void GISystem::update_skybox(Context& context)
+{
+    if (skybox_material_system_ != nullptr)
+        cubemap_integrator_.integrate(context.shader_storage_buffer_pool.get(ambient_sh_buffer_id_),
+            context, context.texture_pool.get(skybox_material_system_->skybox_texture().id));
 }
 
 void GISystem::before_render(Context& context, SceneContext& scene_context, RenderContext& render_context)
@@ -438,10 +448,6 @@ void GISystem::before_render(Context& context, SceneContext& scene_context, Rend
 
 void GISystem::render(Context& context, SceneContext& scene_context, RenderContext& render_context)
 {
-    if (skybox_material_system_ != nullptr)
-        cubemap_integrator_.integrate(context.shader_storage_buffer_pool.get(ambient_sh_buffer_id_),
-            context, context.texture_pool.get(skybox_material_system_->skybox_texture().id));
-
     diffuse_lighting_resolve_material_system_->setup_draw_calls(context, scene_context, render_context);
 
     if (rsm_material_system_ != nullptr && lpv_material_system_ != nullptr)
@@ -651,6 +657,13 @@ UniformBufferHandleType Renderer::system_wide_uniform(const string& name) const
 UniformBufferHandleType Renderer::main_camera_uniform() const
 {
     return render_context_.main_camera.percamera_uniform;
+}
+
+void Renderer::set_skybox_cubemap(const TextureInstance& cubemap)
+{
+    if (skybox_material_system_ != nullptr)
+        skybox_material_system_->set_texture(cubemap);
+    gi_system_.update_skybox(context_);
 }
 
 bool load_node(NodeInstance& node, const string& name, const char* material_system_name, Context& context, SceneContext& scene_context)

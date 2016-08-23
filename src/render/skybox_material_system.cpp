@@ -96,6 +96,9 @@ void SkyboxMaterialSystem::update(Context& context, SceneContext& /*scene_contex
     uniform_buffer_desc.name = "transform";
     uniform.update(uniform_buffer_desc);
 
+    Material& material = context.materials[id()].get(skybox_mesh_.instance_parts[0].material.id);
+    material.textures[0] = skybox_texture_;
+
     setup_draw_call(render_context.draw_calls.add(), skybox_mesh_.instance_parts[0], skybox_mesh_.mesh.parts[0], default_render_target);
 }
 

@@ -1,6 +1,7 @@
 #include "res/image_loaders/cubemap_loader.hpp"
 
 #include <cstring>
+#include "core/types_cast.hpp"
 #include "render/image.hpp"
 #include "pugixml/pugixml.hpp"
 #include "utils/global_log.hpp"
@@ -17,6 +18,12 @@ namespace detail {
         Image tmp_image;
         const FilePath& path = utils::get_file_path(filename);
         size_t stride = 0;
+
+        uint32_t loading_flags = 0;
+        pugi::xml_node n = node.child("flip_v");
+        if (n.child_value() && types_cast<bool>(string(n.child_value())))
+            loading_flags |= image_flip_v;
+
         for (int i = 0; i < 6; ++i)
         {
             pugi::xml_node n = node.child(nodes_names[i]);
@@ -26,7 +33,7 @@ namespace detail {
                 return false;
             }
             FilePath name = utils::path_join(path, FilePath(n.child_value()));
-            if (!load_image_by_extension(tmp_image, name))
+            if (!load_image_by_extension(tmp_image, name, loading_flags))
             {
                 WARN_LOG("load_cubemap(): can't load file " << name);
                 return false;

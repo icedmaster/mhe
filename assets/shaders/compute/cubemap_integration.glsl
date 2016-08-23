@@ -10,7 +10,6 @@
 #if STAGE == 0
 // TODO: use HDR cubemaps
 layout(rgba8, binding = 0) readonly uniform imageCube cubemap;
-//layout(binding = 0) uniform samplerCube cubemap;
 
 layout(std430, binding = 0) buffer OutputData
 {
@@ -23,13 +22,11 @@ layout(local_size_x = THREADS, local_size_y = THREADS) in;
 void main()
 {
     vec3 directions_ws[6] = vec3[6](vec3(1, 0, 0), vec3(-1, 0, 0), vec3(0, 1, 0), vec3(0, -1, 0), vec3(0, 0, 1), vec3(0, 0, -1));
-    //ivec2 size = textureSize(cubemap, 0);
     ivec2 size = imageSize(cubemap);
     ColorSH9 result = sh9_zero();
     for (int f = 0; f < 6; ++f)
     {
         vec3 dir = directions_ws[f];
-        SH9 lobe = sh9_cosine_lobe(dir);
         for (int x = 0; x < min(THREADS, size.x); ++x)
         {
             for (int y = 0; y < min(THREADS, size.y); ++y)
@@ -41,7 +38,6 @@ void main()
                 float weight = 1.0f + u * u + v * v;
                 weight = 4.0f / (sqrt(weight) * weight);
                 vec3 color = imageLoad(cubemap, ivec3(xpos, ypos, f)).rgb;
-                //vec3 color = texture(cubemap, vec3(u * 0.5f + 0.5f, v * 0.5f + 0.5f, 0.0f) + directions_ws[f]).rgb;
                 ColorSH9 projected_color = sh9_project(dir, color * weight);
                 result = add(result, projected_color);
             }

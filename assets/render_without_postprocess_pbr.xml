@@ -1,7 +1,7 @@
 <mhe>
   <materials>
 	<material name="unlit" shader="unlit" priority="4" />
-	<material name="skybox" shader="skybox" priority="0" defs="cubemaps/test.cubemap" />
+	<material name="skybox" shader="skybox" priority="0" defs="cubemaps/yokohama/yokohama.cubemap" />
 	<material name="gbuffer_fill" shader="gbuffer_fill_pbr" priority="4" />
 	<material name="gbuffer_draw" shader="gbuffer_brdf" priority="5" />
     <material name="posteffect_simple" shader="gbuffer_draw" priority="6">

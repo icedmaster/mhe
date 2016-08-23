@@ -24,6 +24,10 @@ public:
         BloomMaterialSystem* bloom_material_system = engine.context().material_systems.get<BloomMaterialSystem>();
         bloom_material_system->settings().intensity = 0.0f;
 
+        engine.context().texture_manager.get(skyboxes_[0], string("cubemaps/test.cubemap"));
+        engine.context().texture_manager.get(skyboxes_[1], string("cubemaps/yokohama/yokohama.cubemap"));
+        engine.context().texture_manager.get(skyboxes_[2], string("cubemaps/ice-river/ice-river.cubemap"));
+
         return true;
     }
 
@@ -38,8 +42,23 @@ public:
             ImGui::SliderFloat("M", &materials[i].render_data.metalness, 0.0f, 1.0f);
         }
         ImGui::End();
+
+        const KeyboardDevice* keyboard = engine.event_manager().keyboard();
+        if (keyboard->is_key_pressed(KeyboardDevice::key_1))
+            update_skybox(engine, 0);
+        else if (keyboard->is_key_pressed(KeyboardDevice::key_2))
+            update_skybox(engine, 1);
+        else if (keyboard->is_key_pressed(KeyboardDevice::key_3))
+            update_skybox(engine, 2);
         return true;
     }
+
+    void update_skybox(mhe::game::Engine& engine, int index)
+    {
+        engine.renderer()->set_skybox_cubemap(skyboxes_[index]);
+    }
+
+    TextureInstance skyboxes_[3];
 };
 
 int main(int /*argc*/, char** /*argv*/)

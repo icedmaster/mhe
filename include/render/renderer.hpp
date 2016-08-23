@@ -145,6 +145,8 @@ public:
 
     void apply(Renderer& renderer);
 
+    void update_skybox(Context& context);
+
     void before_render(Context& context, SceneContext& scene_context, RenderContext& render_context);
     void render(Context& context, SceneContext& scene_context, RenderContext& render_context);
 
@@ -271,6 +273,8 @@ public:
     virtual void setup_common_pass(Material& /*material*/) const
     {
     }
+
+    void set_skybox_cubemap(const TextureInstance& cubemap);
 protected:
     Context& context()
     {

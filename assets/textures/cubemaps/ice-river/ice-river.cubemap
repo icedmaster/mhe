@@ -1,0 +1,11 @@
+<mhe>
+	<cubemap>
+		<negx>negx.tga</negx>
+		<negy>negy.tga</negy>
+		<negz>negz.tga</negz>
+		<posx>posx.tga</posx>
+		<posy>posy.tga</posy>
+		<posz>posz.tga</posz>
+        <flip_v>1</flip_v>
+	</cubemap>
+</mhe>

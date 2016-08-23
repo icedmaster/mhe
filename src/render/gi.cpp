@@ -42,7 +42,6 @@ bool CubemapIntegrator::integrate(ShaderStorageBuffer& dst, Context& context, Te
     prepare_draw_call(compute_call);
     compute_call.image_access[0] = access_readonly;
     compute_call.images[0] = &cubemap;
-    //compute_call.textures[0] = &cubemap;
     compute_call.shader_program = &context.shader_pool.get(ubershader.get_default());
     size_t threads_number = compute_call.shader_program->variable_value<size_t>(string("THREADS"));
     size_t threads_number_sq = threads_number * threads_number;
