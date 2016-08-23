@@ -1,5 +1,5 @@
 [defs PASS 0 1]
-[defs QUALITY 0 1]
+[defs QUALITY 0 2]
 
 struct VSOutput
 {
@@ -25,6 +25,8 @@ void main()
 #define BLUR_SAMPLES 1
 #elif QUALITY == 1
 #define BLUR_SAMPLES 3
+#elif QUALITY == 2
+#define BLUR_SAMPLES 5
 #endif
 
 [uniform blur_params 1 per_frame]

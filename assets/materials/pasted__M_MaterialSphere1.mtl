@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<mhe>
+	<material>
+		<albedo>
+			<ref ref="crystal.tga" />
+		</albedo>
+		<normalmap>
+			<ref ref="normalmaps/test-nm.tga" />
+		</normalmap>
+	</material>
+</mhe>

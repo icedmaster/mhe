@@ -77,7 +77,7 @@ private:
 
     void init_spot_lights(mhe::game::Engine& engine)
     {
-        mhe::LightInstance& light_instance = engine.scene().create_light();
+        mhe::LightInstance& light_instance = engine.scene().create_light(mhe::Light::spot);
         mhe::Light& light = light_instance.light;
         light.shading().diffuse = mhe::color_green;
         light.shading().specular = mhe::color_white;
@@ -92,7 +92,7 @@ private:
         light.desc().cast_shadows = false;
         light.set_type(mhe::Light::spot);
 
-        mhe::LightInstance& light_instance2 = engine.scene().create_light();
+        mhe::LightInstance& light_instance2 = engine.scene().create_light(mhe::Light::spot);
         mhe::Light& light2 = light_instance2.light;
         light2.shading().diffuse = mhe::color_blue;
         light2.shading().specular = mhe::color_white;
@@ -113,7 +113,7 @@ private:
 
     void init_directional_lights(mhe::game::Engine& engine)
     {
-        mhe::LightInstance& light_instance = engine.scene().create_light();
+        mhe::LightInstance& light_instance = engine.scene().create_light(mhe::Light::directional);
         mhe::Light& light = light_instance.light;
         light.shading().diffuse = mhe::vec4(0.78f, 1.0f, 0.716f, 1.0f);
         light.shading().specular = mhe::vec4(1.0f, 1.0f, 1.0f, 1.0f);

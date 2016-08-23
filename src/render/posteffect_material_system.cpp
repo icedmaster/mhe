@@ -96,8 +96,11 @@ bool PosteffectDebugMaterialSystem::init_mesh_instance(Context& context, MeshIns
     return true;
 }
 
-void PosteffectDebugMaterialSystem::destroy(Context&)
+void PosteffectDebugMaterialSystem::destroy(Context& context)
 {
+    destroy_mesh_instance(fullscreen_mesh_, context);
+    for (size_t i = 0; i < max_textures_number; ++i)
+        destroy_mesh_instance(mesh_[i], context);
 }
 
 void PosteffectDebugMaterialSystem::setup(Context& context, SceneContext& scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count)
@@ -174,8 +177,10 @@ bool PosteffectMaterialSystemBase::init(Context& context, const MaterialSystemCo
     return init_mesh(context, material_system_context);
 }
 
-void PosteffectMaterialSystemBase::destroy(Context&)
-{}
+void PosteffectMaterialSystemBase::destroy(Context& context)
+{
+    destroy_mesh_instance(mesh_, context);
+}
 
 void PosteffectMaterialSystemBase::setup(Context& context, SceneContext& scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count)
 {
@@ -257,7 +262,7 @@ bool PosteffectMaterialSystemBase::init_mesh(Context& context, const MaterialSys
     const std::vector<string>& outputs_scale = utils::split(outputs_str, string(","));
     if (!outputs_scale.empty())
     {
-        create_output(render_state.id(), context, 0, types_cast<float>(outputs_scale[0]), format_rgba);
+        create_output(render_state.id(), context, 0, 0, 0, types_cast<float>(outputs_scale[0]), format_rgba);
     }
 
     Material& material = create_and_get(context.materials[id()]);
@@ -285,10 +290,18 @@ bool PosteffectMaterialSystemBase::create_output(Context& context, size_t index,
     ASSERT(output(index).id == Texture::invalid_id, "create_output() - trying to create a new output when old output still exists");
     ASSERT(default_render_target_ == mhe::default_render_target || default_render_target_ == RenderTarget::invalid_id,
         "RenderTarget has been set already");
-    return create_output(mesh_.instance_parts[0].render_state_id, context, index, scale, format);
+    return create_output(mesh_.instance_parts[0].render_state_id, context, index, 0, 0, scale, format);
 }
 
-void PosteffectMaterialSystemBase::fill_render_target_desc(RenderTargetDesc& desc, int format) const
+bool PosteffectMaterialSystemBase::create_output(Context& context, size_t index, size_t width, size_t height, int format)
+{
+    ASSERT(output(index).id == Texture::invalid_id, "create_output() - trying to create a new output when old output still exists");
+    ASSERT(default_render_target_ == mhe::default_render_target || default_render_target_ == RenderTarget::invalid_id,
+        "RenderTarget has been set already");
+    return create_output(mesh_.instance_parts[0].render_state_id, context, index, width, height, 0.0f, format);
+}
+
+void PosteffectMaterialSystemBase::fill_render_target_desc(RenderTargetDesc& desc, size_t width, size_t height, int format) const
 {
     desc.target = rt_readwrite;
     desc.use_depth = false;
@@ -296,12 +309,15 @@ void PosteffectMaterialSystemBase::fill_render_target_desc(RenderTargetDesc& des
     desc.color_targets = 1;
     desc.color_datatype[0] = format_default;
     desc.color_format[0] = format != format_max ? format : format_rgba;
+    desc.width = width;
+    desc.height = height;
 }
 
-bool PosteffectMaterialSystemBase::create_output(RenderStateHandleType render_state_id, Context& context, size_t index, float scale, int format)
+bool PosteffectMaterialSystemBase::create_output(RenderStateHandleType render_state_id, Context& context, size_t index,
+    size_t width, size_t height, float scale, int format)
 {
     RenderTargetDesc render_target_desc;
-    fill_render_target_desc(render_target_desc, format);
+    fill_render_target_desc(render_target_desc, width, height, format);
     RenderTarget& render_target = context.render_target_manager.create(context, render_target_desc, scale);
     const TextureInstance* ids = nullptr;
     render_target.color_textures(&ids);
@@ -328,6 +344,22 @@ Material& PosteffectMaterialSystemBase::default_material(Context& context)
 RenderTargetHandleType PosteffectMaterialSystemBase::default_render_target() const
 {
     return default_render_target_;
+}
+
+void PosteffectMaterialSystemBase::set_render_target(RenderTargetHandleType render_target_id, Context& context)
+{
+    default_render_target_ = render_target_id;
+    RenderTarget& render_target = context.render_target_pool.get(render_target_id);
+    const TextureInstance* color_textures = nullptr;
+    size_t outputs_number = render_target.color_textures(&color_textures);
+    if (outputs_number == 0) return;
+    for (size_t i = 0; i < outputs_number; ++i)
+        set_output(i, color_textures[i]);
+    // TODO: also add render target's depth
+    RenderState& render_state = context.render_state_pool.get(mesh_instance().instance_parts[0].render_state_id);
+    ViewportDesc viewport_desc;
+    viewport_desc.viewport.set(0, 0, render_target.width(), render_target.height());
+    render_state.update_viewport(viewport_desc);
 }
 
 bool SSRMaterialSystem::init(Context& context, const MaterialSystemContext& material_system_context)
@@ -359,6 +391,12 @@ bool SSRMaterialSystem::init(Context& context, const MaterialSystemContext& mate
     probes_info_ = ubershader(context).info("PROBES");
 
     return true;
+}
+
+void SSRMaterialSystem::destroy(Context& context)
+{
+    destroy_pool_object(context.uniform_pool, ssr_uniform_);
+    PosteffectMaterialSystemBase::destroy(context);
 }
 
 void SSRMaterialSystem::init_debug_views(Context& context)
@@ -421,13 +459,21 @@ bool BlurMaterialSystem::init(Context& context, const MaterialSystemContext& mat
     return true;
 }
 
-bool BlurMaterialSystem::create_output(RenderStateHandleType render_state_id, Context& context, size_t index, float scale, int format)
+void BlurMaterialSystem::destroy(Context& context)
 {
-    if (!PosteffectMaterialSystemBase::create_output(render_state_id, context, index, scale, format))
+    destroy_pool_object(context.uniform_pool, uniform_);
+    context.render_target_manager.destroy(output_rt_, context);
+    PosteffectMaterialSystemBase::destroy(context);
+}
+
+bool BlurMaterialSystem::create_output(RenderStateHandleType render_state_id, Context& context, size_t index,
+    size_t width, size_t height, float scale, int format)
+{
+    if (!PosteffectMaterialSystemBase::create_output(render_state_id, context, index, width, height, scale, format))
         return false;
 
     RenderTargetDesc render_target_desc;
-    fill_render_target_desc(render_target_desc, format);
+    fill_render_target_desc(render_target_desc, width, height, format);
     RenderTarget& render_target = context.render_target_manager.create(context, render_target_desc, scale);
     output_rt_ = render_target.id();
 
@@ -559,6 +605,14 @@ void DOFMaterialSystem::postinit(Context& context)
     composite_material.uniforms[1] = dof_uniform_;
 }
 
+void DOFMaterialSystem::destroy(Context& context)
+{
+    context.render_target_manager.destroy(dof_rt_, context);
+    context.render_target_manager.destroy(blur_rt_, context);
+    destroy_pool_object(context.uniform_pool, dof_uniform_);
+    PosteffectMaterialSystemBase::destroy(context);
+}
+
 void DOFMaterialSystem::init_debug_views(Context& context)
 {
     size_t debug_view_id = context.debug_views->add_view("Depth of field");
@@ -623,6 +677,13 @@ bool SSAOMaterialSystem::init(Context& context, const MaterialSystemContext& mat
     ssao_shader_data_.ssaodata[2] = vec4::zero();
 
     return true;
+}
+
+void SSAOMaterialSystem::destroy(Context& context)
+{
+    destroy_pool_object(context.texture_pool, noise_texture_.id);
+    destroy_pool_object(context.uniform_pool, ssao_uniform_);
+    PosteffectMaterialSystemBase::destroy(context);
 }
 
 void SSAOMaterialSystem::init_debug_views(Context& context)
@@ -708,6 +769,8 @@ bool AverageLuminanceMaterialSystem::ReductionCommand::execute_impl(Context& con
         size_t threads_number = compute_call_.shader_program->variable_value<size_t>(string("THREADS_NUMBER"));
         size_t workgroups_number = reduction_context_.input_size / threads_number;
         compute_call_.workgroups_number.set(workgroups_number, workgroups_number, 1);
+
+        context.driver.memory_barrier(memory_barrier_image_fetch);
         context.driver.execute(context, &compute_call_, 1);
         context.driver.memory_barrier(memory_barrier_storage_buffer);
 
@@ -836,6 +899,17 @@ bool AverageLuminanceMaterialSystem::init(Context& context, const MaterialSystem
     reduction_command_.set_parameters(shader_storage_, reduction_context, reduction_threads_number);
 
     return true;
+}
+
+void AverageLuminanceMaterialSystem::destroy(Context& context)
+{
+    destroy_pool_object(context.shader_storage_buffer_pool, shader_storage_[0]);
+    destroy_pool_object(context.shader_storage_buffer_pool, shader_storage_[1]);
+    destroy_pool_object(context.uniform_pool, adaptation_uniform_);
+    destroy_pool_object(context.render_target_pool, render_target_);
+    destroy_pool_object(context.render_target_pool, adaptation_render_target_[0]);
+    destroy_pool_object(context.render_target_pool, adaptation_render_target_[1]);
+    PosteffectMaterialSystemBase::destroy(context);
 }
 
 void AverageLuminanceMaterialSystem::init_debug_views(Context& context)
@@ -978,6 +1052,14 @@ bool BloomMaterialSystem::init(Context& context, const MaterialSystemContext& ma
     blur_material_system_->PosteffectMaterialSystemBase::create_output(context, 0, 0.25f, format_rgba16f);
 
     return true;
+}
+
+void BloomMaterialSystem::destroy(Context& context)
+{
+    destroy_pool_object(context.uniform_pool, uniform_);
+    for (size_t i = 0; i < steps_number; ++i)
+        destroy_pool_object(context.render_state_pool, render_states_[i]);
+    PosteffectMaterialSystemBase::destroy(context);
 }
 
 void BloomMaterialSystem::init_debug_views(Context& context)

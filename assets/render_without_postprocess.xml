@@ -21,7 +21,7 @@
       <cascades>2</cascades>
       <height>1024</height>
       <width>1024</width>
-      <percentage>20, 100</percentage>
+      <percentage>50, 100</percentage>
     </options>
   </material>
   <material name="tonemap" shader="posteffect_tonemap" priority="9">
@@ -84,6 +84,6 @@
         <uniform index="1" node="bloom" uniform="1" />
       </uniforms>
 	</node>
-	<node name="fxaa" material="fxaa" src="" priority="8" />
+	<node name="fxaa" material="fxaa" src="" priority="32" />
   </posteffects>
 </mhe>

@@ -8,6 +8,7 @@
 #include "render/light_instance_methods.hpp"
 #include "render/utils/simple_meshes.hpp"
 #include "render/render_globals.hpp"
+#include "render/renderer.hpp"
 
 namespace mhe {
 
@@ -85,25 +86,20 @@ void GBufferFillMaterialSystem::setup(Context& context, SceneContext& scene_cont
         index.set(skinning_info, use_skinning);
         material.shader_program = shader.get(index);
 
-        UniformBufferDesc uniform_buffer_desc;
-        uniform_buffer_desc.unit = material_data_unit;
-        uniform_buffer_desc.update_type = uniform_buffer_static;
-        uniform_buffer_desc.size = sizeof(PhongMaterialData);
+        MaterialData& material_data = context.material_data_pool.get(parts[i].material_id);
+        UniformBuffer::IdType material_uniform_id = create_material_uniform(context, material_data);
 
-        pool_initializer<UniformPool> uniform_wr(context.uniform_pool);
-        UniformBuffer& uniform = uniform_wr.object();
-        if (!uniform.init(uniform_buffer_desc))
+        if (is_handle_valid(material_uniform_id))
         {
-            WARN_LOG("Can't initialize material uniform");
-        }
-        else
-        {
-            material.uniforms[material_data_unit] = uniform_wr.take();
-            MaterialData material_data;
-            if (!context.material_manager.get(material_data, parts[i].material_id))
-            {
-                WARN_LOG("Can't find a material with id:" << parts[i].material_id);
-            }
+            UniformBufferDesc uniform_buffer_desc;
+            uniform_buffer_desc.unit = material_data_unit;
+            uniform_buffer_desc.update_type = uniform_buffer_static;
+            uniform_buffer_desc.size = sizeof(PhongMaterialData);
+
+            UniformBuffer& uniform = context.uniform_pool.get(material_uniform_id);
+            bool res = uniform.init(uniform_buffer_desc);
+            ASSERT(res, "Can't initialize material uniform");
+            material.uniforms[material_data_unit] = material_uniform_id;
             PhongMaterialData shader_material_data;
             shader_material_data.diffuse = vec4(material_data.render_data.diffuse, 1.0f);
             shader_material_data.specular = vec4(material_data.render_data.specular, material_data.render_data.specular_shininess);
@@ -139,14 +135,11 @@ void GBufferFillMaterialSystem::update(Context& context, SceneContext& /*scene_c
         material.shader_program = shader.get(index);
 
 #ifdef MHE_UPDATE_MATERIAL
-        MaterialData& material_data = context.material_manager.material_data(parts[i].material_id);
-        PhongMaterialData shader_material_data;
-        shader_material_data.diffuse = vec4(material_data.render_data.diffuse, 1.0f);
-        shader_material_data.specular = vec4(material_data.render_data.specular, material_data.render_data.specular_shininess);
-        shader_material_data.params = vec4(material_data.render_data.glossiness, 0.0f, 0.0f, 0.0f);
-
-        UniformBuffer& uniform = context.uniform_pool.get(material.uniforms[material_data_unit]);
-        uniform.update(shader_material_data);
+        if (is_handle_valid(material.uniforms[material_data_unit]))
+        {
+            const MaterialData& material_data = context.material_data_pool.get(parts[i].material_id);
+            update_material_data(context.uniform_pool.get(material.uniforms[material_data_unit]), material_data);
+        }
 #endif
     }
 }
@@ -164,6 +157,62 @@ void GBufferFillMaterialSystem::output(Context& context, size_t unit, TextureIns
         render_target.depth_texture(texture);
     else
         render_target.color_texture(texture, unit);
+}
+
+UniformBufferHandleType GBufferFillMaterialSystem::create_material_uniform(Context& context, const MaterialData& material_data)
+{
+    UniformBufferHandleType uniform_id = UniformBuffer::invalid_id;
+    size_t uniform_data_size = 0;
+    switch (material_data.lighting_model)
+    {
+    case material_type_blinn_phong:
+        uniform_data_size = sizeof(PhongMaterialData);
+        uniform_id = context.uniform_pool.create();
+        break;
+    case material_type_ggx:
+        uniform_data_size = sizeof(PBRMaterialData);
+        uniform_id = context.uniform_pool.create();
+        break;
+    default:
+        return UniformBuffer::invalid_id;
+    }
+
+    UniformBuffer& uniform_buffer = context.uniform_pool.get(uniform_id);
+    UniformBufferDesc uniform_buffer_desc;
+    uniform_buffer_desc.unit = material_data_unit;
+    uniform_buffer_desc.update_type = uniform_buffer_static;
+    uniform_buffer_desc.size = uniform_data_size;
+
+    bool res = uniform_buffer.init(uniform_buffer_desc);
+    ASSERT(res, "Can't initialize material uniform");
+    update_material_data(uniform_buffer, material_data);
+
+    return uniform_id;
+}
+
+void GBufferFillMaterialSystem::update_material_data(UniformBuffer& uniform_buffer, const MaterialData& material_data)
+{
+    switch (material_data.lighting_model)
+    {
+    case material_type_blinn_phong:
+        {
+            PhongMaterialData shader_material_data;
+            shader_material_data.diffuse = vec4(material_data.render_data.diffuse, 1.0f);
+            shader_material_data.specular = vec4(material_data.render_data.specular, material_data.render_data.specular_shininess);
+            shader_material_data.params = vec4(material_data.render_data.glossiness, 0.0f, 0.0f, 0.0f);
+            uniform_buffer.update(shader_material_data);
+        }
+        break;
+
+    case material_type_ggx:
+        {
+            PBRMaterialData shader_material_data;
+            shader_material_data.parameters.set(material_data.render_data.roughness, material_data.render_data.metalness, 0.0f, 0.0f);
+            uniform_buffer.update(shader_material_data);
+        }
+        break;
+    default: break;
+    }
 }
 
 bool GBufferDrawMaterialSystem::init(Context& context, const MaterialSystemContext& material_system_context)
@@ -193,38 +242,11 @@ bool GBufferDrawMaterialSystem::init(Context& context, const MaterialSystemConte
     if (!context.shader_manager.get(shader(), material_system_context.shader_name))
         return false;
 
-    for (size_t i = 0; i < max_lights_number; ++i)
-    {
-        light_uniform_[i] = context.uniform_pool.create();
-        UniformBuffer& uniform = context.uniform_pool.get(light_uniform_[i]);
-        UniformBufferDesc uniform_buffer_desc;
-        uniform_buffer_desc.name = "lights";
-        uniform_buffer_desc.program = &default_program(context);
-        if (!uniform.init(uniform_buffer_desc))
-        {
-            destroy(context);
-            return false;
-        }
-    }
-
     UberShader::Index index;
     const UberShader::Info& info = ubershader(context).info("LIGHT_TYPE");
     index.set(info, Light::directional);
     ShaderProgram::IdType directional_shader_program_id = ubershader(context).get(index);
     ShaderProgram& directional_shader_program = context.shader_pool.get(directional_shader_program_id);
-    for (size_t i = 0; i < max_directional_lights_number; ++i)
-    {
-        directional_light_uniform_[i] = context.uniform_pool.create();
-        UniformBuffer& uniform = context.uniform_pool.get(directional_light_uniform_[i]);
-        UniformBufferDesc uniform_buffer_desc;
-        uniform_buffer_desc.name = "lights";
-        uniform_buffer_desc.program = &directional_shader_program;
-        if (!uniform.init(uniform_buffer_desc))
-        {
-            destroy(context);
-            return false;
-        }
-    }
 
     profile_command_.set_stages(render_stage_begin_priority | render_stage_end_priority);
     list_of_commands_.add_command(&clear_command_);
@@ -314,6 +336,7 @@ void GBufferDrawMaterialSystem::set_render_target(Context& context, RenderTarget
     ASSERT(number != 0, "Invalid render target");
     albedo_texture_ = textures[0];
     normal_texture_ = textures[1];
+    accumnulator_texture_ = textures[2];
     TextureInstance depth_texture;
     number = render_target.depth_texture(depth_texture);
     ASSERT(number != 0, "Invalid depth texture");
@@ -325,12 +348,6 @@ void GBufferDrawMaterialSystem::destroy(Context& context)
     destroy_mesh_instance(quad_mesh_, context);
     destroy_mesh_instance(sphere_mesh_, context);
     destroy_mesh_instance(conus_mesh_, context);
-
-    for (size_t i = 0; i < max_directional_lights_number; ++i)
-        destroy_pool_object(context.uniform_pool, directional_light_uniform_[i]);
-
-    for (size_t i = 0; i < max_lights_number; ++i)
-        destroy_pool_object(context.uniform_pool, light_uniform_[i]);
 
     destroy_pool_object(context.render_state_pool, render_state_);
 }
@@ -356,34 +373,17 @@ void GBufferDrawMaterialSystem::update(Context& context, SceneContext& scene_con
         int type = 0;
         size_t use_shadowmap = 0;
         TextureInstance shadowmap_texture;
-        UniformBuffer::IdType light_uniform;
+        UniformBuffer::IdType light_uniform = render_context.lights[i].uniform_id;
         // Update light data
         LightData data;
         const Light& light = render_context.lights[i].light;
         type = light.type();
-        if (type != Light::directional)
-            update_light_data(data, scene_context, render_context.lights[i], light);
-        else
-        {
-            DirectionalLightData light_data;
-            update_directional_light_data(light_data, scene_context, render_context.lights[i], light);
-            UniformBuffer& uniform = context.uniform_pool.get(directional_light_uniform_[directional_light_index++]);
-            uniform.update(light_data);
-            light_uniform = uniform.id();
-        }
 
         const ShadowInfo* shadow_info = light.shadow_info();
         if (shadowmap_enabled_.value() && shadow_info != nullptr)
         {
             use_shadowmap = 1;
             shadowmap_texture = shadow_info->shadowmap;
-        }
-
-        if (light.type() != Light::directional)
-        {
-            UniformBuffer& uniform = context.uniform_pool.get(light_uniform_[i]);
-            uniform.update(reinterpret_cast<const uint8_t*>(&data), sizeof(LightData));
-            light_uniform = uniform.id();
         }
 
         // Choose the correct shader
@@ -409,76 +409,18 @@ void GBufferDrawMaterialSystem::update(Context& context, SceneContext& scene_con
         material.shader_program = shader_program_id;
         material.textures[0] = albedo_texture_;
         material.textures[1] = normal_texture_;
-        material.textures[2] = depth_texture_;
+        material.textures[2] = accumnulator_texture_;
+        material.textures[3] = depth_texture_;
+        material.textures[6] = context.renderer->indirect_diffuse_lighting_texture();
         material.textures[shadowmap_texture_unit] = shadowmap_texture;
-        material.textures[env_cubemap_texture_unit] = cubemap_texture;
         material.uniforms[0] = render_context.main_camera.percamera_uniform;
-        material.uniforms[1] = light_uniform;
+        material.uniforms[2] = light_uniform;
         draw_call.material.material_system = id();
         draw_call.material.id = material.id;
 
         draw_call.render_state = render_state_;
         draw_call.render_target = light_buffer_render_target_;
         draw_call.command = &list_of_commands_;
-    }
-}
-
-mat4x4 GBufferDrawMaterialSystem::update_light_transform(const Light& light, const vec3& position, const vec3& /*direction*/) const
-{
-    if (light.type() == Light::directional) return mat4x4::identity();
-    if (light.type() == Light::omni)
-    {
-        mat4x4 res = mat4x4::scaling_matrix(light.desc().omni.radius);
-        res.set_row(3, position);
-        return res;
-    }
-    return mat4x4::identity();
-}
-
-void GBufferDrawMaterialSystem::update_light_data(LightData& light_data, const SceneContext& scene_context, 
-    const LightInstance& light_instance, const Light& light) const
-{
-    light_data.diffuse = light.shading().diffuse * light.shading().intensity;
-    light_data.diffuse.set_w(light.type() == Light::spot ? light.spot_angle_coeff() : light.angle());
-    light_data.specular = light.shading().specular * light.shading().specular_intensity;
-    light_data.specular.set_w(light.attenuation_b());
-    const vec3& light_position = get_light_position(scene_context, light_instance.id);
-    light_data.position = vec4(light_position.x(), light_position.y(), light_position.z(), light.attenuation_a());
-    const vec3& light_direction = get_light_direction(scene_context, light_instance.id);
-    light_data.direction = vec4(light_direction.x(), light_direction.y(), light_direction.z(), light.angle_attenuation());
-
-    const ShadowInfo* shadow_info = light.shadow_info();
-    if (shadowmap_enabled_.value() && shadow_info != nullptr)
-    {
-        light_data.lightvp = shadow_info->lightvp[0];
-        light_data.shadowmap_params = vec4(light.desc().shadowmap_bias, 0.0f, 0.0f, 0.0f);
-    }
-
-    light_data.lightw = update_light_transform(light, light_position, light_direction);
-}
-
-void GBufferDrawMaterialSystem::update_directional_light_data(DirectionalLightData& light_data,
-    const SceneContext& scene_context,
-    const LightInstance& light_instance, const Light& light) const
-{
-    light_data.diffuse = light.shading().diffuse * light.shading().intensity;
-    light_data.specular = light.shading().specular * light.shading().specular_intensity;
-    light_data.direction = get_light_direction(scene_context, light_instance.id);
-
-    const ShadowInfo* shadow_info = light.shadow_info();
-    if (shadowmap_enabled_.value() && shadow_info != nullptr)
-    {
-        light_data.shadowmap_params = vec4(light.desc().shadowmap_bias, 0.0f, 0.0f, 0.0f);
-
-        light_data.cascades_number = shadow_info->cascades_number;
-        for (size_t i = 0; i < shadow_info->cascades_number; ++i)
-        {
-            light_data.csm_offset[i] = shadow_info->offset[i];
-            light_data.csm_scale[i] = shadow_info->scale[i];
-            light_data.cascade_znear[i] = shadow_info->znear[i];
-            light_data.cascade_zfar[i] = shadow_info->zfar[i];
-            light_data.lightvp[i] = shadow_info->lightview[i];
-        }
     }
 }
 

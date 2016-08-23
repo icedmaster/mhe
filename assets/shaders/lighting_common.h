@@ -8,6 +8,12 @@
 
 #define MAX_CASCADES_NUMBER 8
 
+struct IndirectLighting
+{
+    vec3 diffuse;
+    vec3 specular;
+};
+
 #if LIGHT_TYPE == DIRECTIONAL_LIGHT && defined(CASCADED_SHADOWMAP)
 
 #define DIRECTIONAL_CSM
@@ -22,6 +28,7 @@ struct Light
 	vec4 csm_offset[MAX_CASCADES_NUMBER];
 	float cascade_znear[MAX_CASCADES_NUMBER];
 	float cascade_zfar[MAX_CASCADES_NUMBER];
+    vec4 scsm_params[MAX_CASCADES_NUMBER];
 	vec4 shadowmap_params;	// x - shadowmap bias
 	int cascades_number;
 };
@@ -97,6 +104,31 @@ vec3 lit_blinn(Light light, vec3 pos, vec3 normal, vec3 viewdir, float shininess
 
 	return lambert(light.diffuse.rgb, vec3(1.0f), lightdir, normal) * attenuation + 
 		blinn(light.specular.rgb, vec3(1.0f), lightdir, normal, viewdir, shininess, env_color) * attenuation;
+}
+
+vec3 light_direction(vec3 pos_ws, Light light)
+{
+#if LIGHT_TYPE != POINT_LIGHT
+	#ifdef LIGHT_DIRECTION_FROM_SOURCE
+	vec3 light_direction = -light.direction.xyz;
+	#else
+	vec3 light_direction = light.direction.xyz;
+	#endif
+#endif
+
+#if LIGHT_TYPE == DIRECTIONAL_LIGHT
+	vec3 lightdir = light_direction;
+#else
+	vec3 lightray = light.position.xyz - pos_ws;
+	vec3 lightdir = normalize(lightray);
+#endif
+
+    return lightdir;
+}
+
+float light_shadowmap_bias(Light light)
+{
+    return light.shadowmap_params.x;
 }
 
 // shadowmap functions

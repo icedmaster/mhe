@@ -18,7 +18,8 @@ public:
         gi_modifier_material_system_(nullptr)
     {}
 
-    void init(AbstractGBufferFillMaterialSystem* fill, AbstractGBufferUseMaterialSystem* light, PosteffectMaterialSystemBase* draw);
+    void init(AbstractGBufferFillMaterialSystem* fill, AbstractGBufferUseMaterialSystem* light, PosteffectMaterialSystemBase* draw,
+        const Renderer::Settings& settings);
     void enable();
     void disable();
 
@@ -34,6 +35,8 @@ public:
     {
         return gbuffer_.depth;
     }
+
+    void setup_common_pass(Material& material) const override;
 private:
     void init_priorities();
 

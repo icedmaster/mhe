@@ -159,6 +159,12 @@ inline vector2<T> operator/ (T t, const vector2<T>& v)
     return vector2<T>(t / v.x(), t / v.y());
 }
 
+template <class T, class U>
+inline vector2<T> operator/ (const vector2<T>& v, U t)
+{
+    return vector2<T>(v.x() / t, v.y() / t);
+}
+
 template <class T>
 inline vector2<T> floor(const vector2<T>& v)
 {

@@ -30,6 +30,11 @@ public:
         return types_cast<V>(it->value);
     }
 
+    bool has(const K& key) const
+    {
+        return storage_.find(key) != storage_.end();
+    }
+
     void clear()
     {
         storage_.clear();

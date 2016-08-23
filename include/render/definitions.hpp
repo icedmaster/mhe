@@ -60,9 +60,10 @@ enum
 enum
 {
     memory_barrier_storage_buffer = 1,
-    memory_barrier_max
+    memory_barrier_image_fetch = 1 << 1
 };
 
+const uint32_t memory_barrier_none = 0;
 const uint32_t memory_barrier_all = 0xffffffff;
 
 }

@@ -6,62 +6,62 @@
 
 namespace mhe {
 
-struct RenderContext;
-class Scene;
+    struct RenderContext;
+    class Scene;
 
-class MHE_EXPORT CameraController : public ref_counter
-{
-public:
-	CameraController(Scene& scene);
+    class MHE_EXPORT CameraController : public ref_counter
+    {
+    public:
+        CameraController(Scene& scene);
 
-	virtual ~CameraController() {}
-	
-	void update(const RenderContext& render_context)
-	{
-		update_impl(render_context);
-	}
+        virtual ~CameraController() {}
 
-	const Camera& camera() const
-	{
-		return camera_node_.camera;
-	}
+        void update(const RenderContext& render_context)
+        {
+            update_impl(render_context);
+        }
 
-	Camera& camera()
-	{
-		return camera_node_.camera;
-	}
+        const Camera& camera() const
+        {
+            return camera_node_.camera;
+        }
 
-	TransformInstance& transform_instance();
+        Camera& camera()
+        {
+            return camera_node_.camera;
+        }
 
-	void set_move_speed(float speed)
-	{
-		move_speed_ = speed;
-	}
+        TransformInstance& transform_instance();
 
-	void set_rotation_speed(float speed)
-	{
-		rotation_speed_ = speed;
-	}
-protected:
-	float move_speed() const
-	{
-		return move_speed_;
-	}
+        void set_move_speed(float speed)
+        {
+            move_speed_ = speed;
+        }
 
-	float rotation_speed() const
-	{
-		return rotation_speed_;
-	}
+        void set_rotation_speed(float speed)
+        {
+            rotation_speed_ = speed;
+        }
+    protected:
+        float move_speed() const
+        {
+            return move_speed_;
+        }
 
-	void sync_camera();
-private:
-	virtual void update_impl(const RenderContext& render_context) = 0;
+        float rotation_speed() const
+        {
+            return rotation_speed_;
+        }
 
-	Scene& scene_;
-	CameraNode camera_node_;
-	float move_speed_;
-	float rotation_speed_;
-};
+        void sync_camera();
+    private:
+        virtual void update_impl(const RenderContext& render_context) = 0;
+
+        Scene& scene_;
+        CameraNode camera_node_;
+        float move_speed_;
+        float rotation_speed_;
+    };
 
 }
 

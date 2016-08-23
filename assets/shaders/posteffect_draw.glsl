@@ -21,6 +21,7 @@ void main()
 [fragment]
 
 [include "geometry_common.h"]
+[include "common.h"]
 
 [sampler2D main_texture 0]
 

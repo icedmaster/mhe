@@ -24,6 +24,7 @@
 
 [include "geometry_common.h"]
 
+[uniform lights 2 permodel]
 uniform lights
 {
 	Light light;

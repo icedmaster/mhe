@@ -50,6 +50,8 @@ struct MaterialInstance
 
 const float default_shininess = 50.0f;
 const float default_glossiness = 0.0f;
+const float default_roughness = 0.5f;
+const float default_metalness = 0.0f;
 
 struct MaterialRenderData
 {
@@ -59,57 +61,27 @@ struct MaterialRenderData
     vec3 emissive;
     float specular_shininess;
     float glossiness;
+    float roughness;
+    float metalness;
 
-    MaterialRenderData() : specular_shininess(default_shininess), glossiness(default_glossiness) {}
+    MaterialRenderData() : specular_shininess(default_shininess), glossiness(default_glossiness),
+        roughness(default_roughness), metalness(default_metalness) {}
+};
+
+enum LightingModel
+{
+    material_type_blinn_phong,
+    material_type_ggx
 };
 
 struct MaterialData
 {
-    FilePath name;
+    POOL_STRUCT(MaterialDataIdType);
     MaterialRenderData render_data;
     TextureInstance textures[material_textures_number];
-    string lighting_model;
-};
+    LightingModel lighting_model;
 
-struct MaterialInitializationData
-{
-    FilePath name;
-    MaterialRenderData render_data;
-    FilePath textures[material_textures_number];
-    string lighting_model;
-};
-
-typedef uint16_t MaterialId;
-
-class MHE_EXPORT MaterialManager
-{
-public:
-    MaterialId get(const MaterialInitializationData& data) const;
-
-    bool get(MaterialData& material, MaterialId id) const
-    {
-        MaterialsMap::iterator it = materials_.find(id);
-        if (it == materials_.end()) return false;
-        material = it->value;
-        return true;
-    }
-
-    MaterialData& material_data(MaterialId id)
-    {
-        ASSERT(materials_.find(id) != materials_.end(), "Invalid material id:" << id);
-        return materials_[id];
-    }
-
-    bool id_by_name(MaterialId& id, const string& name) const;
-
-    void set_context(Context* context)
-    {
-        context_ = context;
-    }
-private:
-    typedef hashmap<MaterialId, MaterialData> MaterialsMap;
-    Context* context_;
-    mutable MaterialsMap materials_;
+    MaterialData() : lighting_model(material_type_ggx) {}
 };
 
 }

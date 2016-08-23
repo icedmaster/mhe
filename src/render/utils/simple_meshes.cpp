@@ -130,12 +130,16 @@ bool create_fullscreen_quad(MeshInstance& mesh, const Context& context)
 
     uint32_t indexes[3] = {0, 1, 2};
 
+    mesh.mesh.parts.resize(1);
+    mesh.instance_parts.resize(1);
+
     MeshPart& part = mesh.mesh.parts[0];
 
     part.render_data.vbuffer = context.vertex_buffer_pool.create();
     part.render_data.ibuffer = context.index_buffer_pool.create();
 
     part.render_data.elements_number = 1;
+    part.render_data.layout = FullscreenLayout::handle;
 
     VertexBuffer& vbuffer = context.vertex_buffer_pool.get(part.render_data.vbuffer);
     if (!vbuffer.init(buffer_update_type_static,
@@ -310,6 +314,21 @@ bool create_cube(MeshInstance& mesh_instance, const Context& context, uint32_t f
         return false;
     IndexBuffer& ibuffer = context.index_buffer_pool.get(mesh.parts[0].render_data.ibuffer);
     return ibuffer.init(vbuffer, &indices[0], indices.size());
+}
+
+bool create_fullscreen_quad_shared(MeshInstance& mesh_instance, Context& context)
+{
+    const FilePath name = "__mhe_fullscreen_quad";
+    if (!context.mesh_manager.has(name))
+    {
+        if (create_fullscreen_quad(mesh_instance, context))
+        {
+            context.mesh_manager.add(mesh_instance.mesh, name);
+            return true;
+        }
+        return false;
+    }
+    else return context.mesh_manager.get_instance(mesh_instance, name);
 }
 
 bool create_plane(NodeInstance& node, const Context& context, uint32_t flags)

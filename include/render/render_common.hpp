@@ -8,6 +8,7 @@ namespace mhe {
 
 typedef uint8_t MaterialSystemId;
 
+typedef uint16_t UbershaderHandleType;
 typedef uint16_t ShaderProgramHandleType;
 typedef uint16_t TextureHandleType;
 typedef uint16_t LayoutHandleType;
@@ -23,6 +24,10 @@ typedef uint16_t MaterialHandleType;
 typedef uint16_t AABBInstanceHandleType;
 typedef uint16_t MeshTraceDataHandleType;
 typedef uint16_t MeshRawDataHandleType;
+
+typedef uint16_t LightInstanceIdType;
+
+typedef uint16_t MaterialDataIdType;
 
 enum Primitive
 {

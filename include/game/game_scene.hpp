@@ -15,13 +15,13 @@ struct GameSceneDesc
 class GameScene : public ref_counter
 {
 public:
-	virtual ~GameScene() {}
-	
-	virtual bool init(Engine& engine, const GameSceneDesc& desc) = 0;
-	virtual void close() {}
-	virtual bool update(Engine& engine) = 0;
-	virtual void before_draw(Engine& /*engine*/) {}
-	virtual void draw(Engine& /*engine*/) {}
+    virtual ~GameScene() {}
+    
+    virtual bool init(Engine& engine, const GameSceneDesc& desc) = 0;
+    virtual void close() {}
+    virtual bool update(Engine& engine) = 0;
+    virtual void before_draw(Engine& /*engine*/) {}
+    virtual void draw(Engine& /*engine*/) {}
 };
 
 }}

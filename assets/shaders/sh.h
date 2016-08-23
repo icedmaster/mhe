@@ -31,20 +31,28 @@ struct RGBSH4
 #define COS_A1 (2.0f * PI) / 3.0f
 #define COS_A2 PI * 0.25f
 
-ColorSH9 fetch_sh9_color(samplerBuffer buffer, int vertex)
+ColorSH9 fetch_sh9_color(samplerBuffer buf, int vertex)
 {
 	int stride = 9;
 	ColorSH9 res;
 	for (int i = 0; i < 9; ++i)
 	{
-		vec3 c = texelFetch(buffer, vertex * stride + i).rgb;
+		vec3 c = texelFetch(buf, vertex * stride + i).rgb;
 		res.c[i] = c;
 	}
 
 	return res;
 }
 
-SH9 sh_cosine_lobe(in vec3 dir)
+ColorSH9 sh9_zero()
+{
+    ColorSH9 res;
+    for (int i = 0; i < 9; ++i)
+        res.c[i] = VEC3_ZERO;
+    return res;
+}
+
+SH9 sh9_cosine_lobe(in vec3 dir)
 {
 	SH9 sh;
 
@@ -64,6 +72,31 @@ SH9 sh_cosine_lobe(in vec3 dir)
     sh.c[8] = 0.546274f * (dir.x * dir.x - dir.y * dir.y) * COS_A2;
 
 	return sh;
+}
+
+ColorSH9 sh9_project(in vec3 dir, in vec3 color)
+{
+    SH9 lobe = sh9_cosine_lobe(dir);
+    ColorSH9 res;
+    for (int i = 0; i < 9; ++i)
+        res.c[i] = color * lobe.c[i];
+    return res;
+}
+
+ColorSH9 add(ColorSH9 sh1, ColorSH9 sh2)
+{
+    ColorSH9 res;
+    for (int i = 0; i < 9; ++i)
+        res.c[i] = sh1.c[i] + sh2.c[i];
+    return res;
+}
+
+ColorSH9 mul(ColorSH9 sh, float f)
+{
+    ColorSH9 res;
+    for (int i = 0; i < 9; ++i)
+        res.c[i] = sh.c[i] * f;
+    return res;
 }
 
 SH4 sh_cosine_lobe_sh4(in vec3 dir)
@@ -150,7 +183,7 @@ RGBSH4 mul(RGBSH4 sh, float f)
 vec3 calculate_irradiance(in vec3 nrm, in ColorSH9 radiance)
 {
 	vec3 res = VEC3_ZERO;
-	SH9 cos_lobe = sh_cosine_lobe(nrm);
+	SH9 cos_lobe = sh9_cosine_lobe(nrm);
 	for (int i = 0; i < 9; ++i)
 		res += cos_lobe.c[i] * radiance.c[i];
 	return res / PI;

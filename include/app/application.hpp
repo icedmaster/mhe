@@ -42,7 +42,7 @@ public:
         return name_;
     }
 
-    std::string path() const
+    string path() const
     {
         return application_base_path();
     }
@@ -57,9 +57,9 @@ protected:
     virtual void mhe_app_close();
     virtual int run_impl();
     virtual void stop_impl();
-    virtual void init_assets_path(const std::string& config_assets_path);
+    virtual void init_assets_path(const string& config_assets_path);
 
-    virtual std::string application_base_path() const
+    virtual string application_base_path() const
     {
         return "";
     }
@@ -74,6 +74,7 @@ private:
     void init_posteffects(const RendererParams& params);
     void init_gi_params(pugi::xml_node node, GIParams& params) const;
     void init_gi(const GIParams& params);
+    void init_materials_to_process(pugi::xml_node node);
 
     void add_delegates();
     bool on_system_event(const Event* event);

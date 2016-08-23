@@ -164,7 +164,7 @@ void CSMDepthRenderingMaterialSystem::start_frame(Context& context, SceneContext
         zfar[i] = render_context.main_camera.zfar * percentage_[i];
         znear[i] = i == 0 ? render_context.main_camera.znear : zfar[i - 1];
         view[i] = light_view;
-        calculate_projection(proj[i], view[i], aabb_points, render_context.main_camera, znear[i], zfar[i], light_direction, render_context);
+        calculate_projection(proj[i], view[i], shadow_info_.scsm_params[i], aabb_points, render_context.main_camera, znear[i], zfar[i], light_direction, render_context);
 
         TransformSimpleData transform_data;
         transform_data.vp = view[i] * proj[i];
@@ -187,7 +187,8 @@ void CSMDepthRenderingMaterialSystem::start_frame(Context& context, SceneContext
     light->set_shadow_info(&shadow_info_);
 }
 
-void CSMDepthRenderingMaterialSystem::calculate_projection(mat4x4& proj, mat4x4& view, const vec4* /*aabb*/, const CameraData& camera_data, float znear, float zfar,
+void CSMDepthRenderingMaterialSystem::calculate_projection(mat4x4& proj, mat4x4& view, vec4& params,
+    const vec4* /*aabb*/, const CameraData& camera_data, float znear, float zfar,
     const vec3& lightdir, const RenderContext& render_context) const
 {
     vec3 viewspace_frustum_points[8];
@@ -232,6 +233,8 @@ void CSMDepthRenderingMaterialSystem::calculate_projection(mat4x4& proj, mat4x4&
     radius = std::ceil(radius * 16.0f) / 16.0f;
     float light_distance = radius;
     float light_zfar = 2.0f * light_distance;
+
+    params.set(frustum_center_ws, radius * radius);
 
     switch (settings_.distance_calculation_mode)
     {

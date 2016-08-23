@@ -10,8 +10,12 @@
 #include "render/posteffect_material_system.hpp"
 #include "render/rsm_material_system.hpp"
 #include "render/lpv_material_system.hpp"
+#include "render/skybox_material_system.hpp"
+#include "render/light_instance_methods.hpp"
+#include "render/deferred_renderer.hpp"
 #include "debug/profiler.hpp"
 #include "res/resource_manager.hpp"
+#include "math/sh.h"
 
 namespace mhe {
 
@@ -75,6 +79,12 @@ void update_nodes(Context& context, RenderContext& render_context, SceneContext&
     }
 }
 
+void update_lights(Context& context, RenderContext& render_context, SceneContext& scene_context)
+{
+    for (size_t i = 0; i < render_context.lights_number; ++i)
+        update_light_uniform(context, scene_context, render_context.lights[i]);
+}
+
 void sort_draw_calls(const Context& context, RenderContext& render_context)
 {
     DrawCallSortHelper helper(context);
@@ -84,31 +94,29 @@ void sort_draw_calls(const Context& context, RenderContext& render_context)
 }
 
 void setup_node(NodeInstance& node, MaterialSystem* material_system, Context& context, SceneContext& scene_context,
-                const string& albedo_texture_name, const string& normalmap_texture_name)
+                const FilePath& material_name,
+                const FilePath& albedo_texture_name, const FilePath& normalmap_texture_name)
 {
-    static const string material_name_prefix = string("mat_");
-
-    MaterialInitializationData initialization_data;
-    initialization_data.name = material_name_prefix + albedo_texture_name + normalmap_texture_name;
-    initialization_data.textures[albedo_texture_unit] = albedo_texture_name;
-    initialization_data.textures[normal_texture_unit] = normalmap_texture_name;
-    initialization_data.render_data.specular_shininess = default_shininess;
-    initialization_data.render_data.glossiness = default_glossiness;
-
-    setup_node(node, material_system, context, scene_context, initialization_data);
+    MaterialData& material_data = create_and_get(context.material_data_pool);
+    material_data.render_data.glossiness = default_glossiness;
+    material_data.render_data.specular_shininess = default_shininess;
+    context.texture_manager.get(material_data.textures[albedo_texture_unit], albedo_texture_name);
+    if (!normalmap_texture_name.empty())
+        context.texture_manager.get(material_data.textures[normal_texture_unit], normalmap_texture_name);
+    context.material_manager.add(material_data.id, material_name);
+    setup_node(node, material_system, context, scene_context, material_data.id);
 }
 
-void setup_node(NodeInstance& node, MaterialSystem* material_system, Context& context, SceneContext& scene_context,
-    const MaterialInitializationData& material_initialization_data)
+void setup_node(NodeInstance& node, MaterialSystem* material_system, Context& context, SceneContext& scene_context, MaterialDataIdType material_id)
 {
-    node.mesh.mesh.parts[0].material_id = context.material_manager.get(material_initialization_data);
+    node.mesh.mesh.parts[0].material_id = material_id;
     ModelContext model_context;
     model_context.transform_uniform = node.mesh.shared_uniform;
     model_context.animation_texture_buffer = node.mesh.skeleton_instance.texture_buffer;
     material_system->setup(context, scene_context, &node.mesh.instance_parts[0], &node.mesh.mesh.parts[0], &model_context, 1);
 }
 
-void PosteffectSystem::add(Context& context, const PosteffectSystem::PosteffectNodeDesc& desc)
+PosteffectMaterialSystemBase* PosteffectSystem::add(Context& context, const PosteffectSystem::PosteffectNodeDesc& desc)
 {
     PosteffectMaterialSystemBase* material_system = create(context, desc);
     ASSERT(material_system != nullptr, "Couldn't create a material system");
@@ -117,6 +125,8 @@ void PosteffectSystem::add(Context& context, const PosteffectSystem::PosteffectN
     node.material_system = material_system;
 
     posteffects_.push_back(node);
+
+    return material_system;
 }
 
 PosteffectMaterialSystemBase* PosteffectSystem::create(Context& context, const PosteffectNodeDesc& desc)
@@ -237,7 +247,7 @@ void PosteffectSystem::init_buffers(PosteffectMaterialSystemBase* material_syste
     }
 }
 
-void PosteffectSystem::init_uniforms(PosteffectMaterialSystemBase* material_system, Context& /*context*/,
+void PosteffectSystem::init_uniforms(PosteffectMaterialSystemBase* material_system, Context& context,
     const PosteffectSystem::PosteffectNodeDesc& node_desc)
 {
     for (size_t i = 0, size = node_desc.uniforms.size(); i < size; ++i)
@@ -246,12 +256,30 @@ void PosteffectSystem::init_uniforms(PosteffectMaterialSystemBase* material_syst
         UniformBufferHandleType buffer_id = buffer_desc.explicit_handle;
         if (!is_handle_valid(buffer_id))
         {
-            const PosteffectNode* input_node = find_node(buffer_desc.node);
-            ASSERT(input_node != nullptr && input_node->material_system != nullptr, "Can't find a node with name:" << buffer_desc.node);
-            buffer_id = input_node->material_system->uniform(buffer_desc.node_buffer);
-            if (!is_handle_valid(buffer_id))
+            if (!buffer_desc.systemwide_name.empty())
             {
-                WARN_LOG("The uniform is not valid:" << buffer_desc.node << " " << buffer_desc.node_buffer);
+                buffer_id = context.renderer->system_wide_uniform(buffer_desc.systemwide_name);
+                ASSERT(is_handle_valid(buffer_id), "Invalid system-wide uniform name:" << buffer_desc.systemwide_name);
+            }
+            else if (!buffer_desc.node.empty())
+            {
+                const PosteffectNode* input_node = find_node(buffer_desc.node);
+                ASSERT(input_node != nullptr && input_node->material_system != nullptr, "Can't find a node with name:" << buffer_desc.node);
+                buffer_id = input_node->material_system->uniform(buffer_desc.node_buffer);
+                if (!is_handle_valid(buffer_id))
+                {
+                    WARN_LOG("The uniform is not valid:" << buffer_desc.node << " " << buffer_desc.node_buffer);
+                }
+            }
+            else if (!buffer_desc.material.empty())
+            {
+                MaterialSystem* material_system = context.material_systems.get(buffer_desc.material);
+                ASSERT(material_system != nullptr, "Invalid material with name:" << buffer_desc.material);
+                buffer_id = material_system->uniform(buffer_desc.node_buffer);
+                if (!is_handle_valid(buffer_id))
+                {
+                    WARN_LOG("The uniform is not valid:" << buffer_desc.material << " " << buffer_desc.node_buffer);
+                }
             }
         }
         material_system->set_uniform(buffer_desc.index, buffer_id);
@@ -280,8 +308,38 @@ const PosteffectSystem::PosteffectNode* PosteffectSystem::find_node(const string
 GISystem::GISystem() :
     rsm_material_system_(nullptr),
     lpv_material_system_(nullptr),
-    lpv_resolve_material_system_(nullptr)
+    lpv_resolve_material_system_(nullptr),
+    skybox_material_system_(nullptr),
+    diffuse_lighting_resolve_material_system_(nullptr)
 {}
+
+bool GISystem::init(Context& context, const Settings& settings)
+{
+    const string diffuse_resolve_name = IndirectLightingResolveMaterialSystem::material_name();
+
+    MaterialSystemContext material_system_context;
+    material_system_context.material_instances_number = 1;
+    material_system_context.shader_name = settings.diffuse_resolve_shader_name;
+    material_system_context.priority = DeferredRenderer::deferred_renderer_gbuffer_modifier_priority;
+    material_system_context.instance_name = diffuse_resolve_name;
+
+    context.initialization_parameters.add(diffuse_resolve_name, material_system_context);
+    diffuse_lighting_resolve_material_system_ =
+        create<IndirectLightingResolveMaterialSystem>(context, diffuse_resolve_name, diffuse_resolve_name);
+
+    const RenderTarget& rt = context.render_target_pool.get(diffuse_lighting_resolve_material_system_->render_target_id());
+
+    TextureInstance texture;
+    rt.color_texture(texture, 0);
+    context.renderer->set_indirect_diffuse_lighting_texture(texture);
+
+    return true;
+}
+
+void GISystem::destroy(Context& context)
+{
+    UNUSED(context);
+}
 
 void GISystem::add_lpv(Context& context, Renderer& renderer, const LPVParams& params)
 {
@@ -349,6 +407,37 @@ void GISystem::add_lpv(Context& context, Renderer& renderer, const LPVParams& pa
 void GISystem::apply(Renderer& renderer)
 {
     renderer.set_gi_modifier_material_system(lpv_resolve_material_system_, 0);
+    ASSERT(diffuse_lighting_resolve_material_system_ != nullptr, "Invalid diffuse GI material system");
+    diffuse_lighting_resolve_material_system_->set_global_ambient_sh_buffer(ambient_sh_buffer_id_);
+}
+
+void GISystem::add_skybox(Context& context, const SkyboxMaterialSystem* skybox_material_system, const CubemapIntegrator::Settings& integrator_settings)
+{
+    skybox_material_system_ = skybox_material_system;
+    cubemap_integrator_.init(context, integrator_settings);
+    if (skybox_material_system_ != nullptr)
+    {
+        ShaderStorageBuffer& buffer = create_and_get(context.shader_storage_buffer_pool);
+        ShaderStorageBufferDesc desc;
+        desc.format = format_float;
+        desc.size = sizeof(SH<vec3, 3>);
+        desc.update_type = buffer_update_type_dynamic;
+        if (!buffer.init(desc, nullptr, 0))
+        {
+            ERROR_LOG("Can't initialize a ShaderStorageBuffer");
+        }
+        ambient_sh_buffer_id_ = buffer.id();
+
+        cubemap_integrator_.integrate(context.shader_storage_buffer_pool.get(ambient_sh_buffer_id_),
+            context, context.texture_pool.get(skybox_material_system_->skybox_texture().id));
+    }
+}
+
+void GISystem::update_skybox(Context& context)
+{
+    if (skybox_material_system_ != nullptr)
+        cubemap_integrator_.integrate(context.shader_storage_buffer_pool.get(ambient_sh_buffer_id_),
+            context, context.texture_pool.get(skybox_material_system_->skybox_texture().id));
 }
 
 void GISystem::before_render(Context& context, SceneContext& scene_context, RenderContext& render_context)
@@ -359,6 +448,8 @@ void GISystem::before_render(Context& context, SceneContext& scene_context, Rend
 
 void GISystem::render(Context& context, SceneContext& scene_context, RenderContext& render_context)
 {
+    diffuse_lighting_resolve_material_system_->setup_draw_calls(context, scene_context, render_context);
+
     if (rsm_material_system_ != nullptr && lpv_material_system_ != nullptr)
     {
         RSMData data;
@@ -382,7 +473,7 @@ Renderer::Renderer(Context& context) :
     debug_mode_(renderer_debug_mode_none)
 {}
 
-bool Renderer::init()
+bool Renderer::init(const Settings& settings)
 {
     UniformBuffer& buffer = create_and_get(context_.uniform_pool);
     render_context_.main_camera.percamera_uniform = buffer.id();
@@ -390,11 +481,16 @@ bool Renderer::init()
     desc.unit = perframe_data_unit;
     desc.size = sizeof(PerCameraData);
     buffer.init(desc);
+
+    context_.renderer = this;
+
+    gi_system_.init(context_, settings.gi_settings);
     return true;
 }
 
 void Renderer::destroy()
 {
+    gi_system_.destroy(context_);
     destroy_pool_object(context_.uniform_pool, render_context_.main_camera.percamera_uniform);
 }
 
@@ -419,6 +515,7 @@ void Renderer::update(SceneContext& scene_context)
     buffer.update(data);
 
     update_nodes(context_, render_context_, scene_context);
+    update_lights(context_, render_context_, scene_context);
     update_impl(context_, render_context_, scene_context);
 }
 
@@ -436,6 +533,13 @@ void Renderer::before_update(SceneContext& scene_context)
     gi_system_.before_render(context_, scene_context, render_context_);
 }
 
+void Renderer::flush_pass()
+{
+    sort_draw_calls(context_, render_context_);
+    context_.driver.render(context_, render_context_.draw_calls.data(), render_context_.draw_calls.size());
+    render_context_.draw_calls.clear();
+}
+
 void Renderer::render(SceneContext& scene_context)
 {
     if (skybox_material_system_ != nullptr)
@@ -444,6 +548,7 @@ void Renderer::render(SceneContext& scene_context)
         directional_shadowmap_depth_write_material_system_->setup_draw_calls(context_, scene_context, render_context_);
     if (shadowmap_depth_write_material_system_ != nullptr)
         shadowmap_depth_write_material_system_->setup_draw_calls(context_, scene_context, render_context_);
+
     render_impl(context_, render_context_, scene_context);
 
     for (size_t i = 0, size = material_systems_.size(); i < size; ++i)
@@ -542,6 +647,25 @@ void Renderer::debug_mode_changed(DebugMode mode, MaterialSystemId material_syst
     }
 }
 
+UniformBufferHandleType Renderer::system_wide_uniform(const string& name) const
+{
+    if (name == "main_camera")
+        return render_context_.main_camera.percamera_uniform;
+    return InvalidHandle<UniformBufferHandleType>::id;
+}
+
+UniformBufferHandleType Renderer::main_camera_uniform() const
+{
+    return render_context_.main_camera.percamera_uniform;
+}
+
+void Renderer::set_skybox_cubemap(const TextureInstance& cubemap)
+{
+    if (skybox_material_system_ != nullptr)
+        skybox_material_system_->set_texture(cubemap);
+    gi_system_.update_skybox(context_);
+}
+
 bool load_node(NodeInstance& node, const string& name, const char* material_system_name, Context& context, SceneContext& scene_context)
 {
     if (!context.mesh_manager.get_instance(node.mesh, name))
@@ -611,7 +735,7 @@ void destroy_render(Context& context)
     destroy_pool_elements(context.shader_pool);
     destroy_pool_elements(context.texture_pool);
     destroy_pool_elements(context.render_target_pool);
-    destroy_pool_elements_destroy(context.shader_storage_buffer_pool);
+    destroy_pool_elements(context.shader_storage_buffer_pool);
     destroy_pool_elements_destroy(context.texture_buffer_pool);
 }
 

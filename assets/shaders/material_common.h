@@ -7,3 +7,8 @@ struct PhongMaterial
 
 #define PHONG_MATERIAL_SHININESS(material) material.specular.w
 #define PHONG_MATERIAL_GLOSSINESS(material) material.params.x
+
+struct PBRMaterial
+{
+    vec4 parameters; // x - roughness, y - metalness
+};

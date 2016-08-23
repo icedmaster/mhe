@@ -1,5 +1,7 @@
 #include "render/mesh.hpp"
 
+#include "render/context.hpp"
+
 namespace mhe {
 
 bool create_mesh(Mesh& mesh, const uint8_t* vertices, size_t vertices_size, const uint32_t* indices, size_t indices_size,

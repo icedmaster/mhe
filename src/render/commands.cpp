@@ -58,12 +58,14 @@ bool CopyFramebufferCommand::execute_impl(Context& /*context*/, RenderStage /*cu
 
 bool ListOfCommands::execute_impl(Context& context, RenderStage current_stage)
 {
+    bool result = true;
     for (size_t i = 0, size = commands_.size(); i < size; ++i)
     {
         if (!(commands_[i]->stages() & current_stage)) continue;
-        commands_[i]->execute(context, current_stage);
+        if (!commands_[i]->execute(context, current_stage))
+            result = false;
     }
-    return true;
+    return result;
 }
 
 GPUProfileCommand::GPUProfileCommand(const char* name) :
@@ -97,5 +99,16 @@ bool GPUProfileCommand::execute_impl(Context& /*context*/, RenderStage current_s
     }
 
     return true;
+}
+
+ComputeCallCommand::ComputeCallCommand()
+{
+    set_stages(render_stage_before_render_target_setup);
+}
+
+bool ComputeCallCommand::execute_impl(Context& context, RenderStage current_stage)
+{
+    context.driver.execute(context, &compute_call_, 1);
+    return false;
 }
 }

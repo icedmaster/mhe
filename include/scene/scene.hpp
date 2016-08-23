@@ -40,11 +40,11 @@ public:
             state_.nodes_visible = visible;
         }
 
-				void update_parts(size_t total, size_t visible)
-				{
-					state_.parts = total;
-					state_.parts_visible = visible;
-				}
+                void update_parts(size_t total, size_t visible)
+                {
+                    state_.parts = total;
+                    state_.parts_visible = visible;
+                }
 
         size_t aabbs() const
         {
@@ -66,15 +66,15 @@ public:
             return prev_state_.nodes_visible;
         }
 
-				size_t parts() const
-				{
-					return prev_state_.parts;
-				}
+                size_t parts() const
+                {
+                    return prev_state_.parts;
+                }
 
-				size_t parts_visible() const
-				{
-					return prev_state_.parts_visible;
-				}
+                size_t parts_visible() const
+                {
+                    return prev_state_.parts_visible;
+                }
     private:
         struct State
         {
@@ -82,8 +82,8 @@ public:
             size_t aabbs_visible;
             size_t nodes;
             size_t nodes_visible;
-						size_t parts;
-						size_t parts_visible;
+                        size_t parts;
+                        size_t parts_visible;
         };
 
         State state_;
@@ -92,62 +92,67 @@ public:
 public:
     Scene(Context& context);
 
-	const TransformPool& transform_pool() const
-	{
-		return scene_context_.transform_pool;
-	}
+    const TransformPool& transform_pool() const
+    {
+        return scene_context_.transform_pool;
+    }
 
-	NodeInstance& create_node() const;
-	void update(RenderContext& render_context);
-	void process_requests(RenderContext& render_context);
+    NodeInstance& create_node() const;
+    void update(RenderContext& render_context);
+    void process_requests(RenderContext& render_context);
 
-	LightInstance& create_light() const;
+    LightInstance& create_light(int type) const;
 
-	size_t nodes(NodeInstance*& nodes, size_t& offset, size_t material_system) const;
-	size_t nodes(NodeInstance*& nodes) const;
+    size_t nodes(NodeInstance*& nodes, size_t& offset, size_t material_system) const;
+    size_t nodes(NodeInstance*& nodes) const;
 
-	void delete_node(uint16_t id);
+    void delete_node(uint16_t id);
 
-	AABBInstance& create_aabb() const;
+    AABBInstance& create_aabb() const;
 
-	void set_camera_controller(CameraController* controller)
-	{
-		camera_controller_ = controller;
-	}
+    void set_camera_controller(CameraController* controller)
+    {
+        camera_controller_ = controller;
+    }
 
-	SceneContext& scene_context()
-	{
-		return scene_context_;
-	}
+    CameraController *camera_controller() const
+    {
+        return camera_controller_.get();
+    }
+
+    SceneContext& scene_context()
+    {
+        return scene_context_;
+    }
 
     const Stats& stats() const
     {
         return stats_;
     }
 private:
-	void refresh_node_material_link(NodeInstance* nodes);
+    void refresh_node_material_link(NodeInstance* nodes);
     void update_light_sources(RenderContext& render_context);
 
-	void frustum_culling();
-	void parts_frustum_culling(const planef* planes, const planef* abs_planes);
+    void frustum_culling();
+    void parts_frustum_culling(const planef* planes, const planef* abs_planes);
 
-	void update_scene_aabb(RenderContext& render_context) const;
+    void update_scene_aabb(RenderContext& render_context) const;
 
-	struct MaterialConnector
-	{
-		size_t offset;
-		size_t size;
-	};
+    struct MaterialConnector
+    {
+        size_t offset;
+        size_t size;
+    };
 
     Context& context_;
-	SceneContext scene_context_;
+    SceneContext scene_context_;
     Stats stats_;
-	ref_ptr<CameraController> camera_controller_;
+    ref_ptr<CameraController> camera_controller_;
     size_t visible_aabbs_;
     size_t visible_nodes_;
 
-	GlobalVar<size_t> global_max_lights_number_;
-	GlobalVar<bool> use_frustum_culling_;
+    GlobalVar<size_t> global_max_lights_number_;
+    GlobalVar<bool> use_frustum_culling_;
 };
 
 }

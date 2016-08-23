@@ -1,18 +1,21 @@
 #include <utils/logutils.hpp>
 #include <utils/file_utils.hpp>
+#include <utils/cmdline_parser.hpp>
 #include <render/layouts.hpp>
 #include <render/mesh_grid.hpp>
 #include <render/mesh.hpp>
+#include <res/mhe_binary_mesh.hpp>
 #include <res/scene_export.hpp>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include <pugixml/pugixml.hpp>
 #include <vector>
 #include <fstream>
 
 const size_t mhe_header_length = 3;
 const char mhe_header[mhe_header_length + 1] = "mhe";
-const char mhe_version = 0x2;
+const char mhe_default_version = 0x2;
 const char mhe_animation_version = 0x1;
 
 const size_t initial_vertex_buffer_size = 100000;
@@ -24,6 +27,8 @@ const mhe::vec3 default_aabb_max = mhe::vec3(-9999999.0f, -9999999.0f, -9999999.
 struct ExportParams
 {
     mhe::FilePath texture_path;
+    mhe::FilePath material_path;
+    uint8_t version;
 };
 
 struct ExportBone
@@ -39,6 +44,12 @@ struct SkinningExportContext
     mhe::hashmap<uint32_t, std::vector<ExportBone> > vertices_to_bones;
     mhe::mat4x4 root_local_to_world_transform;
     mhe::mat4x4 inv_mesh_transform;
+};
+
+struct MeshExportContext
+{
+    mhe::res::Mesh mesh;
+    mhe::vector<mhe::res::Material> materials;
 };
 
 mhe::vec3 convert(const aiVector3D& v)
@@ -71,10 +82,10 @@ mhe::quatf convert(const aiQuaternion& q)
     return mhe::quatf(q.x, q.y, q.z, q.w);
 }
 
-void write_header(std::ofstream& stream, uint8_t layout)
+void write_header(std::ofstream& stream, uint8_t layout, uint8_t version)
 {
     stream.write(mhe_header, mhe_header_length);
-    stream.put(mhe_version);
+    stream.put(version);
     stream.put(layout);
 }
 
@@ -88,44 +99,12 @@ void write_vertex_data(std::ofstream& stream, uint32_t vertex_size, const char* 
     stream.write(index_data, indexes_number * 4); // index is u32
 }
 
-void write_mesh_data(std::ofstream& stream, const mhe::MeshExportData& data)
-{
-    stream.write((const char*)&data, sizeof(mhe::MeshExportData));
-}
-
 template <class Str>
 void write_string(std::ofstream& stream, const Str& str)
 {
     size_t len = str.length();
     stream.write((const char*)&len, 4);
     stream.write(str.data(), len);
-}
-
-void write_material_data(std::ofstream& stream, const mhe::MaterialExportData* data, size_t size)
-{
-    uint32_t materials_number = size;
-    stream.write((const char*)&materials_number, 4);
-    for (size_t i = 0; i < size; ++i)
-    {
-        // name
-        write_string(stream, data[i].name);
-        // material_system
-        write_string(stream, data[i].material_system);
-        // lighting model
-        write_string(stream, data[i].lighting_model);
-        // material data
-        stream.write((const char*)&data[i].data, sizeof(mhe::MaterialRenderData));
-        // textures
-        uint32_t len = data[i].albedo_texture.name.length();
-        stream.write((const char*)&len, 4);
-        stream.write(data[i].albedo_texture.name.c_str(), len);
-        stream.write((const char*)&(data[i].albedo_texture.mode), 1);
-
-        len = data[i].normalmap_texture.name.length();
-        stream.write((const char*)&len, 4);
-        stream.write(data[i].normalmap_texture.name.c_str(), len);
-        stream.write((const char*)&(data[i].normalmap_texture.mode), 1);
-    }
 }
 
 void write_parts_data(std::ofstream& stream, const mhe::MeshPartExportData* data, size_t size)
@@ -232,8 +211,8 @@ void sort_by_weight(std::vector<ExportBone>& bones)
     std::sort(bones.begin(), bones.end(), WeightSortHelper());
 }
 
-void fill_skinned_vertices(std::vector<mhe::SkinnedGeometryLayout::Vertex> &out_vertices,
-    std::vector<mhe::StandartGeometryLayout::Vertex>& vertices, SkinningExportContext& skinning_context)
+void fill_skinned_vertices(mhe::vector<mhe::SkinnedGeometryLayout::Vertex> &out_vertices,
+    mhe::vector<mhe::StandartGeometryLayout::Vertex>& vertices, SkinningExportContext& skinning_context)
 {
     for (size_t i = 0, size = vertices.size(); i < size; ++i)
     {
@@ -270,9 +249,10 @@ void fill_skinned_vertices(std::vector<mhe::SkinnedGeometryLayout::Vertex> &out_
 
 template <class V>
 void process_node(const aiScene* assimp_scene, aiNode* node, const aiMatrix4x4& parent_transform, 
-    std::vector<uint32_t>& indices, std::vector<V>& vertices,
-    std::vector<mhe::MeshPartExportData>& parts, mhe::vec3& mesh_aabb_min, mhe::vec3& mesh_aabb_max,
-    SkinningExportContext& skinning_context)
+    mhe::vector<uint32_t>& indices, mhe::vector<V>& vertices,
+    mhe::vector<mhe::MeshPartExportData>& parts,
+    mhe::vec3& mesh_aabb_min, mhe::vec3& mesh_aabb_max,
+    SkinningExportContext& skinning_context, MeshExportContext& mesh_context)
 {
     aiMatrix4x4 transform = parent_transform * node->mTransformation;
     aiMatrix4x4 inv_transform = transform;
@@ -292,7 +272,9 @@ void process_node(const aiScene* assimp_scene, aiNode* node, const aiMatrix4x4& 
         part_data.ibuffer_offset = indices.size();
         part_data.vbuffer_offset = vertices.size();
         part_data.faces_number = mesh->mNumFaces;
-        part_data.material_index = mesh->mMaterialIndex;
+
+        mhe::res::Mesh::Part& res_part = mesh_context.mesh.parts.add();
+        res_part.material = mesh_context.materials[mesh->mMaterialIndex].ref;
 
         mhe::vec3 submesh_aabb_min = default_aabb_min, submesh_aabb_max = default_aabb_max;
 
@@ -376,11 +358,11 @@ void process_node(const aiScene* assimp_scene, aiNode* node, const aiMatrix4x4& 
 
         setup_parents(assimp_scene, mesh, skinning_context);
 
-        parts.back().aabb = mhe::AABBf::from_min_max(submesh_aabb_min, submesh_aabb_max);
+        mesh_context.mesh.parts.back().aabb = mhe::AABBf::from_min_max(submesh_aabb_min, submesh_aabb_max);
     }
 
     for (unsigned int n = 0; n < node->mNumChildren; ++n)
-        process_node(assimp_scene, node->mChildren[n], transform, indices, vertices, parts, mesh_aabb_min, mesh_aabb_max, skinning_context);
+        process_node(assimp_scene, node->mChildren[n], transform, indices, vertices, parts, mesh_aabb_min, mesh_aabb_max, skinning_context, mesh_context);
 }
 
 void create_grid(mhe::MeshGrid& grid, const std::vector<mhe::StandartGeometryLayout::Vertex>& vertices,
@@ -509,6 +491,31 @@ void process_animations(const aiScene* assimp_scene, const char* out_filename, c
     }
 }
 
+void write_material_data(const mhe::FilePath& filename, const mhe::res::Material& material)
+{
+    mhe::res::XMLSerializer serializer(filename.c_str(), "material");
+    material.write(serializer);
+    INFO_LOG("Exported a material:" << filename);
+}
+
+void process_material_data(const char* out_filename, const ExportParams& params, MeshExportContext& mesh_context)
+{
+    for (size_t i = 0, size = mesh_context.materials.size(); i < size; ++i)
+    {
+        mhe::FilePath filename = mhe::utils::get_file_path(mhe::FilePath(out_filename)) + mesh_context.materials[i].id;
+        filename += ".mtl";
+        write_material_data(filename, mesh_context.materials[i]);
+        mesh_context.materials[i].ref = params.material_path + mesh_context.materials[i].id;
+    }
+}
+
+void write_mesh_data(const mhe::FilePath& binary_filename, const MeshExportContext& mesh_context)
+{
+    mhe::FilePath mesh_filename = mhe::utils::get_file_name_with_path(binary_filename) + ".mesh";
+    mhe::res::XMLSerializer serializer(mesh_filename.c_str(), "mesh");
+    mesh_context.mesh.write(serializer);
+}
+
 void process_scene(const char* out_filename, const aiScene* assimp_scene, const ExportParams& params)
 {
     if (!assimp_scene->HasMeshes() && !assimp_scene->HasAnimations())
@@ -517,106 +524,26 @@ void process_scene(const char* out_filename, const aiScene* assimp_scene, const 
         return;
     }
     
-    mhe::MeshExportData mesh_export_data;
-    std::vector<mhe::StandartGeometryLayout::Vertex> vertexes;
-    std::vector<mhe::SkinnedGeometryLayout::Vertex> skinned_vertices;
-    std::vector<uint32_t> indexes;
-    std::vector<mhe::MeshPartExportData> parts(assimp_scene->mNumMeshes);
-    std::vector<mhe::MaterialExportData> materials(assimp_scene->mNumMaterials);
+    mhe::vector<mhe::StandartGeometryLayout::Vertex> vertexes;
+    mhe::vector<mhe::SkinnedGeometryLayout::Vertex> skinned_vertices;
+    mhe::vector<uint32_t> indexes;
+    mhe::vector<mhe::MeshPartExportData> parts(assimp_scene->mNumMeshes);
 
     SkinningExportContext skinning_context;
+    MeshExportContext mesh_context;
 
-    vertexes.reserve(initial_vertex_buffer_size);
-    indexes.reserve(initial_vertex_buffer_size);
-    
-    mhe::vec3 mesh_aabb_min = default_aabb_min, mesh_aabb_max = default_aabb_max;
+    mesh_context.mesh.binary = mhe::utils::get_file_name_with_extension(out_filename);
 
-    if (assimp_scene->mRootNode != nullptr)
-    {
-        parts.resize(0);
-        process_node(assimp_scene, assimp_scene->mRootNode, aiMatrix4x4(), indexes, vertexes, parts, mesh_aabb_min, mesh_aabb_max, skinning_context);
-    }
-    else
-    {
-        for (unsigned int m = 0; m < assimp_scene->mNumMeshes; ++m)
-        {
-            aiMesh* mesh = assimp_scene->mMeshes[m];
-            ASSERT(mesh != nullptr, "Mesh is invalid");
-
-            mhe::MeshPartExportData part_data;
-            part_data.ibuffer_offset = indexes.size();
-            part_data.vbuffer_offset = vertexes.size();
-            part_data.faces_number = mesh->mNumFaces;
-            part_data.material_index = mesh->mMaterialIndex;
-
-            mhe::vec3 submesh_aabb_min = default_aabb_min, submesh_aabb_max = default_aabb_max;
-
-            parts[m] = part_data;
-
-            for (unsigned int i = 0; i < mesh->mNumFaces; ++i)
-            {
-                ASSERT(mesh->mFaces[i].mNumIndices == 3, "The mesh must be triangulated");
-                for (unsigned int j = 0; j < mesh->mFaces[i].mNumIndices; ++j)
-                {
-                    indexes.push_back(mesh->mFaces[i].mIndices[j] + part_data.vbuffer_offset);
-                }
-            }
-
-            for (unsigned int i = 0; i < mesh->mNumVertices; ++i)
-            {
-                mhe::StandartGeometryLayout::Vertex vertex;
-                aiVector3D& v = mesh->mVertices[i];
-                vertex.pos.set(v.x, v.y, v.z);
-                aiVector3D& n = mesh->mNormals[i];
-                vertex.nrm.set(n.x, n.y, n.z);
-                aiVector3D& t = mesh->mTextureCoords[0][i];
-                vertex.tex.set(t.x, t.y);
-
-                aiVector3D& aiTng = mesh->mTangents[i];
-                aiVector3D& aiBitng = mesh->mBitangents[i];
-                mhe::vec3 tng(aiTng.x, aiTng.y, aiTng.z);
-                mhe::vec3 bitng(aiBitng.x, aiBitng.y, aiBitng.z);
-                float sign = mhe::dot(bitng, mhe::cross(vertex.nrm, tng)) > 0.0f ? 1.0f : -1.0f;
-
-                vertex.tng = mhe::vec4(tng, sign);
-
-                vertexes.push_back(vertex);
-
-                mesh_aabb_max = mhe::max(mesh_aabb_max, vertex.pos);
-                mesh_aabb_min = mhe::min(mesh_aabb_min, vertex.pos);
-                submesh_aabb_max = mhe::max(submesh_aabb_max, vertex.pos);
-                submesh_aabb_min = mhe::min(submesh_aabb_min, vertex.pos);
-            }
-            parts[m].aabb = mhe::AABBf::from_min_max(submesh_aabb_min, submesh_aabb_max);
-        }
-    }
-
-    mesh_export_data.aabb = mhe::AABBf::from_min_max(mesh_aabb_min, mesh_aabb_max);
-
+    // init materials first
+    mesh_context.materials.resize(assimp_scene->mNumMaterials);
     for (unsigned int i = 0; i < assimp_scene->mNumMaterials; ++i)
     {
         aiMaterial* material = assimp_scene->mMaterials[i];
-        mhe::MaterialExportData& material_data = materials[i];
+        mhe::res::Material& material_data = mesh_context.materials[i];
 
         aiString name;
         material->Get(AI_MATKEY_NAME, name);
-
-        // render properties
-        aiColor3D diffuse, ambient, specular, emissive;
-        float shininess = 0.0f, shininess_strength = 0.0f;
-        material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);
-        material->Get(AI_MATKEY_COLOR_AMBIENT, ambient);
-        material->Get(AI_MATKEY_COLOR_SPECULAR, specular);
-        material->Get(AI_MATKEY_COLOR_EMISSIVE, emissive);
-        material->Get(AI_MATKEY_SHININESS, shininess);
-        material->Get(AI_MATKEY_SHININESS_STRENGTH, shininess_strength);
-
-        material_data.name = convert(name);
-        material_data.data.diffuse = convert(diffuse);
-        material_data.data.ambient = convert(ambient);
-        material_data.data.specular = convert(specular);
-        material_data.data.emissive = convert(emissive);
-        material_data.data.specular_shininess = shininess;
+        material_data.id = name.C_Str();
 
         // textures
         aiString path;
@@ -626,8 +553,7 @@ void process_scene(const char* out_filename, const aiScene* assimp_scene, const 
             mhe::FilePath filename = path.C_Str();
             filename = mhe::utils::convert_slashes(filename);
             filename = filename.empty() ? filename : mhe::utils::path_join(params.texture_path, mhe::utils::get_file_name_with_extension(filename));
-            material_data.albedo_texture.name = filename;
-            material_data.albedo_texture.mode = static_cast<uint8_t>(map_mode);
+            material_data.albedo.ref = filename;
             INFO_LOG("Found an albedo texture:" << filename);
         }
 
@@ -636,14 +562,25 @@ void process_scene(const char* out_filename, const aiScene* assimp_scene, const 
             mhe::FilePath filename = path.C_Str();
             filename = mhe::utils::convert_slashes(filename);
             filename = filename.empty() ? filename : mhe::utils::path_join(params.texture_path, mhe::utils::get_file_name_with_extension(filename));
-            material_data.normalmap_texture.name = filename;
-            material_data.normalmap_texture.mode = static_cast<uint8_t>(map_mode);
+            material_data.normalmap.ref = filename;
             INFO_LOG("Found a normalmap texture:" << filename);
         }
     }
 
-    //mhe::MeshGrid mesh_grid;
-    //create_grid(mesh_grid, vertexes, indexes);
+    process_material_data(out_filename, params, mesh_context);
+
+    vertexes.reserve(initial_vertex_buffer_size);
+    indexes.reserve(initial_vertex_buffer_size);
+    
+    mhe::vec3 mesh_aabb_min = default_aabb_min, mesh_aabb_max = default_aabb_max;
+
+    if (assimp_scene->mRootNode != nullptr)
+    {
+        parts.resize(0);
+        process_node(assimp_scene, assimp_scene->mRootNode, aiMatrix4x4(), indexes, vertexes, parts, mesh_aabb_min, mesh_aabb_max, skinning_context, mesh_context);
+    }
+
+    mesh_context.mesh.aabb = mhe::AABBf::from_min_max(mesh_aabb_min, mesh_aabb_max);
     
     INFO_LOG("Exporting geometry " << out_filename << " ...");
 
@@ -654,7 +591,7 @@ void process_scene(const char* out_filename, const aiScene* assimp_scene, const 
         return;
     }
 
-    DEBUG_LOG("The result AABB is:" << mesh_export_data.aabb);
+    DEBUG_LOG("The result AABB is:" << mesh_context.mesh.aabb);
 
     uint8_t layout = mhe::StandartGeometryLayout::handle;
     size_t vertex_size = sizeof(mhe::StandartGeometryLayout::Vertex);
@@ -671,12 +608,14 @@ void process_scene(const char* out_filename, const aiScene* assimp_scene, const 
         vertex_data = (const char*)&skinned_vertices[0];
     }
 
-    write_header(f, layout);
-    write_mesh_data(f, mesh_export_data);
+    // description data
+    write_mesh_data(out_filename, mesh_context);
+
+    // binary data
+    write_header(f, layout, params.version);
     write_vertex_data(f, vertex_size,
         vertex_data, vertexes.size(),
         (const char*)&indexes[0], indexes.size());
-    write_material_data(f, &materials[0], materials.size());
     write_parts_data(f, &parts[0], parts.size());
     write_skinning_data(f, skinning_context);
     //write_grid_data(f, mesh_grid);
@@ -692,16 +631,17 @@ int main(int argc, char** argv)
 {
     mhe::utils::create_standart_log();
     mhe::create_default_allocator();
-    if (argc < 3)
+    mhe::utils::CmdLineParser parser(argc, argv);
+    uint8_t version = parser.get<uint8_t>("--version", "-v", mhe_default_version);
+    const char* in_filename = parser.get<const char*>("--source", "-s");
+    const char* out_filename = parser.get<const char*>("--destination", "-d");
+    const char* texture_path = parser.get<const char*>("--texture-path", "-tp");
+    const char* material_path = parser.get<const char*>("--material-path", "-mp");
+    if (in_filename == nullptr || out_filename == nullptr)
     {
-        ERROR_LOG("Invalid number of arguments");
-        ERROR_LOG("Usage: meshconverter infile outfile");
+        ERROR_LOG("Source and destination names must be specified");
         return 1;
     }
-
-    const char* in_filename = argv[1];
-    const char* out_filename = argv[2];
-    const char* texture_path = argc > 3 ? argv[3] : nullptr;
     
     Assimp::Importer importer;
     const aiScene* assimp_scene = importer.ReadFile(in_filename, aiProcess_CalcTangentSpace | aiProcess_Triangulate |
@@ -713,8 +653,11 @@ int main(int argc, char** argv)
     }
 
     ExportParams params;
+    params.version = version;
     if (texture_path != nullptr)
         params.texture_path = texture_path;
+    if (material_path != nullptr)
+        params.material_path = material_path;
 
     process_scene(out_filename, assimp_scene, params);
 

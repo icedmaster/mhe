@@ -26,9 +26,11 @@ const char* tags[] = {vertex_shader_tag, geometry_shader_tag, fragment_shader_ta
 
 struct LoadContext
 {
+    std::string current_filename;
     std::string filename;
     std::string version;
     size_t level;
+    hashmap<std::string, bool> includes;
     bool tag_found;
 };
 
@@ -64,12 +66,25 @@ std::string parse_include(ShaderInitializationParams& params, const std::string&
         return std::string();
     const std::string& filename = tag.substr(first + 1, last - first - 1);
 
-    std::string fullname = utils::path_join(utils::get_file_path(load_context.filename), filename);
+    std::string fullname = utils::path_join(utils::get_file_path(load_context.current_filename), filename);
+
+    if (load_context.includes.contains(fullname))
+        return "";
+    load_context.includes[fullname] = true;
+
     std::ifstream f(fullname.c_str());
-    if (!f.is_open()) return std::string();
+    if (!f.is_open())
+    {
+        ASSERT(0, "Couldn't open an include file:" << fullname);
+        return std::string();
+    }
     const std::vector<std::string>& content = utils::read_lines(f);
     f.close();
-    return load_shader_impl(params, content, shadertag, load_context);
+    std::string prev_filename = load_context.current_filename;
+    load_context.current_filename = fullname;
+    std::string res = load_shader_impl(params, content, shadertag, load_context);
+    load_context.current_filename = prev_filename;
+    return res;
 }
 
 std::string parse_sampler(ShaderInitializationParams& params, const std::string& tag)
@@ -142,7 +157,7 @@ std::string parse_variable(ShaderInitializationParams& params, const std::string
     const std::vector<std::string>& data = utils::split(tag.substr(first + 1, last - first - 1), " ");
     ASSERT(data.size() == 3 && data[0] == "var", "Invalid shader source:" << tag);
     params.variables.add(string(data[1].c_str()), string(data[2].c_str()));
-    return "#define " + data[1] + " " + data[2];
+    return "#define " + data[1] + " " + data[2] + "\n";
 }
 
 std::string parse_version(ShaderInitializationParams& params, const std::string& tag)
@@ -339,20 +354,28 @@ bool ShaderProgramLoader::load(type& res, const std::string& name, const context
         ShaderInitializationParams params;
         detail::LoadContext load_context;
         load_context.filename = filename_with_extension;
+        load_context.current_filename = filename_with_extension;
         load_context.level = 0;
         load_context.tag_found = false;
+        load_context.includes.clear();
         params.csdata = detail::load_shader_impl(params, data, detail::compute_shader_tag, load_context);
         if (params.csdata.empty())
         {
             load_context.tag_found = false;
+            load_context.includes.clear();
             params.vsdata = detail::load_shader_impl(params, data, detail::vertex_shader_tag, load_context);
             load_context.tag_found = false;
+            load_context.includes.clear();
             params.fsdata = detail::load_shader_impl(params, data, detail::fragment_shader_tag, load_context);
             load_context.tag_found = false;
+            load_context.includes.clear();
             params.gsdata = detail::load_shader_impl(params, data, detail::geometry_shader_tag, load_context);
         }
+
+        detail::update_shader_data(params, context);
+
         // TODO: parse GLSL errors to find the correct line with error
-        
+
         const std::vector<std::string>& vs_tmp = utils::split(params.vsdata, "\n", true);
         const std::vector<std::string>& fs_tmp = utils::split(params.fsdata, "\n", true);
         const std::vector<std::string>& cs_tmp = utils::split(params.csdata, "\n", true);
@@ -361,8 +384,6 @@ bool ShaderProgramLoader::load(type& res, const std::string& name, const context
         UNUSED(fs_tmp);
         UNUSED(cs_tmp);
         UNUSED(gs_tmp);
-
-        detail::update_shader_data(params, context);
 
         result = shader_program.init(params);
         if (!result)

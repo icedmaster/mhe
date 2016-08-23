@@ -6,6 +6,7 @@
 #include "render/context.hpp"
 #include "render/material_system.hpp"
 #include "render/renderer.hpp"
+#include "render/light_instance_methods.hpp"
 #include "debug/profiler.hpp"
 
 namespace mhe {
@@ -79,12 +80,14 @@ NodeInstance& Scene::create_node() const
     return node;
 }
 
-LightInstance& Scene::create_light() const
+LightInstance& Scene::create_light(int type) const
 {
     LightInstance::IdType id = scene_context_.light_pool.create();
     LightInstance& light = scene_context_.light_pool.get(id);
     light.transform_id = scene_context_.transform_pool.create();
     light.aabb_id = scene_context_.aabb_pool.create();
+    light.light.set_type(type);
+    init_light(context_, light);
     return light;
 }
 

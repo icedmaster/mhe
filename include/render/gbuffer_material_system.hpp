@@ -79,6 +79,9 @@ private:
     void update(Context& context, SceneContext& scene_context, RenderContext& render_context, MeshPartInstance* parts_instances, MeshPart* parts, size_t count);
     void setup_uniforms(Material& material, Context& context, SceneContext& scene_context, const MeshPartInstance& part, const ModelContext& model_context) override;
 
+    UniformBufferHandleType create_material_uniform(Context& context, const MaterialData& material_data);
+    void update_material_data(UniformBuffer& uniform_buffer, const MaterialData& material_data);
+
     ClearCommand clear_command_;
     GPUProfileCommand profile_command_;
     ListOfCommands list_of_commands_;
@@ -125,9 +128,6 @@ private:
     bool init_sphere(Context& context);
     bool init_conus(Context& context);
     void update(Context& context, SceneContext& scene_context, RenderContext& render_context);
-    mat4x4 update_light_transform(const Light& light, const vec3& position, const vec3& direction) const;
-    void update_light_data(LightData& light_data, const SceneContext& scene_context, const LightInstance& light_instance, const Light& light) const;
-    void update_directional_light_data(DirectionalLightData& light_data, const SceneContext& scene_context, const LightInstance& light_instance, const Light& light) const;
 
     MeshInstance quad_mesh_;
     MeshInstance sphere_mesh_;
@@ -140,9 +140,8 @@ private:
     TextureInstance light_buffer_texture_;
     TextureInstance albedo_texture_;
     TextureInstance normal_texture_;
+    TextureInstance accumnulator_texture_;
     TextureInstance depth_texture_;
-    UniformBuffer::IdType light_uniform_[max_lights_number];
-    UniformBuffer::IdType directional_light_uniform_[max_directional_lights_number];
     RenderStateHandleType render_state_;
 
     GlobalVar<bool> shadowmap_enabled_;

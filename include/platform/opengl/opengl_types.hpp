@@ -209,6 +209,8 @@ inline GLbitfield get_barriers(uint32_t barriers)
     // TODO: need to optimize this method
     if (barriers & memory_barrier_storage_buffer)
         result |= GL_SHADER_STORAGE_BARRIER_BIT;
+    if (barriers & memory_barrier_image_fetch)
+        result |= GL_SHADER_IMAGE_ACCESS_BARRIER_BIT;
     return result;
 }
 

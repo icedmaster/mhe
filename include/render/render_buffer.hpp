@@ -373,7 +373,7 @@ public:
         return impl_->init(desc, data, size);
     }
 
-    void destroy()
+    void close()
     {
         impl_->destroy();
     }

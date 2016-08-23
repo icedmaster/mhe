@@ -54,9 +54,11 @@ struct LightInstance
     Light light;
     TransformInstance::IdType transform_id;
     AABBInstance::IdType aabb_id;
+    UniformBufferHandleType uniform_id;
     bool enabled;
 
-    LightInstance() : id(invalid_id), transform_id(TransformInstance::invalid_id), aabb_id(AABBInstance::invalid_id), enabled(true) {}
+    LightInstance() : id(invalid_id), transform_id(TransformInstance::invalid_id), aabb_id(AABBInstance::invalid_id),
+        uniform_id(InvalidHandle<UniformBufferHandleType>::id), enabled(true) {}
 };
 
 }

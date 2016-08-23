@@ -65,7 +65,7 @@ struct LightDesc
     LightDesc() :
         shadowmap_bias(0.00125f),
         cast_shadows(false),
-        auto_shadow_configuration(true)
+                auto_shadow_configuration(true)
     {}
 };
 
@@ -88,6 +88,7 @@ struct ShadowInfo
     array<vec3, max_shadowmap_cascades_number> scale;
     array<float, max_shadowmap_cascades_number> znear;
     array<float, max_shadowmap_cascades_number> zfar;
+    array<vec4, max_shadowmap_cascades_number> scsm_params;
     size_t cascades_number;
 };
 
@@ -102,12 +103,6 @@ public:
     };
 
     static const size_t light_types_number = directional + 1;
-
-    struct Settings
-    {
-        LightDesc light_desc;
-        ShadingSettings shading_settings;
-    };
 public:
     Light() :
         type_(spot),
@@ -129,29 +124,24 @@ public:
         return type_;
     }
 
-    const Settings& settings() const
-    {
-        return settings_;
-    }
-
     ShadingSettings& shading()
     {
-        return settings_.shading_settings;
+        return shading_;
     }
 
     const ShadingSettings& shading() const
     {
-        return settings_.shading_settings;
+        return shading_;
     }
 
     LightDesc& desc()
     {
-        return settings_.light_desc;
+        return desc_;
     }
 
     const LightDesc& desc() const
     {
-        return settings_.light_desc;
+        return desc_;
     }
 
     float attenuation_a() const
@@ -159,16 +149,16 @@ public:
         switch (type_)
         {
         case spot:
-            return settings_.light_desc.spot.attenuation_a;
+            return desc_.spot.attenuation_a;
         case omni:
-            return settings_.light_desc.omni.omni_attenuation;
+            return desc_.omni.omni_attenuation;
         default: return 0.0f;
         }
     }
 
     float attenuation_b() const
     {
-        if (type_ == spot) return settings_.light_desc.spot.attenuation_b;
+        if (type_ == spot) return desc_.spot.attenuation_b;
         return 1.0f;
     }
 
@@ -176,8 +166,8 @@ public:
     {
         switch (type_)
         {
-        case spot: return settings_.light_desc.spot.angle * 0.5f;
-        case omni: return settings_.light_desc.omni.radius;
+        case spot: return desc_.spot.angle * 0.5f;
+        case omni: return desc_.omni.radius;
         default: return 0.0f;
         }
     }
@@ -185,13 +175,13 @@ public:
     float spot_angle_coeff() const
     {
         ASSERT(type_ == spot, "Invalid type");
-        return cos(settings_.light_desc.spot.angle * 0.5f);
+        return cos(desc_.spot.angle * 0.5f);
     }
 
     float angle_attenuation() const
     {
         if (type_ == spot)
-            return settings_.light_desc.spot.angle_attenuation;
+            return desc_.spot.angle_attenuation;
         return 1.0f;
     }
 
@@ -205,7 +195,8 @@ public:
         return shadow_info_;
     }
 private:
-    Settings settings_;
+    ShadingSettings shading_;
+    LightDesc desc_;
     int type_;
     const ShadowInfo* shadow_info_;
 };

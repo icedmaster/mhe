@@ -8,6 +8,7 @@
 
 #include "shader_program.hpp"
 #include "render_target.hpp"
+#include "render_common.hpp"
 
 namespace mhe {
 
@@ -74,6 +75,11 @@ public:
 
     virtual void init_debug_views(Context& /*context*/)
     {}
+
+    virtual UniformBufferHandleType uniform(size_t /*index*/) const
+    {
+        return InvalidHandle<UniformBufferHandleType>::id;
+    }
 
     void setup_draw_calls(Context& context, SceneContext& scene_context, RenderContext& render_context);
 

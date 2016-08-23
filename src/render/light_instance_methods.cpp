@@ -1,8 +1,24 @@
 #include "render/light_instance_methods.hpp"
 
 #include "render/scene_context.hpp"
+#include "render/uniforms.hpp"
+#include "render/context.hpp"
 
 namespace mhe {
+
+namespace {
+mat4x4 update_light_transform(const Light& light, const vec3& position)
+{
+    if (light.type() == Light::directional) return mat4x4::identity();
+    if (light.type() == Light::omni)
+    {
+        mat4x4 res = mat4x4::scaling_matrix(light.desc().omni.radius);
+        res.set_row(3, position);
+        return res;
+    }
+    return mat4x4::identity();
+}
+}
 
 void set_light_position(SceneContext& scene_context, LightInstance::IdType id, const vec3& position)
 {
@@ -70,6 +86,74 @@ mat4x4 get_light_view_matrix(SceneContext& scene_context, LightInstance::IdType 
     const LightInstance& light_instance = scene_context.light_pool.get(id);
     Transform& transform = scene_context.transform_pool.get(light_instance.transform_id).transform;
     return transform.view();
+}
+
+void init_light(Context& context, LightInstance& light_instance)
+{
+    UniformBufferDesc uniform_buffer_desc;
+    uniform_buffer_desc.size = light_instance.light.type() == Light::directional ? sizeof(DirectionalLightData) : sizeof(LightData);
+    uniform_buffer_desc.unit = 0; // can be any valid slot
+    uniform_buffer_desc.update_type = uniform_buffer_normal;
+    UniformBuffer& uniform = create_and_get(context.uniform_pool);
+    bool res = uniform.init(uniform_buffer_desc);
+    ASSERT(res, "Light uniform buffer initialization failed");
+    light_instance.uniform_id = uniform.id();
+}
+
+void update_light_uniform(Context& context, SceneContext& scene_context, LightInstance& light_instance)
+{
+    Light& light = light_instance.light;
+    UniformBuffer& uniform_buffer = context.uniform_pool.get(light_instance.uniform_id);
+    if (light_instance.light.type() != Light::directional)
+    {
+        LightData light_data;
+        light_data.diffuse = light.shading().diffuse * light.shading().intensity;
+        light_data.diffuse.set_w(light.type() == Light::spot ?
+            light.spot_angle_coeff() : light.angle());
+        light_data.specular = light.shading().specular * light.shading().specular_intensity;
+        light_data.specular.set_w(light.attenuation_b());
+        const vec3& light_position = get_light_position(scene_context, light_instance.id);
+        light_data.position = vec4(light_position.x(), light_position.y(), light_position.z(), light.attenuation_a());
+        const vec3& light_direction = get_light_direction(scene_context, light_instance.id);
+        light_data.direction = vec4(light_direction.x(), light_direction.y(), light_direction.z(), light.angle_attenuation());
+
+        const ShadowInfo* shadow_info = light.shadow_info();
+        if (shadow_info != nullptr)
+        {
+            light_data.lightvp = shadow_info->lightvp[0];
+            light_data.shadowmap_params = vec4(light.desc().shadowmap_bias, 0.0f, 0.0f, 0.0f);
+        }
+
+        light_data.lightw = update_light_transform(light, light_position);
+
+        uniform_buffer.update(light_data);
+    }
+    else
+    {
+        DirectionalLightData light_data;
+        light_data.diffuse = light.shading().diffuse * light.shading().intensity;
+        light_data.specular = light.shading().specular * light.shading().specular_intensity;
+        light_data.direction = get_light_direction(scene_context, light_instance.id);
+
+        const ShadowInfo* shadow_info = light.shadow_info();
+        if (shadow_info != nullptr)
+        {
+            light_data.shadowmap_params = vec4(light.desc().shadowmap_bias, 0.0f, 0.0f, 0.0f);
+
+            light_data.cascades_number = shadow_info->cascades_number;
+            for (size_t i = 0; i < shadow_info->cascades_number; ++i)
+            {
+                light_data.csm_offset[i] = shadow_info->offset[i];
+                light_data.csm_scale[i] = shadow_info->scale[i];
+                light_data.cascade_znear[i] = shadow_info->znear[i];
+                light_data.cascade_zfar[i] = shadow_info->zfar[i];
+                light_data.lightvp[i] = shadow_info->lightview[i];
+                light_data.scsm_params[i] = shadow_info->scsm_params[i];
+            }
+        }
+
+        uniform_buffer.update(light_data);
+    }
 }
 
 }

@@ -132,6 +132,7 @@ public:
 
     bool init_screen_input(Context& context, size_t index, uint8_t render_stage = render_stage_before_render_target_setup);
     bool create_output(Context& context, size_t index, float scale, int format);
+    bool create_output(Context& context, size_t index, size_t width, size_t height, int format);
 
     void set_buffer(size_t index, ShaderStorageBufferHandleType id)
     {
@@ -148,7 +149,7 @@ public:
         uniforms_[index] = id;
     }
 
-    UniformBufferHandleType uniform(size_t index) const
+    virtual UniformBufferHandleType uniform(size_t index) const override
     {
         return uniforms_[index];
     }
@@ -156,11 +157,7 @@ public:
     // This method will be called when PosteffectChain has initialized this material system
     virtual void postinit(Context& /*context*/) {}
 
-    void set_render_target(RenderTargetHandleType render_target_id)
-    {
-        default_render_target_ = render_target_id;
-        // TODO: need to setup outputs
-    }
+    void set_render_target(RenderTargetHandleType render_target_id, Context& context);
 protected:
     MeshInstance& mesh_instance()
     {
@@ -169,9 +166,9 @@ protected:
 
     Material& default_material(Context& context);
 
-    void fill_render_target_desc(RenderTargetDesc& desc, int format = format_rgba) const;
+    void fill_render_target_desc(RenderTargetDesc& desc, size_t width, size_t height, int format = format_rgba) const;
 
-    virtual bool create_output(RenderStateHandleType render_state, Context& context, size_t index, float scale, int format);
+    virtual bool create_output(RenderStateHandleType render_state, Context& context, size_t index, size_t width, size_t height, float scale, int format);
     void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
     void prepare_draw_call(DrawCall& draw_call, Context& context, SceneContext& scene_context, const RenderContext& render_context,
         RenderTargetHandleType render_target_id);
@@ -228,6 +225,7 @@ public:
     };
 
     bool init(Context& context, const MaterialSystemContext& material_system_context) override;
+    void destroy(Context& context) override;
     void init_debug_views(Context& context) override;
 
     Settings& settings()
@@ -260,7 +258,8 @@ public:
     enum
     {
         quality_normal,
-        quality_high
+        quality_high,
+        quality_ultra
     };
 
     struct Settings
@@ -272,6 +271,7 @@ public:
     };
 
     bool init(Context& context, const MaterialSystemContext& material_system_context) override;
+    void destroy(Context& context) override;
 
     size_t default_instances_number() const override
     {
@@ -296,7 +296,7 @@ public:
         return output_rt_;
     }
 private:
-    bool create_output(RenderStateHandleType render_state_id, Context& context, size_t index, float scale, int format) override;
+    bool create_output(RenderStateHandleType render_state_id, Context& context, size_t index, size_t width, size_t height, float scale, int format) override;
     void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
 
     Settings settings_;
@@ -323,6 +323,7 @@ class DOFMaterialSystem : public PosteffectMaterialSystemBase
     };
 public:
     bool init(Context& context, const MaterialSystemContext& material_system_context) override;
+    void destroy(Context& context) override;
 
     size_t default_instances_number() const override
     {
@@ -364,6 +365,7 @@ public:
     };
 
     bool init(Context& context, const MaterialSystemContext& material_system_context) override;
+    void destroy(Context& context) override;
     void init_debug_views(Context& context) override;
 private:
     void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
@@ -446,6 +448,7 @@ public:
     };
 
     bool init(Context& context, const MaterialSystemContext& material_system_context) override;
+    void destroy(Context& context) override;
     void init_debug_views(Context& context) override;
     void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
 
@@ -492,11 +495,17 @@ public:
     };
 
     bool init(Context& context, const MaterialSystemContext& material_system_context) override;
+    void destroy(Context& context) override;
     void init_debug_views(Context& context) override;
 
     size_t default_instances_number() const override
     {
         return steps_number + 1;
+    }
+
+    Settings& settings()
+    {
+        return settings_;
     }
 private:
     void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;

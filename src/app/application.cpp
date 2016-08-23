@@ -13,6 +13,8 @@
 // TODO: move render initialization out of this file
 #include "render/deferred_renderer.hpp"
 #include "render/posteffect_material_system.hpp"
+#include "render/skybox_material_system.hpp"
+#include "render/renderer.hpp"
 
 namespace mhe {
 namespace app {
@@ -45,6 +47,21 @@ struct PosteffectParams
     fixed_size_vector<PosteffectSystem::PosteffectNodeDesc, 16> nodes;
 };
 
+struct GIParams
+{
+    GISystem::LPVParams lpv_params;
+    GISystem::Settings gi_settings;
+    string skybox_material;
+    CubemapIntegrator::Settings integrator_settings;
+    bool use_lpv;
+    bool use_skybox_ambient;
+
+    GIParams() :
+    use_lpv(false),
+        use_skybox_ambient(false)
+    {}
+};
+
 struct RendererParams
 {
     string skybox;
@@ -53,16 +70,7 @@ struct RendererParams
     string fullscreen_debug;
     string probes_accumulator;
     PosteffectParams posteffect_params;
-};
-
-struct GIParams
-{
-    GISystem::LPVParams lpv_params;
-    bool use_lpv;
-
-    GIParams() :
-        use_lpv(false)
-    {}
+    GIParams gi_params;
 };
 
 Application::Application(const char* name) :
@@ -144,15 +152,16 @@ void Application::stop_impl()
     else main_loop->stop();
 }
 
-void Application::init_assets_path(const std::string& config_assets_path)
+void Application::init_assets_path(const string& config_assets_path)
 {   
-    std::string base_path = utils::path_join(application_base_path(),
+    string base_path = utils::path_join(application_base_path(),
         config_assets_path.empty() ? assets_base_path : config_assets_path);
     INFO_LOG("Application::init_assets_path with base path:" << base_path);
 
     engine_->context().shader_manager.set_path(utils::path_join(base_path, shader_path));
     engine_->context().mesh_manager.set_path(utils::path_join(base_path, mesh_path));
     engine_->context().texture_manager.set_path(utils::path_join(base_path, texture_path));
+    engine_->context().material_manager.set_path(utils::path_join(base_path, material_path));
 }
 
 void Application::add_delegates()
@@ -210,7 +219,7 @@ void Application::init_render(const ApplicationConfig& config)
 
     GIParams gi_params;
     init_posteffect_parameters(mhe_node.child("posteffects"), renderer_params);
-    init_gi_params(mhe_node.child("gi"), gi_params);
+    init_gi_params(mhe_node.child("gi"), renderer_params.gi_params);
     
     pugi::xml_node gbuffer_node = mhe_node.child("gbuffer");
     if (gbuffer_node)
@@ -218,7 +227,8 @@ void Application::init_render(const ApplicationConfig& config)
     else
         engine_->set_renderer(new NullRenderer(engine_->context()));
     init_posteffects(renderer_params);
-    init_gi(gi_params);
+    init_gi(renderer_params.gi_params);
+    init_materials_to_process(mhe_node.child("materials_to_process"));
 }
 
 void Application::init_posteffect_parameters(pugi::xml_node node, RendererParams& params) const
@@ -312,6 +322,8 @@ void Application::init_posteffect_parameters(pugi::xml_node node, RendererParams
                 attr = u.attribute("uniform");
                 ASSERT(attr, "Malformed posteffect node. The uniform index of input node for a uniform must exist");
                 buffer.node_buffer = attr.as_uint();
+                buffer.material = u.attribute("material").value();
+                buffer.systemwide_name = u.attribute("system").value();
             }
         }
 
@@ -384,6 +396,9 @@ void Application::init_gbuffer(pugi::xml_node gbuffer_node, const RendererParams
     MaterialSystem* directional_depth_write_material_system = context.material_systems.get(params.directional_depth_write);
     PosteffectDebugMaterialSystem* fullscreen_debug_material_system = context.material_systems.get<PosteffectDebugMaterialSystem>(params.fullscreen_debug);
     ProbesAccumulatorMaterialSystem* probes_accumulator_material_system = context.material_systems.get<ProbesAccumulatorMaterialSystem>(params.probes_accumulator);
+
+    Renderer::Settings renderer_settings;
+    renderer_settings.gi_settings = params.gi_params.gi_settings;
     
     DeferredRenderer* renderer = new DeferredRenderer(context);
     renderer->set_skybox_material_system(skybox_material_system);
@@ -391,7 +406,7 @@ void Application::init_gbuffer(pugi::xml_node gbuffer_node, const RendererParams
     renderer->set_directional_shadowmap_depth_write_material_system(directional_depth_write_material_system);
     renderer->set_fullscreen_debug_material_system(fullscreen_debug_material_system);
     renderer->set_probes_accumulator_material_system(probes_accumulator_material_system);
-    renderer->init(fill_material_system, use_material_system, draw_material_system);
+    renderer->init(fill_material_system, use_material_system, draw_material_system, renderer_settings);
     engine_->set_renderer(renderer);
 }
 
@@ -411,13 +426,44 @@ void Application::init_gi_params(pugi::xml_node node, GIParams& params) const
     if (!node) return;
     params.use_lpv = node.child("lpv") != 0;
     params.lpv_params.base_priority = DeferredRenderer::deferred_renderer_base_priority;
+    
+    pugi::xml_node n = node.child("skybox");
+    if (n)
+    {
+        params.skybox_material = n.attribute("material").value();
+        params.integrator_settings.shader_name = n.attribute("integrator_shader_name").value();
+        params.use_skybox_ambient = true;
+    }
+
+    n = node.child("settings");
+    if (n)
+    {
+        pugi::xml_node diffuse_resolve_node = n.child("diffuse_resolve_shader");
+        if (diffuse_resolve_node)
+            params.gi_settings.diffuse_resolve_shader_name = diffuse_resolve_node.child_value();
+    }
 }
 
 void Application::init_gi(const GIParams& params)
 {
     if (params.use_lpv)
         engine_->renderer()->gi_system().add_lpv(engine_->context(), *engine_->renderer(), params.lpv_params);
+    if (params.use_skybox_ambient)
+        engine_->renderer()->gi_system().add_skybox(engine_->context(),
+            engine_->context().material_systems.get<SkyboxMaterialSystem>(params.skybox_material), params.integrator_settings);
     engine_->renderer()->gi_system().apply(*engine_->renderer());
+}
+
+void Application::init_materials_to_process(pugi::xml_node node)
+{
+    if (!node) return;
+    for (pugi::xml_node n = node.child("material"); n; n = n.next_sibling("material"))
+    {
+        const char* name = n.attribute("name").value();
+        MaterialSystem* material_system = engine_->context().material_systems.get(name);
+        ASSERT(material_system != nullptr, "Invalid material system name:" << name);
+        engine_->renderer()->set_material_system_to_process(material_system);
+    }
 }
 
 }}

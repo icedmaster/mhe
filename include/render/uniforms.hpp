@@ -59,6 +59,7 @@ struct DirectionalLightData
     vec4 csm_offset[max_shadowmap_cascades_number];
     float cascade_znear[max_shadowmap_cascades_number];
     float cascade_zfar[max_shadowmap_cascades_number];
+    vec4 scsm_params[max_shadowmap_cascades_number];
     vec4 shadowmap_params;
     uint32_t cascades_number;
     uint32_t padding[3];
@@ -69,6 +70,11 @@ struct PhongMaterialData
     vec4 diffuse;
     vec4 specular;
     vec4 params;
+};
+
+struct PBRMaterialData
+{
+    vec4 parameters;
 };
 
 const size_t perframe_data_unit = 0;
@@ -82,6 +88,10 @@ const size_t normal_texture_unit = 2;
 const size_t shadowmap_texture_unit = 5;
 const size_t env_cubemap_texture_unit = 6;
 const size_t baked_light_texture_unit = 2;
+
+// PBR
+const size_t roughness_texture_unit = 3;
+const size_t metalness_texture_unit = 4;
 
 }
 

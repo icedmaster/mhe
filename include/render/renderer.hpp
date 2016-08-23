@@ -7,6 +7,7 @@
 #include "core/fixed_size_vector.hpp"
 #include "math/vector4.hpp"
 #include "render_context.hpp"
+#include "gi.hpp"
 
 #include "debug/gpu_profiler.hpp"
 
@@ -24,6 +25,8 @@ class PosteffectDebugMaterialSystem;
 class LPVMaterialSystem;
 class RSMMaterialSystem;
 class LPVResolveMaterialSystem;
+class SkyboxMaterialSystem;
+class IndirectLightingResolveMaterialSystem;
 class Renderer;
 
 bool init_node(NodeInstance& node, Context& context);
@@ -31,9 +34,9 @@ void update_nodes(Context& context, RenderContext& render_context, SceneContext&
 void sort_draw_calls(const Context& context, RenderContext& render_context);
 
 MHE_EXPORT void setup_node(NodeInstance& node, MaterialSystem* material_system, Context& context, SceneContext& scene_context,
-                const string& albedo_texture_name, const string& normalmap_texture_name = string());
-MHE_EXPORT void setup_node(NodeInstance& node, MaterialSystem* material_system, Context& context, SceneContext& scene_context,
-    const MaterialInitializationData& material_initialization_data);
+                           const FilePath& material_name,
+                           const FilePath& albedo_texture_name, const FilePath& normalmap_texture_name = string());
+MHE_EXPORT void setup_node(NodeInstance& node, MaterialSystem* material_system, Context& context, SceneContext& scene_context, MaterialDataIdType material_id);
 
 MHE_EXPORT bool load_node(NodeInstance& instance, const string& name, const char* material_system_name, Context& context, SceneContext& scene_context);
 
@@ -71,6 +74,8 @@ public:
         string node;
         size_t node_buffer;
         BufferHandleType explicit_handle;
+        string systemwide_name;
+        string material;
 
         Buffer() : explicit_handle(InvalidHandle<BufferHandleType>::id) {}
     };
@@ -93,7 +98,7 @@ public:
         bool instantiate;
     };
 
-    MHE_EXPORT void add(Context& context, const PosteffectNodeDesc& node_desc);
+    MHE_EXPORT PosteffectMaterialSystemBase* add(Context& context, const PosteffectNodeDesc& node_desc);
     MHE_EXPORT PosteffectMaterialSystemBase* create(Context& context, const PosteffectNodeDesc& node_desc);
     void process(Context& context, RenderContext& render_context, SceneContext& scene_context);
 private:
@@ -125,17 +130,41 @@ public:
         LPVParams() : output_texture_format(format_rgb16f), output_texture_scale(1.0f) {}
     };
 
+    struct Settings
+    {
+        string diffuse_resolve_shader_name;
+    };
+
     GISystem();
 
+    bool init(Context& context, const Settings& settings);
+    void destroy(Context& context);
+
     void add_lpv(Context& context, Renderer& renderer, const LPVParams& params);
+    void add_skybox(Context& context, const SkyboxMaterialSystem* skybox_material_system, const CubemapIntegrator::Settings& integrator_settings);
+
     void apply(Renderer& renderer);
+
+    void update_skybox(Context& context);
 
     void before_render(Context& context, SceneContext& scene_context, RenderContext& render_context);
     void render(Context& context, SceneContext& scene_context, RenderContext& render_context);
+
+    LPVMaterialSystem* lpv_material_system() const
+    {
+        return lpv_material_system_;
+    }
 private:
     RSMMaterialSystem* rsm_material_system_;
     LPVMaterialSystem* lpv_material_system_;
     LPVResolveMaterialSystem* lpv_resolve_material_system_;
+    const SkyboxMaterialSystem* skybox_material_system_;
+
+    ShaderStorageBufferHandleType ambient_sh_buffer_id_;
+    CubemapIntegrator cubemap_integrator_;
+
+    IndirectLightingResolveMaterialSystem* diffuse_lighting_resolve_material_system_;
+
 };
 
 class MHE_EXPORT Renderer : public ref_counter
@@ -157,10 +186,15 @@ public:
         renderer_debug_mode_probes
     };
 public:
+    struct Settings
+    {
+        GISystem::Settings gi_settings;
+    };
+
     Renderer(Context& context);
     virtual ~Renderer() {}
 
-    bool init();
+    bool init(const Settings& settings);
     void destroy();
 
     virtual void before_update(SceneContext& scene_context);
@@ -171,6 +205,16 @@ public:
     void set_shadowmap_depth_write_material_system(MaterialSystem* material_system);
     void set_directional_shadowmap_depth_write_material_system(MaterialSystem* material_system);
     void set_fullscreen_debug_material_system(PosteffectDebugMaterialSystem* material_system);
+
+    void set_indirect_diffuse_lighting_texture(const TextureInstance& texture)
+    {
+        gi_diffuse_texture_ = texture;
+    }
+
+    const TextureInstance& indirect_diffuse_lighting_texture() const
+    {
+        return gi_diffuse_texture_;
+    }
 
     void set_material_system_to_process(MaterialSystem* material_system)
     {
@@ -210,6 +254,9 @@ public:
         return render_context_;
     }
 
+    UniformBufferHandleType system_wide_uniform(const string& name) const;
+    UniformBufferHandleType main_camera_uniform() const;
+
     virtual void set_gi_modifier_material_system(MaterialSystem*, size_t)
     {}
 
@@ -222,6 +269,12 @@ public:
     {
         return TextureInstance();
     }
+
+    virtual void setup_common_pass(Material& /*material*/) const
+    {
+    }
+
+    void set_skybox_cubemap(const TextureInstance& cubemap);
 protected:
     Context& context()
     {
@@ -235,6 +288,8 @@ private:
     virtual void update_impl(Context& /*context*/, RenderContext& /*render_context*/, SceneContext& /*scene_context*/) {}
     virtual void render_impl(Context& context, RenderContext& render_context, SceneContext& scene_context) = 0;
 
+    void flush_pass();
+
     Context& context_;
     MaterialSystem* skybox_material_system_;
     MaterialSystem* shadowmap_depth_write_material_system_;
@@ -242,6 +297,8 @@ private:
     // To implement
     MaterialSystem* transparent_objects_material_system_;
     MaterialSystem* particles_material_system_;
+
+    TextureInstance gi_diffuse_texture_;
 
     PosteffectDebugMaterialSystem* fullscreen_debug_material_system_;
 

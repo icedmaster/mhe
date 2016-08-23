@@ -8,6 +8,8 @@
 #include "render/csm_depth_rendering_material_system.hpp"
 #include "render/rsm_material_system.hpp"
 #include "render/lpv_material_system.hpp"
+#include "render/fog.hpp"
+#include "render/gi.hpp"
 
 namespace mhe {
 namespace game {
@@ -36,6 +38,12 @@ void Engine::setup_generated()
     MaterialSystemFactory::instance().add<RSMMaterialSystem>();
     MaterialSystemFactory::instance().add<LPVMaterialSystem>();
     MaterialSystemFactory::instance().add<LPVResolveMaterialSystem>();
+    MaterialSystemFactory::instance().add<HeightFogMaterialSystem>();
+    MaterialSystemFactory::instance().add<ExponentialShadowMap>();
+    MaterialSystemFactory::instance().add<VolumetricFogMaterialSystem>();
+    MaterialSystemFactory::instance().add<VolumetricFogResolveMaterialSystem>();
+    MaterialSystemFactory::instance().add<VolumetricFogSystem>();
+    MaterialSystemFactory::instance().add<IndirectLightingResolveMaterialSystem>();
 }
 
 }}

@@ -13,6 +13,8 @@
 /12_sh/build/*
 /13_compute/build/*
 /14_lpv/build/*
+/15_fog/build/*
+/16_pbr/build/*
 
 !/build/CMakeLists.txt
 !/01_init/build/CMakeLists.txt
@@ -29,6 +31,8 @@
 !/12_sh/build/CMakeLists.txt
 !/13_compute/build/CMakeLists.txt
 !/14_lpv/build/CMakeLists.txt
+!/15_fog/build/CMakeLists.txt
+!/16_pbr/build/CMakeLists.txt
 
 
 
