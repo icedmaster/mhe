@@ -86,7 +86,7 @@ void GBufferFillMaterialSystem::setup(Context& context, SceneContext& scene_cont
         index.set(skinning_info, use_skinning);
         material.shader_program = shader.get(index);
 
-        MaterialData& material_data = context.material_data_pool.get(parts[i].material_id);
+        MaterialData& material_data = context.material_data_pool.get(instance_parts[i].material_id);
         UniformBuffer::IdType material_uniform_id = create_material_uniform(context, material_data);
 
         if (is_handle_valid(material_uniform_id))
@@ -114,7 +114,7 @@ void GBufferFillMaterialSystem::update(Context& context, SceneContext& scene_con
     MATERIAL_UPDATE_WITH_COMMAND(context, scene_context, render_context, update, render_target_, &list_of_commands_);
 }
 
-void GBufferFillMaterialSystem::update(Context& context, SceneContext& /*scene_context*/, RenderContext& render_context, MeshPartInstance* nodes, MeshPart* parts, size_t count)
+void GBufferFillMaterialSystem::update(Context& context, SceneContext& /*scene_context*/, RenderContext& render_context, MeshPartInstance* instance_parts, MeshPart* parts, size_t count)
 {
     UberShader& shader = ubershader(context);
     const UberShader::Info& normalmap_info = shader.info("NORMALMAP");
@@ -124,7 +124,7 @@ void GBufferFillMaterialSystem::update(Context& context, SceneContext& /*scene_c
     clear_command_.reset();
     for (size_t i = 0; i < count; ++i)
     {
-        Material& material = context.materials[id()].get(nodes[i].material.id);
+        Material& material = context.materials[id()].get(instance_parts[i].material.id);
         material.uniforms[perframe_data_unit] = render_context.main_camera.percamera_uniform;
         size_t use_normalmap = material.textures[normal_texture_unit].id != Texture::invalid_id && use_normalmapping_ ? 1 : 0;
         size_t use_skinning = material.texture_buffers[animation_texture_unit] != TextureBuffer::invalid_id ? 1 : 0;
@@ -137,7 +137,7 @@ void GBufferFillMaterialSystem::update(Context& context, SceneContext& /*scene_c
 #ifdef MHE_UPDATE_MATERIAL
         if (is_handle_valid(material.uniforms[material_data_unit]))
         {
-            const MaterialData& material_data = context.material_data_pool.get(parts[i].material_id);
+            const MaterialData& material_data = context.material_data_pool.get(instance_parts[i].material_id);
             update_material_data(context.uniform_pool.get(material.uniforms[material_data_unit]), material_data);
         }
 #endif

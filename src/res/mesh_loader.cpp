@@ -37,6 +37,9 @@ bool MeshLoader::setup_instance(MeshInstance& instance, context_type* context)
         instance.skeleton_instance.texture_buffer = texture_buffer.id();
     }
 
+    for (size_t i = 0, size = instance.instance_parts.size(); i < size; ++i)
+        instance.instance_parts[i].material_id = instance.mesh.parts[i].material_id;
+
     return true;
 }
 

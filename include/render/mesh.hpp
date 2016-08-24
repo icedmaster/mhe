@@ -99,12 +99,14 @@ struct MeshPartInstance
     };
 
     MaterialInstance material;
+    MaterialDataIdType material_id;
     RenderStateHandleType render_state_id;
     AABBInstanceHandleType aabb_id;
     uint16_t flags;
     bool visible : 1;
 
-    MeshPartInstance() : render_state_id(InvalidHandle<RenderStateHandleType>::id),
+    MeshPartInstance() : material_id(InvalidHandle<MaterialDataIdType>::id),
+        render_state_id(InvalidHandle<RenderStateHandleType>::id),
         aabb_id(InvalidHandle<AABBInstanceHandleType>::id),
         flags(cast_shadow | receive_shadow | cast_reflection),
         visible(true)

@@ -53,7 +53,7 @@ void MaterialSystem::standart_material_setup(Context& context, SceneContext& sce
         instance_parts[i].material.material_system = material_system_id;
         instance_parts[i].material.id = material.id;
 
-        MaterialData& material_data = context.material_data_pool.get(parts[i].material_id);
+        MaterialData& material_data = context.material_data_pool.get(instance_parts[i].material_id);
 
         ::memcpy(material.textures, material_data.textures, sizeof(TextureInstance) * material_textures_number);
 

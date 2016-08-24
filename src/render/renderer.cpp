@@ -109,7 +109,7 @@ void setup_node(NodeInstance& node, MaterialSystem* material_system, Context& co
 
 void setup_node(NodeInstance& node, MaterialSystem* material_system, Context& context, SceneContext& scene_context, MaterialDataIdType material_id)
 {
-    node.mesh.mesh.parts[0].material_id = material_id;
+    node.mesh.instance_parts[0].material_id = material_id;
     ModelContext model_context;
     model_context.transform_uniform = node.mesh.shared_uniform;
     model_context.animation_texture_buffer = node.mesh.skeleton_instance.texture_buffer;
