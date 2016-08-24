@@ -45,6 +45,11 @@
     </options>
   </material>
   </materials>
+  <gi>
+    <settings>
+      <diffuse_resolve_shader>gi_diffuse_resolve</diffuse_resolve_shader>
+    </settings>
+  </gi>
   <skybox name="skybox" />
   <shadowmap_depth_write name="depth_write" />
   <directional_shadowmap_depth_write name="csm_depth_write" />

@@ -29,7 +29,7 @@
 // #define PUGIXML_NO_EXCEPTIONS
 
 // Set this to control attributes for public classes/functions, i.e.:
-#ifdef __WIN32__
+#ifdef _WIN32
 #define PUGIXML_API __declspec(dllexport) // to export all public symbols from DLL
 #endif
 // #define PUGIXML_CLASS __declspec(dllimport) // to import all classes from DLL

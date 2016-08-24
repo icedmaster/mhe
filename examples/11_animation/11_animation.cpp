@@ -205,9 +205,7 @@ public:
         mhe::GBufferFillMaterialSystem* material_system = engine.context().material_systems.get<mhe::GBufferFillMaterialSystem>();
         mhe::NodeInstance& plane = engine.scene().create_node();
         mhe::utils::create_plane(plane, engine.context());
-        /*mhe::MaterialInitializationData material_initialization_data;
-        material_initialization_data.textures[0] = mhe::string("test.tga");
-        mhe::setup_node(plane, material_system, engine.context(), engine.scene_context(), material_initialization_data);*/
+        mhe::setup_node(plane, material_system, engine.context(), engine.scene_context(), mhe::FilePath("test"), mhe::FilePath("test.tga"));
         mhe::set_node_transform(engine.scene_context(), plane, mhe::vec3::zero(), mhe::quatf(mhe::pi_2, 0.0f, 0.0f),
             mhe::vec3(5.0f, 5.0f, 5.0f));
 
