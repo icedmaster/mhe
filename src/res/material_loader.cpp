@@ -26,6 +26,10 @@ bool MaterialLoader::load(type& res, const FilePath& name, const context_type* c
         context->texture_manager.get(material_data.textures[albedo_texture_unit], dbmaterial.albedo.ref);
     if (!dbmaterial.normalmap.ref.empty())
         context->texture_manager.get(material_data.textures[normal_texture_unit], dbmaterial.normalmap.ref);
+    if (!dbmaterial.roughness_map.ref.empty())
+        context->texture_manager.get(material_data.textures[roughness_texture_unit], dbmaterial.roughness_map.ref);
+    if (!dbmaterial.metalness_map.ref.empty())
+        context->texture_manager.get(material_data.textures[metalness_texture_unit], dbmaterial.metalness_map.ref);
 
     res = material_data.id;
 

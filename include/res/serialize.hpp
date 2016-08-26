@@ -185,6 +185,7 @@ private:
 #define WRITE_BASIC_TYPE_FIELD(field, serializer) if (!serializer.write_basic_type(#field, field)) return false;
 
 #define READ_FIELD(field, serializer) if (!serializer.read(#field, field)) return false;
+#define READ_FIELD_WITH_DEFAULT(field, serializer, default_value) if (!serializer.read(#field, field)) field = default_value;
 #define READ_BASIC_TYPE_FIELD(field, serializer) if (!serializer.read_basic_type(#field, field)) return false;
 
 #endif

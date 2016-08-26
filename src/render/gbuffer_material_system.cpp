@@ -90,22 +90,7 @@ void GBufferFillMaterialSystem::setup(Context& context, SceneContext& scene_cont
         UniformBuffer::IdType material_uniform_id = create_material_uniform(context, material_data);
 
         if (is_handle_valid(material_uniform_id))
-        {
-            UniformBufferDesc uniform_buffer_desc;
-            uniform_buffer_desc.unit = material_data_unit;
-            uniform_buffer_desc.update_type = uniform_buffer_static;
-            uniform_buffer_desc.size = sizeof(PhongMaterialData);
-
-            UniformBuffer& uniform = context.uniform_pool.get(material_uniform_id);
-            bool res = uniform.init(uniform_buffer_desc);
-            ASSERT(res, "Can't initialize material uniform");
             material.uniforms[material_data_unit] = material_uniform_id;
-            PhongMaterialData shader_material_data;
-            shader_material_data.diffuse = vec4(material_data.render_data.diffuse, 1.0f);
-            shader_material_data.specular = vec4(material_data.render_data.specular, material_data.render_data.specular_shininess);
-            shader_material_data.params = vec4(material_data.render_data.glossiness, 0.0f, 0.0f, 0.0f);
-            uniform.update(shader_material_data);
-        }
     }
 }
 
@@ -118,6 +103,8 @@ void GBufferFillMaterialSystem::update(Context& context, SceneContext& /*scene_c
 {
     UberShader& shader = ubershader(context);
     const UberShader::Info& normalmap_info = shader.info("NORMALMAP");
+    const UberShader::Info& roughness_info = shader.info("ROUGHNESS_MAP");
+    const UberShader::Info& metalness_info = shader.info("METALNESS_MAP");
     const UberShader::Info& skinning_info = shader.info("SKINNING");
     const UberShader::Info& baked_light_info = shader.info("BAKED_LIGHT");
     UberShader::Index index;
@@ -126,10 +113,14 @@ void GBufferFillMaterialSystem::update(Context& context, SceneContext& /*scene_c
     {
         Material& material = context.materials[id()].get(instance_parts[i].material.id);
         material.uniforms[perframe_data_unit] = render_context.main_camera.percamera_uniform;
-        size_t use_normalmap = material.textures[normal_texture_unit].id != Texture::invalid_id && use_normalmapping_ ? 1 : 0;
-        size_t use_skinning = material.texture_buffers[animation_texture_unit] != TextureBuffer::invalid_id ? 1 : 0;
-        size_t use_baked_light = use_baked_lighting_ && material.texture_buffers[baked_light_texture_unit] != TextureBuffer::invalid_id ? 1 : 0;
+        const size_t use_normalmap = material.textures[normal_texture_unit].id != Texture::invalid_id && use_normalmapping_ ? 1 : 0;
+        const size_t use_roughness_map = is_handle_valid(material.textures[roughness_texture_unit].id) ? 1 : 0;
+        const size_t use_metalness_map = is_handle_valid(material.textures[metalness_texture_unit].id) ? 1 : 0;
+        const size_t use_skinning = material.texture_buffers[animation_texture_unit] != TextureBuffer::invalid_id ? 1 : 0;
+        const size_t use_baked_light = use_baked_lighting_ && material.texture_buffers[baked_light_texture_unit] != TextureBuffer::invalid_id ? 1 : 0;
         index.set(normalmap_info, use_normalmap);
+        index.set(roughness_info, use_roughness_map);
+        index.set(metalness_info, use_metalness_map);
         index.set(skinning_info, use_skinning);
         index.set(baked_light_info, use_baked_light);
         material.shader_program = shader.get(index);

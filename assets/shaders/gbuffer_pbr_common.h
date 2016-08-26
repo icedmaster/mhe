@@ -49,5 +49,10 @@ vec3 gbuffer_normal_ws(vec2 tex)
 {
     return texture(gbuffer_layer1_texture, tex).xyz;
 }
+
+float gbuffer_depth(vec2 tex)
+{
+    return texture(depth_texture, tex).x;
+}
 #endif
 

@@ -1,5 +1,3 @@
-[defs PROBES 0 1]
-
 #define EARLY_EXIT
 //#define VIEWSPACE
 
@@ -8,7 +6,7 @@
 [fragment]
 
 [include "common.h"]
-[include "gbuffer_common.h"]
+[include "gbuffer_pbr_common.h"]
 
 [uniform ssr_params 1 per_frame]
 uniform ssr_params
@@ -17,10 +15,6 @@ uniform ssr_params
 };
 
 [sampler2D lit_texture 4]
-
-#if PROBES == 1
-[sampler2D probes_texture 5]
-#endif
 
 in VSOutput vsoutput;
 
@@ -53,7 +47,7 @@ vec4 ssr(vec3 ray_origin, vec3 ray_dir, GBuffer gbuffer, int samples, float init
 
 #ifdef EARLY_EXIT
 	if (dot(ray_dir, reflected) < 0.0f) return VEC4_ZERO;
-	if (gbuffer.glossiness < 0.01f) return VEC4_ZERO;
+	if (gbuffer.metalness < 0.01f) return VEC4_ZERO;
 #endif
 
 	float fade_distance = params.fade_distance;
@@ -102,14 +96,9 @@ vec4 ssr(vec3 ray_origin, vec3 ray_dir, GBuffer gbuffer, int samples, float init
 
 	vec3 lit = texture(lit_texture, res_pos).rgb;
 
-#if PROBES == 1
-	vec3 probe_data = texture(probes_texture, gbuffer.pixel_pos).rgb;
-	lit = mix(probe_data * 0.25f, lit, weight * view_weight) * view_weight;
-#else
 	lit *= weight * view_weight;
-#endif
 
-	return vec4(lit * gbuffer.glossiness * params.intensity * distance_weight, weight);
+	return vec4(lit * gbuffer.metalness * params.intensity * distance_weight, weight);
 }
 
 void main()

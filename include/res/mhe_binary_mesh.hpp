@@ -27,7 +27,7 @@ struct Texture : public Serializable
 
     bool read(Deserializer& deserializer) override
     {
-        READ_FIELD(ref, deserializer);
+        READ_FIELD_WITH_DEFAULT(ref, deserializer, FilePath());
         return true;
     }
 };
@@ -38,11 +38,15 @@ struct Material : public Serializable
     FilePath ref;
     Texture albedo;
     Texture normalmap;
+    Texture roughness_map;
+    Texture metalness_map;
 
     bool write(Serializer& serializer) const override
     {
         WRITE_FIELD(albedo, serializer);
         WRITE_FIELD(normalmap, serializer);
+        WRITE_FIELD(roughness_map, serializer);
+        WRITE_FIELD(metalness_map, serializer);
         return true;
     }
 
@@ -50,6 +54,8 @@ struct Material : public Serializable
     {
         READ_FIELD(albedo, deserializer);
         READ_FIELD(normalmap, deserializer);
+        READ_FIELD(roughness_map, deserializer);
+        READ_FIELD(metalness_map, deserializer);
         return true;
     }
 };
