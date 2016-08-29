@@ -3,6 +3,7 @@
 #include <cstring>
 #include "core/assert.hpp"
 #include "render/image.hpp"
+#include "render/definitions.hpp"
 
 namespace mhe {
 
@@ -33,7 +34,8 @@ bool load_uncompressed_tga(Image& image, std::istream& stream, uint32_t flags)
     data.resize(size);
     stream.read(reinterpret_cast<char*>(&data[0]), size);
 
-    swap_bgr_rgb(data, image.bpp / 8);
+    if (image.bpp >= 24)
+        swap_bgr_rgb(data, image.bpp / 8);
     if (flags & image_flip_v)
         flip(data, image.width, image.height, image.bpp / 8);
 
@@ -50,7 +52,7 @@ bool load_uncompressed_tga(Image& image, std::istream& stream, uint32_t flags)
         }
     }
     else image.data = data;
-    image.mode = image_rgba;
+    image.mode = image.bpp == 8 ? format_r8 : format_rgba;
     return true;
 }
 

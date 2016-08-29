@@ -9,12 +9,6 @@ namespace mhe {
 
 enum
 {
-    image_rgba,
-    image_bgra
-};
-
-enum
-{
     image_flip_v = 1
 };
 

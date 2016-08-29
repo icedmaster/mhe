@@ -15,19 +15,13 @@ namespace mhe {
 
 namespace detail {
 
-int texture_format(int image_format)
-{
-    int formats[] = {image_rgba, image_bgra};
-    return formats[image_format];
-}
-
 bool create_texture(Texture& texture, int target, const Image& image, const Context* /*context*/)
 {
     TextureDesc desc;
     desc.type = target;
     desc.width = image.width;
     desc.height = image.height;
-    desc.format = texture_format(image.mode);
+    desc.format = image.mode;
     desc.mips = image.has_mips ? 0 : default_mips_number;
     desc.mag_filter = texture_filter_linear_mipmap_linear;
     desc.min_filter = texture_filter_linear_mipmap_linear;
