@@ -46,17 +46,28 @@ public:
         global_ambient_sh_id_ = ssb_id;
     }
 
-    RenderTargetHandleType render_target_id() const override
+    RenderTargetHandleType resolved_diffuse_render_target_id() const
     {
-        return rt_id_;
+        return resolved_diffuse_rt_id_;
+    }
+
+    RenderTargetHandleType resolved_specular_render_target_id() const
+    {
+        return resolved_specular_rt_id_;
     }
 private:
     void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
 
-    bool init_fullscreen_quad(Context& context);
+    bool init_fullscreen_quad(MeshInstance& mesh_instance, Context& context);
 
-    RenderTargetHandleType rt_id_;
-    MeshInstance quad_mesh_;
+    UbershaderHandleType diffuse_resolve_ubershader_id_;
+    UbershaderHandleType specular_resolve_ubershader_id_;
+    RenderTargetHandleType resolved_diffuse_rt_id_;
+    RenderTargetHandleType resolved_specular_rt_id_;
+    MaterialHandleType diffuse_resolve_material_id_;
+    MaterialHandleType specular_resolve_material_id_;
+    MeshInstance diffuse_resolve_quad_mesh_;
+    MeshInstance specular_resolve_quad_mesh_;
 
     ShaderStorageBufferHandleType global_ambient_sh_id_;
 };

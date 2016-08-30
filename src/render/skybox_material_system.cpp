@@ -100,6 +100,8 @@ void SkyboxMaterialSystem::update(Context& context, SceneContext& /*scene_contex
     material.textures[0] = skybox_texture_;
 
     setup_draw_call(render_context.draw_calls.add(), skybox_mesh_.instance_parts[0], skybox_mesh_.mesh.parts[0], default_render_target);
+
+    render_context.space_grid.set_global_cubemap(skybox_texture_);
 }
 
 }

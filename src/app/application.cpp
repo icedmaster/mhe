@@ -441,6 +441,9 @@ void Application::init_gi_params(pugi::xml_node node, GIParams& params) const
         pugi::xml_node diffuse_resolve_node = n.child("diffuse_resolve_shader");
         if (diffuse_resolve_node)
             params.gi_settings.diffuse_resolve_shader_name = diffuse_resolve_node.child_value();
+        pugi::xml_node specular_resolve_node = n.child("specular_resolve_shader");
+        if (specular_resolve_node)
+            params.gi_settings.specular_resolve_shader_name = specular_resolve_node.child_value();
     }
 }
 

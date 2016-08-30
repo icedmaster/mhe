@@ -69,6 +69,7 @@ void main()
 in VSOutput vsoutput;
 
 [sampler2D gi_diffuse_texture 6]
+[sampler2D gi_specular_texture 7]
 
 out vec3 out_color;
 
@@ -76,7 +77,7 @@ IndirectLighting get_indirect_lighting(vec2 tex)
 {
     IndirectLighting indirect_lighting;
     indirect_lighting.diffuse = texture(gi_diffuse_texture, tex).rgb;
-    indirect_lighting.specular = VEC3_ZERO;
+    indirect_lighting.specular = texture(gi_specular_texture, tex).rgb;
     return indirect_lighting;
 }
 

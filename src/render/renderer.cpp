@@ -310,7 +310,7 @@ GISystem::GISystem() :
     lpv_material_system_(nullptr),
     lpv_resolve_material_system_(nullptr),
     skybox_material_system_(nullptr),
-    diffuse_lighting_resolve_material_system_(nullptr)
+    indirect_lighting_resolve_material_system_(nullptr)
 {}
 
 bool GISystem::init(Context& context, const Settings& settings)
@@ -318,20 +318,29 @@ bool GISystem::init(Context& context, const Settings& settings)
     const string diffuse_resolve_name = IndirectLightingResolveMaterialSystem::material_name();
 
     MaterialSystemContext material_system_context;
-    material_system_context.material_instances_number = 1;
-    material_system_context.shader_name = settings.diffuse_resolve_shader_name;
+    material_system_context.material_instances_number = 2;
     material_system_context.priority = DeferredRenderer::deferred_renderer_gbuffer_modifier_priority;
     material_system_context.instance_name = diffuse_resolve_name;
+    material_system_context.options.add("diffuse_resolve_shader", settings.diffuse_resolve_shader_name);
+    material_system_context.options.add("specular_resolve_shader", settings.specular_resolve_shader_name);
 
     context.initialization_parameters.add(diffuse_resolve_name, material_system_context);
-    diffuse_lighting_resolve_material_system_ =
+    indirect_lighting_resolve_material_system_ =
         create<IndirectLightingResolveMaterialSystem>(context, diffuse_resolve_name, diffuse_resolve_name);
 
-    const RenderTarget& rt = context.render_target_pool.get(diffuse_lighting_resolve_material_system_->render_target_id());
+    {
+        const RenderTarget& rt = context.render_target_pool.get(indirect_lighting_resolve_material_system_->resolved_diffuse_render_target_id());
+        TextureInstance texture;
+        rt.color_texture(texture, 0);
+        context.renderer->set_indirect_diffuse_lighting_texture(texture);
+    }
 
-    TextureInstance texture;
-    rt.color_texture(texture, 0);
-    context.renderer->set_indirect_diffuse_lighting_texture(texture);
+    {
+        const RenderTarget& rt = context.render_target_pool.get(indirect_lighting_resolve_material_system_->resolved_specular_render_target_id());
+        TextureInstance texture;
+        rt.color_texture(texture, 0);
+        context.renderer->set_indirect_specular_lighting_texture(texture);
+    }
 
     return true;
 }
@@ -407,8 +416,8 @@ void GISystem::add_lpv(Context& context, Renderer& renderer, const LPVParams& pa
 void GISystem::apply(Renderer& renderer)
 {
     renderer.set_gi_modifier_material_system(lpv_resolve_material_system_, 0);
-    ASSERT(diffuse_lighting_resolve_material_system_ != nullptr, "Invalid diffuse GI material system");
-    diffuse_lighting_resolve_material_system_->set_global_ambient_sh_buffer(ambient_sh_buffer_id_);
+    ASSERT(indirect_lighting_resolve_material_system_ != nullptr, "Invalid diffuse GI material system");
+    indirect_lighting_resolve_material_system_->set_global_ambient_sh_buffer(ambient_sh_buffer_id_);
 }
 
 void GISystem::add_skybox(Context& context, const SkyboxMaterialSystem* skybox_material_system, const CubemapIntegrator::Settings& integrator_settings)
@@ -448,7 +457,7 @@ void GISystem::before_render(Context& context, SceneContext& scene_context, Rend
 
 void GISystem::render(Context& context, SceneContext& scene_context, RenderContext& render_context)
 {
-    diffuse_lighting_resolve_material_system_->setup_draw_calls(context, scene_context, render_context);
+    indirect_lighting_resolve_material_system_->setup_draw_calls(context, scene_context, render_context);
 
     if (rsm_material_system_ != nullptr && lpv_material_system_ != nullptr)
     {

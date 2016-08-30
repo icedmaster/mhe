@@ -400,6 +400,7 @@ void GBufferDrawMaterialSystem::update(Context& context, SceneContext& /*scene_c
         material.textures[2] = accumnulator_texture_;
         material.textures[3] = depth_texture_;
         material.textures[6] = context.renderer->indirect_diffuse_lighting_texture();
+        material.textures[7] = context.renderer->indirect_specular_lighting_texture();
         material.textures[shadowmap_texture_unit] = shadowmap_texture;
         material.uniforms[0] = render_context.main_camera.percamera_uniform;
         material.uniforms[2] = light_uniform;

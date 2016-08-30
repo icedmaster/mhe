@@ -94,8 +94,25 @@ bool CubemapIntegrator::integrate(ShaderStorageBuffer& dst, Context& context, Te
 bool IndirectLightingResolveMaterialSystem::init(Context& context, const MaterialSystemContext& material_system_context)
 {
     set_layout(FullscreenLayout::handle);
-    if (!init_default(context, material_system_context))
+
+    const string& diffuse_resolve_shader = material_system_context.options.get<string>("diffuse_resolve_shader");
+    ASSERT(!diffuse_resolve_shader.empty(), "Diffuse resolve shader name must not be empty");
+    Shader shader;
+    if (!context.shader_manager.get(shader, diffuse_resolve_shader))
+    {
+        ERROR_LOG("Can't load shader:" << diffuse_resolve_shader);
         return false;
+    }
+    diffuse_resolve_ubershader_id_ = shader.shader_program_handle;
+
+    const string& specular_resolve_shader = material_system_context.options.get<string>("specular_resolve_shader");
+    ASSERT(!specular_resolve_shader.empty(), "Specular resolve shader name must not be empty");
+    if (!context.shader_manager.get(shader, specular_resolve_shader))
+    {
+        ERROR_LOG("Can't load shader:" << specular_resolve_shader);
+        return false;
+    }
+    specular_resolve_ubershader_id_ = shader.shader_program_handle;
 
     RenderTargetDesc rt_desc;
     rt_desc.color_datatype[0] = format_default;
@@ -105,22 +122,30 @@ bool IndirectLightingResolveMaterialSystem::init(Context& context, const Materia
     rt_desc.texture_type = texture_2d;
     rt_desc.use_depth = false;
     rt_desc.use_stencil = false;
-    rt_id_ = context.render_target_manager.create(context, rt_desc, 1.0f).id();
+    resolved_diffuse_rt_id_ = context.render_target_manager.create(context, rt_desc, 1.0f).id();
+    resolved_specular_rt_id_ = context.render_target_manager.create(context, rt_desc, 1.0f).id();
 
-    if (!init_fullscreen_quad(context))
+    if (!init_fullscreen_quad(diffuse_resolve_quad_mesh_, context))
     {
         ERROR_LOG("Fullscreen quad initialization failed");
         return false;
     }
+
+    diffuse_resolve_material_id_ = context.materials[id()].create();
+    diffuse_resolve_quad_mesh_.instance_parts[0].material.id = diffuse_resolve_material_id_;
+
+    specular_resolve_quad_mesh_ = diffuse_resolve_quad_mesh_;
+    specular_resolve_material_id_ = context.materials[id()].create();
+    specular_resolve_quad_mesh_.instance_parts[0].material.id = specular_resolve_material_id_;
 
     global_ambient_sh_id_ = ShaderStorageBuffer::invalid_id;
 
     return true;
 }
 
-bool IndirectLightingResolveMaterialSystem::init_fullscreen_quad(Context& context)
+bool IndirectLightingResolveMaterialSystem::init_fullscreen_quad(MeshInstance& mesh_instance, Context& context)
 {
-    if (!utils::create_fullscreen_quad_shared(quad_mesh_, context))
+    if (!utils::create_fullscreen_quad_shared(mesh_instance, context))
     {
         ERROR_LOG("Can't create a fullscreen quad");
         return false;
@@ -137,18 +162,18 @@ bool IndirectLightingResolveMaterialSystem::init_fullscreen_quad(Context& contex
         return false;
     }
 
-    quad_mesh_.mesh.parts[0].render_data.layout = FullscreenLayout::handle;
-    quad_mesh_.instance_parts[0].render_state_id = render_state.id();
+    mesh_instance.mesh.parts[0].render_data.layout = FullscreenLayout::handle;
+    mesh_instance.instance_parts[0].render_state_id = render_state.id();
 
-    quad_mesh_.instance_parts[0].material.material_system = id();
-    quad_mesh_.instance_parts[0].material.id = context.materials[id()].create();
+    mesh_instance.instance_parts[0].material.material_system = id();
     return true;
 }
 
 void IndirectLightingResolveMaterialSystem::destroy(Context& context)
 {
-    destroy_pool_object(context.render_state_pool, quad_mesh_.instance_parts[0].render_state_id);
-    context.render_target_manager.destroy(rt_id_, context);
+    destroy_pool_object(context.render_state_pool, diffuse_resolve_quad_mesh_.instance_parts[0].render_state_id);
+    context.render_target_manager.destroy(resolved_diffuse_rt_id_, context);
+    context.render_target_manager.destroy(resolved_specular_rt_id_, context);
 }
 
 void IndirectLightingResolveMaterialSystem::setup(Context &context, SceneContext &scene_context, MeshPartInstance* instance_parts,
@@ -159,18 +184,29 @@ void IndirectLightingResolveMaterialSystem::setup(Context &context, SceneContext
 
 void IndirectLightingResolveMaterialSystem::update(Context& context, SceneContext& /*scene_context*/, RenderContext& render_context)
 {
-    UberShader& ushader = ubershader(context);
+    // diffuse
+    UberShader& ushader = context.ubershader_pool.get(diffuse_resolve_ubershader_id_);
     UberShader::Index index;
     const UberShader::Info& info = ushader.info("MODE");
     if (is_handle_valid(global_ambient_sh_id_))
         index.set(info, mode_sh_ambient);
 
-    Material& material = context.materials[id()].get(quad_mesh_.instance_parts[0].material.id);
+    Material& material = context.materials[id()].get(diffuse_resolve_material_id_);
     material.shader_program = ushader.get(index);
     material.shader_storage_buffers[2] = global_ambient_sh_id_;
     context.renderer->setup_common_pass(material);
 
-    setup_draw_call(render_context.draw_calls.add(), quad_mesh_.instance_parts[0], quad_mesh_.mesh.parts[0], rt_id_);
+    setup_draw_call(render_context.draw_calls.add(),
+        diffuse_resolve_quad_mesh_.instance_parts[0], diffuse_resolve_quad_mesh_.mesh.parts[0], resolved_diffuse_rt_id_);
+
+    // specular
+    UberShader& specular_ushader = context.ubershader_pool.get(specular_resolve_ubershader_id_);
+    Material& specular_material = context.materials[id()].get(specular_resolve_material_id_);
+    specular_material.shader_program = specular_ushader.get_default();
+    context.renderer->setup_common_pass(specular_material);
+    specular_material.textures[4] = render_context.space_grid.global_cubemap();
+    setup_draw_call(render_context.draw_calls.add(),
+        specular_resolve_quad_mesh_.instance_parts[0], specular_resolve_quad_mesh_.mesh.parts[0], resolved_specular_rt_id_);
 }
 
 }

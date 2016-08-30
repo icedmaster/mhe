@@ -51,7 +51,7 @@ struct MaterialInstance
 const float default_shininess = 50.0f;
 const float default_glossiness = 0.0f;
 const float default_roughness = 0.5f;
-const float default_metalness = 0.1f;
+const float default_metalness = 50.0f / 255.0f;
 
 struct MaterialRenderData
 {

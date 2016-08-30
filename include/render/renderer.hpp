@@ -133,6 +133,7 @@ public:
     struct Settings
     {
         string diffuse_resolve_shader_name;
+        string specular_resolve_shader_name;
     };
 
     GISystem();
@@ -163,8 +164,7 @@ private:
     ShaderStorageBufferHandleType ambient_sh_buffer_id_;
     CubemapIntegrator cubemap_integrator_;
 
-    IndirectLightingResolveMaterialSystem* diffuse_lighting_resolve_material_system_;
-
+    IndirectLightingResolveMaterialSystem* indirect_lighting_resolve_material_system_;
 };
 
 class MHE_EXPORT Renderer : public ref_counter
@@ -214,6 +214,16 @@ public:
     const TextureInstance& indirect_diffuse_lighting_texture() const
     {
         return gi_diffuse_texture_;
+    }
+
+    void set_indirect_specular_lighting_texture(const TextureInstance& texture)
+    {
+        gi_specular_texture_ = texture;
+    }
+
+    const TextureInstance& indirect_specular_lighting_texture() const
+    {
+        return gi_specular_texture_;
     }
 
     void set_material_system_to_process(MaterialSystem* material_system)
@@ -299,6 +309,7 @@ private:
     MaterialSystem* particles_material_system_;
 
     TextureInstance gi_diffuse_texture_;
+    TextureInstance gi_specular_texture_;
 
     PosteffectDebugMaterialSystem* fullscreen_debug_material_system_;
 
