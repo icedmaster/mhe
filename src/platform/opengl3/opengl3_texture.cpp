@@ -43,13 +43,12 @@ bool OpenGL3Texture::init(const TextureDesc& desc, const uint8_t* data, size_t s
             pixel_data_format_,
             datatype_, data);
         CHECK_GL_ERRORS();
-        
-        if (desc.mips > 0)
-        {
-            // TODO: need to try glTexStorage2D - we can setup the mipmaps number then
-            OpenGLExtensions::instance().glGenerateMipmap(target_);
-            CHECK_GL_ERRORS();
-        }
+    }
+    if (desc.mips > 0)
+    {
+        // TODO: need to try glTexStorage2D - we can setup the mipmaps number then
+        OpenGLExtensions::instance().glGenerateMipmap(target_);
+        CHECK_GL_ERRORS();
     }
     return true;
 }

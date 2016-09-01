@@ -29,9 +29,9 @@ bool create_texture(Texture& texture, int target, const Image& image, const Cont
     if (target == texture_cube)
     {
         desc.address_mode_s = desc.address_mode_t = texture_clamp_to_edge;
-        desc.mips = 0;
-        desc.mag_filter = texture_filter_linear;
-        desc.min_filter = texture_filter_linear;
+        desc.mips = default_mips_number;
+        desc.mag_filter = texture_filter_linear_mipmap_linear;
+        desc.min_filter = texture_filter_linear_mipmap_linear;
     }
     return texture.init(desc, &image.data[0], image.data.size());
 }

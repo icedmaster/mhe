@@ -48,6 +48,8 @@ bool OpenGL3Driver::init(DriverRenderingCapabilities& caps)
     glEnable(GL_FRAMEBUFFER_SRGB);
 #endif
 
+    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
     return true;
 }
 
