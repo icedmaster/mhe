@@ -55,6 +55,11 @@ public:
     {
         return resolved_specular_rt_id_;
     }
+
+    void add_gi_diffuse(const TextureInstance& texture)
+    {
+        gi_diffuse_ = texture;
+    }
 private:
     void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
 
@@ -70,6 +75,8 @@ private:
     MeshInstance specular_resolve_quad_mesh_;
 
     ShaderStorageBufferHandleType global_ambient_sh_id_;
+
+    TextureInstance gi_diffuse_;
 };
 
 }

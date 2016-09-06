@@ -15,7 +15,7 @@
 
 const size_t mhe_header_length = 3;
 const char mhe_header[mhe_header_length + 1] = "mhe";
-const char mhe_default_version = 0x2;
+const char mhe_default_version = 0x3;
 const char mhe_animation_version = 0x1;
 
 const size_t initial_vertex_buffer_size = 100000;
@@ -635,8 +635,8 @@ int main(int argc, char** argv)
     uint8_t version = parser.get<uint8_t>("--version", "-v", mhe_default_version);
     const char* in_filename = parser.get<const char*>("--source", "-s");
     const char* out_filename = parser.get<const char*>("--destination", "-d");
-    const char* texture_path = parser.get<const char*>("--texture-path", "-tp");
-    const char* material_path = parser.get<const char*>("--material-path", "-mp");
+    const char* texture_path = parser.get<const char*>("--texture-path", "-tp", "");
+    const char* material_path = parser.get<const char*>("--material-path", "-mp", "");
     if (in_filename == nullptr || out_filename == nullptr)
     {
         ERROR_LOG("Source and destination names must be specified");

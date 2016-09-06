@@ -411,11 +411,12 @@ void GISystem::add_lpv(Context& context, Renderer& renderer, const LPVParams& pa
         renderer.posteffect_system().create(context, posteffect_node_desc));
     ASSERT(lpv_resolve_material_system_ != nullptr, "LPVResolveMaterialSystem initialization failed."
         "Probably, you forgot to add its description to the configuration file");
+    lpv_resolve_material_system_->set_priority(params.base_priority);
+    indirect_lighting_resolve_material_system_->add_gi_diffuse(lpv_resolve_material_system_->output(0));
 }
 
 void GISystem::apply(Renderer& renderer)
 {
-    renderer.set_gi_modifier_material_system(lpv_resolve_material_system_, 0);
     ASSERT(indirect_lighting_resolve_material_system_ != nullptr, "Invalid diffuse GI material system");
     indirect_lighting_resolve_material_system_->set_global_ambient_sh_buffer(ambient_sh_buffer_id_);
 }
@@ -457,9 +458,7 @@ void GISystem::before_render(Context& context, SceneContext& scene_context, Rend
 
 void GISystem::render(Context& context, SceneContext& scene_context, RenderContext& render_context)
 {
-    indirect_lighting_resolve_material_system_->setup_draw_calls(context, scene_context, render_context);
-
-    if (rsm_material_system_ != nullptr && lpv_material_system_ != nullptr)
+    if (rsm_material_system_ != nullptr && lpv_material_system_ != nullptr && lpv_resolve_material_system_ != nullptr)
     {
         RSMData data;
         rsm_material_system_->rsm_data(data);
@@ -467,7 +466,11 @@ void GISystem::render(Context& context, SceneContext& scene_context, RenderConte
 
         rsm_material_system_->setup_draw_calls(context, scene_context, render_context);
         lpv_material_system_->setup_draw_calls(context, scene_context, render_context);
+
+        lpv_resolve_material_system_->setup_draw_calls(context, scene_context, render_context);
     }
+
+    indirect_lighting_resolve_material_system_->setup_draw_calls(context, scene_context, render_context);
 }
 
 Renderer::Renderer(Context& context) :

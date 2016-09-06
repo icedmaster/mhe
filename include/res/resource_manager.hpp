@@ -101,7 +101,6 @@ protected:
         typename resmap::iterator it = resources_.find(name);
         if (it != resources_.end())
         {
-            INFO_LOG("get resource:" << name);
             it->value.refs.add_ref();
             res = it->value.res;
             return true;

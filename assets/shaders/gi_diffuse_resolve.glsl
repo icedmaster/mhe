@@ -1,6 +1,7 @@
 [version 430]
 
 [defs MODE 0 2]
+[defs GI_TEXTURE 0 1]
 
 #define CONSTANT_AMBIENT_MODE 0
 #define SH_AMBIENT_MODE 1
@@ -23,6 +24,8 @@ layout(std430, binding = 2) buffer SHData
 };
 #endif
 
+[sampler2D gi_texture 4]
+
 out vec3 out_color;
 
 void main()
@@ -32,5 +35,9 @@ void main()
 #elif MODE == SH_AMBIENT_MODE
     vec3 nrm_ws = gbuffer_normal_ws(vsoutput.tex);
     out_color = calculate_irradiance(nrm_ws, ambient_sh);
+#endif
+
+#if GI_TEXTURE == 1
+    out_color = out_color + texture(gi_texture, vsoutput.tex).rgb;
 #endif
 }

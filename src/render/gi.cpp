@@ -187,14 +187,19 @@ void IndirectLightingResolveMaterialSystem::update(Context& context, SceneContex
     // diffuse
     UberShader& ushader = context.ubershader_pool.get(diffuse_resolve_ubershader_id_);
     UberShader::Index index;
-    const UberShader::Info& info = ushader.info("MODE");
+    const UberShader::Info& mode_info = ushader.info("MODE");
+    const UberShader::Info& gi_texture_info = ushader.info("GI_TEXTURE");
     if (is_handle_valid(global_ambient_sh_id_))
-        index.set(info, mode_sh_ambient);
+        index.set(mode_info, mode_sh_ambient);
+    if (is_handle_valid(gi_diffuse_.id))
+        index.set(gi_texture_info, 1);
 
     Material& material = context.materials[id()].get(diffuse_resolve_material_id_);
     material.shader_program = ushader.get(index);
     material.shader_storage_buffers[2] = global_ambient_sh_id_;
     context.renderer->setup_common_pass(material);
+
+    material.textures[4] = gi_diffuse_;
 
     setup_draw_call(render_context.draw_calls.add(),
         diffuse_resolve_quad_mesh_.instance_parts[0], diffuse_resolve_quad_mesh_.mesh.parts[0], resolved_diffuse_rt_id_);

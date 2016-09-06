@@ -63,12 +63,6 @@ void main()
 [sampler2D normalmap_texture 2]
 #endif
 
-[uniform material 2 permodel]
-uniform material
-{
-	PhongMaterial material_data;
-};
-
 in VSOutput vsoutput;
 
 layout (location = 0) out vec3 out_normal;
@@ -86,7 +80,7 @@ void main()
 #endif
 
     float flux_reflectance_coeff = settings.x;
-    float reflected_flux = flux_reflectance_coeff * PHONG_MATERIAL_GLOSSINESS(material_data);
+    float reflected_flux = flux_reflectance_coeff;
 
     // output values
     out_normal = normal_wspace;

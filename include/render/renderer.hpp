@@ -155,6 +155,11 @@ public:
     {
         return lpv_material_system_;
     }
+
+    IndirectLightingResolveMaterialSystem* gi_resolve_material_system() const
+    {
+        return indirect_lighting_resolve_material_system_;
+    }
 private:
     RSMMaterialSystem* rsm_material_system_;
     LPVMaterialSystem* lpv_material_system_;

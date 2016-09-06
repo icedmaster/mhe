@@ -28,12 +28,7 @@ public:
         light_instance.enabled = true;
 
         mhe::NodeInstance& node = engine.scene().create_node();
-        mhe::load_node<mhe::GBufferFillMaterialSystem>(node, mhe::string("sponza.bin"), engine.context(), engine.scene_context());
-
-        for (size_t i = 0, size = node.mesh.mesh.parts.size(); i < size; ++i)
-        {
-            engine.context().material_data_pool.get(node.mesh.mesh.parts[i].material_id).render_data.glossiness = 1.0f;
-        }
+        mhe::load_node<mhe::GBufferFillMaterialSystem>(node, mhe::string("sponza.mesh"), engine.context(), engine.scene_context());
 
         MaterialSystemContext material_system_context;
         const string fog_material_name("height_fog");

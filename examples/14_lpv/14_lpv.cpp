@@ -5,7 +5,7 @@
 //#define SPONZA
 
 #ifndef SPONZA
-const char* mesh_name = "test-scene-simple.bin";
+const char* mesh_name = "test-scene-simple.mesh";
 //const char* mesh_name = "lighting-test-simple.bin";
 #else
 const char* mesh_name = "sponza.bin";
@@ -37,12 +37,6 @@ public:
 
         mhe::NodeInstance& node = engine.scene().create_node();
         mhe::load_node<mhe::GBufferFillMaterialSystem>(node, mhe::string(mesh_name), engine.context(), engine.scene_context());
-
-        // The glossiness coefficient will be used for calculating the initial intensity of VPL
-        for (size_t i = 0, size = node.mesh.mesh.parts.size(); i < size; ++i)
-        {
-            engine.context().material_data_pool.get(node.mesh.mesh.parts[i].material_id).render_data.glossiness = 0.5f;
-        }
 
         // This is a small hack, because I don't include the skybox contribution during the average luminance calculation
         // and the results on the test scene where skybox may cover a big part of screen may be incorrect
@@ -130,9 +124,9 @@ public:
 
         lpv_resolve_material_system_ = static_cast<LPVResolveMaterialSystem*>(
             engine.renderer()->posteffect_system().create(engine.context(), posteffect_node_desc));
-
-        DeferredRenderer* deferred_renderer = static_cast<DeferredRenderer*>(engine.renderer());
-        deferred_renderer->set_gi_modifier_material_system(lpv_resolve_material_system_, 0);
+        lpv_resolve_material_system_->set_priority(DeferredRenderer::deferred_renderer_gbuffer_modifier_priority - 1);
+        engine.renderer()->set_material_system_to_process(lpv_resolve_material_system_);
+        engine.renderer()->gi_system().gi_resolve_material_system()->add_gi_diffuse(lpv_resolve_material_system_->output(0));
 
         return true;
     }
@@ -181,7 +175,7 @@ int main(int /*argc*/, char** /*argv*/)
 #else
     config.assets_path = "../../assets/";
 #endif
-    config.render_config_filename = mhe::utils::path_join(config.assets_path, "render_without_postprocess.xml");
+    config.render_config_filename = mhe::utils::path_join(config.assets_path, "render_without_postprocess_pbr.xml");
     app.init(config);
 
     mhe::game::GameSceneDesc desc;

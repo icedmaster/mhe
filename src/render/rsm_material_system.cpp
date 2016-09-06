@@ -164,7 +164,6 @@ void RSMMaterialSystem::update(Context& context, SceneContext& /*scene_context*/
             material.textures[normal_texture_unit] = original_material.textures[normal_texture_unit];
             material.uniforms[0] = transform_uniform_;
             material.uniforms[1] = original_material.uniforms[1];
-            material.uniforms[2] = original_material.uniforms[2];
             material.texture_buffers[animation_texture_unit] = original_material.texture_buffers[animation_texture_unit];
 
             UberShader::Index shader_index;
