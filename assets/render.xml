@@ -55,7 +55,7 @@
   <gi>
     <settings>
       <diffuse_resolve_shader>gi_diffuse_resolve</diffuse_resolve_shader>
-      <specular_resolve_shader>gi_diffuse_resolve</specular_resolve_shader>
+      <specular_resolve_shader>gi_specular_resolve</specular_resolve_shader>
     </settings>
     <skybox material="skybox" integrator_shader_name="compute/cubemap_integration" />
   </gi>

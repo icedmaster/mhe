@@ -22,6 +22,7 @@ public:
         light.shading().specular = mhe::vec4(1.0f, 1.0f, 1.0f, 1.0f);
         light.shading().intensity = 3.0f;
         mhe::set_light_rotation(engine.scene_context(), light_instance.id, mhe::quatf(mhe::pi_2 * 0.75f, mhe::deg_to_rad(15.0f), 0.0f));
+        //mhe::set_light_rotation(engine.scene_context(), light_instance.id, mhe::quatf(mhe::pi_2, mhe::deg_to_rad(15.0f), 0.0f));
         light.set_type(mhe::Light::directional);
         light.desc().cast_shadows = true;
         light.desc().shadowmap_bias = 0.01f;
@@ -161,6 +162,9 @@ public:
 
         volumetric_fog_material_system_ = volumetric_fog_material_system;
         esm_material_system_ = esm_material_system;
+#else
+        VolumetricFogMaterialSystem* volumetric_fog_material_system = engine.context().material_systems.get<VolumetricFogMaterialSystem>();
+        volumetric_fog_material_system->settings().color = colorf(0.8f, 0.8f, 0.8f, 0.8f);
 #endif
 
         return true;
