@@ -2,8 +2,8 @@
   <materials>
 	<material name="unlit" shader="unlit" priority="4" />
 	<material name="skybox" shader="skybox" priority="0" defs="cubemaps/test.cubemap" />
-	<material name="gbuffer_fill" shader="gbuffer_fill" priority="4" />
-	<material name="gbuffer_draw" shader="gbuffer_draw_blinn_phong" priority="5" />
+	<material name="gbuffer_fill" shader="gbuffer_fill_pbr" priority="4" />
+	<material name="gbuffer_draw" shader="gbuffer_brdf" priority="5" />
     <material name="posteffect_simple" shader="gbuffer_draw" priority="6">
       <options>
         <single_dc>1</single_dc>
@@ -80,6 +80,11 @@
   <gi>
     <lpv>
     </lpv>
+    <settings>
+      <diffuse_resolve_shader>gi_diffuse_resolve</diffuse_resolve_shader>
+      <specular_resolve_shader>gi_diffuse_resolve</specular_resolve_shader>
+    </settings>
+    <skybox material="skybox" integrator_shader_name="compute/cubemap_integration" />
   </gi>
   <materials_to_process>
     <material name="volumetric_fog_system" />

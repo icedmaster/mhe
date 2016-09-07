@@ -39,8 +39,10 @@ vec3 BRDF_lambert_ggx(GBuffer gbuffer, IndirectLighting indirect_lighting, vec3 
     
     vec3 F = fresnel_schlick(specular, ldoth);
 
+    vec3 material_diffuse = gbuffer.albedo * (1.0f - gbuffer.metalness);
+    vec3 material_specular = mix(vec3(0.08f * 0.5f), gbuffer.albedo, gbuffer.metalness);
+
     float fs = max(V * D / (PI + 0.0001f), 0.0f);
-    return mix(gbuffer.albedo * (fd * diffuse + indirect_lighting.diffuse),
-               gbuffer.albedo * (fs * F * ndotl + fresnel_schlick(indirect_lighting.specular, ldoth) * indirect_lighting.diffuse),
-               gbuffer.metalness);
+    return material_diffuse * (fd * diffuse + indirect_lighting.diffuse) + 
+        material_specular * (fs * F * ndotl + fresnel_schlick(indirect_lighting.specular, ldoth) * indirect_lighting.diffuse);
 }
