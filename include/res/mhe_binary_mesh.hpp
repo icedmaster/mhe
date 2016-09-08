@@ -72,12 +72,14 @@ struct Mesh : public Serializable
 
         bool write(Serializer& serializer) const override
         {
+            WRITE_BASIC_TYPE_FIELD(aabb, serializer);
             WRITE_FIELD(material, serializer);
             return true;
         }
 
         bool read(Deserializer& deserializer) override
         {
+            READ_BASIC_TYPE_FIELD(aabb, deserializer);
             READ_FIELD(material, deserializer);
             return true;
         }
