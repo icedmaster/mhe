@@ -13,36 +13,16 @@ namespace mhe {
 
 void DebugViews::init(EventManager& event_manager)
 {
-    event_manager.add_bind("debug_main", keyboard_event_type, KeyboardEvent::key_pressed, KeyboardDevice::key_f1);
-    event_manager.add_bind("debug_shadow", keyboard_event_type, KeyboardEvent::key_pressed, KeyboardDevice::key_f2);
     event_manager.add_bind("standart_stats", keyboard_event_type, KeyboardEvent::key_pressed, KeyboardDevice::key_f3);
-    event_manager.add_bind("debug_ssr", keyboard_event_type, KeyboardEvent::key_pressed, KeyboardDevice::key_f4);
-    event_manager.add_bind("debug_ssao", keyboard_event_type, KeyboardEvent::key_pressed, KeyboardDevice::key_f5);
-    event_manager.add_bind("debug_baked_irradiance", keyboard_event_type, KeyboardEvent::key_pressed, KeyboardDevice::key_f6);
-    event_manager.add_bind("debug_probes", keyboard_event_type, KeyboardEvent::key_pressed, KeyboardDevice::key_f7);
-    event_manager.add_bind("debug_bloom", keyboard_event_type, KeyboardEvent::key_pressed, KeyboardDevice::key_f8);
-    event_manager.add_bind("debug_lpv", keyboard_event_type, KeyboardEvent::key_pressed, KeyboardDevice::key_f9);
 
     stats_enabled_ = false;
+    debug_buffer_ = 0;
+
+    DebugBuffer& buffer = debug_buffers_.add();
+    buffer.mode = Renderer::renderer_debug_mode_none;
+    buffer.name = "none";
 
     imgui_.init(&engine_);
-
-    for (size_t i = 0; i < posteffect_max; ++i)
-        posteffect_id_[i] = MaterialSystem::invalid_id;
-
-    MaterialSystem* material_system = engine_.context().material_systems.get("ssr");
-    if (material_system != nullptr)
-        posteffect_id_[posteffect_ssr] = material_system->id();
-    material_system = engine_.context().material_systems.get("ssao");
-    if (material_system != nullptr)
-        posteffect_id_[posteffect_ssao] = material_system->id();
-    material_system = engine_.context().material_systems.get("bloom");
-    if (material_system != nullptr)
-        posteffect_id_[posteffect_bloom] = material_system->id();
-    material_system = engine_.context().material_systems.get("lpv_resolve");
-    if (material_system != nullptr)
-        posteffect_id_[posteffect_lpv] = material_system->id();
-    posteffect_debug_mode_ = posteffect_max;
 }
 
 void DebugViews::destroy()
@@ -55,117 +35,26 @@ void DebugViews::update()
     Renderer* renderer = engine_.renderer();
 
     Renderer::DebugMode current_mode = renderer->debug_mode();
-    Renderer::DebugMode new_mode = current_mode;
-    MaterialSystemId material_system_id = MaterialSystem::invalid_id;
-    // TODO: need to rewrite it
-    if (engine_.event_manager().check_bind("debug_main"))
-    {
-        if (current_mode == Renderer::renderer_debug_mode_main)
-            new_mode = Renderer::renderer_debug_mode_none;
-        else new_mode = Renderer::renderer_debug_mode_main;
-    }
-    else if (engine_.event_manager().check_bind("debug_shadow"))
-    {
-        if (current_mode == Renderer::renderer_debug_mode_shadows)
-            new_mode = Renderer::renderer_debug_mode_none;
-        else new_mode = Renderer::renderer_debug_mode_shadows;
-    }
-    else if (engine_.event_manager().check_bind("debug_ssr"))
-    {
-        if (current_mode == Renderer::renderer_debug_mode_posteffect && posteffect_debug_mode_ == posteffect_ssr)
-        {
-            new_mode = Renderer::renderer_debug_mode_none;
-            posteffect_debug_mode_ = posteffect_max;
-        }
-        else
-        {
-            new_mode = Renderer::renderer_debug_mode_posteffect;
-            posteffect_debug_mode_ = posteffect_ssr;
-            material_system_id = posteffect_id_[posteffect_ssr];
-        }
-    }
-    else if (engine_.event_manager().check_bind("debug_ssao"))
-    {
-        if (current_mode == Renderer::renderer_debug_mode_posteffect && posteffect_debug_mode_ == posteffect_ssao)
-        {
-            new_mode = Renderer::renderer_debug_mode_none;
-            posteffect_debug_mode_ = posteffect_max;
-        }
-        else
-        {
-            new_mode = Renderer::renderer_debug_mode_posteffect;
-            posteffect_debug_mode_ = posteffect_ssao;
-            material_system_id = posteffect_id_[posteffect_ssao];
-        }
-    }
-    else if (engine_.event_manager().check_bind("debug_baked_irradiance"))
-    {
-        if (current_mode == Renderer::renderer_debug_mode_baked_irradiance)
-        {
-            new_mode = Renderer::renderer_debug_mode_none;
-            posteffect_debug_mode_ = posteffect_max;
-        }
-        else
-        {
-            new_mode = Renderer::renderer_debug_mode_baked_irradiance;
-        }
-    }
-    else if (engine_.event_manager().check_bind("debug_probes"))
-    {
-        if (current_mode == Renderer::renderer_debug_mode_probes)
-        {
-            new_mode = Renderer::renderer_debug_mode_none;
-            posteffect_debug_mode_ = posteffect_max;
-        }
-        else
-        {
-            new_mode = Renderer::renderer_debug_mode_probes;
-        }
-    }
-    else if (engine_.event_manager().check_bind("debug_bloom"))
-    {
-        if (current_mode == Renderer::renderer_debug_mode_posteffect && posteffect_debug_mode_ == posteffect_bloom)
-        {
-            new_mode = Renderer::renderer_debug_mode_none;
-            posteffect_debug_mode_ = posteffect_max;
-        }
-        else
-        {
-            new_mode = Renderer::renderer_debug_mode_posteffect;
-            posteffect_debug_mode_ = posteffect_bloom;
-            material_system_id = posteffect_id_[posteffect_bloom];
-        }
-    }
-    else if (engine_.event_manager().check_bind("debug_lpv"))
-    {
-        if (current_mode == Renderer::renderer_debug_mode_posteffect && posteffect_debug_mode_ == posteffect_lpv)
-        {
-            new_mode = Renderer::renderer_debug_mode_none;
-            posteffect_debug_mode_ = posteffect_max;
-        }
-        else
-        {
-            new_mode = Renderer::renderer_debug_mode_posteffect;
-            posteffect_debug_mode_ = posteffect_lpv;
-            material_system_id = posteffect_id_[posteffect_lpv];
-        }
-    }
-
-    if (posteffect_debug_mode_ == Renderer::renderer_debug_mode_posteffect &&
-        current_mode != new_mode &&
-        material_system_id == MaterialSystem::invalid_id)
-    {
-        posteffect_debug_mode_ = Renderer::renderer_debug_mode_none;
-        new_mode = Renderer::renderer_debug_mode_none;
-    }
 
     if (engine_.event_manager().check_bind("standart_stats"))
         stats_enabled_ ^= 1;
 
-    if (current_mode != new_mode)
-        renderer->set_debug_mode(new_mode, material_system_id);
-
     imgui_.update(engine_.context(), engine_.render_context(), engine_.event_manager());
+
+    int current_buffer = debug_buffer_;
+
+    if (stats_enabled_)
+    {
+        fixed_size_vector<const char*, 16> items(debug_buffers_.size());
+        for (size_t i = 0, size = items.size(); i < size; ++i)
+            items[i] = debug_buffers_[i].name.c_str();
+        ImGui::Combo("Debug modes", &current_buffer, &items[0], items.size());
+    }
+
+    if (current_buffer != debug_buffer_)
+        renderer->set_debug_buffer(static_cast<Renderer::DebugMode>(debug_buffers_[current_buffer].mode),
+        debug_buffers_[current_buffer].texture);
+    debug_buffer_ = current_buffer;
 
     for (size_t i = 0, size = debug_views_.size(); i < size; ++i)
         debug_views_[i].update();
@@ -190,6 +79,16 @@ DebugViews::DebugView& DebugViews::get_view(size_t id)
 {
     ASSERT(id < debug_views_.size(), "Invalid debug view id:" << id);
     return debug_views_[id];
+}
+
+size_t DebugViews::add_debug_buffer(const string& name, const TextureInstance& texture, int debug_mode)
+{
+    size_t id = debug_buffers_.size();
+    DebugBuffer& buffer = debug_buffers_.add();
+    buffer.name = name;
+    buffer.mode = debug_mode;
+    buffer.texture = texture;
+    return id;
 }
 
 void DebugViews::DebugView::add(const string& name, float min_value, float max_value, float* value)

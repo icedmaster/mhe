@@ -79,7 +79,7 @@ struct Mesh : public Serializable
 
         bool read(Deserializer& deserializer) override
         {
-            READ_BASIC_TYPE_FIELD(aabb, deserializer);
+            READ_BASIC_TYPE_FIELD_WITH_DEFAULT(aabb, deserializer, AABBf());
             READ_FIELD(material, deserializer);
             return true;
         }

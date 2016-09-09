@@ -182,13 +182,13 @@ public:
     enum DebugMode
     {
         renderer_debug_mode_none,
-        renderer_debug_mode_main,
-        renderer_debug_mode_shadows,
-        renderer_debug_mode_posteffect,
-        renderer_debug_mode_albedo,
-        renderer_debug_mode_normal,
-        renderer_debug_mode_baked_irradiance,
-        renderer_debug_mode_probes
+        renderer_debug_mode_rgba,
+        renderer_debug_mode_rgb,
+        renderer_debug_mode_r,
+        renderer_debug_mode_g,
+        renderer_debug_mode_b,
+        renderer_debug_mode_a,
+        renderer_debug_mode_depth
     };
 public:
     struct Settings
@@ -209,7 +209,7 @@ public:
     void set_skybox_material_system(MaterialSystem* material_system);
     void set_shadowmap_depth_write_material_system(MaterialSystem* material_system);
     void set_directional_shadowmap_depth_write_material_system(MaterialSystem* material_system);
-    void set_fullscreen_debug_material_system(PosteffectDebugMaterialSystem* material_system);
+    void set_fullscreen_debug_material_system(PosteffectMaterialSystemBase* material_system);
 
     void set_indirect_diffuse_lighting_texture(const TextureInstance& texture)
     {
@@ -239,12 +239,6 @@ public:
     void set_ambient_color(const colorf& color)
     {
         ambient_color_ = color;
-    }
-
-    void set_debug_mode(DebugMode mode, MaterialSystemId material_system_id)
-    {
-        debug_mode_ = mode;
-        debug_mode_changed(mode, material_system_id);
     }
 
     DebugMode debug_mode() const
@@ -290,6 +284,13 @@ public:
     }
 
     void set_skybox_cubemap(const TextureInstance& cubemap);
+
+    PosteffectMaterialSystemBase* debug_material_system() const
+    {
+        return fullscreen_debug_material_system_;
+    }
+
+    void set_debug_buffer(DebugMode mode, const TextureInstance& texture);
 protected:
     Context& context()
     {
@@ -297,8 +298,6 @@ protected:
     }
 
     virtual void execute_render(RenderContext& render_context);
-protected:
-    virtual void debug_mode_changed(DebugMode mode, MaterialSystemId material_system_id);
 private:
     virtual void update_impl(Context& /*context*/, RenderContext& /*render_context*/, SceneContext& /*scene_context*/) {}
     virtual void render_impl(Context& context, RenderContext& render_context, SceneContext& scene_context) = 0;
@@ -316,7 +315,7 @@ private:
     TextureInstance gi_diffuse_texture_;
     TextureInstance gi_specular_texture_;
 
-    PosteffectDebugMaterialSystem* fullscreen_debug_material_system_;
+    PosteffectMaterialSystemBase* fullscreen_debug_material_system_;
 
     fixed_size_vector<MaterialSystem*, 16> material_systems_;
 

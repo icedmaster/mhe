@@ -125,35 +125,4 @@ void DeferredRenderer::render_impl(Context& context, RenderContext& render_conte
         gi_modifier_material_system_->setup_draw_calls(context, scene_context, render_context);
 }
 
-void DeferredRenderer::debug_mode_changed(DebugMode mode, MaterialSystemId material_system_id)
-{
-    Renderer::debug_mode_changed(mode, material_system_id);
-    PosteffectDebugMaterialSystem* debug_material_system = context().material_systems.get<PosteffectDebugMaterialSystem>();
-    ASSERT(debug_material_system != nullptr, "Invalid DebugMaterialSystem");
-    if (mode == Renderer::renderer_debug_mode_none)
-        debug_material_system->disable();
-    else if (mode == Renderer::renderer_debug_mode_main)
-    {
-        debug_material_system->set_render_target(context().render_target_pool.get(gbuffer_fill_material_system_->render_target()));
-        debug_material_system->set_texture(2, gbuffer_light_material_system_->lighting_texture());
-        debug_material_system->enable();
-    }
-    else if (mode == Renderer::renderer_debug_mode_baked_irradiance)
-    {
-        RenderTarget& render_target = context().render_target_pool.get(gbuffer_fill_material_system_->render_target());
-        TextureInstance baked_irradiance_texture;
-        render_target.color_texture(baked_irradiance_texture, baked_light_texture_unit);
-        debug_material_system->set_texture(0, baked_irradiance_texture);
-        debug_material_system->enable();
-    }
-    else if (mode == Renderer::renderer_debug_mode_probes && probes_accumulator_material_system_ != nullptr)
-    {
-        RenderTarget& render_target = context().render_target_pool.get(probes_accumulator_material_system_->render_target());
-        TextureInstance texture;
-        render_target.color_texture(texture, 0);
-        debug_material_system->set_texture(0, texture);
-        debug_material_system->enable();
-    }
-}
-
 }

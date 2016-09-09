@@ -65,7 +65,7 @@ public:
     virtual bool read(const char* field, float& value) = 0;
     virtual bool read(const char* field, string& value) = 0;
     virtual bool read(const char* field, FilePath& value) = 0;
-    virtual void begin_field(const char* field) = 0;
+    virtual bool begin_field(const char* field) = 0;
     virtual void end_field() = 0;
     virtual void next_field(const char* field) = 0;
 
@@ -94,7 +94,7 @@ public:
     template <class T>
     bool read(const char* field, vector<T>& value)
     {
-        begin_field(field);
+        if (!begin_field(field)) return false;
         uint32_t size;
         if (!read("size", size)) return false;
         value.resize(size);
@@ -112,7 +112,7 @@ public:
     template <class T>
     bool read_basic_type(const char* field, T& value)
     {
-        begin_field(field);
+        if (!begin_field(field)) return false;
         if (!deserialize(*this, value)) return false;
         end_field();
         return true;
@@ -166,7 +166,7 @@ public:
     bool read(string& value) override;
     bool read(FilePath& value) override;
 
-    void begin_field(const char* field) override;
+    bool begin_field(const char* field) override;
     void end_field() override;
     void next_field(const char* field) override;
 
@@ -187,5 +187,6 @@ private:
 #define READ_FIELD(field, serializer) if (!serializer.read(#field, field)) return false;
 #define READ_FIELD_WITH_DEFAULT(field, serializer, default_value) if (!serializer.read(#field, field)) field = default_value;
 #define READ_BASIC_TYPE_FIELD(field, serializer) if (!serializer.read_basic_type(#field, field)) return false;
+#define READ_BASIC_TYPE_FIELD_WITH_DEFAULT(field, serializer, default_value) if (!serializer.read_basic_type(#field, field)) field = default_value;
 
 #endif

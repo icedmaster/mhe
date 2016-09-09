@@ -631,32 +631,26 @@ void Renderer::set_directional_shadowmap_depth_write_material_system(MaterialSys
     directional_shadowmap_depth_write_material_system_->set_priority(shadowmap_depth_write_material_system_priority);
 }
 
-void Renderer::set_fullscreen_debug_material_system(PosteffectDebugMaterialSystem* material_system)
+void Renderer::set_fullscreen_debug_material_system(PosteffectMaterialSystemBase* material_system)
 {
     fullscreen_debug_material_system_ = material_system;
     fullscreen_debug_material_system_->set_priority(debug_material_system_priority);
     fullscreen_debug_material_system_->disable();
 }
 
-void Renderer::debug_mode_changed(DebugMode mode, MaterialSystemId material_system_id)
+void Renderer::set_debug_buffer(DebugMode mode, const TextureInstance& texture)
 {
-    if (fullscreen_debug_material_system_ == nullptr) return;
+    if (fullscreen_debug_material_system_ == nullptr)
+        return;
 
-    if (mode == renderer_debug_mode_shadows)
+    if (mode == renderer_debug_mode_none && debug_mode_ != mode)
+        fullscreen_debug_material_system_->disable();
+    else
     {
-        RenderTarget& render_target = context_.render_target_pool.get(directional_shadowmap_depth_write_material_system_->render_target_id());
-        fullscreen_debug_material_system_->set_render_target(render_target);
+        fullscreen_debug_material_system_->set_input(0, texture);
         fullscreen_debug_material_system_->enable();
     }
-
-    if (mode == renderer_debug_mode_posteffect)
-    {
-        PosteffectMaterialSystemBase* posteffect_material_system = context_.material_systems.get<PosteffectMaterialSystemBase>(material_system_id);
-        for (size_t i = 0, n = posteffect_material_system->outputs_number(); i < n; ++i)
-            fullscreen_debug_material_system_->set_texture(i, posteffect_material_system->output(i));
-        fullscreen_debug_material_system_->set_viewports_number(posteffect_material_system->outputs_number());
-        fullscreen_debug_material_system_->enable();
-    }
+    debug_mode_ = mode;
 }
 
 UniformBufferHandleType Renderer::system_wide_uniform(const string& name) const

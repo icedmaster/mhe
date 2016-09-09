@@ -35,6 +35,12 @@ class DebugViews
         void update() override;
     };
 
+    struct DebugBuffer
+    {
+        string name;
+        TextureInstance texture;
+        int mode;
+    };
 public:
     class DebugView
     {
@@ -63,25 +69,18 @@ public:
     size_t add_view(const string& name);
     DebugView& get_view(size_t id);
 
+    size_t add_debug_buffer(const string& name, const TextureInstance& texture, int debug_mode);
+
     ImGuiHelper& imgui_helper()
     {
         return imgui_;
     }
 private:
-    enum
-    {
-        posteffect_ssr,
-        posteffect_ssao,
-        posteffect_bloom,
-        posteffect_lpv,
-        posteffect_max
-    };
-
     game::Engine& engine_;
     ImGuiHelper imgui_;
-    array<MaterialSystemId, posteffect_max> posteffect_id_;
-    int posteffect_debug_mode_;
+    int debug_buffer_;
     fixed_size_vector<DebugView, 16> debug_views_;
+    fixed_size_vector<DebugBuffer, 16> debug_buffers_;
     bool stats_enabled_;
 };
 

@@ -394,7 +394,6 @@ void Application::init_gbuffer(pugi::xml_node gbuffer_node, const RendererParams
     MaterialSystem* skybox_material_system = context.material_systems.get(params.skybox);
     MaterialSystem* depth_write_material_system = context.material_systems.get(params.shadowmap_depth_write);
     MaterialSystem* directional_depth_write_material_system = context.material_systems.get(params.directional_depth_write);
-    PosteffectDebugMaterialSystem* fullscreen_debug_material_system = context.material_systems.get<PosteffectDebugMaterialSystem>(params.fullscreen_debug);
     ProbesAccumulatorMaterialSystem* probes_accumulator_material_system = context.material_systems.get<ProbesAccumulatorMaterialSystem>(params.probes_accumulator);
 
     Renderer::Settings renderer_settings;
@@ -404,7 +403,6 @@ void Application::init_gbuffer(pugi::xml_node gbuffer_node, const RendererParams
     renderer->set_skybox_material_system(skybox_material_system);
     renderer->set_shadowmap_depth_write_material_system(depth_write_material_system);
     renderer->set_directional_shadowmap_depth_write_material_system(directional_depth_write_material_system);
-    renderer->set_fullscreen_debug_material_system(fullscreen_debug_material_system);
     renderer->set_probes_accumulator_material_system(probes_accumulator_material_system);
     renderer->init(fill_material_system, use_material_system, draw_material_system, renderer_settings);
     engine_->set_renderer(renderer);

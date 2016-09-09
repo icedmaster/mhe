@@ -74,6 +74,8 @@ public:
     {
         use_normalmapping_ = enable;
     }
+
+    void init_debug_views(Context& context) override;
 private:
     void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
     void update(Context& context, SceneContext& scene_context, RenderContext& render_context, MeshPartInstance* parts_instances, MeshPart* parts, size_t count);

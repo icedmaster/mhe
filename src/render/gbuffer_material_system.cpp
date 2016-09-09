@@ -9,6 +9,7 @@
 #include "render/utils/simple_meshes.hpp"
 #include "render/render_globals.hpp"
 #include "render/renderer.hpp"
+#include "debug/debug_views.hpp"
 
 namespace mhe {
 
@@ -204,6 +205,16 @@ void GBufferFillMaterialSystem::update_material_data(UniformBuffer& uniform_buff
         break;
     default: break;
     }
+}
+
+void GBufferFillMaterialSystem::init_debug_views(Context& context)
+{
+    RenderTarget& render_target = context.render_target_pool.get(render_target_);
+    TextureInstance texture_instance;
+    render_target.color_texture(texture_instance, 0);
+    context.debug_views->add_debug_buffer("albedo", texture_instance, Renderer::renderer_debug_mode_rgb);
+    render_target.color_texture(texture_instance, 1);
+    context.debug_views->add_debug_buffer("normal", texture_instance, Renderer::renderer_debug_mode_rgb);
 }
 
 bool GBufferDrawMaterialSystem::init(Context& context, const MaterialSystemContext& material_system_context)

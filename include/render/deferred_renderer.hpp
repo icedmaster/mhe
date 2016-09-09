@@ -41,7 +41,6 @@ private:
     void init_priorities();
 
     void render_impl(Context& context, RenderContext& render_context, SceneContext& scene_context) override;
-    void debug_mode_changed(DebugMode mode, MaterialSystemId material_system_id) override;
 
     GBuffer gbuffer_;
     MaterialSystem* shadowmap_depth_write_material_system_;

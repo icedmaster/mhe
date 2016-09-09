@@ -182,9 +182,12 @@ bool XMLDeserializer::read(FilePath& value)
     return true;
 }
 
-void XMLDeserializer::begin_field(const char* field)
+bool XMLDeserializer::begin_field(const char* field)
 {
-    current_node_ = current_node_.child(field);
+    pugi::xml_node n = current_node_.child(field);
+    if (!n) return false;
+    current_node_ = n;
+    return true;
 }
 
 void XMLDeserializer::end_field()
