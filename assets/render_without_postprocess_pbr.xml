@@ -10,7 +10,7 @@
 		<blend>1</blend>
       </options>
     </material>
-    <material name="posteffect_debug" shader="posteffect_draw" priority="10">
+    <material name="buffer_debug" shader="posteffect_draw" priority="10">
       <options>
         <overdraw>0</overdraw>
       </options>
@@ -55,7 +55,7 @@
   <skybox name="skybox" />
   <shadowmap_depth_write name="depth_write" />
   <directional_shadowmap_depth_write name="csm_depth_write" />
-  <fullscreen_debug name="posteffect_debug" />
+  <fullscreen_debug name="buffer_debug" />
   <gbuffer>
 	<fill name="gbuffer_fill" />
 	<use name="gbuffer_draw" />

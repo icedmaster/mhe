@@ -41,6 +41,8 @@ public:
 
     void setup(Context &context, SceneContext &scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count) override;
 
+    void init_debug_views(Context& context) override;
+
     void set_global_ambient_sh_buffer(ShaderStorageBufferHandleType ssb_id)
     {
         global_ambient_sh_id_ = ssb_id;

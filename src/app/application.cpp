@@ -395,6 +395,7 @@ void Application::init_gbuffer(pugi::xml_node gbuffer_node, const RendererParams
     MaterialSystem* depth_write_material_system = context.material_systems.get(params.shadowmap_depth_write);
     MaterialSystem* directional_depth_write_material_system = context.material_systems.get(params.directional_depth_write);
     ProbesAccumulatorMaterialSystem* probes_accumulator_material_system = context.material_systems.get<ProbesAccumulatorMaterialSystem>(params.probes_accumulator);
+    PosteffectMaterialSystemBase* debug_material_system = context.material_systems.get<PosteffectMaterialSystemBase>(params.fullscreen_debug);
 
     Renderer::Settings renderer_settings;
     renderer_settings.gi_settings = params.gi_params.gi_settings;
@@ -404,6 +405,7 @@ void Application::init_gbuffer(pugi::xml_node gbuffer_node, const RendererParams
     renderer->set_shadowmap_depth_write_material_system(depth_write_material_system);
     renderer->set_directional_shadowmap_depth_write_material_system(directional_depth_write_material_system);
     renderer->set_probes_accumulator_material_system(probes_accumulator_material_system);
+    renderer->set_fullscreen_debug_material_system(debug_material_system);
     renderer->init(fill_material_system, use_material_system, draw_material_system, renderer_settings);
     engine_->set_renderer(renderer);
 }

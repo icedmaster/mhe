@@ -201,6 +201,11 @@ class PosteffectSimpleMaterialSystem : public PosteffectMaterialSystemBase
     SETUP_POSTEFFECT_MATERIAL(PosteffectSimpleMaterialSystem, "posteffect_simple");
 };
 
+class PosteffectBufferDebugMaterialSystem : public PosteffectMaterialSystemBase
+{
+    SETUP_POSTEFFECT_MATERIAL(PosteffectBufferDebugMaterialSystem, "buffer_debug");
+};
+
 class TonemapMaterialSystem : public PosteffectMaterialSystemBase
 {
     SETUP_POSTEFFECT_MATERIAL(TonemapMaterialSystem, "tonemap");

@@ -5,6 +5,7 @@
 #include "render/instances.hpp"
 #include "render/utils/simple_meshes.hpp"
 #include "render/render_context.hpp"
+#include "render/renderer.hpp"
 #include "utils/strutils.hpp"
 #include "debug/debug_views.hpp"
 #include "debug/gpu_profiler.hpp"
@@ -412,6 +413,8 @@ void SSRMaterialSystem::init_debug_views(Context& context)
     view.add("intensity", 0.0f, 5.0f, &ssr_shader_data_.ssrdata[1].z());
     view.add("fade distance", 0.0f, 100.0f, &ssr_shader_data_.ssrdata[1].w());
     view.add("UV fade", 0.0f, 1.0f, &ssr_shader_data_.ssrdata[2].x());
+
+    context.debug_views->add_debug_buffer(string("ssr"), output(0), Renderer::renderer_debug_mode_rgb);
 }
 
 void SSRMaterialSystem::update(Context& context, SceneContext& scene_context, RenderContext& render_context)
@@ -699,6 +702,8 @@ void SSAOMaterialSystem::init_debug_views(Context& context)
     view.add("intensity", 0.0f, 10.0f, &ssao_shader_data_.ssaodata[1].z());
     view.add("samples", 1.0f, 24.0f, &ssao_shader_data_.ssaodata[1].w());
     view.add("rotation", 0.0f, 10.0f, &settings_.rotation_speed);
+
+    context.debug_views->add_debug_buffer(string("ssao"), output(0), Renderer::renderer_debug_mode_rgb);
 }
 
 void SSAOMaterialSystem::update(Context& context, SceneContext& scene_context, RenderContext& render_context)

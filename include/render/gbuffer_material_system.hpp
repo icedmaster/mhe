@@ -115,6 +115,8 @@ public:
 
     void set_render_target(Context& context, RenderTarget::IdType render_target) override;
 
+    void init_debug_views(Context& context) override;
+
     const TextureInstance& lighting_texture() const
     {
         return light_buffer_texture_;

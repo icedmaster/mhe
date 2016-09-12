@@ -6,6 +6,7 @@
 #include "render/utils/simple_meshes.hpp"
 #include "render/renderer.hpp"
 #include "math/sh.h"
+#include "debug/debug_views.hpp"
 
 namespace mhe {
 
@@ -174,6 +175,18 @@ void IndirectLightingResolveMaterialSystem::destroy(Context& context)
     destroy_pool_object(context.render_state_pool, diffuse_resolve_quad_mesh_.instance_parts[0].render_state_id);
     context.render_target_manager.destroy(resolved_diffuse_rt_id_, context);
     context.render_target_manager.destroy(resolved_specular_rt_id_, context);
+}
+
+void IndirectLightingResolveMaterialSystem::init_debug_views(Context& context)
+{
+    RenderTarget& diffuse_rt = context.render_target_pool.get(resolved_diffuse_rt_id_);
+    TextureInstance texture;
+    diffuse_rt.color_texture(texture, 0);
+    context.debug_views->add_debug_buffer(string("indirect diffuse"), texture, Renderer::renderer_debug_mode_rgb);
+
+    RenderTarget& specular_rt = context.render_target_pool.get(resolved_specular_rt_id_);
+    specular_rt.color_texture(texture, 0);
+    context.debug_views->add_debug_buffer(string("indirect specular"), texture, Renderer::renderer_debug_mode_rgb);
 }
 
 void IndirectLightingResolveMaterialSystem::setup(Context &context, SceneContext &scene_context, MeshPartInstance* instance_parts,

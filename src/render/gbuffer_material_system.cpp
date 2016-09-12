@@ -352,6 +352,14 @@ void GBufferDrawMaterialSystem::destroy(Context& context)
     destroy_pool_object(context.render_state_pool, render_state_);
 }
 
+void GBufferDrawMaterialSystem::init_debug_views(Context& context)
+{
+    RenderTarget& render_target = context.render_target_pool.get(light_buffer_render_target_);
+    TextureInstance texture;
+    render_target.color_texture(texture, 0);
+    context.debug_views->add_debug_buffer(string("lighting"), texture, Renderer::renderer_debug_mode_rgb);
+}
+
 void GBufferDrawMaterialSystem::setup(Context& context, SceneContext& scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count)
 {
     empty_setup(context, scene_context, instance_parts, parts, model_contexts, count);

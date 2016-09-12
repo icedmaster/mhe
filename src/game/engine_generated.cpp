@@ -44,6 +44,7 @@ void Engine::setup_generated()
     MaterialSystemFactory::instance().add<VolumetricFogResolveMaterialSystem>();
     MaterialSystemFactory::instance().add<VolumetricFogSystem>();
     MaterialSystemFactory::instance().add<IndirectLightingResolveMaterialSystem>();
+    MaterialSystemFactory::instance().add<PosteffectBufferDebugMaterialSystem>();
 }
 
 }}
