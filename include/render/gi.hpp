@@ -11,6 +11,11 @@ namespace mhe {
 struct Context;
 class ShaderStorageBuffer;
 class Texture;
+class LPVMaterialSystem;
+class RSMMaterialSystem;
+class LPVResolveMaterialSystem;
+class SkyboxMaterialSystem;
+class Renderer;
 
 class CubemapIntegrator
 {
@@ -79,6 +84,60 @@ private:
     ShaderStorageBufferHandleType global_ambient_sh_id_;
 
     TextureInstance gi_diffuse_;
+};
+
+class GISystem
+{
+public:
+    struct LPVParams
+    {
+        size_t base_priority;
+        int output_texture_format;
+        float output_texture_scale;
+
+        LPVParams() : output_texture_format(format_rgb16f), output_texture_scale(1.0f) {}
+    };
+
+    struct Settings
+    {
+        string diffuse_resolve_shader_name;
+        string specular_resolve_shader_name;
+    };
+
+    GISystem();
+
+    bool init(Context& context, const Settings& settings);
+    void destroy(Context& context);
+
+    void add_lpv(Context& context, Renderer& renderer, const LPVParams& params);
+    void add_skybox(Context& context, const SkyboxMaterialSystem* skybox_material_system, const CubemapIntegrator::Settings& integrator_settings);
+
+    void apply(Renderer& renderer);
+
+    void update_skybox(Context& context);
+
+    void before_render(Context& context, SceneContext& scene_context, RenderContext& render_context);
+    void render(Context& context, SceneContext& scene_context, RenderContext& render_context);
+
+    LPVMaterialSystem* lpv_material_system() const
+    {
+        return lpv_material_system_;
+    }
+
+    IndirectLightingResolveMaterialSystem* gi_resolve_material_system() const
+    {
+        return indirect_lighting_resolve_material_system_;
+    }
+private:
+    RSMMaterialSystem* rsm_material_system_;
+    LPVMaterialSystem* lpv_material_system_;
+    LPVResolveMaterialSystem* lpv_resolve_material_system_;
+    const SkyboxMaterialSystem* skybox_material_system_;
+
+    ShaderStorageBufferHandleType ambient_sh_buffer_id_;
+    CubemapIntegrator cubemap_integrator_;
+
+    IndirectLightingResolveMaterialSystem* indirect_lighting_resolve_material_system_;
 };
 
 }

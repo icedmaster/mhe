@@ -4,7 +4,10 @@
 #include "render/draw_call.hpp"
 #include "render/layouts.hpp"
 #include "render/utils/simple_meshes.hpp"
-#include "render/renderer.hpp"
+#include "render/deferred_renderer.hpp"
+#include "render/rsm_material_system.hpp"
+#include "render/lpv_material_system.hpp"
+#include "render/skybox_material_system.hpp"
 #include "math/sh.h"
 #include "debug/debug_views.hpp"
 
@@ -225,6 +228,174 @@ void IndirectLightingResolveMaterialSystem::update(Context& context, SceneContex
     specular_material.textures[4] = render_context.space_grid.global_cubemap();
     setup_draw_call(render_context.draw_calls.add(),
         specular_resolve_quad_mesh_.instance_parts[0], specular_resolve_quad_mesh_.mesh.parts[0], resolved_specular_rt_id_);
+}
+
+GISystem::GISystem() :
+rsm_material_system_(nullptr),
+    lpv_material_system_(nullptr),
+    lpv_resolve_material_system_(nullptr),
+    skybox_material_system_(nullptr),
+    indirect_lighting_resolve_material_system_(nullptr)
+{}
+
+bool GISystem::init(Context& context, const Settings& settings)
+{
+    const string diffuse_resolve_name = IndirectLightingResolveMaterialSystem::material_name();
+
+    MaterialSystemContext material_system_context;
+    material_system_context.material_instances_number = 2;
+    material_system_context.priority = DeferredRenderer::deferred_renderer_gbuffer_modifier_priority;
+    material_system_context.instance_name = diffuse_resolve_name;
+    material_system_context.options.add("diffuse_resolve_shader", settings.diffuse_resolve_shader_name);
+    material_system_context.options.add("specular_resolve_shader", settings.specular_resolve_shader_name);
+
+    context.initialization_parameters.add(diffuse_resolve_name, material_system_context);
+    indirect_lighting_resolve_material_system_ =
+        create<IndirectLightingResolveMaterialSystem>(context, diffuse_resolve_name, diffuse_resolve_name);
+
+    {
+        const RenderTarget& rt = context.render_target_pool.get(indirect_lighting_resolve_material_system_->resolved_diffuse_render_target_id());
+        TextureInstance texture;
+        rt.color_texture(texture, 0);
+        context.renderer->set_indirect_diffuse_lighting_texture(texture);
+    }
+
+    {
+        const RenderTarget& rt = context.render_target_pool.get(indirect_lighting_resolve_material_system_->resolved_specular_render_target_id());
+        TextureInstance texture;
+        rt.color_texture(texture, 0);
+        context.renderer->set_indirect_specular_lighting_texture(texture);
+    }
+
+    return true;
+}
+
+void GISystem::destroy(Context& context)
+{
+    UNUSED(context);
+}
+
+void GISystem::add_lpv(Context& context, Renderer& renderer, const LPVParams& params)
+{
+    const string rsm_name(RSMMaterialSystem::material_name());
+
+    rsm_material_system_ = static_cast<RSMMaterialSystem*>(create(context, rsm_name, rsm_name));
+    ASSERT(rsm_material_system_ != nullptr, "RSMMaterialSystem initialization failed."
+        "Probably, you forgot to add its description to the configuration file");
+    rsm_material_system_->set_priority(params.base_priority - 2);
+
+    const string lpv_name(LPVMaterialSystem::material_name());
+
+    lpv_material_system_ = static_cast<LPVMaterialSystem*>(create(context, lpv_name, lpv_name));
+    lpv_material_system_->set_gbuffer(rsm_material_system_->gbuffer());
+    lpv_material_system_->settings().mode = LPVMaterialSystem::mode_rsm;
+    lpv_material_system_->set_priority(params.base_priority - 1);
+    ASSERT(lpv_material_system_ != nullptr, "LPVMaterialSystem initialization failed."
+        "Probably, you forgot to add its description to the configuration file");
+
+    const string lpv_resolve_name(LPVResolveMaterialSystem::material_name());
+    PosteffectSystem::PosteffectNodeDesc posteffect_node_desc;
+    posteffect_node_desc.name = lpv_resolve_name;
+    posteffect_node_desc.material = lpv_resolve_name;
+    posteffect_node_desc.priority = 0;
+    // input 0 - normals
+    PosteffectSystem::NodeInput& input0 = posteffect_node_desc.inputs.add();
+    input0.index = 0;
+    input0.explicit_texture = renderer.scene_normals_buffer();
+    // input 1 - depth
+    PosteffectSystem::NodeInput& input1 = posteffect_node_desc.inputs.add();
+    input1.index = 1;
+    input1.explicit_texture = renderer.scene_depth_buffer();
+    // ...and 3 channels of LPV RT
+    PosteffectSystem::NodeInput& input2 = posteffect_node_desc.inputs.add();
+    input2.index = 2;
+    input2.material = lpv_name;
+    input2.material_output = 0;
+    PosteffectSystem::NodeInput& input3 = posteffect_node_desc.inputs.add();
+    input3.index = 3;
+    input3.material = lpv_name;
+    input3.material_output = 1;
+    PosteffectSystem::NodeInput& input4 = posteffect_node_desc.inputs.add();
+    input4.index = 4;
+    input4.material = lpv_name;
+    input4.material_output = 2;
+    // resolve-to buffer
+    PosteffectSystem::NodeOutput& output0 = posteffect_node_desc.outputs.add();
+    output0.format = params.output_texture_format;
+    output0.index = 0;
+    output0.scale = params.output_texture_scale;
+    // we also need a couple of uniforms
+    PosteffectSystem::Uniforms::type& uniform0 = posteffect_node_desc.uniforms.add();
+    uniform0.index = 0;
+    uniform0.explicit_handle = renderer.render_context().main_camera.percamera_uniform;
+    PosteffectSystem::Uniforms::type& uniform1 = posteffect_node_desc.uniforms.add();
+    uniform1.index = 1;
+    uniform1.explicit_handle = lpv_material_system_->injection_settings_uniform();
+
+    lpv_resolve_material_system_ = static_cast<LPVResolveMaterialSystem*>(
+        renderer.posteffect_system().create(context, posteffect_node_desc));
+    ASSERT(lpv_resolve_material_system_ != nullptr, "LPVResolveMaterialSystem initialization failed."
+        "Probably, you forgot to add its description to the configuration file");
+    lpv_resolve_material_system_->set_priority(params.base_priority);
+    indirect_lighting_resolve_material_system_->add_gi_diffuse(lpv_resolve_material_system_->output(0));
+}
+
+void GISystem::apply(Renderer& renderer)
+{
+    ASSERT(indirect_lighting_resolve_material_system_ != nullptr, "Invalid diffuse GI material system");
+    indirect_lighting_resolve_material_system_->set_global_ambient_sh_buffer(ambient_sh_buffer_id_);
+}
+
+void GISystem::add_skybox(Context& context, const SkyboxMaterialSystem* skybox_material_system, const CubemapIntegrator::Settings& integrator_settings)
+{
+    skybox_material_system_ = skybox_material_system;
+    cubemap_integrator_.init(context, integrator_settings);
+    if (skybox_material_system_ != nullptr)
+    {
+        ShaderStorageBuffer& buffer = create_and_get(context.shader_storage_buffer_pool);
+        ShaderStorageBufferDesc desc;
+        desc.format = format_float;
+        desc.size = sizeof(SH<vec3, 3>);
+        desc.update_type = buffer_update_type_dynamic;
+        if (!buffer.init(desc, nullptr, 0))
+        {
+            ERROR_LOG("Can't initialize a ShaderStorageBuffer");
+        }
+        ambient_sh_buffer_id_ = buffer.id();
+
+        cubemap_integrator_.integrate(context.shader_storage_buffer_pool.get(ambient_sh_buffer_id_),
+            context, context.texture_pool.get(skybox_material_system_->skybox_texture().id));
+    }
+}
+
+void GISystem::update_skybox(Context& context)
+{
+    if (skybox_material_system_ != nullptr)
+        cubemap_integrator_.integrate(context.shader_storage_buffer_pool.get(ambient_sh_buffer_id_),
+        context, context.texture_pool.get(skybox_material_system_->skybox_texture().id));
+}
+
+void GISystem::before_render(Context& context, SceneContext& scene_context, RenderContext& render_context)
+{
+    if (rsm_material_system_ != nullptr)
+        rsm_material_system_->start_frame(context, scene_context, render_context);
+}
+
+void GISystem::render(Context& context, SceneContext& scene_context, RenderContext& render_context)
+{
+    if (rsm_material_system_ != nullptr && lpv_material_system_ != nullptr && lpv_resolve_material_system_ != nullptr)
+    {
+        RSMData data;
+        rsm_material_system_->rsm_data(data);
+        lpv_material_system_->set_rsm_data(data);
+
+        rsm_material_system_->setup_draw_calls(context, scene_context, render_context);
+        lpv_material_system_->setup_draw_calls(context, scene_context, render_context);
+
+        lpv_resolve_material_system_->setup_draw_calls(context, scene_context, render_context);
+    }
+
+    indirect_lighting_resolve_material_system_->setup_draw_calls(context, scene_context, render_context);
 }
 
 }
