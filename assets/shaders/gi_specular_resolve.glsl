@@ -17,7 +17,7 @@ out vec3 out_color;
 void main()
 {
     float depth = gbuffer_depth(vsoutput.tex);
-    if (depth > 0.9999f)
+    if (depth == 1.0f)
     {
         out_color = VEC3_ZERO;
         return;

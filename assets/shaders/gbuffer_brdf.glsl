@@ -90,7 +90,7 @@ void main()
 	vec2 tex = vsoutput.tex;
 #endif
     GBuffer gbuffer = gbuffer_unpack(tex);
-    if (gbuffer.depth > 0.9999f)
+    if (gbuffer.depth == 1.0f)
     {
         out_color = VEC3_ZERO;
         return;
