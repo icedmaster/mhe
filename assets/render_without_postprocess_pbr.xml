@@ -10,7 +10,7 @@
 		<blend>1</blend>
       </options>
     </material>
-    <material name="buffer_debug" shader="posteffect_draw" priority="10">
+    <material name="buffer_debug" shader="posteffect_debug" priority="10">
       <options>
         <overdraw>0</overdraw>
       </options>

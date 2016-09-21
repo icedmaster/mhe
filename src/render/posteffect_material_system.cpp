@@ -1152,4 +1152,24 @@ void BloomMaterialSystem::copy(Context& context, DrawCall& draw_call, RenderTarg
     ASSERT(material.textures[0].id != Texture::invalid_id, "Invalid source id");
 }
 
+PosteffectBufferDebugMaterialSystem::PosteffectBufferDebugMaterialSystem() :
+    PosteffectMaterialSystemBase("buffer_debug"),
+    mode_(Renderer::renderer_debug_mode_rgba)
+{
+}
+
+void PosteffectBufferDebugMaterialSystem::update(Context& context, SceneContext& scene_context, RenderContext& render_context)
+{
+    PosteffectMaterialSystemBase::update(context, scene_context, render_context);
+
+    Material& material = default_material(context);
+    UberShader& ushader = ubershader(context);
+    const UberShader::Info& ushader_info = ushader.info("MODE");
+    UberShader::Index ushader_index;
+    ushader_index.set(ushader_info, mode_ - 1);
+    material.shader_program = ushader.get(ushader_index);
+
+    material.uniforms[0] = context.renderer->main_camera_uniform();
+}
+
 }

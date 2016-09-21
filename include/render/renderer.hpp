@@ -23,6 +23,7 @@ class MaterialSystem;
 class PosteffectMaterialSystemBase;
 class PosteffectDebugMaterialSystem;
 class IndirectLightingResolveMaterialSystem;
+class PosteffectBufferDebugMaterialSystem;
 class Renderer;
 
 bool init_node(NodeInstance& node, Context& context);
@@ -151,7 +152,7 @@ public:
     void set_skybox_material_system(MaterialSystem* material_system);
     void set_shadowmap_depth_write_material_system(MaterialSystem* material_system);
     void set_directional_shadowmap_depth_write_material_system(MaterialSystem* material_system);
-    void set_fullscreen_debug_material_system(PosteffectMaterialSystemBase* material_system);
+    void set_fullscreen_debug_material_system(PosteffectBufferDebugMaterialSystem* material_system);
 
     void set_indirect_diffuse_lighting_texture(const TextureInstance& texture)
     {
@@ -227,7 +228,7 @@ public:
 
     void set_skybox_cubemap(const TextureInstance& cubemap);
 
-    PosteffectMaterialSystemBase* debug_material_system() const
+    PosteffectBufferDebugMaterialSystem* debug_material_system() const
     {
         return fullscreen_debug_material_system_;
     }
@@ -257,7 +258,7 @@ private:
     TextureInstance gi_diffuse_texture_;
     TextureInstance gi_specular_texture_;
 
-    PosteffectMaterialSystemBase* fullscreen_debug_material_system_;
+    PosteffectBufferDebugMaterialSystem* fullscreen_debug_material_system_;
 
     fixed_size_vector<MaterialSystem*, 16> material_systems_;
 

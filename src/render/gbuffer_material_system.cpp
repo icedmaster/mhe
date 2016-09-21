@@ -213,8 +213,12 @@ void GBufferFillMaterialSystem::init_debug_views(Context& context)
     TextureInstance texture_instance;
     render_target.color_texture(texture_instance, 0);
     context.debug_views->add_debug_buffer("albedo", texture_instance, Renderer::renderer_debug_mode_rgb);
+    context.debug_views->add_debug_buffer("roughness", texture_instance, Renderer::renderer_debug_mode_a);
     render_target.color_texture(texture_instance, 1);
     context.debug_views->add_debug_buffer("normal", texture_instance, Renderer::renderer_debug_mode_rgb);
+    context.debug_views->add_debug_buffer("metalness", texture_instance, Renderer::renderer_debug_mode_a);
+    render_target.depth_texture(texture_instance);
+    context.debug_views->add_debug_buffer("depth", texture_instance, Renderer::renderer_debug_mode_depth);
 }
 
 bool GBufferDrawMaterialSystem::init(Context& context, const MaterialSystemContext& material_system_context)

@@ -203,7 +203,18 @@ class PosteffectSimpleMaterialSystem : public PosteffectMaterialSystemBase
 
 class PosteffectBufferDebugMaterialSystem : public PosteffectMaterialSystemBase
 {
-    SETUP_POSTEFFECT_MATERIAL(PosteffectBufferDebugMaterialSystem, "buffer_debug");
+    SETUP_MATERIAL("buffer_debug");
+public:
+    PosteffectBufferDebugMaterialSystem();
+
+    void set_mode(int mode)
+    {
+        mode_ = mode;
+    }
+private:
+    void update(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
+
+    int mode_;
 };
 
 class TonemapMaterialSystem : public PosteffectMaterialSystemBase

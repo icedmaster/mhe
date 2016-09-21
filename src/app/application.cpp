@@ -395,7 +395,7 @@ void Application::init_gbuffer(pugi::xml_node gbuffer_node, const RendererParams
     MaterialSystem* depth_write_material_system = context.material_systems.get(params.shadowmap_depth_write);
     MaterialSystem* directional_depth_write_material_system = context.material_systems.get(params.directional_depth_write);
     ProbesAccumulatorMaterialSystem* probes_accumulator_material_system = context.material_systems.get<ProbesAccumulatorMaterialSystem>(params.probes_accumulator);
-    PosteffectMaterialSystemBase* debug_material_system = context.material_systems.get<PosteffectMaterialSystemBase>(params.fullscreen_debug);
+    PosteffectBufferDebugMaterialSystem* debug_material_system = context.material_systems.get<PosteffectBufferDebugMaterialSystem>(params.fullscreen_debug);
 
     Renderer::Settings renderer_settings;
     renderer_settings.gi_settings = params.gi_params.gi_settings;

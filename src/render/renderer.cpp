@@ -460,7 +460,7 @@ void Renderer::set_directional_shadowmap_depth_write_material_system(MaterialSys
     directional_shadowmap_depth_write_material_system_->set_priority(shadowmap_depth_write_material_system_priority);
 }
 
-void Renderer::set_fullscreen_debug_material_system(PosteffectMaterialSystemBase* material_system)
+void Renderer::set_fullscreen_debug_material_system(PosteffectBufferDebugMaterialSystem* material_system)
 {
     fullscreen_debug_material_system_ = material_system;
     fullscreen_debug_material_system_->set_priority(debug_material_system_priority);
@@ -478,6 +478,7 @@ void Renderer::set_debug_buffer(DebugMode mode, const TextureInstance& texture)
     {
         fullscreen_debug_material_system_->set_input(0, texture);
         fullscreen_debug_material_system_->enable();
+        fullscreen_debug_material_system_->set_mode(mode);
     }
     debug_mode_ = mode;
 }

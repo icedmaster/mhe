@@ -289,7 +289,7 @@ int main(int /*argc*/, char** /*argv*/)
 #else
     config.assets_path = "../../assets/";
 #endif
-    config.render_config_filename = mhe::utils::path_join(config.assets_path, "render_without_postprocess.xml");
+    config.render_config_filename = mhe::utils::path_join(config.assets_path, "render_without_postprocess_pbr.xml");
     app.init(config);
 
     mhe::game::GameSceneDesc desc;

@@ -5,6 +5,9 @@ class GameScene : public mhe::game::GameScene
 public:
     bool init(mhe::game::Engine& engine, const mhe::game::GameSceneDesc& /*desc*/)
     {
+        x_ = y_ = z_ = 0.0f;
+        x_ = mhe::pi_2;
+
         keyboard_ = engine.event_manager().keyboard();
         
         mhe::NodeInstance& node = engine.scene().create_node();
@@ -54,6 +57,14 @@ public:
 
     bool update(mhe::game::Engine& engine)
     {
+        ImGui::Begin("light");
+        ImGui::SliderAngle("x", &x_);
+        ImGui::SliderAngle("y", &y_);
+        ImGui::SliderAngle("z", &z_);
+        ImGui::End();
+
+        mhe::set_light_rotation(engine.scene_context(), directional_lights_[0], mhe::quatf(x_, y_, z_));
+
         if (keyboard_->is_key_pressed(mhe::KeyboardDevice::key_p))
         {
             mhe::SSRMaterialSystem* ssr_material_system = engine.context().material_systems.get<mhe::SSRMaterialSystem>();
@@ -119,7 +130,6 @@ private:
         light.shading().specular = mhe::vec4(1.0f, 1.0f, 1.0f, 1.0f);
         light.shading().intensity = 5.0f;
         mhe::set_light_position(engine.scene_context(), light_instance.id, mhe::vec3(0, 2000, 0));
-        mhe::set_light_rotation(engine.scene_context(), light_instance.id, mhe::quatf(mhe::pi_2, 0.0f, 0.0f));
         light.set_type(mhe::Light::directional);
         light.desc().directional.directional_shadowmap_projection_znear = 10.0f;
         light.desc().directional.directional_shadowmap_projection_zfar = 2200.0f;
@@ -128,6 +138,8 @@ private:
         light.desc().cast_shadows = true;
         light.desc().shadowmap_bias = 0.002;
         light_instance.enabled = true;
+
+        directional_lights_[0] = light_instance.id;
     }
 
     void update_lights(mhe::game::Engine& engine)
@@ -161,6 +173,7 @@ private:
     mhe::LightInstance::IdType directional_lights_[2];
     const mhe::KeyboardDevice* keyboard_;
     int light_type_;
+    float x_, y_, z_;
 };
 
 int main(int /*argc*/, char** /*argv*/)
