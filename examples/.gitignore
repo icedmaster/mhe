@@ -1,38 +1,20 @@
 /build/*
-/01_init/build/*
-/02_draw/build/*
-/03_skybox/build/*
-/04_deferred/build/*
-/05_lighting/build/*
-/06_performance/build/*
-/07_shadowmap/build/*
 /08_sponza/build/*
-/09_reflections/build/*
-/10_imgui/build/*
 /11_animation/build/*
 /12_sh/build/*
-/13_compute/build/*
 /14_lpv/build/*
 /15_fog/build/*
 /16_pbr/build/*
+/17_vct/build/*
 
 !/build/CMakeLists.txt
-!/01_init/build/CMakeLists.txt
-!/02_draw/build/CMakeLists.txt
-!/03_skybox/build/CMakeLists.txt
-!/04_deferred/build/CMakeLists.txt
-!/05_lighting/build/CMakeLists.txt
-!/06_performance/build/CMakeLists.txt
-!/07_shadowmap/build/CMakeLists.txt
 !/08_sponza/build/CMakeLists.txt
-!/09_reflections/build/CMakeLists.txt
-!/10_imgui/build/CMakeLists.txt
 !/11_animation/build/CMakeLists.txt
 !/12_sh/build/CMakeLists.txt
-!/13_compute/build/CMakeLists.txt
 !/14_lpv/build/CMakeLists.txt
 !/15_fog/build/CMakeLists.txt
 !/16_pbr/build/CMakeLists.txt
+!/17_vct/build/CMakeLists.txt
 
 
 

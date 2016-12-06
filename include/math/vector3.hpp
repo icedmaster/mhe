@@ -399,6 +399,8 @@ typedef vector3<size_t> uivec3;
 const v3d x_axis = v3d(1.0, 0.0, 0.0);
 const v3d y_axis = v3d(0.0, 1.0, 0.0);
 const v3d z_axis = v3d(0.0, 0.0, 1.0);
+
+const vec3 color_rgb_white = vec3(1.0f, 1.0f, 1.0f);
 };
 
 #endif

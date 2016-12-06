@@ -51,14 +51,15 @@ struct LightInstance
 {
     POOL_STRUCT(uint16_t);
 
-    Light light;
+    res::Light dblight;
     TransformInstance::IdType transform_id;
     AABBInstance::IdType aabb_id;
     UniformBufferHandleType uniform_id;
+    const ShadowInfo* shadow_info;
     bool enabled;
 
     LightInstance() : id(invalid_id), transform_id(TransformInstance::invalid_id), aabb_id(AABBInstance::invalid_id),
-        uniform_id(InvalidHandle<UniformBufferHandleType>::id), enabled(true) {}
+        uniform_id(InvalidHandle<UniformBufferHandleType>::id), shadow_info(nullptr), enabled(true) {}
 };
 
 }

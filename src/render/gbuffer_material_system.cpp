@@ -250,7 +250,7 @@ bool GBufferDrawMaterialSystem::init(Context& context, const MaterialSystemConte
 
     UberShader::Index index;
     const UberShader::Info& info = ubershader(context).info("LIGHT_TYPE");
-    index.set(info, Light::directional);
+    index.set(info, directional);
 
     profile_command_.set_stages(render_stage_begin_priority | render_stage_end_priority);
     list_of_commands_.add_command(&clear_command_);
@@ -387,10 +387,10 @@ void GBufferDrawMaterialSystem::update(Context& context, SceneContext& /*scene_c
         UniformBuffer::IdType light_uniform = render_context.lights[i].uniform_id;
         // Update light data
         LightData data;
-        const Light& light = render_context.lights[i].light;
-        type = light.type();
+        const res::Light& light = render_context.lights[i].dblight;
+        type = light.type;
 
-        const ShadowInfo* shadow_info = light.shadow_info();
+        const ShadowInfo* shadow_info = render_context.lights[i].shadow_info;
         if (shadowmap_enabled_.value() && shadow_info != nullptr)
         {
             use_shadowmap = 1;
@@ -409,9 +409,9 @@ void GBufferDrawMaterialSystem::update(Context& context, SceneContext& /*scene_c
         // Here we go - it's time to kick off something to draw
         DrawCall& draw_call = render_context.draw_calls.add();
 
-        if (type == Light::directional)
+        if (type == directional)
             draw_call.render_data = quad_mesh_.mesh.parts[0].render_data;
-        else if (type == Light::spot)
+        else if (type == spot)
             draw_call.render_data = quad_mesh_.mesh.parts[0].render_data;
         else
             draw_call.render_data = sphere_mesh_.mesh.parts[0].render_data;

@@ -183,10 +183,14 @@ private:
 
 #define WRITE_FIELD(field, serializer) if (!serializer.write(#field, field)) return false;
 #define WRITE_BASIC_TYPE_FIELD(field, serializer) if (!serializer.write_basic_type(#field, field)) return false;
+#define WRITE_ENUM(field, serializer) if (!serializer.write(#field, static_cast<uint32_t>(field))) return false;
 
 #define READ_FIELD(field, serializer) if (!serializer.read(#field, field)) return false;
 #define READ_FIELD_WITH_DEFAULT(field, serializer, default_value) if (!serializer.read(#field, field)) field = default_value;
+#define TRY_READ_FIELD(field, serializer) serializer.read(#field, field)
 #define READ_BASIC_TYPE_FIELD(field, serializer) if (!serializer.read_basic_type(#field, field)) return false;
 #define READ_BASIC_TYPE_FIELD_WITH_DEFAULT(field, serializer, default_value) if (!serializer.read_basic_type(#field, field)) field = default_value;
+#define TRY_READ_BASIC_TYPE_FIELD(field, serializer) serializer.read_basic_type(#field, field)
+#define TRY_READ_ENUM(field, serializer) {uint32_t value; if (serializer.read(#field, value)) field = static_cast<decltype(field)>(value);}
 
 #endif

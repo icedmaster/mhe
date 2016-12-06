@@ -214,7 +214,7 @@ void ExponentialShadowMap::update(Context& context, SceneContext& scene_context,
     LightInstance* directional_light_instance = nullptr;
     for (size_t i = 0; i < render_context.lights_number; ++i)
     {
-        if (render_context.lights[i].light.type() == Light::directional)
+        if (render_context.lights[i].dblight.type == directional)
         {
             directional_light_instance = &render_context.lights[i];
             break;
@@ -226,7 +226,7 @@ void ExponentialShadowMap::update(Context& context, SceneContext& scene_context,
 
     light_instance_id_ = directional_light_instance->id;
 
-    const ShadowInfo* shadow_info = directional_light_instance->light.shadow_info();
+    const ShadowInfo* shadow_info = directional_light_instance->shadow_info;
     if (shadow_info == nullptr) return;
     if (!is_handle_valid(downsampled_texture_.id))
         init_downsampling(context, shadow_info);

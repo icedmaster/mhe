@@ -78,7 +78,7 @@ bool set_diffuse_color(game::Engine& engine, size_t id, const colorf& color)
 {
     if (!engine.scene_context().light_pool.is_valid(id))
         return false;
-    engine.scene_context().light_pool.get(id).light.shading().diffuse = color;
+    engine.scene_context().light_pool.get(id).dblight.diffuse_color = color.xyz();
     return true;
 }
 
@@ -86,7 +86,7 @@ bool get_diffuse_color(game::Engine& engine, size_t id, colorf& color)
 {
     if (!engine.scene_context().light_pool.is_valid(id))
         return false;
-    color = engine.scene_context().light_pool.get(id).light.shading().diffuse;
+    color = engine.scene_context().light_pool.get(id).dblight.diffuse_color;
     return true;
 }
 
@@ -94,7 +94,7 @@ bool set_specular_color(game::Engine& engine, size_t id, const colorf& color)
 {
     if (!engine.scene_context().light_pool.is_valid(id))
         return false;
-    engine.scene_context().light_pool.get(id).light.shading().specular = color;
+    engine.scene_context().light_pool.get(id).dblight.specular_color = color.xyz();
     return true;
 }
 
@@ -102,7 +102,7 @@ bool get_specular_color(game::Engine& engine, size_t id, colorf& color)
 {
     if (!engine.scene_context().light_pool.is_valid(id))
         return false;
-    color = engine.scene_context().light_pool.get(id).light.shading().specular;
+    color = engine.scene_context().light_pool.get(id).dblight.specular_color;
     return true;
 }
 

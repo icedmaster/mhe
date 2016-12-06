@@ -111,20 +111,17 @@ void CSMDepthRenderingMaterialSystem::start_frame(Context& context, SceneContext
 {
     mat4x4 light_view;
     LightInstance* light_instance = nullptr;
-    Light* light = nullptr;
     for (size_t i = 0; i < render_context.lights_number; ++i)
     {
-        if (!render_context.lights[i].light.desc().cast_shadows ||
-            render_context.lights[i].light.type() != Light::directional ||
-            !render_context.lights[i].light.desc().auto_shadow_configuration)
+        if (!render_context.lights[i].dblight.cast_shadows ||
+            render_context.lights[i].dblight.type != directional)
             continue;
         light_view = get_light_view_matrix(scene_context, render_context.lights[i].id);
         shadow_info_.shadowmap = shadowmap_;
-        light = &render_context.lights[i].light;
         light_instance = &render_context.lights[i];
     }
 
-    if (light == nullptr)
+    if (light_instance == nullptr)
         return;
 
     vec4 aabb_points[8];
@@ -184,7 +181,7 @@ void CSMDepthRenderingMaterialSystem::start_frame(Context& context, SceneContext
         render_context.render_view_requests.register_request(static_cast<ViewId>(shadowmap_view0 + i), request);
     }
 
-    light->set_shadow_info(&shadow_info_);
+    light_instance->shadow_info = &shadow_info_;
 }
 
 void CSMDepthRenderingMaterialSystem::calculate_projection(mat4x4& proj, mat4x4& view, vec4& params,

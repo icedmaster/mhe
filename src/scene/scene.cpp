@@ -34,7 +34,7 @@ struct LightSortHelper
     {
         if (!light1.enabled) return false;
         if (!light2.enabled) return true;
-        return light1.light.type() < light2.light.type();
+        return light1.dblight.type < light2.dblight.type;
     }
 };
 
@@ -80,13 +80,13 @@ NodeInstance& Scene::create_node() const
     return node;
 }
 
-LightInstance& Scene::create_light(int type) const
+LightInstance& Scene::create_light(LightType type) const
 {
     LightInstance::IdType id = scene_context_.light_pool.create();
     LightInstance& light = scene_context_.light_pool.get(id);
     light.transform_id = scene_context_.transform_pool.create();
     light.aabb_id = scene_context_.aabb_pool.create();
-    light.light.set_type(type);
+    light.dblight.type = type;
     init_light(context_, light);
     return light;
 }
@@ -176,7 +176,7 @@ void Scene::update_light_sources(RenderContext& render_context)
     size_t size = 0;
     for (size_t i = 0; i < scene_context_.light_pool.size(); ++i, ++size)
     {
-        lights[i].light.set_shadow_info(nullptr);
+        lights[i].shadow_info = nullptr;
         if (!lights[i].enabled)
             break;
     }

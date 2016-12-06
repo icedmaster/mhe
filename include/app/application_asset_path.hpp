@@ -6,6 +6,17 @@
 namespace mhe {
 namespace app {
 
+inline string default_assets_path()
+{
+#ifdef MHE_STANDALONE
+    return "assets/";
+#elif defined MHE_VS
+    return "../../assets/";
+#else
+    return "../assets/";
+#endif
+}
+
 const mhe::string assets_base_path = "assets/";
 const mhe::string texture_path = "textures/";
 const mhe::string font_path = "fonts/";

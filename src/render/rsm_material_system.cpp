@@ -102,7 +102,7 @@ void RSMMaterialSystem::start_frame(Context& /*context*/, SceneContext& scene_co
     LightInstance* lights = render_context.lights;
     for (size_t i = 0; i < render_context.lights_number; ++i)
     {
-        if (lights[i].light.type() == Light::directional)
+        if (lights[i].dblight.type == directional)
         {
             light_instance = &lights[i];
             break;
@@ -131,8 +131,8 @@ void RSMMaterialSystem::start_frame(Context& /*context*/, SceneContext& scene_co
     render_context.render_view_requests.register_request(additional_view0, frustum_culling_request);
 
     shader_data_.vp = light_vp_;
-    shader_data_.settings.set_x(light_instance->light.shading().intensity * settings_.flux_intensity);
-    shader_data_.light_diffuse_color = light_instance->light.shading().diffuse;
+    shader_data_.settings.set_x(light_instance->dblight.intensity * settings_.flux_intensity);
+    shader_data_.light_diffuse_color = light_instance->dblight.diffuse_color;
 }
 
 void RSMMaterialSystem::update(Context& context, SceneContext& /*scene_context*/, RenderContext& render_context)
