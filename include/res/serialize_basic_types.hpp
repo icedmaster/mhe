@@ -2,6 +2,7 @@
 #define __SERIALIZE_BASIC_TYPES_HPP__
 
 #include "math/aabb.hpp"
+#include "math/quat.hpp"
 
 namespace mhe {
 namespace res {
@@ -27,11 +28,31 @@ bool serialize(Serializer& serializer, const AABB<T>& value)
 }
 
 template <class T>
+bool serialize(Serializer& serializer, const quat<T>& value)
+{
+    serializer.write("x", value.x());
+    serializer.write("y", value.y());
+    serializer.write("z", value.z());
+    serializer.write("w", value.w());
+    return true;
+}
+
+template <class T>
 bool deserialize(Deserializer& serializer, vector3<T>& value)
 {
     serializer.read("x", value.x());
     serializer.read("y", value.y());
     serializer.read("z", value.z());
+    return true;
+}
+
+template <class T>
+bool deserialize(Deserializer& serializer, quat<T>& value)
+{
+    serializer.read("x", value.x());
+    serializer.read("y", value.y());
+    serializer.read("z", value.z());
+    serializer.read("w", value.w());
     return true;
 }
 

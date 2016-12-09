@@ -23,6 +23,12 @@ const mhe::string font_path = "fonts/";
 const mhe::string shader_path = "shaders/";
 const mhe::string mesh_path = "meshes/";
 const mhe::string material_path = "materials/";
+const mhe::string objects_path = "objects/";
+
+inline string default_objects_path()
+{
+    return default_assets_path() + objects_path;
+}
 
 }}
 

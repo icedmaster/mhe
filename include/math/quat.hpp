@@ -63,6 +63,26 @@ public:
         return q_[3];
     }
 
+    T& x()
+    {
+        return q_[0];
+    }
+
+    T& y()
+    {
+        return q_[1];
+    }
+
+    T& z()
+    {
+        return q_[2];
+    }
+
+    T& w()
+    {
+        return q_[3];
+    }
+
     vector4<T> as_vec4() const
     {
         return vector4<T>(q_[0], q_[1], q_[2], q_[3]);

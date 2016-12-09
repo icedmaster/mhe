@@ -83,6 +83,30 @@ namespace res
             return true;
         }
     };
+
+    // It's temporary here
+    struct Transform : public Serializable
+    {
+        vec3 position;
+        quatf rotation;
+        vec3 scale;
+
+        bool write(Serializer& serializer) const override
+        {
+            WRITE_BASIC_TYPE_FIELD(position, serializer);
+            WRITE_BASIC_TYPE_FIELD(rotation, serializer);
+            WRITE_BASIC_TYPE_FIELD(scale, serializer);
+            return true;
+        }
+
+        bool read(Deserializer& serializer) override
+        {
+            TRY_READ_BASIC_TYPE_FIELD(position, serializer);
+            TRY_READ_BASIC_TYPE_FIELD(rotation, serializer);
+            TRY_READ_BASIC_TYPE_FIELD(scale, serializer);
+            return true;
+        }
+    };
 }
 
 struct ShadowInfo

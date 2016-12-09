@@ -10,6 +10,12 @@ XMLSerializer::XMLSerializer(const char* filename, const char* node) : filename_
     current_node_ = node_;
 }
 
+XMLSerializer::XMLSerializer(const char* filename) : filename_(filename)
+{
+    pugi::xml_node mhe_node = doc_.append_child("mhe");
+    current_node_ = mhe_node;
+}
+
 XMLSerializer::~XMLSerializer()
 {
     doc_.save_file(filename_.c_str());
@@ -76,6 +82,15 @@ XMLDeserializer::XMLDeserializer(const char* filename, const char* node)
     pugi::xml_node mhe_node = doc_.child("mhe");
     if (!mhe_node) return;
     current_node_ = mhe_node.child(node);
+}
+
+XMLDeserializer::XMLDeserializer(const char* filename)
+{
+    pugi::xml_parse_result res = doc_.load_file(filename);
+    if (res.status != pugi::status_ok) return;
+    pugi::xml_node mhe_node = doc_.child("mhe");
+    ASSERT(mhe_node, "Invalid xml file");
+    current_node_ = mhe_node;
 }
 
 bool XMLDeserializer::read(const char* field, uint8_t& value)

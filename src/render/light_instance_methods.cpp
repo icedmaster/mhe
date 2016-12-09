@@ -3,6 +3,8 @@
 #include "render/scene_context.hpp"
 #include "render/uniforms.hpp"
 #include "render/context.hpp"
+#include "scene/scene.hpp"
+#include "res/serialize.hpp"
 
 namespace mhe {
 
@@ -18,6 +20,58 @@ mat4x4 update_light_transform(const LightInstance& light, const vec3& position)
     }
     return mat4x4::identity();
 }
+}
+
+LightInstance& create_light(Context& context, Scene& scene, const FilePath& filename)
+{
+    LightInstance& light_instance = scene.create_light(directional); // the actual type will be loaded from the file
+    light_instance.resource_path = filename;
+    reload_light(context, scene, light_instance);
+    return light_instance;
+}
+
+void reload_light(Context&, Scene& scene, LightInstance& light_instance)
+{
+    res::XMLDeserializer deserializer(light_instance.resource_path.c_str());
+    {
+        deserializer.begin_field("light");
+        bool res = light_instance.dblight.read(deserializer);
+        ASSERT(res == true, "Can't read serialized data from:" << light_instance.resource_path);
+        deserializer.end_field();
+    }
+    {
+        deserializer.begin_field("transform");
+        res::Transform dbtransform;
+        bool res = dbtransform.read(deserializer);
+        deserializer.end_field();
+        ASSERT(res == true, "Can't read serialized data from:" << light_instance.resource_path);
+        Transform& transform = scene.transform_pool().get(light_instance.transform_id).transform;
+        transform.set(dbtransform.position, dbtransform.rotation, dbtransform.scale);
+    }
+}
+
+bool serialize_light(Context& context, Scene& scene, LightInstance& light_instance, const FilePath& filename)
+{
+    res::XMLSerializer serializer(filename.c_str());
+    // TODO: add VERIFY macro
+    {
+        serializer.begin_field("light");
+        bool res = light_instance.dblight.write(serializer);
+        ASSERT(res == true, "Can't write serialized data to:" << light_instance.resource_path);
+        serializer.end_field();
+    }
+    {
+        Transform& transform = scene.transform_pool().get(light_instance.transform_id).transform;
+        res::Transform dbtransform;
+        dbtransform.position = transform.position();
+        dbtransform.rotation = transform.rotation();
+        dbtransform.scale = transform.scale();
+        serializer.begin_field("transform");
+        bool res = dbtransform.write(serializer);
+        serializer.end_field();
+        ASSERT(res == true, "Can't write serialized data to:" << light_instance.resource_path);
+    }
+    return true;
 }
 
 void set_light_position(SceneContext& scene_context, LightInstance::IdType id, const vec3& position)

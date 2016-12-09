@@ -7,6 +7,7 @@
 #include "node.hpp"
 #include "light.hpp"
 #include "render_common.hpp"
+#include "debug/loadable_object.hpp"
 
 namespace mhe {
 
@@ -50,6 +51,7 @@ struct NodeInstance
 struct LightInstance
 {
     POOL_STRUCT(uint16_t);
+    LOADABLE_OBJECT();
 
     res::Light dblight;
     TransformInstance::IdType transform_id;

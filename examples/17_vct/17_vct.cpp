@@ -7,7 +7,7 @@ class GameScene : public mhe::game::GameScene
 public:
     bool init(mhe::game::Engine& engine, const mhe::game::GameSceneDesc& /*desc*/) override
     {
-        mhe::LightInstance& light_instance = engine.scene().create_light(mhe::directional);
+        /*mhe::LightInstance& light_instance = engine.scene().create_light(mhe::directional);
         mhe::res::Light& light = light_instance.dblight;
         light.diffuse_color = mhe::color_rgb_white;
         light.specular_color = mhe::color_rgb_white;
@@ -16,6 +16,9 @@ public:
         light.cast_shadows = true;
         light.shadowmap_bias = 0.01f;
         light_instance.enabled = true;
+        mhe::serialize_light(engine.context(), engine.scene(), light_instance, mhe::FilePath("17-vct-light.xml"));*/
+
+        light_id_ = mhe::create_light(engine.context(), engine.scene(), mhe::utils::path_join(mhe::app::default_objects_path(), mhe::string("17-vct-light.xml"))).id;
 
         mhe::NodeInstance& node = engine.scene().create_node();
         mhe::load_node<mhe::GBufferFillMaterialSystem>(node, mhe::string("pbr-test-simple.mesh"), engine.context(), engine.scene_context());
@@ -25,8 +28,14 @@ public:
 
     bool update(mhe::game::Engine& engine) override
     {
+        if (engine.event_manager().keyboard()->is_key_pressed(mhe::KeyboardDevice::key_r))
+        {
+            mhe::reload_light(engine.context(), engine.scene(), engine.scene().scene_context().light_pool.get(light_id_));
+        }
         return true;
     }
+private:
+    mhe::LightInstance::IdType light_id_;
 };
 
 int main(int /*argc*/, char** /*argv*/)

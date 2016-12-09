@@ -6,6 +6,11 @@
 namespace mhe {
 
 struct SceneContext;
+class Scene;
+
+MHE_EXPORT LightInstance &create_light(Context& context, Scene& scene, const FilePath& filename);
+MHE_EXPORT void reload_light(Context& context, Scene& scene, LightInstance& light_instance);
+MHE_EXPORT bool serialize_light(Context& context, Scene& scene, LightInstance& light_instance, const FilePath& filename);
 
 MHE_EXPORT void set_light_position(SceneContext& scene_context, LightInstance::IdType id, const vec3& position);
 MHE_EXPORT const vec3& get_light_position(const SceneContext& scene_context, LightInstance::IdType id);

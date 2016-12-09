@@ -131,6 +131,7 @@ class MHE_EXPORT XMLSerializer : public Serializer
 {
 public:
     XMLSerializer(const char* filename, const char* node);
+    XMLSerializer(const char* filename);
     ~XMLSerializer();
 
     bool write(const char* field, uint8_t value) override;
@@ -152,6 +153,7 @@ class MHE_EXPORT XMLDeserializer : public Deserializer
 {
 public:
     XMLDeserializer(const char* filename, const char* node);
+    XMLDeserializer(const char* filename);
     bool read(const char* field, uint8_t& value) override;
     bool read(const char* field, uint16_t& value) override;
     bool read(const char* field, uint32_t& value) override;

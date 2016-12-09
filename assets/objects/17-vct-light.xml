@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<mhe>
+	<light>
+		<type value="2" />
+		<angle value="45" />
+		<radius value="1" />
+		<attenuation value="0.02" />
+		<spot_attenuation value="0.02" />
+		<diffuse_color>
+			<x value="0.5" />
+			<y value="1" />
+			<z value="0.5" />
+		</diffuse_color>
+		<specular_color>
+			<x value="1" />
+			<y value="1" />
+			<z value="1" />
+		</specular_color>
+		<intensity value="3" />
+		<specular_intensity value="1" />
+		<shadowmap_znear value="0.1" />
+		<shadowmap_zfar value="100" />
+		<shadowmap_bias value="0.01" />
+		<cast_shadows value="1" />
+	</light>
+	<transform>
+		<position>
+			<x value="0" />
+			<y value="0" />
+			<z value="0" />
+		</position>
+		<rotation>
+			<x value="0.550817" />
+			<y value="0.108529" />
+			<z value="-0.0725165" />
+			<w value="0.824356" />
+		</rotation>
+		<scale>
+			<x value="1" />
+			<y value="1" />
+			<z value="1" />
+		</scale>
+	</transform>
+</mhe>
