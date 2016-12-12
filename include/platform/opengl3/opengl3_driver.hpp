@@ -27,6 +27,7 @@ struct OpenGL3ContextState
     bool blend;
     bool scissor_test;
     bool cull;
+    bool rasterizer_depth_test_disabled;
     uint8_t color_mask;
 
     OpenGL3ContextState();

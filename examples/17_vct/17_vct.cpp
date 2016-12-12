@@ -21,7 +21,8 @@ public:
         light_id_ = mhe::create_light(engine.context(), engine.scene(), mhe::utils::path_join(mhe::app::default_objects_path(), mhe::string("17-vct-light.xml"))).id;
 
         mhe::NodeInstance& node = engine.scene().create_node();
-        mhe::load_node<mhe::GBufferFillMaterialSystem>(node, mhe::string("pbr-test-simple.mesh"), engine.context(), engine.scene_context());
+        //mhe::load_node<mhe::GBufferFillMaterialSystem>(node, mhe::string("pbr-test-simple.mesh"), engine.context(), engine.scene_context());
+        mhe::load_node<mhe::GBufferFillMaterialSystem>(node, mhe::string("sponza.mesh"), engine.context(), engine.scene_context());
 
         return true;
     }

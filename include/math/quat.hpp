@@ -126,12 +126,6 @@ public:
         const float cz = ::cos(az * 0.5f);
         const float sz = ::sin(az * 0.5f);
 
-        quat<T> qx(sx, 0.0f, 0.0f, cx); // pitch
-        quat<T> qy(0.0f, sy, 0.0f, cy); // yaw
-        quat<T> qz(0.0f, 0.0f, sz, cz); // roll
-
-        // TODO: optimize it
-        //*this = qx * qy * qz;
         q_[3] = cx * cy * cz + sx * sy * sz;
         q_[0] = sx * cy * cz - cx * sy * sz;
         q_[1] = cx * sy * cz + sx * cy * sz;
@@ -145,9 +139,9 @@ public:
         const float z_sqr = q_[2] * q_[2];
         const float w_sqr = q_[3] * q_[3];
 
-        xangle = ::atan2( 2 * (w() * z() + y() * x()), (1 - 2 * (z_sqr + y_sqr)) );
+        xangle = ::atan2( 2 * (w() * x() + z() * y()), (1 - 2 * (y_sqr + x_sqr)) );
         yangle = ::asin( 2 * (w() * y() - x() * z()) );
-        zangle = ::atan2( 2 * (w() * x() + z() * y()), (1 - 2 * (y_sqr + x_sqr)) );
+        zangle = ::atan2( 2 * (w() * z() + y() * x()), (1 - 2 * (z_sqr + y_sqr)) );
     }
 
     template <class V>

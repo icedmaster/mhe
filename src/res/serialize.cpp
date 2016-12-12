@@ -34,7 +34,7 @@ bool XMLSerializer::write(const char* field, uint16_t value)
 bool XMLSerializer::write(const char* field, uint32_t value)
 {
     pugi::xml_node node = current_node_.append_child(field);
-    pugi::xml_attribute attr = node.append_attribute("value");
+    pugi::xml_attribute attr = node.append_attribute("v");
     attr.set_value(value);
     return true;
 }
@@ -42,7 +42,7 @@ bool XMLSerializer::write(const char* field, uint32_t value)
 bool XMLSerializer::write(const char* field, float value)
 {
     pugi::xml_node node = current_node_.append_child(field);
-    pugi::xml_attribute attr = node.append_attribute("value");
+    pugi::xml_attribute attr = node.append_attribute("v");
     attr.set_value(value);
     return true;
 }
@@ -50,7 +50,7 @@ bool XMLSerializer::write(const char* field, float value)
 bool XMLSerializer::write(const char* field, const string& value)
 {
     pugi::xml_node node = current_node_.append_child(field);
-    pugi::xml_attribute attr = node.append_attribute("value");
+    pugi::xml_attribute attr = node.append_attribute("v");
     if (!value.empty())
         attr.set_value(value.c_str());
     return true;
@@ -113,7 +113,7 @@ bool XMLDeserializer::read(const char* field, uint32_t& value)
 {
     pugi::xml_node n = current_node_.child(field);
     if (!n) return false;
-    pugi::xml_attribute attr = n.attribute("value");
+    pugi::xml_attribute attr = n.attribute("v");
     if (!attr) return false;
     value = attr.as_uint();
     return true;
@@ -123,7 +123,7 @@ bool XMLDeserializer::read(const char* field, float& value)
 {
     pugi::xml_node n = current_node_.child(field);
     if (!n) return false;
-    pugi::xml_attribute attr = n.attribute("value");
+    pugi::xml_attribute attr = n.attribute("v");
     if (!attr) return false;
     value = attr.as_float();
     return true;
@@ -133,7 +133,7 @@ bool XMLDeserializer::read(const char* field, string& value)
 {
     pugi::xml_node n = current_node_.child(field);
     if (!n) return false;
-    pugi::xml_attribute attr = n.attribute("value");
+    pugi::xml_attribute attr = n.attribute("v");
     if (!attr) return false;
     value = attr.value();
     return true;
@@ -167,7 +167,7 @@ bool XMLDeserializer::read(uint16_t& value)
 
 bool XMLDeserializer::read(uint32_t& value)
 {
-    pugi::xml_attribute attr = current_node_.attribute("value");
+    pugi::xml_attribute attr = current_node_.attribute("v");
     if (!attr) return false;
     value = attr.as_uint();
     return true;
@@ -175,7 +175,7 @@ bool XMLDeserializer::read(uint32_t& value)
 
 bool XMLDeserializer::read(float& value)
 {
-    pugi::xml_attribute attr = current_node_.attribute("value");
+    pugi::xml_attribute attr = current_node_.attribute("v");
     if (!attr) return false;
     value = attr.as_float();
     return true;
@@ -183,7 +183,7 @@ bool XMLDeserializer::read(float& value)
 
 bool XMLDeserializer::read(string& value)
 {
-    pugi::xml_attribute attr = current_node_.attribute("value");
+    pugi::xml_attribute attr = current_node_.attribute("v");
     if (!attr) return false;
     value = attr.value();
     return true;

@@ -93,6 +93,7 @@ void RasterizerState::init(const RasterizerDesc& desc)
     desc_.color_mask[1] = write_color;
     desc_.color_mask[2] = write_color;
     desc_.color_mask[3] = write_color;
+    desc_.disable_depth_test = !desc.depth_test_enabled;
 }
 
 void RasterizerState::enable(OpenGL3ContextState& state) const
@@ -101,7 +102,8 @@ void RasterizerState::enable(OpenGL3ContextState& state) const
     bool enabled_changed = enable != state.cull;
     bool winding_changed = desc_.winding != state.cull_winding;
     bool mode_changed = desc_.cull != state.cull_mode;
-    bool changed = enabled_changed || winding_changed || mode_changed;
+    bool depth_test_mode_changed = desc_.disable_depth_test != state.rasterizer_depth_test_disabled;
+    bool changed = enabled_changed || winding_changed || mode_changed || depth_test_mode_changed;
     if (changed)
     {
         if (!enable && enabled_changed)
@@ -118,6 +120,14 @@ void RasterizerState::enable(OpenGL3ContextState& state) const
         state.cull = enable;
         state.cull_winding = desc_.winding;
         state.cull_mode = desc_.cull;
+        if (depth_test_mode_changed)
+        {
+            if (desc_.disable_depth_test)
+                glEnable(GL_DEPTH_CLAMP);
+            else
+                glDisable(GL_DEPTH_CLAMP);
+        }
+        state.rasterizer_depth_test_disabled = desc_.disable_depth_test;
     }
 
     uint8_t color_mask = desc_.color_mask[0] | desc_.color_mask[1] << 1 | desc_.color_mask[2] << 2 | desc_.color_mask[3] << 3;

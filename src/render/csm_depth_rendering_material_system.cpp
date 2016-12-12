@@ -66,6 +66,8 @@ bool CSMDepthRenderingMaterialSystem::init(Context& context, const MaterialSyste
         RenderState& render_state = create_and_get(context.render_state_pool);
         RenderStateDesc render_state_desc;
         render_state_desc.viewport.viewport.set(i * rt_width, 0, rt_width, rt_height);
+        render_state_desc.rasterizer.cull = cull_none;
+        render_state_desc.rasterizer.depth_test_enabled = false;
         if (!render_state.init(render_state_desc))
         {
             destroy(context);

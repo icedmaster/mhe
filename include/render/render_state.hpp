@@ -103,9 +103,10 @@ struct RasterizerDesc
     CullMode cull;
     WindingOrder order;
     bool color_write;
+    bool depth_test_enabled;
 
     RasterizerDesc() :
-        cull(cull_back), order(winding_ccw), color_write(true)
+        cull(cull_back), order(winding_ccw), color_write(true), depth_test_enabled(true)
     {}
 };
 

@@ -14,7 +14,8 @@ namespace mhe {
 namespace opengl {
 
 OpenGL3ContextState::OpenGL3ContextState() :
-    cull_mode(GL_BACK), cull_winding(GL_CCW), depth_test(false), depth_write(false), stencil(false), blend(false), scissor_test(false), cull(true), color_mask(0xf)
+    cull_mode(GL_BACK), cull_winding(GL_CCW), depth_test(false), depth_write(false), stencil(false), blend(false), scissor_test(false), cull(true),
+    rasterizer_depth_test_disabled(false), color_mask(0xf)
 {
     uniforms.fill(UniformBuffer::invalid_id);
 }
