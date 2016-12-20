@@ -132,7 +132,7 @@ float get_shadow_value(vec3 pos_01, vec3 pos_ws, float linear_depth, Light light
         return get_shadow_value(shadowmap_texture, shadowmap_pos_01.z, shadowmap_pos_01.xy, light_shadowmap_bias(light), sample_size);
 #else
 		return get_shadow_value(shadowmap_texture, shadowmap_pos_01.z, shadowmap_pos_01.xy * shadowmap_coord_scale + shadowmap_coord_offset,
-                                light_shadowmap_bias(light) * bias_scale, sample_size);
+                                light_shadowmap_bias(light), sample_size);
 #endif
 	}
 #endif // SHADOWMAP

@@ -5,7 +5,7 @@
 
 namespace mhe {
 
-MaterialSystem* create(Context& context, const string& name, const string& instance_name)
+MaterialSystem* create_material_system(Context& context, const string& name, const string& instance_name)
 {
     MaterialSystem* material_system = MaterialSystemFactory::instance().create(name.c_str());
     if (material_system == nullptr)

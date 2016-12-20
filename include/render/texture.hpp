@@ -12,7 +12,8 @@ enum
 {
     texture_2d,
     texture_cube,
-    texture_3d
+    texture_3d,
+    texture_buffer // is not supported - use TextureBuffer instead
 };
 
 // filter type

@@ -73,9 +73,9 @@ public:
         }
 
         if (keyboard_->is_key_pressed(mhe::KeyboardDevice::key_0))
-            light_type_ = mhe::Light::spot;
+            light_type_ = mhe::spot;
         else if (keyboard_->is_key_pressed(mhe::KeyboardDevice::key_2))
-            light_type_ = mhe::Light::directional;
+            light_type_ = mhe::directional;
         else return true;
         update_lights(engine);
         return true;
@@ -88,35 +88,31 @@ private:
 
     void init_spot_lights(mhe::game::Engine& engine)
     {
-        mhe::LightInstance& light_instance = engine.scene().create_light(mhe::Light::spot);
-        mhe::Light& light = light_instance.light;
-        light.shading().diffuse = mhe::color_green;
-        light.shading().specular = mhe::color_white;
+        mhe::LightInstance& light_instance = engine.scene().create_light(mhe::spot);
+        mhe::res::Light& light = light_instance.dblight;
+        light.diffuse_color = mhe::color_rgb_green;
+        light.specular_color = mhe::color_rgb_white;
         mhe::set_light_position(engine.scene_context(), light_instance.id, mhe::vec3(0, 20, 0));
         mhe::set_light_rotation(engine.scene_context(), light_instance.id, mhe::quatf(-mhe::pi_2, 0.0f, 0.0f));
-        light.desc().spot.attenuation_a = 0.2f;
-        light.desc().spot.attenuation_b = 0.1f;
-        light.desc().spot.angle = mhe::deg_to_rad(30.0f);
-        light.desc().spot.angle_attenuation = 0.5f;
-        light.desc().spot.spot_shadowmap_projection_znear = 0.1f;
-        light.desc().spot.spot_shadowmap_projection_zfar = 50.0f;
-        light.desc().cast_shadows = false;
-        light.set_type(mhe::Light::spot);
+        light.attenuation = 0.2f;
+        light.spot_attenuation = 0.5f;
+        light.angle = mhe::deg_to_rad(30.0f);
+        light.shadowmap_znear = 0.1f;
+        light.shadowmap_zfar = 50.0f;
+        light.cast_shadows = false;
 
-        mhe::LightInstance& light_instance2 = engine.scene().create_light(mhe::Light::spot);
-        mhe::Light& light2 = light_instance2.light;
-        light2.shading().diffuse = mhe::color_blue;
-        light2.shading().specular = mhe::color_white;
+        mhe::LightInstance& light_instance2 = engine.scene().create_light(mhe::spot);
+        mhe::res::Light& light2 = light_instance2.dblight;
+        light.diffuse_color = mhe::color_rgb_green;
+        light.specular_color = mhe::color_rgb_white;
         mhe::set_light_position(engine.scene_context(), light_instance2.id, mhe::vec3(0, 1, 20));
         mhe::set_light_rotation(engine.scene_context(), light_instance2.id, mhe::quatf(0.0f, mhe::pi, 0.0f));
-        light2.desc().spot.attenuation_a = 0.2f;
-        light2.desc().spot.attenuation_b = 0.2f;
-        light2.desc().spot.angle = mhe::deg_to_rad(30.0f);
-        light2.desc().spot.angle_attenuation = 0.5f;
-        light2.desc().spot.spot_shadowmap_projection_znear = 0.1f;
-        light2.desc().spot.spot_shadowmap_projection_zfar = 50.0f;
-        light2.desc().cast_shadows = true;
-        light2.set_type(mhe::Light::spot);
+        light.attenuation = 0.2f;
+        light.spot_attenuation = 0.5f;
+        light.angle = mhe::deg_to_rad(30.0f);
+        light.shadowmap_znear = 0.1f;
+        light.shadowmap_zfar = 50.0f;
+        light.cast_shadows = true;
 
         spot_lights_[0] = light_instance.id;
         spot_lights_[1] = light_instance2.id;
@@ -124,19 +120,16 @@ private:
 
     void init_directional_lights(mhe::game::Engine& engine)
     {
-        mhe::LightInstance& light_instance = engine.scene().create_light(mhe::Light::directional);
-        mhe::Light& light = light_instance.light;
-        light.shading().diffuse = mhe::vec4(0.78f, 1.0f, 0.716f, 1.0f);
-        light.shading().specular = mhe::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-        light.shading().intensity = 5.0f;
+        mhe::LightInstance& light_instance = engine.scene().create_light(mhe::directional);
+        mhe::res::Light& light = light_instance.dblight;
+        light.diffuse_color = mhe::vec3(0.78f, 1.0f, 0.716f);
+        light.specular_color = mhe::color_rgb_white;
+        light.intensity = 5.0f;
         mhe::set_light_position(engine.scene_context(), light_instance.id, mhe::vec3(0, 2000, 0));
-        light.set_type(mhe::Light::directional);
-        light.desc().directional.directional_shadowmap_projection_znear = 10.0f;
-        light.desc().directional.directional_shadowmap_projection_zfar = 2200.0f;
-        light.desc().directional.directional_shadowmap_projection_height = 2500.0;
-        light.desc().directional.directional_shadowmap_projection_width = 2500.0;
-        light.desc().cast_shadows = true;
-        light.desc().shadowmap_bias = 0.002;
+        light.shadowmap_znear = 10.0f;
+        light.shadowmap_zfar = 2200.0f;
+        light.cast_shadows = true;
+        light.shadowmap_bias = 0.002;
         light_instance.enabled = true;
 
         directional_lights_[0] = light_instance.id;
@@ -149,12 +142,12 @@ private:
 
         switch (light_type_)
         {
-        case mhe::Light::spot:
+        case mhe::spot:
             std::copy(spot_lights_, spot_lights_ + 2, for_enable);
             std::copy(directional_lights_, directional_lights_ + 2, for_disable);
             break;
 
-        case mhe::Light::directional:
+        case mhe::directional:
             std::copy(directional_lights_, directional_lights_ + 2, for_enable);
             std::copy(spot_lights_, spot_lights_ + 2, for_disable);
             break;
@@ -189,7 +182,7 @@ int main(int /*argc*/, char** /*argv*/)
 #else
     config.assets_path = "../../assets/";
 #endif
-    config.render_config_filename = mhe::utils::path_join(config.assets_path, "render.xml");
+    config.render_config_filename = mhe::utils::path_join(config.assets_path, mhe::string("render.xml"));
     app.init(config);
 
     app.engine().renderer()->set_ambient_color(mhe::color_white * 0.3f);

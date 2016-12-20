@@ -148,7 +148,7 @@ PosteffectMaterialSystemBase* PosteffectSystem::create(Context& context, const P
         material_system = context.material_systems.get<PosteffectMaterialSystemBase>(desc.material.c_str());
     else
     {
-        material_system = mhe::create<PosteffectMaterialSystemBase>(context, desc.material, desc.name);
+        material_system = mhe::create_material_system<PosteffectMaterialSystemBase>(context, desc.material, desc.name);
     }
     ASSERT(material_system != nullptr, "Can't find material system with name:" << desc.material);
     material_system->set_priority(posteffect_material_priority_base + desc.priority);

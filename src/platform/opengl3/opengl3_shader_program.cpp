@@ -2,6 +2,7 @@
 
 #include "utils/global_log.hpp"
 #include "platform/opengl/opengl_extension.hpp"
+#include "platform/opengl/opengl_helpers.hpp"
 
 namespace mhe {
 namespace opengl {
@@ -30,7 +31,7 @@ bool OpenGL3ShaderProgram::Shader::check_status(GLenum type, GLenum param) const
         GLchar buffer[1024];
         GLint length = 0;
         OpenGLExtensions::instance().glGetShaderInfoLog(id_, sizeof(buffer), &length, buffer);
-        ERROR_LOG("Shader " << id_ << " type:" << type << " check status error:" << buffer);
+        ERROR_LOG("Shader " << id_ << " type:" << enum_to_string(type) << " check status error:" << buffer);
         return false;
     }
     return true;

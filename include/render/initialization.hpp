@@ -24,12 +24,12 @@ private:
 	hashmap<string, MaterialSystemContext> material_systems;
 };
 
-MHE_EXPORT MaterialSystem* create(Context& context, const string& name, const string& instance_name);
+MHE_EXPORT MaterialSystem* create_material_system(Context& context, const string& name, const string& instance_name);
 
 template <class T>
-T* create(Context& context, const string& name, const string& instance_name)
+T* create_material_system(Context& context, const string& name, const string& instance_name)
 {
-	return checked_static_cast<T*>(create(context, name, instance_name));
+	return checked_static_cast<T*>(create_material_system(context, name, instance_name));
 }
 
 }

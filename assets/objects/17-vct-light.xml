@@ -20,7 +20,7 @@
 		<specular_intensity v="1" />
 		<shadowmap_znear v="0.1" />
 		<shadowmap_zfar v="100" />
-		<shadowmap_bias v="0.01" />
+		<shadowmap_bias v="0.001" />
 		<cast_shadows v="1" />
 	</light>
 	<transform>

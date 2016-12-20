@@ -12,6 +12,10 @@
 
 namespace mhe {
 
+namespace res {
+    class Deserializer;
+}
+
 struct Context;
 struct Material;
 struct MaterialInstance;
@@ -42,6 +46,9 @@ struct MaterialSystemContext
     KeyValue<string, string> options;
     size_t material_instances_number;
     size_t priority;
+    res::Deserializer* deserializer;
+
+    MaterialSystemContext() : material_instances_number(0), deserializer(nullptr) {}
 };
 
 class MHE_EXPORT MaterialSystem : public ref_counter

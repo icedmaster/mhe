@@ -251,7 +251,7 @@ bool GISystem::init(Context& context, const Settings& settings)
 
     context.initialization_parameters.add(diffuse_resolve_name, material_system_context);
     indirect_lighting_resolve_material_system_ =
-        create<IndirectLightingResolveMaterialSystem>(context, diffuse_resolve_name, diffuse_resolve_name);
+        create_material_system<IndirectLightingResolveMaterialSystem>(context, diffuse_resolve_name, diffuse_resolve_name);
 
     {
         const RenderTarget& rt = context.render_target_pool.get(indirect_lighting_resolve_material_system_->resolved_diffuse_render_target_id());
@@ -279,14 +279,14 @@ void GISystem::add_lpv(Context& context, Renderer& renderer, const LPVParams& pa
 {
     const string rsm_name(RSMMaterialSystem::material_name());
 
-    rsm_material_system_ = static_cast<RSMMaterialSystem*>(create(context, rsm_name, rsm_name));
+    rsm_material_system_ = static_cast<RSMMaterialSystem*>(create_material_system(context, rsm_name, rsm_name));
     ASSERT(rsm_material_system_ != nullptr, "RSMMaterialSystem initialization failed."
         "Probably, you forgot to add its description to the configuration file");
     rsm_material_system_->set_priority(params.base_priority - 2);
 
     const string lpv_name(LPVMaterialSystem::material_name());
 
-    lpv_material_system_ = static_cast<LPVMaterialSystem*>(create(context, lpv_name, lpv_name));
+    lpv_material_system_ = static_cast<LPVMaterialSystem*>(create_material_system(context, lpv_name, lpv_name));
     lpv_material_system_->set_gbuffer(rsm_material_system_->gbuffer());
     lpv_material_system_->settings().mode = LPVMaterialSystem::mode_rsm;
     lpv_material_system_->set_priority(params.base_priority - 1);

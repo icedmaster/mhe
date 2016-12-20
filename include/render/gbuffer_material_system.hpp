@@ -13,7 +13,6 @@
 
 namespace mhe {
 
-class Light;
 struct LightInstance;
 struct LightData;
 struct DirectionalLightData;

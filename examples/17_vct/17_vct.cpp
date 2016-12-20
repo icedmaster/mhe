@@ -1,4 +1,5 @@
 #include "mhe.hpp"
+#include "render/vct_material_system.hpp"
 
 using namespace mhe;
 
@@ -7,22 +8,18 @@ class GameScene : public mhe::game::GameScene
 public:
     bool init(mhe::game::Engine& engine, const mhe::game::GameSceneDesc& /*desc*/) override
     {
-        /*mhe::LightInstance& light_instance = engine.scene().create_light(mhe::directional);
-        mhe::res::Light& light = light_instance.dblight;
-        light.diffuse_color = mhe::color_rgb_white;
-        light.specular_color = mhe::color_rgb_white;
-        light.intensity = 3.0f;
-        mhe::set_light_rotation(engine.scene_context(), light_instance.id, mhe::quatf(mhe::pi_2 * 0.75f, mhe::deg_to_rad(15.0f), 0.0f));
-        light.cast_shadows = true;
-        light.shadowmap_bias = 0.01f;
-        light_instance.enabled = true;
-        mhe::serialize_light(engine.context(), engine.scene(), light_instance, mhe::FilePath("17-vct-light.xml"));*/
-
         light_id_ = mhe::create_light(engine.context(), engine.scene(), mhe::utils::path_join(mhe::app::default_objects_path(), mhe::string("17-vct-light.xml"))).id;
 
         mhe::NodeInstance& node = engine.scene().create_node();
-        //mhe::load_node<mhe::GBufferFillMaterialSystem>(node, mhe::string("pbr-test-simple.mesh"), engine.context(), engine.scene_context());
-        mhe::load_node<mhe::GBufferFillMaterialSystem>(node, mhe::string("sponza.mesh"), engine.context(), engine.scene_context());
+        mhe::load_node<mhe::GBufferFillMaterialSystem>(node, mhe::string("pbr-test-simple.mesh"), engine.context(), engine.scene_context());
+        //mhe::load_node<mhe::GBufferFillMaterialSystem>(node, mhe::string("sponza.mesh"), engine.context(), engine.scene_context());
+
+        const string voxelize_name = mhe::VoxelizeMaterialSystem::material_name();
+        MaterialSystemContext material_system_context;
+        material_system_context.instance_name = voxelize_name;
+        material_system_context.shader_name = voxelize_name;
+        engine.context().initialization_parameters.add(voxelize_name, material_system_context);
+        voxelize_material_system_ = create_material_system<mhe::VoxelizeMaterialSystem>(engine.context(), voxelize_name, voxelize_name);
 
         return true;
     }
@@ -37,6 +34,7 @@ public:
     }
 private:
     mhe::LightInstance::IdType light_id_;
+    mhe::VoxelizeMaterialSystem* voxelize_material_system_;
 };
 
 int main(int /*argc*/, char** /*argv*/)

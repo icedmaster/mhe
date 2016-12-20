@@ -134,7 +134,7 @@ bool ExponentialShadowMap::init(Context& context, const MaterialSystemContext& m
     resolve_material_system_context.shader_name = string("posteffect_copy");
     resolve_material_system_context.material_instances_number = 1;
     context.initialization_parameters.add(string("posteffect_simple"), resolve_material_system_context);
-    depth_copy_material_system_ = create<PosteffectSimpleMaterialSystem>(context, string("posteffect_simple"), string("esm_depth_copy"));
+    depth_copy_material_system_ = create_material_system<PosteffectSimpleMaterialSystem>(context, string("posteffect_simple"), string("esm_depth_copy"));
     ASSERT(depth_copy_material_system_ != nullptr, "Couldn't create a material system for depth copying");
 
     Shader shader;
@@ -497,7 +497,7 @@ bool VolumetricFogSystem::init(Context& context, const MaterialSystemContext& sy
     material_system_context.instance_name = esm_name;
     material_system_context.options = system_context.options;
     context.initialization_parameters.add(esm_name, material_system_context);
-    esm_material_system_ = create<ExponentialShadowMap>(context, esm_name, esm_name);
+    esm_material_system_ = create_material_system<ExponentialShadowMap>(context, esm_name, esm_name);
     ASSERT(esm_material_system_ != nullptr, "Couldn't create ExponentialShadowMap material system");
 
     // step 2 - volumetric fog itself
@@ -506,7 +506,7 @@ bool VolumetricFogSystem::init(Context& context, const MaterialSystemContext& sy
     material_system_context.instance_name = volumetric_fog_name;
     ++material_system_context.priority;
     context.initialization_parameters.add(volumetric_fog_name, material_system_context);
-    volumetric_fog_material_system_ = create<VolumetricFogMaterialSystem>(context, volumetric_fog_name, volumetric_fog_name);
+    volumetric_fog_material_system_ = create_material_system<VolumetricFogMaterialSystem>(context, volumetric_fog_name, volumetric_fog_name);
     ASSERT(volumetric_fog_material_system_ != nullptr, "Couldn't create VolumetricFogMaterialSystem");
 
     return true;

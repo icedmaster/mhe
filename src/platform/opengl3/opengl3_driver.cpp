@@ -3,6 +3,7 @@
 #include "platform/opengl/mhe_gl.hpp"
 #include "platform/opengl/opengl_extension.hpp"
 #include "platform/opengl/opengl_types.hpp"
+#include "platform/opengl/opengl_helpers.hpp"
 
 #include "platform/opengl3/opengl3_shader_program.hpp"
 #include "platform/opengl3/opengl3_render_state.hpp"
@@ -40,6 +41,7 @@ bool OpenGL3Driver::init(DriverRenderingCapabilities& caps)
     INFO_LOG("OpenGL3Driver::context:" << major << "." << minor);
     OpenGLExtensions::create_singleton();
     OpenGLExtensions::instance().init_extensions();
+    init_text_description();
 
     current_render_target_ = nullptr;
 

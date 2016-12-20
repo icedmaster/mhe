@@ -366,7 +366,7 @@ void Application::init_materials(pugi::xml_node materials_node)
 
         if (!on_demand)
         {
-            MaterialSystem* material_system = create(context, name, material_instance_name);
+            MaterialSystem* material_system = create_material_system(context, name, material_instance_name);
             if (material_system == nullptr)
             {
                 WARN_LOG("MaterialSystem initialization failed:" << name);
