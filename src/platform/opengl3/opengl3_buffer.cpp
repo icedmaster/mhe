@@ -2,6 +2,7 @@
 
 #include "platform/opengl/opengl_types.hpp"
 #include "platform/opengl/opengl_extension.hpp"
+#include "platform/opengl/opengl_helpers.hpp"
 #include "platform/opengl3/opengl3_shader_program.hpp"
 
 #include "render/render_globals.hpp"

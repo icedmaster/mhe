@@ -10,6 +10,7 @@
 #include "opengl3_render_state.hpp"
 #include "opengl3_render_target.hpp"
 #include "opengl3_query.hpp"
+#include "opengl3_atomics.hpp"
 
 namespace mhe {
 namespace opengl {
@@ -17,70 +18,75 @@ namespace opengl {
 class OpenGL3VideoDriverFactory : public AbstractVideoDriverFactory
 {
 public:
-	const char* name() const override
-	{
-		return "opengl3";
-	}
+    const char* name() const override
+    {
+        return "opengl3";
+    }
 
-	DriverImpl* create_video_driver() const override
-	{
-		return new OpenGL3Driver;
-	}
+    DriverImpl* create_video_driver() const override
+    {
+        return new OpenGL3Driver;
+    }
 
-	RenderBufferImpl* create_render_buffer() const override
-	{
-		return new OpenGL3Buffer;
-	}
+    RenderBufferImpl* create_render_buffer() const override
+    {
+        return new OpenGL3Buffer;
+    }
 
-	IndexBufferImpl* create_index_buffer() const override
-	{
-		return new OpenGL3IndexBuffer;
-	}
+    IndexBufferImpl* create_index_buffer() const override
+    {
+        return new OpenGL3IndexBuffer;
+    }
 
-	LayoutImpl* create_layout() const override
-	{
-		return new OpenGL3Layout;
-	}
+    LayoutImpl* create_layout() const override
+    {
+        return new OpenGL3Layout;
+    }
 
-	UniformBufferImpl* create_uniform_buffer() const override
-	{
-		return new OpenGL3UniformBuffer;
-	}
+    UniformBufferImpl* create_uniform_buffer() const override
+    {
+        return new OpenGL3UniformBuffer;
+    }
 
-	ShaderProgramImpl* create_shader_program() const override
-	{
-		return new OpenGL3ShaderProgram;
-	}
+    ShaderProgramImpl* create_shader_program() const override
+    {
+        return new OpenGL3ShaderProgram;
+    }
 
-	TextureImpl* create_texture() const override
-	{
-		return new OpenGL3Texture;
-	}
+    TextureImpl* create_texture() const override
+    {
+        return new OpenGL3Texture;
+    }
 
-	RenderStateImpl* create_render_state() const override
-	{
-		return new OpenGL3RenderState;
-	}
+    RenderStateImpl* create_render_state() const override
+    {
+        return new OpenGL3RenderState;
+    }
 
-	RenderTargetImpl* create_render_target() const override
-	{
-		return new OpenGL3RenderTarget;
-	}
+    RenderTargetImpl* create_render_target() const override
+    {
+        return new OpenGL3RenderTarget;
+    }
 
-	TextureBufferImpl* create_texture_buffer() const override
-	{
-		return new OpenGL3TextureBuffer;
-	}
+    TextureBufferImpl* create_texture_buffer() const override
+    {
+        return new OpenGL3TextureBuffer;
+    }
 
-	ShaderStorageBufferImpl* create_shader_storage_buffer() const override
-	{
-		return new OpenGL3ShaderStorageBuffer;
-	}
+    ShaderStorageBufferImpl* create_shader_storage_buffer() const override
+    {
+        return new OpenGL3ShaderStorageBuffer;
+    }
 
-	QueryImpl* create_query() const override
-	{
-		return new OpenGL3Query;
-	}
+    QueryImpl* create_query() const override
+    {
+        return new OpenGL3Query;
+    }
+
+    AtomicImpl* create_atomic() const override
+    {
+        return new OpenGL3Atomic;
+    }
 };
 
 }}

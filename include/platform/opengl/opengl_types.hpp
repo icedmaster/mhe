@@ -86,7 +86,7 @@ inline GLenum get_image_format(int format)
 inline GLenum get_pixel_data_format(int format)
 {
     ASSERT(format < format_max, "Invalid texture format");
-    GLenum formats[format_max] = {GL_RGBA, GL_BGRA, GL_RGBA, GL_DEPTH_STENCIL, GL_DEPTH_COMPONENT, GL_RED, GL_RED, GL_RGB, GL_RG, GL_RGBA, GL_RGB, GL_RGB, GL_RED, GL_RED};
+    GLenum formats[format_max] = {GL_RGBA, GL_BGRA, GL_RGBA, GL_DEPTH_STENCIL, GL_DEPTH_COMPONENT, GL_RED, GL_RED, GL_RGB, GL_RG, GL_RGBA, GL_RGB, GL_RGB, GL_RED, GL_RED_INTEGER};
     return formats[format];
 }
 

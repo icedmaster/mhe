@@ -262,7 +262,8 @@ struct UniformBufferDesc
     size_t unit;    // fixed uniform binding index
     size_t size;    // fixed uniform size
 
-    UniformBufferDesc() : unit(invalid_uniform_unit), size(0) {}
+    UniformBufferDesc() : update_type(uniform_buffer_normal), name(nullptr), program(nullptr),
+        unit(invalid_uniform_unit), size(0) {}
 };
 
 template <class T>

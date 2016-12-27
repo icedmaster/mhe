@@ -269,6 +269,14 @@ void Driver::perform_draw_call(Context& context, const DrawCall& draw_call)
         impl_->set_texture(texture, j);
         state_.textures[j] = material.textures[j].id;
     }
+    for (size_t j = 0; j < material_textures_number; ++j)
+    {
+        if (material.images[j].id == Texture::invalid_id || material.images[j].id == state_.textures[j])
+            continue;
+        const Texture& texture = context.texture_pool.get(material.images[j].id);
+        impl_->set_image(texture, j, material.image_access[j]);
+        state_.textures[j] = material.textures[j].id;
+    }
     for (size_t j = 0; j < material_uniforms_number; ++j)
     {
         if (material.uniforms[j] == UniformBuffer::invalid_id || (material.uniforms[j] == state_.uniforms[j] && !shader_program_changed))
@@ -292,6 +300,11 @@ void Driver::perform_draw_call(Context& context, const DrawCall& draw_call)
         const TextureBuffer& texture_buffer = context.texture_buffer_pool.get(material.texture_buffers[j]);
         impl_->set_texture_buffer(texture_buffer, j);
         state_.texture_buffers[j] = texture_buffer.id();
+    }
+    for (size_t j = 0; j < max_atomics_number; ++j)
+    {
+        if (draw_call.atomics[j] == nullptr) continue;
+        impl_->set_atomic(*draw_call.atomics[j], j);
     }
     impl_->draw(draw_call.render_data);
     stats_.update(draw_call.render_data.elements_number);

@@ -10,6 +10,7 @@
 #include "platform/opengl3/opengl3_buffer.hpp"
 #include "platform/opengl3/opengl3_texture.hpp"
 #include "platform/opengl3/opengl3_render_target.hpp"
+#include "platform/opengl3/opengl3_atomics.hpp"
 
 namespace mhe {
 namespace opengl {
@@ -270,6 +271,12 @@ void OpenGL3Driver::memory_barrier(uint32_t barriers)
 {
     OpenGLExtensions::instance().glMemoryBarrier(get_barriers(barriers));
     CHECK_GL_ERRORS();
+}
+
+void OpenGL3Driver::set_atomic(const Atomic& atomic, size_t unit)
+{
+    const OpenGL3Atomic* impl = static_cast<const OpenGL3Atomic*>(atomic.impl());
+    impl->bind(unit);
 }
 
 }}

@@ -31,6 +31,7 @@ class Layout;
 class RenderTarget;
 class RenderCommand;
 class ShaderStorageBuffer;
+class Atomic;
 
 class DriverImpl
 {
@@ -76,6 +77,7 @@ public:
     virtual void set_render_target(const RenderTarget& render_target) = 0;
     virtual void set_texture_buffer(const TextureBuffer& texture_buffer, size_t unit) = 0;
     virtual void set_default_render_target() = 0;
+    virtual void set_atomic(const Atomic& atomic, size_t unit) = 0;
     virtual void draw(const RenderData& data) = 0;
     virtual void draw(size_t elements_number, size_t vbuffer_offset, size_t ibuffer_offset, size_t indices_number, Primitive primitive) = 0;
 

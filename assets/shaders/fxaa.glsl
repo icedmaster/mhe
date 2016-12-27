@@ -25,10 +25,10 @@ struct VSOutput
 	vec2 tex;
 };
 
-[vertex]
-
 #define FULLSCREEN_LAYOUT
 [include "geometry_common.h"]
+
+[vertex]
 
 out VSOutput vsoutput;
 

@@ -3,6 +3,7 @@
 
 #include "render/texture.hpp"
 #include "../opengl/mhe_gl.hpp"
+#include "opengl3_buffer.hpp"
 
 namespace mhe {
 namespace opengl {
@@ -53,7 +54,9 @@ public:
 private:
     void init_cubemap(const TextureDesc& desc, const uint8_t* data, size_t size);
     void init_3d_texture(const TextureDesc& desc, const uint8_t* data, size_t size);
+    void init_texture_buffer(const TextureDesc& desc, const uint8_t* data, size_t size);
 
+    VBO vbo_; // for texture buffers or image buffers
     GLuint id_;
     GLenum target_;
     GLsizei width_;

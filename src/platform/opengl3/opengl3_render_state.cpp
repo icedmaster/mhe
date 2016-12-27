@@ -3,6 +3,7 @@
 
 #include "platform/opengl/opengl_types.hpp"
 #include "platform/opengl/opengl_extension.hpp"
+#include "platform/opengl/opengl_helpers.hpp"
 
 namespace mhe {
 namespace opengl {

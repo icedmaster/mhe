@@ -38,17 +38,4 @@
 // contain a bug with gl_VertexID that doesn't include the offset passed through this method.
 //#define MHE_OPENGL_USE_GL_DRAW_ELEMENTS_BASE_VERTEX
 
-#ifdef MHE_OPENGL_ABORT_ON_ERROR
-#define PRINT_ERROR(m) ASSERT(0, FUNCTION_DESCRIPTION_MACRO << ":" << e)
-#else
-#define PRINT_ERROR(m) WARN_LOG(FUNCTION_DESCRIPTION_MACRO << ":" << e);
-#endif
-
-#define CHECK_GL_ERRORS()                       \
-    {                                           \
-        GLenum e = glGetError();                    \
-        if (e != GL_NO_ERROR)                       \
-            PRINT_ERROR(e);                 \
-    }                                           
-
 #endif

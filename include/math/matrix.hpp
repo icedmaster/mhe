@@ -583,6 +583,13 @@ public:
         return m;
     }
 
+    static matrix scaling_matrix(T x, T y, T z)
+    {
+        matrix m;
+        m.set_scale(x, y, z);
+        return m;
+    }
+
     static matrix rotation_matrix(float x_angle, float y_angle, float z_angle)
     {
         matrix m;

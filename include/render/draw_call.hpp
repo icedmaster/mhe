@@ -2,8 +2,13 @@
 #define __DRAW_CALL_HPP__
 
 #include "node.hpp"
+#include "core/array.hpp"
 
 namespace mhe {
+
+class Atomic;
+
+const size_t max_atomics_number = 4;
 
 struct DrawCall
 {
@@ -11,11 +16,16 @@ struct DrawCall
     RenderTargetHandleType render_target;
     MaterialInstance material;
     RenderData render_data;
+    array<Atomic*, max_atomics_number> atomics;
     RenderCommand* command;
+    int barrier;
     uint8_t pass;
 
     DrawCall() : render_state(InvalidHandle<RenderStateHandleType>::id),
-        render_target(default_render_target), command(nullptr), pass(0) {}
+        render_target(default_render_target), command(nullptr), barrier(memory_barrier_none), pass(0)
+    {
+        atomics.fill(nullptr);
+    }
 };
 
 // TODO: move Explicit draw calls to a separate header (can use forward declaration then)

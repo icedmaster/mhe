@@ -1,6 +1,8 @@
 #include "render/vct_material_system.hpp"
 
 #include "render/context.hpp"
+#include "render/render_context.hpp"
+#include "render/instances.hpp"
 #include "utils/global_log.hpp"
 
 namespace mhe {
@@ -16,40 +18,108 @@ bool VoxelizeMaterialSystem::init(Context& context, const MaterialSystemContext&
     if (material_system_context.deserializer != nullptr)
         settings_.shared.dbsettings.read(*material_system_context.deserializer);
 
-    TextureBufferDesc buffer_desc;
-    buffer_desc.format = format_r32ui;
-    buffer_desc.unit = 0;
-    buffer_desc.update_type = buffer_update_type_dynamic;
-    TextureBuffer& texture_buffer = create_and_get(context.texture_buffer_pool);
-    ASSERT(texture_buffer.init(buffer_desc, 0, nullptr), "Position texture buffer initialization failed");
-    position_texture_id_ = texture_buffer.id();
-
     TextureDesc texture_desc;
     texture_desc.address_mode_r = texture_clamp;
     texture_desc.address_mode_s = texture_clamp;
     texture_desc.address_mode_t = texture_clamp;
     texture_desc.format = format_r32ui;
+    texture_desc.type = texture_buffer;
+    texture_desc.width = settings_.shared.dbsettings.size.x() * settings_.shared.dbsettings.size.y() * settings_.shared.dbsettings.size.z();
+    texture_desc.height = 1;
+    texture_desc.depth = 1;
+    {
+        Texture& texture = create_and_get(context.texture_pool);
+        VERIFY(texture.init(texture_desc, nullptr, texture_desc.width * 4), "Position buffer initialization failed");
+        position_texture_id_ = texture.id();
+    }
+
     texture_desc.type = texture_3d;
     texture_desc.width = settings_.shared.dbsettings.size.x();
     texture_desc.height = settings_.shared.dbsettings.size.y();
     texture_desc.depth = settings_.shared.dbsettings.size.z();
-    texture_desc.type = texture_3d;
+
+    ASSERT(texture_desc.width == texture_desc.height && texture_desc.width == texture_desc.depth, "Only the same size along all axes is now supported");
+
     {
         Texture& texture = create_and_get(context.texture_pool);
-        ASSERT(texture.init(texture_desc, nullptr, 0), "Color texture initialization failed");
+        VERIFY(texture.init(texture_desc, nullptr, 0), "Color texture initialization failed");
         color_texture_id_ = texture.id();
     }
     {
         Texture& texture = create_and_get(context.texture_pool);
-        ASSERT(texture.init(texture_desc, nullptr, 0), "Normal texture initialization failed");
+        VERIFY(texture.init(texture_desc, nullptr, 0), "Normal texture initialization failed");
         normal_texture_id_ = texture.id();
     }
+
+    UniformBufferDesc uniform_buffer_desc;
+    uniform_buffer_desc.size = sizeof(UniformData);
+    uniform_buffer_desc.unit = 0;
+    UniformBuffer& uniform_buffer = create_and_get(context.uniform_pool);
+    VERIFY(uniform_buffer.init(uniform_buffer_desc), "Uniform buffer initialization failed");
+    uniform_id_ = uniform_buffer.id();
+    UniformData uniform_data;
+    init_uniform_data(uniform_data);
+    uniform_buffer.update(uniform_data);
+
+    RenderStateDesc render_state_desc;
+    render_state_desc.blend.enabled = false;
+    render_state_desc.depth.write_enabled = false;
+    render_state_desc.depth.test_enabled = false;
+    render_state_desc.rasterizer.color_write = false;
+    render_state_desc.rasterizer.cull = cull_none;
+    render_state_desc.scissor.enabled = false;
+    render_state_desc.stencil.enabled = false;
+    render_state_desc.viewport.viewport = rect<int>(0, 0, texture_desc.width, texture_desc.height);
+    RenderState& render_state = create_and_get(context.render_state_pool);
+    VERIFY(render_state.init(render_state_desc), "Render state initialization failed");
+    render_state_id_ = render_state.id();
+
+    VERIFY(atomic_counter_.init(format_uint), "Atomic coutner initialization failed");
 
     return true;
 }
 
+void VoxelizeMaterialSystem::init_uniform_data(UniformData& data) const
+{
+    data.grid_size = vec4(settings_.shared.dbsettings.size, 0.0f);
+
+    mat4x4 proj;
+    proj.set_ortho(0.0f, static_cast<float>(settings_.shared.dbsettings.size.x()),
+        0.0f, static_cast<float>(settings_.shared.dbsettings.size.y()),
+        0.0f, static_cast<float>(settings_.shared.dbsettings.size.z()));
+    // view matrices
+    mat4x4 view;
+    // +X
+    view.set(0.0f, 0.0f, -1.0f, 0.0f,
+             0.0f, 1.0f, 0.0f, 0.0f,
+             1.0f, 0.0f, 0.0f, 0.0f,
+             0.0f, 0.0f, -1.0f, 1.0f);
+    data.vp[0] = view * proj;
+    // +Y
+    view.set(-1.0f, 0.0f, 0.0f, 0.0f,
+             0.0f, 0.0f, 1.0f, 0.0f,
+             0.0f, 1.0f, 0.0f, 0.0f,
+             0.0f, 0.0f, -1.0f, 1.0f);
+    data.vp[1] = view * proj;
+    // +Z
+    view.set(-1.0f, 0.0f, 0.0f, 0.0f,
+             0.0f, 1.0f, 0.0f, 0.0f,
+             0.0f, 0.0f, -1.0f, 0.0f,
+             0.0f, 0.0f, -1.0f, 1.0f);
+    data.vp[2] = view * proj;
+
+    data.worldspace_to_voxelspace = mat4x4::translation_matrix(
+        settings_.shared.dbsettings.size.x(),
+        settings_.shared.dbsettings.size.y(),
+        settings_.shared.dbsettings.size.z()) *
+        mat4x4::scaling_matrix(0.5f);
+}
+
 void VoxelizeMaterialSystem::destroy(Context& context)
 {
+    atomic_counter_.destroy();
+    destroy_pool_object(context.render_state_pool, render_state_id_);
+    destroy_pool_object(context.uniform_pool, uniform_id_);
     destroy_pool_object(context.texture_pool, normal_texture_id_);
     destroy_pool_object(context.texture_pool, color_texture_id_);
     destroy_pool_object(context.texture_pool, position_texture_id_);
@@ -63,7 +133,33 @@ void VoxelizeMaterialSystem::setup(Context &context, SceneContext &scene_context
 
 void VoxelizeMaterialSystem::update(Context& context, SceneContext& scene_context, RenderContext& render_context)
 {
+    context.materials[id()].clear();
 
+    const NodeInstance* nodes = render_context.nodes;
+    const size_t nodes_count = render_context.nodes_number;
+    for (size_t i = 0; i < nodes_count; ++i)
+    {
+        for (size_t j = 0, size = nodes[i].mesh.instance_parts.size(); j < size; ++j)
+        {
+            if (!nodes[i].mesh.instance_parts[j].visible) continue;
+            const MeshPartInstance& part_instance = nodes[i].mesh.instance_parts[j];
+            DrawCall& draw_call = render_context.draw_calls.add();
+            Material& original_material = context.materials[part_instance.material.material_system].get(part_instance.material.id);
+            Material& material = create_and_get(context.materials[id()]);
+            material.shader_program = ubershader(context).get_default();
+            material.uniforms[0] = uniform_id_;
+            material.uniforms[1] = original_material.uniforms[1];
+            material.textures[0] = original_material.textures[0];
+            material.images[1].id = position_texture_id_;
+            material.images[2].id = color_texture_id_;
+            material.images[3].id = normal_texture_id_;
+            setup_draw_call(draw_call, part_instance, nodes[i].mesh.mesh.parts[j], default_render_target);
+            draw_call.material.id = material.id;
+            draw_call.material.material_system = id();
+            draw_call.render_state = render_state_id_;
+            draw_call.atomics[0] = &atomic_counter_;
+        }
+    }
 }
 
 }

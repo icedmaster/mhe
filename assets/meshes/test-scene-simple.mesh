@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<mhe>
+	<mesh>
+		<binary ref="test-scene-simple.bin" />
+		<aabb>
+			<center>
+				<x v="0" />
+				<y v="1.19276" />
+				<z v="0" />
+			</center>
+			<extents>
+				<x v="5" />
+				<y v="1.69276" />
+				<z v="5" />
+			</extents>
+		</aabb>
+		<parts>
+			<size v="2" />
+			<item>
+				<material ref="lambert5" />
+			</item>
+			<item>
+				<material ref="lambert6" />
+			</item>
+		</parts>
+	</mesh>
+</mhe>

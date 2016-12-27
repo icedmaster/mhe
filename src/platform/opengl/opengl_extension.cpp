@@ -92,13 +92,7 @@ void OpenGLExtensions::init_extensions()
 
     get_str_extensions();
 
-    INFO_LOG("supported extensions:");
-    for (std::map<std::string, bool>::iterator it = loaded_extensions_.begin();
-         it != loaded_extensions_.end(); ++it)
-    {
-        if (it->second)
-            INFO_LOG(it->first);
-    }
+    INFO_LOG("supported extensions:" << get_supported_extensions());
 #endif
 }
 

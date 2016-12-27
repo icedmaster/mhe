@@ -20,6 +20,8 @@ public:
         material_system_context.shader_name = voxelize_name;
         engine.context().initialization_parameters.add(voxelize_name, material_system_context);
         voxelize_material_system_ = create_material_system<mhe::VoxelizeMaterialSystem>(engine.context(), voxelize_name, voxelize_name);
+        voxelize_material_system_->set_priority(1);
+        engine.renderer()->set_material_system_to_process(voxelize_material_system_);
 
         return true;
     }

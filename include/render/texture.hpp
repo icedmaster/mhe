@@ -13,7 +13,7 @@ enum
     texture_2d,
     texture_cube,
     texture_3d,
-    texture_buffer // is not supported - use TextureBuffer instead
+    texture_buffer
 };
 
 // filter type
@@ -65,7 +65,7 @@ struct TextureDesc
     TextureDesc() :
         type(texture_2d), mag_filter(texture_filter_linear), min_filter(texture_filter_linear),
         address_mode_t(texture_wrap), address_mode_s(texture_wrap), address_mode_r(texture_wrap), anisotropic_level(1.0f),
-        format(format_rgba), datatype(format_ubyte), mips(0)
+        format(format_rgba), datatype(format_default), mips(0)
     {}
 };
 

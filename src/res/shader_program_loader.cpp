@@ -204,7 +204,7 @@ std::string load_shader_impl(ShaderInitializationParams& params, const std::vect
     {
         const std::string& s = utils::trim_copy(data[i]);
 
-        if (s.find(include_tag) != std::string::npos)
+        if (s.find(include_tag) != std::string::npos && state != state_incorrect_found)
         {
             ++load_context.level;
             actual_data += parse_include(params, s, tag, load_context);
