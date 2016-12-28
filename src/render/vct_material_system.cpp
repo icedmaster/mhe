@@ -119,8 +119,8 @@ void VoxelizeMaterialSystem::init_uniform_data(UniformData& data) const
     data.vp[0] = view * proj;
     // +Y
     view.set(-1.0f, 0.0f, 0.0f, 0.0f,
-             0.0f, 0.0f, 1.0f, 0.0f,
-             0.0f, 1.0f, 0.0f, 0.0f,
+             0.0f, 0.0f, -1.0f, 0.0f,
+             0.0f, -1.0f, 0.0f, 0.0f,
              0.0f, 0.0f, -1.0f, 1.0f);
     data.vp[1] = view * proj;
     // +Z

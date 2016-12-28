@@ -122,7 +122,7 @@ void calculate_average_and_save(layout (r32ui) uimage3D out_image, ivec3 coord, 
 
     // now we got the averaged value
     value = uint_to_vec4(curr);
-    value.xyz /= 255.0f;
+    value.w = 255.0f;
     imageStore(out_image, coord, uvec4(vec4_to_uint(value)));
 }
 
