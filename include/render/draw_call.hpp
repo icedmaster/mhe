@@ -10,6 +10,12 @@ class Atomic;
 
 const size_t max_atomics_number = 4;
 
+template <class DC>
+inline void prepare_draw_call(DC& draw_call)
+{
+    ::memset(&draw_call, 0, sizeof(DC));
+}
+
 struct DrawCall
 {
     RenderStateHandleType render_state;
@@ -66,13 +72,12 @@ struct ComputeCallExplicit
     UniformBuffer* uniforms[compute_call_uniforms_number];
     uivec3 workgroups_number;
     int barrier;
-};
 
-template <class DC>
-inline void prepare_draw_call(DC& draw_call)
-{
-    ::memset(&draw_call, 0, sizeof(DC));
-}
+    ComputeCallExplicit()
+    {
+        ::memset(this, 0, sizeof(ComputeCallExplicit));
+    }
+};
 
 }
 

@@ -309,6 +309,9 @@ void Driver::perform_draw_call(Context& context, const DrawCall& draw_call)
     impl_->draw(draw_call.render_data);
     stats_.update(draw_call.render_data.elements_number);
 
+    if (draw_call.barrier != memory_barrier_none)
+        impl_->memory_barrier(draw_call.barrier);
+
     if (command_render_stages & render_stage_after_submit)
         draw_call.command->execute(context, render_stage_after_submit);
 }

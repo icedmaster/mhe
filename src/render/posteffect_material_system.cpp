@@ -775,7 +775,7 @@ bool AverageLuminanceMaterialSystem::ReductionCommand::execute_impl(Context& con
         size_t workgroups_number = reduction_context_.input_size / threads_number;
         compute_call_.workgroups_number.set(workgroups_number, workgroups_number, 1);
 
-        context.driver.memory_barrier(memory_barrier_image_fetch);
+        context.driver.memory_barrier(memory_barrier_image_access);
         context.driver.execute(context, &compute_call_, 1);
         context.driver.memory_barrier(memory_barrier_storage_buffer);
 

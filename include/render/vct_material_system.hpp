@@ -4,6 +4,7 @@
 #include "material_system.hpp"
 #include "render_common.hpp"
 #include "atomics.hpp"
+#include "commands.hpp"
 #include "math/vector3.hpp"
 #include "math/matrix.hpp"
 #include "res/serialize.hpp"
@@ -73,6 +74,9 @@ private:
     UniformBufferHandleType uniform_id_;
     RenderStateHandleType render_state_id_;
     Atomic atomic_counter_;
+    // clear pass
+    ShaderProgramHandleType clear_shader_id_;
+    ComputeCallCommand clear_draw_call_command_;
 };
 
 }

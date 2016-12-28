@@ -7,6 +7,8 @@
 
 namespace mhe {
 
+const string vct_voxelize_clear_shader_name = "compute/vct_voxelize_clear";
+
 bool VoxelizeMaterialSystem::init(Context& context, const MaterialSystemContext& material_system_context)
 {
     if (!init_default(context, material_system_context))
@@ -14,6 +16,10 @@ bool VoxelizeMaterialSystem::init(Context& context, const MaterialSystemContext&
         ERROR_LOG("Material default initialization failed");
         return false;
     }
+
+    Shader shader;
+    VERIFY(context.shader_manager.get(shader, vct_voxelize_clear_shader_name), "Couldn't get a shader:" << vct_voxelize_clear_shader_name);
+    clear_shader_id_ = context.ubershader_pool.get(shader.shader_program_handle).get_default();
 
     if (material_system_context.deserializer != nullptr)
         settings_.shared.dbsettings.read(*material_system_context.deserializer);
@@ -74,7 +80,23 @@ bool VoxelizeMaterialSystem::init(Context& context, const MaterialSystemContext&
     VERIFY(render_state.init(render_state_desc), "Render state initialization failed");
     render_state_id_ = render_state.id();
 
-    VERIFY(atomic_counter_.init(format_uint), "Atomic coutner initialization failed");
+    VERIFY(atomic_counter_.init(format_uint), "Atomic counter initialization failed");
+
+    // setup the clear command
+    ComputeCallExplicit& compute_call = clear_draw_call_command_.compute_call();
+    compute_call.shader_program = &context.shader_pool.get(clear_shader_id_);
+    compute_call.images[0] = &context.texture_pool.get(color_texture_id_);
+    compute_call.images[1] = &context.texture_pool.get(normal_texture_id_);
+    compute_call.image_access[0] = access_writeonly;
+    compute_call.image_access[1] = access_writeonly;
+
+    const size_t threads_number = compute_call.shader_program->variable_value<size_t>("THREADS_NUMBER");
+    compute_call.workgroups_number.set(settings_.shared.dbsettings.size.x() / threads_number,
+        settings_.shared.dbsettings.size.y() / threads_number,
+        settings_.shared.dbsettings.size.z() / threads_number);
+
+    compute_call.barrier = memory_barrier_image_access;
+    clear_draw_call_command_.set_stages(render_stage_begin_priority);
 
     return true;
 }
@@ -109,9 +131,9 @@ void VoxelizeMaterialSystem::init_uniform_data(UniformData& data) const
     data.vp[2] = view * proj;
 
     data.worldspace_to_voxelspace = mat4x4::translation_matrix(
-        settings_.shared.dbsettings.size.x(),
-        settings_.shared.dbsettings.size.y(),
-        settings_.shared.dbsettings.size.z()) *
+        static_cast<float>(settings_.shared.dbsettings.size.x()),
+        static_cast<float>(settings_.shared.dbsettings.size.y()),
+        static_cast<float>(settings_.shared.dbsettings.size.z())) *
         mat4x4::scaling_matrix(0.5f);
 }
 
@@ -158,6 +180,8 @@ void VoxelizeMaterialSystem::update(Context& context, SceneContext& scene_contex
             draw_call.material.material_system = id();
             draw_call.render_state = render_state_id_;
             draw_call.atomics[0] = &atomic_counter_;
+            draw_call.command = &clear_draw_call_command_;
+            draw_call.barrier = memory_barrier_image_access | memory_barrier_atomic_counter;
         }
     }
 }
