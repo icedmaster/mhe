@@ -31,7 +31,7 @@ public:
 
     bool wait() override;
     void notify() override;
-    bool check() const override
+    bool check() const
     {
         return flag_;
     }

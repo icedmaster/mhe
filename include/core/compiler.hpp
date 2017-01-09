@@ -13,6 +13,8 @@
 #endif
 #else
 #define MHE_GCC
+#define MHE_CPP11
+#define MHE_COMPILER_HAS_NULLPTR
 #endif
 
 #ifdef MHE_VS

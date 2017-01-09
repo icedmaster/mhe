@@ -43,13 +43,13 @@ void register_light_type(RDBGProcessor& rdbg_processor)
 #endif
 }
 
-bool light_set_data(game::Engine& engine, const uint8_t* data, size_t size, size_t offset)
+bool light_set_data(game::Engine&, const uint8_t*, size_t, size_t)
 {
     NOT_IMPLEMENTED_METHOD();
     return false;
 }
 
-bool light_get_data(game::Engine& engine, uint8_t* data, size_t& size, size_t offset)
+bool light_get_data(game::Engine& engine, uint8_t* data, size_t& size, size_t)
 {
     LightInstance* light_instances = engine.scene_context().light_pool.all_objects();
     size_t objects_number = engine.scene_context().light_pool.size();
@@ -64,12 +64,12 @@ bool light_get_data(game::Engine& engine, uint8_t* data, size_t& size, size_t of
     return true;
 }
 
-bool light_set_object_data(game::Engine& engine, size_t objectid, const uint8_t* data, size_t size, size_t offset)
+bool light_set_object_data(game::Engine&, size_t, const uint8_t*, size_t, size_t)
 {
     return false;
 }
 
-bool light_get_object_data(game::Engine& engine, size_t objectid, uint8_t* data, size_t& size, size_t offset)
+bool light_get_object_data(game::Engine&, size_t, uint8_t*, size_t&, size_t)
 {
     return false;
 }

@@ -137,7 +137,6 @@ public:
         const float x_sqr = q_[0] * q_[0];
         const float y_sqr = q_[1] * q_[1];
         const float z_sqr = q_[2] * q_[2];
-        const float w_sqr = q_[3] * q_[3];
 
         xangle = ::atan2( 2 * (w() * x() + z() * y()), (1 - 2 * (y_sqr + x_sqr)) );
         yangle = ::asin( 2 * (w() * y() - x() * z()) );

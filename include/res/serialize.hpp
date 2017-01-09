@@ -15,6 +15,7 @@ public:
     virtual bool write(const char* field, uint8_t value) = 0;
     virtual bool write(const char* field, uint16_t value) = 0;
     virtual bool write(const char* field, uint32_t value) = 0;
+    virtual bool write(const char* field, uint64_t value) = 0;
     virtual bool write(const char* field, float value) = 0;
     virtual bool write(const char* field, const string& value) = 0;
     virtual bool write(const char* field, const FilePath& value) = 0;
@@ -62,6 +63,7 @@ public:
     virtual bool read(const char* field, uint8_t& value) = 0;
     virtual bool read(const char* field, uint16_t& value) = 0;
     virtual bool read(const char* field, uint32_t& value) = 0;
+    virtual bool read(const char* field, uint64_t& value) = 0;
     virtual bool read(const char* field, float& value) = 0;
     virtual bool read(const char* field, string& value) = 0;
     virtual bool read(const char* field, FilePath& value) = 0;
@@ -137,6 +139,7 @@ public:
     bool write(const char* field, uint8_t value) override;
     bool write(const char* field, uint16_t value) override;
     bool write(const char* field, uint32_t value) override;
+    bool write(const char* field, uint64_t value) override;
     bool write(const char* field, float value) override;
     bool write(const char* field, const string& value) override;
     bool write(const char* field, const FilePath& value) override;
@@ -157,6 +160,7 @@ public:
     bool read(const char* field, uint8_t& value) override;
     bool read(const char* field, uint16_t& value) override;
     bool read(const char* field, uint32_t& value) override;
+    bool read(const char* field, uint64_t& value) override;
     bool read(const char* field, float& value) override;
     bool read(const char* field, string& value) override;
     bool read(const char* field, FilePath& value) override;

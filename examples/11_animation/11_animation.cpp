@@ -209,16 +209,15 @@ public:
         mhe::set_node_transform(engine.scene_context(), plane, mhe::vec3::zero(), mhe::quatf(mhe::pi_2, 0.0f, 0.0f),
             mhe::vec3(5.0f, 5.0f, 5.0f));
 
-        mhe::LightInstance& light_instance = engine.scene().create_light(mhe::Light::directional);
-        mhe::Light& light = light_instance.light;
-        light.shading().diffuse = mhe::vec4(240.0f / 255.0f, 150.0f / 255.0f, 80.0f / 255.0f, 1.0f);
-        light.shading().specular = mhe::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-        light.shading().intensity = 5.0f;
+        mhe::LightInstance& light_instance = engine.scene().create_light(mhe::directional);
+        mhe::res::Light& light = light_instance.dblight;
+        light.diffuse_color = mhe::vec3(240.0f / 255.0f, 150.0f / 255.0f, 80.0f / 255.0f);
+        light.specular_color = mhe::color_rgb_white;
+        light.intensity = 5.0f;
         mhe::set_light_position(engine.scene_context(), light_instance.id, mhe::vec3(0, 1.0f, 0));
         mhe::set_light_rotation(engine.scene_context(), light_instance.id, mhe::quatf(mhe::pi_2, 0.0f, 0.0f));
-        light.set_type(mhe::Light::directional);
-        light.desc().cast_shadows = true;
-        light.desc().shadowmap_bias = 0.005f;
+        light.cast_shadows = true;
+        light.shadowmap_bias = 0.005f;
         light_instance.enabled = true;
         return true;
     }
@@ -289,7 +288,7 @@ int main(int /*argc*/, char** /*argv*/)
 #else
     config.assets_path = "../../assets/";
 #endif
-    config.render_config_filename = mhe::utils::path_join(config.assets_path, "render_without_postprocess_pbr.xml");
+    config.render_config_filename = mhe::utils::path_join(config.assets_path, mhe::string("render_without_postprocess_pbr.xml"));
     app.init(config);
 
     mhe::game::GameSceneDesc desc;

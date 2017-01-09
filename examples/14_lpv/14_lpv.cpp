@@ -20,19 +20,18 @@ public:
     {
         debug_mode_on_ = false;
 
-        mhe::LightInstance& light_instance = engine.scene().create_light(mhe::Light::directional);
-        mhe::Light& light = light_instance.light;
-        light.shading().diffuse = mhe::color_white;
-        light.shading().specular = mhe::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-        light.shading().intensity = 3.0f;
+        mhe::LightInstance& light_instance = engine.scene().create_light(mhe::directional);
+        mhe::res::Light& light = light_instance.dblight;
+        light.diffuse_color = mhe::color_rgb_white;
+        light.specular_color = mhe::color_rgb_white;
+        light.intensity = 3.0f;
 #ifndef SPONZA
         mhe::set_light_rotation(engine.scene_context(), light_instance.id, mhe::quatf(0.0f, -mhe::pi_2 * 1.3f, mhe::pi_2 * 0.7f));
 #else
         mhe::set_light_rotation(engine.scene_context(), light_instance.id, mhe::quatf(mhe::pi_2 * 0.75f, mhe::deg_to_rad(15.0f), 0.0f));
 #endif
-        light.set_type(mhe::Light::directional);
-        light.desc().cast_shadows = true;
-        light.desc().shadowmap_bias = 0.01f;
+        light.cast_shadows = true;
+        light.shadowmap_bias = 0.01f;
         light_instance.enabled = true;
 
         mhe::NodeInstance& node = engine.scene().create_node();
@@ -51,7 +50,7 @@ public:
         material_system_context.material_instances_number = 0;
         engine.context().initialization_parameters.add(rsm_name, material_system_context);
 
-        rsm_material_system_ = static_cast<RSMMaterialSystem*>(create(engine.context(), rsm_name, rsm_name));
+        rsm_material_system_ = static_cast<RSMMaterialSystem*>(create_material_system(engine.context(), rsm_name, rsm_name));
         engine.renderer()->set_material_system_to_process(rsm_material_system_);
         rsm_material_system_->init_debug_views(engine.context());
         rsm_material_system_->settings().mode = RSMMaterialSystem::mode_volume;
@@ -69,7 +68,7 @@ public:
         material_system_context.options.add(string("geometry_injection_shader"), geometry_injection_shader_name);
         engine.context().initialization_parameters.add(lpv_name, material_system_context);
 
-        lpv_material_system_ = static_cast<LPVMaterialSystem*>(create(engine.context(), lpv_name, lpv_name));
+        lpv_material_system_ = static_cast<LPVMaterialSystem*>(create_material_system(engine.context(), lpv_name, lpv_name));
         engine.renderer()->set_material_system_to_process(lpv_material_system_);
         lpv_material_system_->set_gbuffer(rsm_material_system_->gbuffer());
         lpv_material_system_->init_debug_views(engine.context());
@@ -136,8 +135,8 @@ public:
         if (engine.event_manager().check_bind("debug_lpv"))
         {
             debug_mode_on_ ^= 1;
-            engine.renderer()->set_debug_mode(debug_mode_on_ ? Renderer::renderer_debug_mode_posteffect : Renderer::renderer_debug_mode_none,
-                lpv_resolve_material_system_->id());
+            //engine.renderer()->set_debug_mode(debug_mode_on_ ? Renderer::renderer_debug_mode_posteffect : Renderer::renderer_debug_mode_none,
+            //    lpv_resolve_material_system_->id());
         }
 
         const KeyboardDevice* keyboard = engine.event_manager().keyboard();
@@ -175,7 +174,7 @@ int main(int /*argc*/, char** /*argv*/)
 #else
     config.assets_path = "../../assets/";
 #endif
-    config.render_config_filename = mhe::utils::path_join(config.assets_path, "render_without_postprocess_pbr.xml");
+    config.render_config_filename = mhe::utils::path_join(config.assets_path, mhe::string("render_without_postprocess_pbr.xml"));
     app.init(config);
 
     mhe::game::GameSceneDesc desc;

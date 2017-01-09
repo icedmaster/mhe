@@ -34,8 +34,6 @@ void DebugViews::update()
 {
     Renderer* renderer = engine_.renderer();
 
-    Renderer::DebugMode current_mode = renderer->debug_mode();
-
     if (engine_.event_manager().check_bind("standart_stats"))
         stats_enabled_ ^= 1;
 

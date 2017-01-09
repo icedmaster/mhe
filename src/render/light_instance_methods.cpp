@@ -50,7 +50,7 @@ void reload_light(Context&, Scene& scene, LightInstance& light_instance)
     }
 }
 
-bool serialize_light(Context& context, Scene& scene, LightInstance& light_instance, const FilePath& filename)
+bool serialize_light(Context&, Scene& scene, LightInstance& light_instance, const FilePath& filename)
 {
     res::XMLSerializer serializer(filename.c_str());
     // TODO: add VERIFY macro

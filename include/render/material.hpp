@@ -33,7 +33,7 @@ struct Material
 
     Material() : shader_program(ShaderProgram::invalid_id)
     {
-        for (int i = 0; i < material_textures_number; ++i)
+        for (size_t i = 0; i < material_textures_number; ++i)
             image_access[i] = access_readwrite;
         ::memset(uniforms, UniformBuffer::invalid_id, sizeof(uniforms));
         ::memset(texture_buffers, TextureBuffer::invalid_id, sizeof(texture_buffers));

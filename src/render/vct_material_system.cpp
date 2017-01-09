@@ -153,7 +153,7 @@ void VoxelizeMaterialSystem::setup(Context &context, SceneContext &scene_context
     empty_setup(context, scene_context, instance_parts, parts, model_contexts, count);
 }
 
-void VoxelizeMaterialSystem::update(Context& context, SceneContext& scene_context, RenderContext& render_context)
+void VoxelizeMaterialSystem::update(Context& context, SceneContext&, RenderContext& render_context)
 {
     context.materials[id()].clear();
 

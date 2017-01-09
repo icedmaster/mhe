@@ -340,7 +340,7 @@ void GISystem::add_lpv(Context& context, Renderer& renderer, const LPVParams& pa
     indirect_lighting_resolve_material_system_->add_gi_diffuse(lpv_resolve_material_system_->output(0));
 }
 
-void GISystem::apply(Renderer& renderer)
+void GISystem::apply(Renderer&)
 {
     ASSERT(indirect_lighting_resolve_material_system_ != nullptr, "Invalid diffuse GI material system");
     indirect_lighting_resolve_material_system_->set_global_ambient_sh_buffer(ambient_sh_buffer_id_);

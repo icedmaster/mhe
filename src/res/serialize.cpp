@@ -39,6 +39,12 @@ bool XMLSerializer::write(const char* field, uint32_t value)
     return true;
 }
 
+bool XMLSerializer::write(const char* field, uint64_t value)
+{
+    return write(field, static_cast<uint32_t>(value));
+}
+
+
 bool XMLSerializer::write(const char* field, float value)
 {
     pugi::xml_node node = current_node_.append_child(field);
@@ -117,6 +123,14 @@ bool XMLDeserializer::read(const char* field, uint32_t& value)
     if (!attr) return false;
     value = attr.as_uint();
     return true;
+}
+
+bool XMLDeserializer::read(const char* field, uint64_t& value)
+{
+    uint32_t t;
+    bool res = read(field, t);
+    value = t;
+    return res;
 }
 
 bool XMLDeserializer::read(const char* field, float& value)

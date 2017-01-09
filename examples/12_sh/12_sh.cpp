@@ -871,15 +871,14 @@ public:
         }
 #endif
 
-        mhe::LightInstance& light_instance = engine.scene().create_light(mhe::Light::directional);
-        mhe::Light& light = light_instance.light;
-        light.shading().diffuse = mhe::color_white;
-        light.shading().specular = mhe::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-        light.shading().intensity = 5.0f;
+        mhe::LightInstance& light_instance = engine.scene().create_light(mhe::directional);
+        mhe::res::Light& light = light_instance.dblight;
+        light.diffuse_color = mhe::color_rgb_white;
+        light.specular_color = mhe::color_rgb_white;
+        light.intensity = 5.0f;
         mhe::set_light_rotation(engine.scene_context(), light_instance.id, mhe::quatf(0.0f, -mhe::pi_2 * 1.3f, mhe::pi_2 * 0.7f));
-        light.set_type(mhe::Light::directional);
-        light.desc().cast_shadows = true;
-        light.desc().shadowmap_bias = 0.01f;
+        light.cast_shadows = true;
+        light.shadowmap_bias = 0.01f;
         light_instance.enabled = true;
 
         if (!mesh_baker.init(engine.context(), engine.scene_context(), engine))
@@ -1033,7 +1032,7 @@ int main(int /*argc*/, char** /*argv*/)
 #else
     config.assets_path = "../../assets/";
 #endif
-    config.render_config_filename = mhe::utils::path_join(config.assets_path, "render_without_postprocess.xml");
+    config.render_config_filename = mhe::utils::path_join(config.assets_path, mhe::string("render_without_postprocess.xml"));
     app.init(config);
 
     app.engine().context().window_system.disable_vsync();

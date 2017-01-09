@@ -100,7 +100,7 @@ void GBufferFillMaterialSystem::update(Context& context, SceneContext& scene_con
     MATERIAL_UPDATE_WITH_COMMAND(context, scene_context, render_context, update, render_target_, &list_of_commands_);
 }
 
-void GBufferFillMaterialSystem::update(Context& context, SceneContext& /*scene_context*/, RenderContext& render_context, MeshPartInstance* instance_parts, MeshPart* parts, size_t count)
+void GBufferFillMaterialSystem::update(Context& context, SceneContext& /*scene_context*/, RenderContext& render_context, MeshPartInstance* instance_parts, MeshPart*, size_t count)
 {
     UberShader& shader = ubershader(context);
     const UberShader::Info& normalmap_info = shader.info("NORMALMAP");

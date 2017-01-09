@@ -83,7 +83,7 @@ void OpenGL3Texture::init_3d_texture(const TextureDesc& desc, const uint8_t* dat
     CHECK_GL_ERRORS();
 }
 
-void OpenGL3Texture::init_texture_buffer(const TextureDesc& desc, const uint8_t* data, size_t size)
+void OpenGL3Texture::init_texture_buffer(const TextureDesc&, const uint8_t* data, size_t size)
 {
     bool res = vbo_.init(GL_TEXTURE_BUFFER, size, data, GL_DYNAMIC_DRAW);
     ASSERT(res, "VBO initialization for a TextureBuffer failed");
