@@ -330,6 +330,10 @@ void Driver::memory_barrier(uint32_t barriers)
 void Driver::perform_compute_call(Context& /*context*/, const ComputeCallExplicit& compute_call)
 {
     ASSERT(compute_call.shader_program != nullptr, "Invalid shader program");
+
+    if (compute_call.wait_barrier != memory_barrier_none)
+        memory_barrier(compute_call.wait_barrier);
+
     impl_->set_shader_program(*compute_call.shader_program);
     for (size_t i = 0; i < compute_call_images_number; ++i)
     {

@@ -48,10 +48,9 @@ bool CubemapIntegrator::integrate(ShaderStorageBuffer& dst, Context& context, Te
     compute_call.images[0] = &cubemap;
     compute_call.shader_program = &context.shader_pool.get(ubershader.get_default());
     size_t threads_number = compute_call.shader_program->variable_value<size_t>(string("THREADS"));
-    size_t threads_number_sq = threads_number * threads_number;
-    // each thread processes THREADS number of pixels in each dimension
-    compute_call.workgroups_number.set(iceil(cubemap.width(), threads_number_sq), iceil(cubemap.height(), threads_number_sq), 1);
+    compute_call.workgroups_number.set(iceil(cubemap.width(), threads_number), iceil(cubemap.height(), threads_number), 1);
     compute_call.barrier = memory_barrier_storage_buffer;
+    compute_call.wait_barrier = memory_barrier_image_access | memory_barrier_storage_buffer;
 
     ShaderStorageBuffer& tmp_buffer = create_and_get(context.shader_storage_buffer_pool);
     ShaderStorageBufferDesc desc;
@@ -85,6 +84,7 @@ bool CubemapIntegrator::integrate(ShaderStorageBuffer& dst, Context& context, Te
     compute_call.buffers[1] = &dst;
     compute_call.uniforms[2] = &uniform_buffer;
     compute_call.shader_program = &reduction_shader_program;
+    compute_call.wait_barrier = memory_barrier_none;
     compute_call.workgroups_number.set(1);
 
     context.driver.execute(context, &compute_call, 1);
@@ -231,7 +231,7 @@ void IndirectLightingResolveMaterialSystem::update(Context& context, SceneContex
 }
 
 GISystem::GISystem() :
-rsm_material_system_(nullptr),
+    rsm_material_system_(nullptr),
     lpv_material_system_(nullptr),
     lpv_resolve_material_system_(nullptr),
     skybox_material_system_(nullptr),

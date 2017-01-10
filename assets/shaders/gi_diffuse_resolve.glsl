@@ -20,7 +20,7 @@ in VSOutput vsoutput;
 #if MODE == SH_AMBIENT_MODE
 layout(std430, binding = 2) buffer SHData
 {
-    ColorSH9 ambient_sh;
+    float ambient_sh_data[27];
 };
 #endif
 
@@ -34,7 +34,7 @@ void main()
     out_color = ambient.rgb;
 #elif MODE == SH_AMBIENT_MODE
     vec3 nrm_ws = gbuffer_normal_ws(vsoutput.tex);
-    out_color = calculate_irradiance(nrm_ws, ambient_sh);
+    out_color = calculate_irradiance(nrm_ws, read_sh9(ambient_sh_data));
 #endif
 
 #if GI_TEXTURE == 1

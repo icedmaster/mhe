@@ -71,7 +71,8 @@ struct ComputeCallExplicit
     ShaderStorageBuffer* buffers[compute_call_buffers_number];
     UniformBuffer* uniforms[compute_call_uniforms_number];
     uivec3 workgroups_number;
-    int barrier;
+    uint32_t wait_barrier;
+    uint32_t barrier;
 
     ComputeCallExplicit()
     {

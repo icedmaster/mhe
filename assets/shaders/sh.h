@@ -208,3 +208,14 @@ RGBSH4 empty_rgbsh4()
     return res;
 }
 
+ColorSH9 read_sh9(float f[27])
+{
+	ColorSH9 res;
+	for (int i = 0; i < 9; ++i)
+	{
+		res.c[i].x = f[i * 3 + 0];
+		res.c[i].y = f[i * 3 + 1];
+		res.c[i].z = f[i * 3 + 2];
+	}
+	return res;
+}
