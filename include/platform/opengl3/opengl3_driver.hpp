@@ -85,7 +85,8 @@ private:
     void set_default_render_target();
     void set_atomic(const Atomic& atomic, size_t unit) override;
     void draw(const RenderData& data);
-    void draw(size_t elements_number, size_t vbuffer_offset, size_t ibuffer_offset, size_t indices_number, Primitive primitive) override;
+    void draw(size_t elements_number, size_t vbuffer_offset, size_t ibuffer_offset, size_t indices_number,
+              Primitive primitive, size_t instances_count) override;
 
     void flush();
 

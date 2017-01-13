@@ -5,6 +5,7 @@
 #include "render/render_common.hpp"
 #include "render/render_buffer.hpp"
 #include "render/render_state.hpp"
+#include "render/mesh.hpp"
 #include "render/texture.hpp"
 #include "math/vector4.hpp"
 #include "math/vector2.hpp"
@@ -67,6 +68,7 @@ private:
 	UniformBufferHandleType transform_uniform_id_;
 	VertexBufferHandleType vbuffer_id_;
 	IndexBufferHandleType ibuffer_id_;
+    RenderData render_data_;
 	bool enabled_;
 };
 

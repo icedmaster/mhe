@@ -41,6 +41,8 @@ struct DrawCallExplicit
     RenderState* render_state;
     RenderTarget* render_target;
     Texture* textures[material_textures_number];
+    Texture* images[material_textures_number];
+    int image_access[material_textures_number];
     UniformBuffer* uniforms[material_uniforms_number];
     TextureBuffer* texture_buffers[material_texture_buffers_number];
     ShaderProgram* shader_program;
@@ -53,6 +55,7 @@ struct DrawCallExplicit
     IndexBuffer* ibuffer;
     VertexBuffer* vbuffer;
     RenderCommand* render_command;
+    uint32_t instances_count;
     uint8_t pass;
     // Will be moved to the ID
     uint8_t priority;

@@ -1,5 +1,8 @@
 #ifndef CUSTOM_PERCAMERA_UNIFORM
 [uniform percamera 0 perframe]
+#ifdef DEFINE_BINDING_POINT_IN_SHADER
+layout (binding = 0)
+#endif
 uniform percamera
 {
     mat4 vp;

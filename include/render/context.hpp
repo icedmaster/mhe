@@ -179,6 +179,16 @@ private:
     hashmap<RenderTargetHandleType, bool> temporaty_render_targets_usage_;
 };
 
+struct SharedRenderStates
+{
+    RenderStateHandleType default_render_state;
+};
+
+struct SharedObjects
+{
+    SharedRenderStates render_states;
+};
+
 struct Context
 {
     RenderDataInitializationParameters initialization_parameters;
@@ -211,6 +221,8 @@ struct Context
     MeshTraceDataPool mesh_trace_data_pool;
 
     RenderTargetManager render_target_manager;
+
+    SharedObjects shared;
 
     DebugViews* debug_views;
     Renderer* renderer;

@@ -10,6 +10,7 @@
 #include "render/posteffect_material_system.hpp"
 #include "render/light_instance_methods.hpp"
 #include "render/deferred_renderer.hpp"
+#include "render/scene_entity.hpp"
 #include "debug/profiler.hpp"
 #include "res/resource_manager.hpp"
 #include "math/sh.h"
@@ -32,6 +33,35 @@ namespace
 
         const Context& context_;
     };
+
+    void init_shared_render_states(Context& context)
+    {
+        RenderStateDesc desc;
+        desc.blend.enabled = false;
+        desc.depth.test_enabled = true;
+        desc.depth.write_enabled = true;
+        desc.rasterizer.color_write = true;
+        desc.rasterizer.cull = cull_back;
+        desc.rasterizer.depth_test_enabled = true;
+        desc.rasterizer.order = winding_ccw;
+        desc.scissor.enabled = false;
+        desc.viewport.viewport = rect<int>(0, 0, 0, 0);
+        {
+            RenderState& render_state = create_and_get(context.render_state_pool);
+            VERIFY(render_state.init(desc), "Couldn't initialize a common render state");
+            context.shared.render_states.default_render_state = render_state.id();
+        }
+    }
+
+    void init_shared_objects(Context& context)
+    {
+        init_shared_render_states(context);
+    }
+
+    void destroy_shared_objects(Context& context)
+    {
+        destroy_pool_object(context.render_state_pool, context.shared.render_states.default_render_state);
+    }
 }
 
 bool init_node(NodeInstance& node, Context& context)
@@ -372,6 +402,12 @@ void Renderer::before_update(SceneContext& scene_context)
         material_systems_[i]->start_frame(context_, scene_context, render_context_);
 
     gi_system_.before_render(context_, scene_context, render_context_);
+
+    for (size_t i = 0, size = scene_entities_.size(); i < size; ++i)
+    {
+        ASSERT(scene_entities_[i] != nullptr, "Invalid scene entity");
+        scene_entities_[i]->update(context_, scene_context, render_context_);
+    }
 }
 
 void Renderer::flush_pass()
@@ -403,7 +439,20 @@ void Renderer::render(SceneContext& scene_context)
         fullscreen_debug_material_system_->setup_draw_calls(context_, scene_context, render_context_);
 
     sort_draw_calls(context_, render_context_);
+
+    for (size_t i = 0, size = scene_entities_.size(); i < size; ++i)
+    {
+        ASSERT(scene_entities_[i] != nullptr, "Invalid scene entity");
+        scene_entities_[i]->before_render(context_, scene_context, render_context_);
+    }
+
     execute_render(render_context_);
+
+    for (size_t i = 0, size = scene_entities_.size(); i < size; ++i)
+    {
+        ASSERT(scene_entities_[i] != nullptr, "Invalid scene entity");
+        scene_entities_[i]->after_render(context_, scene_context, render_context_);
+    }
 }
 
 void Renderer::execute_render(RenderContext& render_context)
@@ -472,9 +521,9 @@ void Renderer::set_debug_buffer(DebugMode mode, const TextureInstance& texture)
     if (fullscreen_debug_material_system_ == nullptr)
         return;
 
-    if (mode == renderer_debug_mode_none && debug_mode_ != mode)
+    if (mode == renderer_debug_mode_none)
         fullscreen_debug_material_system_->disable();
-    else
+    else if (debug_mode_ != mode)
     {
         fullscreen_debug_material_system_->set_input(0, texture);
         fullscreen_debug_material_system_->enable();
@@ -538,6 +587,7 @@ bool init_render(Context& context)
     RenderGlobals render_globals;
     setup(render_globals);
     init_standart_layouts(context);
+    init_shared_objects(context);
 
     return true;
 }
@@ -563,6 +613,8 @@ void destroy_pool_elements_destroy(Pool& pool)
 
 void destroy_render(Context& context)
 {
+    destroy_shared_objects(context);
+
     context.material_systems.clear(context);
     // tear down the context
     destroy_pool_elements(context.vertex_buffer_pool);

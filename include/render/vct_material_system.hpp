@@ -5,10 +5,12 @@
 #include "render_common.hpp"
 #include "atomics.hpp"
 #include "commands.hpp"
+#include "scene_entity.hpp"
 #include "math/vector3.hpp"
 #include "math/matrix.hpp"
 #include "res/serialize.hpp"
 #include "res/serialize_basic_types.hpp"
+#include "debug/debug_views.hpp"
 
 namespace mhe {
 
@@ -16,7 +18,7 @@ namespace res
 {
     struct VCTSettings : public Serializable
     {
-        static const size_t default_size = 64;
+        static const size_t default_size = 8;
         uivec3 size;
         float cell_size;
 
@@ -56,7 +58,23 @@ public:
     void destroy(Context& context) override;
 
     void setup(Context &context, SceneContext &scene_context, MeshPartInstance* instance_parts, MeshPart* parts, ModelContext* model_contexts, size_t count) override;
+
+    void init_debug_views(Context& context) override;
 private:
+    class VoxelizedSceneVisualizer : public SceneEntity
+    {
+    public:
+        bool init(VoxelizeMaterialSystem* voxelize_material_system, Context& context);
+        void destroy(Context &context);
+
+        void before_render(Context& context, SceneContext& scene_context, RenderContext& render_context) override;
+    private:
+        VoxelizeMaterialSystem* voxelize_material_system_;
+        ShaderProgramHandleType shader_program_id_;
+        MeshInstance cube_instance_;
+        ClearCommand clear_command_;
+    };
+
     struct UniformData
     {
         vec4 grid_size;
@@ -77,6 +95,8 @@ private:
     // clear pass
     ShaderProgramHandleType clear_shader_id_;
     ComputeCallCommand clear_draw_call_command_;
+    // debugging
+    VoxelizedSceneVisualizer voxels_visualizer_;
 };
 
 }

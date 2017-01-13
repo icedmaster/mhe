@@ -150,6 +150,12 @@ void Driver::perform_draw_call(Context& context, const DrawCallExplicit& draw_ca
         impl_->set_texture(*draw_call.textures[j], j);
         state_.textures[j] = draw_call.textures[j]->id();
     }
+    for (size_t j = 0; j < material_textures_number; ++j)
+    {
+        if (draw_call.images[j] == nullptr)
+            continue;
+        impl_->set_image(*draw_call.images[j], j, draw_call.image_access[j]);
+    }
     for (size_t j = 0; j < material_uniforms_number; ++j)
     {
         if (draw_call.uniforms[j] == nullptr || (draw_call.uniforms[j]->id() == state_.uniforms[j] && !shader_program_changed))
@@ -164,7 +170,8 @@ void Driver::perform_draw_call(Context& context, const DrawCallExplicit& draw_ca
         impl_->set_texture_buffer(*draw_call.texture_buffers[j], j);
         state_.texture_buffers[j] = draw_call.texture_buffers[j]->id();
     }
-    impl_->draw(draw_call.elements_number, draw_call.vbuffer_offset, draw_call.ibuffer_offset, draw_call.indices_number, draw_call.primitive);
+    impl_->draw(draw_call.elements_number, draw_call.vbuffer_offset, draw_call.ibuffer_offset, draw_call.indices_number,
+                draw_call.primitive, draw_call.instances_count);
     stats_.update(draw_call.elements_number);
 }
 

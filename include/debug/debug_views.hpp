@@ -10,6 +10,7 @@
 namespace mhe {
 
 class EventManager;
+class SceneEntity;
 
 namespace game {
 
@@ -19,6 +20,7 @@ class Engine;
 
 class DebugViews
 {
+private:
     struct DebugField : public ref_counter
     {
         virtual ~DebugField() {}
@@ -35,11 +37,14 @@ class DebugViews
         void update() override;
     };
 
-    struct DebugBuffer
+    struct DebugVisualization
     {
         string name;
         TextureInstance texture;
         int mode;
+        SceneEntity* scene;
+
+        DebugVisualization() : scene(nullptr) {}
     };
 public:
     class DebugView
@@ -70,6 +75,7 @@ public:
     DebugView& get_view(size_t id);
 
     size_t add_debug_buffer(const string& name, const TextureInstance& texture, int debug_mode);
+    size_t add_debug_scene(const string& name, SceneEntity* scene);
 
     ImGuiHelper& imgui_helper()
     {
@@ -80,7 +86,7 @@ private:
     ImGuiHelper imgui_;
     int debug_buffer_;
     fixed_size_vector<DebugView, 16> debug_views_;
-    fixed_size_vector<DebugBuffer, 16> debug_buffers_;
+    fixed_size_vector<DebugVisualization, 16> debug_visualizers_;
     bool stats_enabled_;
 };
 

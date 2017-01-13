@@ -3,11 +3,61 @@
 #include "render/context.hpp"
 #include "render/render_context.hpp"
 #include "render/instances.hpp"
+#include "render/utils/simple_meshes.hpp"
+#include "render/mesh.hpp"
+#include "render/renderer.hpp"
 #include "utils/global_log.hpp"
 
 namespace mhe {
 
 const string vct_voxelize_clear_shader_name = "compute/vct_voxelize_clear";
+const string vct_debug_shader_name = "vct_debug";
+
+bool VoxelizeMaterialSystem::VoxelizedSceneVisualizer::init(VoxelizeMaterialSystem *voxelize_material_system,
+                                                            Context &context)
+{
+    voxelize_material_system_ = voxelize_material_system;
+
+    Shader shader;
+    VERIFY(context.shader_manager.get(shader, vct_debug_shader_name), "Can't load a shader:" << vct_debug_shader_name);
+    shader_program_id_ = context.ubershader_pool.get(shader.shader_program_handle).get_default();
+    return utils::create_cube(cube_instance_, context);
+}
+
+void VoxelizeMaterialSystem::VoxelizedSceneVisualizer::destroy(Context &context)
+{
+    destroy_mesh_instance(cube_instance_, context);
+}
+
+void VoxelizeMaterialSystem::VoxelizedSceneVisualizer::before_render(Context &context,
+                                                                     SceneContext &scene_context,
+                                                                     RenderContext &render_context)
+{
+    clear_command_.reset();
+    DrawCallExplicit& draw_call = render_context.explicit_draw_calls.add();
+    prepare_draw_call(draw_call);
+    MeshPart& part = cube_instance_.mesh.parts[0];
+    draw_call.elements_number = part.render_data.elements_number;
+    draw_call.ibuffer = &context.index_buffer_pool.get(part.render_data.ibuffer);
+    draw_call.ibuffer_offset = 0;
+    draw_call.indices_number = part.render_data.indexes_number;
+    draw_call.layout = &context.layout_pool.get(part.render_data.layout);
+    draw_call.pass = 0;
+    draw_call.primitive = part.render_data.primitive;
+    draw_call.render_command = &clear_command_;
+    draw_call.render_state = &context.render_state_pool.get(context.shared.render_states.default_render_state);
+    draw_call.render_target = nullptr;
+    draw_call.shader_program = &context.shader_pool.get(shader_program_id_);
+    draw_call.vbuffer = &context.vertex_buffer_pool.get(part.render_data.vbuffer);
+    draw_call.vbuffer_offset = part.render_data.vbuffer_offset;
+    draw_call.uniforms[0] = &context.uniform_pool.get(context.renderer->main_camera_uniform());
+    draw_call.images[1] = &context.texture_pool.get(voxelize_material_system_->position_texture_id_);
+    draw_call.images[2] = &context.texture_pool.get(voxelize_material_system_->color_texture_id_);
+    draw_call.image_access[1] = access_readonly;
+    draw_call.image_access[2] = access_readonly;
+    const uivec3& grid_size = voxelize_material_system_->settings_.shared.dbsettings.size;
+    draw_call.instances_count = grid_size.x() * grid_size.y() * grid_size.z();
+}
 
 bool VoxelizeMaterialSystem::init(Context& context, const MaterialSystemContext& material_system_context)
 {
@@ -98,6 +148,8 @@ bool VoxelizeMaterialSystem::init(Context& context, const MaterialSystemContext&
     compute_call.barrier = memory_barrier_image_access;
     clear_draw_call_command_.set_stages(render_stage_begin_priority);
 
+    voxels_visualizer_.init(this, context);
+
     return true;
 }
 
@@ -139,6 +191,7 @@ void VoxelizeMaterialSystem::init_uniform_data(UniformData& data) const
 
 void VoxelizeMaterialSystem::destroy(Context& context)
 {
+    voxels_visualizer_.destroy(context);
     atomic_counter_.destroy();
     destroy_pool_object(context.render_state_pool, render_state_id_);
     destroy_pool_object(context.uniform_pool, uniform_id_);
@@ -151,6 +204,11 @@ void VoxelizeMaterialSystem::setup(Context &context, SceneContext &scene_context
 {
     ASSERT(false, "This method shouldn't be called");
     empty_setup(context, scene_context, instance_parts, parts, model_contexts, count);
+}
+
+void VoxelizeMaterialSystem::init_debug_views(Context& context)
+{
+    context.debug_views->add_debug_scene(string("voxels"), &voxels_visualizer_);
 }
 
 void VoxelizeMaterialSystem::update(Context& context, SceneContext&, RenderContext& render_context)

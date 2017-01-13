@@ -100,6 +100,7 @@ void OpenGL3Driver::disable_blending()
 void OpenGL3Driver::set_viewport(int x, int y, int w, int h)
 {
     glViewport(x, y, w, h);
+    CHECK_GL_ERRORS();
     state_.viewport.set(x, y, w, h);
 }
 
@@ -110,6 +111,7 @@ void OpenGL3Driver::flush()
 #else
     glFinish();
 #endif
+    CHECK_GL_ERRORS();
 }
 
 void OpenGL3Driver::set_state(const RenderState& state)
@@ -217,24 +219,28 @@ void OpenGL3Driver::draw(const RenderData& data)
     CHECK_GL_ERRORS();
 }
 
-void OpenGL3Driver::draw(size_t elements_number, size_t /*vbuffer_offset*/, size_t ibuffer_offset, size_t indices_number, Primitive primitive)
+void OpenGL3Driver::draw(size_t elements_number, size_t /*vbuffer_offset*/, size_t ibuffer_offset, size_t indices_number,
+                         Primitive primitive, size_t instances_count)
 {
     if (primitive == gpu_generated)
     {
         glDrawArrays(GL_POINTS, 0, elements_number);
         return;
     }
-    if (indices_number == 0)
-        return;
 
 #ifdef MHE_OPENGL_USE_GL_DRAW_ELEMENTS_BASE_VERTEX
     OpenGLExtensions::instance().glDrawElementsBaseVertex(get_primitive_type(primitive), 
         indices_number != 0 ? indices_number : current_index_buffer_->size(), GL_UNSIGNED_INT,
         (void*)(ibuffer_offset * sizeof(uint32_t)), vbuffer_offset);
 #else
-    glDrawElements(get_primitive_type(primitive),
-        indices_number != 0 ? indices_number : current_index_buffer_->size(), GL_UNSIGNED_INT,
-        (void*)(ibuffer_offset * sizeof(uint32_t)));
+    if (instances_count <= 1)
+        glDrawElements(get_primitive_type(primitive),
+                       indices_number != 0 ? indices_number : current_index_buffer_->size(), GL_UNSIGNED_INT,
+                       (void*)(ibuffer_offset * sizeof(uint32_t)));
+    else
+        glDrawElementsInstanced(get_primitive_type(primitive),
+                                indices_number != 0 ? indices_number : current_index_buffer_->size(), GL_UNSIGNED_INT,
+                                (void*)(ibuffer_offset * sizeof(uint32_t)), instances_count);
 #endif
     CHECK_GL_ERRORS();  
 }

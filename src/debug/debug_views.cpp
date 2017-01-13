@@ -18,7 +18,7 @@ void DebugViews::init(EventManager& event_manager)
     stats_enabled_ = false;
     debug_buffer_ = 0;
 
-    DebugBuffer& buffer = debug_buffers_.add();
+    DebugVisualization& buffer = debug_visualizers_.add();
     buffer.mode = Renderer::renderer_debug_mode_none;
     buffer.name = "none";
 
@@ -43,15 +43,21 @@ void DebugViews::update()
 
     if (stats_enabled_)
     {
-        fixed_size_vector<const char*, 16> items(debug_buffers_.size());
+        fixed_size_vector<const char*, 16> items(debug_visualizers_.size());
         for (size_t i = 0, size = items.size(); i < size; ++i)
-            items[i] = debug_buffers_[i].name.c_str();
+            items[i] = debug_visualizers_[i].name.c_str();
         ImGui::Combo("Debug modes", &current_buffer, &items[0], items.size());
     }
 
     if (current_buffer != debug_buffer_)
-        renderer->set_debug_buffer(static_cast<Renderer::DebugMode>(debug_buffers_[current_buffer].mode),
-        debug_buffers_[current_buffer].texture);
+    {
+        renderer->set_debug_buffer(static_cast<Renderer::DebugMode>(debug_visualizers_[current_buffer].mode),
+            debug_visualizers_[current_buffer].texture);
+        if (debug_visualizers_[debug_buffer_].scene != nullptr)
+            renderer->remove_scene_entity(debug_visualizers_[debug_buffer_].scene);
+        if (debug_visualizers_[current_buffer].scene != nullptr)
+            renderer->add_scene_entity(debug_visualizers_[current_buffer].scene);
+    }
     debug_buffer_ = current_buffer;
 
     for (size_t i = 0, size = debug_views_.size(); i < size; ++i)
@@ -81,11 +87,23 @@ DebugViews::DebugView& DebugViews::get_view(size_t id)
 
 size_t DebugViews::add_debug_buffer(const string& name, const TextureInstance& texture, int debug_mode)
 {
-    size_t id = debug_buffers_.size();
-    DebugBuffer& buffer = debug_buffers_.add();
+    size_t id = debug_visualizers_.size();
+    DebugVisualization& buffer = debug_visualizers_.add();
     buffer.name = name;
     buffer.mode = debug_mode;
     buffer.texture = texture;
+    buffer.scene = nullptr;
+    return id;
+}
+
+size_t DebugViews::add_debug_scene(const string& name, SceneEntity* scene)
+{
+    ASSERT(scene != nullptr, "Invalid debug scene");
+    size_t id = debug_visualizers_.size();
+    DebugVisualization& buffer = debug_visualizers_.add();
+    buffer.name = name;
+    buffer.scene = scene;
+    buffer.mode = Renderer::renderer_debug_mode_none;
     return id;
 }
 

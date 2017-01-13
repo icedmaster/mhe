@@ -25,6 +25,7 @@ class PosteffectDebugMaterialSystem;
 class IndirectLightingResolveMaterialSystem;
 class PosteffectBufferDebugMaterialSystem;
 class Renderer;
+class SceneEntity;
 
 bool init_node(NodeInstance& node, Context& context);
 void update_nodes(Context& context, RenderContext& render_context, SceneContext& scene_context);
@@ -179,6 +180,23 @@ public:
         material_systems_.push_back(material_system);
     }
 
+    void add_scene_entity(SceneEntity* entity)
+    {
+        scene_entities_.push_back(entity);
+    }
+
+    void remove_scene_entity(SceneEntity* entity)
+    {
+        for (auto it = scene_entities_.begin(), end = scene_entities_.end(); it != end; ++it)
+        {
+            if (*it == entity)
+            {
+                scene_entities_.erase(it);
+                return;
+            }
+        }
+    }
+
     void set_ambient_color(const colorf& color)
     {
         ambient_color_ = color;
@@ -261,6 +279,7 @@ private:
     PosteffectBufferDebugMaterialSystem* fullscreen_debug_material_system_;
 
     fixed_size_vector<MaterialSystem*, 16> material_systems_;
+    fixed_size_vector<SceneEntity*, 16> scene_entities_;
 
     colorf ambient_color_;
     DebugMode debug_mode_;

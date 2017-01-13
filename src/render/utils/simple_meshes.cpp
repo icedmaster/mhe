@@ -296,7 +296,9 @@ bool create_cube(MeshInstance& mesh_instance, const Context& context, uint32_t f
         3, 7, 4, 3, 4, 0};
     memcpy(&indices[0], i, sizeof(i));
 
+    mesh_instance.instance_parts.resize(1);
     Mesh& mesh = mesh_instance.mesh;
+    mesh.parts.resize(1);
 
     mesh.aabb.center = vec3(0.5f, 0.5f, 0.5f);
     mesh.aabb.extents = vec3(0.5f, 0.5f, 0.5f);
@@ -307,6 +309,8 @@ bool create_cube(MeshInstance& mesh_instance, const Context& context, uint32_t f
     mesh.parts[0].render_data.ibuffer = context.index_buffer_pool.create();
 
     mesh.parts[0].render_data.elements_number = 12;
+
+    mesh.parts[0].render_data.layout = StandartGeometryLayout::handle;
 
     VertexBuffer& vbuffer = context.vertex_buffer_pool.get(mesh.parts[0].render_data.vbuffer);
     if (!vbuffer.init(buffer_update_type_static,

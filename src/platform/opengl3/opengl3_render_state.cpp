@@ -32,6 +32,7 @@ void DepthState::enable(OpenGL3ContextState& state) const
         else glDepthMask(GL_FALSE);
         state.depth_write = desc_.write_enabled;
     }
+    CHECK_GL_ERRORS();
 }
 
 void StencilState::init(const StencilDesc& desc)
@@ -56,6 +57,7 @@ void StencilState::enable(OpenGL3ContextState& state) const
     }
     else glDisable(GL_STENCIL_TEST);
     state.stencil = desc_.enabled;
+    CHECK_GL_ERRORS();
 }
 
 void BlendState::init(const BlendDesc& desc)
@@ -83,6 +85,7 @@ void BlendState::enable(OpenGL3ContextState& state) const
     }
     else glDisable(GL_BLEND);
     state.blend = desc_.enabled;
+    CHECK_GL_ERRORS();
 }
 
 void RasterizerState::init(const RasterizerDesc& desc)
@@ -129,6 +132,7 @@ void RasterizerState::enable(OpenGL3ContextState& state) const
                 glDisable(GL_DEPTH_CLAMP);
         }
         state.rasterizer_depth_test_disabled = desc_.disable_depth_test;
+        CHECK_GL_ERRORS();
     }
 
     uint8_t color_mask = desc_.color_mask[0] | desc_.color_mask[1] << 1 | desc_.color_mask[2] << 2 | desc_.color_mask[3] << 3;
@@ -136,6 +140,7 @@ void RasterizerState::enable(OpenGL3ContextState& state) const
     {
         glColorMask(desc_.color_mask[0], desc_.color_mask[1], desc_.color_mask[2], desc_.color_mask[3]);
         state.color_mask = color_mask;
+        CHECK_GL_ERRORS();
     }
 }
 
