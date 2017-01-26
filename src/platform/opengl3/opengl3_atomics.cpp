@@ -23,6 +23,11 @@ void OpenGL3Atomic::bind(size_t unit) const
     CHECK_GL_ERRORS();
 }
 
+void OpenGL3Atomic::update(const uint8_t* value, size_t size)
+{
+    vbo_.update(size, 0, value);
+}
+
 size_t OpenGL3Atomic::get_size_by_type(int type) const
 {
     UNUSED(type);

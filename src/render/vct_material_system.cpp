@@ -215,6 +215,8 @@ void VoxelizeMaterialSystem::update(Context& context, SceneContext&, RenderConte
 {
     context.materials[id()].clear();
 
+    atomic_counter_.set(0);
+
     const NodeInstance* nodes = render_context.nodes;
     const size_t nodes_count = render_context.nodes_number;
     for (size_t i = 0; i < nodes_count; ++i)
