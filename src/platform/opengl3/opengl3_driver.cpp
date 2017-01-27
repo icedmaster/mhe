@@ -238,11 +238,11 @@ void OpenGL3Driver::draw(size_t elements_number, size_t /*vbuffer_offset*/, size
                        indices_number != 0 ? indices_number : current_index_buffer_->size(), GL_UNSIGNED_INT,
                        (void*)(ibuffer_offset * sizeof(uint32_t)));
     else
-        glDrawElementsInstanced(get_primitive_type(primitive),
+        OpenGLExtensions::instance().glDrawElementsInstanced(get_primitive_type(primitive),
                                 indices_number != 0 ? indices_number : current_index_buffer_->size(), GL_UNSIGNED_INT,
                                 (void*)(ibuffer_offset * sizeof(uint32_t)), instances_count);
 #endif
-    CHECK_GL_ERRORS();  
+    CHECK_GL_ERRORS();
 }
 
 uint OpenGL3Driver::supported_versions(pair<uint, uint>* versions, uint size) const
@@ -256,9 +256,7 @@ uint OpenGL3Driver::supported_versions(pair<uint, uint>* versions, uint size) co
 void OpenGL3Driver::set_image(const Texture& texture, size_t unit, int access)
 {
     const OpenGL3Texture* opengl_texture = static_cast<const OpenGL3Texture*>(texture.impl());
-    OpenGLExtensions::instance().glBindImageTexture(unit, opengl_texture->id(), 0, opengl_texture->is_layered() ? GL_TRUE : GL_FALSE,
-        0, get_access(access), opengl_texture->image_format());
-    CHECK_GL_ERRORS();
+    opengl_texture->bind(unit, access);
 }
 
 void OpenGL3Driver::set_shader_storage_buffer(const ShaderStorageBuffer& buffer, size_t unit)

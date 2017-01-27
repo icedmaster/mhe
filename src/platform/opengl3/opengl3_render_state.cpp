@@ -63,6 +63,11 @@ void StencilState::enable(OpenGL3ContextState& state) const
 void BlendState::init(const BlendDesc& desc)
 {
     desc_.enabled = desc.enabled;
+    GLboolean write_color = desc.color_write ? GL_TRUE : GL_FALSE;
+    desc_.color_mask[0] = write_color;
+    desc_.color_mask[1] = write_color;
+    desc_.color_mask[2] = write_color;
+    desc_.color_mask[3] = write_color;
     if (desc_.enabled)
     {
         desc_.func = get_blend_operation(desc.func);
@@ -76,6 +81,13 @@ void BlendState::init(const BlendDesc& desc)
 
 void BlendState::enable(OpenGL3ContextState& state) const
 {
+    uint8_t color_mask = desc_.color_mask[0] | desc_.color_mask[1] << 1 | desc_.color_mask[2] << 2 | desc_.color_mask[3] << 3;
+    if (color_mask != state.color_mask)
+    {
+        glColorMask(desc_.color_mask[0], desc_.color_mask[1], desc_.color_mask[2], desc_.color_mask[3]);
+        state.color_mask = color_mask;
+        CHECK_GL_ERRORS();
+    }
     if (state.blend == desc_.enabled) return;
     if (desc_.enabled)
     {
@@ -92,11 +104,6 @@ void RasterizerState::init(const RasterizerDesc& desc)
 {
     desc_.cull = get_cull_mode(desc.cull);
     desc_.winding = get_winding_order(desc.order);
-    GLboolean write_color = desc.color_write ? GL_TRUE : GL_FALSE;
-    desc_.color_mask[0] = write_color;
-    desc_.color_mask[1] = write_color;
-    desc_.color_mask[2] = write_color;
-    desc_.color_mask[3] = write_color;
     desc_.disable_depth_test = !desc.depth_test_enabled;
 }
 
@@ -132,14 +139,6 @@ void RasterizerState::enable(OpenGL3ContextState& state) const
                 glDisable(GL_DEPTH_CLAMP);
         }
         state.rasterizer_depth_test_disabled = desc_.disable_depth_test;
-        CHECK_GL_ERRORS();
-    }
-
-    uint8_t color_mask = desc_.color_mask[0] | desc_.color_mask[1] << 1 | desc_.color_mask[2] << 2 | desc_.color_mask[3] << 3;
-    if (color_mask != state.color_mask)
-    {
-        glColorMask(desc_.color_mask[0], desc_.color_mask[1], desc_.color_mask[2], desc_.color_mask[3]);
-        state.color_mask = color_mask;
         CHECK_GL_ERRORS();
     }
 }

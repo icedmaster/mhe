@@ -66,15 +66,15 @@ public:
             return prev_state_.nodes_visible;
         }
 
-                size_t parts() const
-                {
-                    return prev_state_.parts;
-                }
+        size_t parts() const
+        {
+            return prev_state_.parts;
+        }
 
-                size_t parts_visible() const
-                {
-                    return prev_state_.parts_visible;
-                }
+        size_t parts_visible() const
+        {
+            return prev_state_.parts_visible;
+        }
     private:
         struct State
         {

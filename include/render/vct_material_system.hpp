@@ -22,7 +22,7 @@ namespace res
         uivec3 size;
         float cell_size;
 
-        VCTSettings() : size(default_size, default_size, default_size), cell_size(1.0f) {}
+        VCTSettings() : size(default_size, default_size, default_size), cell_size(2.0f) {}
 
         bool write(Serializer& serializer) const override
         {

@@ -51,6 +51,8 @@ public:
     {
         return target_ == GL_TEXTURE_3D || target_ == GL_TEXTURE_CUBE_MAP;
     }
+
+    void bind(size_t unit, int access) const;
 private:
     void init_cubemap(const TextureDesc& desc, const uint8_t* data, size_t size);
     void init_3d_texture(const TextureDesc& desc, const uint8_t* data, size_t size);

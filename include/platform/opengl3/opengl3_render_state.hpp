@@ -52,6 +52,7 @@ private:
     struct Desc
     {
         bool enabled;
+        GLboolean color_mask[4];
         GLenum func;
         GLenum func_alpha;
         GLenum srcmode;
@@ -73,7 +74,6 @@ private:
     {
         GLenum cull;
         GLenum winding;
-        GLboolean color_mask[4];
         bool disable_depth_test;
     };
 

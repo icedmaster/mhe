@@ -69,6 +69,7 @@ enum BlendMode
 struct BlendDesc
 {
     bool enabled;
+    bool color_write;
     BlendFunc func;
     BlendFunc func_alpha;
     BlendMode srcmode;
@@ -77,7 +78,7 @@ struct BlendDesc
     BlendMode dstmode_alpha;
 
     BlendDesc() :
-        enabled(false),
+        enabled(false), color_write(true),
         func(blend_add), func_alpha(blend_add),
         srcmode(blend_one), dstmode(blend_zero),
         srcmode_alpha(blend_one), dstmode_alpha(blend_zero)
@@ -102,11 +103,10 @@ struct RasterizerDesc
 {
     CullMode cull;
     WindingOrder order;
-    bool color_write;
     bool depth_test_enabled;
 
     RasterizerDesc() :
-        cull(cull_back), order(winding_ccw), color_write(true), depth_test_enabled(true)
+        cull(cull_back), order(winding_ccw), depth_test_enabled(true)
     {}
 };
 

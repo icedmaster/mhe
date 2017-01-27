@@ -722,6 +722,15 @@ public:
         glFramebufferTexture3D(target, attachment, textarget, texture, level, layer);
 #endif
     }
+
+    void glDrawElementsInstanced(GLenum mode, GLsizei count, GLenum type, const void* indices, GLsizei primcount)
+    {
+#ifndef MHE_USE_NATIVE_OPENGL
+        glDrawElementsInstanced_(mode, count, type, indices, primcount);
+#else
+        glDrawElementsInstanced(mode, count, type, indices, primcount);
+#endif
+    }
 private:
     OpenGLExtensions() {}
     ~OpenGLExtensions() {}
@@ -820,6 +829,7 @@ private:
     PFNGLMEMORYBARRIERPROC glMemoryBarrier_;
     PFNGLTEXIMAGE3DPROC glTexImage3D_;
     PFNGLFRAMEBUFFERTEXTURE3DPROC glFramebufferTexture3D_;
+    PFNGLDRAWELEMENTSINSTANCEDPROC glDrawElementsInstanced_;
 #endif
     std::map<std::string, bool> loaded_extensions_;
 };

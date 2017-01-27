@@ -291,7 +291,7 @@ bool create_cube(MeshInstance& mesh_instance, const Context& context, uint32_t f
     uint32_t i[36] = {0, 1, 2, 0, 2, 3,
         7, 2, 6, 7, 3, 2,
         4, 7, 6, 4, 6, 5,
-        4, 1, 5, 4, 0, 1,
+        4, 5, 1, 4, 1, 0,
         2, 5, 6, 2, 1, 5,
         3, 7, 4, 3, 4, 0};
     memcpy(&indices[0], i, sizeof(i));

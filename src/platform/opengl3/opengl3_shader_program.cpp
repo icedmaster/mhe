@@ -63,6 +63,7 @@ bool OpenGL3ShaderProgram::init(const ShaderInitializationParams& params)
 void OpenGL3ShaderProgram::close()
 {
     vertex_shader_.close();
+    geometry_shader_.close();
     fragment_shader_.close();
     compute_shader_.close();
     OpenGLExtensions::instance().glDeleteProgram(id_);

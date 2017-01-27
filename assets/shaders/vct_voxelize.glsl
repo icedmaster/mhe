@@ -7,6 +7,14 @@ struct VSOutput
     vec2 tex;
 };
 
+[uniform Settings 0 percamera]
+layout (binding = 0) uniform Settings
+{
+    vec4 grid_size;
+    mat4 vp[3];
+    mat4 worldspace_to_voxelspace;
+};
+
 [vertex]
 
 #define CUSTOM_PERCAMERA_UNIFORM
@@ -23,14 +31,6 @@ void main()
 
 [geometry]
 
-[uniform Settings 0 percamera]
-layout (binding = 0) uniform Settings
-{
-    vec4 grid_size;
-    mat4 vp[3];
-    mat4 worldspace_to_voxelspace;
-};
-
 in VSOutput vsoutput[3];
 out VSOutput gsoutput;
 
@@ -39,7 +39,7 @@ layout (triangle_strip, max_vertices = 3) out;
 
 void main()
 {
-    vec3 triangle_normal = normalize((vsoutput[0].nrm + vsoutput[1].nrm + vsoutput[2].nrm) / 3.0f);
+    vec3 triangle_normal = normalize(vsoutput[0].nrm + vsoutput[1].nrm + vsoutput[2].nrm);
 
     vec3 axes[3] = vec3[3]( vec3(1.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f), vec3(0.0f, 0.0f, 1.0f) );
     float max_len = 0.0f;
@@ -126,9 +126,24 @@ void calculate_average_and_save(layout (r32ui) uimage3D out_image, ivec3 coord, 
     imageStore(out_image, coord, uvec4(vec4_to_uint(value)));
 }
 
+bool is_outside(uvec3 pos)
+{
+    if (pos.x < 0 || pos.x > grid_size.x ||
+        pos.y < 0 || pos.y > grid_size.y ||
+        pos.z < 0 || pos.z > grid_size.z)
+        return true;
+    return false;
+}
+
+out vec4 out_color;
+
 void main()
 {
     uvec3 voxel_pos = uvec3(floor(gsoutput.pos));
+
+    if (is_outside(voxel_pos))
+        return;
+
     vec4 c = texture(albedo_texture, gsoutput.tex);
 
     uint index = atomicCounterIncrement(voxel_index);
@@ -137,4 +152,6 @@ void main()
     imageStore(position_buffer, int(index), uvec4(uvec3_to_uint(voxel_pos)));
 
     calculate_average_and_save(color_image, ivec3(voxel_pos), c);
+
+    out_color = vec4(1.0f, 0.0f, 0.0f, 1.0f);
 }

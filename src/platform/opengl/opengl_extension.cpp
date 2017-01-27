@@ -88,6 +88,7 @@ void OpenGLExtensions::init_extensions()
     glMemoryBarrier_ = load_extension<PFNGLMEMORYBARRIERPROC>("glMemoryBarrier");
     glTexImage3D_ = load_extension<PFNGLTEXIMAGE3DPROC>("glTexImage3D");
     glFramebufferTexture3D_ = load_extension<PFNGLFRAMEBUFFERTEXTURE3DPROC>("glFramebufferTexture3D");
+    glDrawElementsInstanced_ = load_extension<PFNGLDRAWELEMENTSINSTANCEDPROC>("glDrawElementsInstanced");
 #endif  // MHE_OPENGL_HAS_SHADERS
 
     get_str_extensions();

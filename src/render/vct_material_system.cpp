@@ -119,10 +119,11 @@ bool VoxelizeMaterialSystem::init(Context& context, const MaterialSystemContext&
 
     RenderStateDesc render_state_desc;
     render_state_desc.blend.enabled = false;
+    render_state_desc.blend.color_write = false;
     render_state_desc.depth.write_enabled = false;
     render_state_desc.depth.test_enabled = false;
-    render_state_desc.rasterizer.color_write = false;
     render_state_desc.rasterizer.cull = cull_none;
+    render_state_desc.rasterizer.depth_test_enabled = false;
     render_state_desc.scissor.enabled = false;
     render_state_desc.stencil.enabled = false;
     render_state_desc.viewport.viewport = rect<int>(0, 0, texture_desc.width, texture_desc.height);
@@ -170,7 +171,7 @@ void VoxelizeMaterialSystem::init_uniform_data(UniformData& data) const
              0.0f, 0.0f, -1.0f, 1.0f);
     data.vp[0] = view * proj;
     // +Y
-    view.set(-1.0f, 0.0f, 0.0f, 0.0f,
+    view.set(1.0f, 0.0f, 0.0f, 0.0f,
              0.0f, 0.0f, -1.0f, 0.0f,
              0.0f, -1.0f, 0.0f, 0.0f,
              0.0f, 0.0f, -1.0f, 1.0f);
@@ -182,11 +183,12 @@ void VoxelizeMaterialSystem::init_uniform_data(UniformData& data) const
              0.0f, 0.0f, -1.0f, 1.0f);
     data.vp[2] = view * proj;
 
-    data.worldspace_to_voxelspace = mat4x4::translation_matrix(
-        static_cast<float>(settings_.shared.dbsettings.size.x()),
-        static_cast<float>(settings_.shared.dbsettings.size.y()),
-        static_cast<float>(settings_.shared.dbsettings.size.z())) *
-        mat4x4::scaling_matrix(0.5f);
+    const uivec3 half_size = settings_.shared.dbsettings.size / 2;
+    data.worldspace_to_voxelspace.set(
+        1.0f / settings_.shared.dbsettings.cell_size, 0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f / settings_.shared.dbsettings.cell_size, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f / settings_.shared.dbsettings.cell_size, 0.0f,
+        static_cast<float>(half_size.x()), static_cast<float>(half_size.y()), static_cast<float>(half_size.z()), 1.0f);
 }
 
 void VoxelizeMaterialSystem::destroy(Context& context)

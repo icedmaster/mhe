@@ -49,6 +49,5 @@ vec4 uint_to_vec4(uint v)
 void main()
 {	
 	uint color_ui = imageLoad(color_image, ivec3(voxel_pos)).x;
-	//out_color = uint_to_vec4(color_ui);
-	out_color = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+	out_color = uint_to_vec4(color_ui);
 }

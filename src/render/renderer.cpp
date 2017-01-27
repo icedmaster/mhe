@@ -38,9 +38,9 @@ namespace
     {
         RenderStateDesc desc;
         desc.blend.enabled = false;
+        desc.blend.color_write = true;
         desc.depth.test_enabled = true;
         desc.depth.write_enabled = true;
-        desc.rasterizer.color_write = true;
         desc.rasterizer.cull = cull_back;
         desc.rasterizer.depth_test_enabled = true;
         desc.rasterizer.order = winding_ccw;

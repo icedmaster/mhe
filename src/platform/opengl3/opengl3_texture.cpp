@@ -87,6 +87,7 @@ void OpenGL3Texture::init_texture_buffer(const TextureDesc&, const uint8_t* data
 {
     bool res = vbo_.init(GL_TEXTURE_BUFFER, size, data, GL_DYNAMIC_DRAW);
     ASSERT(res, "VBO initialization for a TextureBuffer failed");
+    OpenGLExtensions::instance().glTexBuffer(GL_TEXTURE_BUFFER, format_, vbo_.id());
     vbo_.disable();
 }
 
@@ -144,6 +145,13 @@ void OpenGL3Texture::read(uint8_t* data, size_t size)
     glGetTexImage(target_, 0, pixel_data_format_, datatype_, data);
     CHECK_GL_ERRORS();
     glBindTexture(target_, 0);
+}
+
+void OpenGL3Texture::bind(size_t unit, int access) const
+{
+    OpenGLExtensions::instance().glBindImageTexture(unit, id_, 0, is_layered() ? GL_TRUE : GL_FALSE,
+        0, get_access(access), image_format_);
+    CHECK_GL_ERRORS();
 }
 
 }}
