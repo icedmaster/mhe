@@ -54,9 +54,13 @@ void main()
         }
     }
 
+    vec3 pos_middle = (vsoutput[0].pos + vsoutput[1].pos + vsoutput[2].pos) / 3.0f;
+    vec3 pos_middle_cs = (vp[main_axis] * vec4(pos_middle, 1.0f)).xyz;
+
     for (int i = 0; i < 3; ++i)
     {
         vec4 proj_pos = vp[main_axis] * vec4(vsoutput[i].pos, 1.0f);
+        proj_pos.xyz += normalize(proj_pos.xyz - pos_middle_cs) * 0.5f / grid_size.x; 
         gsoutput.pos = (worldspace_to_voxelspace * vec4(vsoutput[i].pos, 1.0f)).xyz;
         gsoutput.nrm = vsoutput[i].nrm;
         gsoutput.tex = vsoutput[i].tex;
@@ -73,8 +77,8 @@ in VSOutput gsoutput;
 layout (binding = 0) uniform sampler2D albedo_texture;
 
 layout (r32ui, binding = 1) uniform uimageBuffer position_buffer; 
-layout (r32ui, binding = 2) uniform uimage3D color_image;
-layout (r32ui, binding = 3) uniform uimage3D normal_image;
+layout (r32ui, binding = 2) uniform volatile uimage3D color_image;
+layout (r32ui, binding = 3) uniform volatile uimage3D normal_image;
 
 layout (binding = 0) uniform atomic_uint voxel_index;
 
@@ -97,8 +101,12 @@ vec4 uint_to_vec4(uint v)
     return vec4(x, y, z, w);
 }
 
-void calculate_average_and_save(layout (r32ui) uimage3D out_image, ivec3 coord, vec4 value)
+void calculate_average_and_save(layout (r32ui) volatile uimage3D out_image, ivec3 coord, vec4 value)
 {
+    value *= 255.0f;
+    imageStore(out_image, coord, uvec4(vec4_to_uint(value)));
+    return;
+
     uint prev = 0;
     uint counter = 0;
     value.w = 1.0f;
@@ -126,23 +134,9 @@ void calculate_average_and_save(layout (r32ui) uimage3D out_image, ivec3 coord, 
     imageStore(out_image, coord, uvec4(vec4_to_uint(value)));
 }
 
-bool is_outside(uvec3 pos)
-{
-    if (pos.x < 0 || pos.x > grid_size.x ||
-        pos.y < 0 || pos.y > grid_size.y ||
-        pos.z < 0 || pos.z > grid_size.z)
-        return true;
-    return false;
-}
-
-out vec4 out_color;
-
 void main()
 {
     uvec3 voxel_pos = uvec3(floor(gsoutput.pos));
-
-    if (is_outside(voxel_pos))
-        return;
 
     vec4 c = texture(albedo_texture, gsoutput.tex);
 
@@ -152,6 +146,4 @@ void main()
     imageStore(position_buffer, int(index), uvec4(uvec3_to_uint(voxel_pos)));
 
     calculate_average_and_save(color_image, ivec3(voxel_pos), c);
-
-    out_color = vec4(1.0f, 0.0f, 0.0f, 1.0f);
 }

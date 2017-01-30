@@ -21,13 +21,15 @@ namespace res
         static const size_t default_size = 8;
         uivec3 size;
         float cell_size;
+        uint8_t rebuild_every_frame;
 
-        VCTSettings() : size(default_size, default_size, default_size), cell_size(2.0f) {}
+        VCTSettings() : size(default_size, default_size, default_size), cell_size(2.0f), rebuild_every_frame(true) {}
 
         bool write(Serializer& serializer) const override
         {
             WRITE_BASIC_TYPE_FIELD(size, serializer);
             WRITE_FIELD(cell_size, serializer);
+            WRITE_FIELD(rebuild_every_frame, serializer);
             return true;
         }
 
@@ -35,6 +37,7 @@ namespace res
         {
             TRY_READ_BASIC_TYPE_FIELD(size, serializer);
             TRY_READ_FIELD(cell_size, serializer);
+            TRY_READ_FIELD(rebuild_every_frame, serializer);
             return true;
         }
     };
@@ -97,6 +100,8 @@ private:
     ComputeCallCommand clear_draw_call_command_;
     // debugging
     VoxelizedSceneVisualizer voxels_visualizer_;
+
+    bool static_voxelized_;
 };
 
 }

@@ -182,6 +182,8 @@ private:
 struct SharedRenderStates
 {
     RenderStateHandleType default_render_state;
+    RenderStateHandleType default_render_state_no_cull;
+    RenderStateHandleType alpha_blend_render_state_no_cull;
 };
 
 struct SharedObjects

@@ -5,9 +5,18 @@
 #define DEFINE_BINDING_POINT_IN_SHADER
 [include "geometry_common.h"]
 
-layout (r32ui, binding = 1) uniform readonly uimageBuffer position_buffer; 
+[uniform Settings 1 percamera]
+layout (binding = 1) uniform Settings
+{
+    vec4 grid_size;
+    mat4 vct_vp[3];
+    mat4 worldspace_to_voxelspace;
+};
+
+layout (r32ui, binding = 2) uniform readonly uimage3D color_image;
 
 out flat uvec3 voxel_pos;
+out vec4 voxel_color;
 
 uvec3 uint_to_uvec3(uint v)
 {
@@ -16,26 +25,6 @@ uvec3 uint_to_uvec3(uint v)
 	uint z = (v >> 20) & 0x3ff;
     return uvec3(x, y, z);
 }
-
-void main()
-{
-	int voxel_index = gl_InstanceID;
-	voxel_pos = uint_to_uvec3(imageLoad(position_buffer, voxel_index).x);
-	mat4 world = mat4(1.0f, 0.0f, 0.0f, 0.0f,
-					  0.0f, 1.0f, 0.0f, 0.0f,
-					  0.0f, 0.0f, 1.0f, 0.0f,
-					  voxel_pos.x, voxel_pos.y, voxel_pos.z, 1.0f);
-					  
-	gl_Position = vp * world * vec4(pos, 1.0f);	
-}
-
-[fragment]
-
-layout (r32ui, binding = 2) uniform readonly uimage3D color_image;
-layout (r32ui, binding = 3) uniform readonly uimage3D normal_image; 
-
-in flat uvec3 voxel_pos;
-out vec4 out_color;
 
 vec4 uint_to_vec4(uint v)
 {
@@ -47,7 +36,34 @@ vec4 uint_to_vec4(uint v)
 }
 
 void main()
-{	
+{
+	int voxel_index = gl_InstanceID;
+    int grid_dim = int(grid_size.x);
+    int x = voxel_index % grid_dim;
+    int y = (voxel_index % (grid_dim * grid_dim)) / grid_dim;
+    int z = voxel_index / (grid_dim * grid_dim);
+    voxel_pos = uvec3(x, y, z);
+    float cell_size = grid_size.w;
+	mat4 world = mat4(cell_size, 0.0f, 0.0f, 0.0f,
+					  0.0f, cell_size, 0.0f, 0.0f,
+					  0.0f, 0.0f, cell_size, 0.0f,
+					  (voxel_pos.x - grid_dim * 0.5f) * cell_size, (voxel_pos.y - grid_dim * 0.5f) * cell_size, (voxel_pos.z - grid_dim * 0.5f) * cell_size, 1.0f);
 	uint color_ui = imageLoad(color_image, ivec3(voxel_pos)).x;
-	out_color = uint_to_vec4(color_ui);
+    voxel_color = uint_to_vec4(color_ui);
+					  
+	gl_Position = vp * world * vec4(pos, 1.0f);	
+}
+
+[fragment]
+
+layout (r32ui, binding = 3) uniform readonly uimage3D normal_image; 
+
+in flat uvec3 voxel_pos;
+in vec4 voxel_color;
+out vec4 out_color;
+
+void main()
+{
+    if (voxel_color.a < 0.01f) discard;
+	out_color = voxel_color;
 }

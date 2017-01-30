@@ -51,6 +51,20 @@ namespace
             VERIFY(render_state.init(desc), "Couldn't initialize a common render state");
             context.shared.render_states.default_render_state = render_state.id();
         }
+        desc.rasterizer.cull = cull_none;
+        {
+            RenderState& render_state = create_and_get(context.render_state_pool);
+            VERIFY(render_state.init(desc), "Couldn't initialize a common render state without culling");
+            context.shared.render_states.default_render_state_no_cull = render_state.id();
+        }
+        desc.blend.enabled = true;
+        desc.blend.srcmode = blend_src_alpha;
+        desc.blend.dstmode = blend_src_inv_alpha;
+        {
+            RenderState& render_state = create_and_get(context.render_state_pool);
+            VERIFY(render_state.init(desc), "Couldn't initialize a alpha blend render state without culling");
+            context.shared.render_states.alpha_blend_render_state_no_cull = render_state.id();
+        }
     }
 
     void init_shared_objects(Context& context)

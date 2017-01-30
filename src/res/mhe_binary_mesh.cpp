@@ -78,6 +78,8 @@ bool init_mesh(Mesh& mesh, uint8_t layout,
         mesh.parts.push_back(part);
     }
 
+    INFO_LOG("Loaded a mesh:" << dbmesh.binary << " AABB:" << dbmesh.aabb);
+
     return !mesh.parts.empty();
 }
 

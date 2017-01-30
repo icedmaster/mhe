@@ -45,12 +45,13 @@ void VoxelizeMaterialSystem::VoxelizedSceneVisualizer::before_render(Context &co
     draw_call.pass = 0;
     draw_call.primitive = part.render_data.primitive;
     draw_call.render_command = &clear_command_;
-    draw_call.render_state = &context.render_state_pool.get(context.shared.render_states.default_render_state);
+    draw_call.render_state = &context.render_state_pool.get(context.shared.render_states.default_render_state_no_cull);
     draw_call.render_target = nullptr;
     draw_call.shader_program = &context.shader_pool.get(shader_program_id_);
     draw_call.vbuffer = &context.vertex_buffer_pool.get(part.render_data.vbuffer);
     draw_call.vbuffer_offset = part.render_data.vbuffer_offset;
     draw_call.uniforms[0] = &context.uniform_pool.get(context.renderer->main_camera_uniform());
+    draw_call.uniforms[1] = &context.uniform_pool.get(voxelize_material_system_->uniform_id_);
     draw_call.images[1] = &context.texture_pool.get(voxelize_material_system_->position_texture_id_);
     draw_call.images[2] = &context.texture_pool.get(voxelize_material_system_->color_texture_id_);
     draw_call.image_access[1] = access_readonly;
@@ -74,6 +75,10 @@ bool VoxelizeMaterialSystem::init(Context& context, const MaterialSystemContext&
     if (material_system_context.deserializer != nullptr)
         settings_.shared.dbsettings.read(*material_system_context.deserializer);
 
+    settings_.shared.dbsettings.cell_size = 4.0f;
+    settings_.shared.dbsettings.size.set(64);
+    settings_.shared.dbsettings.rebuild_every_frame = true;
+
     TextureDesc texture_desc;
     texture_desc.address_mode_r = texture_clamp;
     texture_desc.address_mode_s = texture_clamp;
@@ -85,7 +90,7 @@ bool VoxelizeMaterialSystem::init(Context& context, const MaterialSystemContext&
     texture_desc.depth = 1;
     {
         Texture& texture = create_and_get(context.texture_pool);
-        VERIFY(texture.init(texture_desc, nullptr, texture_desc.width * 4), "Position buffer initialization failed");
+        VERIFY(texture.init(texture_desc, nullptr, texture_desc.width * sizeof(uint32_t)), "Position buffer initialization failed");
         position_texture_id_ = texture.id();
     }
 
@@ -151,12 +156,14 @@ bool VoxelizeMaterialSystem::init(Context& context, const MaterialSystemContext&
 
     voxels_visualizer_.init(this, context);
 
+    static_voxelized_ = false;
+
     return true;
 }
 
 void VoxelizeMaterialSystem::init_uniform_data(UniformData& data) const
 {
-    data.grid_size = vec4(settings_.shared.dbsettings.size, 0.0f);
+    data.grid_size = vec4(settings_.shared.dbsettings.size, settings_.shared.dbsettings.cell_size);
 
     mat4x4 proj;
     proj.set_ortho(0.0f, static_cast<float>(settings_.shared.dbsettings.size.x()),
@@ -165,21 +172,21 @@ void VoxelizeMaterialSystem::init_uniform_data(UniformData& data) const
     // view matrices
     mat4x4 view;
     // +X
-    view.set(0.0f, 0.0f, -1.0f, 0.0f,
+    view.set(0.0f, 0.0f, 1.0f, 0.0f,
              0.0f, 1.0f, 0.0f, 0.0f,
              1.0f, 0.0f, 0.0f, 0.0f,
              0.0f, 0.0f, -1.0f, 1.0f);
     data.vp[0] = view * proj;
     // +Y
     view.set(1.0f, 0.0f, 0.0f, 0.0f,
-             0.0f, 0.0f, -1.0f, 0.0f,
-             0.0f, -1.0f, 0.0f, 0.0f,
+             0.0f, 0.0f, 1.0f, 0.0f,
+             0.0f, 1.0f, 0.0f, 0.0f,
              0.0f, 0.0f, -1.0f, 1.0f);
     data.vp[1] = view * proj;
     // +Z
     view.set(-1.0f, 0.0f, 0.0f, 0.0f,
              0.0f, 1.0f, 0.0f, 0.0f,
-             0.0f, 0.0f, -1.0f, 0.0f,
+             0.0f, 0.0f, 1.0f, 0.0f,
              0.0f, 0.0f, -1.0f, 1.0f);
     data.vp[2] = view * proj;
 
@@ -215,6 +222,9 @@ void VoxelizeMaterialSystem::init_debug_views(Context& context)
 
 void VoxelizeMaterialSystem::update(Context& context, SceneContext&, RenderContext& render_context)
 {
+    if (static_voxelized_ && !settings_.shared.dbsettings.rebuild_every_frame)
+        return;
+
     context.materials[id()].clear();
 
     atomic_counter_.set(0);
@@ -246,6 +256,7 @@ void VoxelizeMaterialSystem::update(Context& context, SceneContext&, RenderConte
             draw_call.barrier = memory_barrier_image_access | memory_barrier_atomic_counter;
         }
     }
+    static_voxelized_ = true;
 }
 
 }
