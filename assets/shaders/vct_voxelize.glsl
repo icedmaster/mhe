@@ -60,7 +60,7 @@ void main()
     for (int i = 0; i < 3; ++i)
     {
         vec4 proj_pos = vp[main_axis] * vec4(vsoutput[i].pos, 1.0f);
-        proj_pos.xyz += normalize(proj_pos.xyz - pos_middle_cs) * 0.5f / grid_size.x; 
+        proj_pos.xyz += normalize(proj_pos.xyz - pos_middle_cs) * grid_size.w * 0.5f;
         gsoutput.pos = (worldspace_to_voxelspace * vec4(vsoutput[i].pos, 1.0f)).xyz;
         gsoutput.nrm = vsoutput[i].nrm;
         gsoutput.tex = vsoutput[i].tex;

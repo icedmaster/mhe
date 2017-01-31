@@ -75,9 +75,9 @@ bool VoxelizeMaterialSystem::init(Context& context, const MaterialSystemContext&
     if (material_system_context.deserializer != nullptr)
         settings_.shared.dbsettings.read(*material_system_context.deserializer);
 
-    settings_.shared.dbsettings.cell_size = 4.0f;
-    settings_.shared.dbsettings.size.set(64);
-    settings_.shared.dbsettings.rebuild_every_frame = true;
+    settings_.shared.dbsettings.cell_size = 10.0f;
+    settings_.shared.dbsettings.size.set(128);
+    settings_.shared.dbsettings.rebuild_every_frame = false;
 
     TextureDesc texture_desc;
     texture_desc.address_mode_r = texture_clamp;
@@ -172,21 +172,21 @@ void VoxelizeMaterialSystem::init_uniform_data(UniformData& data) const
     // view matrices
     mat4x4 view;
     // +X
-    view.set(0.0f, 0.0f, 1.0f, 0.0f,
+    view.set(0.0f, 0.0f, -1.0f, 0.0f,
              0.0f, 1.0f, 0.0f, 0.0f,
              1.0f, 0.0f, 0.0f, 0.0f,
              0.0f, 0.0f, -1.0f, 1.0f);
     data.vp[0] = view * proj;
     // +Y
     view.set(1.0f, 0.0f, 0.0f, 0.0f,
-             0.0f, 0.0f, 1.0f, 0.0f,
-             0.0f, 1.0f, 0.0f, 0.0f,
+             0.0f, 0.0f, -1.0f, 0.0f,
+             0.0f, -1.0f, 0.0f, 0.0f,
              0.0f, 0.0f, -1.0f, 1.0f);
     data.vp[1] = view * proj;
     // +Z
     view.set(-1.0f, 0.0f, 0.0f, 0.0f,
              0.0f, 1.0f, 0.0f, 0.0f,
-             0.0f, 0.0f, 1.0f, 0.0f,
+             0.0f, 0.0f, -1.0f, 0.0f,
              0.0f, 0.0f, -1.0f, 1.0f);
     data.vp[2] = view * proj;
 
