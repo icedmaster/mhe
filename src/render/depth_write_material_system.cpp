@@ -152,7 +152,7 @@ void DepthWriteMaterialSystem::update(Context& context, SceneContext& scene_cont
                 draw_call.render_target = render_targets_[light_data_index];
 
                 draw_call.command = &clear_commands_[light_data_index];
-                draw_call.pass = light_data_index;
+                draw_call.pass = static_cast<uint8_t>(light_data_index);
             }
         }
         ++light_data_index;

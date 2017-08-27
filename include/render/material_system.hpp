@@ -45,8 +45,8 @@ struct MaterialSystemContext
     string defs[max_material_definitions];
     KeyValue<string, string> options;
     size_t material_instances_number;
-    size_t priority;
     res::Deserializer* deserializer;
+    uint8_t priority;
 
     MaterialSystemContext() : material_instances_number(0), deserializer(nullptr) {}
 };

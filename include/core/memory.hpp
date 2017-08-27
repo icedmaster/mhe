@@ -23,37 +23,22 @@ MHE_EXPORT void print_memory_info();
 
 inline void* allocate(size_t size)
 {
-	return mhe::details::allocate(size);
+    return mhe::details::allocate(size);
 }
 
 inline void free(void* p)
 {
-	mhe::details::free(p);
+    mhe::details::free(p);
 }
 
 }
 
 #ifndef MHE_SYSTEM_NEW_DELETE
 
-inline void* operator new(size_t size)
-{
-	return mhe::details::allocate(size);
-}
-
-inline void* operator new[](size_t count)
-{
-	return mhe::details::allocate(count);
-}
-
-inline void operator delete(void* p)
-{
-	return mhe::details::free(p);
-}
-
-inline void operator delete[] (void* p)
-{
-	return mhe::details::free(p);
-}
+void* operator new(size_t size);
+void* operator new[](size_t count);
+void operator delete(void* p);
+void operator delete[](void* p);
 
 #endif
 

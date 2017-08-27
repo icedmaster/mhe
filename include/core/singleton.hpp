@@ -10,27 +10,28 @@ template <class T>
 class Singleton : public noncopyable
 {
 public:
-	static void create_singleton()
-	{
-		self_ = new T;
-	}
+    static void create_singleton()
+    {
+        ASSERT(self_ == nullptr, "Singleton has already been created");
+        self_ = new T;
+    }
 
-	static void destroy_singleton()
-	{
-		delete self_;
-	}
+    static void destroy_singleton()
+    {
+        delete self_;
+        self_ = nullptr;
+    }
 
-	static T& instance()
-	{
-		return *self_;
-		//static T self;
-		//return self;
-	}
+    static T& instance()
+    {
+        ASSERT(self_ != nullptr, "Invalid singleton");
+        return *self_;
+    }
 protected:
-	Singleton() {}
-	~Singleton() {}
+    Singleton() {}
+    ~Singleton() {}
 private:
-	static T* self_;
+    static T* self_;
 };
 
 template <class T>

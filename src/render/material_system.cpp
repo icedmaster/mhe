@@ -40,8 +40,8 @@ void MaterialSystem::standart_material_setup(Context& context, SceneContext& sce
     ASSERT(model_contexts, "Invalid model contexts");
 
     size_t layout_id = layout();
-    size_t material_system_id = id();
-    size_t shader_id = ubershader(context).get_default();
+    uint8_t material_system_id = id();
+    ShaderProgram::IdType shader_id = ubershader(context).get_default();
 
     for (size_t i = 0; i < count; ++i)
     {
@@ -58,7 +58,7 @@ void MaterialSystem::standart_material_setup(Context& context, SceneContext& sce
         ::memcpy(material.textures, material_data.textures, sizeof(TextureInstance) * material_textures_number);
 
         if (parts[i].render_data.layout == Layout::invalid_id)
-            parts[i].render_data.layout = layout_id;
+            parts[i].render_data.layout = static_cast<Layout::IdType>(layout_id);
 
         RenderState& render_state = create_and_get(context.render_state_pool);
         RenderStateDesc desc;

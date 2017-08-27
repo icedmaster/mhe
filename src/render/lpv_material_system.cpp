@@ -293,7 +293,7 @@ void LPVMaterialSystem::propagation(Context& context, RenderContext& render_cont
 
         draw_call.render_target = render_targets[render_target_index];
 
-        draw_call.pass = 2 + i;
+        draw_call.pass = static_cast<uint8_t>(2 + i);
         draw_call.command = &propagation_list_of_commands_;
 
         render_target_index ^= 1;

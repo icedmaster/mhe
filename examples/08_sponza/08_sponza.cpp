@@ -129,7 +129,7 @@ private:
         light.shadowmap_znear = 10.0f;
         light.shadowmap_zfar = 2200.0f;
         light.cast_shadows = true;
-        light.shadowmap_bias = 0.002;
+        light.shadowmap_bias = 0.002f;
         light_instance.enabled = true;
 
         directional_lights_[0] = light_instance.id;

@@ -80,7 +80,7 @@ public:
     void resize(size_t size)
     {
         ASSERT(size_ == 0, "Trying to resize a pool that is already in use");
-        capacity_ = size;
+        capacity_ = static_cast<I>(size);
         destroy_array(objects_, allocator_);
         destroy_array(indexes_, allocator_);
         objects_ = create_array<T>(size, allocator_);
@@ -168,7 +168,7 @@ public:
         last_ = capacity_ - 1;
         size_ = 0;
 
-        for (size_t i = 0; i < capacity_; ++i)
+        for (I i = 0; i < capacity_; ++i)
         {
             indexes_[i].id = i;
             indexes_[i].next = i + 1;
@@ -181,7 +181,7 @@ private:
     mutable I first_;
     mutable I last_;
     mutable I size_;
-    size_t capacity_;
+    I capacity_;
     allocator* allocator_;
 };
 

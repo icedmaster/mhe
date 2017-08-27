@@ -282,7 +282,7 @@ void CSMDepthRenderingMaterialSystem::update(Context& context, SceneContext& /*s
     context.materials[id()].clear();
     clear_command_.reset();
 
-    for (size_t pass = 0; pass < cascades_number_; ++pass)
+    for (uint8_t pass = 0; pass < cascades_number_; ++pass)
     {
         const bool* visibility = render_context.render_view_requests.frustum_culling_request_data(static_cast<ViewId>(shadowmap_view0 + pass)).result.visibility.data();
         size_t v = 0;

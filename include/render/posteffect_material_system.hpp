@@ -34,7 +34,7 @@ public:
 
     void set_viewports_number(size_t number)
     {
-        textures_number_ = number;
+        textures_number_ = static_cast<uint8_t>(number);
     }
 private:
     bool init_mesh(Context& context, const MaterialSystemContext& material_system_context);

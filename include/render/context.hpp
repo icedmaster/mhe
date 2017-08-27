@@ -52,7 +52,7 @@ public:
     void add(MaterialSystem* material_system, uint8_t priority = 128)
     {
         ASSERT(material_system != nullptr, "Invalid material_system");
-        material_system->set_id(systems_.size());
+        material_system->set_id(static_cast<uint8_t>(systems_.size()));
         material_system->set_priority(priority);
         systems_.push_back(ref_ptr<MaterialSystem>(material_system));
     }

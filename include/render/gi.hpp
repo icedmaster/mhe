@@ -91,9 +91,9 @@ class GISystem
 public:
     struct LPVParams
     {
-        size_t base_priority;
         int output_texture_format;
         float output_texture_scale;
+        uint8_t base_priority;
 
         LPVParams() : output_texture_format(format_rgb16f), output_texture_scale(1.0f) {}
     };

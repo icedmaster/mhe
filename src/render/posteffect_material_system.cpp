@@ -66,7 +66,7 @@ bool PosteffectDebugMaterialSystem::init_mesh_instance(Context& context, MeshIns
         ERROR_LOG("Can't create fullscreen quad");
         return false;
     }
-    mesh_instance.mesh.parts[0].render_data.layout = layout();
+    mesh_instance.mesh.parts[0].render_data.layout = static_cast<Layout::IdType>(layout());
 
     RenderState& render_state = create_and_get(context.render_state_pool);
 
@@ -151,7 +151,7 @@ void PosteffectDebugMaterialSystem::set_render_target(const RenderTarget& render
     size_t color_textures_number = render_target.color_textures(textures_);
     size_t depth_textures_number = render_target.depth_texture(textures_[max_textures_number - 1]);
     texture_type_mask_ = depth_textures_number == 0 ? 0 : (1 << 3);
-    textures_number_ = color_textures_number + depth_textures_number;
+    textures_number_ = static_cast<uint8_t>(color_textures_number + depth_textures_number);
 }
 
 PosteffectMaterialSystemBase::PosteffectMaterialSystemBase(const char* name) :
@@ -241,7 +241,7 @@ bool PosteffectMaterialSystemBase::init_mesh(Context& context, const MaterialSys
         ERROR_LOG("Can't create fullscreen quad");
         return false;
     }
-    mesh_.mesh.parts[0].render_data.layout = layout();
+    mesh_.mesh.parts[0].render_data.layout = static_cast<Layout::IdType>(layout());
 
     RenderState& render_state = create_and_get(context.render_state_pool);
 
@@ -1143,7 +1143,7 @@ void BloomMaterialSystem::copy(Context& context, DrawCall& draw_call, RenderTarg
     viewport_desc.viewport.set(0, 0, dst.width(), dst.height());
     render_state.update_viewport(viewport_desc);
     draw_call.render_state = render_states_[pass];
-    draw_call.pass = pass + 1;
+    draw_call.pass = static_cast<uint8_t>(pass + 1);
     draw_call.command = &clear_command_simple_;
     Material& material = context.materials[id()].get(materials_[pass]);
     draw_call.material.id = materials_[pass];
