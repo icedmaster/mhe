@@ -77,7 +77,7 @@ bool VoxelizeMaterialSystem::init(Context& context, const MaterialSystemContext&
 
     settings_.shared.dbsettings.cell_size = 10.0f;
     settings_.shared.dbsettings.size.set(128);
-    settings_.shared.dbsettings.rebuild_every_frame = false;
+    settings_.shared.dbsettings.rebuild_every_frame = true;
 
     TextureDesc texture_desc;
     texture_desc.address_mode_r = texture_clamp;
@@ -163,12 +163,15 @@ bool VoxelizeMaterialSystem::init(Context& context, const MaterialSystemContext&
 
 void VoxelizeMaterialSystem::init_uniform_data(UniformData& data) const
 {
-    data.grid_size = vec4(settings_.shared.dbsettings.size, settings_.shared.dbsettings.cell_size);
+    // assuming that all dimension are the same can use .x() here
+    const float rasterization_offset = settings_.shared.dbsettings.cell_size / settings_.shared.dbsettings.size.x() * 0.5f;
+    data.grid_size = vec4(settings_.shared.dbsettings.size, rasterization_offset);
 
+    vec3 world_size = data.grid_size.xyz() * settings_.shared.dbsettings.cell_size * 0.5f;
     mat4x4 proj;
-    proj.set_ortho(0.0f, static_cast<float>(settings_.shared.dbsettings.size.x()),
-        0.0f, static_cast<float>(settings_.shared.dbsettings.size.y()),
-        0.0f, static_cast<float>(settings_.shared.dbsettings.size.z()));
+    proj.set_ortho(-world_size.x(), world_size.x(),
+        -world_size.y(), world_size.y(),
+        -world_size.z(), world_size.z());
     // view matrices
     mat4x4 view;
     // +X
@@ -178,9 +181,9 @@ void VoxelizeMaterialSystem::init_uniform_data(UniformData& data) const
              0.0f, 0.0f, -1.0f, 1.0f);
     data.vp[0] = view * proj;
     // +Y
-    view.set(1.0f, 0.0f, 0.0f, 0.0f,
+    view.set(0.0f, 1.0f, 0.0f, 0.0f,
              0.0f, 0.0f, -1.0f, 0.0f,
-             0.0f, -1.0f, 0.0f, 0.0f,
+             -1.0f, 0.0f, 0.0f, 0.0f,
              0.0f, 0.0f, -1.0f, 1.0f);
     data.vp[1] = view * proj;
     // +Z

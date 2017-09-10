@@ -2,8 +2,8 @@
 
 struct VSOutput
 {
-	vec3 pos;
-	vec3 nrm;
+    vec3 pos;
+    vec3 nrm;
     vec2 tex;
 };
 
@@ -24,8 +24,8 @@ out VSOutput vsoutput;
 
 void main()
 {
-	vsoutput.pos = (model * vec4(pos, 1.0f)).xyz;
-	vsoutput.nrm = (normal * vec4(nrm, 0.0f)).xyz;
+    vsoutput.pos = (model * vec4(pos, 1.0f)).xyz;
+    vsoutput.nrm = (normal * vec4(nrm, 0.0f)).xyz;
     vsoutput.tex = tex;
 }
 
@@ -57,17 +57,19 @@ void main()
     vec3 pos_middle = (vsoutput[0].pos + vsoutput[1].pos + vsoutput[2].pos) / 3.0f;
     vec3 pos_middle_cs = (vp[main_axis] * vec4(pos_middle, 1.0f)).xyz;
 
+    float rasterization_offset = grid_size.w;
+
     for (int i = 0; i < 3; ++i)
     {
         vec4 proj_pos = vp[main_axis] * vec4(vsoutput[i].pos, 1.0f);
-        proj_pos.xyz += normalize(proj_pos.xyz - pos_middle_cs) * grid_size.w * 0.5f;
+        proj_pos.xyz += normalize(proj_pos.xyz - pos_middle_cs) * rasterization_offset;
         gsoutput.pos = (worldspace_to_voxelspace * vec4(vsoutput[i].pos, 1.0f)).xyz;
         gsoutput.nrm = vsoutput[i].nrm;
         gsoutput.tex = vsoutput[i].tex;
         gl_Position = proj_pos;
-		EmitVertex();
+        EmitVertex();
     }
-	EndPrimitive();
+    EndPrimitive();
 }
 
 [fragment]
